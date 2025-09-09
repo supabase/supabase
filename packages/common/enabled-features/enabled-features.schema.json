@@ -112,6 +112,10 @@
       "description": "Enable the database roles page"
     },
 
+    "docs:compliance": {
+      "type": "boolean",
+      "description": "Enable documentation on compliance"
+    },
     "docs:self-hosting": {
       "type": "boolean",
       "description": "Enable documentation for self-hosting"
@@ -258,6 +262,7 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
+    "docs:compliance",
     "docs:self-hosting",
     "feedback:docs",
     "integrations:vercel",

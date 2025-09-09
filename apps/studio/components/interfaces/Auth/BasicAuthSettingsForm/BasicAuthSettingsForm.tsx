@@ -41,7 +41,7 @@ const schema = object({
   SITE_URL: string().required('Must have a Site URL'),
 })
 
-const BasicAuthSettingsForm = () => {
+export const BasicAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const showManualLinking = useIsFeatureEnabled('authentication:show_manual_linking')
 
@@ -333,5 +333,3 @@ const BasicAuthSettingsForm = () => {
     </ScaffoldSection>
   )
 }
-
-export default BasicAuthSettingsForm

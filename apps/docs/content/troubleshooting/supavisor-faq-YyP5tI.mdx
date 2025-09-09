@@ -33,7 +33,7 @@ They sit between the database and your client servers. They are solely optimized
 
 ### Where are the connection strings
 
-Supabase provides 3 database connection strings that can be used simultaneously if necessary. You can find them on the dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+Supabase provides 3 database connection strings that can be used simultaneously if necessary. You can find them on the dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
 <img
   width="999"
@@ -89,7 +89,7 @@ Now, imagine the tournament organizers decide to expand the venue to house 200 p
 
 ### In the context of Supavisor, what does "pool size" mean?
 
-"Pool size" refers to the maximum number of direct connections the pooler can maintain per unique user, database, and mode combination. You can adjust it in the [project connect page](https://supabase.com/dashboard/project/_?showConnect=true) to strike a balance between efficient resource utilization and accommodating peak traffic.
+"Pool size" refers to the maximum number of direct connections the pooler can maintain per unique user, database, and mode combination. You can adjust it in the [project connect page](/dashboard/project/_?showConnect=true) to strike a balance between efficient resource utilization and accommodating peak traffic.
 
 ### What is the "user+db+mode" combination?
 
@@ -129,7 +129,7 @@ No, it doesn't. Let's break it down:
 
 ### **How to change pool size**
 
-In the [Dashboard's Database Settings](https://supabase.com/dashboard/project/_/database/settings), you can configure Supavisor's "Pool Size":
+In the [Dashboard's Database Settings](/dashboard/project/_/database/settings), you can configure Supavisor's "Pool Size":
 
 <img
   width="673"
@@ -137,7 +137,7 @@ In the [Dashboard's Database Settings](https://supabase.com/dashboard/project/_/
   src="https://github.com/supabase/supabase/assets/91111415/ce9e9d28-67c2-4dd2-ac0a-0a0150e63b4f"
 />
 
-You can also change the pool size for PostgREST's (DB API) internal pooler at the bottom of the [application settings](https://supabase.com/dashboard/project/_/settings/api).
+You can also change the pool size for PostgREST's (DB API) internal pooler at the bottom of the [application settings](/dashboard/project/_/settings/api).
 
 ### Do all services on Supabase use Supavisor?
 
@@ -159,13 +159,13 @@ As a rule of thumb, if you're using the DB REST API or multiple app-based "user+
 
 Connection usage can be monitored with a Supabase Grafana Dashboard. It provides realtime visibility of over 200 database metrics, such as graphs of CPU, EBS, and active direct/pooler connections. It can be extremely useful for monitoring and debugging instances.
 
-You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). Refer to Supabase [documentation](https://supabase.com/docs/guides/platform/metrics) to learn more about the metrics endpoint.
+You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). Refer to Supabase [documentation](/docs/guides/platform/metrics) to learn more about the metrics endpoint.
 
 ### **Can Supavisor really support a million connections?**
 
 It depends.
 
-In the article ["Supavisor: Scaling Postgres to 1 Million Connections"](https://supabase.com/blog/supavisor-1-million) we gave Supavisor the capacity to connect to a million clients simultaneously. The pooler triaged the clients' queries to 400 database connections.
+In the article ["Supavisor: Scaling Postgres to 1 Million Connections"](/blog/supavisor-1-million) we gave Supavisor the capacity to connect to a million clients simultaneously. The pooler triaged the clients' queries to 400 database connections.
 
 What is important is that the database processing these queries had 64vCPUs and 256GB of memory. It could process the queries fast enough to ensure that there was never a noticeable bottleneck. The clients never waited long enough to timeout. If the clients were asking to run inefficient queries, like the one below, a severe backlog of pending client queries would have formed:
 
