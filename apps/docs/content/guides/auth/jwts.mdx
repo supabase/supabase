@@ -106,6 +106,8 @@ const supabase = createClient(
 
 </TabPanel>
 
+<$Show if="sdk:dart">
+
 <TabPanel id="dart" label="Flutter">
 
 ```dart
@@ -120,6 +122,9 @@ await Supabase.initialize(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:swift">
 
 <TabPanel id="swift" label="Swift (iOS)">
 
@@ -140,6 +145,9 @@ let supabase = SupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:kotlin">
 
 <TabPanel id="kotlin" label="Kotlin">
 
@@ -155,6 +163,7 @@ val supabase = createSupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 

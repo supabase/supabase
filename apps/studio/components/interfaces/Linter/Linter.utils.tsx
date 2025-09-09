@@ -300,6 +300,15 @@ export const lintInfoMap: LintInfo[] = [
     docsLink: 'https://supabase.com/docs/guides/auth/auth-mfa',
     category: 'security',
   },
+  {
+    name: 'vulnerable_postgres_version',
+    title: 'Postgres version has security patches available',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/infrastructure`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/upgrading',
+    category: 'security',
+  },
 ]
 
 export const LintCTA = ({
