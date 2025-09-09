@@ -34,7 +34,14 @@ import { TotalUsage } from './TotalUsage'
 const Usage = () => {
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
-  const [selectedProjectRef, setSelectedProjectRef] = useState<string | undefined>('all-projects')
+  const [selectedProjectRefInputValue, setSelectedProjectRefInputValue] = useState<
+    string | undefined
+  >('all-projects')
+
+  // [Alaister] 'all-projects' is not a valid project ref, it's just used as an extra
+  // state for the select input. As such we need to remove it for the selected project ref
+  const selectedProjectRef =
+    selectedProjectRefInputValue === 'all-projects' ? undefined : selectedProjectRefInputValue
 
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -58,7 +65,7 @@ const Usage = () => {
   useEffect(() => {
     if (projectRef && isSuccess && orgProjects !== undefined) {
       if (orgProjects.find((project) => project.ref === projectRef)) {
-        setSelectedProjectRef(projectRef)
+        setSelectedProjectRefInputValue(projectRef)
       }
     }
     // [Joshen] Since we're already looking at isSuccess
@@ -164,10 +171,10 @@ const Usage = () => {
                   />
 
                   <Select_Shadcn_
-                    value={selectedProjectRef}
+                    value={selectedProjectRefInputValue}
                     onValueChange={(value) => {
-                      if (value === 'all-projects') setSelectedProjectRef('all-projects')
-                      else setSelectedProjectRef(value)
+                      if (value === 'all-projects') setSelectedProjectRefInputValue('all-projects')
+                      else setSelectedProjectRefInputValue(value)
                     }}
                   >
                     <SelectTrigger_Shadcn_ size="tiny" className="w-[180px]">
@@ -227,7 +234,7 @@ const Usage = () => {
         </ScaffoldContainer>
       </div>
 
-      {selectedProjectRef && selectedProjectRef !== 'all-projects' ? (
+      {selectedProjectRef ? (
         <ScaffoldContainer className="mt-5">
           <Admonition
             type="default"
