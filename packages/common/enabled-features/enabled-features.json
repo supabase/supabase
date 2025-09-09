@@ -32,6 +32,7 @@
   "database:replication": true,
   "database:roles": true,
 
+  "docs:compliance": false,
   "docs:self-hosting": true,
 
   "feedback:docs": true,
