@@ -80,9 +80,15 @@ export const ReportChartV2 = ({
     }
   }, [attributesMatchDataProperties, chartData, report.id])
 
+  /**
+   * Depending on the source the timestamp key could be 'timestamp' or 'period_start'
+   */
+  const firstItem = chartData[0]
+  const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
+
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
     chartData,
-    'timestamp',
+    timestampKey,
     (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
     0,
     startDate,
@@ -112,21 +118,6 @@ export const ReportChartV2 = ({
           isFetching && 'opacity-50'
         )}
       >
-        {!attributesMatchDataProperties && finalChartData.length > 0 ? (
-          <div className="w-full">
-            ERROR: The attributes do not match the data
-            <div className="w-full flex gap-1">
-              <pre className="w-1/2">
-                Attributes
-                {JSON.stringify(dynamicAttributes, null, 2)}
-              </pre>
-              <pre className="w-1/2">
-                Data
-                {JSON.stringify(finalChartData, null, 2)}
-              </pre>
-            </div>
-          </div>
-        ) : null}
         {isLoadingChart ? (
           <Loader2 className="size-5 animate-spin text-foreground-light" />
         ) : isErrorState ? (
@@ -137,7 +128,7 @@ export const ReportChartV2 = ({
           <div className="w-full">
             <ComposedChart
               attributes={dynamicAttributes}
-              data={finalChartData}
+              data={filledChartData}
               format={report.format ?? undefined}
               xAxisKey={report.xAxisKey ?? 'timestamp'}
               yAxisKey={report.yAxisKey ?? dynamicAttributes[0]?.attribute}
