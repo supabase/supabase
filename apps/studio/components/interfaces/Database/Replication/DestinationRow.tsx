@@ -10,9 +10,7 @@ import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/p
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
 import { Pipeline } from 'data/replication/pipelines-query'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
-import { useUpdatePipelineVersionMutation } from 'data/replication/update-pipeline-version-mutation'
 import { AlertCircle } from 'lucide-react'
 import {
   PipelineStatusRequestStatus,
@@ -30,11 +28,11 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 
 interface DestinationRowProps {
-  sourceId: number | undefined
+  sourceId?: number
   destinationId: number
   destinationName: string
   type: string
-  pipeline: Pipeline | undefined
+  pipeline?: Pipeline
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
@@ -78,8 +76,6 @@ export const DestinationRow = ({
 
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
-  const { mutateAsync: updatePipelineVersion } = useUpdatePipelineVersionMutation({})
-  const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
@@ -99,43 +95,6 @@ export const DestinationRow = ({
     pipelineId: pipeline?.id,
   })
   const hasUpdate = Boolean(versionData?.new_version)
-  const performUpdateAndRestart = async () => {
-    if (!projectRef || !pipeline?.id) return
-    const versionId = versionData?.new_version?.id
-    if (!versionId) return
-
-    // Step 1: Update to the new version
-    try {
-      await updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
-    } catch (e: any) {
-      // 404: default changed; version cache will refresh via mutation onError. Keep dialog open.
-      if (e?.code === 404) return
-      // Other errors are already toasted by the mutation; do not double-toast here.
-      return
-    }
-
-    // Step 2: Reflect optimistic restart (only if currently active) and close any panels
-    const isActive =
-      statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-    setShowEditDestinationPanel(false)
-    setShowUpdateVersionModal(false)
-
-    if (isActive) {
-      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-
-      // Step 3: Restart the pipeline
-      try {
-        await startPipeline({ projectRef, pipelineId: pipeline.id })
-        toast.success('Pipeline successfully updated and is currently restarting')
-      } catch (e: any) {
-        // Clear optimistic state and surface a single concise error
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-        toast.error('Failed to restart pipeline')
-      }
-    } else {
-      toast.success('Pipeline successfully updated')
-    }
-  }
 
   const onDeleteClick = async () => {
     if (!projectRef) {
@@ -247,6 +206,7 @@ export const DestinationRow = ({
           </Table.td>
         </Table.tr>
       )}
+
       <DeleteDestination
         visible={showDeleteDestinationForm}
         setVisible={setShowDeleteDestinationForm}
@@ -254,6 +214,7 @@ export const DestinationRow = ({
         isLoading={isDeleting}
         name={destinationName}
       />
+
       <DestinationPanel
         visible={showEditDestinationPanel}
         onClose={() => setShowEditDestinationPanel(false)}
@@ -267,12 +228,11 @@ export const DestinationRow = ({
           statusName,
         }}
       />
+
       <UpdateVersionModal
         visible={showUpdateVersionModal}
-        currentVersionName={versionData?.version?.name}
-        newVersionName={versionData?.new_version?.name}
-        onCancel={() => setShowUpdateVersionModal(false)}
-        onConfirm={performUpdateAndRestart}
+        pipeline={pipeline}
+        onClose={() => setShowUpdateVersionModal(false)}
         confirmLabel={
           statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
             ? 'Update and restart'
