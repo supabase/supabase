@@ -147,6 +147,9 @@ type PlanNodeData = {
   actualTotalTime?: number
   actualRows?: number
   actualLoops?: number
+  // Estimation
+  estFactor?: number
+  estActualTotalRows?: number
   rowsRemovedByFilter?: number
   rowsRemovedByIndexRecheck?: number
   heapFetches?: number
@@ -251,6 +254,12 @@ const buildGraphFromPlan = (
     const nodeTimeIncl = (plan['Actual Total Time'] ?? 0) * loops
     const nodeCostIncl = plan['Total Cost'] ?? 0
 
+    // Estimation factor calculation
+    const actualRowsPerLoop = plan['Actual Rows'] ?? 0
+    const actualRowsTotal = actualRowsPerLoop * loops
+    const planRowsEst = plan['Plan Rows'] ?? 0
+    const estFactor = planRowsEst > 0 ? actualRowsTotal / planRowsEst : undefined
+
     const nodeSharedHit = plan['Shared Hit Blocks'] ?? 0
     const nodeSharedRead = plan['Shared Read Blocks'] ?? 0
     const nodeSharedDirtied = plan['Shared Dirtied Blocks'] ?? 0
@@ -302,6 +311,8 @@ const buildGraphFromPlan = (
       actualTotalTime: plan['Actual Total Time'],
       actualRows: plan['Actual Rows'],
       actualLoops: plan['Actual Loops'],
+      estFactor: estFactor,
+      estActualTotalRows: actualRowsTotal,
       rowsRemovedByFilter: plan['Rows Removed by Filter'],
       rowsRemovedByIndexRecheck: plan['Rows Removed by Index Recheck'],
       heapFetches: plan['Heap Fetches'],
@@ -488,6 +499,29 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
                 {data.actualRows !== undefined ? data.actualRows : '-'}
                 {data.planRows !== undefined ? ` / est ${data.planRows}` : ''}
               </span>
+            </div>
+          </li>
+        )}
+        {/* Estimation factor (actual_total / plan_est) */}
+        {typeof data.estFactor === 'number' && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+            title={
+              typeof data.estActualTotalRows === 'number' && typeof data.planRows === 'number'
+                ? `actual_total_rows: ${data.estActualTotalRows} / plan_rows: ${data.planRows}`
+                : undefined
+            }
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>Estimation Factor</span>
+              <span>{data.estFactor.toFixed(2)}×</span>
             </div>
           </li>
         )}
