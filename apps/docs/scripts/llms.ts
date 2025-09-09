@@ -2,12 +2,13 @@ import './utils/dotenv.js'
 
 import 'dotenv/config'
 import fs from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
 import {
   fetchCliLibReferenceSource,
   fetchCSharpLibReferenceSource,
   fetchDartLibReferenceSource,
   fetchGuideSources,
+  fetchGuidesForCategory,
+  getGuideCategories,
   fetchJsLibReferenceSource,
   fetchKtLibReferenceSource,
   fetchPythonLibReferenceSource,
@@ -28,12 +29,29 @@ function toLink(source: Source) {
   return `[${source.title}](https://supabase.com/${source.relPath})`
 }
 
-const SOURCES: Source[] = [
-  {
-    title: 'Supabase Guides',
-    relPath: 'llms/guides.txt',
-    fetch: fetchGuideSources,
-  },
+// Dynamic function to generate guide sources
+async function generateGuideSources(): Promise<Source[]> {
+  const categories = await getGuideCategories()
+
+  const guideSources: Source[] = [
+    // Keep the main guides.txt for backward compatibility
+    {
+      title: 'Supabase Guides (All)',
+      relPath: 'llms/guides.txt',
+      fetch: fetchGuideSources,
+    },
+    // Add category-specific sources
+    ...categories.map((category) => ({
+      title: category.title,
+      relPath: `${category.urlPath}/llms.txt`,
+      fetch: () => fetchGuidesForCategory(category.path),
+    })),
+  ]
+
+  return guideSources
+}
+
+const REFERENCE_SOURCES: Source[] = [
   {
     title: 'Supabase Reference (JavaScript)',
     relPath: 'llms/js.txt',
@@ -92,10 +110,10 @@ const SOURCES: Source[] = [
   },
 ]
 
-async function generateMainLlmsTxt() {
-  const sourceLinks = SOURCES.map((source) => `- ${toLink(source)}`).join('\n')
+async function generateMainLlmsTxt(allSources: Source[]) {
+  const sourceLinks = allSources.map((source) => `- ${toLink(source)}`).join('\n')
   const fullText = `# Supabase Docs\n\n${sourceLinks}`
-  fs.writeFile('public/llms.txt', fullText)
+  await fs.writeFile('public/llms.txt', fullText)
 }
 
 async function generateSourceLlmsTxt(sourceDefn: Source) {
@@ -108,18 +126,26 @@ async function generateSourceLlmsTxt(sourceDefn: Source) {
     .join('\n\n')
   const fullText = sourceDefn.title + '\n\n' + sourceText
 
-  fs.writeFile(`public/${sourceDefn.relPath}`, fullText)
+  // Ensure directory exists
+  const dirPath = `public/${sourceDefn.relPath}`.split('/').slice(0, -1).join('/')
+  await fs.mkdir(dirPath, { recursive: true })
+
+  await fs.writeFile(`public/${sourceDefn.relPath}`, fullText)
 }
 
 async function generateLlmsTxt() {
   try {
     await fs.mkdir('public/llms', { recursive: true })
-    await Promise.all([generateMainLlmsTxt(), ...SOURCES.map(generateSourceLlmsTxt)])
+
+    // Generate guide sources dynamically
+    const guideSources = await generateGuideSources()
+    const allSources = [...guideSources, ...REFERENCE_SOURCES]
+
+    await Promise.all([generateMainLlmsTxt(allSources), ...allSources.map(generateSourceLlmsTxt)])
   } catch (err) {
     console.error(err)
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  generateLlmsTxt()
-}
+// Run the function when this script is executed directly
+generateLlmsTxt()
