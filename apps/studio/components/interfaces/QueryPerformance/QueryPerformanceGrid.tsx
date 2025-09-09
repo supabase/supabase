@@ -36,7 +36,7 @@ interface QueryPerformanceGridProps {
 }
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
-  const { setSortConfig } = useQueryPerformanceSort()
+  const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { preset, sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
@@ -84,7 +84,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                     onClick={() => {
                       setSortConfig(col.id, 'asc')
                     }}
-                    className="flex gap-2"
+                    className={cn(
+                      'flex gap-2',
+                      sort?.column === col.id && sort?.order === 'asc' && 'text-foreground'
+                    )}
                   >
                     <ArrowUp size={14} />
                     Sort Ascending
@@ -93,7 +96,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                     onClick={() => {
                       setSortConfig(col.id, 'desc')
                     }}
-                    className="flex gap-2"
+                    className={cn(
+                      'flex gap-2',
+                      sort?.column === col.id && sort?.order === 'desc' && 'text-foreground'
+                    )}
                   >
                     <ArrowDown size={14} />
                     Sort Descending
