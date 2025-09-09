@@ -127,10 +127,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                         )}
                       >
                         {(is400 || is500) && (
-                          <CriticalIcon
-                            hideBackground
-                            className={cn(is400 && 'text-warning-600')}
-                          />
+                          <CriticalIcon hideBackground className={cn(is400 && 'text-warning')} />
                         )}
                         {status}
                       </div>

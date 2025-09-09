@@ -24,10 +24,17 @@
 
   "billing:all": true,
 
+  "dashboard_auth:sign_up": true,
+  "dashboard_auth:sign_in_with_github": true,
+  "dashboard_auth:sign_in_with_sso": true,
+  "dashboard_auth:sign_in_with_email": true,
+
   "database:replication": true,
   "database:roles": true,
 
   "docs:self-hosting": true,
+
+  "feedback:docs": true,
 
   "integrations:vercel": true,
   "integrations:show_stripe_wrapper": true,
