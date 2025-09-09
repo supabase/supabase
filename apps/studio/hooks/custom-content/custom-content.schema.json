@@ -81,6 +81,11 @@
         "type": "string",
         "enum": ["AWS", "AWS_K8S", "AWS_NIMBUS", "FLY"]
       }
+    },
+
+    "ssl:certificate_url": {
+      "type": "string",
+      "description": "The URL of the SSL certificate"
     }
   },
   "required": [
@@ -88,7 +93,8 @@
     "project_homepage:example_projects",
     "logs:default_query",
     "connect:frameworks",
-    "infra:cloud_providers"
+    "infra:cloud_providers",
+    "ssl:certificate_url"
   ],
   "additionalProperties": false
 }
