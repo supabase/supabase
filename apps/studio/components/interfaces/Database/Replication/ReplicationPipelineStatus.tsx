@@ -191,7 +191,8 @@ export const ReplicationPipelineStatus = () => {
               />
             </div>
           </div>
-          <div className="flex items-center gap-x-4">
+
+          <div className="flex items-center gap-x-2">
             {hasUpdate && (
               <Button
                 type="primary"
@@ -201,46 +202,44 @@ export const ReplicationPipelineStatus = () => {
                 Update available
               </Button>
             )}
-            <div className="flex items-center gap-x-2">
-              <Input
-                icon={<Search size={12} />}
-                className="pl-7 h-[26px] text-xs"
-                placeholder="Search for tables"
-                value={filterString}
-                disabled={isPipelineError}
-                onChange={(e) => setFilterString(e.target.value)}
-                actions={
-                  filterString.length > 0
-                    ? [
-                        <X
-                          key="close"
-                          className="mx-2 cursor-pointer text-foreground"
-                          size={14}
-                          strokeWidth={2}
-                          onClick={() => setFilterString('')}
-                        />,
-                      ]
-                    : undefined
-                }
-              />
+            <Input
+              icon={<Search size={12} />}
+              className="pl-7 h-[26px] text-xs"
+              placeholder="Search for tables"
+              value={filterString}
+              disabled={isPipelineError}
+              onChange={(e) => setFilterString(e.target.value)}
+              actions={
+                filterString.length > 0
+                  ? [
+                      <X
+                        key="close"
+                        className="mx-2 cursor-pointer text-foreground"
+                        size={14}
+                        strokeWidth={2}
+                        onClick={() => setFilterString('')}
+                      />,
+                    ]
+                  : undefined
+              }
+            />
 
-              <Button asChild type="default">
-                <Link href={logsUrl}>View logs</Link>
-              </Button>
+            <Button asChild type="default">
+              <Link href={logsUrl}>View logs</Link>
+            </Button>
 
-              <Button
-                type={statusName === 'stopped' ? 'primary' : 'default'}
-                onClick={onPrimaryAction}
-                loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
-                disabled={
-                  isEnablingDisabling ||
-                  !PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
-                }
-                icon={icon}
-              >
-                {label}
-              </Button>
-            </div>
+            <Button
+              type={statusName === 'stopped' ? 'primary' : 'default'}
+              onClick={onPrimaryAction}
+              loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
+              disabled={
+                isEnablingDisabling ||
+                !PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
+              }
+              icon={icon}
+            >
+              {label}
+            </Button>
           </div>
         </div>
 
