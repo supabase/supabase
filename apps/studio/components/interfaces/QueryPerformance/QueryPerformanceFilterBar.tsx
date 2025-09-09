@@ -1,7 +1,7 @@
-import { RefreshCw, Search } from 'lucide-react'
-import { parseAsString, parseAsArrayOf, useQueryStates } from 'nuqs'
-import { useState, useEffect } from 'react'
 import { useDebounce } from '@uidotdev/usehooks'
+import { RefreshCw, Search } from 'lucide-react'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
@@ -31,17 +31,9 @@ export const QueryPerformanceFilterBar = ({
     roles: parseAsArrayOf(parseAsString).withDefault([]),
   })
 
-  const onSearchQueryChange = (value: string) => {
-    setSearchParams({ search: value || '' })
-  }
-
   const [inputValue, setInputValue] = useState(searchQuery)
   const debouncedInputValue = useDebounce(inputValue, 500)
-
-  useEffect(() => {
-    onSearchQueryChange(debouncedInputValue)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedInputValue])
+  const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
 
   const [filters, setFilters] = useState<{ roles: string[]; query: string }>({
     roles: defaultFilterRoles,
@@ -60,6 +52,15 @@ export const QueryPerformanceFilterBar = ({
     setSearchParams({ roles })
   }
 
+  const onSearchQueryChange = (value: string) => {
+    setSearchParams({ search: value || '' })
+  }
+
+  useEffect(() => {
+    onSearchQueryChange(searchValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue])
+
   return (
     <div className="px-6 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center">
       <div className="flex items-center gap-x-4">
@@ -69,7 +70,7 @@ export const QueryPerformanceFilterBar = ({
             autoComplete="off"
             icon={<Search size={12} />}
             value={inputValue}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
             name="keyword"
             id="keyword"
             placeholder="Filter by query"
