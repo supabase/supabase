@@ -347,7 +347,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>rows</span>
+              <span>Rows</span>
               <span>
                 {data.actualRows !== undefined ? data.actualRows : '-'}
                 {data.planRows !== undefined ? ` / est ${data.planRows}` : ''}
@@ -369,7 +369,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>cost</span>
+              <span>Cost</span>
               <span>
                 {data.startupCost !== undefined ? data.startupCost : '-'}
                 {data.totalCost !== undefined ? ` → ${data.totalCost}` : ''}
@@ -391,8 +391,8 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>width</span>
-              <span>{data.planWidth}</span>
+              <span>Plan Width</span>
+              <span>{data.planWidth} bytes</span>
             </div>
           </li>
         )}
@@ -427,7 +427,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>removed (recheck)</span>
+              <span>Removed (recheck)</span>
               <span>{data.rowsRemovedByIndexRecheck}</span>
             </div>
           </li>
@@ -444,7 +444,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>heapfetches</span>
+              <span>Heap Fetches</span>
               <span>{data.heapFetches}</span>
             </div>
           </li>
@@ -463,7 +463,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>shared</span>
+              <span>Shared</span>
               <span>
                 h:{data.sharedHit ?? 0} r:{data.sharedRead ?? 0}
                 {typeof data.sharedWritten === 'number' ? ` w:${data.sharedWritten}` : ''}
@@ -483,7 +483,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>temp</span>
+              <span>Temp</span>
               <span>
                 r:{data.tempRead ?? 0} w:{data.tempWritten ?? 0}
               </span>
@@ -502,7 +502,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>local</span>
+              <span>Local</span>
               <span>
                 h:{data.localHit ?? 0} r:{data.localRead ?? 0}
                 {typeof data.localWritten === 'number' ? ` w:${data.localWritten}` : ''}
@@ -524,7 +524,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>output</span>
+              <span>Output</span>
               <span className="truncate max-w-[95px]" title={data.outputCols.join(', ')}>
                 {data.outputCols.join(', ')}
               </span>
@@ -545,7 +545,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>io</span>
+              <span>IO</span>
               <span>
                 {typeof data.ioReadTime === 'number' ? `r:${data.ioReadTime}ms` : ''}
                 {typeof data.ioWriteTime === 'number'
