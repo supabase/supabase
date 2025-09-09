@@ -1,5 +1,5 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { RefreshCw, Search } from 'lucide-react'
+import { RefreshCw, Search, X } from 'lucide-react'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { ChangeEvent, useEffect, useState } from 'react'
 
@@ -10,7 +10,8 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Input } from 'ui'
+import { Button } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery,
@@ -74,7 +75,18 @@ export const QueryPerformanceFilterBar = ({
             name="keyword"
             id="keyword"
             placeholder="Filter by query"
-            className="w-48"
+            className="w-56"
+            actions={[
+              inputValue && (
+                <Button
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
+                  onClick={() => setInputValue('')}
+                  className="p-0 h-5 w-5"
+                />
+              ),
+            ]}
           />
 
           <FilterPopover
