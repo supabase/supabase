@@ -1,6 +1,6 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport } from 'ai'
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Info, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -128,6 +128,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     id: snap.activeChatId,
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     messages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
     async onToolCall({ toolCall }) {
       if (toolCall.toolName === 'rename_chat') {

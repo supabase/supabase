@@ -30,6 +30,8 @@ interface EdgeFunctionBlockProps {
   tooltip?: ReactNode
   /** Optional callback on drag start */
   onDragStart?: (e: DragEvent<Element>) => void
+  /** Hide the header deploy button (used when an external confirm footer is shown) */
+  hideDeployButton?: boolean
 }
 
 export const EdgeFunctionBlock = ({
@@ -39,6 +41,7 @@ export const EdgeFunctionBlock = ({
   actions,
   showCode: _showCode = false,
   tooltip,
+  hideDeployButton = false,
 }: EdgeFunctionBlockProps) => {
   const { ref } = useParams()
   const [isDeployed, setIsDeployed] = useState(false)
@@ -102,7 +105,7 @@ export const EdgeFunctionBlock = ({
       icon={<Code size={16} strokeWidth={1.5} className="text-foreground-muted" />}
       label={label}
       actions={
-        ref && functionName ? (
+        ref && functionName && !hideDeployButton ? (
           <>
             <Button
               type="outline"

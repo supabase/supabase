@@ -1,6 +1,7 @@
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
+import type { ToolSet } from 'ai'
 
 export const getMcpTools = async ({
   accessToken,
@@ -17,18 +18,21 @@ export const getMcpTools = async ({
     projectId: projectRef,
   })
 
-  const availableMcpTools = await mcpClient.tools()
+  const availableMcpTools = (await mcpClient.tools()) as ToolSet
   // Filter tools based on the (potentially modified) AI opt-in level
   const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
 
-  // Validate that only known tools are provided
-  const { data: validatedTools, error: validationError } =
-    toolSetValidationSchema.safeParse(allowedMcpTools)
+  // Remove UI-executed tools handled locally
+  const filteredMcpTools: ToolSet = { ...allowedMcpTools }
+  delete (filteredMcpTools as any)['execute_sql']
+  delete (filteredMcpTools as any)['deploy_edge_function']
 
-  if (validationError) {
-    console.error('MCP tools validation error:', validationError)
+  // Validate that only known tools are provided
+  const validation = toolSetValidationSchema.safeParse(filteredMcpTools)
+  if (!validation.success) {
+    console.error('MCP tools validation error:', validation.error)
     throw new Error('Internal error: MCP tools validation failed')
   }
 
-  return validatedTools
+  return validation.data
 }

@@ -30,6 +30,15 @@ interface DisplayBlockRendererProps {
   messageParts: UIMessagePart<UIDataTypes, UITools>[] | undefined
   isLoading: boolean
   onResults: (args: { messageId: string; resultId?: string; results: any[] }) => void
+  onError?: (args: { messageId: string; resultId?: string; errorText: string }) => void
+  /**
+   * External signal to trigger a query run.
+   * Increment this number to trigger another run. The component will
+   * translate this into a boolean toggle for QueryBlock.runQuery.
+   */
+  triggerRunSignal?: number
+  /** Notify parent when a run starts or ends (for shared loading states) */
+  onRunStateChange?: (isRunning: boolean) => void
 }
 
 export const DisplayBlockRenderer = ({
@@ -40,6 +49,9 @@ export const DisplayBlockRenderer = ({
   messageParts,
   isLoading,
   onResults,
+  onError,
+  triggerRunSignal = 0,
+  onRunStateChange,
 }: PropsWithChildren<DisplayBlockRendererProps>) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -74,6 +86,7 @@ export const DisplayBlockRenderer = ({
   const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
   const label = initialArgs.label || 'SQL Results'
   const sqlQuery = initialArgs.sql
+  const runQueryFlag = (triggerRunSignal || 0) % 2 === 1
 
   const handleRunQuery = (queryType: 'select' | 'mutation') => {
     sendEvent({
@@ -87,6 +100,7 @@ export const DisplayBlockRenderer = ({
         organization: org?.slug ?? 'Unknown',
       },
     })
+    onRunStateChange?.(true)
   }
 
   const handleUpdateChartConfig = ({
@@ -117,7 +131,7 @@ export const DisplayBlockRenderer = ({
         showRunButtonIfNotReadOnly={true}
         isLoading={isLoading}
         draggable={isDraggableToReports}
-        runQuery={false}
+        runQuery={runQueryFlag}
         tooltip={
           isDraggableToReports ? (
             <div className="flex items-center gap-x-2">
@@ -128,9 +142,16 @@ export const DisplayBlockRenderer = ({
             </div>
           ) : undefined
         }
-        onResults={(results) => onResults({ messageId, resultId, results })}
+        onResults={(results) => {
+          onResults({ messageId, resultId, results })
+          onRunStateChange?.(false)
+        }}
         onRunQuery={handleRunQuery}
         onUpdateChartConfig={handleUpdateChartConfig}
+        onError={(errorText) => {
+          onError?.({ messageId, resultId, errorText })
+          onRunStateChange?.(false)
+        }}
         onDragStart={handleDragStart}
       />
     </div>

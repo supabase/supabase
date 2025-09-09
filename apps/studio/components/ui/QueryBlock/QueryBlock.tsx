@@ -73,6 +73,10 @@ interface QueryBlockProps {
   onDragStart?: (e: DragEvent<Element>) => void
   /** Optional: callback when the results are returned from running the SQL query*/
   onResults?: (results: any[]) => void
+  /** Optional: callback when an error occurs while running the SQL query*/
+  onError?: (errorText: string) => void
+  /** Force showing confirmation (write) bar before executing */
+  forceShowConfirmation?: boolean
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
   /** Optional height set to render the SQL query (Used in Reports) */
@@ -121,6 +125,8 @@ export const QueryBlock = ({
   onUpdateChartConfig,
   onDragStart,
   onResults,
+  onError,
+  forceShowConfirmation,
 }: QueryBlockProps) => {
   const { ref } = useParams()
 
@@ -181,6 +187,7 @@ export const QueryBlock = ({
       } else {
         setQueryError(error)
       }
+      onError?.(error.message)
     },
   })
 
@@ -213,6 +220,11 @@ export const QueryBlock = ({
   }
 
   useEffect(() => {
+    if (forceShowConfirmation) setShowWarning('hasWriteOperation')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forceShowConfirmation])
+
+  useEffect(() => {
     setChartSettings(chartConfig)
   }, [chartConfig])
 
@@ -233,6 +245,7 @@ export const QueryBlock = ({
 
   useEffect(() => {
     if (isRefreshing) handleExecute()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRefreshing])
 
   return (
@@ -347,6 +360,15 @@ export const QueryBlock = ({
             }
           }}
           disabled={!sql}
+          {...(showWarning !== 'hasWriteOperation'
+            ? {
+                message: 'Run this query now and send the results to the Assistant? ',
+                subMessage:
+                  'We will execute the query and provide the result rows back to the Assistant to continue the conversation.',
+                cancelLabel: 'Skip',
+                confirmLabel: 'Run & send',
+              }
+            : {})}
         />
       )}
 

@@ -29,8 +29,6 @@ export const toolSetValidationSchema = z.record(
     // Local tools
     'execute_sql',
     'deploy_edge_function',
-    'display_query',
-    'display_edge_function',
     'rename_chat',
     'list_policies',
 
@@ -91,8 +89,6 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   // UI tools - always available
   execute_sql: TOOL_CATEGORIES.UI,
   deploy_edge_function: TOOL_CATEGORIES.UI,
-  display_query: TOOL_CATEGORIES.UI,
-  display_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
 

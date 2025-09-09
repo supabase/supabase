@@ -43,8 +43,8 @@ export const getTools = async ({
     })
 
     tools = {
-      ...tools,
       ...mcpTools,
+      ...tools,
       ...getSchemaTools({
         projectRef,
         connectionString,
