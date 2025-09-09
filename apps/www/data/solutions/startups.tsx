@@ -83,18 +83,7 @@ const data: () => {
           infrastructure.
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/startups/startups-hero-dark.svg',
-            light: '/images/solutions/startups/startups-hero-light.svg',
-          }}
-          alt="Supabase for Startups"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your company',
