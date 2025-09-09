@@ -95,6 +95,10 @@ export const TableEditorMenu = () => {
     id,
   })
 
+  if (selectedTable?.schema && !selectedSchema) {
+    setSelectedSchema(selectedTable.schema)
+  }
+
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
 
   const onSelectExportCLI = async (id: number) => {
@@ -106,12 +110,6 @@ export const TableEditorMenu = () => {
     const supaTable = table && parseSupaTable(table)
     setTableToExport(supaTable)
   }
-
-  useEffect(() => {
-    if (selectedTable?.schema) {
-      setSelectedSchema(selectedTable.schema)
-    }
-  }, [selectedTable?.schema])
 
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
