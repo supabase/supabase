@@ -58,7 +58,7 @@ export const ReportChartV2 = ({
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
     {
-      enabled: Boolean(projectRef && canFetch && isAvailable),
+      enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
       staleTime: 0,
     }
@@ -66,6 +66,19 @@ export const ReportChartV2 = ({
 
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
+
+  /**
+   * Checks the attributes received match properties inside the data items
+   */
+  const attributesMatchDataProperties = dynamicAttributes?.every((attribute) =>
+    chartData?.some((item: any) => item[attribute.attribute])
+  )
+
+  useEffect(() => {
+    if (!attributesMatchDataProperties && chartData.length > 0) {
+      console.warn(`[ReportChartV2 ${report.id}]: Chart attributes do not match data provided.`)
+    }
+  }, [attributesMatchDataProperties, chartData, report.id])
 
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
     chartData,
@@ -88,7 +101,8 @@ export const ReportChartV2 = ({
   }
 
   const isErrorState = error && !isLoadingChart
-  const showEmptyState = (!finalChartData || finalChartData.length === 0) && !isLoadingChart
+
+  if (report.hide) return null
 
   return (
     <Card id={report.id} className={cn('relative w-full overflow-hidden scroll-mt-16', className)}>
@@ -98,12 +112,23 @@ export const ReportChartV2 = ({
           isFetching && 'opacity-50'
         )}
       >
+        {!attributesMatchDataProperties && finalChartData.length > 0 ? (
+          <div className="w-full">
+            ERROR: The attributes do not match the data
+            <div className="w-full flex gap-1">
+              <pre className="w-1/2">
+                Attributes
+                {JSON.stringify(dynamicAttributes, null, 2)}
+              </pre>
+              <pre className="w-1/2">
+                Data
+                {JSON.stringify(finalChartData, null, 2)}
+              </pre>
+            </div>
+          </div>
+        ) : null}
         {isLoadingChart ? (
           <Loader2 className="size-5 animate-spin text-foreground-light" />
-        ) : showEmptyState ? (
-          <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
-            No data available for the selected time range and filters
-          </p>
         ) : isErrorState ? (
           <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
             Error loading chart data
