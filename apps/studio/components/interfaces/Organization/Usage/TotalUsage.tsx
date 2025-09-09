@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { useBreakpoint } from 'common'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
@@ -41,6 +42,7 @@ export const TotalUsage = ({
   endDate,
   currentBillingCycleSelected,
 }: ComputeProps) => {
+  const isMobile = useBreakpoint('md')
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
@@ -58,7 +60,7 @@ export const TotalUsage = ({
   })
 
   // When the user filters by project ref or selects a custom timeframe, we only display usage+project breakdown, but no costs/limits
-  const showRelationToSubscription = currentBillingCycleSelected && projectRef === 'all-projects'
+  const showRelationToSubscription = currentBillingCycleSelected && !projectRef
 
   const hasExceededAnyLimits =
     showRelationToSubscription &&
@@ -184,19 +186,12 @@ export const TotalUsage = ({
                 )}
               </p>
             )}
-            <div className="grid grid-cols-12 mt-3">
+            <div className="grid grid-cols-2 mt-3 gap-[1px] bg-border">
               {sortedBillingMetrics.map((metric, i) => {
-                const isLastBillingMetric = i === sortedBillingMetrics.length - 1
-                const isLastInRow = isLastBillingMetric && computeMetrics.length === 0
-
                 return (
                   <div
-                    className={cn(
-                      'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                      i % 2 === 0 && 'md:border-r',
-                      !isLastInRow && 'border-b'
-                    )}
                     key={metric.key}
+                    className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
                   >
                     <BillingMetric
                       idx={i}
@@ -214,12 +209,8 @@ export const TotalUsage = ({
               {computeMetrics.map((metric, i) => {
                 return (
                   <div
-                    className={cn(
-                      'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                      (i + sortedBillingMetrics.length) % 2 === 0 && 'md:border-r',
-                      'border-b last:border-b-0'
-                    )}
                     key={metric}
+                    className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
                   >
                     <ComputeMetric
                       slug={orgSlug}
@@ -240,6 +231,10 @@ export const TotalUsage = ({
                   </div>
                 )
               })}
+
+              {!isMobile && (sortedBillingMetrics.length + computeMetrics.length) % 2 === 1 && (
+                <div className="col-span-2 md:col-span-1 bg-sidebar" />
+              )}
             </div>
           </div>
         )}
