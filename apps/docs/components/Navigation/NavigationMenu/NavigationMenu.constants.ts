@@ -7,6 +7,7 @@ import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Naviga
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
   billingAll: billingEnabled,
+  docsCompliance: complianceEnabled,
   'docsSelf-hosting': selfHostingEnabled,
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
@@ -16,6 +17,7 @@ const {
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
+  'docs:compliance',
   'docs:self-hosting',
   'sdk:csharp',
   'sdk:dart',
@@ -1440,6 +1442,10 @@ export const functions: NavMenuConstant = {
           name: 'Development Environment',
           url: '/guides/functions/development-environment' as `/${string}`,
         },
+        {
+          name: 'Architecture',
+          url: '/guides/functions/architecture',
+        },
       ],
     },
     {
@@ -2188,6 +2194,7 @@ export const security: NavMenuConstant = {
     {
       name: 'Compliance',
       url: undefined,
+      enabled: complianceEnabled,
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
