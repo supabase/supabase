@@ -26,14 +26,16 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import type { RawPlan, PlanRoot, PlanMeta, PlanNodeData, Agg } from './types'
+import {
+  NODE_TYPE,
+  DEFAULT_NODE_WIDTH,
+  DEFAULT_NODE_HEIGHT,
+  HIDDEN_NODE_CONNECTOR,
+} from './constants'
 
 type ExplainPlanFlowProps = {
   json: string
 }
-
-const NODE_TYPE = 'plan'
-const DEFAULT_NODE_WIDTH = 180
-const DEFAULT_NODE_HEIGHT = 40
 
 type MetricsVisibility = {
   time: boolean
@@ -321,7 +323,6 @@ const blocksToBytes = (blocks?: number) => {
 /**
  * @see: https://github.com/wbkd/react-flow/discussions/2698
  */
-const hiddenNodeConnector = 'opacity-0'
 const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
   const vis = useContext(MetricsVisibilityContext)
@@ -441,7 +442,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
       className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
       style={{ width: DEFAULT_NODE_WIDTH }}
     >
-      <Handle type="target" position={Position.Top} className={hiddenNodeConnector} />
+      <Handle type="target" position={Position.Top} className={HIDDEN_NODE_CONNECTOR} />
       <header
         className={cn(
           'text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between',
@@ -786,7 +787,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
           </li>
         )}
       </ul>
-      <Handle type="source" position={Position.Bottom} className={hiddenNodeConnector} />
+      <Handle type="source" position={Position.Bottom} className={HIDDEN_NODE_CONNECTOR} />
     </div>
   )
 }
