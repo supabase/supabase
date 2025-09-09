@@ -65,7 +65,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
   useEffect(() => {
     if (containerRef.current) {
-      const containerWidthLocal = containerRef.current.offsetWidth
+      const containerWidthLocal = containerRef.current.getBoundingClientRect().width
       const colsLocal = resolveColumnsForWidth(containerWidthLocal)
       const columnWidth = (containerWidthLocal - (colsLocal - 1) * gap) / colsLocal
       const totalWidth = childrenArray.length * columnWidth + (childrenArray.length - 1) * gap
