@@ -31,7 +31,6 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
   const [scrollPosition, setScrollPosition] = useState(0)
   const [maxScroll, setMaxScroll] = useState(0)
-  const [containerWidth, setContainerWidth] = useState(0)
 
   const resolveColumnsForWidth = (width: number): number => {
     if (!Array.isArray(columns)) return columns
@@ -43,14 +42,14 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   }
 
   const getRenderColumns = (): number => {
-    const width = containerRef.current?.getBoundingClientRect().width ?? containerWidth
-    return resolveColumnsForWidth(width || 0)
+    const width = containerRef.current?.getBoundingClientRect().width ?? 0
+    return resolveColumnsForWidth(width)
   }
 
   const scrollByStep = (direction: -1 | 1) => {
     const el = containerRef.current
     if (!el) return
-    const widthLocal = el.offsetWidth
+    const widthLocal = el.getBoundingClientRect().width
     const colsLocal = resolveColumnsForWidth(widthLocal)
     const columnWidth = (widthLocal - (colsLocal - 1) * gap) / colsLocal
     const scrollAmount = columnWidth + gap
@@ -64,36 +63,34 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   const canScrollRight = scrollPosition < maxScroll
 
   useEffect(() => {
-    if (containerRef.current) {
-      const containerWidthLocal = containerRef.current.getBoundingClientRect().width
-      const colsLocal = resolveColumnsForWidth(containerWidthLocal)
-      const columnWidth = (containerWidthLocal - (colsLocal - 1) * gap) / colsLocal
-      const totalWidth = childrenArray.length * columnWidth + (childrenArray.length - 1) * gap
-      const maxScrollValue = Math.max(0, totalWidth - containerWidthLocal)
-      setMaxScroll(maxScrollValue)
-    }
-  }, [childrenArray.length, containerWidth, gap, columns])
-
-  useEffect(() => {
     const element = containerRef.current
     if (!element) return
 
-    setContainerWidth(element.offsetWidth)
+    const computeMaxScroll = (width: number) => {
+      const colsLocal = resolveColumnsForWidth(width)
+      const columnWidth = (width - (colsLocal - 1) * gap) / colsLocal
+      const totalWidth = childrenArray.length * columnWidth + (childrenArray.length - 1) * gap
+      const maxScrollValue = Math.max(0, totalWidth - width)
+      setMaxScroll(maxScrollValue)
+    }
+
+    // Initial calculation
+    computeMaxScroll(element.getBoundingClientRect().width)
 
     if (typeof ResizeObserver !== 'undefined') {
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
-          setContainerWidth(entry.contentRect.width)
+          computeMaxScroll(entry.contentRect.width)
         }
       })
       resizeObserver.observe(element)
       return () => resizeObserver.disconnect()
     } else {
-      const handleResize = () => setContainerWidth(element.offsetWidth)
+      const handleResize = () => computeMaxScroll(element.getBoundingClientRect().width)
       window.addEventListener('resize', handleResize)
       return () => window.removeEventListener('resize', handleResize)
     }
-  }, [])
+  }, [childrenArray.length, gap, columns])
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
