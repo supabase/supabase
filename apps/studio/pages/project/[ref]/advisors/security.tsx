@@ -34,13 +34,12 @@ const ProjectLints: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  const activeLints = (data ?? [])
-    .filter((lint) => lint.categories.includes('SECURITY'))
-    // hide vulnerable_postgres_version lint temporarily
-    // https://linear.app/supabase/project/pg-minor-version-upgrade-for-security-vulnerabilities-0124b2c2dcf5
-    // https://github.com/supabase/supabase/pull/38280/files
-    .filter((lint) => lint.name !== 'vulnerable_postgres_version')
-  console.log('activeLints', activeLints)
+  const activeLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  // hide vulnerable_postgres_version lint temporarily
+  // https://linear.app/supabase/project/pg-minor-version-upgrade-for-security-vulnerabilities-0124b2c2dcf5
+  // https://github.com/supabase/supabase/pull/38280/files
+  //.filter((lint) => lint.name !== 'vulnerable_postgres_version')
+
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
   const filteredLints = activeLints
