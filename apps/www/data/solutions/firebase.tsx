@@ -23,6 +23,7 @@ import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
 import MainProducts from 'data/MainProducts'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { companyStats } from 'data/company-stats'
+import { MobbinLogo } from '~/components/BrandLogo'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -90,22 +91,13 @@ const data = {
         draggable={false}
         src="/images/blog/avatars/jian-mobbin.jpg"
         alt="Jian Jie Liau"
-        className="dark:invert object-contain opacity-50 hover:!opacity-60 max-w-20 max-h-10 !w-10 !h-10"
-        width={28}
-        height={28}
+        className="object-cover"
+        width={32}
+        height={32}
       />
     ),
     link: '/customers/mobbin',
-    logo: (
-      <Image
-        draggable={false}
-        src="/images/customers/logos/mobbin.png"
-        alt="Mobbin logo"
-        className="w-10 h-10 rounded-full overflow-hidden"
-        width={28}
-        height={28}
-      />
-    ),
+    logo: <MobbinLogo className="w-full" />,
   },
   why: {
     id: 'why-supabase',
