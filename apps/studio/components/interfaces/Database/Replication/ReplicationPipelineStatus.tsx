@@ -393,6 +393,7 @@ export const ReplicationPipelineStatus = () => {
       </div>
       <UpdateVersionModal
         visible={showUpdateVersionModal}
+        pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
         confirmLabel={
           statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
