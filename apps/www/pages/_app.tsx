@@ -5,11 +5,12 @@ import '../styles/index.css'
 import {
   AuthProvider,
   FeatureFlagProvider,
+  getFlags as getConfigCatFlags,
   IS_PLATFORM,
   PageTelemetry,
+  TelemetryTagManager,
   ThemeProvider,
   useThemeSandbox,
-  TelemetryTagManager,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
@@ -86,7 +87,7 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+        <FeatureFlagProvider API_URL={API_URL} getConfigCatFlags={getConfigCatFlags}>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
             enableSystem

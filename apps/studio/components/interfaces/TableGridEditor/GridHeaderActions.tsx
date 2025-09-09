@@ -5,8 +5,9 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import APIDocsButton from 'components/ui/APIDocsButton'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -45,9 +46,10 @@ import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
   table: Entity
+  isRefetching: boolean
 }
 
-const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
+export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -65,7 +67,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
-  const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
   const { mutate: updateTable } = useTableUpdateMutation({
@@ -210,6 +212,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </TooltipContent>
             </Tooltip>
           )}
+
           {isTable && !isSchemaLocked ? (
             table.rls_enabled ? (
               <>
@@ -276,13 +279,13 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 <PopoverContent_Shadcn_
                   // using `portal` for a safari fix. issue with rendering outside of body element
                   portal
-                  className="min-w-[395px] text-sm"
+                  className="w-80 text-sm"
                   align="end"
                 >
-                  <h3 className="flex items-center gap-2">
+                  <h4 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
-                  </h3>
-                  <div className="grid gap-2 mt-4 text-foreground-light text-sm">
+                  </h4>
+                  <div className="grid gap-2 mt-4 text-foreground-light text-xs">
                     <p>
                       You can restrict and control who can read, write and update data in this table
                       using Row Level Security.
@@ -292,20 +295,20 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       table.
                     </p>
                     {!isSchemaLocked && (
-                      <div className="mt-2">
-                        <Button
-                          type="default"
-                          onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
-                        >
-                          Enable RLS for this table
-                        </Button>
-                      </div>
+                      <Button
+                        type="default"
+                        className="mt-2 w-min"
+                        onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
+                      >
+                        Enable RLS for this table
+                      </Button>
                     )}
                   </div>
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
             )
           ) : null}
+
           {isView && viewHasLints && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
@@ -356,6 +359,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           )}
+
           {isMaterializedView && materializedViewHasLints && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
@@ -398,6 +402,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           )}
+
           {isForeignTable && table.schema === 'public' && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
@@ -435,10 +440,13 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           )}
+
           <RoleImpersonationPopover serviceRoleLabel="postgres" />
+
           {isTable && realtimeEnabled && (
-            <Button
+            <ButtonTooltip
               type="default"
+              size="tiny"
               icon={
                 <MousePointer2
                   strokeWidth={1.5}
@@ -446,11 +454,23 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 />
               }
               onClick={() => setShowEnableRealtime(true)}
+              className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: isRealtimeEnabled
+                    ? 'Click to disable realtime for this table'
+                    : 'Click to enable realtime for this table',
+                },
+              }}
             >
-              Realtime {isRealtimeEnabled ? 'on' : 'off'}
-            </Button>
+              {!isRealtimeEnabled && 'Enable Realtime'}
+            </ButtonTooltip>
           )}
+
           {doesHaveAutoGeneratedAPIDocs && <APIDocsButton section={['entities', table.name]} />}
+
+          <RefreshButton tableId={table.id} isRefetching={isRefetching} />
         </div>
       )}
       <ConfirmationModal
@@ -500,5 +520,3 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     </div>
   )
 }
-
-export default GridHeaderActions

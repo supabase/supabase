@@ -21,9 +21,9 @@ export async function updateBranch({
   persistent,
   requestReview,
 }: BranchUpdateVariables) {
-  const { data, error } = await patch('/v1/branches/{branch_id}', {
+  const { data, error } = await patch('/v1/branches/{branch_id_or_ref}', {
     params: {
-      path: { branch_id: id },
+      path: { branch_id_or_ref: id },
     },
     body: {
       branch_name: branchName,

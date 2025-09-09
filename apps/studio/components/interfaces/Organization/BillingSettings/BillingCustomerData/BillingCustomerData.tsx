@@ -61,6 +61,7 @@ export const BillingCustomerData = () => {
       line1: customerProfile?.address?.line1,
       line2: customerProfile?.address?.line2 ?? undefined,
       postal_code: customerProfile?.address?.postal_code ?? undefined,
+      state: customerProfile?.address?.state ?? undefined,
       billing_name: customerProfile?.billing_name,
       tax_id_type: taxId?.type,
       tax_id_value: taxId?.value,
@@ -118,7 +119,7 @@ export const BillingCustomerData = () => {
         {selectedOrganization?.managed_by !== undefined &&
         selectedOrganization?.managed_by !== 'supabase' ? (
           <PartnerManagedResource
-            partner={selectedOrganization?.managed_by}
+            managedBy={selectedOrganization?.managed_by}
             resource="Billing Addresses"
             cta={{
               installationId: selectedOrganization?.partner_id,

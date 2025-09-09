@@ -1,0 +1,17 @@
+{
+  "$schema": "./custom-content.schema.json",
+
+  "dashboard_auth:custom_provider": null,
+
+  "organization:legal_documents": null,
+
+  "project_homepage:example_projects": null,
+
+  "logs:default_query": null,
+
+  "connect:frameworks": null,
+
+  "infra:cloud_providers": ["AWS", "AWS_K8S", "FLY"],
+
+  "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt"
+}
