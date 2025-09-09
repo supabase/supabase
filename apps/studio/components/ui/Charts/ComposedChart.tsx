@@ -416,6 +416,7 @@ export function ComposedChart({
                     attributes?.find((a) => a.attribute === attribute?.name)?.label ||
                     attribute?.name
                   }
+                  maxBarSize={24}
                 />
               ))
             : stackedAttributes.map((attribute, i) => (
