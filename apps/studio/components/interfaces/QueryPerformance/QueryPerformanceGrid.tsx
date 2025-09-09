@@ -82,6 +82,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                     size="tiny"
                     className="p-1 h-5 w-5"
                     icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                    onClick={(e) => e.stopPropagation()}
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
