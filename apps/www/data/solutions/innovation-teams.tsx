@@ -84,18 +84,7 @@ const data: () => {
           ideas while maintaining enterprise-grade security and compliance.{' '}
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/innovation-teams/innovation-teams-hero-dark.svg',
-            light: '/images/solutions/innovation-teams/innovation-teams-hero-light.svg',
-          }}
-          alt="Supabase for Innovation Teams"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',

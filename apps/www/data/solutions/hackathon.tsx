@@ -84,18 +84,7 @@ const data: () => {
           updates, and more.
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/hackathon/hackathon-hero-dark.svg',
-            light: '/images/solutions/hackathon/hackathon-hero-light.svg',
-          }}
-          alt="Supabase for Innovation Teams"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',
@@ -126,7 +115,7 @@ const data: () => {
         />
       ),
       link: '/customers/soshi',
-      logo: <SoshiLogo className='w-full'/>,
+      logo: <SoshiLogo className="w-full" />,
     },
     why: {
       id: 'why-supabase',
