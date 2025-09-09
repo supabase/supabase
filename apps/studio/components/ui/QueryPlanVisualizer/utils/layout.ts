@@ -1,6 +1,6 @@
 import { Position, type Edge, type Node } from 'reactflow'
 import dagre from '@dagrejs/dagre'
-import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from './constants'
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from '../constants'
 
 export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()

@@ -1,4 +1,4 @@
-import { getLayoutedElementsViaDagre } from '../layout'
+import { getLayoutedElementsViaDagre } from '../utils/layout'
 import { NODE_TYPE } from '../constants'
 import type { Edge, Node } from 'reactflow'
 import type { RawPlan, PlanRoot, PlanNodeData, Agg } from '../types'
