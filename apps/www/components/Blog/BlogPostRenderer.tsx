@@ -172,9 +172,12 @@ const BlogPostRenderer = ({
     return `${minutes} min read`
   }
 
+  // only show draft loading in development/preview environments
+  const shouldShowDraftLoading = isLivePreviewLoading && process.env.NODE_ENV !== 'production'
+
   return (
     <>
-      {isLivePreviewLoading && (
+      {shouldShowDraftLoading && (
         <div className="fixed top-10 right-10 border rounded-full rounded-tr-none animate-spin transform w-10 h-10 bg-transparent" />
       )}
       {isDraftMode && <DraftModeBanner />}
@@ -202,7 +205,7 @@ const BlogPostRenderer = ({
                 <div className="space-y-4">
                   <Link href="/blog" className="text-brand hidden lg:inline-flex items-center">
                     Blog{' '}
-                    {isLivePreviewLoading && (
+                    {shouldShowDraftLoading && (
                       <div className="text-xs text-foreground-lighter ml-4">Draft loading...</div>
                     )}
                   </Link>
