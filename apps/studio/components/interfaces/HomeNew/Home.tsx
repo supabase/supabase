@@ -17,6 +17,7 @@ import {
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AdvisorSection } from './AdvisorSection'
+import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
 
 export const HomeV2 = () => {
   const { ref, enableBranching } = useParams()
@@ -49,10 +50,9 @@ export const HomeV2 = () => {
     ['getting-started', 'usage', 'advisor', 'custom-report']
   )
 
-  const [gettingStartedState] = useLocalStorage<'empty' | 'code' | 'no-code' | 'hidden'>(
-    `home-getting-started-${project?.ref || 'default'}`,
-    'empty'
-  )
+  const [gettingStartedState, setGettingStartedState] = useLocalStorage<
+    'empty' | 'code' | 'no-code' | 'hidden'
+  >(`home-getting-started-${project?.ref || 'default'}`, 'empty')
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -102,6 +102,16 @@ export const HomeV2 = () => {
                 strategy={verticalListSortingStrategy}
               >
                 {sectionOrder.map((id) => {
+                  if (id === 'getting-started') {
+                    return gettingStartedState === 'hidden' ? null : (
+                      <SortableSection key={id} id={id}>
+                        <GettingStartedSection
+                          value={gettingStartedState}
+                          onChange={setGettingStartedState}
+                        />
+                      </SortableSection>
+                    )
+                  }
                   if (id === 'advisor') {
                     return (
                       <SortableSection key={id} id={id}>
