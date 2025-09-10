@@ -11,6 +11,7 @@ import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
@@ -20,6 +21,7 @@ import { Admonition } from 'ui-patterns'
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const { id, ref, content, skip } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
@@ -49,10 +51,16 @@ const SqlEditor: NextPageWithLayout = () => {
   const invalidId = isError && error.code === 400 && error.message.includes('Invalid uuid')
 
   useEffect(() => {
-    if (ref && data) {
-      snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+    if (ref && data && project) {
+      // [Joshen] Check if snippet belongs to the current project
+      if (data.project_id === project.id) {
+        snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+      } else {
+        setLastVisitedSnippet(undefined)
+        router.push(`/project/${ref}/sql/new`)
+      }
     }
-  }, [ref, data])
+  }, [ref, data, project])
 
   // Load the last visited snippet when landing on /new
   useEffect(() => {
