@@ -1,4 +1,4 @@
-import { SubsectionModel } from '../../../resources/guide/guideModel.js'
+import { GuideModel, SubsectionModel } from '../../../resources/guide/guideModel.js'
 import { GuideModelLoader } from '../../../resources/guide/guideModelLoader.js'
 import { BaseLoader, BaseSource } from './base.js'
 
@@ -31,6 +31,16 @@ export class MarkdownLoader extends BaseLoader {
         this.options
       ),
     ]
+  }
+
+  static fromGuideModel(source: string, guide: GuideModel): MarkdownSource {
+    const path = guide.href ? guide.href.replace('https://supabase.com/docs', '') : ''
+
+    return new MarkdownSource(source, path, guide.content ?? '', {
+      checksum: guide.checksum,
+      meta: guide.metadata,
+      sections: guide.subsections,
+    })
   }
 }
 

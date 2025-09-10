@@ -1,13 +1,13 @@
 import Link from 'next/link'
 
-import ActivityStats from 'components/interfaces/HomeNew/ActivityStats'
-import { ReactFlowProvider } from 'reactflow'
+import { ActivityStats } from 'components/interfaces/HomeNew/ActivityStats'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
-import { cn, Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import InstanceConfiguration from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
+import { ReactFlowProvider } from 'reactflow'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 
 interface TopSectionProps {
   projectName: string
@@ -20,7 +20,7 @@ interface TopSectionProps {
   isPaused: boolean
 }
 
-const TopSection = ({
+export const TopSection = ({
   projectName,
   isMainBranch,
   parentProject,
@@ -33,7 +33,7 @@ const TopSection = ({
     <div className="flex flex-col gap-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 py-16 md:p-0 w-full items-center">
         <div className="flex flex-col">
-          <div className="flex flex-col md:flex-row md:items-end gap-3 w-full">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
             <div>
               {!isMainBranch && (
                 <Link
@@ -45,7 +45,7 @@ const TopSection = ({
               )}
               <h1 className="text-3xl">{projectName}</h1>
             </div>
-            <div className="flex items-center gap-x-2 mb-1">
+            <div className="flex items-center gap-x-2">
               {isOrioleDb && (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -92,5 +92,3 @@ const TopSection = ({
     </div>
   )
 }
-
-export default TopSection

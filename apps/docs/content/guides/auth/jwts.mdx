@@ -106,6 +106,8 @@ const supabase = createClient(
 
 </TabPanel>
 
+<$Show if="sdk:dart">
+
 <TabPanel id="dart" label="Flutter">
 
 ```dart
@@ -120,6 +122,9 @@ await Supabase.initialize(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:swift">
 
 <TabPanel id="swift" label="Swift (iOS)">
 
@@ -140,6 +145,9 @@ let supabase = SupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:kotlin">
 
 <TabPanel id="kotlin" label="Kotlin">
 
@@ -155,6 +163,7 @@ val supabase = createSupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 
@@ -170,7 +179,7 @@ Supabase Auth exposes a [JSON Web Key](https://datatracker.ietf.org/doc/html/rfc
 GET https://project-id.supabase.co/auth/v1/.well-known/jwks.json
 ```
 
-Which responds with JWKS object containing one or more asymmetric [JWT signing keys](/docs/guides/auth/signing-keys) (only their public keys).
+Which responds with JWKS object containing one or more asymmetric [JWT signing keys](/docs/guides/auth/signing-keys) (only their public keys). Be aware that this endpoint does not return any keys if you are not using asymmetric JWT signing keys.
 
 ```json
 {

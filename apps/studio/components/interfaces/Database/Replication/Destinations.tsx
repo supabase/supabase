@@ -1,5 +1,5 @@
 import { Plus, Search } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
@@ -7,6 +7,9 @@ import AlertError from 'components/ui/AlertError'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
+import { replicationKeys } from 'data/replication/keys'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { DestinationPanel } from './DestinationPanel'
@@ -57,6 +60,30 @@ export const Destinations = () => {
       : (destinationsData?.destinations ?? []).filter((destination) =>
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )
+
+  // Prefetch pipeline version info for all destinations on first load only
+  const queryClient = useQueryClient()
+  const prefetchedRef = useRef(false)
+  useEffect(() => {
+    if (
+      projectRef &&
+      !prefetchedRef.current &&
+      pipelinesData?.pipelines &&
+      pipelinesData.pipelines.length > 0 &&
+      isPipelinesSuccess
+    ) {
+      prefetchedRef.current = true
+      pipelinesData.pipelines.forEach((p) => {
+        if (!p?.id) return
+        queryClient.prefetchQuery({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id),
+          queryFn: ({ signal }) =>
+            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id }, signal),
+          staleTime: Infinity,
+        })
+      })
+    }
+  }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   return (
     <>

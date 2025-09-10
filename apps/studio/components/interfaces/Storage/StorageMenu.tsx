@@ -1,9 +1,9 @@
-import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 
 import { useParams } from 'common'
-import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import { CreateBucketModal } from 'components/interfaces/Storage/CreateBucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -16,7 +16,7 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import BucketRow from './BucketRow'
+import { BucketRow } from './BucketRow'
 
 const StorageMenu = () => {
   const router = useRouter()

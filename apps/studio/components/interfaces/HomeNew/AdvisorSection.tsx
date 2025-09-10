@@ -85,7 +85,7 @@ export const AdvisorSection = () => {
               return (
                 <Card
                   key={lint.cache_key}
-                  className="h-full flex flex-col items-stretch h-64 cursor-pointer"
+                  className="h-full flex flex-col items-stretch cursor-pointer"
                   onClick={() => {
                     handleCardClick(lint)
                   }}
@@ -132,7 +132,8 @@ export const AdvisorSection = () => {
                   <SheetHeader>
                     <div className="flex items-center gap-4">
                       <SheetTitle>
-                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
+                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title ??
+                          'Unknown'}
                       </SheetTitle>
                       <LintCategoryBadge category={selectedLint.categories[0]} />
                     </div>

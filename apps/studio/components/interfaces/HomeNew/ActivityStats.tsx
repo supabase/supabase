@@ -1,18 +1,20 @@
 import dayjs from 'dayjs'
+import { GitBranch } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { useParams } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { Skeleton } from 'ui'
-import { ServiceStatus } from './ServiceStatus'
-import { GitBranch } from 'lucide-react'
 
-export function ActivityStats() {
-  const { data: project } = useSelectedProjectQuery()
+import { useParams } from 'common'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { useMigrationsQuery } from 'data/database/migrations-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { cn, Skeleton } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
+import { ServiceStatus } from './ServiceStatus'
+
+export const ActivityStats = () => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: branchesData, isLoading: isLoadingBranches } = useBranchesQuery({
     projectRef: project?.parent_project_ref ?? project?.ref,
@@ -53,61 +55,77 @@ export function ActivityStats() {
 
   return (
     <div className="@container">
-      <div className="grid grid-cols-2 gap-4 @md:grid-cols-4">
+      <div className="grid grid-cols-2 xl:flex xl:gap-10 gap-4 flex-wrap">
         <div className="block">
-          <p className="heading-meta text-foreground-light">Status</p>
-          <div className="flex items-center gap-2 mt-1">
-            <ServiceStatus />
-          </div>
+          <p className="heading-meta text-foreground-light mb-1">Status</p>
+          <ServiceStatus />
         </div>
-        <Link href={`/project/${ref}/database/migrations`} className="block">
-          <p className="heading-meta text-foreground-light mb-1">Last migration</p>
-          <p className="text-foreground">
+
+        <Link className="block" href={`/project/${ref}/database/migrations`}>
+          <h4 className="heading-meta text-foreground-light mb-1">Last migration</h4>
+
+          <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
             {isLoadingMigrations ? (
-              <Skeleton className="h-4 w-16 mt-2" />
+              <Skeleton className="h-6 w-24" />
             ) : latestMigration ? (
-              dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()
+              <TimestampInfo
+                className="text-base"
+                label={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()}
+                utcTimestamp={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').toISOString()}
+              />
             ) : (
-              'No migrations'
+              <p className="text-foreground-lighter">No migrations</p>
             )}
-          </p>
+          </div>
         </Link>
-        <Link href={`/project/${ref}/database/backups/scheduled`} className="block">
-          <p className="heading-meta text-foreground-light mb-1">Last backup</p>
-          <p className="text-foreground">
+
+        <Link className="block" href={`/project/${ref}/database/backups/scheduled`}>
+          <h4 className="heading-meta text-foreground-light mb-1">Last backup</h4>
+
+          <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
             {isLoadingBackups ? (
-              <Skeleton className="h-4 w-16 mt-2" />
+              <Skeleton className="h-6 w-24" />
             ) : backupsData?.pitr_enabled ? (
-              'PITR enabled'
+              <p>PITR enabled</p>
             ) : latestBackup ? (
-              dayjs(latestBackup.inserted_at).fromNow()
+              <TimestampInfo
+                className="text-base"
+                label={dayjs(latestBackup.inserted_at).fromNow()}
+                utcTimestamp={latestBackup.inserted_at}
+              />
             ) : (
-              'No backups'
+              <p className="text-foreground-lighter">No backups</p>
             )}
-          </p>
+          </div>
         </Link>
-        <Link href={`/project/${ref}/branches`} className="block">
+
+        <Link className="block" href={`/project/${ref}/branches`}>
           <h4 className="heading-meta text-foreground-light mb-1">
             {isDefaultProject ? 'Recent branch' : 'Branch Created'}
           </h4>
-          <p className="text-foreground">
+
+          <div className="text-foreground truncate h-[34px] flex items-center capitalize-sentence">
             {isLoadingBranches ? (
-              <Skeleton className="h-4 w-24 mt-2" />
+              <Skeleton className="h-6 w-24" />
             ) : isDefaultProject ? (
               <div className="flex items-center gap-2">
-                <GitBranch size={16} strokeWidth={1.5} className="text-foreground-muted" />
-                {latestNonDefaultBranch?.name ?? '+ Create your first branch'}
+                <GitBranch size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                <p className={cn('truncate', !latestNonDefaultBranch && 'text-foreground-lighter')}>
+                  {latestNonDefaultBranch?.name ?? 'No branches'}
+                </p>
               </div>
             ) : currentBranch?.created_at ? (
-              dayjs(currentBranch.created_at).fromNow()
+              <TimestampInfo
+                className="text-base"
+                label={dayjs(currentBranch.created_at).fromNow()}
+                utcTimestamp={currentBranch.created_at}
+              />
             ) : (
-              'Unknown'
+              <p className="text-foreground-lighter">Unknown</p>
             )}
-          </p>
+          </div>
         </Link>
       </div>
     </div>
   )
 }
-
-export default ActivityStats

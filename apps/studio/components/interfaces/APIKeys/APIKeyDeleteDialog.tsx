@@ -56,7 +56,7 @@ export const APIKeyDeleteDialog = ({ apiKey, lastSeen }: APIKeyDeleteDialogProps
           },
         }}
       >
-        <Trash2 className="size-4 text-destructive" strokeWidth={1.5} /> Delete API key
+        <Trash2 size={14} strokeWidth={1.5} /> Delete API key
       </DropdownMenuItemTooltip>
       <TextConfirmModal
         visible={isOpen}
