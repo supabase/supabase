@@ -21,7 +21,7 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
     {
       label: 'OAuth Server',
       badge: 'Beta',
-      href: `/project/${ref}/auth/settings/oauth-server`,
+      href: `/project/${ref}/auth/oauth-server`,
     },
     ...(authenticationThirdPartyAuth
       ? [

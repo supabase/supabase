@@ -164,9 +164,7 @@ const OAuthAppsList = () => {
                 third-party applications.
               </p>
               <Button asChild>
-                <Link href={`/project/${projectRef}/auth/settings/oauth-server`}>
-                  Go to Settings
-                </Link>
+                <Link href={`/project/${projectRef}/auth/oauth-server`}>Go to Settings</Link>
               </Button>
             </div>
           </CardContent>

@@ -55,7 +55,7 @@ export const generateAuthMenu = (
                     {
                       name: 'Sign In / Providers',
                       key: 'sign-in-up',
-                      pages: ['providers', 'third-party'],
+                      pages: ['providers', 'oauth-server', 'third-party'],
                       url: `/project/${ref}/auth/providers`,
                       items: [],
                     },

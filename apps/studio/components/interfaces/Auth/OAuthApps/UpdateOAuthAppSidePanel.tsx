@@ -226,10 +226,7 @@ const UpdateOAuthAppSidePanel = ({
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItemLayout
-                    label="Name"
-                    // description=""
-                  >
+                  <FormItemLayout label="Name">
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} placeholder="My OAuth App" />
                     </FormControl_Shadcn_>
@@ -406,9 +403,23 @@ const UpdateOAuthAppSidePanel = ({
                 name="is_public"
                 render={({ field }) => (
                   <FormItemLayout
-                    label="Is public"
+                    label="Public"
                     layout="flex"
-                    description="If enabled, this app will be publicly accessible."
+                    description={
+                      <>
+                        If enabled, the Authorization Code with PKCE (Proof Key for Code Exchange)
+                        flow can be used, particularly beneficial for applications that cannot
+                        securely store Client Secrets, such as native and mobile apps.{' '}
+                        <Link
+                          href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-foreground-light underline hover:text-foreground transition"
+                        >
+                          Learn more
+                        </Link>
+                      </>
+                    }
                   >
                     <FormControl_Shadcn_>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -433,11 +444,11 @@ const UpdateOAuthAppSidePanel = ({
                   Delete App
                 </Button>
               </Admonition>
+              <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+                Update
+              </Button>
             </form>
           </Form_Shadcn_>
-          <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
-            Update
-          </Button>
         </SidePanel.Content>
       </SidePanel>
 

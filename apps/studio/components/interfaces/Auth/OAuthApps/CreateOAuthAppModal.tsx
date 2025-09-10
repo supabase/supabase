@@ -299,11 +299,13 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
                 name="is_public"
                 render={({ field }) => (
                   <FormItemLayout
-                    label="Is public"
+                    label="Public"
                     layout="flex"
                     description={
                       <>
-                        If enabled, this app will be publicly accessible.{' '}
+                        If enabled, the Authorization Code with PKCE (Proof Key for Code Exchange)
+                        flow can be used, particularly beneficial for applications that cannot
+                        securely store Client Secrets, such as native and mobile apps.{' '}
                         <Link
                           href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
                           target="_blank"
