@@ -21,6 +21,7 @@ export function getEvalMockTools(): ToolSet {
           tables: [
             {
               name: 'user_documents',
+              rls_enabled: false,
               columns: [
                 { name: 'id', data_type: 'bigint' },
                 { name: 'user_id', data_type: 'uuid' },
@@ -29,6 +30,7 @@ export function getEvalMockTools(): ToolSet {
             },
             {
               name: 'customers',
+              rls_enabled: true,
               columns: [
                 { name: 'id', data_type: 'uuid' },
                 { name: 'tenant_id', data_type: 'uuid' },
@@ -37,10 +39,19 @@ export function getEvalMockTools(): ToolSet {
             },
             {
               name: 'projects',
+              rls_enabled: false,
               columns: [
                 { name: 'id', data_type: 'uuid' },
                 { name: 'organization_id', data_type: 'uuid' },
                 { name: 'name', data_type: 'text' },
+              ],
+            },
+            {
+              name: 'user_organizations',
+              rls_enabled: true,
+              columns: [
+                { name: 'user_id', data_type: 'uuid' },
+                { name: 'organization_id', data_type: 'uuid' },
               ],
             },
           ],
@@ -96,11 +107,38 @@ export function getEvalMockTools(): ToolSet {
         schemas: z.array(z.string()).describe('The schema names to get the policies for'),
       }),
       execute: async ({ schemas }: { schemas: string[] }) => {
-        // Keep simple and deterministic: no existing policies
+        // Deterministic: In public schema, only 'customers' has an existing SELECT policy
         const effectiveSchemas = schemas?.length ? schemas : ['public']
-        return effectiveSchemas
-          .map((s) => `No existing policies in schema ${s}. You can create new policies as needed.`)
-          .join('\n')
+        const results = [] as Array<{
+          schema: string
+          table: string
+          policies: Array<{
+            name: string
+            command: 'select' | 'insert' | 'update' | 'delete'
+            using?: string
+            check?: string
+          }>
+        }>
+
+        for (const schema of effectiveSchemas) {
+          if (schema !== 'public') continue
+          results.push(
+            {
+              schema,
+              table: 'customers',
+              policies: [
+                {
+                  name: 'customers_tenant_select',
+                  command: 'select',
+                  using: "(auth.jwt() ->> 'tenant_id')::uuid = tenant_id",
+                },
+              ],
+            },
+            { schema, table: 'user_documents', policies: [] },
+            { schema, table: 'projects', policies: [] }
+          )
+        }
+        return results
       },
     }),
   }

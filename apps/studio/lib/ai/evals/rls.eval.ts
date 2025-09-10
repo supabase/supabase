@@ -1,43 +1,35 @@
 import { Eval } from 'braintrust'
-import { Factuality } from 'autoevals'
+import { SupabaseAccuracy } from './supabase-accuracy'
 import { generateTask } from './generate-task'
 
-// Evaluate how well the generate-v4-like function creates RLS policies
+// Evaluate planning for RLS enablement and missing policy creation using tools
 Eval('RLS Policy Generation', {
   data: () => {
     return [
-      // Simple single-table, user-ownership pattern
       {
         input:
-          'Create RLS policies for table public.user_documents with column user_id so users can read/write only their own rows. Include select, insert, update, delete.',
-        expected: 'CREATE POLICY', // We check fuzzy string similarity; exact SQL compared by Factuality
-      },
-      // Multi-tenant via jwt claim pattern
-      {
-        input:
-          "For table public.customers with tenant_id, add SELECT policy restricting rows to tenant_id from auth.jwt() ->> 'tenant_id'.",
-        expected: 'CREATE POLICY',
-      },
-      // Org membership via join-like pattern
-      {
-        input:
-          'For table public.projects with organization_id, allow SELECT for members listed in public.user_organizations(user_id, organization_id) matched by auth.uid().',
-        expected: 'CREATE POLICY',
-      },
-      // Storage example
-      {
-        input:
-          "For table storage.objects, allow SELECT/INSERT only for bucket 'user-uploads' where first folder equals auth.uid().",
-        expected: 'CREATE POLICY',
+          'Secure my database tables. I want to make sure only the right people can read and write data. Please check what tables I have and what rules already exist, then turn on security where it is off and add any missing rules.',
+        expected: `
+I'll check your tables and existing policies, enable RLS where it's off, and add the missing rules in one SQL block.
+
+{ tool: "list_tables", input: { schemas: ["public"] } }
+{ tool: "list_policies", input: { schemas: ["public"] } }
+
+I see an existing SELECT policy on public.customers; I won't duplicate it.
+
+{ tool: "display_query", input: { label: "Enable RLS and Add Policies", sql: "alter table public.user_documents enable row level security;\nalter table public.projects enable row level security;\n\ncreate policy \"user_documents_select_own\" on public.user_documents for select using (auth.uid() = user_id);\ncreate policy \"user_documents_insert_own\" on public.user_documents for insert with check (auth.uid() = user_id);\ncreate policy \"user_documents_update_own\" on public.user_documents for update using (auth.uid() = user_id);\ncreate policy \"user_documents_delete_own\" on public.user_documents for delete using (auth.uid() = user_id);\n\ncreate policy \"projects_select_members\" on public.projects for select using (exists (select 1 from public.user_organizations uo where uo.user_id = auth.uid() and uo.organization_id = public.projects.organization_id));" } }
+`,
       },
     ]
   },
-  task: async (input: string) => {
+  task: async (input: string, hooks) => {
     // Use default options suitable for eval environment (no schema access)
     const output = await generateTask(input, {
       isLimited: false,
     })
+
+    hooks.metadata.output = output
     return output
   },
-  scores: [Factuality],
+  scores: [SupabaseAccuracy],
 })

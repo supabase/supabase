@@ -27,7 +27,7 @@ type GenerateTaskOptions = {
  * using generateText instead of streamText.
  */
 export async function generateTask(input: string, opts: GenerateTaskOptions = {}) {
-  const { projectRef = 'eval-project', chatName = 'RLS Eval', isLimited = true } = opts
+  const { projectRef = 'eval-project', chatName = 'RLS', isLimited = true } = opts
 
   const {
     model,
@@ -74,7 +74,7 @@ export async function generateTask(input: string, opts: GenerateTaskOptions = {}
     ...getEvalMockTools(),
   }
 
-  const result = await generateText({
+  const { steps } = await generateText({
     model,
     messages: coreMessages,
     stopWhen: stepCountIs(5),
@@ -82,5 +82,21 @@ export async function generateTask(input: string, opts: GenerateTaskOptions = {}
     tools,
   })
 
-  return result.text
+  const result = steps
+    .map((step) => {
+      const toolResults = step.toolResults
+        ?.filter((tr) =>
+          ['display_edge_function', 'display_query', 'list_policies', 'list_tables'].includes(
+            tr.toolName
+          )
+        )
+        .map((result) => JSON.stringify({ tool: result.toolName, input: result.input }))
+        .join('\n')
+
+      const text = step.text
+      return `${text}\n${toolResults}`
+    })
+    .join('\n')
+
+  return result
 }
