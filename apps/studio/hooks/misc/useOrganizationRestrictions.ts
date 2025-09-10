@@ -30,13 +30,7 @@ export function useOrganizationRestrictions() {
     (invoice) => invoice.organization_id === org?.id
   )
 
-  if (
-    org &&
-    org.plan.id !== 'free' &&
-    billingCustomer &&
-    !billingCustomer.address?.line1 &&
-    !org.billing_partner
-  ) {
+  if (true) {
     warnings.push({
       type: 'warning',
       title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
