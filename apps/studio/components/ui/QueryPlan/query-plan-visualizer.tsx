@@ -8,7 +8,6 @@ import { MetaOverlay } from './meta-overlay'
 import { SubplanOverlay } from './subplan-overlay'
 import { ControlsOverlay } from './controls-overlay'
 import { NODE_TYPE } from './constants'
-import { buildGraphFromPlan } from './graph/build-graph-from-plan'
 import {
   MetricsVisibilityContext,
   HeatmapContext,
@@ -17,6 +16,7 @@ import {
 } from './contexts'
 import { PlanNode } from './plan-node'
 import { useHeatmapMax } from './hooks/use-heatmap-max'
+import { buildGraphFromPlan } from './graph/build-graph-from-plan'
 import { getLayoutedElementsViaDagre } from './utils/layout'
 import { estimateNodeHeight } from './utils/node-display'
 import { DetailsPanel } from './details-panel'

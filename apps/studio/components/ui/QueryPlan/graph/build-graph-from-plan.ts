@@ -1,6 +1,4 @@
 import type { Edge, Node } from 'reactflow'
-
-import { getLayoutedElementsViaDagre } from '../utils/layout'
 import { NODE_TYPE } from '../constants'
 import type { RawPlan, PlanRoot, PlanNodeData, Agg } from '../types'
 import { toArray } from '../utils/formats'
@@ -233,5 +231,5 @@ export const buildGraphFromPlan = (
     addPlan(planJson[0].Plan)
   }
 
-  return { ...getLayoutedElementsViaDagre(nodes, edges), subplanRoots }
+  return { nodes, edges, subplanRoots }
 }
