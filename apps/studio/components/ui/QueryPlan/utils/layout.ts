@@ -11,7 +11,7 @@ export const getLayoutedElementsViaDagre = (
   dagreGraph.setDefaultEdgeLabel(() => ({}))
   dagreGraph.setGraph({
     rankdir: 'TB',
-    nodesep: 25,
+    nodesep: 100,
     ranksep: 50,
   })
 
