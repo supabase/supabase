@@ -8,7 +8,7 @@ export const useDashboardHistory = () => {
   // [Joshen] History should always refer to the project that the user is currently on
   const { ref } = useParams()
 
-  const [history, setHistory, { isSuccess }] = useLocalStorageQuery(
+  const [history, setHistory, { isSuccess }] = useLocalStorageQuery<DashboardHistory>(
     LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref ?? ''),
     DEFAULT_HISTORY
   )
