@@ -68,6 +68,7 @@ const UpdateOAuthAppSidePanel = ({
     clientId: string
     clientSecret: string
   } | null>(null)
+  const [allowPublicApps, setAllowPublicApps] = useState(false)
 
   useEffect(() => {
     if (selectedApp) {
@@ -83,6 +84,43 @@ const UpdateOAuthAppSidePanel = ({
       form.reset(values)
     }
   }, [visible, selectedApp])
+
+  // Load OAuth server settings to check if public apps are allowed
+  useEffect(() => {
+    const loadOAuthServerSettings = () => {
+      try {
+        const stored = localStorage.getItem('oauth_server_settings')
+        if (stored) {
+          const parsedSettings = JSON.parse(stored)
+          setAllowPublicApps(parsedSettings.allowPublicApps || false)
+        }
+      } catch (error) {
+        console.error('Error loading OAuth server settings from localStorage:', error)
+      }
+    }
+
+    loadOAuthServerSettings()
+
+    // Listen for changes to OAuth server settings
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'oauth_server_settings') {
+        loadOAuthServerSettings()
+      }
+    }
+
+    // Listen for custom events when OAuth server settings are modified in the same tab
+    const handleOAuthServerSettingsChange = () => {
+      loadOAuthServerSettings()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('oauth-server-settings-changed', handleOAuthServerSettingsChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('oauth-server-settings-changed', handleOAuthServerSettingsChange)
+    }
+  }, [])
 
   const FormSchema = z.object({
     name: z
@@ -407,22 +445,33 @@ const UpdateOAuthAppSidePanel = ({
                     layout="flex"
                     description={
                       <>
-                        If enabled, the Authorization Code with PKCE (Proof Key for Code Exchange)
-                        flow can be used, particularly beneficial for applications that cannot
-                        securely store Client Secrets, such as native and mobile apps.{' '}
-                        <Link
-                          href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-foreground-light underline hover:text-foreground transition"
-                        >
-                          Learn more
-                        </Link>
+                        {allowPublicApps ? (
+                          <>
+                            If enabled, the Authorization Code with PKCE (Proof Key for Code
+                            Exchange) flow can be used, particularly beneficial for applications
+                            that cannot securely store Client Secrets, such as native and mobile
+                            apps.{' '}
+                            <Link
+                              href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-foreground-light underline hover:text-foreground transition"
+                            >
+                              Learn more
+                            </Link>
+                          </>
+                        ) : (
+                          'Public OAuth apps are disabled. Enable "Allow Public OAuth Apps" in OAuth Server settings to use this feature.'
+                        )}
                       </>
                     }
                   >
                     <FormControl_Shadcn_>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!allowPublicApps}
+                      />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}

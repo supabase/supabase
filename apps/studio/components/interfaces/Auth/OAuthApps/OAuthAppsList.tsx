@@ -87,7 +87,7 @@ const OAuthAppsList = () => {
         const stored = localStorage.getItem('oauth_server_settings')
         if (stored) {
           const parsedSettings = JSON.parse(stored)
-          setIsOAuthServerEnabled(parsedSettings.oauthServerEnabled)
+          setIsOAuthServerEnabled(parsedSettings.GOTRUE_OAUTH_SERVER_ENABLED)
         }
       } catch (error) {
         console.error('Error loading OAuth server settings from localStorage:', error)
