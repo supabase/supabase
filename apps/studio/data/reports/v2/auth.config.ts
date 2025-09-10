@@ -4,6 +4,7 @@ import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
 import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
 import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { fetchLogs } from 'data/reports/report.utils'
+import z from 'zod'
 
 const METRIC_KEYS = [
   'ActiveUsers',
@@ -178,8 +179,21 @@ export function defaultAuthReportFormatter(
   attributes: ReportDataProviderAttribute[]
 ) {
   const chartAttributes = attributes
-  if (!rawData) return { data: undefined, chartAttributes }
-  const result = rawData.result || []
+
+  const rawDataSchema = z.object({
+    result: z.array(
+      z.object({
+        timestamp: z.string(),
+        count: z.number(),
+      })
+    ),
+  })
+
+  const parsedRawData = rawDataSchema.parse(rawData)
+  const result = parsedRawData.result
+
+  if (!result) return { data: undefined, chartAttributes }
+
   const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
   const data = Array.from(timestamps)
     .sort()
