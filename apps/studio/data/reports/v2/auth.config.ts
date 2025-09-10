@@ -174,7 +174,7 @@ function filterToWhereClause(filters?: AuthReportFilters): string {
  * @returns Formatted data object with consistent time series data and chart attributes
  */
 export function defaultAuthReportFormatter(
-  rawData: any,
+  rawData: unknown,
   attributes: ReportDataProviderAttribute[]
 ) {
   const chartAttributes = attributes
