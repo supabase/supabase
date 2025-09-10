@@ -67,7 +67,7 @@ const schema = object({
   PASSWORD_HIBP_ENABLED: boolean(),
 })
 
-const ProtectionAuthSettingsForm = () => {
+export const ProtectionAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
@@ -287,5 +287,3 @@ const ProtectionAuthSettingsForm = () => {
     </ScaffoldSection>
   )
 }
-
-export default ProtectionAuthSettingsForm

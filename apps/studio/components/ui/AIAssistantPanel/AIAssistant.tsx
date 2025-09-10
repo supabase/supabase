@@ -47,7 +47,8 @@ interface AIAssistantProps {
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedOrganization, isLoading: isLoadingOrganization } =
+    useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
 
@@ -72,6 +73,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
+
+  // Keep latest selected organization to avoid stale values in useChat transport
+  const selectedOrganizationRef = useRef(selectedOrganization)
+  useEffect(() => {
+    selectedOrganizationRef.current = selectedOrganization
+  }, [selectedOrganization])
 
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
@@ -179,7 +186,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             schema: currentSchema,
             table: currentTable?.name,
             chatName: currentChat,
-            orgSlug: selectedOrganization?.slug,
+            orgSlug: selectedOrganizationRef.current?.slug,
           },
           headers: { Authorization: authorizationHeader ?? '' },
         }
@@ -532,7 +539,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={!isApiKeySet || disablePrompts || (isChatLoading && !editingMessageId)}
+            disabled={
+              !isApiKeySet ||
+              disablePrompts ||
+              isLoadingOrganization ||
+              (isChatLoading && !editingMessageId)
+            }
             placeholder={
               hasMessages
                 ? 'Ask a follow up question...'
