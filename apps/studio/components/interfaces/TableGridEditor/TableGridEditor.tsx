@@ -12,7 +12,7 @@ import {
   isTableLike,
   isView,
 } from 'data/table-editor/table-editor-types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -22,7 +22,7 @@ import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
-import TableDefinition from './TableDefinition'
+import { TableDefinition } from './TableDefinition'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
@@ -46,8 +46,14 @@ export const TableGridEditor = ({
 
   const [{ view: selectedView = 'data' }] = useUrlState()
 
-  const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const { can: canEditTables } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+  const { can: canEditColumns } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'columns'
+  )
   const isReadOnly = !canEditTables && !canEditColumns
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
   const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))

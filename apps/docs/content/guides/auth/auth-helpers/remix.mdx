@@ -55,7 +55,7 @@ This library supports the following tooling versions:
 
 ## Set up environment variables
 
-Retrieve your project URL and anon key in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
+Retrieve your project URL and anon key in your project's [API settings](/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
 
 ```bash .env
 SUPABASE_URL=YOUR_SUPABASE_URL
@@ -64,7 +64,7 @@ SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 
 ### Code Exchange route
 
-The `Code Exchange` route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the Remix Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The `Code Exchange` route is required for the [server-side auth flow](/docs/guides/auth/server-side-rendering) implemented by the Remix Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
 
 <Tabs
   scrollable
@@ -822,7 +822,7 @@ export default function Index() {
 
 <Admonition type="tip">
 
-Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/publications) on the table you are subscribing to.
+Ensure you have [enabled replication](/dashboard/project/_/database/publications) on the table you are subscribing to.
 
 </Admonition>
 

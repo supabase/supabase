@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
@@ -28,8 +28,6 @@ const ProjectLints: NextPageWithLayout = () => {
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
-  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
-
   const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
@@ -53,9 +51,8 @@ const ProjectLints: NextPageWithLayout = () => {
       value: type.name,
     }))
 
-  useEffect(() => {
-    // check the URL for an ID and set the selected lint
-    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
+  const selectedLint: Lint | null = useMemo(() => {
+    return activeLints.find((lint) => lint.cache_key === id) ?? null
   }, [id, activeLints])
 
   return (
@@ -70,7 +67,6 @@ const ProjectLints: NextPageWithLayout = () => {
         isLoading={isLoading}
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
-        setSelectedLint={setSelectedLint}
       />
       <LinterFilters
         filterOptions={filterOptions}
@@ -87,7 +83,6 @@ const ProjectLints: NextPageWithLayout = () => {
         filteredLints={filteredLints}
         currentTab={currentTab}
         selectedLint={selectedLint}
-        setSelectedLint={setSelectedLint}
         isLoading={isLoading}
       />
       <LinterPageFooter isLoading={isLoading} isRefetching={isRefetching} refetch={refetch} />
