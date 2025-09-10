@@ -38,7 +38,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { PaymentMethodElementRef } from './PaymentMethods/NewPaymentMethodElement'
+import type { PaymentMethodElementRef } from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
