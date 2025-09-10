@@ -27,7 +27,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
 
       <h3 className="text-sm mb-2">Issue</h3>
       <ReactMarkdown className="leading-6 text-sm text-foreground-light mb-6">
-        {lint.detail.replace(/\`/g, '`')}
+        {lint.detail.replace(/\\`/g, '`')}
       </ReactMarkdown>
       <h3 className="text-sm mb-2">Description</h3>
       <ReactMarkdown className="text-sm text-foreground-light mb-6">

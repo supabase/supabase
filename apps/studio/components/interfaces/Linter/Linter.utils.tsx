@@ -300,6 +300,15 @@ export const lintInfoMap: LintInfo[] = [
     docsLink: 'https://supabase.com/docs/guides/auth/auth-mfa',
     category: 'security',
   },
+  {
+    name: 'vulnerable_postgres_version',
+    title: 'Postgres version has security patches available',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/infrastructure`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/upgrading',
+    category: 'security',
+  },
 ]
 
 export const LintCTA = ({
@@ -384,8 +393,8 @@ export const createLintSummaryPrompt = (lint: Lint) => {
           `${lint.metadata.schema}.${lint.metadata.name}`))) ||
     'N/A'
   const schema = lint.metadata?.schema ?? 'N/A'
-  const issue = lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'
-  const description = lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'
+  const issue = lint.detail ? lint.detail.replace(/\\`/g, '`') : 'N/A'
+  const description = lint.description ? lint.description.replace(/\\`/g, '`') : 'N/A'
   return `Summarize the issue and suggest fixes for the following lint item:
 Title: ${title}
 Entity: ${entity}
