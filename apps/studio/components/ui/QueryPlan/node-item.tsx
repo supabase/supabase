@@ -18,18 +18,16 @@ export const NodeItem = ({
     <li
       title={title}
       className={cn(
-        'text-[8px] leading-5 relative flex flex-row justify-items-start',
+        'text-[8px] leading-5 relative px-2 flex flex-row items-center justify-between',
         'bg-surface-100',
         'border-t',
         'border-t-[0.5px]',
-        'hover:bg-scale-500 transition cursor-default',
+        'hover:bg-scale-500 transition-[background-color] cursor-default',
         heightClass,
         className
       )}
     >
-      <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-        {children}
-      </div>
+      {children}
     </li>
   )
 }
