@@ -1,6 +1,4 @@
-import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
+import { ArrowDown, ArrowUp, ChevronDown, TextSearch, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -8,6 +6,10 @@ import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -16,9 +18,9 @@ import {
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
   cn,
+  CodeBlock,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { QueryPerformanceSort } from '../Reports/Reports.queries'
 import { hasIndexRecommendations } from './index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
@@ -27,51 +29,83 @@ import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
 }
 
-// Load the monaco editor client-side only (does not behave well server-side)
-const Editor = dynamic(() => import('@monaco-editor/react').then(({ Editor }) => Editor), {
-  ssr: false,
-})
-
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
-  const router = useRouter()
+  const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { preset, sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
 
-  const defaultSortValue = router.query.sort
-    ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
-    : undefined
-
   const [view, setView] = useState<'details' | 'suggestion'>('details')
-  const [sort, setSort] = useState<QueryPerformanceSort | undefined>(defaultSortValue)
   const [selectedRow, setSelectedRow] = useState<number>()
   const reportType =
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
 
   const columns = QUERY_PERFORMANCE_REPORTS[reportType].map((col) => {
+    const nonSortableColumns = ['query']
+
     const result: Column<any> = {
       key: col.id,
       name: col.name,
       resizable: true,
       minWidth: col.minWidth ?? 120,
+      sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {
+        const isSortable = !nonSortableColumns.includes(col.id)
+
         return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange(col.id)}
-          >
+          <div className="flex items-center justify-between text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
-              {col.description && <p className="text-foreground-lighter">{col.description}</p>}
+              <p className="!text-foreground font-medium">{col.name}</p>
+              {col.description && (
+                <p className="text-foreground-lighter font-normal">{col.description}</p>
+              )}
             </div>
-            {sort?.column === col.id && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
+
+            {isSortable && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="text"
+                    size="tiny"
+                    className="p-1 h-5 w-5 flex-shrink-0"
+                    icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSortConfig(col.id, 'asc')
+                    }}
+                    className={cn(
+                      'flex gap-2',
+                      sort?.column === col.id && sort?.order === 'asc' && 'text-foreground'
+                    )}
+                  >
+                    <ArrowUp size={14} />
+                    Sort Ascending
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSortConfig(col.id, 'desc')
+                    }}
+                    className={cn(
+                      'flex gap-2',
+                      sort?.column === col.id && sort?.order === 'desc' && 'text-foreground'
+                    )}
+                  >
+                    <ArrowDown size={14} />
+                    Sort Descending
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         )
@@ -80,7 +114,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         const value = props.row?.[col.id]
         if (col.id === 'query') {
           return (
-            <div className="w-full flex items-center gap-x-2 pointer-events-none">
+            <div className="w-full flex items-center gap-x-3">
               {hasIndexRecommendations(props.row.index_advisor_result, true) && (
                 <IndexSuggestionIcon
                   indexAdvisorResult={props.row.index_advisor_result}
@@ -91,37 +125,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   }}
                 />
               )}
-              <Editor
-                height={20}
-                theme="supabase"
+              <CodeBlock
                 language="pgsql"
-                value={value.replace(/\s+/g, ' ').trim()}
-                wrapperProps={{
-                  className:
-                    '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent [&_.monaco-editor]:!outline-transparent',
-                }}
-                options={{
-                  readOnly: true,
-                  domReadOnly: true,
-                  cursorBlinking: 'solid',
-                  tabIndex: -1,
-                  fontSize: 12,
-                  minimap: { enabled: false },
-                  lineNumbers: 'off',
-                  renderLineHighlight: 'none',
-                  scrollbar: { vertical: 'hidden', horizontal: 'hidden' },
-                  overviewRulerLanes: 0,
-                  overviewRulerBorder: false,
-                  glyphMargin: false,
-                  folding: false,
-                  lineDecorationsWidth: 0,
-                  lineNumbersMinChars: 0,
-                  wordWrap: 'off',
-                  scrollBeyondLastLine: false,
-                  contextmenu: false,
-                  selectionHighlight: false,
-                  occurrencesHighlight: 'off',
-                }}
+                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-8 flex-grow pointer-events-none"
+                wrapperClassName="!max-w-full"
+                hideLineNumbers
+                hideCopy
+                value={value.replace(/\s+/g, ' ').trim() as string}
+                wrapLines={false}
               />
             </div>
           )
@@ -137,8 +148,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'prop_total_time') {
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
-              <p>{value || 'n/a'}</p>
+            <div className="w-full flex flex-col justify-center text-xs">
+              <p>{value ? `${value.toFixed(1)}%` : 'n/a'}</p>
             </div>
           )
         }
@@ -150,17 +161,20 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               ? `${value.toFixed(0)}ms`
               : value.toLocaleString()
             : ''
+
+        if (col.id === 'total_time') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
+                <p>{(value / 1000).toFixed(2) + 's' || 'n/a'}</p>
+              )}
+            </div>
+          )
+        }
+
         return (
-          <div
-            className={cn(
-              'w-full flex flex-col justify-center font-mono text-xs',
-              typeof value === 'number' ? 'text-right' : ''
-            )}
-          >
+          <div className="w-full flex flex-col gap-y-0.5 justify-center text-xs">
             <p>{formattedValue}</p>
-            {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
-              <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>
-            )}
           </div>
         )
       },
@@ -168,7 +182,28 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     return result
   })
 
-  const reportData = useMemo(() => data ?? [], [data])
+  const reportData = useMemo(() => {
+    const rawData = data ?? []
+
+    if (sort?.column === 'prop_total_time') {
+      const sortedData = [...rawData].sort((a, b) => {
+        const getNumericValue = (value: number | string) => {
+          if (!value || value === 'n/a') return 0
+          if (typeof value === 'number') return value
+          return parseFloat(value.toString().replace('%', '')) || 0
+        }
+
+        const aValue = getNumericValue(a.prop_total_time)
+        const bValue = getNumericValue(b.prop_total_time)
+
+        return sort.order === 'asc' ? aValue - bValue : bValue - aValue
+      })
+
+      return sortedData
+    }
+
+    return rawData
+  }, [data, sort])
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
   const showIndexSuggestions =
@@ -176,32 +211,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       query.startsWith('with pgrst_source') ||
       query.startsWith('with pgrst_payload')) &&
     hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
-
-  const onSortChange = (column: string) => {
-    let updatedSort = undefined
-
-    if (sort?.column === column) {
-      if (sort.order === 'desc') {
-        updatedSort = { column, order: 'asc' }
-      } else {
-        updatedSort = undefined
-      }
-    } else {
-      updatedSort = { column, order: 'desc' }
-    }
-
-    setSort(updatedSort as QueryPerformanceSort)
-
-    if (updatedSort === undefined) {
-      const { sort, order, ...otherParams } = router.query
-      router.push({ ...router, query: otherParams })
-    } else {
-      router.push({
-        ...router,
-        query: { ...router.query, sort: updatedSort.column, order: updatedSort.order },
-      })
-    }
-  }
 
   useEffect(() => {
     setSelectedRow(undefined)
@@ -264,7 +273,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             return [
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
-              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell:first-child>div]:ml-4',
             ].join(' ')
           }}
