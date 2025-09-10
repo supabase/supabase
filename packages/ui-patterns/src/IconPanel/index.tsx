@@ -102,7 +102,7 @@ export const IconPanel = ({
               {children && (
                 <span className="text-sm text-foreground-light not-prose">{children}</span>
               )}
-              {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
+              {showLink && <span className="text-brand-link justify-end text-sm">Learn more</span>}
             </div>
           </div>
         </div>

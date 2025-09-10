@@ -11,7 +11,7 @@ export const getStatusConfig = (state: TableState['state']) => {
       return {
         badge: <Badge variant="warning">Queued</Badge>,
         description: 'Waiting to start replication',
-        color: 'text-warning-600',
+        color: 'text-warning',
       }
     case 'copying_table':
       return {
@@ -41,7 +41,7 @@ export const getStatusConfig = (state: TableState['state']) => {
       return {
         badge: <Badge variant="warning">Unknown</Badge>,
         description: 'Unknown status',
-        color: 'text-warning-600',
+        color: 'text-warning',
       }
   }
 }

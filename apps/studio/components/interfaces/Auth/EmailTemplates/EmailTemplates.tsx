@@ -7,7 +7,7 @@ import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import TemplateEditor from './TemplateEditor'
 
-const EmailTemplates = () => {
+export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -68,5 +68,3 @@ const EmailTemplates = () => {
     </div>
   )
 }
-
-export default EmailTemplates

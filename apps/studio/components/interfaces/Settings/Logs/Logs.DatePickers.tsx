@@ -29,13 +29,14 @@ export type DatePickerValue = {
   text?: string
 }
 
-interface Props {
+interface LogsDatePickerProps {
   value: DatePickerValue
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
   popoverContentProps?: typeof PopoverContent_Shadcn_
   hideWarnings?: boolean
+  align?: 'start' | 'end' | 'center'
 }
 
 export const LogsDatePicker = ({
@@ -45,7 +46,8 @@ export const LogsDatePicker = ({
   buttonTriggerProps,
   popoverContentProps,
   hideWarnings,
-}: PropsWithChildren<Props>) => {
+  align = 'end',
+}: PropsWithChildren<LogsDatePickerProps>) => {
   const [open, setOpen] = useState(false)
 
   const todayButtonRef = useRef<HTMLButtonElement>(null)
@@ -253,7 +255,7 @@ export const LogsDatePicker = ({
       <PopoverContent_Shadcn_
         className="flex w-full p-0"
         side="bottom"
-        align="end"
+        align={align}
         portal={true}
         {...popoverContentProps}
       >
@@ -389,7 +391,7 @@ export const LogsDatePicker = ({
             />
           </div>
           {isLargeRange && !hideWarnings && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning-600">
+            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning">
               Large ranges may result in memory errors for <br /> big projects.
             </div>
           )}
