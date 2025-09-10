@@ -11,7 +11,7 @@ import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import {
@@ -31,7 +31,7 @@ import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
 
-const Usage = () => {
+export const Usage = () => {
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
   const [selectedProjectRefInputValue, setSelectedProjectRefInputValue] = useState<
@@ -43,7 +43,7 @@ const Usage = () => {
   const selectedProjectRef =
     selectedProjectRefInputValue === 'all-projects' ? undefined : selectedProjectRefInputValue
 
-  const canReadSubscriptions = useCheckPermissions(
+  const { can: canReadSubscriptions } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
@@ -312,5 +312,3 @@ const Usage = () => {
     </>
   )
 }
-
-export default Usage

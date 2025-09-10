@@ -89,40 +89,42 @@ export function useGetProjectPermissions(
   })
   const permissions = permissionsOverride === undefined ? data : permissionsOverride
 
-  const organizationsQueryEnabled = organizationSlugOverride === undefined && enabled
+  const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
   const {
     data: organizationData,
     isLoading: isLoadingOrganization,
     isSuccess: isSuccessOrganization,
   } = useSelectedOrganizationQuery({
-    enabled: organizationsQueryEnabled,
+    enabled: getOrganizationDataFromParamsSlug,
   })
   const organization =
     organizationSlugOverride === undefined ? organizationData : { slug: organizationSlugOverride }
   const organizationSlug = organization?.slug
 
-  const projectsQueryEnabled = projectRefOverride === undefined && enabled
+  const { ref: urlProjectRef } = useParams()
+  const getProjectDataFromParamsRef = !!urlProjectRef && projectRefOverride === undefined && enabled
   const {
     data: projectData,
     isLoading: isLoadingProject,
     isSuccess: isSuccessProject,
   } = useSelectedProjectQuery({
-    enabled: projectsQueryEnabled,
+    enabled: getProjectDataFromParamsRef,
   })
   const project =
     projectRefOverride === undefined || projectData?.parent_project_ref
       ? projectData
       : { ref: projectRefOverride, parent_project_ref: undefined }
+
   const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
 
   const isLoading =
     isLoadingPermissions ||
-    (organizationsQueryEnabled && isLoadingOrganization) ||
-    (projectsQueryEnabled && isLoadingProject)
+    (getOrganizationDataFromParamsSlug && isLoadingOrganization) ||
+    (getProjectDataFromParamsRef && isLoadingProject)
   const isSuccess =
     isSuccessPermissions &&
-    (!organizationsQueryEnabled || isSuccessOrganization) &&
-    (!projectsQueryEnabled || isSuccessProject)
+    (!getOrganizationDataFromParamsSlug || isSuccessOrganization) &&
+    (!getProjectDataFromParamsRef || isSuccessProject)
 
   return {
     permissions,

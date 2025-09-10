@@ -1,4 +1,4 @@
-import { Usage } from 'components/interfaces/Organization'
+import { Usage } from 'components/interfaces/Organization/Usage/Usage'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
