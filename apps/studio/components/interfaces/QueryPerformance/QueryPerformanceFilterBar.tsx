@@ -104,7 +104,7 @@ export const QueryPerformanceFilterBar = ({
           {sort && (
             <div className="text-xs border rounded-md px-2.5 py-1 h-[26px] flex items-center gap-x-2">
               <p>
-                Sort: {sort.column} (<span className="capitalize">{sort.order}</span>)
+                Sort: {sort.column} <span className="text-foreground-lighter">{sort.order}</span>
               </p>
               <Tooltip>
                 <TooltipTrigger onClick={clearSort}>
