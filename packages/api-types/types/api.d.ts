@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  '/v1/branches/{branch_id}': {
+  '/v1/branches/{branch_id_or_ref}': {
     parameters: {
       query?: never
       header?: never
@@ -32,7 +32,7 @@ export interface paths {
     patch: operations['v1-update-a-branch-config']
     trace?: never
   }
-  '/v1/branches/{branch_id}/diff': {
+  '/v1/branches/{branch_id_or_ref}/diff': {
     parameters: {
       query?: never
       header?: never
@@ -52,7 +52,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/merge': {
+  '/v1/branches/{branch_id_or_ref}/merge': {
     parameters: {
       query?: never
       header?: never
@@ -72,7 +72,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/push': {
+  '/v1/branches/{branch_id_or_ref}/push': {
     parameters: {
       query?: never
       header?: never
@@ -92,7 +92,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/reset': {
+  '/v1/branches/{branch_id_or_ref}/reset': {
     parameters: {
       query?: never
       header?: never
@@ -1513,23 +1513,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/projects/{ref}/storage/buckets/{id}/objects': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Gets list of objects with the given bucket */
-    post: operations['v1-list-storage-objects']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/v1/projects/{ref}/types/typescript': {
     parameters: {
       query?: never
@@ -2843,7 +2826,13 @@ export interface components {
     }
     RemoveNetworkBanRequest: {
       identifier?: string
+      /** @description List of IP addresses to unban. */
       ipv4_addresses: string[]
+      /**
+       * @description Include requester's public IP in the list of addresses to unban.
+       * @default false
+       */
+      requester_ip?: boolean
     }
     RemoveReadReplicaBody: {
       database_identifier: string
@@ -3568,43 +3557,6 @@ export interface components {
       name?: string
       version: string
     }[]
-    V1ListStorageObjectsBody: {
-      options?: {
-        limit?: number
-        offset?: number
-        search?: string
-        sort_by?: string
-        /** @enum {string} */
-        sort_order?: 'asc' | 'desc'
-      }
-      path?: string
-    }
-    V1ListStorageObjectsResponse: {
-      items: {
-        bucket_id: string
-        buckets: {
-          allowed_mime_types?: string[]
-          created_at: string
-          file_size_limit?: number
-          id: string
-          name: string
-          owner: string
-          public: boolean
-          /** @enum {string} */
-          type?: 'STANDARD' | 'ANALYTICS'
-          updated_at: string
-        }
-        created_at: string
-        id: string
-        last_accessed_at: string
-        metadata: {
-          [key: string]: unknown
-        }
-        name: string
-        owner: string
-        updated_at: string
-      }[]
-    }
     V1OrganizationMemberResponse: {
       email?: string
       mfa_enabled: boolean
@@ -3875,7 +3827,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3904,7 +3856,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3933,7 +3885,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3968,7 +3920,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3997,7 +3949,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -4030,7 +3982,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -4063,7 +4015,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -6955,6 +6907,13 @@ export interface operations {
           'application/json': components['schemas']['BulkUpdateFunctionResponse']
         }
       }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       403: {
         headers: {
           [name: string]: unknown
@@ -7004,6 +6963,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['FunctionResponse']
         }
+      }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       403: {
         headers: {
@@ -7208,6 +7174,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['DeployFunctionResponse']
         }
+      }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       403: {
         headers: {
@@ -8097,47 +8070,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get list of buckets */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  'v1-list-storage-objects': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1ListStorageObjectsBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V1ListStorageObjectsResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get list of objects with the given bucket */
       500: {
         headers: {
           [name: string]: unknown

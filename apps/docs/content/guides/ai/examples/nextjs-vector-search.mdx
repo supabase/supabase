@@ -12,19 +12,19 @@ While our [Headless Vector search](/docs/guides/ai/examples/headless-vector-sear
 2. Store you embeddings in Postgres using pgvector.
 3. Deploy a function for answering your users' questions.
 
-You can read our [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) blog post for a full example.
+You can read our [Supabase Clippy](/blog/chatgpt-supabase-docs) blog post for a full example.
 
 We assume that you have a Next.js project with a collection of `.mdx` files nested inside your `pages` directory. We will start developing locally with the Supabase CLI and then push our local database changes to our hosted Supabase project. You can find the [full Next.js example on GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
 
 ## Create a project
 
-1. [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+1. [Create a new project](/dashboard) in the Supabase Dashboard.
 1. Enter your project details.
 1. Wait for the new database to launch.
 
 ## Prepare the database
 
-Let's prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](https://supabase.com/dashboard/project/_/sql), or you can copy/paste the SQL below and run it yourself.
+Let's prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](/dashboard/project/_/sql), or you can copy/paste the SQL below and run it yourself.
 
 <Tabs
   scrollable
@@ -35,7 +35,7 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [SQL Editor](https://supabase.com/dashboard/project/_/sql) page in the Dashboard.
+1. Go to the [SQL Editor](/dashboard/project/_/sql) page in the Dashboard.
 2. Click **OpenAI Vector Search**.
 3. Click **Run**.
 
@@ -147,7 +147,7 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
 
     Anytime the user sends a query, we want to find the content that's relevant to their questions. We can do this using pgvector's similarity search.
 
-    These are quite complex SQL operations, so let's wrap them in database functions that we can call from our frontend using [RPC](https://supabase.com/docs/reference/javascript/rpc).
+    These are quite complex SQL operations, so let's wrap them in database functions that we can call from our frontend using [RPC](/docs/reference/javascript/rpc).
 
     </StepHikeCompact.Details>
 
@@ -527,8 +527,8 @@ const handleConfirm = React.useCallback(
 
 Want to learn more about the awesome tech that is powering this?
 
-- Read about how we built [ChatGPT for the Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs).
-- Read the pgvector Docs for [Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
+- Read about how we built [ChatGPT for the Supabase Docs](/blog/chatgpt-supabase-docs).
+- Read the pgvector Docs for [Embeddings and vector similarity](/docs/guides/database/extensions/pgvector)
 - Watch Greg's video for a full breakdown:
 
 <div class="video-container">
