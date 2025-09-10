@@ -74,7 +74,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
 
-  // Keep latest selected organization to avoid stale closures in callbacks
+  // Keep latest selected organization to avoid stale values in useChat transport
   const selectedOrganizationRef = useRef(selectedOrganization)
   useEffect(() => {
     selectedOrganizationRef.current = selectedOrganization
