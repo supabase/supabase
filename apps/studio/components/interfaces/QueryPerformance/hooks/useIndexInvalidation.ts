@@ -10,10 +10,6 @@ import {
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { databaseKeys } from 'data/database/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  QUERY_PERFORMANCE_PRESET_MAP,
-  QUERY_PERFORMANCE_REPORT_TYPES,
-} from '../QueryPerformance.constants'
 import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
 
 export function useIndexInvalidation() {
@@ -26,17 +22,16 @@ export function useIndexInvalidation() {
     sort: parseAsString,
     search: parseAsString.withDefault(''),
     order: parseAsString,
-    preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
+    preset: parseAsString.withDefault('unified'),
   })
 
-  const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
   const roles = router?.query?.roles ?? []
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
     orderBy,
-    preset,
+    preset: 'unified',
     roles: typeof roles === 'string' ? [roles] : roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
   })

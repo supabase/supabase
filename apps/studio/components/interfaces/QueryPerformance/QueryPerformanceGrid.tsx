@@ -23,10 +23,7 @@ import { hasIndexRecommendations } from './index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
-import {
-  QUERY_PERFORMANCE_REPORTS,
-  QUERY_PERFORMANCE_REPORT_TYPES,
-} from './QueryPerformance.constants'
+import { QUERY_PERFORMANCE_COLUMNS } from './QueryPerformance.constants'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
@@ -40,7 +37,7 @@ const Editor = dynamic(() => import('@monaco-editor/react').then(({ Editor }) =>
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
   const router = useRouter()
   const gridRef = useRef<DataGridHandle>(null)
-  const { preset, sort: urlSort, order, roles, search } = useParams()
+  const { sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
 
   const defaultSortValue = router.query.sort
@@ -50,10 +47,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [sort, setSort] = useState<QueryPerformanceSort | undefined>(defaultSortValue)
   const [selectedRow, setSelectedRow] = useState<number>()
-  const reportType =
-    (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
 
-  const columns = QUERY_PERFORMANCE_REPORTS[reportType].map((col) => {
+  const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
     const result: Column<any> = {
       key: col.id,
       name: col.name,
@@ -205,7 +200,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [preset, search, roles, urlSort, order])
+  }, [search, roles, urlSort, order])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -342,7 +337,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 className="mt-0 flex-grow min-h-0 overflow-y-auto"
               >
                 <QueryDetail
-                  reportType={reportType}
+                  reportType="unified"
                   selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
                 />
