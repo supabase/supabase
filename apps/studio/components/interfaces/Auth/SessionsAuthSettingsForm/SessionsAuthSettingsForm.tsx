@@ -59,7 +59,7 @@ const UserSessionsSchema = z.object({
   SESSIONS_SINGLE_PER_USER: z.boolean(),
 })
 
-const SessionsAuthSettingsForm = () => {
+export const SessionsAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
@@ -370,5 +370,3 @@ const SessionsAuthSettingsForm = () => {
     </>
   )
 }
-
-export default SessionsAuthSettingsForm

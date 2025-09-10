@@ -12,7 +12,7 @@ Authentication is hard. SSR is harder. At Supabase, we try to address these toge
 If you are experiencing issues with Supabase Auth and SSR, the following checklist will help you troubleshoot the issues.
 
 ✅ You’re on the latest version of `@supabase/ssr` package. Note that the `@supabase/auth-helpers` package is being deprecated, and all the bug fixes and feature releases will be focused on the `@supabase/ssr` package.
-✅ Do you have all the client utility functions implemented? This way, you can import them into your components that need access to Supabase auth functions. Make sure to follow the [guide available here](https://supabase.com/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs&queryGroups=environment&environment=client-component#creating-a-client) carefully to avoid running into unexpected errors.
+✅ Do you have all the client utility functions implemented? This way, you can import them into your components that need access to Supabase auth functions. Make sure to follow the [guide available here](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs&queryGroups=environment&environment=client-component#creating-a-client) carefully to avoid running into unexpected errors.
 ✅ Do you have the `middleware.ts` file correctly implemented? This lets you refresh expired sessions before loading server components that require a user session for authorization.
 
 This documentation will help you validate that you’re on the correct path.

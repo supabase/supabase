@@ -16,6 +16,7 @@ import {
 } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { AdvisorSection } from './AdvisorSection'
 
 export const HomeV2 = () => {
   const { ref, enableBranching } = useParams()
@@ -100,11 +101,15 @@ export const HomeV2 = () => {
                 )}
                 strategy={verticalListSortingStrategy}
               >
-                {sectionOrder.map((id) => (
-                  <SortableSection key={id} id={id}>
-                    {id}
-                  </SortableSection>
-                ))}
+                {sectionOrder.map((id) => {
+                  if (id === 'advisor') {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        <AdvisorSection />
+                      </SortableSection>
+                    )
+                  }
+                })}
               </SortableContext>
             </DndContext>
           </ScaffoldSection>

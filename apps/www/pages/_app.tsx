@@ -5,7 +5,6 @@ import '../styles/index.css'
 import {
   AuthProvider,
   FeatureFlagProvider,
-  getFlags as getConfigCatFlags,
   IS_PLATFORM,
   PageTelemetry,
   TelemetryTagManager,
@@ -87,7 +86,8 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL} getConfigCatFlags={getConfigCatFlags}>
+        {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
+        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
             enableSystem

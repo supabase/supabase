@@ -89,40 +89,42 @@ export function useGetProjectPermissions(
   })
   const permissions = permissionsOverride === undefined ? data : permissionsOverride
 
-  const organizationsQueryEnabled = organizationSlugOverride === undefined && enabled
+  const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
   const {
     data: organizationData,
     isLoading: isLoadingOrganization,
     isSuccess: isSuccessOrganization,
   } = useSelectedOrganizationQuery({
-    enabled: organizationsQueryEnabled,
+    enabled: getOrganizationDataFromParamsSlug,
   })
   const organization =
     organizationSlugOverride === undefined ? organizationData : { slug: organizationSlugOverride }
   const organizationSlug = organization?.slug
 
-  const projectsQueryEnabled = projectRefOverride === undefined && enabled
+  const { ref: urlProjectRef } = useParams()
+  const getProjectDataFromParamsRef = !!urlProjectRef && projectRefOverride === undefined && enabled
   const {
     data: projectData,
     isLoading: isLoadingProject,
     isSuccess: isSuccessProject,
   } = useSelectedProjectQuery({
-    enabled: projectsQueryEnabled,
+    enabled: getProjectDataFromParamsRef,
   })
   const project =
     projectRefOverride === undefined || projectData?.parent_project_ref
       ? projectData
       : { ref: projectRefOverride, parent_project_ref: undefined }
+
   const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
 
   const isLoading =
     isLoadingPermissions ||
-    (organizationsQueryEnabled && isLoadingOrganization) ||
-    (projectsQueryEnabled && isLoadingProject)
+    (getOrganizationDataFromParamsSlug && isLoadingOrganization) ||
+    (getProjectDataFromParamsRef && isLoadingProject)
   const isSuccess =
     isSuccessPermissions &&
-    (!organizationsQueryEnabled || isSuccessOrganization) &&
-    (!projectsQueryEnabled || isSuccessProject)
+    (!getOrganizationDataFromParamsSlug || isSuccessOrganization) &&
+    (!getProjectDataFromParamsRef || isSuccessProject)
 
   return {
     permissions,
@@ -138,6 +140,7 @@ export function useGetProjectPermissions(
  * check for loading states to not prematurely show "no perms" UIs. We'll also need a separate async check for org perms too
  *
  * Use `import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'` instead
+ * [Joshen] No longer being used, can be deprecated in follow up PR
  */
 export function useCheckPermissions(
   action: string,
@@ -180,6 +183,7 @@ export function useCheckProjectPermissions(
   return doPermissionsCheck(allPermissions, action, resource, data, _organizationSlug, _projectRef)
 }
 
+/** [Joshen] No longer being used, can be deprecated in follow up PR */
 export function usePermissionsLoaded() {
   const isLoggedIn = useIsLoggedIn()
   const { isFetched: isPermissionsFetched } = usePermissionsQuery({ enabled: isLoggedIn })
@@ -200,6 +204,7 @@ export function usePermissionsLoaded() {
   return isLoggedIn && isPermissionsFetched && isOrganizationsFetched
 }
 
+/** [Joshen] To be renamed to be useAsyncCheckPermissions, more generic as it covers both org and project perms */
 // Useful when you want to avoid layout changes while waiting for permissions to load
 export function useAsyncCheckProjectPermissions(
   action: string,
