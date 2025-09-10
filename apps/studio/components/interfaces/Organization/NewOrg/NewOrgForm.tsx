@@ -43,7 +43,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
-} from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
+} from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
