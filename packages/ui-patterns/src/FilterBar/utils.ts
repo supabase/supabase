@@ -1,12 +1,12 @@
-import { 
-  FilterGroup, 
-  FilterCondition, 
+import {
+  FilterGroup,
+  FilterCondition,
   FilterProperty,
   CustomOptionObject,
   FilterOptionObject,
   AsyncOptionsFunction,
   SyncOptionsFunction,
-  isGroup
+  isGroup,
 } from './types'
 
 export function findGroupByPath(group: FilterGroup, path: number[]): FilterGroup | null {
@@ -60,12 +60,16 @@ export function isAsyncOptionsFunction(
   if (typeof options !== 'function') return false
   // More reliable async function detection
   const fnString = options.toString()
-  return options.constructor.name === 'AsyncFunction' ||
-         fnString.startsWith('async ') ||
-         fnString.includes('async function')
+  return (
+    options.constructor.name === 'AsyncFunction' ||
+    fnString.startsWith('async ') ||
+    fnString.includes('async function')
+  )
 }
 
-export function isSyncOptionsFunction(options: FilterProperty['options']): options is SyncOptionsFunction {
+export function isSyncOptionsFunction(
+  options: FilterProperty['options']
+): options is SyncOptionsFunction {
   if (!options || Array.isArray(options) || isCustomOptionObject(options)) return false
   return typeof options === 'function'
 }
@@ -113,8 +117,8 @@ export function removeFromGroup(group: FilterGroup, path: number[]): FilterGroup
 }
 
 export function addFilterToGroup(
-  group: FilterGroup, 
-  path: number[], 
+  group: FilterGroup,
+  path: number[],
   property: FilterProperty
 ): FilterGroup {
   if (path.length === 0) {
@@ -207,10 +211,7 @@ export function updateNestedOperator(
   }
 }
 
-export function updateNestedLogicalOperator(
-  group: FilterGroup,
-  path: number[]
-): FilterGroup {
+export function updateNestedLogicalOperator(group: FilterGroup, path: number[]): FilterGroup {
   if (path.length === 0) {
     return {
       ...group,
@@ -244,9 +245,7 @@ export function updateGroupAtPath(
   return {
     ...group,
     conditions: group.conditions.map((condition, index) =>
-      index === current
-        ? updateGroupAtPath(condition as FilterGroup, rest, newGroup)
-        : condition
+      index === current ? updateGroupAtPath(condition as FilterGroup, rest, newGroup) : condition
     ),
   }
 }

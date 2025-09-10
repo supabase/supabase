@@ -199,9 +199,9 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     const tocDepth = (parsedContent.data as any)?.toc_depth ?? 3
     const mdxSource = await mdxSerialize(content, { tocDepth })
     const { generateReadingTime } = await import('lib/helpers')
-    const blogPost = { 
+    const blogPost = {
       ...parsedContent.data,
-      readingTime: generateReadingTime(content)
+      readingTime: generateReadingTime(content),
     }
 
     const allStaticPosts = getSortedPosts({ directory: '_blog' })
