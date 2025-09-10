@@ -65,7 +65,7 @@ export const QueryPerformanceFilterBar = ({
   }, [searchValue])
 
   return (
-    <div className="px-6 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center">
+    <div className="px-6 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto w-full">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
           <Input
@@ -102,8 +102,8 @@ export const QueryPerformanceFilterBar = ({
           />
 
           {sort && (
-            <div className="text-xs border rounded-md px-2.5 py-1 h-[26px] flex items-center gap-x-2">
-              <p>
+            <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
+              <p className="md:inline-flex gap-x-1 hidden truncate">
                 Sort: {sort.column} <span className="text-foreground-lighter">{sort.order}</span>
               </p>
               <Tooltip>
@@ -117,7 +117,7 @@ export const QueryPerformanceFilterBar = ({
         </div>
       </div>
 
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center pl-2">
         {!showBottomSection && onResetReportClick && (
           <Button type="default" onClick={() => onResetReportClick()}>
             Reset report
