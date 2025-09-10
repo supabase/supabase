@@ -22,6 +22,9 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   } else if (data.subplanName) {
     headerLines.unshift(`[Subplan] ${data.subplanName}`)
   }
+  if (data.parallelAware) {
+    headerLines.unshift('[Parallel]')
+  }
   if (data.joinType) headerLines.push(`${capitalize(data.joinType)} join`)
 
   // Only show join-related conditions in header; exclude index/recheck/filter conditions
@@ -179,6 +182,16 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
       )}
 
       <ul>
+        {/* Workers planned/launched */}
+        {(data.workersPlanned || data.workersLaunched) && (
+          <NodeItem title="Parallel workers summary">
+            <span>Workers</span>
+            <ul className="flex flex-row items-center flex-1 justify-end gap-x-1">
+              <li>Planned:{data.workersPlanned}</li>
+              <li>Launched:{data.workersLaunched}</li>
+            </ul>
+          </NodeItem>
+        )}
         {/* Time (actual) */}
         {vis.time && data.actualTotalTime !== undefined && (
           <NodeItem>

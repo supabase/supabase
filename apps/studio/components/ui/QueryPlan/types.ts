@@ -51,6 +51,9 @@ export type RawPlan = {
   ['Sort Method']?: string
   ['Sort Space Used']?: number
   ['Sort Space Type']?: string
+  // Parallel workers
+  ['Workers Planned']?: number
+  ['Workers Launched']?: number
   // Subplan/CTE names
   ['Subplan Name']?: string
   ['CTE Name']?: string
@@ -115,6 +118,9 @@ export type PlanNodeData = {
   tempWritten?: number
   ioReadTime?: number
   ioWriteTime?: number
+  // Workers
+  workersPlanned?: number
+  workersLaunched?: number
   // Exclusive (derived)
   exclusiveTimeMs?: number
   exclusiveCost?: number

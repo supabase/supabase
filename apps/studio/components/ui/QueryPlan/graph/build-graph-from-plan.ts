@@ -164,6 +164,9 @@ export const buildGraphFromPlan = (
       tempWritten: nodeTempWritten,
       ioReadTime: plan['I/O Read Time'],
       ioWriteTime: plan['I/O Write Time'],
+      // Workers
+      workersPlanned: plan['Workers Planned'],
+      workersLaunched: plan['Workers Launched'],
       // Exclusive (derived)
       exclusiveTimeMs,
       exclusiveCost,
