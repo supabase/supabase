@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
-} from 'components/interfaces/Organization/BillingSettings/PaymentMethods/NewPaymentMethodElement'
+} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'

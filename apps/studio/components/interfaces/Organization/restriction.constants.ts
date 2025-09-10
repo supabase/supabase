@@ -21,4 +21,9 @@ export const RESTRICTION_MESSAGES = {
     title: 'Outstanding Invoices in other Organization',
     message: 'Please pay invoices for other Organization to avoid service disruption.',
   },
+  MISSING_BILLING_INFO: {
+    title: 'Missing Billing Information',
+    message:
+      'Please add a billing address. If you are a registered business, please add a tax ID too.',
+  },
 } as const

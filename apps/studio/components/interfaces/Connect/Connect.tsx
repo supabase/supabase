@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -55,15 +55,7 @@ export const Connect = () => {
     parseAsBoolean.withDefault(false)
   )
 
-  const [connectTab, setConnectTab] = useQueryState(
-    'connectTab',
-    parseAsString.withDefault('direct').withOptions({ clearOnDefault: true })
-  )
-
-  const [prefFramework] = useQueryState(
-    'framework',
-    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
-  )
+  const [tab, setTab] = useQueryState('tab', parseAsString.withDefault('direct'))
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(frameworks)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -113,21 +105,40 @@ export const Connect = () => {
     setSelectedGrandchild(value)
   }
 
-  // reset the parent/child/grandchild when the connection set changes
-  function resetSelectionFromConnections(connections: ConnectionType[]) {
-    setSelectedParent(connections[0]?.key ?? '')
+  // reset the parent/child/grandchild when the connection type (tab) changes
+  function handleConnectionTypeChange(connections: ConnectionType[]) {
+    setSelectedParent(connections[0].key)
 
     if (connections[0]?.children.length > 0) {
-      setSelectedChild(connections[0].children[0]?.key ?? '')
+      setSelectedChild(connections[0].children[0].key)
 
       if (connections[0].children[0]?.children.length > 0) {
-        setSelectedGrandchild(connections[0].children[0].children[0]?.key ?? '')
+        setSelectedGrandchild(connections[0].children[0].children[0].key)
       } else {
         setSelectedGrandchild('')
       }
     } else {
       setSelectedChild('')
       setSelectedGrandchild('')
+    }
+  }
+
+  function handleConnectionType(type: string) {
+    setTab(type)
+
+    if (type === 'frameworks') {
+      setConnectionObject(frameworks)
+      handleConnectionTypeChange(frameworks)
+    }
+
+    if (type === 'mobiles') {
+      setConnectionObject(MOBILES)
+      handleConnectionTypeChange(MOBILES)
+    }
+
+    if (type === 'orms') {
+      setConnectionObject(ORMS)
+      handleConnectionTypeChange(ORMS)
     }
   }
 
@@ -178,31 +189,14 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
-  // Sync connection set when the tab or underlying frameworks change
-  useEffect(() => {
-    if (connectTab === 'frameworks') {
-      setConnectionObject(frameworks)
-      resetSelectionFromConnections(frameworks)
-    } else if (connectTab === 'mobiles') {
-      setConnectionObject(MOBILES)
-      resetSelectionFromConnections(MOBILES)
-    } else if (connectTab === 'orms') {
-      setConnectionObject(ORMS)
-      resetSelectionFromConnections(ORMS)
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      setShowConnect(null)
+      setTab(null)
+    } else {
+      setShowConnect(open)
     }
-  }, [connectTab, frameworks])
-
-  // If a preferred framework is specified, apply it only for the frameworks tab
-  useEffect(() => {
-    if (connectTab !== 'frameworks' || !prefFramework) return
-    const exists = frameworks.find((f) => f.key === prefFramework)
-    if (!exists) return
-    setSelectedParent(prefFramework)
-    const firstChild = exists.children?.[0]?.key ?? ''
-    setSelectedChild(firstChild)
-    const firstGrand = exists.children?.[0]?.children?.[0]?.key ?? ''
-    setSelectedGrandchild(firstGrand)
-  }, [prefFramework, connectTab, frameworks])
+  }
 
   if (!isActiveHealthy) {
     return (
@@ -224,7 +218,7 @@ export const Connect = () => {
   }
 
   return (
-    <Dialog open={showConnect} onOpenChange={(open) => setShowConnect(!open ? null : open)}>
+    <Dialog open={showConnect} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
         <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
           <span>Connect</span>
@@ -238,12 +232,7 @@ export const Connect = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_
-          value={connectTab}
-          onValueChange={(value) => {
-            setConnectTab(value)
-          }}
-        >
+        <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
           <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
             {connectionTypes.map((type) => (
               <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">

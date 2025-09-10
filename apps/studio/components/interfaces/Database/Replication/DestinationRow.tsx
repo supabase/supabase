@@ -8,6 +8,7 @@ import AlertError from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { AlertCircle } from 'lucide-react'
@@ -24,13 +25,14 @@ import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { RowMenu } from './RowMenu'
+import { UpdateVersionModal } from './UpdateVersionModal'
 
 interface DestinationRowProps {
-  sourceId: number | undefined
+  sourceId?: number
   destinationId: number
   destinationName: string
   type: string
-  pipeline: Pipeline | undefined
+  pipeline?: Pipeline
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
@@ -52,6 +54,7 @@ export const DestinationRow = ({
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
+  const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
 
   const {
     data: pipelineStatusData,
@@ -66,7 +69,7 @@ export const DestinationRow = ({
     },
     { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
-  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
@@ -85,6 +88,13 @@ export const DestinationRow = ({
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
   const hasTableErrors = errorCount > 0
+
+  // Check if a newer pipeline version is available (one-time check cached for session)
+  const { data: versionData } = useReplicationPipelineVersionQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
+  const hasUpdate = Boolean(versionData?.new_version)
 
   const onDeleteClick = async () => {
     if (!projectRef) {
@@ -189,11 +199,14 @@ export const DestinationRow = ({
                 isError={isPipelineStatusError}
                 onDeleteClick={() => setShowDeleteDestinationForm(true)}
                 onEditClick={() => setShowEditDestinationPanel(true)}
+                hasUpdate={hasUpdate}
+                onUpdateClick={() => setShowUpdateVersionModal(true)}
               />
             </div>
           </Table.td>
         </Table.tr>
       )}
+
       <DeleteDestination
         visible={showDeleteDestinationForm}
         setVisible={setShowDeleteDestinationForm}
@@ -201,6 +214,7 @@ export const DestinationRow = ({
         isLoading={isDeleting}
         name={destinationName}
       />
+
       <DestinationPanel
         visible={showEditDestinationPanel}
         onClose={() => setShowEditDestinationPanel(false)}
@@ -213,6 +227,17 @@ export const DestinationRow = ({
             statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
           statusName,
         }}
+      />
+
+      <UpdateVersionModal
+        visible={showUpdateVersionModal}
+        pipeline={pipeline}
+        onClose={() => setShowUpdateVersionModal(false)}
+        confirmLabel={
+          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
+            ? 'Update and restart'
+            : 'Update version'
+        }
       />
     </>
   )
