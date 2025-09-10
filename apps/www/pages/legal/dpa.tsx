@@ -22,7 +22,7 @@ const DPA = () => {
                     href="https://supabase.com/downloads/docs/Supabase+DPA+250805.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-brand-link hover:underline"
                     onClick={() =>
                       sendTelemetryEvent({
                         action: 'dpa_pdf_opened',
@@ -42,7 +42,7 @@ const DPA = () => {
                     href="https://supabase.com/dashboard/org/_/documents"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-brand-link hover:underline"
                   >
                     request it from the legal documents page
                   </a>{' '}

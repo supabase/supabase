@@ -3,14 +3,17 @@ import { Download, Move, Trash2, X } from 'lucide-react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Button } from 'ui'
 import { downloadFile } from './StorageExplorer.utils'
 
-const FileExplorerHeaderSelection = () => {
+export const FileExplorerHeaderSelection = () => {
   const { ref: projectRef, bucketId } = useParams()
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
 
   const {
     selectedItems,
@@ -80,5 +83,3 @@ const FileExplorerHeaderSelection = () => {
     </div>
   )
 }
-
-export default FileExplorerHeaderSelection

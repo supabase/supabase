@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import Link from 'next/link'
 import { Badge, cn } from 'ui'
-import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
+import { ChevronRightIcon } from 'lucide-react'
 
 interface Props {
   url: string
@@ -33,7 +33,7 @@ const AnnouncementBadge = ({
           relative
           flex flex-row
           items-center
-          p-1 pr-3
+          p-1 pr-0.5
           text-sm
           w-auto
           gap-2
@@ -48,7 +48,7 @@ const AnnouncementBadge = ({
           overflow-hidden
           focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
           `,
-        !badge && 'px-4'
+        !badge && 'pl-4'
       )}
     >
       {badge && (
@@ -58,7 +58,7 @@ const AnnouncementBadge = ({
       )}
       <span className="text-foreground announcement-text">{announcement}</span>
       {hasArrow && (
-        <ArrowNarrowRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
+        <ChevronRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
         className="announcement-overlay absolute inset-0 -z-10 bg-gradient-to-br
