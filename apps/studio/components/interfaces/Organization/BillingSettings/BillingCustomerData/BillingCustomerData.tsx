@@ -114,7 +114,7 @@ export const BillingCustomerData = () => {
             Changes will be reflected in every upcoming invoice, past invoices are not affected
           </p>
           <p className="text-sm text-foreground-light m-0">
-            A Tax ID are only required for registered businesses.
+            A Tax ID is only required for registered businesses.
           </p>
         </div>
       </ScaffoldSectionDetail>
