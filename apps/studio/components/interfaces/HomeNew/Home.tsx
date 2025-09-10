@@ -17,7 +17,10 @@ import {
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AdvisorSection } from './AdvisorSection'
-import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
+import {
+  GettingStartedSection,
+  type GettingStartedState,
+} from './GettingStarted/GettingStartedSection'
 
 export const HomeV2 = () => {
   const { ref, enableBranching } = useParams()
@@ -50,9 +53,10 @@ export const HomeV2 = () => {
     ['getting-started', 'usage', 'advisor', 'custom-report']
   )
 
-  const [gettingStartedState, setGettingStartedState] = useLocalStorage<
-    'empty' | 'code' | 'no-code' | 'hidden'
-  >(`home-getting-started-${project?.ref || 'default'}`, 'empty')
+  const [gettingStartedState, setGettingStartedState] = useLocalStorage<GettingStartedState>(
+    `home-getting-started-${project?.ref || 'default'}`,
+    'empty'
+  )
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 

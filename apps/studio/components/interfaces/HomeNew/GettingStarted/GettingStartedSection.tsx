@@ -50,7 +50,7 @@ export type GettingStartedStep = {
   actions: GettingStartedAction[]
 }
 
-type GettingStartedState = 'empty' | 'code' | 'no-code' | 'hidden'
+export type GettingStartedState = 'empty' | 'code' | 'no-code' | 'hidden'
 
 export function GettingStartedSection({
   value,
@@ -461,10 +461,7 @@ export function GettingStartedSection({
     [tablesCount, ref, openAiChat, connectActions, hasNonDefaultBranch]
   )
 
-  const steps: GettingStartedStep[] = useMemo(
-    () => (workflow === 'code' ? codeSteps : workflow === 'no-code' ? noCodeSteps : []),
-    [workflow, codeSteps, noCodeSteps]
-  )
+  const steps = workflow === 'code' ? codeSteps : workflow === 'no-code' ? noCodeSteps : []
 
   return (
     <section className="w-full">

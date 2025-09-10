@@ -220,7 +220,7 @@ export const Connect = () => {
       setConnectionObject(ORMS)
       handleConnectionTypeChange(ORMS)
     }
-  }, [connectTab, prefFramework])
+  }, [connectTab, prefFramework, frameworks])
 
   if (!isActiveHealthy) {
     return (
