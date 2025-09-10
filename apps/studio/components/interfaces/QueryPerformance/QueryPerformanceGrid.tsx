@@ -337,7 +337,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 className="mt-0 flex-grow min-h-0 overflow-y-auto"
               >
                 <QueryDetail
-                  reportType="unified"
                   selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
                 />

@@ -24,11 +24,11 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const [{ preset: urlPreset, search: searchQuery, order, sort }] = useQueryStates({
+  const [{ search: searchQuery, order, sort }] = useQueryStates({
     sort: parseAsString,
     search: parseAsString.withDefault(''),
     order: parseAsString,
-    preset: parseAsString.withDefault('mostTimeConsuming'),
+    preset: parseAsString.withDefault('unified'),
   })
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
@@ -41,7 +41,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
     orderBy,
-    preset: 'mostTimeConsuming',
+    preset: 'unified',
     roles: typeof roles === 'string' ? [roles] : roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
   })
