@@ -14,6 +14,17 @@ There are several concepts and terminology that is useful to understand how Real
 - **Payload**: the actual data that is sent and received and that the user will act upon.
 - **Concurrent Connections**: number of total channels subscribed for all clients.
 
+## Channels
+
+Channels are the foundation of Realtime. Think of them as rooms where clients can communicate and listen to events. Channels are identified by a topic name and if they are public or private.
+
+For private channels, you need to use [Realtime Authorization](/docs/guides/realtime/authorization) to control access to the channel and if they are able to send messages.
+For public channels, any user can subscribe to the channel, send and receive messages.
+
+You can set your project to use only private channels or both private and public channels in the [Realtime Settings](/docs/guides/realtime/settings).
+
+To note that if you have a private channel and a public channel with the same topic name, they will be seen as unique channels and messages won't be able to be sent between them.
+
 ## Database resources
 
 Realtime uses several resources from your database to work properly. You need to ensure that your database has the following resources:
@@ -23,29 +34,32 @@ Realtime uses several resources from your database to work properly. You need to
 Realtime uses several database connections to do several operations. Some of them, as a user, you are able to tune them.
 
 The connections are:
-- **Migrations**: Temporarly two connections when we need to run database migrations
+
+- **Migrations**: Temporarily two connections when we need to run database migrations
 - **Authorization**: Configurable connection pool to check authorization policies on join
 - **Postgres Changes**: 3 connection pools required
-   - **Subscription management**: To manage the subscribers to Postgres Changes
-   - **Subscription cleanup**: To cleanup the subscribers to Postgres Changes
-   - **WAL pull**: To pull the changes from the database
+  - **Subscription management**: To manage the subscribers to Postgres Changes
+  - **Subscription cleanup**: To cleanup the subscribers to Postgres Changes
+  - **WAL pull**: To pull the changes from the database
 
 The number of connections varies based on the instance size and your configuration.
 
 ### Replication slots
 
 Realtime also uses, at maximum, 2 replication slots.
+
 - **Broadcast from database**: To broadcast the changes from the database to the clients
 - **Postgres Changes**: To listen to changes from the database
 
 ### Schema and tables
 
 On the `realtime` schema we will create the following tables:
+
 - `schema_migrations` - To track the migrations that have been run on the database from Realtime
 - `subscription` - Track the subscribers to Postgres Changes
 - `messages` - Partitioned table per day that's used for Authorization and Broadcast from database
-   - **Authorization**: To check the authorization policies on join by checking if a given client can read and write to this table
-   - **Broadcast from database**: Replication slot tracks a publication to this table to broadcast the changes to the clients
+  - **Authorization**: To check the authorization policies on join by checking if a given client can read and write to this table
+  - **Broadcast from database**: Replication slot tracks a publication to this table to broadcast the changes to the clients
 
 <Admonition type="note">
 
@@ -56,5 +70,6 @@ Realtime has a cleanup process that will delete tables older than 3 days.
 ### Functions
 
 Realtime creates two functions on your database:
+
 - `realtime.send` - Inserts an entry into `realtime.messages` table that will trigger the replication slot to broadcast the changes to the clients. It also captures errors to prevent the trigger from breaking.
 - `realtime.broadcast_changes` - uses `realtime.send` to broadcast the changes with a format that is compatible with Postgres Changes
