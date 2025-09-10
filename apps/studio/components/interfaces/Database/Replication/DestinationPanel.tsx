@@ -60,8 +60,11 @@ const FormSchema = z.object({
   datasetId: z.string().min(1, 'Dataset id is required'),
   serviceAccountKey: z.string().min(1, 'Service account key is required'),
   publicationName: z.string().min(1, 'Publication is required'),
-  maxSize: z.number().min(1, 'Max Size must be greater than 0').int().optional(),
-  maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
+  maxFillMs: z
+    .number()
+    .min(1, 'Max Fill milliseconds should be greater than 0')
+    .int()
+    .optional(),
   maxStalenessMins: z.number().nonnegative().optional(),
 })
 
@@ -129,7 +132,6 @@ export const DestinationPanel = ({
       // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
-      maxSize: pipelineData?.config?.batch?.max_size,
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
       maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
     }),
@@ -162,9 +164,8 @@ export const DestinationPanel = ({
         }
 
         const batchConfig: any = {}
-        if (!!data.maxSize) batchConfig.maxSize = data.maxSize
         if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
-        const hasBothBatchFields = Object.keys(batchConfig).length === 2
+        const hasBatchFields = Object.keys(batchConfig).length > 0
 
         await updateDestinationPipeline({
           destinationId: existingDestination.destinationId,
@@ -174,7 +175,7 @@ export const DestinationPanel = ({
           destinationConfig: { bigQuery: bigQueryConfig },
           pipelineConfig: {
             publicationName: data.publicationName,
-            ...(hasBothBatchFields ? { batch: batchConfig } : {}),
+            ...(hasBatchFields ? { batch: batchConfig } : {}),
           },
           sourceId,
         })
@@ -209,9 +210,8 @@ export const DestinationPanel = ({
         }
 
         const batchConfig: any = {}
-        if (!!data.maxSize) batchConfig.maxSize = data.maxSize
         if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
-        const hasBothBatchFields = Object.keys(batchConfig).length === 2
+        const hasBatchFields = Object.keys(batchConfig).length > 0
 
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
@@ -220,7 +220,7 @@ export const DestinationPanel = ({
           sourceId,
           pipelineConfig: {
             publicationName: data.publicationName,
-            ...(hasBothBatchFields ? { batch: batchConfig } : {}),
+            ...(hasBatchFields ? { batch: batchConfig } : {}),
           },
         })
         // Set request status only right before starting, then fire and close
@@ -401,31 +401,6 @@ export const DestinationPanel = ({
                         <AccordionContent_Shadcn_ asChild className="!pb-0">
                           <FormField_Shadcn_
                             control={form.control}
-                            name="maxSize"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                className="mb-4"
-                                label="Max size"
-                                layout="vertical"
-                                description="The maximum size of the data to send. Leave empty to use default value."
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_
-                                    {...field}
-                                    type="number"
-                                    value={field.value ?? ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value
-                                      field.onChange(val === '' ? undefined : Number(val))
-                                    }}
-                                    placeholder="Leave empty for default"
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                          <FormField_Shadcn_
-                            control={form.control}
                             name="maxFillMs"
                             render={({ field }) => (
                               <FormItemLayout
@@ -507,34 +482,41 @@ export const DestinationPanel = ({
       <SheetContent showClose={false} size="default">
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
-            <SheetTitle>Create a new destination</SheetTitle>
+            <SheetTitle>Enable Replication (Alpha)</SheetTitle>
           </SheetHeader>
           <SheetSection className="flex-grow overflow-auto">
-            <Alert_Shadcn_>
-              <WarningIcon />
-              <AlertTitle_Shadcn_>
-                {/* Pricing to be decided yet */}
-                Enabling replication will cost additional $xx.xx
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                <span></span>
-                <div className="flex items-center gap-x-2 mt-3">
-                  <Button
-                    type="default"
-                    loading={creatingTenantSource}
-                    onClick={onEnableReplication}
-                  >
-                    Enable replication
-                  </Button>
+            <div className="rounded-md border bg-surface-100 p-5">
+              <div className="flex items-start gap-3">
+                <WarningIcon />
+                <div className="flex-1">
+                  <AlertTitle_Shadcn_ className="mb-1">Replication is in Alpha</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    This feature is in active development and may change as we gather feedback.
+                    Availability and behavior can evolve during the Alpha phase.
+                  </AlertDescription_Shadcn_>
+                  <div className="text-sm text-foreground-light mt-3">
+                    <p className="mb-2">
+                      Pricing is not final yet. You can enable replication now; we’ll announce
+                      pricing later and notify you before any charges apply.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-x-2 mt-4">
+                    <Button
+                      type="primary"
+                      loading={creatingTenantSource}
+                      onClick={onEnableReplication}
+                    >
+                      Enable replication
+                    </Button>
+                    <Button type="default" disabled={creatingTenantSource} onClick={onClose}>
+                      Not now
+                    </Button>
+                  </div>
                 </div>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </div>
+            </div>
           </SheetSection>
-          <SheetFooter>
-            <Button disabled={creatingTenantSource} type="default" onClick={onClose}>
-              Cancel
-            </Button>
-          </SheetFooter>
+          <SheetFooter></SheetFooter>
         </div>
       </SheetContent>
     </Sheet>
