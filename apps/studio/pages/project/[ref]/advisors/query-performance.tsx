@@ -1,9 +1,9 @@
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 
 import { useParams } from 'common'
 import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/EnableIndexAdvisorButton'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
   QUERY_PERFORMANCE_PRESET_MAP,
@@ -19,19 +19,18 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
-import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
-  const router = useRouter()
   const { ref } = useParams()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
-  const [{ preset: urlPreset, search: searchQuery, sort, order }] = useQueryStates({
+  const [{ preset: urlPreset, search: searchQuery, roles }] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
     preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
   })
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
@@ -39,13 +38,12 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const queryHitRate = hooks.queryHitRate()
 
   const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
-  const roles = router?.query?.roles ?? []
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
     orderBy: sortConfig || undefined,
     preset,
-    roles: typeof roles === 'string' ? [roles] : roles,
+    roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
   })
 
