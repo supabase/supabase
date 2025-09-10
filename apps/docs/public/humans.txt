@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Aaron Byrne
 Alaister Young
+Alan De Los Santos
 Aleksi Immonen
 Alexander Korotkov
 Amy Q
