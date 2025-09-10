@@ -161,12 +161,20 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               ? `${value.toFixed(0)}ms`
               : value.toLocaleString()
             : ''
+
+        if (col.id === 'total_time') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
+                <p>{(value / 1000).toFixed(2) + 's' || 'n/a'}</p>
+              )}
+            </div>
+          )
+        }
+
         return (
           <div className="w-full flex flex-col gap-y-0.5 justify-center text-xs">
             <p>{formattedValue}</p>
-            {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
-              <p className="text-foreground-lighter font-mono">{(value / 1000).toFixed(2)}s</p>
-            )}
           </div>
         )
       },
