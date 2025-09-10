@@ -164,7 +164,6 @@ const BlogPostRenderer = ({
       ? `/images/blog/${blogMetaData.thumb}`
       : ''
 
-
   return (
     <>
       {isLivePreviewLoading && (
@@ -203,9 +202,7 @@ const BlogPostRenderer = ({
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
                     <p>•</p>
-                    <p>
-                      {(blogMetaData as any).readingTime}
-                    </p>
+                    <p>{(blogMetaData as any).readingTime}</p>
                   </div>
                   {authors.length > 0 && (
                     <div className="hidden lg:flex justify-between">
