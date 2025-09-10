@@ -95,7 +95,7 @@ export const ExplainPlanFlow = ({ json }: { json: string }) => {
   )
 
   return (
-    <div className="w-full h-full border border-green-500 relative">
+    <div className="w-full h-full border relative">
       {meta?.errorMessage && (
         <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
           <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
