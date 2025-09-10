@@ -221,7 +221,7 @@ const UpdateOAuthAppSidePanel = ({
       >
         <SidePanel.Content className="py-4">
           <Form_Shadcn_ {...form}>
-            <form className="space-y-4" autoFocus={false} onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
               <FormField_Shadcn_
                 control={form.control}
                 name="name"

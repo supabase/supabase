@@ -13,34 +13,25 @@ export interface OAuthApp {
   name: string
   redirect_uris: string[]
   scopes: string[]
-  // type: string
   type: 'manual' | 'dynamic'
   is_public?: boolean
   users_count?: number
   last_used_at?: string
 }
 
-const OAuthApps: NextPageWithLayout = () => {
-  return (
-    <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12">
-            <FormHeader
-              title="OAuth Apps"
-              docsUrl="https://supabase.com/docs/guides/auth/oauth/oauth-apps"
-            />
-            <OAuthAppsList
-              createTrigger={() => {}}
-              editTrigger={() => {}}
-              deleteTrigger={() => {}}
-            />
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
-    </>
-  )
-}
+const OAuthApps: NextPageWithLayout = () => (
+  <ScaffoldContainer>
+    <ScaffoldSection>
+      <div className="col-span-12">
+        <FormHeader
+          title="OAuth Apps"
+          docsUrl="https://supabase.com/docs/guides/auth/oauth/oauth-apps"
+        />
+        <OAuthAppsList />
+      </div>
+    </ScaffoldSection>
+  </ScaffoldContainer>
+)
 
 OAuthApps.getLayout = (page) => (
   <DefaultLayout>

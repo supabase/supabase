@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import { Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
+import Link from 'next/link'
 import dayjs from 'dayjs'
 
 import AlertError from 'components/ui/AlertError'
@@ -14,6 +13,7 @@ import {
   Badge,
   Button,
   Card,
+  CardContent,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -30,23 +30,14 @@ import UpdateOAuthAppSidePanel from './UpdateOAuthAppSidePanel'
 import DeleteOAuthAppModal from './DeleteOAuthAppModal'
 
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useParams } from 'common'
 
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
-
-interface OAuthAppsListProps {
-  createTrigger?: () => void
-  editTrigger?: (trigger: PostgresTrigger) => void
-  deleteTrigger?: (trigger: PostgresTrigger) => void
-}
 
 export const OAUTH_APP_SCOPES_OPTIONS = [
   { name: 'email', value: 'email' },
   { name: 'profile', value: 'profile' },
   { name: 'openid', value: 'openid' },
-  { name: 'offline_access', value: 'offline_access' },
 ]
 
 export const OAUTH_APP_TYPE_OPTIONS = [
@@ -54,11 +45,9 @@ export const OAUTH_APP_TYPE_OPTIONS = [
   { name: 'Dynamic', value: 'dynamic' },
 ]
 
-const OAuthAppsList = ({
-  createTrigger = noop,
-  editTrigger = noop,
-  deleteTrigger = noop,
-}: OAuthAppsListProps) => {
+const OAuthAppsList = () => {
+  const { ref: projectRef } = useParams()
+
   // State for OAuth apps
   const [oAuthApps, setOAuthApps] = useState<OAuthApp[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -98,7 +87,6 @@ const OAuthAppsList = ({
         const stored = localStorage.getItem('oauth_server_settings')
         if (stored) {
           const parsedSettings = JSON.parse(stored)
-          setOAuthServerSettings(parsedSettings)
           setIsOAuthServerEnabled(parsedSettings.oauthServerEnabled)
         }
       } catch (error) {
@@ -149,17 +137,7 @@ const OAuthAppsList = ({
   }
 
   const [isOAuthServerEnabled, setIsOAuthServerEnabled] = useState(false)
-  const [oauthServerSettings, setOAuthServerSettings] = useState({
-    oauthServerEnabled: false,
-    allowDynamicApps: false,
-    allowPublicApps: false,
-    availableScopes: ['openid', 'email', 'profile'],
-  })
-  const aiSnap = useAiAssistantStateSnapshot()
-  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
-
-  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const { can: canCreateTriggers } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -172,6 +150,29 @@ const OAuthAppsList = ({
 
   if (isError) {
     return <AlertError error={error} subject="Failed to retrieve database triggers" />
+  }
+
+  if (!isOAuthServerEnabled) {
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardContent className="py-12 text-center">
+            <div className="flex flex-col items-center gap-y-4">
+              <h3 className="text-lg">OAuth Server is disabled</h3>
+              <p className="text-foreground-light -mt-2">
+                Enable the OAuth Server to make your project act as an identity provider for
+                third-party applications.
+              </p>
+              <Button asChild>
+                <Link href={`/project/${projectRef}/auth/settings/oauth-server`}>
+                  Go to Settings
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -212,28 +213,26 @@ const OAuthAppsList = ({
               onSaveFilters={setFilteredAppScopes}
             />
           </div>
-          {!isSchemaLocked && (
-            <div className="flex items-center gap-x-2">
-              <ButtonTooltip
-                disabled={!isOAuthServerEnabled || !canCreateTriggers}
-                icon={<Plus />}
-                onClick={() => setShowCreatePanel(true)}
-                className="flex-grow"
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !isOAuthServerEnabled
-                      ? 'OAuth server must be enabled in settings'
-                      : !canCreateTriggers
-                        ? 'You need additional permissions to create OAuth apps'
-                        : undefined,
-                  },
-                }}
-              >
-                New OAuth App
-              </ButtonTooltip>
-            </div>
-          )}
+          <div className="flex items-center gap-x-2">
+            <ButtonTooltip
+              disabled={!isOAuthServerEnabled || !canCreateTriggers}
+              icon={<Plus />}
+              onClick={() => setShowCreatePanel(true)}
+              className="flex-grow"
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !isOAuthServerEnabled
+                    ? 'OAuth server must be enabled in settings'
+                    : !canCreateTriggers
+                      ? 'You need additional permissions to create OAuth apps'
+                      : undefined,
+                },
+              }}
+            >
+              New OAuth App
+            </ButtonTooltip>
+          </div>
         </div>
 
         {/* {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />} */}
@@ -265,7 +264,9 @@ const OAuthAppsList = ({
                   oAuthApps.map((app) => (
                     <TableRow key={app.id} className="w-full">
                       <TableCell className="max-w-64 truncate">
-                        <button onClick={() => handleEditClick(app)}>{app.name}</button>
+                        <button type="button" onClick={() => handleEditClick(app)}>
+                          {app.name}
+                        </button>
                       </TableCell>
                       <TableCell className="w-40">{app.client_id}</TableCell>
                       <TableCell className="w-40">
@@ -280,31 +281,29 @@ const OAuthAppsList = ({
                         {dayjs(app.created_at).format('D MMM, YYYY')}
                       </TableCell>
                       <TableCell>
-                        {!isSchemaLocked && (
-                          <div className="flex justify-end items-center space-x-2">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent side="bottom" align="end" className="w-32">
-                                <DropdownMenuItem
-                                  className="space-x-2"
-                                  onClick={() => handleEditClick(app)}
-                                >
-                                  <Edit size={14} />
-                                  <p>Edit</p>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="space-x-2"
-                                  onClick={() => handleDeleteClick(app)}
-                                >
-                                  <Trash size={14} />
-                                  <p>Delete</p>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        )}
+                        <div className="flex justify-end items-center space-x-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button type="default" className="px-1" icon={<MoreVertical />} />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent side="bottom" align="end" className="w-32">
+                              <DropdownMenuItem
+                                className="space-x-2"
+                                onClick={() => handleEditClick(app)}
+                              >
+                                <Edit size={14} />
+                                <p>Edit</p>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="space-x-2"
+                                onClick={() => handleDeleteClick(app)}
+                              >
+                                <Trash size={14} />
+                                <p>Delete</p>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
