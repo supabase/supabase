@@ -47,7 +47,7 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 
 Data sent to the client when using the shared connection pooler (Supavisor) to access your database. When using the shared connection pooler, we do not count database egress, as this would otherwise count double (Database -> Shared Pooler + Shared Pooler -> Client).
 
-**Example:** You are using our [shared connection pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
+**Example:** You are using our [shared connection pooler](/docs/guides/database/connecting-to-postgres#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
 
 ### Log Drain Egress
 
@@ -113,7 +113,7 @@ The organization's Egress usage exceeds the uncached egress quota by 50 GB and t
 
 ### Usage page
 
-You can view Egress usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+You can view Egress usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 
 <Image
   alt="Usage page navigation bar"
@@ -146,7 +146,7 @@ Separately, you can see the cached egress right below:
 
 ### Custom report
 
-1. On the [reports page](https://supabase.com/dashboard/project/_/reports), click **New custom report** in the left navigation menu
+1. On the [reports page](/dashboard/project/_/reports), click **New custom report** in the left navigation menu
 2. After creating a new report, add charts for one or more Supabase services by clicking **Add block**
 
 <Image
@@ -164,7 +164,7 @@ To better understand your Egress usage, identify what’s driving the most traff
 
 ### Frequent database queries
 
-On the Advisors [Query performance view](https://supabase.com/dashboard/project/_/database/query-performance?preset=most_frequent&sort=calls&order=desc) you can see the most frequent queries and the average number of rows returned.
+On the Advisors [Query performance view](/dashboard/project/_/database/query-performance?preset=most_frequent&sort=calls&order=desc) you can see the most frequent queries and the average number of rows returned.
 
 <Image
   alt="Most frequent queries"
@@ -177,7 +177,7 @@ On the Advisors [Query performance view](https://supabase.com/dashboard/project/
 
 ### Most requested API endpoints
 
-In the [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer) you can access Edge Logs, and review the top paths to identify heavily queried endpoints. These logs currently do not include response byte data. That data will be available in the future too.
+In the [Logs Explorer](/dashboard/project/_/logs/explorer) you can access Edge Logs, and review the top paths to identify heavily queried endpoints. These logs currently do not include response byte data. That data will be available in the future too.
 
 <Image
   alt="Top paths"

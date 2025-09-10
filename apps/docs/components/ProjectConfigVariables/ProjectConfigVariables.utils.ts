@@ -6,7 +6,7 @@ export type Org = OrganizationsData[number]
 export type Project = ProjectsData[number]
 export type Branch = BranchesData[number]
 
-export type Variable = 'url' | 'anonKey' | 'sessionPooler'
+export type Variable = 'url' | 'publishableKey' | 'sessionPooler'
 
 function removeDoubleQuotes(str: string) {
   return str.replaceAll('"', '')
@@ -30,7 +30,7 @@ function unescapeDoubleQuotes(str: string) {
 
 export const prettyFormatVariable: Record<Variable, string> = {
   url: 'Project URL',
-  anonKey: 'Anon key',
+  publishableKey: 'Publishable key',
   sessionPooler: 'Connection string (pooler session mode)',
 }
 
