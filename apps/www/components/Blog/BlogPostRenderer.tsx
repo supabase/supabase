@@ -177,9 +177,6 @@ const BlogPostRenderer = ({
 
   return (
     <>
-      {shouldShowDraftLoading && (
-        <div className="fixed top-10 right-10 border rounded-full rounded-tr-none animate-spin transform w-10 h-10 bg-transparent" />
-      )}
       {isDraftMode && <DraftModeBanner />}
       <DefaultLayout className="overflow-x-hidden">
         <div
