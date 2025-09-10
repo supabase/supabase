@@ -108,8 +108,6 @@ const Message = function Message({
 
   const hasTextContent = content && content.trim().length > 0
 
-  console.log(parts)
-
   return (
     <MessageContext.Provider value={{ isLoading, readOnly }}>
       <div
