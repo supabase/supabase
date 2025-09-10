@@ -1,7 +1,9 @@
+import type { Edge, Node } from 'reactflow'
+
 import { getLayoutedElementsViaDagre } from '../utils/layout'
 import { NODE_TYPE } from '../constants'
-import type { Edge, Node } from 'reactflow'
 import type { RawPlan, PlanRoot, PlanNodeData, Agg } from '../types'
+import { toArray } from '../utils/formats'
 
 const zeroAgg = (): Agg => ({
   timeIncl: 0,
@@ -132,6 +134,10 @@ export const buildGraphFromPlan = (
       recheckCond: plan['Recheck Cond'],
       mergeCond: plan['Merge Cond'],
       joinFilter: plan['Join Filter'],
+      // Keys
+      groupKey: toArray(plan['Group Key']),
+      sortKey: toArray(plan['Sort Key']),
+      presortedKey: toArray(plan['Presorted Key']),
       parallelAware: plan['Parallel Aware'],
       asyncCapable: plan['Async Capable'],
       parentRelationship: plan['Parent Relationship'],

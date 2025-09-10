@@ -12,5 +12,27 @@ export const blocksToBytes = (blocks?: number) => {
     v /= 1024
     i++
   }
+
   return `${v.toFixed(1)} ${units[i]}`
+}
+
+// Normalize keys that can be string or string[] in JSON
+export const toArray = (v?: string[] | string): string[] | undefined => {
+  if (v === undefined) return undefined
+
+  return Array.isArray(v) ? v : [v]
+}
+
+// Group/Sort/Presorted keys
+export const formatKeys = (keys: string[] | undefined, presorted?: string[]) => {
+  if (!keys || keys.length === 0) return undefined
+
+  const pres = new Set((presorted ?? []).map((k) => stripParens(k)))
+
+  return keys
+    .map((k) => {
+      const kk = stripParens(k)
+      return pres.has(kk) ? `${kk} (presort)` : kk
+    })
+    .join(', ')
 }

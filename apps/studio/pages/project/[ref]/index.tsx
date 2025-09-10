@@ -82,6 +82,9 @@ const sample3 = `[
 "Workers Launched": 3,
 "Hash Cond": "(t1.id = t2.id)",
 "Rows Removed by Join Filter": 50,
+"Group Key": ["t1.category"],
+"Sort Key": ["(t1.created_at)", "t2.name"],
+"Presorted Key": ["(t1.created_at)"],
 "Plans": [
 {
 "Node Type": "Seq Scan",

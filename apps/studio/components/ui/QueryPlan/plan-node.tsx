@@ -8,7 +8,7 @@ import { Badge, cn } from 'ui'
 import { NodeItem } from './node-item'
 import { HeatmapContext, MetricsVisibilityContext } from './contexts'
 import { DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
-import { blocksToBytes, stripParens } from './utils/formats'
+import { blocksToBytes, formatKeys, stripParens } from './utils/formats'
 
 export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
@@ -25,6 +25,14 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   if (data.parallelAware) {
     headerLines.unshift('[Parallel]')
   }
+
+  // Append grouping and sorting clauses to the header, e.g. "by col1, col2".
+  // `formatKeys` formats/merges keys and accounts for pre-sorted keys when provided.
+  const groupKeys = formatKeys(data.groupKey)
+  if (groupKeys) headerLines.push(`by ${groupKeys}`)
+  const sortKeys = formatKeys(data.sortKey, data.presortedKey)
+  if (sortKeys) headerLines.push(`by ${sortKeys}`)
+
   if (data.joinType) headerLines.push(`${capitalize(data.joinType)} join`)
 
   // Only show join-related conditions in header; exclude index/recheck/filter conditions

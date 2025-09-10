@@ -18,6 +18,10 @@ export type RawPlan = {
   ['Recheck Cond']?: string
   ['Merge Cond']?: string
   ['Join Filter']?: string
+  // Keys
+  ['Group Key']?: string[] | string
+  ['Sort Key']?: string[] | string
+  ['Presorted Key']?: string[] | string
   // Plan Structure / Hierarchy
   ['Parent Relationship']?: string
   ['Scan Direction']?: string
@@ -85,6 +89,10 @@ export type PlanNodeData = {
   recheckCond?: string
   mergeCond?: string
   joinFilter?: string
+  // Keys
+  groupKey?: string[]
+  sortKey?: string[]
+  presortedKey?: string[]
   parallelAware?: boolean
   asyncCapable?: boolean
   parentRelationship?: string
