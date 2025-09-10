@@ -149,7 +149,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         if (col.id === 'prop_total_time') {
           return (
             <div className="w-full flex flex-col justify-center text-xs">
-              <p>{value || 'n/a'}</p>
+              <p>{value ? `${value.toFixed(1)}%` : 'n/a'}</p>
             </div>
           )
         }
@@ -182,7 +182,28 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     return result
   })
 
-  const reportData = useMemo(() => data ?? [], [data])
+  const reportData = useMemo(() => {
+    const rawData = data ?? []
+
+    if (sort?.column === 'prop_total_time') {
+      const sortedData = [...rawData].sort((a, b) => {
+        const getNumericValue = (value: number | string) => {
+          if (!value || value === 'n/a') return 0
+          if (typeof value === 'number') return value
+          return parseFloat(value.toString().replace('%', '')) || 0
+        }
+
+        const aValue = getNumericValue(a.prop_total_time)
+        const bValue = getNumericValue(b.prop_total_time)
+
+        return sort.order === 'asc' ? aValue - bValue : bValue - aValue
+      })
+
+      return sortedData
+    }
+
+    return rawData
+  }, [data, sort])
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
   const showIndexSuggestions =
