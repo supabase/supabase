@@ -42,7 +42,7 @@ export const ProjectTableRow = ({
       className="cursor-pointer hover:bg-surface-200"
       onClick={(event) => {
         if (event.metaKey) {
-          window.open(url, '_blank')
+          window.open(`${BASE_PATH}/${url}`, '_blank')
         } else {
           router.push(url)
         }

@@ -1,7 +1,7 @@
 import createGlobe from 'cobe'
 import { useCallback, useEffect, useRef } from 'react'
 import { useTheme } from 'next-themes'
-import { debounce } from 'lodash'
+import { debounce } from 'lib/helpers'
 
 const Globe = () => {
   const { resolvedTheme } = useTheme()

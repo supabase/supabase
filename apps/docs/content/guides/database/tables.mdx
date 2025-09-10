@@ -58,7 +58,7 @@ and run the SQL queries yourself.
   />
 </video>
 
-1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table Editor](/dashboard/project/_/editor) page in the Dashboard.
 2. Click **New Table** and create a table with the name `todos`.
 3. Click **Save**.
 4. Click **New Column** and create a column with the name `task` and type `text`.
@@ -226,6 +226,7 @@ const { data, error } = await supabase.from('movies').insert([
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -241,6 +242,8 @@ await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -263,6 +266,8 @@ try await supabase.from("movies")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -279,6 +284,8 @@ client.from_("movies").insert([
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -299,6 +306,7 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Bulk data loading

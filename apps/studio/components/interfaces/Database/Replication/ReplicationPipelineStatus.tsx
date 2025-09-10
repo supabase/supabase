@@ -1,8 +1,14 @@
-// @ts-nocheck [Joshen] Temporarily silencing the TS checks here but please eventually remove
-// it's cause the API types are conflicting a bit - API types have probably been updated for the UI here
-// but the UI hasn't been updated yet to fit the new API types
-
-import { Activity, ChevronLeft, ExternalLink, Search, X } from 'lucide-react'
+import {
+  Activity,
+  Ban,
+  ChevronLeft,
+  ExternalLink,
+  Pause,
+  Play,
+  RotateCcw,
+  Search,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -24,8 +30,12 @@ import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ErroredTableDetails } from './ErroredTableDetails'
-import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
-import { PipelineStatus } from './PipelineStatus'
+import {
+  PIPELINE_ACTIONABLE_STATES,
+  PIPELINE_ERROR_MESSAGES,
+  getStatusName,
+} from './Pipeline.utils'
+import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
@@ -97,25 +107,49 @@ export const ReplicationPipelineStatus = () => {
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
   const isEnablingDisabling =
-    requestStatus === PipelineStatusRequestStatus.EnableRequested ||
-    requestStatus === PipelineStatusRequestStatus.DisableRequested
+    requestStatus === PipelineStatusRequestStatus.StartRequested ||
+    requestStatus === PipelineStatusRequestStatus.StopRequested ||
+    requestStatus === PipelineStatusRequestStatus.RestartRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
-  const onTogglePipeline = async () => {
-    if (!projectRef) {
-      return console.error('Project ref is required')
-    }
-    if (!pipeline) {
-      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
-    }
+  const logsUrl = `/project/${projectRef}/logs/etl-replication-logs${
+    pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
+  }`
+
+  const label =
+    statusName === 'stopped'
+      ? 'Start'
+      : statusName === 'started'
+        ? 'Stop'
+        : statusName === 'failed'
+          ? 'Restart'
+          : 'Action unavailable'
+
+  const icon =
+    statusName === 'stopped' ? (
+      <Play />
+    ) : statusName === 'started' ? (
+      <Pause />
+    ) : statusName === 'failed' ? (
+      <RotateCcw />
+    ) : (
+      <Ban />
+    )
+
+  const onPrimaryAction = async () => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
 
     try {
       if (statusName === 'stopped') {
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
         await startPipeline({ projectRef, pipelineId: pipeline.id })
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
       } else if (statusName === 'started') {
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
+      } else if (statusName === 'failed') {
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
+        await startPipeline({ projectRef, pipelineId: pipeline.id })
       }
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
@@ -133,57 +167,57 @@ export const ReplicationPipelineStatus = () => {
           <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
             <Link href={`/project/${projectRef}/database/replication`} />
           </Button>
-          <div>
-            <div className="flex items-center gap-x-3">
-              <h3 className="text-xl font-semibold">{destinationName || 'Pipeline'}</h3>
-              <PipelineStatus
-                pipelineStatus={pipelineStatusData?.status}
-                error={pipelineStatusError}
-                isLoading={isPipelineStatusLoading}
-                isError={isPipelineStatusError}
-                isSuccess={isPipelineStatusSuccess}
-                requestStatus={requestStatus}
-              />
-            </div>
+          <div className="flex items-center gap-x-3">
+            <h3 className="text-xl font-semibold">{destinationName || 'Pipeline'}</h3>
+            <PipelineStatus
+              pipelineStatus={pipelineStatusData?.status}
+              error={pipelineStatusError}
+              isLoading={isPipelineStatusLoading}
+              isError={isPipelineStatusError}
+              isSuccess={isPipelineStatusSuccess}
+              requestStatus={requestStatus}
+              pipelineId={pipelineId}
+            />
           </div>
         </div>
         <div className="flex items-center gap-x-2">
-          <div className="relative">
-            <Search
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-              size={14}
-            />
-            <Input
-              className="pl-7 h-[26px] text-xs"
-              placeholder="Search for tables"
-              value={filterString}
-              disabled={isPipelineError}
-              onChange={(e) => setFilterString(e.target.value)}
-              actions={
-                filterString.length > 0
-                  ? [
-                      <X
-                        key="close"
-                        className="mx-2 cursor-pointer text-foreground"
-                        size={14}
-                        strokeWidth={2}
-                        onClick={() => setFilterString('')}
-                      />,
-                    ]
-                  : undefined
-              }
-            />
-          </div>
+          <Input
+            icon={<Search size={12} />}
+            className="pl-7 h-[26px] text-xs"
+            placeholder="Search for tables"
+            value={filterString}
+            disabled={isPipelineError}
+            onChange={(e) => setFilterString(e.target.value)}
+            actions={
+              filterString.length > 0
+                ? [
+                    <X
+                      key="close"
+                      className="mx-2 cursor-pointer text-foreground"
+                      size={14}
+                      strokeWidth={2}
+                      onClick={() => setFilterString('')}
+                    />,
+                  ]
+                : undefined
+            }
+          />
+
           <Button asChild type="default">
-            <Link href={`/project/${projectRef}/logs/etl-replication-logs`}>View logs</Link>
+            <Link href={logsUrl}>View logs</Link>
           </Button>
+
           <Button
             type={statusName === 'stopped' ? 'primary' : 'default'}
-            onClick={() => onTogglePipeline()}
+            onClick={onPrimaryAction}
             loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
-            disabled={!['failed', 'started', 'stopped', 'stopping'].includes(statusName ?? '')}
+            disabled={
+              isEnablingDisabling ||
+              !PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
+            }
+            icon={icon}
           >
-            {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
+            {label}
           </Button>
         </div>
       </div>
@@ -228,6 +262,7 @@ export const ReplicationPipelineStatus = () => {
           )}
 
           <div className="w-full overflow-hidden overflow-x-auto">
+            {/* [Joshen] Should update to use new Table components next time */}
             <Table
               head={[
                 <Table.th key="table">Table</Table.th>,
@@ -286,15 +321,10 @@ export const ReplicationPipelineStatus = () => {
                               Status unavailable while pipeline is {config.badge.toLowerCase()}
                             </p>
                           ) : (
-                            <div className="space-y-3">
+                            <div className="space-y-1">
                               <div className="text-sm text-foreground">
                                 {statusConfig.description}
                               </div>
-                              {'lag' in table.state && (
-                                <div className="text-xs text-foreground-light">
-                                  Lag: {table.state.lag}ms
-                                </div>
-                              )}
                               {table.state.name === 'error' && (
                                 <ErroredTableDetails
                                   state={table.state}

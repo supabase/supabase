@@ -61,6 +61,7 @@ export const BillingCustomerData = () => {
       line1: customerProfile?.address?.line1,
       line2: customerProfile?.address?.line2 ?? undefined,
       postal_code: customerProfile?.address?.postal_code ?? undefined,
+      state: customerProfile?.address?.state ?? undefined,
       billing_name: customerProfile?.billing_name,
       tax_id_type: taxId?.type,
       tax_id_value: taxId?.value,
@@ -110,7 +111,10 @@ export const BillingCustomerData = () => {
         <div className="sticky space-y-2 top-12 pr-3">
           <p className="text-foreground text-base m-0">Billing Address &amp; Tax ID</p>
           <p className="text-sm text-foreground-light m-0">
-            This will be reflected in every upcoming invoice, past invoices are not affected
+            Changes will be reflected in every upcoming invoice, past invoices are not affected
+          </p>
+          <p className="text-sm text-foreground-light m-0">
+            A Tax ID is only required for registered businesses.
           </p>
         </div>
       </ScaffoldSectionDetail>

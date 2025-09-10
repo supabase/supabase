@@ -24,8 +24,18 @@
 
   "billing:all": true,
 
+  "dashboard_auth:sign_up": true,
+  "dashboard_auth:sign_in_with_github": true,
+  "dashboard_auth:sign_in_with_sso": true,
+  "dashboard_auth:sign_in_with_email": true,
+
   "database:replication": true,
   "database:roles": true,
+
+  "docs:compliance": true,
+  "docs:self-hosting": true,
+
+  "feedback:docs": true,
 
   "integrations:vercel": true,
   "integrations:show_stripe_wrapper": true,
@@ -53,5 +63,11 @@
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
 
-  "reports:all": true
+  "reports:all": true,
+
+  "sdk:csharp": true,
+  "sdk:dart": true,
+  "sdk:kotlin": true,
+  "sdk:python": true,
+  "sdk:swift": true
 }
