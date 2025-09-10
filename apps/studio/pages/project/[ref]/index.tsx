@@ -64,6 +64,73 @@ const sample2 = `[
   }
 ]`
 
+const sample3 = `[
+{
+"Plan": {
+"Node Type": "Hash Join",
+"Join Type": "Inner",
+"Startup Cost": 5.00,
+"Total Cost": 100.00,
+"Plan Rows": 200,
+"Plan Width": 64,
+"Actual Startup Time": 0.10,
+"Actual Total Time": 10.00,
+"Actual Rows": 180,
+"Actual Loops": 1,
+"Hash Cond": "(t1.id = t2.id)",
+"Rows Removed by Join Filter": 25,
+"Rows Removed by Filter": 10,
+"Plans": [
+{
+"Node Type": "Seq Scan",
+"Relation Name": "table2",
+"Alias": "t2",
+"Startup Cost": 0.00,
+"Total Cost": 50.00,
+"Plan Rows": 1500,
+"Plan Width": 32,
+"Actual Startup Time": 0.00,
+"Actual Total Time": 3.00,
+"Actual Rows": 100,
+"Actual Loops": 1
+},
+{
+"Node Type": "Bitmap Heap Scan",
+"Relation Name": "table1",
+"Alias": "t1",
+"Startup Cost": 0.00,
+"Total Cost": 50.00,
+"Plan Rows": 100,
+"Plan Width": 32,
+"Actual Startup Time": 0.00,
+"Actual Total Time": 7.00,
+"Actual Rows": 1000,
+"Actual Loops": 1,
+"Rows Removed by Index Recheck": 5,
+"Recheck Cond": "(id < 1000)",
+"Plans": [
+{
+"Node Type": "Bitmap Index Scan",
+"Index Name": "idx_t1_id",
+"Startup Cost": 0.00,
+"Total Cost": 10.00,
+"Plan Rows": 100,
+"Plan Width": 0,
+"Actual Startup Time": 0.00,
+"Actual Total Time": 1.00,
+"Actual Rows": 120,
+"Actual Loops": 0,
+"Index Cond": "(id < 1000)"
+}
+]
+}
+]
+},
+"Planning Time": 0.50,
+"Execution Time": 12.30
+}
+]`
+
 const HomePage: NextPageWithLayout = () => {
   const isHomeNew = useFlag('homeNew')
 
@@ -72,8 +139,8 @@ const HomePage: NextPageWithLayout = () => {
   }
   return (
     <>
-      <div className="w-full h-[500px]">
-        <QueryPlanVisualizer json={sample2} />
+      <div className="w-full h-full">
+        <QueryPlanVisualizer json={sample3} />
       </div>
       {/* <Home /> */}
     </>

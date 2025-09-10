@@ -37,7 +37,7 @@ export const QueryPlanVisualizer = ({ json }: { json: string }) => {
               : undefined,
       }
       const planPart = root?.Plan ? [root] : parsed
-      const graph = buildGraphFromPlan(planPart)
+      const graph = buildGraphFromPlan(planPart, { executionTime: meta.executionTime })
       if (!graph.nodes.length) {
         return {
           nodes: [],

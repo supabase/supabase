@@ -19,7 +19,8 @@ const zeroAgg = (): Agg => ({
 })
 
 export const buildGraphFromPlan = (
-  planJson: PlanRoot[]
+  planJson: PlanRoot[],
+  opts?: { executionTime?: number }
 ): {
   nodes: Node<PlanNodeData>[]
   edges: Edge[]
@@ -78,7 +79,18 @@ export const buildGraphFromPlan = (
     const actualRowsPerLoop = plan['Actual Rows'] ?? 0
     const actualRowsTotal = actualRowsPerLoop * loops
     const planRowsEst = plan['Plan Rows'] ?? 0
-    const estFactor = planRowsEst > 0 ? actualRowsTotal / planRowsEst : undefined
+    const estFactorRaw = planRowsEst > 0 ? actualRowsTotal / planRowsEst : undefined
+    let estDirection: 'over' | 'under' | 'none' | undefined = undefined
+    let estFactor = estFactorRaw
+    if (typeof estFactorRaw === 'number') {
+      if (estFactorRaw > 1) {
+        estDirection = 'under'
+      } else if (estFactorRaw < 1) {
+        estDirection = 'over'
+      } else {
+        estDirection = 'none'
+      }
+    }
 
     const nodeSharedHit = plan['Shared Hit Blocks'] ?? 0
     const nodeSharedRead = plan['Shared Read Blocks'] ?? 0
@@ -132,8 +144,10 @@ export const buildGraphFromPlan = (
       actualRows: plan['Actual Rows'],
       actualLoops: plan['Actual Loops'],
       estFactor: estFactor,
+      estDirection: estDirection,
       estActualTotalRows: actualRowsTotal,
       rowsRemovedByFilter: plan['Rows Removed by Filter'],
+      rowsRemovedByJoinFilter: plan['Rows Removed by Join Filter'],
       rowsRemovedByIndexRecheck: plan['Rows Removed by Index Recheck'],
       heapFetches: plan['Heap Fetches'],
       outputCols: plan['Output'],
@@ -173,6 +187,16 @@ export const buildGraphFromPlan = (
       // Raw JSON for detail panel
       raw: plan,
     }
+
+    // Never executed flag.
+    // Only set this when execution time is recorded (i.e. EXPLAIN ANALYZE).
+    // Without ANALYZE, Actual fields may be missing/zero and would cause false positives.
+    if (typeof opts?.executionTime === 'number') {
+      if ((plan['Actual Loops'] ?? undefined) === 0) {
+        data.neverExecuted = true
+      }
+    }
+
     // If a subplan context is inherited and not at the root, propagate it for badge display
     if (subName && subName !== plan['Subplan Name']) {
       data.subplanName = subName

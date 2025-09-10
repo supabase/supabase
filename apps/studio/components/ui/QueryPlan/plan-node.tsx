@@ -1,12 +1,12 @@
 import { useContext } from 'react'
 import { capitalize } from 'lodash'
 import { Handle, Position } from 'reactflow'
+import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
+import { Badge, cn } from 'ui'
 import { HeatmapContext, MetricsVisibilityContext } from './contexts'
 import { DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
-import { cn } from 'ui'
-import { Workflow } from 'lucide-react'
 import { blocksToBytes, stripParens } from './utils/formats'
 
 export const PlanNode = ({ data }: { data: PlanNodeData }) => {
@@ -139,6 +139,16 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
           <Workflow strokeWidth={1} size={12} className="text-light" />
           {data.label}
         </div>
+        {data.neverExecuted && (
+          <Badge
+            variant="destructive"
+            size="small"
+            title="Never executed (loops=0)"
+            className="h-[15px] px-1 py-[1px] text-[0.55rem]"
+          >
+            Never executed
+          </Badge>
+        )}
       </header>
       {heat.mode !== 'none' && (
         <div className="h-[3px] w-full bg-surface-100">
@@ -247,7 +257,14 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
               <span>estim</span>
-              <span>{data.estFactor.toFixed(2)}×</span>
+              <span className="inline-flex items-center gap-[2px]">
+                {data.estDirection === 'under' ? (
+                  <ArrowBigDown size={10} strokeWidth={1} fill="currentColor" />
+                ) : data.estDirection === 'over' ? (
+                  <ArrowBigUp size={10} strokeWidth={1} fill="currentColor" />
+                ) : null}
+                {data.estFactor.toFixed(2)}×
+              </span>
             </div>
           </li>
         )}
@@ -326,6 +343,23 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
               <span>Removed (filter)</span>
               <span>{data.rowsRemovedByFilter}</span>
+            </div>
+          </li>
+        )}
+        {data.rowsRemovedByJoinFilter !== undefined && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>Removed (join filter)</span>
+              <span>{data.rowsRemovedByJoinFilter}</span>
             </div>
           </li>
         )}

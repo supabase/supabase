@@ -30,6 +30,7 @@ export type RawPlan = {
   ['Actual Rows']?: number
   ['Actual Loops']?: number
   ['Rows Removed by Filter']?: number
+  ['Rows Removed by Join Filter']?: number
   ['Rows Removed by Index Recheck']?: number
   ['Heap Fetches']?: number
   Output?: string[]
@@ -94,8 +95,10 @@ export type PlanNodeData = {
   actualLoops?: number
   // Estimation
   estFactor?: number
+  estDirection?: 'over' | 'under' | 'none'
   estActualTotalRows?: number
   rowsRemovedByFilter?: number
+  rowsRemovedByJoinFilter?: number
   rowsRemovedByIndexRecheck?: number
   heapFetches?: number
   outputCols?: string[]
@@ -135,6 +138,8 @@ export type PlanNodeData = {
   subplanName?: string
   cteName?: string
   subplanOf?: string
+  // Execution flags
+  neverExecuted?: boolean
 }
 
 export type Agg = {
