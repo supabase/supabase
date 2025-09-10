@@ -1,9 +1,14 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
+import {
+  convertToModelMessages,
+  ModelMessage,
+  stepCountIs,
+  streamText,
+  wrapLanguageModel,
+} from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-import { initLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -12,6 +17,11 @@ import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { initLogger, BraintrustMiddleware } from 'braintrust'
+
+initLogger({
+  projectName: process.env.BRAINTRUST_PROJECT_NAME,
+})
 
 import {
   CHAT_PROMPT,
@@ -27,11 +37,6 @@ export const maxDuration = 120
 export const config = {
   api: { bodyParser: true },
 }
-
-// Initialize Braintrust logging
-initLogger({
-  projectName: 'supabase',
-})
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -138,6 +143,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: modelError.message })
   }
 
+  const wrappedModel = wrapLanguageModel({
+    model,
+    middleware: BraintrustMiddleware({ debug: true }),
+  })
+
   try {
     // Get a list of all schemas to add to context
     const pgMetaSchemasList = pgMeta.schemas.list()
@@ -204,12 +214,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const result = streamText({
-      model,
+      model: wrappedModel,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       abortSignal: abortController.signal,
+      experimental_telemetry: {
+        isEnabled: true,
+      },
     })
 
     result.pipeUIMessageStreamToResponse(res, {

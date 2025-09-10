@@ -1,5 +1,4 @@
 import { openai } from '@ai-sdk/openai'
-import { LanguageModel } from 'ai'
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 import {
   BedrockModel,
@@ -10,12 +9,13 @@ import {
   ProviderName,
   getDefaultModelForProvider,
 } from './model.utils'
+import { LanguageModelV2 } from '@ai-sdk/provider'
 
 type PromptProviderOptions = Record<string, any>
 type ProviderOptions = Record<string, any>
 
 type ModelSuccess = {
-  model: LanguageModel
+  model: LanguageModelV2
   promptProviderOptions?: PromptProviderOptions
   providerOptions?: ProviderOptions
   error?: never
