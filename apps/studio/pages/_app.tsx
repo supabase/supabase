@@ -101,10 +101,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   const cloudProvider = useDefaultProvider()
+
   const getConfigCatFlags = useCallback(
     (userEmail?: string) => {
       const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-
       return getFlags(userEmail, customAttributes)
     },
     [cloudProvider]

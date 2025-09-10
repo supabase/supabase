@@ -39,7 +39,6 @@ const BlogPostRenderer = ({
   blogMetaData,
   isDraftMode,
   livePreviewData,
-  isLivePreviewLoading,
   prevPost,
   nextPost,
   authors,
@@ -164,19 +163,8 @@ const BlogPostRenderer = ({
       ? `/images/blog/${blogMetaData.thumb}`
       : ''
 
-  const generateReadingTime = (text: string | undefined): string => {
-    if (!text) return '0 min read'
-    const wordsPerMinute = 200
-    const numberOfWords = text.split(/\s/g).length
-    const minutes = Math.ceil(numberOfWords / wordsPerMinute)
-    return `${minutes} min read`
-  }
-
   return (
     <>
-      {isLivePreviewLoading && (
-        <div className="fixed top-10 right-10 border rounded-full rounded-tr-none animate-spin transform w-10 h-10 bg-transparent" />
-      )}
       {isDraftMode && <DraftModeBanner />}
       <DefaultLayout className="overflow-x-hidden">
         <div
@@ -201,19 +189,13 @@ const BlogPostRenderer = ({
               <div className="mb-6 lg:mb-10 max-w-5xl space-y-8">
                 <div className="space-y-4">
                   <Link href="/blog" className="text-brand hidden lg:inline-flex items-center">
-                    Blog{' '}
-                    {isLivePreviewLoading && (
-                      <div className="text-xs text-foreground-lighter ml-4">Draft loading...</div>
-                    )}
+                    Blog
                   </Link>
                   <h1 className="text-2xl sm:text-4xl">{blogMetaData.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
                     <p>•</p>
-                    <p>
-                      {(blogMetaData as any).readingTime ||
-                        generateReadingTime(blogMetaData.source)}
-                    </p>
+                    <p>{(blogMetaData as any).readingTime}</p>
                   </div>
                   {authors.length > 0 && (
                     <div className="hidden lg:flex justify-between">
