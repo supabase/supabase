@@ -1,11 +1,8 @@
 import { generateText, stepCountIs, type ModelMessage, type ToolSet } from 'ai'
 import { source } from 'common-tags'
 
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
-import { getTools } from 'lib/ai/tools'
 import { getRenderingTools } from 'lib/ai/tools/rendering-tools'
-import { getFallbackTools } from 'lib/ai/tools/fallback-tools'
 import { getEvalMockTools } from './mock-tools'
 import {
   CHAT_PROMPT,

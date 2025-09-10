@@ -33,7 +33,6 @@ Now I will add the missing policies:
     ]
   },
   task: async (input: string, hooks) => {
-    // Use default options suitable for eval environment (no schema access)
     const output = await generateTask(input, {
       isLimited: false,
     })
