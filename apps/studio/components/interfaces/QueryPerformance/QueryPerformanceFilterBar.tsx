@@ -10,8 +10,9 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery,
@@ -22,6 +23,7 @@ export const QueryPerformanceFilterBar = ({
 }) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { sort, clearSort } = useQueryPerformanceSort()
   const [showBottomSection] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
     true
@@ -63,7 +65,7 @@ export const QueryPerformanceFilterBar = ({
   }, [searchValue])
 
   return (
-    <div className="px-6 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center">
+    <div className="px-6 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto w-full">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
           <Input
@@ -98,10 +100,24 @@ export const QueryPerformanceFilterBar = ({
             onSaveFilters={onFilterRolesChange}
             className="w-56"
           />
+
+          {sort && (
+            <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
+              <p className="md:inline-flex gap-x-1 hidden truncate">
+                Sort: {sort.column} <span className="text-foreground-lighter">{sort.order}</span>
+              </p>
+              <Tooltip>
+                <TooltipTrigger onClick={clearSort}>
+                  <X size={14} className="text-foreground-light hover:text-foreground" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Clear sort</TooltipContent>
+              </Tooltip>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center pl-2">
         {!showBottomSection && onResetReportClick && (
           <Button type="default" onClick={() => onResetReportClick()}>
             Reset report

@@ -1,19 +1,16 @@
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 
 import { useParams } from 'common'
 import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/EnableIndexAdvisorButton'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import {
-  QueryPerformanceSort,
-  useQueryPerformanceQuery,
-} from 'components/interfaces/Reports/Reports.queries'
+import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
@@ -24,15 +21,16 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
-  const router = useRouter()
   const { ref } = useParams()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { sort: sortConfig } = useQueryPerformanceSort()
 
-  const [{ preset: urlPreset, search: searchQuery, order, sort }] = useQueryStates({
+  const [{ preset: urlPreset, search: searchQuery, roles }] = useQueryStates({
     sort: parseAsString,
-    search: parseAsString.withDefault(''),
     order: parseAsString,
+    search: parseAsString.withDefault(''),
     preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
   })
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
@@ -40,14 +38,12 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const queryHitRate = hooks.queryHitRate()
 
   const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
-  const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
-  const roles = router?.query?.roles ?? []
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
-    orderBy,
+    orderBy: sortConfig || undefined,
     preset,
-    roles: typeof roles === 'string' ? [roles] : roles,
+    roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
   })
 

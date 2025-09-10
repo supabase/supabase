@@ -4,6 +4,8 @@ import { Presets } from './Reports.types'
 
 export type QueryPerformanceSort = {
   column:
+    | 'query'
+    | 'rolname'
     | 'total_time'
     | 'prop_total_time'
     | 'calls'
