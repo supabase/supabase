@@ -60,11 +60,7 @@ const FormSchema = z.object({
   datasetId: z.string().min(1, 'Dataset id is required'),
   serviceAccountKey: z.string().min(1, 'Service account key is required'),
   publicationName: z.string().min(1, 'Publication is required'),
-  maxFillMs: z
-    .number()
-    .min(1, 'Max Fill milliseconds should be greater than 0')
-    .int()
-    .optional(),
+  maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
   maxStalenessMins: z.number().nonnegative().optional(),
 })
 
