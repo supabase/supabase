@@ -4,13 +4,16 @@ import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 
 const LogsPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
-  const canReadAuthLogs = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+  const { can: canReadAuthLogs } = useAsyncCheckProjectPermissions(
+    PermissionAction.ANALYTICS_READ,
+    'logflare'
+  )
 
   return !canReadAuthLogs ? (
     <NoPermission isFullPage resourceText="access your project's authentication logs" />

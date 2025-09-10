@@ -1,4 +1,4 @@
-import { GeneralSettings as GeneralSettingsLegacy } from 'components/interfaces/Organization'
+import { GeneralSettings } from 'components/interfaces/Organization/GeneralSettings/GeneralSettings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
@@ -16,7 +16,7 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
       {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
-        <GeneralSettingsLegacy />
+        <GeneralSettings />
       )}
     </>
   )

@@ -20,7 +20,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -98,8 +98,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   })
 
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
-  const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'policies'
+  )
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
