@@ -132,8 +132,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const {
     model: rawModel,
     error: modelError,
-    supportsCachePoint,
-  } = await getModel(projectRef, isLimited) // use project ref as routing key
+    promptProviderOptions,
+    providerOptions,
+  } = await getModel({
+    provider: 'openai',
+    model: 'gpt-5',
+    routingKey: projectRef,
+    isLimited,
+  })
 
   // Wrap AI SDK v5 model with Braintrust middleware for tracing
   const model = wrapLanguageModel({
@@ -191,14 +197,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        ...(supportsCachePoint && {
-          providerOptions: {
-            bedrock: {
-              // Always cache the system prompt (must not contain dynamic content)
-              cachePoint: { type: 'default' },
-            },
-          },
-        }),
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
       },
       {
         role: 'assistant',
@@ -327,6 +326,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         })
 
         result.pipeUIMessageStreamToResponse(res, {
+          sendReasoning: true,
           onError: (error) => {
             // Normalize error message
             let errorMessage: string

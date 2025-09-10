@@ -20,7 +20,7 @@ function AiPrompt({ className }: { className?: string }) {
       className={cn(
         'group',
         'w-fit rounded-full border px-3 py-1 flex gap-2 items-center text-foreground-light text-sm',
-        'hover:border-brand hover:text-brand focus-visible:text-brand',
+        'hover:border-brand hover:text-brand-link focus-visible:text-brand-link',
         'transition-colors',
         className
       )}
@@ -144,7 +144,7 @@ const HomePageCover = (props) => {
             <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">{props.title}</h1>
             <p className="m-0 text-foreground-light">
               Learn how to get up and running with Supabase through tutorials, APIs and platform
-              resources. Differences TBD.
+              resources.
             </p>
           </div>
         </div>
