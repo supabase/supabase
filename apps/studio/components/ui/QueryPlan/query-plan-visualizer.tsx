@@ -20,7 +20,11 @@ import { useHeatmapMax } from './hooks/use-heatmap-max'
 import { DetailsPanel } from './details-panel'
 
 export const QueryPlanVisualizer = ({ json }: { json: string }) => {
-  const { nodes, edges, meta } = useMemo((): { nodes: Node[]; edges: Edge[]; meta?: PlanMeta } => {
+  const { nodes, edges, meta } = useMemo((): {
+    nodes: Node<PlanNodeData>[]
+    edges: Edge[]
+    meta?: PlanMeta
+  } => {
     try {
       const parsed = JSON.parse(json) as any
       const root = Array.isArray(parsed) ? parsed[0] : parsed
