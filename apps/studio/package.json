@@ -67,7 +67,6 @@
     "@tanstack/react-table": "^8.21.3",
     "@uidotdev/usehooks": "^2.4.1",
     "@vercel/functions": "^2.1.0",
-    "@vercel/otel": "^1.13.0",
     "@vitejs/plugin-react": "^4.3.4",
     "@zip.js/zip.js": "^2.7.29",
     "ai": "^5.0.0",
