@@ -39,7 +39,6 @@ const BlogPostRenderer = ({
   blogMetaData,
   isDraftMode,
   livePreviewData,
-  isLivePreviewLoading,
   prevPost,
   nextPost,
   authors,
@@ -172,9 +171,6 @@ const BlogPostRenderer = ({
     return `${minutes} min read`
   }
 
-  // only show draft loading in development/preview environments
-  const shouldShowDraftLoading = isLivePreviewLoading && process.env.NODE_ENV !== 'production'
-
   return (
     <>
       {isDraftMode && <DraftModeBanner />}
@@ -201,10 +197,7 @@ const BlogPostRenderer = ({
               <div className="mb-6 lg:mb-10 max-w-5xl space-y-8">
                 <div className="space-y-4">
                   <Link href="/blog" className="text-brand hidden lg:inline-flex items-center">
-                    Blog{' '}
-                    {shouldShowDraftLoading && (
-                      <div className="text-xs text-foreground-lighter ml-4">Draft loading...</div>
-                    )}
+                    Blog
                   </Link>
                   <h1 className="text-2xl sm:text-4xl">{blogMetaData.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
