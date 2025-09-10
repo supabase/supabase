@@ -155,7 +155,7 @@ export const AuditLogsForm = () => {
                       <InlineLink
                         target="_blank"
                         rel="noopener noreferrer"
-                        href={`/project/${projectRef}/logs/auth-logs?s=auth_audit_event`}
+                        href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
                       >
                         auth logs
                       </InlineLink>
