@@ -16,6 +16,7 @@ import {
   type HeatmapMode,
 } from './contexts'
 import { PlanNode } from './plan-node'
+import { useHeatmapMax } from './hooks/use-heatmap-max'
 import { DetailsPanel } from './details-panel'
 
 export const ExplainPlanFlow = ({ json }: { json: string }) => {
@@ -77,21 +78,7 @@ export const ExplainPlanFlow = ({ json }: { json: string }) => {
 
   // Heatmap mode and maxima across nodes
   const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>('none')
-  const heatMax = useMemo(() => {
-    let maxTime = 0
-    let maxRows = 0
-    let maxCost = 0
-    nodes.forEach((n) => {
-      const d = n.data as PlanNodeData
-      const t = (d.exclusiveTimeMs ?? 0) || (d.actualTotalTime ?? 0) * (d.actualLoops ?? 1)
-      if (t > maxTime) maxTime = t
-      const rowsMetric = (d.actualRows ?? 0) * (d.actualLoops ?? 1) || d.planRows || 0
-      if (rowsMetric > maxRows) maxRows = rowsMetric
-      const c = d.exclusiveCost ?? 0
-      if (c > maxCost) maxCost = c
-    })
-    return { maxTime: maxTime || 1, maxRows: maxRows || 1, maxCost: maxCost || 1 }
-  }, [nodes])
+  const heatMax = useHeatmapMax(nodes as Node<PlanNodeData>[])
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
 
