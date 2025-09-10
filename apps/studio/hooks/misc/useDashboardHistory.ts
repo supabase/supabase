@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useLocalStorageQuery } from './useLocalStorage'
 
 type DashboardHistory = { editor?: string; sql?: string }
-const DEFAULT_HISTORY = { editor: undefined, sql: undefined } as DashboardHistory
+const DEFAULT_HISTORY = { editor: undefined, sql: undefined }
 
 export const useDashboardHistory = () => {
   // [Joshen] History should always refer to the project that the user is currently on
