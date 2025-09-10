@@ -18,6 +18,7 @@ const Hero = () => {
                 <AnnouncementBadge
                   url="/events/migrating-from-firebase-mobbin"
                   announcement="Looking to migrate to Supabase? Sign up for our webinar and learn how"
+                  announcementMobile="Learn how to migrate to Supabase"
                 />
 
                 <div className="flex flex-col items-center">
