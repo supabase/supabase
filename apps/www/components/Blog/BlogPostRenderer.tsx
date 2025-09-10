@@ -164,13 +164,6 @@ const BlogPostRenderer = ({
       ? `/images/blog/${blogMetaData.thumb}`
       : ''
 
-  const generateReadingTime = (text: string | undefined): string => {
-    if (!text) return '0 min read'
-    const wordsPerMinute = 200
-    const numberOfWords = text.split(/\s/g).length
-    const minutes = Math.ceil(numberOfWords / wordsPerMinute)
-    return `${minutes} min read`
-  }
 
   return (
     <>
@@ -211,8 +204,7 @@ const BlogPostRenderer = ({
                     <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
                     <p>•</p>
                     <p>
-                      {(blogMetaData as any).readingTime ||
-                        generateReadingTime(blogMetaData.source)}
+                      {(blogMetaData as any).readingTime}
                     </p>
                   </div>
                   {authors.length > 0 && (
