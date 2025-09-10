@@ -65,76 +65,83 @@ const sample2 = `[
 ]`
 
 const sample3 = `[
-{
-"Plan": {
-"Node Type": "Hash Join",
-"Join Type": "Inner",
-"Startup Cost": 10.00,
-"Total Cost": 120.00,
-"Plan Rows": 500,
-"Plan Width": 64,
-"Actual Startup Time": 0.20,
-"Actual Total Time": 20.00,
-"Actual Rows": 400,
-"Actual Loops": 1,
-"Parallel Aware": true,
-"Workers Planned": 4,
-"Workers Launched": 3,
-"Hash Cond": "(t1.id = t2.id)",
-"Rows Removed by Join Filter": 50,
-"Group Key": ["t1.category"],
-"Sort Key": ["(t1.created_at)", "t2.name"],
-"Presorted Key": ["(t1.created_at)"],
-"Plans": [
-{
-"Node Type": "Seq Scan",
-"Relation Name": "table2",
-"Alias": "t2",
-"Startup Cost": 0.00,
-"Total Cost": 50.00,
-"Plan Rows": 2000,
-"Plan Width": 32,
-"Actual Startup Time": 0.00,
-"Actual Total Time": 8.00,
-"Actual Rows": 150,
-"Actual Loops": 1,
-"Rows Removed by Filter": 20
-},
-{
-"Node Type": "Bitmap Heap Scan",
-"Relation Name": "table1",
-"Alias": "t1",
-"Startup Cost": 0.00,
-"Total Cost": 70.00,
-"Plan Rows": 100,
-"Plan Width": 32,
-"Actual Startup Time": 0.10,
-"Actual Total Time": 12.00,
-"Actual Rows": 900,
-"Actual Loops": 1,
-"Rows Removed by Index Recheck": 10,
-"Recheck Cond": "(id < 1000)",
-"Plans": [
-{
-"Node Type": "Bitmap Index Scan",
-"Index Name": "idx_t1_id",
-"Startup Cost": 0.00,
-"Total Cost": 10.00,
-"Plan Rows": 100,
-"Plan Width": 0,
-"Actual Startup Time": 0.00,
-"Actual Total Time": 1.50,
-"Actual Rows": 120,
-"Actual Loops": 0,
-"Index Cond": "(id < 1000)"
-}
-]
-}
-]
-},
-"Planning Time": 0.80,
-"Execution Time": 22.50
-}
+   {
+      "Plan":{
+         "Node Type":"Hash Join",
+         "Join Type":"Inner",
+         "Startup Cost":10.00,
+         "Total Cost":120.00,
+         "Plan Rows":500,
+         "Plan Width":64,
+         "Actual Startup Time":0.20,
+         "Actual Total Time":20.00,
+         "Actual Rows":400,
+         "Actual Loops":1,
+         "Parallel Aware":true,
+         "Workers Planned":4,
+         "Workers Launched":3,
+         "Hash Cond":"(t1.id = t2.id)",
+         "Rows Removed by Join Filter":50,
+         "Group Key":[
+            "t1.category"
+         ],
+         "Sort Key":[
+            "(t1.created_at)",
+            "t2.name"
+         ],
+         "Presorted Key":[
+            "(t1.created_at)"
+         ],
+         "Plans":[
+            {
+               "Node Type":"Seq Scan",
+               "Relation Name":"table2",
+               "Alias":"t2",
+               "Startup Cost":0.00,
+               "Total Cost":50.00,
+               "Plan Rows":2000,
+               "Plan Width":32,
+               "Actual Startup Time":0.00,
+               "Actual Total Time":8.00,
+               "Actual Rows":150,
+               "Actual Loops":1,
+               "Rows Removed by Filter":20
+            },
+            {
+               "Node Type":"Bitmap Heap Scan",
+               "Relation Name":"table1",
+               "Alias":"t1",
+               "Startup Cost":0.00,
+               "Total Cost":70.00,
+               "Plan Rows":100,
+               "Plan Width":32,
+               "Actual Startup Time":0.10,
+               "Actual Total Time":12.00,
+               "Actual Rows":900,
+               "Actual Loops":1,
+               "Rows Removed by Index Recheck":10,
+               "Recheck Cond":"(id < 1000)",
+               "Plans":[
+                  {
+                     "Node Type":"Bitmap Index Scan",
+                     "Index Name":"idx_t1_id",
+                     "Startup Cost":0.00,
+                     "Total Cost":10.00,
+                     "Plan Rows":100,
+                     "Plan Width":0,
+                     "Actual Startup Time":0.00,
+                     "Actual Total Time":1.50,
+                     "Actual Rows":120,
+                     "Actual Loops":0,
+                     "Index Cond":"(id < 1000)"
+                  }
+               ]
+            }
+         ]
+      },
+      "Planning Time":0.80,
+      "Execution Time":22.50
+   }
 ]`
 
 const HomePage: NextPageWithLayout = () => {

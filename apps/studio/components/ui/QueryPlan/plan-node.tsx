@@ -104,6 +104,15 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
     return `Temp Blocks\n${incl}\n${self}`
   }
 
+  // Calculate removed percentage (0-100) based on removed and actual rows×loops
+  const removedPercentValue = (removed?: number): number | undefined => {
+    const r = removed ?? 0
+    const actualTotal = (data.actualRows ?? 0) * (data.actualLoops ?? 1)
+    const denom = r + actualTotal
+    if (denom <= 0 || r <= 0) return undefined
+    return Math.round((r / denom) * 100)
+  }
+
   // Heatmap progress bar (time/rows/cost)
   const valueForHeat = (() => {
     switch (heat.mode) {
@@ -278,19 +287,27 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {data.rowsRemovedByFilter !== undefined && (
           <NodeItem>
             <span>Removed (filter)</span>
-            <span>{data.rowsRemovedByFilter}</span>
+            <span className="flex items-center">
+              {data.rowsRemovedByFilter} ({removedPercentValue(data.rowsRemovedByFilter)}%)
+            </span>
           </NodeItem>
         )}
         {data.rowsRemovedByJoinFilter !== undefined && (
           <NodeItem>
             <span>Removed (join filter)</span>
-            <span>{data.rowsRemovedByJoinFilter}</span>
+            <span>
+              {data.rowsRemovedByJoinFilter} ({removedPercentValue(data.rowsRemovedByJoinFilter)}%)
+            </span>
           </NodeItem>
         )}
         {data.rowsRemovedByIndexRecheck !== undefined && (
           <NodeItem>
             <span>Removed (recheck)</span>
-            <span>{data.rowsRemovedByIndexRecheck}</span>
+            <span>
+              {data.rowsRemovedByIndexRecheck} (
+              {removedPercentValue(data.rowsRemovedByIndexRecheck)}
+              %)
+            </span>
           </NodeItem>
         )}
         {data.heapFetches !== undefined && (
