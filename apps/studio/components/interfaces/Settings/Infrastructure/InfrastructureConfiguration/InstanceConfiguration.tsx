@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
@@ -18,7 +19,6 @@ import {
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
-import Link from 'next/link'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
 import {
   Button,
@@ -40,7 +40,11 @@ import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
 import { useShowNewReplicaPanel } from './use-show-new-replica'
 
-const InstanceConfigurationUI = () => {
+interface InstanceConfigurationUIProps {
+  diagramOnly?: boolean
+}
+
+const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationUIProps) => {
   const reactFlow = useReactFlow()
   const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
@@ -210,9 +214,9 @@ const InstanceConfigurationUI = () => {
   }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
-    <div className="nowheel border-y">
+    <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>
       <div
-        className={`h-[500px] w-full relative ${
+        className={`${diagramOnly ? 'h-full' : 'h-[500px]'} w-full relative ${
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
@@ -224,70 +228,72 @@ const InstanceConfigurationUI = () => {
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
         {isSuccessReplicas && !isLoadingProject && (
           <>
-            <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
-              <div className="flex items-center justify-center">
-                <ButtonTooltip
-                  type="default"
-                  disabled={!canManageReplicas || isOrioleDb}
-                  className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
-                  onClick={() => setShowNewReplicaPanel(true)}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canManageReplicas
-                        ? 'You need additional permissions to deploy replicas'
-                        : isOrioleDb
-                          ? 'Read replicas are not supported with OrioleDB'
-                          : undefined,
-                    },
-                  }}
-                >
-                  Deploy a new replica
-                </ButtonTooltip>
-                {replicas.length > 0 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        type="default"
-                        icon={<ChevronDown size={16} />}
-                        className="px-1 rounded-l-none border-l-0"
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                          Resize databases
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
-                        <div>Remove all replicas</div>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {!diagramOnly && (
+              <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
+                <div className="flex items-center justify-center">
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canManageReplicas || isOrioleDb}
+                    className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
+                    onClick={() => setShowNewReplicaPanel(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canManageReplicas
+                          ? 'You need additional permissions to deploy replicas'
+                          : isOrioleDb
+                            ? 'Read replicas are not supported with OrioleDB'
+                            : undefined,
+                      },
+                    }}
+                  >
+                    Deploy a new replica
+                  </ButtonTooltip>
+                  {replicas.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          type="default"
+                          icon={<ChevronDown size={16} />}
+                          className="px-1 rounded-l-none border-l-0"
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-52 *:space-x-2">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                            Resize databases
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
+                          <div>Remove all replicas</div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+                {project?.cloud_provider === 'AWS' && (
+                  <div className="flex items-center justify-center">
+                    <Button
+                      type="default"
+                      icon={<Network size={15} />}
+                      className={`rounded-r-none transition ${
+                        view === 'flow' ? 'opacity-100' : 'opacity-50'
+                      }`}
+                      onClick={() => setView('flow')}
+                    />
+                    <Button
+                      type="default"
+                      icon={<Globe2 size={15} />}
+                      className={`rounded-l-none transition ${
+                        view === 'map' ? 'opacity-100' : 'opacity-50'
+                      }`}
+                      onClick={() => setView('map')}
+                    />
+                  </div>
                 )}
               </div>
-              {project?.cloud_provider === 'AWS' && (
-                <div className="flex items-center justify-center">
-                  <Button
-                    type="default"
-                    icon={<Network size={15} />}
-                    className={`rounded-r-none transition ${
-                      view === 'flow' ? 'opacity-100' : 'opacity-50'
-                    }`}
-                    onClick={() => setView('flow')}
-                  />
-                  <Button
-                    type="default"
-                    icon={<Globe2 size={15} />}
-                    className={`rounded-l-none transition ${
-                      view === 'map' ? 'opacity-100' : 'opacity-50'
-                    }`}
-                    onClick={() => setView('map')}
-                  />
-                </div>
-              )}
-            </div>
+            )}
             {view === 'flow' ? (
               <ReactFlow
                 fitView
@@ -322,43 +328,49 @@ const InstanceConfigurationUI = () => {
         )}
       </div>
 
-      <DeployNewReplicaPanel
-        visible={showNewReplicaPanel}
-        selectedDefaultRegion={newReplicaRegion}
-        onSuccess={() => setRefetchInterval(5000)}
-        onClose={() => {
-          setNewReplicaRegion(undefined)
-          setShowNewReplicaPanel(false)
-        }}
-      />
+      {!diagramOnly && (
+        <>
+          <DeployNewReplicaPanel
+            visible={showNewReplicaPanel}
+            selectedDefaultRegion={newReplicaRegion}
+            onSuccess={() => setRefetchInterval(5000)}
+            onClose={() => {
+              setNewReplicaRegion(undefined)
+              setShowNewReplicaPanel(false)
+            }}
+          />
 
-      <DropReplicaConfirmationModal
-        selectedReplica={selectedReplicaToDrop}
-        onSuccess={() => setRefetchInterval(5000)}
-        onCancel={() => setSelectedReplicaToDrop(undefined)}
-      />
+          <DropReplicaConfirmationModal
+            selectedReplica={selectedReplicaToDrop}
+            onSuccess={() => setRefetchInterval(5000)}
+            onCancel={() => setSelectedReplicaToDrop(undefined)}
+          />
 
-      <DropAllReplicasConfirmationModal
-        visible={showDeleteAllModal}
-        onSuccess={() => setRefetchInterval(5000)}
-        onCancel={() => setShowDeleteAllModal(false)}
-      />
+          <DropAllReplicasConfirmationModal
+            visible={showDeleteAllModal}
+            onSuccess={() => setRefetchInterval(5000)}
+            onCancel={() => setShowDeleteAllModal(false)}
+          />
 
-      <RestartReplicaConfirmationModal
-        selectedReplica={selectedReplicaToRestart}
-        onSuccess={() => setRefetchInterval(5000)}
-        onCancel={() => setSelectedReplicaToRestart(undefined)}
-      />
+          <RestartReplicaConfirmationModal
+            selectedReplica={selectedReplicaToRestart}
+            onSuccess={() => setRefetchInterval(5000)}
+            onCancel={() => setSelectedReplicaToRestart(undefined)}
+          />
+        </>
+      )}
     </div>
   )
 }
 
-const InstanceConfiguration = () => {
+interface InstanceConfigurationProps {
+  diagramOnly?: boolean
+}
+
+export const InstanceConfiguration = ({ diagramOnly = false }: InstanceConfigurationProps) => {
   return (
     <ReactFlowProvider>
-      <InstanceConfigurationUI />
+      <InstanceConfigurationUI diagramOnly={diagramOnly} />
     </ReactFlowProvider>
   )
 }
-
-export default InstanceConfiguration

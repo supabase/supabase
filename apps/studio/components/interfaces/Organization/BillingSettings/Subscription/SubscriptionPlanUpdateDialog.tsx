@@ -26,7 +26,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import type { PaymentMethodElementRef } from '../PaymentMethods/NewPaymentMethodElement'
+import type { PaymentMethodElementRef } from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './PaymentMethodSelection'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)

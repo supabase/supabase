@@ -34,7 +34,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { model, error: modelError } = await getModel()
+    const { model, error: modelError } = await getModel({
+      provider: 'openai',
+      routingKey: 'cron',
+    })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
@@ -79,7 +82,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         Here is the user's prompt: ${prompt}
       `,
-      temperature: 0,
     })
 
     return res.json(result.object.cron_expression)

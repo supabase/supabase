@@ -14,8 +14,8 @@ const CHART_TOOLTIP_SYNC_STORAGE_KEY = 'supabase-chart-tooltip-sync-enabled'
 let globalState: ChartHoverState = {
   hoveredIndex: null,
   hoveredChart: null,
-  syncHover: false,
-  syncTooltip: false,
+  syncHover: true,
+  syncTooltip: true,
 }
 
 // Subscribers for state changes

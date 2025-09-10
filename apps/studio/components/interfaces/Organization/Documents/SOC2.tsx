@@ -12,19 +12,19 @@ import {
 import NoPermission from 'components/ui/NoPermission'
 import { getDocument } from 'data/documents/document-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const SOC2 = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
+
   const { mutate: sendEvent } = useSendEventMutation()
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } =
+    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const currentPlan = organization?.plan
 
@@ -51,7 +51,11 @@ export const SOC2 = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadSubscriptions ? (
+        {isLoadingPermissions ? (
+          <div className="flex items-center justify-center h-full">
+            <ShimmeringLoader className="w-24" />
+          </div>
+        ) : !canReadSubscriptions ? (
           <NoPermission resourceText="access our SOC2 Type 2 report" />
         ) : (
           <div className="flex items-center justify-center h-full">
