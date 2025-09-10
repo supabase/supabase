@@ -201,7 +201,9 @@ describe('FilterBar Utils', () => {
       const filterOption = { value: 'test', label: 'Test' }
       expect(isFilterOptionObject(filterOption)).toBe(true)
       expect(isFilterOptionObject('string')).toBe(false)
-      expect(isFilterOptionObject({ component: () => React.createElement('div', {}, 'test') })).toBe(false)
+      expect(
+        isFilterOptionObject({ component: () => React.createElement('div', {}, 'test') })
+      ).toBe(false)
     })
 
     it('identifies async functions', () => {

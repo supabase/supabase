@@ -9,12 +9,12 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { ChevronRight, ExternalLink } from 'lucide-react'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button, Collapsible, SidePanel, cn } from 'ui'
-import { ExternalLink, ChevronRight } from 'lucide-react'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -43,7 +43,7 @@ const SpendCapSidePanel = () => {
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const canUpdateSpendCap = useCheckPermissions(
+  const { can: canUpdateSpendCap } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

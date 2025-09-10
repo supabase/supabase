@@ -66,6 +66,7 @@ const sample2 = `[
 
 const HomePage: NextPageWithLayout = () => {
   const isHomeNew = useFlag('homeNew')
+
   if (isHomeNew) {
     return <HomeV2 />
   }
