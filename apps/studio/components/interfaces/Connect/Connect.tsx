@@ -113,38 +113,21 @@ export const Connect = () => {
     setSelectedGrandchild(value)
   }
 
-  // reset the parent/child/grandchild when the connection type (tab) changes
-  function handleConnectionTypeChange(connections: ConnectionType[]) {
-    setSelectedParent(connections[0].key)
+  // reset the parent/child/grandchild when the connection set changes
+  function resetSelectionFromConnections(connections: ConnectionType[]) {
+    setSelectedParent(connections[0]?.key ?? '')
 
     if (connections[0]?.children.length > 0) {
-      setSelectedChild(connections[0].children[0].key)
+      setSelectedChild(connections[0].children[0]?.key ?? '')
 
       if (connections[0].children[0]?.children.length > 0) {
-        setSelectedGrandchild(connections[0].children[0].children[0].key)
+        setSelectedGrandchild(connections[0].children[0].children[0]?.key ?? '')
       } else {
         setSelectedGrandchild('')
       }
     } else {
       setSelectedChild('')
       setSelectedGrandchild('')
-    }
-  }
-
-  function handleConnectionType(type: string) {
-    if (type === 'frameworks') {
-      setConnectionObject(frameworks)
-      handleConnectionTypeChange(frameworks)
-    }
-
-    if (type === 'mobiles') {
-      setConnectionObject(MOBILES)
-      handleConnectionTypeChange(MOBILES)
-    }
-
-    if (type === 'orms') {
-      setConnectionObject(ORMS)
-      handleConnectionTypeChange(ORMS)
     }
   }
 
@@ -195,32 +178,31 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
-  // Sync initial tab and framework from query params
+  // Sync connection set when the tab or underlying frameworks change
   useEffect(() => {
     if (connectTab === 'frameworks') {
       setConnectionObject(frameworks)
-      handleConnectionTypeChange(frameworks)
-      if (prefFramework) {
-        const exists = frameworks.find((f) => f.key === prefFramework)
-        if (exists) {
-          setSelectedParent(prefFramework)
-          // Reset children/grandchildren based on the new parent
-          const firstChild = exists.children?.[0]?.key ?? ''
-          setSelectedChild(firstChild)
-          const firstGrand = exists.children?.[0]?.children?.[0]?.key ?? ''
-          setSelectedGrandchild(firstGrand)
-        }
-      }
-    }
-    if (connectTab === 'mobiles') {
+      resetSelectionFromConnections(frameworks)
+    } else if (connectTab === 'mobiles') {
       setConnectionObject(MOBILES)
-      handleConnectionTypeChange(MOBILES)
-    }
-    if (connectTab === 'orms') {
+      resetSelectionFromConnections(MOBILES)
+    } else if (connectTab === 'orms') {
       setConnectionObject(ORMS)
-      handleConnectionTypeChange(ORMS)
+      resetSelectionFromConnections(ORMS)
     }
-  }, [connectTab, prefFramework, frameworks])
+  }, [connectTab, frameworks])
+
+  // If a preferred framework is specified, apply it only for the frameworks tab
+  useEffect(() => {
+    if (connectTab !== 'frameworks' || !prefFramework) return
+    const exists = frameworks.find((f) => f.key === prefFramework)
+    if (!exists) return
+    setSelectedParent(prefFramework)
+    const firstChild = exists.children?.[0]?.key ?? ''
+    setSelectedChild(firstChild)
+    const firstGrand = exists.children?.[0]?.children?.[0]?.key ?? ''
+    setSelectedGrandchild(firstGrand)
+  }, [prefFramework, connectTab, frameworks])
 
   if (!isActiveHealthy) {
     return (
@@ -259,7 +241,6 @@ export const Connect = () => {
         <Tabs_Shadcn_
           value={connectTab}
           onValueChange={(value) => {
-            handleConnectionType(value)
             setConnectTab(value)
           }}
         >
