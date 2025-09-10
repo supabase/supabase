@@ -10,10 +10,9 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import type { Sort } from 'components/grid/types'
 
 export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery,
@@ -103,9 +102,17 @@ export const QueryPerformanceFilterBar = ({
           />
 
           {sort && (
-            <Button size="tiny" type="link" icon={<X size={12} />} onClick={clearSort}>
-              Clear sort
-            </Button>
+            <div className="text-xs border rounded-md px-2.5 py-1 h-[26px] flex items-center gap-x-2">
+              <p>
+                Sort: {sort.column} (<span className="capitalize">{sort.order}</span>)
+              </p>
+              <Tooltip>
+                <TooltipTrigger onClick={clearSort}>
+                  <X size={14} className="text-foreground-light hover:text-foreground" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Clear sort</TooltipContent>
+              </Tooltip>
+            </div>
           )}
         </div>
       </div>
