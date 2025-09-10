@@ -49,7 +49,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         store.makeTabActive(tabId)
       }
     }
-  }, [selectedTable, id, projectRef])
+  }, [selectedTable, id, projectRef, store])
 
   return <TableGridEditor isLoadingSelectedTable={isLoading} selectedTable={selectedTable} />
 }

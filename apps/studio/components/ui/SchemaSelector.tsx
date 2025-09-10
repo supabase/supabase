@@ -166,6 +166,7 @@ const SchemaSelector = ({
                         key={schema.id}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                         onSelect={() => {
+                          console.log('calling onSelectSchema', schema.name)
                           onSelectSchema(schema.name)
                           setOpen(false)
                         }}
