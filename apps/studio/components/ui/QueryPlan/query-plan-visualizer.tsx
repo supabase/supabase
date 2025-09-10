@@ -3,10 +3,10 @@ import { useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, type Node, type Edge } from 'reactflow'
 import 'reactflow/dist/style.css'
 
+import type { PlanMeta, PlanNodeData } from './types'
 import { MetaOverlay } from './meta-overlay'
 import { SubplanOverlay } from './subplan-overlay'
 import { ControlsOverlay } from './controls-overlay'
-import type { PlanMeta, PlanNodeData } from './types'
 import { NODE_TYPE } from './constants'
 import { buildGraphFromPlan } from './graph/build-graph-from-plan'
 import {
@@ -17,6 +17,8 @@ import {
 } from './contexts'
 import { PlanNode } from './plan-node'
 import { useHeatmapMax } from './hooks/use-heatmap-max'
+import { getLayoutedElementsViaDagre } from './utils/layout'
+import { estimateNodeHeight } from './utils/node-display'
 import { DetailsPanel } from './details-panel'
 
 export const QueryPlanVisualizer = ({ json }: { json: string }) => {
@@ -86,6 +88,26 @@ export const QueryPlanVisualizer = ({ json }: { json: string }) => {
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
 
+  // Estimate node sizes from data (fixed row heights) and layout with Dagre
+  const layout = useMemo(() => {
+    if (!nodes.length) return { nodes: [], edges: [] }
+
+    const sizes: Record<string, { width: number; height: number }> = {}
+
+    nodes.forEach((n) => {
+      const d = n.data
+      const height = estimateNodeHeight(d, metricsVisibility, heatmapMode)
+      sizes[n.id] = { width: 180, height }
+    })
+
+    const { nodes: nl, edges: el } = getLayoutedElementsViaDagre(
+      nodes.map((n) => ({ ...n })),
+      edges.map((e) => ({ ...e })),
+      sizes
+    )
+    return { nodes: nl, edges: el }
+  }, [nodes, edges, metricsVisibility, heatmapMode])
+
   const { resolvedTheme } = useTheme()
   const miniMapMaskColor = resolvedTheme?.includes('dark')
     ? 'rgb(17, 19, 24, .8)'
@@ -151,16 +173,11 @@ export const QueryPlanVisualizer = ({ json }: { json: string }) => {
             }}
             fitView
             nodeTypes={nodeTypes}
-            nodes={nodes}
-            edges={edges}
+            nodes={layout.nodes}
+            edges={layout.edges}
             minZoom={0.8}
             maxZoom={1.8}
             proOptions={{ hideAttribution: true }}
-            onInit={(instance) => {
-              if (nodes.length > 0) {
-                setTimeout(() => instance.fitView({}))
-              }
-            }}
             onNodeClick={(e, node) => setSelectedNode(node.data as PlanNodeData)}
             onPaneClick={() => setSelectedNode(null)}
           >

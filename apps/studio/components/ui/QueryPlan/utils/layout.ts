@@ -2,7 +2,11 @@ import { Position, type Edge, type Node } from 'reactflow'
 import dagre from '@dagrejs/dagre'
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from '../constants'
 
-export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
+export const getLayoutedElementsViaDagre = (
+  nodes: Node[],
+  edges: Edge[],
+  sizes?: Record<string, { width: number; height: number }>
+) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
   dagreGraph.setGraph({
@@ -12,9 +16,10 @@ export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
   })
 
   nodes.forEach((node) => {
+    const size = sizes?.[node.id]
     dagreGraph.setNode(node.id, {
-      width: DEFAULT_NODE_WIDTH,
-      height: DEFAULT_NODE_HEIGHT,
+      width: size?.width ?? DEFAULT_NODE_WIDTH,
+      height: size?.height ?? DEFAULT_NODE_HEIGHT,
     })
   })
 
@@ -29,8 +34,8 @@ export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
     node.targetPosition = Position.Top
     node.sourcePosition = Position.Bottom
     node.position = {
-      x: nodeWithPosition.x - DEFAULT_NODE_WIDTH / 2,
-      y: nodeWithPosition.y - DEFAULT_NODE_HEIGHT / 2,
+      x: nodeWithPosition.x - (sizes?.[node.id]?.width ?? DEFAULT_NODE_WIDTH) / 2,
+      y: nodeWithPosition.y - (sizes?.[node.id]?.height ?? DEFAULT_NODE_HEIGHT) / 2,
     }
   })
 

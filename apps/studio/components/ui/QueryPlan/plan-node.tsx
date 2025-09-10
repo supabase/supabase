@@ -1,5 +1,4 @@
 import { useContext } from 'react'
-import { capitalize } from 'lodash'
 import { Handle, Position } from 'reactflow'
 import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
 
@@ -8,59 +7,15 @@ import { Badge, cn } from 'ui'
 import { NodeItem } from './node-item'
 import { HeatmapContext, MetricsVisibilityContext } from './contexts'
 import { DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
-import { blocksToBytes, formatKeys, stripParens } from './utils/formats'
+import { blocksToBytes } from './utils/formats'
+import { computeHeaderLines, hasShared, hasTemp, hasLocal } from './utils/node-display'
 
 export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
   const vis = useContext(MetricsVisibilityContext)
   const heat = useContext(HeatmapContext)
 
-  const headerLines: string[] = []
-  // Insert CTE/Subplan badge at the top of the header lines if present
-  if (data.cteName) {
-    headerLines.unshift(`[CTE] ${data.cteName}`)
-  } else if (data.subplanName) {
-    headerLines.unshift(`[Subplan] ${data.subplanName}`)
-  }
-  if (data.parallelAware) {
-    headerLines.unshift('[Parallel]')
-  }
-
-  // Append grouping and sorting clauses to the header, e.g. "by col1, col2".
-  // `formatKeys` formats/merges keys and accounts for pre-sorted keys when provided.
-  const groupKeys = formatKeys(data.groupKey)
-  if (groupKeys) headerLines.push(`by ${groupKeys}`)
-  const sortKeys = formatKeys(data.sortKey, data.presortedKey)
-  if (sortKeys) headerLines.push(`by ${sortKeys}`)
-
-  if (data.joinType) headerLines.push(`${capitalize(data.joinType)} join`)
-
-  // Only show join-related conditions in header; exclude index/recheck/filter conditions
-  const cond = data.hashCond ?? data.mergeCond ?? data.joinFilter
-  if (cond) {
-    headerLines.push(`on ${stripParens(cond)}`)
-  } else if (data.relationName) {
-    headerLines.push(`on ${data.relationName}${data.alias ? ` as ${data.alias}` : ''}`)
-  }
-
-  if (data.indexName && data.label.toLowerCase().includes('index')) {
-    headerLines.push(`using ${data.indexName}`)
-  }
-
-  // Prepare compact buffers summary lines (show only if any > 0)
-  const hasShared =
-    (data.exSharedHit ?? 0) +
-      (data.exSharedRead ?? 0) +
-      (data.exSharedWritten ?? 0) +
-      (data.exSharedDirtied ?? 0) >
-    0
-  const hasTemp = (data.exTempRead ?? 0) + (data.exTempWritten ?? 0) > 0
-  const hasLocal =
-    (data.exLocalHit ?? 0) +
-      (data.exLocalRead ?? 0) +
-      (data.exLocalWritten ?? 0) +
-      (data.exLocalDirtied ?? 0) >
-    0
+  const headerLines = computeHeaderLines(data)
 
   const sharedTooltip = () => {
     const incl = `incl: h=${data.sharedHit ?? 0} (${blocksToBytes(data.sharedHit)}), r=${
@@ -318,7 +273,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
 
         {/* BUFFERS */}
-        {vis.buffers && hasShared && (
+        {vis.buffers && hasShared(data) && (
           <NodeItem title={sharedTooltip()}>
             <span>Shared (self)</span>
             <span>
@@ -327,7 +282,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
             </span>
           </NodeItem>
         )}
-        {vis.buffers && hasTemp && (
+        {vis.buffers && hasTemp(data) && (
           <NodeItem title={tempTooltip()}>
             <span>Temp (self)</span>
             <span>
@@ -335,7 +290,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
             </span>
           </NodeItem>
         )}
-        {vis.buffers && hasLocal && (
+        {vis.buffers && hasLocal(data) && (
           <NodeItem title={localTooltip()}>
             <span>Local (self)</span>
             <span>
