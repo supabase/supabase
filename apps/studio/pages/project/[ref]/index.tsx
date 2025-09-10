@@ -73,7 +73,7 @@ const HomePage: NextPageWithLayout = () => {
   return (
     <>
       <div className="w-full h-[500px]">
-        <ExplainPlanFlow json={sample2} />
+        <QueryPlanVisualizer json={sample2} />
       </div>
       {/* <Home /> */}
     </>
