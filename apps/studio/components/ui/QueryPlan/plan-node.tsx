@@ -5,6 +5,7 @@ import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn } from 'ui'
+import { NodeItem } from './node-item'
 import { HeatmapContext, MetricsVisibilityContext } from './contexts'
 import { DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
 import { blocksToBytes, stripParens } from './utils/formats'
@@ -180,331 +181,153 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
       <ul>
         {/* Time (actual) */}
         {vis.time && data.actualTotalTime !== undefined && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>time</span>
-              <span>
-                {data.actualTotalTime} ms{data.actualLoops ? ` ×${data.actualLoops}` : ''}
-              </span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>time</span>
+            <span>
+              {data.actualTotalTime} ms{data.actualLoops ? ` ×${data.actualLoops}` : ''}
+            </span>
+          </NodeItem>
         )}
         {/* Time (self/exclusive) */}
         {vis.time && typeof data.exclusiveTimeMs === 'number' && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>self time</span>
-              <span>{data.exclusiveTimeMs} ms</span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>self time</span>
+            <span>{data.exclusiveTimeMs} ms</span>
+          </NodeItem>
         )}
 
         {/* Rows (actual / est) */}
         {vis.rows && (data.actualRows !== undefined || data.planRows !== undefined) && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Rows</span>
-              <span>
-                {data.actualRows !== undefined ? data.actualRows : '-'}
-                {data.planRows !== undefined ? ` / est ${data.planRows}` : ''}
-              </span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>Rows</span>
+            <span>
+              {data.actualRows !== undefined ? data.actualRows : '-'}
+              {data.planRows !== undefined ? ` / est ${data.planRows}` : ''}
+            </span>
+          </NodeItem>
         )}
         {/* Estimation factor (actual_total / plan_est) */}
         {vis.rows && typeof data.estFactor === 'number' && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
+          <NodeItem
             title={
               typeof data.estActualTotalRows === 'number' && typeof data.planRows === 'number'
                 ? `actual_total_rows: ${data.estActualTotalRows} / plan_rows: ${data.planRows}`
                 : undefined
             }
           >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>estim</span>
-              <span className="inline-flex items-center gap-[2px]">
-                {data.estDirection === 'under' ? (
-                  <ArrowBigDown size={10} strokeWidth={1} fill="currentColor" />
-                ) : data.estDirection === 'over' ? (
-                  <ArrowBigUp size={10} strokeWidth={1} fill="currentColor" />
-                ) : null}
-                {data.estFactor.toFixed(2)}×
-              </span>
-            </div>
-          </li>
+            <span>estim</span>
+            <span className="inline-flex items-center gap-[2px]">
+              {data.estDirection === 'under' ? (
+                <ArrowBigDown size={10} strokeWidth={1} fill="currentColor" />
+              ) : data.estDirection === 'over' ? (
+                <ArrowBigUp size={10} strokeWidth={1} fill="currentColor" />
+              ) : null}
+              {data.estFactor.toFixed(2)}×
+            </span>
+          </NodeItem>
         )}
 
         {/* Costs (startup → total) */}
         {vis.cost && (data.startupCost !== undefined || data.totalCost !== undefined) && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Cost</span>
-              <span>
-                {data.startupCost !== undefined ? data.startupCost : '-'}
-                {data.totalCost !== undefined ? ` → ${data.totalCost}` : ''}
-              </span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>Cost</span>
+            <span>
+              {data.startupCost !== undefined ? data.startupCost : '-'}
+              {data.totalCost !== undefined ? ` → ${data.totalCost}` : ''}
+            </span>
+          </NodeItem>
         )}
         {/* Cost (self/exclusive) */}
         {vis.cost && typeof data.exclusiveCost === 'number' && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Self Cost</span>
-              <span>{data.exclusiveCost.toFixed(2)}</span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>Self Cost</span>
+            <span>{data.exclusiveCost.toFixed(2)}</span>
+          </NodeItem>
         )}
 
         {/* Width */}
         {data.planWidth !== undefined && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Plan Width</span>
-              <span>{data.planWidth} bytes</span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>Plan Width</span>
+            <span>{data.planWidth} bytes</span>
+          </NodeItem>
         )}
 
         {/* Filters/Removals */}
         {data.rowsRemovedByFilter !== undefined && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Removed (filter)</span>
-              <span>{data.rowsRemovedByFilter}</span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>Removed (filter)</span>
+            <span>{data.rowsRemovedByFilter}</span>
+          </NodeItem>
         )}
         {data.rowsRemovedByJoinFilter !== undefined && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Removed (join filter)</span>
-              <span>{data.rowsRemovedByJoinFilter}</span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>Removed (join filter)</span>
+            <span>{data.rowsRemovedByJoinFilter}</span>
+          </NodeItem>
         )}
         {data.rowsRemovedByIndexRecheck !== undefined && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Removed (recheck)</span>
-              <span>{data.rowsRemovedByIndexRecheck}</span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>Removed (recheck)</span>
+            <span>{data.rowsRemovedByIndexRecheck}</span>
+          </NodeItem>
         )}
         {data.heapFetches !== undefined && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Heap Fetches</span>
-              <span>{data.heapFetches}</span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>Heap Fetches</span>
+            <span>{data.heapFetches}</span>
+          </NodeItem>
         )}
 
         {/* BUFFERS */}
         {vis.buffers && hasShared && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-            title={sharedTooltip()}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Shared (self)</span>
-              <span>
-                h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0} d:{data.exSharedDirtied ?? 0}{' '}
-                w:{data.exSharedWritten ?? 0}
-              </span>
-            </div>
-          </li>
+          <NodeItem title={sharedTooltip()}>
+            <span>Shared (self)</span>
+            <span>
+              h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0} d:{data.exSharedDirtied ?? 0} w:
+              {data.exSharedWritten ?? 0}
+            </span>
+          </NodeItem>
         )}
         {vis.buffers && hasTemp && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-            title={tempTooltip()}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Temp (self)</span>
-              <span>
-                r:{data.exTempRead ?? 0} w:{data.exTempWritten ?? 0}
-              </span>
-            </div>
-          </li>
+          <NodeItem title={tempTooltip()}>
+            <span>Temp (self)</span>
+            <span>
+              r:{data.exTempRead ?? 0} w:{data.exTempWritten ?? 0}
+            </span>
+          </NodeItem>
         )}
         {vis.buffers && hasLocal && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-            title={localTooltip()}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Local (self)</span>
-              <span>
-                h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0} d:{data.exLocalDirtied ?? 0} w:
-                {data.exLocalWritten ?? 0}
-              </span>
-            </div>
-          </li>
+          <NodeItem title={localTooltip()}>
+            <span>Local (self)</span>
+            <span>
+              h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0} d:{data.exLocalDirtied ?? 0} w:
+              {data.exLocalWritten ?? 0}
+            </span>
+          </NodeItem>
         )}
 
         {/* Output cols (verbose) */}
         {vis.output && Array.isArray(data.outputCols) && data.outputCols.length > 0 && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              'min-h-[22px]'
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Output</span>
-              <span className="truncate max-w-[95px]" title={data.outputCols.join(', ')}>
-                {data.outputCols.join(', ')}
-              </span>
-            </div>
-          </li>
+          <NodeItem heightClass="min-h-[22px]">
+            <span>Output</span>
+            <span className="truncate max-w-[95px]" title={data.outputCols.join(', ')}>
+              {data.outputCols.join(', ')}
+            </span>
+          </NodeItem>
         )}
 
         {/* I/O times */}
         {vis.buffers && (data.ioReadTime !== undefined || data.ioWriteTime !== undefined) && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>IO</span>
-              <span>
-                {typeof data.ioReadTime === 'number' ? `r:${data.ioReadTime}ms` : ''}
-                {typeof data.ioWriteTime === 'number'
-                  ? `${typeof data.ioReadTime === 'number' ? ' ' : ''}w:${data.ioWriteTime}ms`
-                  : ''}
-              </span>
-            </div>
-          </li>
+          <NodeItem>
+            <span>IO</span>
+            <span>
+              {typeof data.ioReadTime === 'number' ? `r:${data.ioReadTime}ms` : ''}
+              {typeof data.ioWriteTime === 'number'
+                ? `${typeof data.ioReadTime === 'number' ? ' ' : ''}w:${data.ioWriteTime}ms`
+                : ''}
+            </span>
+          </NodeItem>
         )}
       </ul>
       <Handle type="source" position={Position.Bottom} className={HIDDEN_NODE_CONNECTOR} />
