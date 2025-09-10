@@ -90,135 +90,159 @@ export function useKeyboardNavigation({
     [activeInput, activeFilters, removeFilterByPath, removeGroupByPath, setActiveInput]
   )
 
-  const findPreviousCondition = useCallback((currentPath: number[]): number[] | null => {
-    const [groupPath, conditionIndex] = [currentPath.slice(0, -1), currentPath[currentPath.length - 1]]
-    
-    // Try previous condition in same group
-    if (conditionIndex > 0) {
-      const prevPath = [...groupPath, conditionIndex - 1]
+  const findPreviousCondition = useCallback(
+    (currentPath: number[]): number[] | null => {
+      const [groupPath, conditionIndex] = [
+        currentPath.slice(0, -1),
+        currentPath[currentPath.length - 1],
+      ]
+
+      // Try previous condition in same group
+      if (conditionIndex > 0) {
+        const prevPath = [...groupPath, conditionIndex - 1]
+        const group = findGroupByPath(activeFilters, groupPath)
+        const prevCondition = group?.conditions[conditionIndex - 1]
+        // If previous is a condition (not a group), return its path
+        if (prevCondition && !('logicalOperator' in prevCondition)) {
+          return prevPath
+        }
+        // If previous is a group, find its last condition recursively
+        if (prevCondition && 'logicalOperator' in prevCondition) {
+          return findLastConditionInGroup(prevPath)
+        }
+      }
+
+      // No previous condition in this group, go up to parent
+      if (groupPath.length > 0) {
+        return findPreviousCondition(groupPath)
+      }
+
+      return null
+    },
+    [activeFilters]
+  )
+
+  const findNextCondition = useCallback(
+    (currentPath: number[]): number[] | null => {
+      const [groupPath, conditionIndex] = [
+        currentPath.slice(0, -1),
+        currentPath[currentPath.length - 1],
+      ]
       const group = findGroupByPath(activeFilters, groupPath)
-      const prevCondition = group?.conditions[conditionIndex - 1]
-      // If previous is a condition (not a group), return its path
-      if (prevCondition && !('logicalOperator' in prevCondition)) {
-        return prevPath
+
+      // Try next condition in same group
+      if (group && conditionIndex < group.conditions.length - 1) {
+        const nextPath = [...groupPath, conditionIndex + 1]
+        const nextCondition = group.conditions[conditionIndex + 1]
+        // If next is a condition, return its path
+        if (!('logicalOperator' in nextCondition)) {
+          return nextPath
+        }
+        // If next is a group, find its first condition recursively
+        return findFirstConditionInGroup(nextPath)
       }
-      // If previous is a group, find its last condition recursively
-      if (prevCondition && 'logicalOperator' in prevCondition) {
-        return findLastConditionInGroup(prevPath)
+
+      // No next condition in this group, go up to parent and find next
+      if (groupPath.length > 0) {
+        return findNextCondition(groupPath)
       }
-    }
-    
-    // No previous condition in this group, go up to parent
-    if (groupPath.length > 0) {
-      return findPreviousCondition(groupPath)
-    }
-    
-    return null
-  }, [activeFilters])
 
-  const findNextCondition = useCallback((currentPath: number[]): number[] | null => {
-    const [groupPath, conditionIndex] = [currentPath.slice(0, -1), currentPath[currentPath.length - 1]]
-    const group = findGroupByPath(activeFilters, groupPath)
-    
-    // Try next condition in same group
-    if (group && conditionIndex < group.conditions.length - 1) {
-      const nextPath = [...groupPath, conditionIndex + 1]
-      const nextCondition = group.conditions[conditionIndex + 1]
-      // If next is a condition, return its path
-      if (!('logicalOperator' in nextCondition)) {
-        return nextPath
+      return null
+    },
+    [activeFilters]
+  )
+
+  const findFirstConditionInGroup = useCallback(
+    (groupPath: number[]): number[] | null => {
+      const group = findGroupByPath(activeFilters, groupPath)
+      if (!group || group.conditions.length === 0) return null
+
+      const firstCondition = group.conditions[0]
+      if (!('logicalOperator' in firstCondition)) {
+        return [...groupPath, 0]
       }
-      // If next is a group, find its first condition recursively
-      return findFirstConditionInGroup(nextPath)
-    }
-    
-    // No next condition in this group, go up to parent and find next
-    if (groupPath.length > 0) {
-      return findNextCondition(groupPath)
-    }
-    
-    return null
-  }, [activeFilters])
+      // First item is a group, recurse
+      return findFirstConditionInGroup([...groupPath, 0])
+    },
+    [activeFilters]
+  )
 
-  const findFirstConditionInGroup = useCallback((groupPath: number[]): number[] | null => {
-    const group = findGroupByPath(activeFilters, groupPath)
-    if (!group || group.conditions.length === 0) return null
-    
-    const firstCondition = group.conditions[0]
-    if (!('logicalOperator' in firstCondition)) {
-      return [...groupPath, 0]
-    }
-    // First item is a group, recurse
-    return findFirstConditionInGroup([...groupPath, 0])
-  }, [activeFilters])
+  const findLastConditionInGroup = useCallback(
+    (groupPath: number[]): number[] | null => {
+      const group = findGroupByPath(activeFilters, groupPath)
+      if (!group || group.conditions.length === 0) return null
 
-  const findLastConditionInGroup = useCallback((groupPath: number[]): number[] | null => {
-    const group = findGroupByPath(activeFilters, groupPath)
-    if (!group || group.conditions.length === 0) return null
-    
-    const lastCondition = group.conditions[group.conditions.length - 1]
-    const lastIndex = group.conditions.length - 1
-    if (!('logicalOperator' in lastCondition)) {
-      return [...groupPath, lastIndex]
-    }
-    // Last item is a group, recurse
-    return findLastConditionInGroup([...groupPath, lastIndex])
-  }, [activeFilters])
+      const lastCondition = group.conditions[group.conditions.length - 1]
+      const lastIndex = group.conditions.length - 1
+      if (!('logicalOperator' in lastCondition)) {
+        return [...groupPath, lastIndex]
+      }
+      // Last item is a group, recurse
+      return findLastConditionInGroup([...groupPath, lastIndex])
+    },
+    [activeFilters]
+  )
 
-  const findPreviousConditionFromGroup = useCallback((groupPath: number[]): number[] | null => {
-    // If this group has conditions, find the last one
-    const group = findGroupByPath(activeFilters, groupPath)
-    if (group && group.conditions.length > 0) {
-      return findLastConditionInGroup(groupPath)
-    }
-    
-    // No conditions in this group, find previous sibling or parent
-    if (groupPath.length > 0) {
-      const parentPath = groupPath.slice(0, -1)
-      const groupIndex = groupPath[groupPath.length - 1]
-      if (groupIndex > 0) {
-        // Find last condition in previous sibling
-        const prevSiblingPath = [...parentPath, groupIndex - 1]
-        const parentGroup = findGroupByPath(activeFilters, parentPath)
-        const prevSibling = parentGroup?.conditions[groupIndex - 1]
-        if (prevSibling) {
-          if ('logicalOperator' in prevSibling) {
-            return findLastConditionInGroup(prevSiblingPath)
-          } else {
-            return prevSiblingPath
+  const findPreviousConditionFromGroup = useCallback(
+    (groupPath: number[]): number[] | null => {
+      // If this group has conditions, find the last one
+      const group = findGroupByPath(activeFilters, groupPath)
+      if (group && group.conditions.length > 0) {
+        return findLastConditionInGroup(groupPath)
+      }
+
+      // No conditions in this group, find previous sibling or parent
+      if (groupPath.length > 0) {
+        const parentPath = groupPath.slice(0, -1)
+        const groupIndex = groupPath[groupPath.length - 1]
+        if (groupIndex > 0) {
+          // Find last condition in previous sibling
+          const prevSiblingPath = [...parentPath, groupIndex - 1]
+          const parentGroup = findGroupByPath(activeFilters, parentPath)
+          const prevSibling = parentGroup?.conditions[groupIndex - 1]
+          if (prevSibling) {
+            if ('logicalOperator' in prevSibling) {
+              return findLastConditionInGroup(prevSiblingPath)
+            } else {
+              return prevSiblingPath
+            }
           }
         }
+        // Look at parent group
+        return findPreviousConditionFromGroup(parentPath)
       }
-      // Look at parent group
-      return findPreviousConditionFromGroup(parentPath)
-    }
-    
-    return null
-  }, [activeFilters, findLastConditionInGroup])
 
-  const findNextConditionFromGroup = useCallback((groupPath: number[]): number[] | null => {
-    // Find next sibling or dive into nested groups
-    if (groupPath.length > 0) {
-      const parentPath = groupPath.slice(0, -1)
-      const groupIndex = groupPath[groupPath.length - 1]
-      const parentGroup = findGroupByPath(activeFilters, parentPath)
-      
-      if (parentGroup && groupIndex < parentGroup.conditions.length - 1) {
-        // Find first condition in next sibling
-        const nextSiblingPath = [...parentPath, groupIndex + 1]
-        const nextSibling = parentGroup.conditions[groupIndex + 1]
-        if ('logicalOperator' in nextSibling) {
-          return findFirstConditionInGroup(nextSiblingPath)
-        } else {
-          return nextSiblingPath
+      return null
+    },
+    [activeFilters, findLastConditionInGroup]
+  )
+
+  const findNextConditionFromGroup = useCallback(
+    (groupPath: number[]): number[] | null => {
+      // Find next sibling or dive into nested groups
+      if (groupPath.length > 0) {
+        const parentPath = groupPath.slice(0, -1)
+        const groupIndex = groupPath[groupPath.length - 1]
+        const parentGroup = findGroupByPath(activeFilters, parentPath)
+
+        if (parentGroup && groupIndex < parentGroup.conditions.length - 1) {
+          // Find first condition in next sibling
+          const nextSiblingPath = [...parentPath, groupIndex + 1]
+          const nextSibling = parentGroup.conditions[groupIndex + 1]
+          if ('logicalOperator' in nextSibling) {
+            return findFirstConditionInGroup(nextSiblingPath)
+          } else {
+            return nextSiblingPath
+          }
         }
+        // Look at parent group
+        return findNextConditionFromGroup(parentPath)
       }
-      // Look at parent group
-      return findNextConditionFromGroup(parentPath)
-    }
-    
-    return null
-  }, [activeFilters, findFirstConditionInGroup])
+
+      return null
+    },
+    [activeFilters, findFirstConditionInGroup]
+  )
 
   const handleArrowLeft = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -252,7 +276,7 @@ export function useKeyboardNavigation({
           const groupPath = activeInput.path.slice(0, -1)
           const conditionIndex = activeInput.path[activeInput.path.length - 1]
           const group = findGroupByPath(activeFilters, groupPath)
-          
+
           if (group && conditionIndex < group.conditions.length - 1) {
             // There's a next condition, navigate to it
             const nextCondition = group.conditions[conditionIndex + 1]
@@ -279,7 +303,14 @@ export function useKeyboardNavigation({
         }
       }
     },
-    [activeInput, activeFilters, findGroupByPath, findFirstConditionInGroup, findNextConditionFromGroup, setActiveInput]
+    [
+      activeInput,
+      activeFilters,
+      findGroupByPath,
+      findFirstConditionInGroup,
+      findNextConditionFromGroup,
+      setActiveInput,
+    ]
   )
 
   return {
