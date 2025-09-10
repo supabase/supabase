@@ -222,7 +222,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'ssl_not_enforced',
     title: 'SSL not enforced',
     icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/settings/database`,
+    link: ({ projectRef }) => `/project/${projectRef}/database/settings`,
     linkText: 'View settings',
     docsLink: 'https://supabase.com/docs/guides/platform/ssl-enforcement',
     category: 'security',
@@ -231,7 +231,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'network_restrictions_not_set',
     title: 'No network restrictions',
     icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/settings/database`,
+    link: ({ projectRef }) => `/project/${projectRef}/database/settings`,
     linkText: 'View settings',
     docsLink: 'https://supabase.com/docs/guides/platform/network-restrictions',
     category: 'security',
@@ -298,6 +298,15 @@ export const lintInfoMap: LintInfo[] = [
     link: ({ projectRef }) => `/project/${projectRef}/auth/mfa`,
     linkText: 'View settings',
     docsLink: 'https://supabase.com/docs/guides/auth/auth-mfa',
+    category: 'security',
+  },
+  {
+    name: 'vulnerable_postgres_version',
+    title: 'Postgres version has security patches available',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/infrastructure`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/upgrading',
     category: 'security',
   },
 ]
@@ -372,4 +381,24 @@ export const NoIssuesFound = ({ level }: { level: string }) => {
       </div>
     </div>
   )
+}
+
+export const createLintSummaryPrompt = (lint: Lint) => {
+  const title = lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title
+  const entity =
+    (lint.metadata &&
+      (lint.metadata.entity ||
+        (lint.metadata.schema &&
+          lint.metadata.name &&
+          `${lint.metadata.schema}.${lint.metadata.name}`))) ||
+    'N/A'
+  const schema = lint.metadata?.schema ?? 'N/A'
+  const issue = lint.detail ? lint.detail.replace(/\\`/g, '`') : 'N/A'
+  const description = lint.description ? lint.description.replace(/\\`/g, '`') : 'N/A'
+  return `Summarize the issue and suggest fixes for the following lint item:
+Title: ${title}
+Entity: ${entity}
+Schema: ${schema}
+Issue Details: ${issue}
+Description: ${description}`
 }

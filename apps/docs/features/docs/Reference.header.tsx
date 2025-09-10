@@ -40,7 +40,7 @@ function ClientLibHeader({ menuData, className }: ClientLibHeaderProps) {
             href={menuData.pkg.repo}
             target="_blank"
             rel="noreferrer noopener"
-            className="hover:text-brand focus-visible:text-brand transition-colors"
+            className="hover:text-brand-link focus-visible:text-brand-link transition-colors"
           >
             <span className="sr-only">View on GitHub</span>
             <Github size={18} />

@@ -12,14 +12,13 @@
   --secondary-400: 248.3deg 54.5% 25.9%;
   --secondary-200: 248deg 53.6% 11%;
   --brand-link: 155deg 100% 38.6%;
-  --brand-button: 154.9deg 100% 19.2%;
   --brand-default: 153.1deg 60.2% 52.7%;
   --brand-600: 154.9deg 59.5% 70%;
   --brand-500: 154.9deg 100% 19.2%;
   --brand-400: 155.5deg 100% 9.6%;
   --brand-300: 155.1deg 100% 8%;
   --brand-200: 162deg 100% 2%;
-  --warning-default: 38.9deg 100% 42.9%;
+  --warning-default: 38.9deg 100% 42.9%; /* warning-600 */
   --warning-600: 38.9deg 100% 42.9%;
   --warning-500: 34.8deg 90.9% 21.6%;
   --warning-400: 33.2deg 100% 14.5%;

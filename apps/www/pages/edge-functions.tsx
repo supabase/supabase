@@ -50,6 +50,7 @@ function EdgeFunctions() {
         <ProductHeader
           {...pageData.heroSection}
           footer={<HighlightColumns highlights={pageData.highlightsSection.highlights} />}
+          footerPosition="bottom"
         />
         <SingleQuote
           id="quote"

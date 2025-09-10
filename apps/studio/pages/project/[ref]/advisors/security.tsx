@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
@@ -11,13 +11,13 @@ import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
-  const project = useSelectedProject()
   const { preset, id } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
@@ -28,13 +28,16 @@ const ProjectLints: NextPageWithLayout = () => {
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
-  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
-
   const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
 
   const activeLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  // hide vulnerable_postgres_version lint temporarily
+  // https://linear.app/supabase/project/pg-minor-version-upgrade-for-security-vulnerabilities-0124b2c2dcf5
+  // https://github.com/supabase/supabase/pull/38280/files
+  //.filter((lint) => lint.name !== 'vulnerable_postgres_version')
+
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
   const filteredLints = activeLints
@@ -50,9 +53,8 @@ const ProjectLints: NextPageWithLayout = () => {
       value: type.name,
     }))
 
-  useEffect(() => {
-    // check the URL for an ID and set the selected lint
-    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
+  const selectedLint: Lint | null = useMemo(() => {
+    return activeLints.find((lint) => lint.cache_key === id) ?? null
   }, [id, activeLints])
 
   return (
@@ -67,7 +69,6 @@ const ProjectLints: NextPageWithLayout = () => {
         isLoading={isLoading}
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
-        setSelectedLint={setSelectedLint}
       />
       <LinterFilters
         filterOptions={filterOptions}
@@ -84,7 +85,6 @@ const ProjectLints: NextPageWithLayout = () => {
         filteredLints={filteredLints}
         currentTab={currentTab}
         selectedLint={selectedLint}
-        setSelectedLint={setSelectedLint}
         isLoading={isLoading}
       />
       <LinterPageFooter

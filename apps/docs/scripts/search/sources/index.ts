@@ -1,5 +1,4 @@
-import { sep } from 'node:path'
-
+import { GuideModelLoader } from '../../../resources/guide/guideModelLoader.js'
 import {
   GitHubDiscussionLoader,
   type GitHubDiscussionSource,
@@ -16,9 +15,6 @@ import {
   OpenApiReferenceLoader,
   type OpenApiReferenceSource,
 } from './reference-doc.js'
-import { walk } from './util.js'
-
-const ignoredFiles = ['pages/404.mdx']
 
 export type SearchSource =
   | MarkdownSource
@@ -30,18 +26,9 @@ export type SearchSource =
   | LintWarningsGuideSource
 
 export async function fetchGuideSources() {
-  return (
-    await Promise.all(
-      (await walk('content/guides'))
-        .filter(
-          ({ path }) =>
-            /\.mdx?$/.test(path) &&
-            !ignoredFiles.includes(path) &&
-            !path.split(sep).some((part) => part.startsWith('_'))
-        )
-        .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
-    )
-  ).flat()
+  const guides = (await GuideModelLoader.allFromFs()).unwrapLeft()
+
+  return guides.map((guide) => MarkdownLoader.fromGuideModel('guide', guide))
 }
 
 export async function fetchOpenApiReferenceSource() {

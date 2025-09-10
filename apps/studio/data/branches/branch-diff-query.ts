@@ -15,9 +15,9 @@ export async function getBranchDiff({
   branchId,
   includedSchemas,
 }: Pick<BranchDiffVariables, 'branchId' | 'includedSchemas'>) {
-  const { data: diffData, error } = await get('/v1/branches/{branch_id}/diff', {
+  const { data: diffData, error } = await get('/v1/branches/{branch_id_or_ref}/diff', {
     params: {
-      path: { branch_id: branchId },
+      path: { branch_id_or_ref: branchId },
       query: includedSchemas ? { included_schemas: includedSchemas } : undefined,
     },
     headers: {
@@ -41,7 +41,7 @@ export async function getBranchDiff({
 type BranchDiffData = Awaited<ReturnType<typeof getBranchDiff>>
 
 export const useBranchDiffQuery = (
-  { branchId, projectRef, includedSchemas = 'public' }: BranchDiffVariables,
+  { branchId, projectRef, includedSchemas }: BranchDiffVariables,
   {
     enabled = true,
     ...options

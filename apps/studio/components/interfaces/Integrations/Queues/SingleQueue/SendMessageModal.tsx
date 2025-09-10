@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useDatabaseQueueMessageSendMutation } from 'data/database-queues/database-queue-messages-send-mutation'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -38,7 +38,7 @@ const FORM_ID = 'QUEUES_SEND_MESSAGE_FORM'
 
 export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) => {
   const { childId: queueName } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const form = useForm<SendMessageForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -121,6 +121,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                     <CodeEditor
                       id="message-payload"
                       language="json"
+                      autofocus={false}
                       className="!mb-0 h-32 overflow-hidden rounded border"
                       onInputChange={(e: string | undefined) => field.onChange(e)}
                       options={{ wordWrap: 'off', contextmenu: false }}

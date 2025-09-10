@@ -9,7 +9,7 @@ import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import NewDestinationPanel from './DestinationPanel'
+import { DestinationPanel } from './DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
@@ -133,15 +133,15 @@ export const Destinations = () => {
                 'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
               )}
             >
-              <h4 className="text-lg">Send data to your first destination</h4>
-              <p className="prose text-sm text-center mt-2">
+              <h4>Send data to your first destination</h4>
+              <p className="prose text-sm text-center mt-1 max-w-full">
                 Use destinations to improve performance or run analysis on your data via
                 integrations like BigQuery
               </p>
               <Button
                 icon={<Plus />}
                 onClick={() => setShowNewDestinationPanel(true)}
-                className="mt-6"
+                className="mt-4"
               >
                 Add destination
               </Button>
@@ -159,7 +159,7 @@ export const Destinations = () => {
           </div>
         )}
 
-      <NewDestinationPanel
+      <DestinationPanel
         visible={showNewDestinationPanel}
         sourceId={sourceId}
         onClose={() => setShowNewDestinationPanel(false)}

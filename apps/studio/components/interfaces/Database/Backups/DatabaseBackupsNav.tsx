@@ -1,7 +1,6 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Link from 'next/link'
-import React from 'react'
 
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, NavMenu, NavMenuItem } from 'ui'
 
 type Props = {
@@ -9,7 +8,7 @@ type Props = {
 }
 
 function DatabaseBackupsNav({ active }: Props) {
-  const { ref, cloud_provider } = useProjectContext()?.project || {}
+  const { ref, cloud_provider } = useSelectedProjectQuery()?.data || {}
 
   const navMenuItems = [
     {
@@ -31,7 +30,7 @@ function DatabaseBackupsNav({ active }: Props) {
         <div className="flex items-center gap-1">
           Restore to new project{' '}
           <Badge size="small" className="!text-[10px] px-1.5 py-0">
-            New
+            Beta
           </Badge>
         </div>
       ),

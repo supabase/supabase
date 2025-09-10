@@ -55,7 +55,7 @@ message = "Database error saving new user"
 
 ## SOLUTION 1 (trigger related)
 
-Check if the auth schema contains any triggers in the [Dashboard's trigger section](https://supabase.com/dashboard/project/_/database/triggers). Remove all triggers by dropping their functions with a CASCADE modifier:
+Check if the auth schema contains any triggers in the [Dashboard's trigger section](/dashboard/project/_/database/triggers). Remove all triggers by dropping their functions with a CASCADE modifier:
 
 ```sql
 DROP FUNCTION <function name>() CASCADE;
@@ -64,9 +64,9 @@ DROP FUNCTION <function name>() CASCADE;
 -- DROP TRIGGER <trigger_name> on auth.<table_name>;
 ```
 
-Then recreate the functions with a [security definer](https://supabase.com/docs/guides/database/functions#security-definer-vs-invoker) modifier before recreating the triggers.
+Then recreate the functions with a [security definer](/docs/guides/database/functions#security-definer-vs-invoker) modifier before recreating the triggers.
 
-The [SQL Editor](https://supabase.com/dashboard/project/_/sql/) contains a template for [User Management](https://supabase.com/dashboard/project/_/sql/quickstarts). Within it, there is a working example of how to setup triggers with security definer that may be worth referencing:
+The [SQL Editor](/dashboard/project/_/sql/) contains a template for [User Management](/dashboard/project/_/sql/quickstarts). Within it, there is a working example of how to setup triggers with security definer that may be worth referencing:
 
 ```sql
 create table profiles (

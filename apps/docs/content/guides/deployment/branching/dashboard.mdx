@@ -1,0 +1,65 @@
+---
+title: 'Branching via the dashboard'
+subtitle: 'Create, manage, review, and merge branches directly in the dashboard'
+---
+
+You can create, manage, review, and merge Supabase branches directly via the dashboard. This is useful for quick testing, prototyping, or when you prefer to work in a no-code way. You can also connect a Supabase branch to a GitHub branch at a later time if needed.
+
+<Admonition type="note" label="Public Alpha">
+
+Branch management via the dashboard is currently in public alpha. Features and functionality may change.
+
+</Admonition>
+
+## How Branching works
+
+You can do the following directly from the Supabase dashboard:
+
+- Create preview branches
+- Make changes to your public schema or edge functions
+- Merge these changes back into production when ready
+- Pull in updates from production
+
+## Enable branch management via the dashboard
+
+This functionality is currently in beta and requires opting in. To opt in you must enable the feature preview:
+
+1. Open the user menu by clicking on your user icon in the top right.
+1. Select **Branching via dashboard**.
+1. Click **Enable feature**.
+
+## Creating a branch
+
+Once you've enabled the feature, you can create a new branch:
+
+1. Click the arrows next to the branch name in the top menu bar. (The top menu bar has the format `YOUR_ORGANIZATION / YOUR_PROJECT / CURRENT_BRANCH_NAME`.)
+2. Click `Create branch`.
+
+## Making changes to a branch
+
+Use the branch selector in the top bar to change to your branch. Any changes you make (including SQL run in the SQL editor, table editor changes, and configuration changes) are now made against the currently selected branch.
+
+You can also use the branch's API keys and connection strings to run changes against the branch from your own code or SQL client.
+
+## Creating a merge request
+
+To review and merge changes from a branch back into your production branch, you must first create a merge request. There are two ways to do this.
+
+The first is to click the merge request button next to the branch selector that's located in the top menu. This will create the merge request and redirect you to the merge page where you can review and merge any changes.
+
+The second is to click on manage branches from within the branch selector, then in the left hand navigation you can click on merge requests. From here you can view all open merge requests and create new ones.
+
+## Pulling changes from production into a branch
+
+When reviewing a merge request you may see a notice at the top of the page asking you to update your branch. This appears when your preview branch has drifted from your production branch. There may be public schema or edge function changes that have been made after your preview branch was created. Clicking update branch will attempt to pull in these changes, but be aware that by doing this your existing edge functions will be replaced. Any new edge functions created on the preview branch will remain untouched.
+
+## Limitations
+
+There are a few limitations you should be aware of before deciding to use branching without git.
+
+- Custom roles created through the dashboard are not captured on branch creation
+- Branches can only be merged to main; merging between preview branches is not supported
+- If your branch is out of date, you can pull in latest changes from main, but keep in mind that all functions will be overwritten
+- Deleting functions must be done manually on main branch
+- Migration conflicts must be manually resolved on the preview branch
+- If you have run migrations on main, new branches will be created from existing migrations instead of a full schema dump

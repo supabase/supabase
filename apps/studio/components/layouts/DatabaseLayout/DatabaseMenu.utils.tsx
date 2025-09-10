@@ -1,7 +1,8 @@
+import { ArrowUpRight } from 'lucide-react'
+
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { ArrowUpRight } from 'lucide-react'
 
 export const generateDatabaseMenu = (
   project?: Project,
@@ -10,11 +11,19 @@ export const generateDatabaseMenu = (
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
     enablePgReplicate: boolean
+    showPgReplicate: boolean
+    showRoles: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges, enablePgReplicate } =
-    flags || {}
+  const {
+    pgNetExtensionExists,
+    pitrEnabled,
+    columnLevelPrivileges,
+    enablePgReplicate,
+    showPgReplicate,
+    showRoles,
+  } = flags || {}
 
   return [
     {
@@ -64,30 +73,25 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/publications`,
           items: [],
         },
-        ...(enablePgReplicate
+        ...(showPgReplicate
           ? [
               {
                 name: 'Replication',
                 key: 'replication',
                 url: `/project/${ref}/database/replication`,
+                label: !enablePgReplicate ? 'Coming soon' : undefined,
                 items: [],
               },
             ]
-          : [
-              {
-                name: 'Replication',
-                key: 'replication',
-                url: `/project/${ref}/database/replication`,
-                label: 'Coming Soon',
-                items: [],
-              },
-            ]),
+          : []),
       ],
     },
     {
-      title: 'Access Control',
+      title: 'Configuration',
       items: [
-        { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
+        ...(showRoles
+          ? [{ name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] }]
+          : []),
         ...(columnLevelPrivileges
           ? [
               {
@@ -106,6 +110,7 @@ export const generateDatabaseMenu = (
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
+        { name: 'Settings', key: 'settings', url: `/project/${ref}/database/settings`, items: [] },
       ],
     },
     {

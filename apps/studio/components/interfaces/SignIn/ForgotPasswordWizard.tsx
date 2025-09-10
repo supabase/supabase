@@ -13,7 +13,7 @@ import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Sha
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Must be a valid email').min(1, 'Email is required'),
+  email: z.string().min(1, 'Please provide an email address').email('Must be a valid email'),
 })
 
 const codeSchema = z.object({

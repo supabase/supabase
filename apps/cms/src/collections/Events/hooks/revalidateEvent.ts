@@ -1,10 +1,10 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath, revalidateTag } from 'next/cache'
+// Avoid importing next/cache at module scope so migrations can run in a plain Node env
 
 import type { Event } from '../../../payload-types'
 
-export const revalidateEvent: CollectionAfterChangeHook<Event> = ({
+export const revalidateEvent: CollectionAfterChangeHook<Event> = async ({
   doc,
   previousDoc,
   req: { payload, context },
@@ -14,9 +14,11 @@ export const revalidateEvent: CollectionAfterChangeHook<Event> = ({
       const path = `/events/${doc.slug}`
 
       payload.logger.info(`Revalidating event at path: ${path}`)
-
-      revalidatePath(path)
-      revalidateTag('events-sitemap')
+      try {
+        const { revalidatePath, revalidateTag } = await import('next/cache')
+        revalidatePath(path)
+        revalidateTag('events-sitemap')
+      } catch {}
     }
 
     // If the event was previously published, we need to revalidate the old path
@@ -25,19 +27,27 @@ export const revalidateEvent: CollectionAfterChangeHook<Event> = ({
 
       payload.logger.info(`Revalidating old event at path: ${oldPath}`)
 
-      revalidatePath(oldPath)
-      revalidateTag('events-sitemap')
+      try {
+        const { revalidatePath, revalidateTag } = await import('next/cache')
+        revalidatePath(oldPath)
+        revalidateTag('events-sitemap')
+      } catch {}
     }
   }
   return doc
 }
 
-export const revalidateDelete: CollectionAfterDeleteHook<Event> = ({ doc, req: { context } }) => {
+export const revalidateDelete: CollectionAfterDeleteHook<Event> = async ({
+  doc,
+  req: { context },
+}) => {
   if (!context.disableRevalidate) {
     const path = `/events/${doc?.slug}`
-
-    revalidatePath(path)
-    revalidateTag('events-sitemap')
+    try {
+      const { revalidatePath, revalidateTag } = await import('next/cache')
+      revalidatePath(path)
+      revalidateTag('events-sitemap')
+    } catch {}
   }
 
   return doc

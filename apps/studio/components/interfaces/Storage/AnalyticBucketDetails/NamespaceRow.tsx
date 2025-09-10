@@ -4,13 +4,13 @@ import { useMemo, useState } from 'react'
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { FDW } from 'data/fdw/fdws-query'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { BASE_PATH } from 'lib/constants'
 import { Button, cn, TableCell, TableRow } from 'ui'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 type NamespaceRowProps = {
   bucketName: string
@@ -33,7 +33,7 @@ export const NamespaceRow = ({
   wrapperValues,
   wrapperMeta,
 }: NamespaceRowProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
 
   const { data: tablesData, isLoading: isLoadingNamespaceTables } = useIcebergNamespaceTablesQuery(

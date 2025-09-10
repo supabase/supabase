@@ -2,9 +2,9 @@ import { Copy } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { copyToClipboard } from 'ui'
 
 export const CopyEnvButton = ({
@@ -14,7 +14,7 @@ export const CopyEnvButton = ({
   serverOptions: { name: string; secureEntry: boolean }[]
   values: Record<string, string>
 }) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isLoading, setIsLoading] = useState(false)
 
   const onCopy = useCallback(async () => {

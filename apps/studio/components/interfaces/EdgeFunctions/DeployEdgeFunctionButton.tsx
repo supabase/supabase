@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -23,7 +23,7 @@ import {
 export const DeployEdgeFunctionButton = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()

@@ -2,7 +2,7 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { ResponseError } from 'types'
 import { lintKeys } from './keys'
@@ -39,7 +39,7 @@ export const useProjectLintRulesQuery = <TData = ProjectLintRulesData>(
     ...options
   }: UseQueryOptions<ProjectLintRulesData, ProjectLintRulesError, TData> = {}
 ) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<ProjectLintRulesData, ProjectLintRulesError, TData>(

@@ -30,12 +30,20 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a sql function command when the command is SELECT public.test_fn(1, 2)', () => {
-    const command = 'SELECT public.test_fn(1, 2)'
+  it('should return a sql function command when the command is SELECT auth.jwt () and ends with ;', () => {
+    const command = 'SELECT auth.jwt ();'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       type: 'sql_function',
-      schema: 'public',
-      functionName: 'test_fn',
+      schema: 'auth',
+      functionName: 'jwt',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is SELECT public.test_fn(1, 2)', () => {
+    const command = 'SELECT public.test_fn(1, 2)'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
       snippet: command,
     })
   })
@@ -190,6 +198,14 @@ describe('parseCronJobCommand', () => {
       httpBody: '{"key": "value"}',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should return SQL snippet type if the command is a HTTP request that cannot be parsed properly due to positional notationa', () => {
+    const command = `SELECT net.http_post( 'https://webhook.site/dacc2028-a588-462c-9597-c8968e61d0fa', '{"message":"Hello from Supabase"}'::jsonb, '{}'::jsonb, '{"Content-Type":"application/json"}'::jsonb );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
       snippet: command,
     })
   })

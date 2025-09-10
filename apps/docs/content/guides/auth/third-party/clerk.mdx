@@ -45,6 +45,8 @@ hideElidedLines={true}
 
 </TabPanel>
 
+<$Show if="sdk:dart">
+
 <TabPanel id="dart" label="Flutter">
 
 ```dart
@@ -54,7 +56,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 await Supabase.initialize(
   url: 'SUPABASE_URL',
-  anonKey: 'SUPABASE_ANON_KEY',
+  anonKey: 'SUPABASE_PUBLISHABLE_KEY',
   accessToken: () async {
     final token = await ClerkAuth.of(context).sessionToken();
     return token.jwt;
@@ -63,6 +65,9 @@ await Supabase.initialize(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:swift">
 
 <TabPanel id="swift" label="Swift (iOS)">
 
@@ -84,6 +89,7 @@ let supabase = SupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 
@@ -117,7 +123,7 @@ This example uses a restrictive RLS policy checks that the [second factor verifi
 
 ## Deprecated integration with JWT templates
 
-As of 1st April 2025 the previously available [Clerk Integration with Supabase](https://supabase.com/partners/integrations/clerk) is considered deprecated and is no longer recommended for use. All projects using the deprecated integration will be excluded from Third-Party Monthly Active User (TP-MAU) charges until at least 1st January 2026.
+As of 1st April 2025 the previously available [Clerk Integration with Supabase](/partners/integrations/clerk) is considered deprecated and is no longer recommended for use. All projects using the deprecated integration will be excluded from Third-Party Monthly Active User (TP-MAU) charges until at least 1st January 2026.
 
 This integration used low-level primitives that are still available in Supabase and Clerk, such as a [configurable JWT secret](/dashboard/project/_/settings/api) and [JWT templates from Clerk](https://clerk.com/docs/backend-requests/jwt-templates). This enables you to keep using it in an unofficial manner, though only limited support will be provided from Supabase.
 

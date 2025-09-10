@@ -3,11 +3,16 @@
 import { ChevronRight, Play, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
-import { useBreakpoint } from 'common'
+import { isFeatureEnabled, useBreakpoint } from 'common'
 import { cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
 import DocsCoverLogo from './DocsCoverLogo'
+
+const { sdkDart: sdkDartEnabled, sdkKotlin: sdkKotlinEnabled } = isFeatureEnabled([
+  'sdk:dart',
+  'sdk:kotlin',
+])
 
 function AiPrompt({ className }: { className?: string }) {
   return (
@@ -15,7 +20,7 @@ function AiPrompt({ className }: { className?: string }) {
       className={cn(
         'group',
         'w-fit rounded-full border px-3 py-1 flex gap-2 items-center text-foreground-light text-sm',
-        'hover:border-brand hover:text-brand focus-visible:text-brand',
+        'hover:border-brand hover:text-brand-link focus-visible:text-brand-link',
         'transition-colors',
         className
       )}
@@ -52,11 +57,13 @@ const HomePageCover = (props) => {
       tooltip: 'Flutter',
       icon: '/docs/img/icons/flutter-icon',
       href: '/guides/getting-started/quickstarts/flutter',
+      enabled: sdkDartEnabled,
     },
     {
       tooltip: 'Android Kotlin',
       icon: '/docs/img/icons/kotlin-icon',
       href: '/guides/getting-started/quickstarts/kotlin',
+      enabled: sdkKotlinEnabled,
     },
     {
       tooltip: 'SvelteKit',
@@ -109,16 +116,18 @@ const HomePageCover = (props) => {
         </div>
         <div className="shrink-0">
           <div className="flex flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
-            {frameworks.map((framework, i) => (
-              <Link key={i} href={framework.href} passHref className="no-underline">
-                <IconPanel
-                  iconSize={iconSize}
-                  hideArrow
-                  tooltip={framework.tooltip}
-                  icon={framework.icon}
-                />
-              </Link>
-            ))}
+            {frameworks
+              .filter((framework) => framework.enabled !== false)
+              .map((framework, i) => (
+                <Link key={i} href={framework.href} passHref className="no-underline">
+                  <IconPanel
+                    iconSize={iconSize}
+                    hideArrow
+                    tooltip={framework.tooltip}
+                    icon={framework.icon}
+                  />
+                </Link>
+              ))}
           </div>
           <AiPrompt className="mt-6" />
         </div>

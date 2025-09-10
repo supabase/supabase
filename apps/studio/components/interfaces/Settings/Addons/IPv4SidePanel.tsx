@@ -10,8 +10,8 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
@@ -21,11 +21,14 @@ import { Admonition } from 'ui-patterns'
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
-  const canUpdateIPv4 = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const { can: canUpdateIPv4 } = useAsyncCheckProjectPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'ipv4'
@@ -136,7 +139,7 @@ const IPv4SidePanel = () => {
             <p className="text-sm">
               If you are connecting via the Shared connection pooler, you do not need this add-on as
               our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-              <InlineLink href={`/project/${projectRef}/settings/database#connection-pooler`}>
+              <InlineLink href={`/project/${projectRef}/database/settings#connection-pooler`}>
                 project database settings
               </InlineLink>
               .

@@ -11,7 +11,7 @@ To enable Bitbucket Auth for your project, you need to set up a Bitbucket OAuth 
 Setting up Bitbucket logins for your application consists of 3 parts:
 
 - Create and configure a Bitbucket OAuth Consumer on [Bitbucket](https://bitbucket.org)
-- Add your Bitbucket OAuth Consumer keys to your [Supabase Project](https://supabase.com/dashboard)
+- Add your Bitbucket OAuth Consumer keys to your [Supabase Project](/dashboard)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Access your Bitbucket account
@@ -61,7 +61,10 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+const supabase = createClient(
+  'https://your-project-id.supabase.co',
+  'sb_publishable_... or anon key'
+)
 
 // ---cut---
 async function signInWithBitbucket() {
@@ -88,6 +91,7 @@ Future<void> signInWithBitbucket() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Bitbucket` as the `Provider`:
@@ -99,6 +103,7 @@ suspend fun signInWithBitbucket() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -116,7 +121,10 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+const supabase = createClient(
+  'https://your-project-id.supabase.co',
+  'sb_publishable_... or anon key'
+)
 
 // ---cut---
 async function signOut() {
@@ -136,6 +144,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -147,6 +156,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources

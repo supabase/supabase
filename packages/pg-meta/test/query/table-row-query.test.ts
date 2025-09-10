@@ -1653,16 +1653,16 @@ describe('Table Row Query', () => {
               else subject_id::text
             end as subject_id,
               case 
-                when octet_length(timestamp::text) > 10240 
+                when octet_length("timestamp"::text) > 10240 
                 then
                   case
-                    when array_ndims(timestamp) = 1
+                    when array_ndims("timestamp") = 1
                     then
-                      (select array_cat(timestamp[1:50]::text[], array['...']::text[]))::text[]
+                      (select array_cat("timestamp"[1:50]::text[], array['...']::text[]))::text[]
                     else
-                      timestamp[1:50]::text[]
+                      "timestamp"[1:50]::text[]
                   end
-                else timestamp::text[]
+                else "timestamp"::text[]
               end
             ,
               case 

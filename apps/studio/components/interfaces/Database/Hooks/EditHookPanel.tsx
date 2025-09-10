@@ -4,11 +4,11 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
 import { Button, Form, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -42,14 +42,50 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
 
   // [Joshen] There seems to be some bug between Checkbox.Group within the Form component
   // hence why this external state as a temporary workaround
-  const [events, setEvents] = useState<string[]>([])
+  const [events, setEvents] = useState<string[]>(selectedHook?.events ?? [])
   const [eventsError, setEventsError] = useState<string>()
 
   // For HTTP request
-  const [httpHeaders, setHttpHeaders] = useState<HTTPArgument[]>([])
-  const [httpParameters, setHttpParameters] = useState<HTTPArgument[]>([])
+  const [httpHeaders, setHttpHeaders] = useState<HTTPArgument[]>(() => {
+    if (typeof selectedHook === `undefined`) {
+      return [{ id: uuidv4(), name: 'Content-type', value: 'application/json' }]
+    }
+    const [_, __, headers] = selectedHook.function_args
+    let parsedHeaders: Record<string, string> = {}
 
-  const { project } = useProjectContext()
+    try {
+      parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
+    } catch (e) {
+      parsedHeaders = {}
+    }
+
+    return Object.entries(parsedHeaders).map(([name, value]) => ({
+      id: uuidv4(),
+      name,
+      value,
+    }))
+  })
+  const [httpParameters, setHttpParameters] = useState<HTTPArgument[]>(() => {
+    if (typeof selectedHook === `undefined`) {
+      return [{ id: uuidv4(), name: '', value: '' }]
+    }
+    const [_, __, ___, parameters] = selectedHook.function_args
+    let parsedParameters: Record<string, string> = {}
+
+    try {
+      parsedParameters = JSON.parse(parameters.replace(/\\"/g, '"'))
+    } catch (e) {
+      parsedParameters = {}
+    }
+
+    return Object.entries(parsedParameters).map(([name, value]) => ({
+      id: uuidv4(),
+      name,
+      value,
+    }))
+  })
+
+  const { data: project } = useSelectedProjectQuery()
   const { data } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -100,48 +136,8 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
     if (visible) {
       setIsEdited(false)
       setIsClosingPanel(false)
-
-      if (selectedHook !== undefined) {
-        setEvents(selectedHook.events)
-
-        const [_, __, headers, parameters] = selectedHook.function_args
-
-        let parsedParameters: Record<string, string> = {}
-
-        // Try to parse the parameters with escaped quotes
-        try {
-          parsedParameters = JSON.parse(parameters.replace(/\\"/g, '"'))
-        } catch (e) {
-          // If parsing still fails, fallback to an empty object
-          parsedParameters = {}
-        }
-
-        let parsedHeaders: Record<string, string> = {}
-        try {
-          parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
-        } catch (e) {
-          // If parsing still fails, fallback to an empty object
-          parsedHeaders = {}
-        }
-
-        setHttpHeaders(
-          Object.keys(parsedHeaders).map((key) => {
-            return { id: uuidv4(), name: key, value: parsedHeaders[key] }
-          })
-        )
-
-        setHttpParameters(
-          Object.keys(parsedParameters).map((key) => {
-            return { id: uuidv4(), name: key, value: parsedParameters[key] }
-          })
-        )
-      } else {
-        setEvents([])
-        setHttpHeaders([{ id: uuidv4(), name: 'Content-type', value: 'application/json' }])
-        setHttpParameters([{ id: uuidv4(), name: '', value: '' }])
-      }
     }
-  }, [visible, selectedHook])
+  }, [visible])
 
   const onClosePanel = () => {
     if (isEdited) setIsClosingPanel(true)

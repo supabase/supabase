@@ -9,7 +9,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useLintRuleDeleteMutation } from 'data/lint/delete-lint-rule-mutation'
 import { useProjectLintRulesQuery } from 'data/lint/lint-rules-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -40,7 +40,7 @@ const SIMPLIFIED_INTERFACE = true
 
 export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [open, setOpen] = useState(false)
   const [expandedLint, setExpandedLint] = useState<string>()

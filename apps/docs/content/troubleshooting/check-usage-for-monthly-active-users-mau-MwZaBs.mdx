@@ -9,7 +9,7 @@ database_id = "1759134d-a98d-4bfa-9501-71e06180700e"
 
 You can see the usage in your [projects usage page](https://app.supabase.com/project/_/settings/billing/usage).
 
-For MAU, we rely on the [Auth Server](https://github.com/supabase/auth) logs. MAU count is relative to your billing cycle and resets whenever your billing cycle resets. You can check your Auth logs in your [projects logs & analytics section](https://supabase.com/dashboard/project/_/logs/auth-logs).
+For MAU, we rely on the [Auth Server](https://github.com/supabase/auth) logs. MAU count is relative to your billing cycle and resets whenever your billing cycle resets. You can check your Auth logs in your [projects logs & analytics section](/dashboard/project/_/logs/auth-logs).
 
 We do a distinct count of all user ids in the billing cycle. An Auth event can be a login, token refresh, logout, ... If an authenticated user does any of this, we count it towards the MAU. A user is only counted once towards MAU in a billing cycle.
 

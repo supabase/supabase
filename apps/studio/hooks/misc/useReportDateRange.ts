@@ -9,6 +9,7 @@ import {
 } from 'components/interfaces/Reports/Reports.constants'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
+import { AnalyticsInterval } from 'data/analytics/constants'
 
 export const DATERANGE_LIMITS: { [key: string]: number } = {
   free: 1,
@@ -20,7 +21,7 @@ export const DATERANGE_LIMITS: { [key: string]: number } = {
 export interface ReportDateRange {
   period_start: { date: string; time_period: string }
   period_end: { date: string; time_period: string }
-  interval: string
+  interval: AnalyticsInterval
 }
 
 // Create parsers for individual URL parameters

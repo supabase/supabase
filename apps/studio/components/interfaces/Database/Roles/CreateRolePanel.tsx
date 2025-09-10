@@ -3,9 +3,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -44,10 +44,10 @@ const initialValues = {
   canBypassRls: false,
 }
 
-const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
+export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -187,5 +187,3 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     </SidePanel>
   )
 }
-
-export default CreateRolePanel

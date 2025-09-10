@@ -17,7 +17,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -56,7 +56,7 @@ import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 export const InviteMemberButton = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { permissions: permissions } = useGetPermissions()
 
   const { organizationMembersCreate: organizationMembersCreationEnabled } = useIsFeatureEnabled([
@@ -66,12 +66,12 @@ export const InviteMemberButton = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
-  const { data: projects } = useProjectsQuery()
+  const { data } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
 
-  const orgProjects = (projects ?? [])
+  const orgProjects = (data?.projects ?? [])
     .filter((project) => project.organization_id === organization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
 

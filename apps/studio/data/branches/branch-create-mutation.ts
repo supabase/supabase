@@ -1,26 +1,27 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchCreateVariables = {
-  is_default?: boolean
   projectRef: string
   branchName: string
   gitBranch?: string
   region?: string
   withData?: boolean
-}
+} & Pick<components['schemas']['CreateBranchBody'], 'is_default' | 'desired_instance_size'>
 
 export async function createBranch({
-  is_default,
   projectRef,
+  is_default,
   branchName,
   gitBranch,
   region,
   withData,
+  desired_instance_size,
 }: BranchCreateVariables) {
   const { data, error } = await post('/v1/projects/{ref}/branches', {
     params: {
@@ -30,8 +31,9 @@ export async function createBranch({
       is_default,
       branch_name: branchName,
       git_branch: gitBranch,
-      region: region,
+      region,
       with_data: withData,
+      desired_instance_size,
     },
   })
 

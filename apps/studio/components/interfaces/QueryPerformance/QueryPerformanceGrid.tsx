@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
@@ -30,6 +31,11 @@ import {
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
 }
+
+// Load the monaco editor client-side only (does not behave well server-side)
+const Editor = dynamic(() => import('@monaco-editor/react').then(({ Editor }) => Editor), {
+  ssr: false,
+})
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
   const router = useRouter()
@@ -74,7 +80,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         const value = props.row?.[col.id]
         if (col.id === 'query') {
           return (
-            <div className="w-full flex items-center gap-x-2">
+            <div className="w-full flex items-center gap-x-2 pointer-events-none">
               {hasIndexRecommendations(props.row.index_advisor_result, true) && (
                 <IndexSuggestionIcon
                   indexAdvisorResult={props.row.index_advisor_result}
@@ -85,17 +91,65 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   }}
                 />
               )}
-              <div className="font-mono text-xs">{value}</div>
+              <Editor
+                height={20}
+                theme="supabase"
+                language="pgsql"
+                value={value.replace(/\s+/g, ' ').trim()}
+                wrapperProps={{
+                  className:
+                    '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent [&_.monaco-editor]:!outline-transparent',
+                }}
+                options={{
+                  readOnly: true,
+                  domReadOnly: true,
+                  cursorBlinking: 'solid',
+                  tabIndex: -1,
+                  fontSize: 12,
+                  minimap: { enabled: false },
+                  lineNumbers: 'off',
+                  renderLineHighlight: 'none',
+                  scrollbar: { vertical: 'hidden', horizontal: 'hidden' },
+                  overviewRulerLanes: 0,
+                  overviewRulerBorder: false,
+                  glyphMargin: false,
+                  folding: false,
+                  lineDecorationsWidth: 0,
+                  lineNumbersMinChars: 0,
+                  wordWrap: 'off',
+                  scrollBeyondLastLine: false,
+                  contextmenu: false,
+                  selectionHighlight: false,
+                  occurrencesHighlight: 'off',
+                }}
+              />
+            </div>
+          )
+        }
+
+        if (col.id === 'rolname') {
+          return (
+            <div className="w-full flex flex-col justify-center font-mono text-xs">
+              <p>{value || 'n/a'}</p>
+            </div>
+          )
+        }
+
+        if (col.id === 'prop_total_time') {
+          return (
+            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+              <p>{value || 'n/a'}</p>
             </div>
           )
         }
 
         const isTime = col.name.includes('time')
-        const formattedValue = !!value
-          ? isTime
-            ? `${value.toFixed(0)}ms`
-            : value.toLocaleString()
-          : ''
+        const formattedValue =
+          !!value && typeof value === 'number' && !isNaN(value) && isFinite(value)
+            ? isTime
+              ? `${value.toFixed(0)}ms`
+              : value.toLocaleString()
+            : ''
         return (
           <div
             className={cn(
@@ -104,7 +158,9 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             )}
           >
             <p>{formattedValue}</p>
-            {isTime && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>}
+            {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
+              <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>
+            )}
           </div>
         )
       },
@@ -112,7 +168,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     return result
   })
 
-  const reportData = data ?? []
+  const reportData = useMemo(() => data ?? [], [data])
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
   const showIndexSuggestions =
@@ -150,6 +206,43 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   useEffect(() => {
     setSelectedRow(undefined)
   }, [preset, search, roles, urlSort, order])
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!reportData.length || selectedRow === undefined) return
+
+      if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
+
+      // stop default RDG behavior (which moves focus to header when selectedRow is 0)
+      event.stopPropagation()
+
+      let nextIndex = selectedRow
+      if (event.key === 'ArrowUp' && selectedRow > 0) {
+        nextIndex = selectedRow - 1
+      } else if (event.key === 'ArrowDown' && selectedRow < reportData.length - 1) {
+        nextIndex = selectedRow + 1
+      }
+
+      if (nextIndex !== selectedRow) {
+        setSelectedRow(nextIndex)
+        gridRef.current?.scrollToCell({ idx: 0, rowIdx: nextIndex })
+
+        const rowQuery = reportData[nextIndex]?.query ?? ''
+        if (!rowQuery.trim().toLowerCase().startsWith('select')) {
+          setView('details')
+        }
+      }
+    },
+    [reportData, selectedRow]
+  )
+
+  useEffect(() => {
+    // run before RDG to prevent header focus (the third param: true)
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true)
+    }
+  }, [handleKeyDown])
 
   return (
     <ResizablePanelGroup

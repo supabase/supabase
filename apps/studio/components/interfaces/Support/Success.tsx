@@ -79,7 +79,7 @@ const Success = ({
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Search on Github discussions
+                    Search on GitHub discussions
                   </Link>
                 </Button>,
               ]}

@@ -140,7 +140,7 @@ Once you have imported your users, you can sign them in using the [`signInWithOt
 
 Configure your OAuth providers in Supabase by following the [Social login guides](/docs/guides/auth/social-login).
 
-For both new and existing users, sign in the user using the [`signInWithOAuth`](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
+For both new and existing users, sign in the user using the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
 
 After the user has completed the OAuth flow successfully, you can check if the user is a new or existing user in Auth0 by mapping their social provider id to Auth0. Auth0 stores the social provider ID in the user ID, which has the format `provider_name|provider_id` (for example, `github|123456`). See the [Auth0 identity docs](https://auth0.com/docs/manage-users/user-accounts/identify-users) to learn more.
 

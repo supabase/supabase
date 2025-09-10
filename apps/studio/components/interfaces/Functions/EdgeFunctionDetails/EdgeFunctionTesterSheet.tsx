@@ -12,7 +12,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from 'data/edge-functions/edge-function-test-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { prettifyJSON } from 'lib/helpers'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
@@ -80,7 +80,7 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>
 
 export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef, functionSlug } = useParams()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 

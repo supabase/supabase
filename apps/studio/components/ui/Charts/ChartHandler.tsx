@@ -33,6 +33,7 @@ interface ChartHandlerProps {
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
+  syncId?: string
 }
 
 /**
@@ -59,6 +60,7 @@ const ChartHandler = ({
   isLoading,
   format,
   highlightedValue,
+  syncId,
   ...otherProps
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
@@ -176,6 +178,7 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
+          syncId={syncId}
           {...otherProps}
         />
       ) : (
@@ -187,6 +190,7 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
+          syncId={syncId}
           {...otherProps}
         />
       )}

@@ -214,10 +214,14 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
 }
 
 export const handleCopyCell = (
-  { column, row }: { column: CalculatedColumn<any, unknown>; row: any },
+  {
+    mode,
+    column,
+    row,
+  }: { mode: 'SELECT' | 'EDIT'; column: CalculatedColumn<any, unknown>; row: any },
   event: CellKeyboardEvent
 ) => {
-  if (event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
+  if (mode === 'SELECT' && event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
     const colKey = column.key
     const cellValue = row[colKey] ?? ''
     const value = formatClipboardValue(cellValue)

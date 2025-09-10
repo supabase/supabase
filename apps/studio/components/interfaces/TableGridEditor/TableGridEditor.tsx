@@ -12,9 +12,9 @@ import {
   isTableLike,
   isView,
 } from 'data/table-editor/table-editor-types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -22,7 +22,7 @@ import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
-import TableDefinition from './TableDefinition'
+import { TableDefinition } from './TableDefinition'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
@@ -46,8 +46,14 @@ export const TableGridEditor = ({
 
   const [{ view: selectedView = 'data' }] = useUrlState()
 
-  const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const { can: canEditTables } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+  const { can: canEditColumns } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'columns'
+  )
   const isReadOnly = !canEditTables && !canEditColumns
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
   const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
@@ -71,6 +77,8 @@ export const TableGridEditor = ({
       tabs.handleTabClose({ id: tabId, router, editor: 'table', onClearDashboardHistory })
     }
   }, [onClearDashboardHistory, router, selectedTable, tabs])
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
@@ -138,8 +146,8 @@ export const TableGridEditor = ({
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
   const isTableSelected = isTableLike(selectedTable)
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
-  const canEditViaTableEditor = isTableSelected && !isLocked
+
+  const canEditViaTableEditor = isTableSelected && !isSchemaLocked
   const editable = !isReadOnly && canEditViaTableEditor
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`

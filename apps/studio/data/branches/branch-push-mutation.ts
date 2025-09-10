@@ -11,8 +11,8 @@ export type BranchPushVariables = {
 }
 
 export async function pushBranch({ id }: Pick<BranchPushVariables, 'id'>) {
-  const { data, error } = await post('/v1/branches/{branch_id}/push', {
-    params: { path: { branch_id: id } },
+  const { data, error } = await post('/v1/branches/{branch_id_or_ref}/push', {
+    params: { path: { branch_id_or_ref: id } },
     body: {},
   })
 

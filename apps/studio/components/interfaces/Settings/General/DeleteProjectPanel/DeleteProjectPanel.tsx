@@ -1,13 +1,12 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, CriticalIcon } from 'ui'
 import DeleteProjectButton from './DeleteProjectButton'
 
 export const DeleteProjectPanel = () => {
-  const selectedOrganization = useSelectedOrganization()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   if (project === undefined) return null
 

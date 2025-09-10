@@ -65,11 +65,13 @@ const Shimmer = () => (
 const FormSectionContent = ({
   children,
   loading = true,
+  loaders,
   fullWidth,
   className,
 }: {
   children: React.ReactNode | string
   loading?: boolean
+  loaders?: number
   fullWidth?: boolean
   className?: string
 }) => {
@@ -81,7 +83,11 @@ const FormSectionContent = ({
         ${className}
       `}
     >
-      {loading ? Children.map(children, () => <Shimmer />) : children}
+      {loading
+        ? !!loaders
+          ? new Array(loaders).fill(0).map((_, idx) => <Shimmer key={idx} />)
+          : Children.map(children, (_, idx) => <Shimmer key={idx} />)
+        : children}
     </div>
   )
 }

@@ -9,9 +9,9 @@
 import { useTheme } from 'next-themes'
 import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { Button } from './../Button'
-import { cn } from './../../lib/utils/cn'
 import { copyToClipboard } from '../../lib/utils'
+import { cn } from './../../lib/utils/cn'
+import { Button } from './../Button'
 import { dart } from './prism'
 
 dart(Prism)
@@ -65,7 +65,7 @@ export const SimpleCodeBlock = ({
           <div className="Code codeBlockWrapper group">
             <pre ref={target} className={cn('codeBlock', className, parentClassName)}>
               {tokens.map((line, i) => {
-                const lineProps = getLineProps({ line, key: i })
+                const { key: _key, ...lineProps } = getLineProps({ line, key: i })
 
                 if (highlightLines.includes(i + 1)) {
                   lineProps.className = `${lineProps.className} docusaurus-highlight-code-line`
@@ -73,9 +73,10 @@ export const SimpleCodeBlock = ({
 
                 return (
                   <div key={i} {...lineProps}>
-                    {line.map((token, key) => (
-                      <span key={key} {...getTokenProps({ token, key })} />
-                    ))}
+                    {line.map((token, key) => {
+                      const { key: _key, ...tokenProps } = getTokenProps({ token, key })
+                      return <span key={key} {...tokenProps} />
+                    })}
                   </div>
                 )
               })}

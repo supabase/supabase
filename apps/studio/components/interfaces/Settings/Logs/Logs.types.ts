@@ -93,6 +93,7 @@ export type QueryType =
   | 'pg_upgrade'
   | 'pg_cron'
   | 'pgbouncer'
+  | 'etl'
 
 export type Mode = 'simple' | 'custom'
 

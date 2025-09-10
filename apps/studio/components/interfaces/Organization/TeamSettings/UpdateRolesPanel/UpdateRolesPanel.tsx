@@ -10,7 +10,7 @@ import { OrganizationMember } from 'data/organizations/organization-members-quer
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -58,10 +58,11 @@ interface UpdateRolesPanelProps {
 
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
   const { slug } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data: projects } = useProjectsQuery()
+  const { data } = useProjectsQuery()
+  const projects = data?.projects ?? []
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 

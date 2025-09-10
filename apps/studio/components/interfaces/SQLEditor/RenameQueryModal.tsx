@@ -12,7 +12,7 @@ import {
 import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
@@ -32,7 +32,7 @@ const RenameQueryModal = ({
   onComplete,
 }: RenameQueryModalProps) => {
   const { ref } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()

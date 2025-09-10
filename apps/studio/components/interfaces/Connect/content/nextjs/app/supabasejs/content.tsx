@@ -1,10 +1,10 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
 import {
+  ConnectTabContent,
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
-  ConnectTabContent,
 } from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
 
@@ -154,4 +154,6 @@ export const createClient = (request: NextRequest) => {
   )
 }
 
+// [Joshen] Used as a dynamic import
+// eslint-disable-next-line no-restricted-exports
 export default ContentFile

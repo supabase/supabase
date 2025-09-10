@@ -144,7 +144,7 @@ export const ConnectionPanel = ({
             >
               <Button asChild type="default" className="mt-2">
                 <Link
-                  href={`/project/${projectRef}/settings/database#connection-pooler`}
+                  href={`/project/${projectRef}/database/settings#connection-pooler`}
                   className="text-xs text-light hover:text-foreground"
                 >
                   Database Settings
@@ -199,7 +199,7 @@ export const ConnectionPanel = ({
                 <div className="flex flex-col pl-[52px]">
                   <span className="text-xs text-foreground">
                     {type === 'transaction'
-                      ? 'Pre-warmed connection pool to Postgres'
+                      ? 'Clients share a connection pool'
                       : 'Each client has a dedicated connection to Postgres'}
                   </span>
                 </div>

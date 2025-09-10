@@ -14,7 +14,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
@@ -75,7 +75,7 @@ export const BranchDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
-  const projectDetails = useSelectedProject()
+  const { data: projectDetails } = useSelectedProjectQuery()
 
   const [open, setOpen] = useState(false)
 
@@ -230,7 +230,7 @@ export const BranchDropdown = () => {
                         <MessageCircle size={14} strokeWidth={1} className="text-muted mt-0.5" />
                         <div>
                           <p>Branching feedback</p>
-                          <p className="text-lighter">Join Github Discussion</p>
+                          <p className="text-lighter">Join GitHub Discussion</p>
                         </div>
                       </a>
                     </CommandItem_Shadcn_>

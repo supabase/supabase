@@ -6,6 +6,7 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { Branch } from 'data/branches/branches-query'
+import { BASE_PATH } from 'lib/constants'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { WorkflowLogs } from './WorkflowLogs'
 
@@ -87,7 +88,7 @@ export const BranchRow = ({
 
   const handleRowClick = () => {
     if (external) {
-      window.open(navigateUrl, '_blank', 'noopener noreferrer')
+      window.open(`${BASE_PATH}/${navigateUrl}`, '_blank', 'noopener noreferrer')
     } else {
       router.push(navigateUrl)
     }

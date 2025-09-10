@@ -10,6 +10,7 @@ import { codeSampleRemark } from './CodeSample'
 import { codeTabsRemark } from './CodeTabs'
 import { fromDocsMarkdown } from './utils.server'
 import { partialsRemark } from './Partial'
+import { showRemark } from './Show'
 
 type Transformer = (ast: Root) => Root | Promise<Root>
 
@@ -27,6 +28,7 @@ export async function preprocessMdx<T>(mdx: string, transformers: Transformer[])
 
 export function preprocessMdxWithDefaults(mdx: string) {
   return preprocessMdx(mdx, [
+    showRemark(),
     remarkMkDocsAdmonition(),
     remarkPyMdownTabs(),
     partialsRemark(),

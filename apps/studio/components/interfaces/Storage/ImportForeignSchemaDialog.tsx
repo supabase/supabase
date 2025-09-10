@@ -6,12 +6,12 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { getFDWs } from 'data/fdw/fdws-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
@@ -34,7 +34,7 @@ export const ImportForeignSchemaDialog = ({
   visible,
   onClose,
 }: ImportForeignSchemaDialogProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { ref } = useParams()
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
@@ -107,7 +107,7 @@ export const ImportForeignSchemaDialog = ({
       const serverOptions = await getDecryptedParameters({
         ref: project?.ref,
         connectionString: project?.connectionString ?? undefined,
-        serverName,
+        wrapper,
       })
 
       const formValues: Record<string, string> = {
@@ -158,11 +158,7 @@ export const ImportForeignSchemaDialog = ({
       hideFooter
       visible={visible}
       size="medium"
-      header={
-        <span>
-          Connect namespace <span className="text-brand">{namespace}</span>
-        </span>
-      }
+      header={<span>Connect namespace "{namespace}"</span>}
       onCancel={() => onClose()}
     >
       <Form_Shadcn_ {...form}>
@@ -173,9 +169,9 @@ export const ImportForeignSchemaDialog = ({
               name="targetSchema"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Target Schema"
-                  description="Enter a schema name under which the Iceberg data will be accessible. The schema will be created."
                   layout="vertical"
+                  label="Specify a new schema for where the Iceberg data will be accessible"
+                  description="A new schema will be created. For security purposes, the wrapper tables from the foreign schema cannot be created within an existing schema."
                 >
                   <Input_Shadcn_ {...field} placeholder="Enter schema name" />
                 </FormItemLayout>

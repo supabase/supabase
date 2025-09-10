@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 
-import ReportChart from 'components/interfaces/Reports/ReportChart'
+import { ReportChart } from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'

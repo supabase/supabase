@@ -1,14 +1,13 @@
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainDelete from './CustomDomainDelete'
 import CustomDomainVerify from './CustomDomainVerify'
@@ -17,7 +16,7 @@ import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
 
 const CustomDomainConfig = () => {
   const { ref } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 

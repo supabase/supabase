@@ -1,8 +1,13 @@
+import { useState } from 'react'
+
 import { useParams } from 'common'
+import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { getConnectionStrings } from 'components/interfaces/Connect/DatabaseSettings.utils'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { getAllTableRowsSql } from 'data/table-rows/table-rows-query'
 import { pluckObjectFields } from 'lib/helpers'
-import { useState } from 'react'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import {
   Button,
   cn,
@@ -22,13 +27,25 @@ import {
 import { Admonition } from 'ui-patterns'
 
 interface ExportDialogProps {
-  table?: { name: string; schema: string }
+  table?: SupaTable
+  filters?: Filter[]
+  sorts?: Sort[]
+  ignoreRoleImpersonation?: boolean
+
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export const ExportDialog = ({ table, open, onOpenChange }: ExportDialogProps) => {
+export const ExportDialog = ({
+  table,
+  filters = [],
+  sorts = [],
+  ignoreRoleImpersonation = false,
+  open,
+  onOpenChange,
+}: ExportDialogProps) => {
   const { ref: projectRef } = useParams()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const [selectedTab, setSelectedTab] = useState<string>('csv')
 
@@ -48,10 +65,18 @@ export const ExportDialog = ({ table, open, onOpenChange }: ExportDialogProps) =
   })
 
   const outputName = `${table?.name}_rows`
+  const queryChains = !table ? undefined : getAllTableRowsSql({ table, sorts, filters })
+  const query = !!queryChains
+    ? ignoreRoleImpersonation
+      ? queryChains.toSql()
+      : wrapWithRoleImpersonation(
+          queryChains.toSql(),
+          roleImpersonationState as RoleImpersonationState
+        )
+    : ''
 
   const csvExportCommand = `
-${connectionStrings.direct.psql} -c "COPY (SELECT * FROM "${table?.schema}"."${table?.name}") TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv
-`.trim()
+${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()
 
   const sqlExportCommand = `
 pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
@@ -95,6 +120,12 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table
                 value={sqlExportCommand}
                 className="[&_code]:text-[12px] [&_code]:text-foreground"
               />
+              <Admonition
+                type="note"
+                className="mt-2"
+                title="Filters are not supported when exporting as SQL via pg_dump"
+                description="If you'd like to export as SQL, we recommend creating a view first then exporting the data from there via pg_dump instead"
+              />
             </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
 
@@ -107,15 +138,11 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table
           </p>
 
           {selectedTab === 'sql' && (
-            <Admonition
-              type="note"
-              title="The pg_dump version needs to match your Postgres version"
-            >
-              <p className="!leading-normal">
-                If you run into a server version mismatch error, you will need to update{' '}
-                <code>pg_dump</code> before running the command.
-              </p>
-            </Admonition>
+            <p className="text-sm text-foreground-light">
+              Note: <code>pg_dump</code> needs to match your project's Postgres version. If you run
+              into a server version mismatch error, you will need to update <code>pg_dump</code>{' '}
+              before running the command.
+            </p>
           )}
         </DialogSection>
         <DialogFooter>

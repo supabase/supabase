@@ -81,7 +81,7 @@ export const AdvisorWidget = () => {
   let titleContent: React.ReactNode
 
   if (totalIssues === 0) {
-    titleContent = <h2 className="text-xl">No issues available</h2>
+    titleContent = <h2>No issues available</h2>
   } else {
     const issuesText = totalIssues === 1 ? 'issue' : 'issues'
     const numberDisplay = totalIssues.toString()
@@ -94,7 +94,7 @@ export const AdvisorWidget = () => {
     }
 
     titleContent = (
-      <h2 className="text-xl">
+      <h2>
         {numberDisplay} {issuesText} need
         {totalIssues === 1 ? 's' : ''} <span className={attentionClassName}>attention</span>
       </h2>

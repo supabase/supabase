@@ -2,40 +2,32 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteDestinationProps {
   visible: boolean
-  setVisible: (value: boolean) => void
-  onDelete: () => void
   isLoading: boolean
   name: string
+  setVisible: (value: boolean) => void
+  onDelete: () => void
 }
 
-const DeleteDestination = ({
+export const DeleteDestination = ({
   visible,
-  setVisible,
-  onDelete,
   isLoading,
   name,
+  setVisible,
+  onDelete,
 }: DeleteDestinationProps) => {
   return (
-    <>
-      <TextConfirmModal
-        variant={'warning'}
-        visible={visible}
-        onCancel={() => setVisible(!visible)}
-        onConfirm={onDelete}
-        title="Delete this destination"
-        loading={isLoading}
-        confirmLabel={`Delete destination`}
-        confirmPlaceholder="Type in name of destination"
-        confirmString={name ?? 'Unknown'}
-        text={
-          <>
-            <span>This will delete the destination</span>{' '}
-          </>
-        }
-        alert={{ title: 'You cannot recover this destination once deleted.' }}
-      />
-    </>
+    <TextConfirmModal
+      variant="destructive"
+      visible={visible}
+      loading={isLoading}
+      title="Delete this destination"
+      confirmLabel={isLoading ? 'Deleting…' : `Delete destination`}
+      confirmPlaceholder="Type in name of destination"
+      confirmString={name ?? 'Unknown'}
+      text={`This will delete the destination "${name}"`}
+      alert={{ title: 'You cannot recover this destination once deleted.' }}
+      onCancel={() => setVisible(!visible)}
+      onConfirm={onDelete}
+    />
   )
 }
-
-export default DeleteDestination

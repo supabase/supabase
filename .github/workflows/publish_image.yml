@@ -8,7 +8,7 @@ on:
 
 jobs:
   settings:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     outputs:
       image_version: ${{ steps.meta.outputs.version }}
     steps:
@@ -25,7 +25,7 @@ jobs:
 
   release_x86:
     needs: settings
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 120
     env:
       arch: amd64
@@ -107,7 +107,7 @@ jobs:
       - settings
       - release_x86
       - release_arm
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - uses: docker/setup-buildx-action@v2
 

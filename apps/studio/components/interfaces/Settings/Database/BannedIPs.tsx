@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -13,13 +12,14 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Skeleton } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const BannedIPs = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
 
@@ -39,11 +39,15 @@ const BannedIPs = () => {
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
 
-  const canUnbanNetworks = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUnbanNetworks } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {

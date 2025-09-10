@@ -1,0 +1,295 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+
+    "ai:opt_in_level_disabled": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'disabled'"
+    },
+    "ai:opt_in_level_schema": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema'"
+    },
+    "ai:opt_in_level_schema_and_log": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log'"
+    },
+    "ai:opt_in_level_schema_and_log_and_data": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log_and_data'"
+    },
+
+    "authentication:sign_in_providers": {
+      "type": "boolean",
+      "description": "Enable the authentication sign in / providers page"
+    },
+    "authentication:third_party_auth": {
+      "type": "boolean",
+      "description": "Enable the authentication third party auth page"
+    },
+    "authentication:rate_limits": {
+      "type": "boolean",
+      "description": "Enable the authentication rate limits page"
+    },
+    "authentication:emails": {
+      "type": "boolean",
+      "description": "Enable the authentication emails page"
+    },
+    "authentication:multi_factor": {
+      "type": "boolean",
+      "description": "Enable the authentication multi factor page"
+    },
+    "authentication:attack_protection": {
+      "type": "boolean",
+      "description": "Enable the authentication attack protection page"
+    },
+    "authentication:advanced": {
+      "type": "boolean",
+      "description": "Enable the authentication advanced page"
+    },
+
+    "authentication:show_providers": {
+      "type": "boolean",
+      "description": "Show the providers section in the authentication Sign In / Providers page"
+    },
+    "authentication:show_manual_linking": {
+      "type": "boolean",
+      "description": "Show the manual linking toggle in the authentication Sign In / Providers page under User Signups"
+    },
+    "authentication:show_send_invitation": {
+      "type": "boolean",
+      "description": "Show the send invitation option in the authentication users page"
+    },
+    "authentication:show_provider_filter": {
+      "type": "boolean",
+      "description": "Show the provider filter in the authentication users page"
+    },
+    "authentication:show_sort_by_email": {
+      "type": "boolean",
+      "description": "Show the sort by email option in the authentication users page"
+    },
+    "authentication:show_sort_by_phone": {
+      "type": "boolean",
+      "description": "Show the sort by phone option in the authentication users page"
+    },
+    "authentication:show_user_type_filter": {
+      "type": "boolean",
+      "description": "Show the user type filter in the authentication users page"
+    },
+
+    "billing:all": {
+      "type": "boolean",
+      "description": "Enable the billing settings page"
+    },
+
+    "dashboard_auth:sign_up": {
+      "type": "boolean",
+      "description": "Enable the sign up page in the dashboard"
+    },
+    "dashboard_auth:sign_in_with_github": {
+      "type": "boolean",
+      "description": "Enable the sign in with github provider"
+    },
+    "dashboard_auth:sign_in_with_sso": {
+      "type": "boolean",
+      "description": "Enable the sign in with sso provider"
+    },
+    "dashboard_auth:sign_in_with_email": {
+      "type": "boolean",
+      "description": "Enable the sign in with email/password provider"
+    },
+
+    "database:replication": {
+      "type": "boolean",
+      "description": "Enable the database replication page"
+    },
+    "database:roles": {
+      "type": "boolean",
+      "description": "Enable the database roles page"
+    },
+
+    "docs:compliance": {
+      "type": "boolean",
+      "description": "Enable documentation on compliance"
+    },
+    "docs:self-hosting": {
+      "type": "boolean",
+      "description": "Enable documentation for self-hosting"
+    },
+
+    "feedback:docs": {
+      "type": "boolean",
+      "description": "Enable feedback submission for docs site"
+    },
+
+    "integrations:vercel": {
+      "type": "boolean",
+      "description": "Enable the vercel integration section in the organization and project settings pages"
+    },
+    "integrations:show_stripe_wrapper": {
+      "type": "boolean",
+      "description": "Show the Stripe wrapper under project integrations"
+    },
+
+    "logs:templates": {
+      "type": "boolean",
+      "description": "Enable the logs templates page"
+    },
+    "logs:collections": {
+      "type": "boolean",
+      "description": "Enable the logs collections page"
+    },
+
+    "profile:show_email": {
+      "type": "boolean",
+      "description": "Show the user's email address in the toolbar"
+    },
+    "profile:show_information": {
+      "type": "boolean",
+      "description": "Shows the user's profile information (first name, last name) in account preferences"
+    },
+    "profile:show_analytics_and_marketing": {
+      "type": "boolean",
+      "description": "Shows the analytics and marketing section in account preferences"
+    },
+    "profile:show_account_deletion": {
+      "type": "boolean",
+      "description": "Shows the account deletion section in account preferences"
+    },
+
+    "project_connection:javascript_example": {
+      "type": "boolean",
+      "description": "Show the javascript example in the project connection settings. If off, it'll show up as Typescript example instead (both are the same code example)"
+    },
+    "project_connection:dart_example": {
+      "type": "boolean",
+      "description": "Show the dart example in the project connection settings"
+    },
+
+    "project_creation:show_advanced_config": {
+      "type": "boolean",
+      "description": "Show the advanced configuration option in the project creation flow"
+    },
+
+    "project_homepage:show_instance_size": {
+      "type": "boolean",
+      "description": "Show the instance size badge in the project homepage and infrastructure settings"
+    },
+    "project_homepage:show_examples": {
+      "type": "boolean",
+      "description": "Show the example projects in the project homepage"
+    },
+    "project_homepage:show_all_client_libraries": {
+      "type": "boolean",
+      "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
+    },
+
+    "project_addons:dedicated_ipv4_address": {
+      "type": "boolean",
+      "description": "Show the dedicated IPv4 address addon"
+    },
+
+    "project_settings:custom_domains": {
+      "type": "boolean",
+      "description": "Show the custom domain configuration section + custom domain addon"
+    },
+    "project_settings:show_disable_legacy_api_keys": {
+      "type": "boolean",
+      "description": "Show the disable legacy API keys section in project settings API Keys page"
+    },
+    "project_settings:legacy_jwt_keys": {
+      "type": "boolean",
+      "description": "Enable the legacy JWT secret page in project settings"
+    },
+    "project_settings:log_drains": {
+      "type": "boolean",
+      "description": "Enable the log drains page in project settings"
+    },
+
+    "reports:all": {
+      "type": "boolean",
+      "description": "Enable the project reports page"
+    },
+
+    "sdk:csharp": {
+      "type": "boolean",
+      "description": "Enable the C# SDK"
+    },
+    "sdk:dart": {
+      "type": "boolean",
+      "description": "Enable the Dart/Flutter SDK"
+    },
+    "sdk:kotlin": {
+      "type": "boolean",
+      "description": "Enable the Kotlin SDK"
+    },
+    "sdk:python": {
+      "type": "boolean",
+      "description": "Enable the Python SDK"
+    },
+    "sdk:swift": {
+      "type": "boolean",
+      "description": "Enable the Swift SDK"
+    }
+  },
+  "required": [
+    "ai:opt_in_level_disabled",
+    "ai:opt_in_level_schema",
+    "ai:opt_in_level_schema_and_log",
+    "ai:opt_in_level_schema_and_log_and_data",
+    "authentication:sign_in_providers",
+    "authentication:third_party_auth",
+    "authentication:rate_limits",
+    "authentication:emails",
+    "authentication:multi_factor",
+    "authentication:attack_protection",
+    "authentication:advanced",
+    "authentication:show_providers",
+    "authentication:show_manual_linking",
+    "authentication:show_provider_filter",
+    "authentication:show_send_invitation",
+    "authentication:show_sort_by_email",
+    "authentication:show_sort_by_phone",
+    "authentication:show_user_type_filter",
+    "billing:all",
+    "dashboard_auth:sign_up",
+    "dashboard_auth:sign_in_with_github",
+    "dashboard_auth:sign_in_with_sso",
+    "dashboard_auth:sign_in_with_email",
+    "database:replication",
+    "database:roles",
+    "docs:compliance",
+    "docs:self-hosting",
+    "feedback:docs",
+    "integrations:vercel",
+    "integrations:show_stripe_wrapper",
+    "profile:show_email",
+    "profile:show_information",
+    "profile:show_analytics_and_marketing",
+    "profile:show_account_deletion",
+    "logs:templates",
+    "logs:collections",
+    "project_creation:show_advanced_config",
+    "project_homepage:show_instance_size",
+    "project_homepage:show_examples",
+    "project_homepage:show_all_client_libraries",
+    "project_addons:dedicated_ipv4_address",
+    "project_settings:custom_domains",
+    "project_settings:show_disable_legacy_api_keys",
+    "project_settings:legacy_jwt_keys",
+    "project_settings:log_drains",
+    "project_connection:javascript_example",
+    "project_connection:dart_example",
+    "reports:all",
+    "sdk:csharp",
+    "sdk:dart",
+    "sdk:kotlin",
+    "sdk:python",
+    "sdk:swift"
+  ],
+  "additionalProperties": false
+}

@@ -27,28 +27,22 @@ export const OptInToOpenAIToggle = () => {
           className="flex flex-col gap-y-4 text-sm text-foreground-light"
         >
           <p>
-            Supabase AI utilizes Amazon Bedrock ("Bedrock"), a service designed with a strong focus
-            on data privacy and security.
+            Supabase AI utilizes third-party AI providers designed with a strong focus on data
+            privacy and security.
           </p>
 
           <p>
-            Amazon Bedrock does not store or log your prompts and completions. This data is not used
-            to train any AWS models and is not distributed to third parties or model providers.
-            Model providers do not have access to Amazon Bedrock logs or customer prompts and
-            completions.
+            By default, only schema data is shared with third-party AI providers. This is not
+            retained by them nor used as training data. With your permission, Supabase may also
+            share customer-generated prompts, database data, and project logs with these providers.
+            This information is used solely to generate responses to your queries and is not
+            retained by the providers or used to train their models.
           </p>
 
           <p>
-            By default, no information is shared with Bedrock unless you explicitly provide consent.
-            With your permission, Supabase may share customer-generated prompts, database schema,
-            database data, and project logs with Bedrock. This information is used solely to
-            generate responses to your queries and is not retained by Bedrock or used to train their
-            foundation models.
-          </p>
-
-          <p>
-            If you are a HIPAA Covered Entity, please note that Bedrock is HIPAA eligible, and
-            Supabase has a Business Associate Agreement in place covering this use.
+            For organizations with HIPAA compliance enabled in their Supabase configuration, any
+            consented information will only be shared with third-party AI providers with whom
+            Supabase has established a Business Associate Agreement (BAA).
           </p>
 
           <p>

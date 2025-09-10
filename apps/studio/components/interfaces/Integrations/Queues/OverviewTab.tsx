@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -8,7 +8,7 @@ import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 
 export const QueuesOverviewTab = () => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,

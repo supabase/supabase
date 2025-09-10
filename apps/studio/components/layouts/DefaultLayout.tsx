@@ -1,11 +1,14 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { Sidebar } from 'components/interfaces/Sidebar'
 import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useAppStateSnapshot } from 'state/app-state'
 import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
@@ -28,7 +31,20 @@ export interface DefaultLayoutProps {
 const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
   const { ref } = useParams()
   const router = useRouter()
+  const appSnap = useAppStateSnapshot()
   const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
+  const backToDashboardURL =
+    appSnap.lastRouteBeforeVisitingAccountPage.length > 0
+      ? appSnap.lastRouteBeforeVisitingAccountPage
+      : !!lastVisitedOrganization
+        ? `/org/${lastVisitedOrganization}`
+        : '/organizations'
 
   useCheckLatestDeploy()
 
@@ -41,12 +57,18 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
             <AppBannerWrapper />
             <div className="flex-shrink-0">
               <MobileNavigationBar />
-              <LayoutHeader showProductMenu={showProductMenu} headerTitle={headerTitle} />
+              <LayoutHeader
+                showProductMenu={showProductMenu}
+                headerTitle={headerTitle}
+                backToDashboardURL={
+                  router.pathname.startsWith('/account') ? backToDashboardURL : undefined
+                }
+              />
             </div>
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">
-              {/* Sidebar */}
-              <Sidebar />
+              {/* Sidebar - Only show for project pages, not account pages */}
+              {!router.pathname.startsWith('/account') && <Sidebar />}
               {/* Main Content */}
               <div className="flex-grow h-full overflow-y-auto">{children}</div>
             </div>

@@ -3,8 +3,7 @@ import { RotateCw, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useFlag, useParams } from 'common'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
@@ -12,7 +11,7 @@ import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signin
 import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -48,9 +47,9 @@ import { SigningKeyRow } from './signing-key-row'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
-export default function JWTSecretKeysTable() {
+export const JWTSecretKeysTable = () => {
   const { ref: projectRef } = useParams()
-  const { project, isLoading: isProjectLoading } = useProjectContext()
+  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
 
   const newJwtSecrets = useFlag('newJwtSecrets')
 
@@ -258,7 +257,7 @@ export default function JWTSecretKeysTable() {
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <h2 className="text-xl">Previously used keys</h2>
+              <h2>Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
                 These JWT signing keys are still used to{' '}
                 <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
@@ -326,7 +325,7 @@ export default function JWTSecretKeysTable() {
       {revokedKeys.length > 0 && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <h2 className="text-xl">Revoked keys</h2>
+            <h2>Revoked keys</h2>
             <p className="text-sm text-foreground-lighter">
               These keys are no longer used to verify or sign JWTs.
             </p>

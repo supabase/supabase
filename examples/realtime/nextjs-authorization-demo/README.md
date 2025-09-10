@@ -2,7 +2,7 @@
 
 Example application on how you can use Realtime Authorization to limit access to Realtime [Channels](https://supabase.com/docs/guides/realtime/concepts#channels) and [Broadcast](https://supabase.com/docs/guides/realtime/broadcast) and [Presence](https://supabase.com/docs/guides/realtime/presence) extensions.
 
-You can provide feedback on our [Github Discussion](https://github.com/orgs/supabase/discussions/22484).
+You can provide feedback on our [GitHub Discussion](https://github.com/orgs/supabase/discussions/22484).
 
 ## Objective
 
