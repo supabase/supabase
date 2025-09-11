@@ -190,7 +190,6 @@ export function DiskManagementForm() {
   const isPlanUpgradeRequired = org?.plan.id === 'free'
 
   const { formState } = form
-  const { computeSize: formComputeSize, storageType: formStorageType } = form.watch()
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
   const totalSize = formState.defaultValues?.totalSize || 0
   const usedPercentage = (usedSize / totalSize) * 100
