@@ -17,7 +17,7 @@ import {
 } from 'recharts'
 
 import { CategoricalChartState } from 'recharts/types/chart/types'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
 import {
@@ -64,6 +64,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   syncId?: string
   docsUrl?: string
   sql?: string
+  showNewBadge?: boolean
 }
 
 export function ComposedChart({
@@ -101,6 +102,7 @@ export function ComposedChart({
   syncId,
   docsUrl,
   sql,
+  showNewBadge,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -304,6 +306,7 @@ export function ComposedChart({
     <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
         title={title}
+        showNewBadge={showNewBadge}
         format={format}
         customDateFormat={customDateFormat}
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}

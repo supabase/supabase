@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { AnalyticsInterval } from 'data/analytics/constants'
@@ -8,7 +8,7 @@ import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Card, CardContent, cn } from 'ui'
+import { Badge, Card, CardContent, cn } from 'ui'
 import { ReportChartUpsell } from './ReportChartUpsell'
 export interface ReportChartV2Props {
   report: ReportConfig
@@ -58,7 +58,7 @@ export const ReportChartV2 = ({
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
     {
-      enabled: Boolean(projectRef && canFetch && isAvailable),
+      enabled: Boolean(projectRef && canFetch),
       refetchOnWindowFocus: false,
       staleTime: 0,
     }
@@ -67,9 +67,14 @@ export const ReportChartV2 = ({
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
 
+  /**
+   * Infra monitoring data returns 'period_start', but logs return 'timestamp'
+   */
+  const firstItem = chartData[0]
+  const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
     chartData,
-    'timestamp',
+    timestampKey,
     (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
     0,
     startDate,
@@ -88,7 +93,6 @@ export const ReportChartV2 = ({
   }
 
   const isErrorState = error && !isLoadingChart
-  const showEmptyState = (!finalChartData || finalChartData.length === 0) && !isLoadingChart
 
   return (
     <Card id={report.id} className={cn('relative w-full overflow-hidden scroll-mt-16', className)}>
@@ -100,16 +104,12 @@ export const ReportChartV2 = ({
       >
         {isLoadingChart ? (
           <Loader2 className="size-5 animate-spin text-foreground-light" />
-        ) : showEmptyState ? (
-          <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
-            No data available for the selected time range and filters
-          </p>
         ) : isErrorState ? (
           <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
             Error loading chart data
           </p>
         ) : (
-          <div className="w-full">
+          <div className="w-full relative">
             <ComposedChart
               attributes={dynamicAttributes}
               data={finalChartData}
@@ -132,6 +132,7 @@ export const ReportChartV2 = ({
               titleTooltip={report.titleTooltip}
               syncId={syncId}
               sql={queryResult?.query}
+              showNewBadge={report.showNewBadge}
             />
           </div>
         )}
