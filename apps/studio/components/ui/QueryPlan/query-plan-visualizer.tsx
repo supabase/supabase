@@ -105,7 +105,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   useEffect(() => {
     const handler = () => {
       setIsFullscreen(Boolean(document.fullscreenElement))
-      requestAnimationFrame(() => rfInstance?.fitView({ padding: 0.2 }))
+      requestAnimationFrame(() => rfInstance?.fitView())
     }
 
     document.addEventListener('fullscreenchange', handler)
@@ -115,7 +115,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   }, [rfInstance])
 
   const toggleFullscreen = async () => {
-    const el = containerRef.current as any
+    const el = containerRef.current
     if (!el) return
 
     try {
