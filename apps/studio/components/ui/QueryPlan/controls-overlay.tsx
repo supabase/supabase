@@ -3,13 +3,6 @@ import { Filter, ChevronsUpDown, Check } from 'lucide-react'
 
 import type { MetricsVisibility, HeatmapMode } from './contexts'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@ui/components/shadcn/ui/select'
-import {
   cn,
   Button,
   Checkbox_Shadcn_,
@@ -165,19 +158,6 @@ export const ControlsOverlay = ({
 
         <div className="h-[14px] w-px bg-border mx-1" />
         <div className="flex items-center gap-x-1 text-xs">
-          <span>Heatmap:</span>
-          <Select value={heatmapMode} onValueChange={(v) => setHeatmapMode(v as HeatmapMode)}>
-            <SelectTrigger size="tiny" className="w-20">
-              <SelectValue placeholder="none" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="none">none</SelectItem>
-              <SelectItem value="time">time</SelectItem>
-              <SelectItem value="rows">rows</SelectItem>
-              <SelectItem value="cost">cost</SelectItem>
-            </SelectContent>
-          </Select>
-
           <Popover_Shadcn_
             open={heatmapPopoverOpen}
             onOpenChange={setHeatmapPopoverOpen}
