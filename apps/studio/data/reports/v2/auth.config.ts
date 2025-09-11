@@ -107,7 +107,7 @@ const AUTH_REPORT_SQL: Record<
           round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_latency_ms,
           round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_latency_ms
         from auth_logs
-        where json_value(event_message, "$.path") = '/token'
+        where json_value(event_message, "$.auth_event.action") = 'login'
         group by timestamp
         order by timestamp desc
       `
@@ -118,17 +118,17 @@ const AUTH_REPORT_SQL: Record<
         --signup-latency
         select 
           timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          json_value(event_message, "$.auth_event.traits.provider") as provider,
+          count(*) as count,
           round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms,
           round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_latency_ms,
           round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_latency_ms,
           round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_latency_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_latency_ms
+          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_latency_ms,
+          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_latency_ms
         from auth_logs
         where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-          and json_value(event_message, "$.status") = '200'
-        group by timestamp, provider
-        order by timestamp desc, provider
+        group by timestamp
+        order by timestamp desc
       `
   },
   ErrorsByStatus: (interval) => {
@@ -412,13 +412,14 @@ export const createAuthReportConfig = ({
     label: 'Sign In Latency',
     valuePrecision: 2,
     hide: false,
+    hideHighlightedValue: true,
     showTooltip: true,
     showLegend: true,
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The average latency for sign in operations by grant type.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['pro', 'team', 'enterprise'],
     dataProvider: async () => {
       const attributes = [
         {
@@ -455,8 +456,6 @@ export const createAuthReportConfig = ({
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
       const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
-      console.log('sign in latency', { sql, rawData, transformedData })
-
       return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
     },
   },
@@ -464,49 +463,52 @@ export const createAuthReportConfig = ({
     id: 'sign-up-latency',
     label: 'Sign Up Latency',
     valuePrecision: 2,
-    hide: true,
+    hide: false,
+    hideHighlightedValue: true,
     showTooltip: true,
     showLegend: true,
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The average latency for sign up operations by provider.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['pro', 'team', 'enterprise'],
     dataProvider: async () => {
       const attributes = [
         {
-          attribute: 'SignUpLatency',
-          provider: 'logs',
-          label: 'Email',
-          providerType: 'email',
-          enabled: true,
+          attribute: 'avg_latency_ms',
+          label: 'Avg. Latency (ms)',
         },
         {
-          attribute: 'SignUpLatency',
-          provider: 'logs',
-          label: 'Google',
-          providerType: 'google',
-          enabled: true,
+          attribute: 'max_latency_ms',
+          label: 'Max. Latency (ms)',
         },
         {
-          attribute: 'SignUpLatency',
-          provider: 'logs',
-          label: 'GitHub',
-          providerType: 'github',
-          enabled: true,
+          attribute: 'min_latency_ms',
+          label: 'Min. Latency (ms)',
         },
         {
-          attribute: 'SignUpLatency',
-          provider: 'logs',
-          label: 'Apple',
-          providerType: 'apple',
-          enabled: true,
+          attribute: 'p50_latency_ms',
+          label: 'P50 Latency (ms)',
+        },
+        {
+          attribute: 'p95_latency_ms',
+          label: 'P95 Latency (ms)',
+        },
+        {
+          attribute: 'p99_latency_ms',
+          label: 'P99 Latency (ms)',
+        },
+        {
+          attribute: 'request_count',
+          label: 'Request Count',
         },
       ]
 
       const sql = AUTH_REPORT_SQL.SignUpLatency(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
       const transformedData = defaultAuthReportFormatter(rawData, attributes)
+
+      console.log('sign up latency', { sql, rawData, transformedData })
 
       return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
     },
