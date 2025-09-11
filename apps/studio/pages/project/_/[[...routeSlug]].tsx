@@ -17,6 +17,7 @@ import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Button,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -59,6 +60,22 @@ const OrganizationErrorState = () => {
       <AlertTitle_Shadcn_>Failed to load your Supabase organizations</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>Try refreshing the page</AlertDescription_Shadcn_>
     </Alert_Shadcn_>
+  )
+}
+
+const OrganizationEmptyState = () => {
+  return (
+    <div className="w-full border rounded-lg p-8 flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <p className="text-foreground text-base font-medium">No projects or organizations found</p>
+        <p className="text-sm text-foreground-lighter leading-relaxed">
+          Create your first organization to get started with Supabase
+        </p>
+      </div>
+      <Button asChild type="primary" size="medium">
+        <Link href="/new">Create organization</Link>
+      </Button>
+    </div>
   )
 }
 
@@ -108,7 +125,7 @@ const GenericProjectPage: NextPage = () => {
     if (!!lastVisitedOrgSlug) {
       setSlug(lastVisitedOrgSlug)
     } else if (isSuccessOrganizations) {
-      setSlug(organizations[0].slug)
+      setSlug(organizations[0]?.slug)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastVisitedOrgSlug, isSuccessOrganizations])
@@ -118,31 +135,35 @@ const GenericProjectPage: NextPage = () => {
       <Header />
       <PageLayout className="flex-grow min-h-0" title="Select a project to continue">
         <ScaffoldContainer className="flex-grow flex flex-col">
-          <ScaffoldSection isFullWidth>
-            <div className="flex items-center gap-x-2">
-              <Select_Shadcn_ value={selectedSlug} onValueChange={setSlug}>
-                <SelectTrigger_Shadcn_ size="tiny" className="w-60 truncate">
-                  <div className="flex items-center gap-x-2">
-                    <p className="text-xs text-foreground-light">Organization:</p>
-                    <SelectValue_Shadcn_ placeholder="Select an organization" />
-                  </div>
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_ className="col-span-8">
-                  {organizations.map((org) => (
-                    <SelectItem_Shadcn_ key={org.slug} value={org.slug} className="text-xs">
-                      {org.name}
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-              <HomePageActions hideNewProject />
-            </div>
-          </ScaffoldSection>
+          {organizations.length > 0 && (
+            <ScaffoldSection isFullWidth>
+              <div className="flex items-center gap-x-2">
+                <Select_Shadcn_ value={selectedSlug} onValueChange={setSlug}>
+                  <SelectTrigger_Shadcn_ size="tiny" className="w-60 truncate">
+                    <div className="flex items-center gap-x-2">
+                      <p className="text-xs text-foreground-light">Organization:</p>
+                      <SelectValue_Shadcn_ placeholder="Select an organization" />
+                    </div>
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_ className="col-span-8">
+                    {organizations.map((org) => (
+                      <SelectItem_Shadcn_ key={org.slug} value={org.slug} className="text-xs">
+                        {org.name}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+                <HomePageActions hideNewProject />
+              </div>
+            </ScaffoldSection>
+          )}
           <ScaffoldSection isFullWidth className="flex-grow pt-0 flex flex-col gap-y-4 h-px">
             {isLoadingOrganizations ? (
               <OrganizationLoadingState />
             ) : isErrorOrganizations ? (
               <OrganizationErrorState />
+            ) : organizations.length === 0 ? (
+              <OrganizationEmptyState />
             ) : !!selectedOrganization ? (
               <ProjectList
                 organization={selectedOrganization}
