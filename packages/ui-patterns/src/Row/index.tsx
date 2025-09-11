@@ -1,14 +1,15 @@
 'use client'
 
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import type { ReactNode } from 'react'
+import type React from 'react'
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
+import type { ReactNode } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: ReactNode
-  /** columns can be a fixed number or an array [lg, md, sm] */
+  // columns can be a fixed number or an array [lg, md, sm]
   columns: number | [number, number, number]
+  children: ReactNode
   className?: string
   /** gap between items in pixels */
   gap?: number
