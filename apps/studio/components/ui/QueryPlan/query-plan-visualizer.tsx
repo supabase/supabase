@@ -205,8 +205,12 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             planningTime={meta?.planningTime}
             executionTime={meta?.executionTime}
             jitTotalTime={meta?.jitTotalTime}
+            className={isFullscreen ? 'text-xs p-2' : 'text-[9px]'}
           />
-          <SubplanOverlay subplanRoots={meta?.subplanRoots} />
+          <SubplanOverlay
+            subplanRoots={meta?.subplanRoots}
+            className={isFullscreen ? 'text-xs p-2' : 'text-[9px]'}
+          />
         </div>
 
         {selectedNode && (
