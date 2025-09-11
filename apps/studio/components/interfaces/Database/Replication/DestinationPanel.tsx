@@ -6,7 +6,6 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
-import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
@@ -21,9 +20,6 @@ import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
@@ -43,7 +39,6 @@ import {
   SheetSection,
   SheetTitle,
   TextArea_Shadcn_,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import NewPublicationPanel from './NewPublicationPanel'
@@ -88,9 +83,6 @@ export const DestinationPanel = ({
 
   const editMode = !!existingDestination
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-
-  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
-    useCreateTenantSourceMutation()
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -231,11 +223,6 @@ export const DestinationPanel = ({
     }
   }
 
-  const onEnableReplication = async () => {
-    if (!projectRef) return console.error('Project ref is required')
-    await createTenantSource({ projectRef })
-  }
-
   useEffect(() => {
     if (editMode && destinationData && pipelineData) {
       form.reset(defaultValues)
@@ -249,7 +236,7 @@ export const DestinationPanel = ({
     }
   }, [visible, defaultValues, form])
 
-  return sourceId ? (
+  return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
         <SheetContent showClose={false} size="default">
@@ -467,54 +454,12 @@ export const DestinationPanel = ({
           </div>
         </SheetContent>
       </Sheet>
+
       <NewPublicationPanel
         visible={publicationPanelVisible}
         sourceId={sourceId}
         onClose={() => setPublicationPanelVisible(false)}
       />
     </>
-  ) : (
-    <Sheet open={visible} onOpenChange={onClose}>
-      <SheetContent showClose={false} size="default">
-        <div className="flex flex-col h-full" tabIndex={-1}>
-          <SheetHeader>
-            <SheetTitle>Enable Replication (Alpha)</SheetTitle>
-          </SheetHeader>
-          <SheetSection className="flex-grow overflow-auto">
-            <div className="rounded-md border bg-surface-100 p-5">
-              <div className="flex items-start gap-3">
-                <WarningIcon />
-                <div className="flex-1">
-                  <AlertTitle_Shadcn_ className="mb-1">Replication is in Alpha</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    This feature is in active development and may change as we gather feedback.
-                    Availability and behavior can evolve during the Alpha phase.
-                  </AlertDescription_Shadcn_>
-                  <div className="text-sm text-foreground-light mt-3">
-                    <p className="mb-2">
-                      Pricing is not final yet. You can enable replication now; we’ll announce
-                      pricing later and notify you before any charges apply.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-x-2 mt-4">
-                    <Button
-                      type="primary"
-                      loading={creatingTenantSource}
-                      onClick={onEnableReplication}
-                    >
-                      Enable replication
-                    </Button>
-                    <Button type="default" disabled={creatingTenantSource} onClick={onClose}>
-                      Not now
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </SheetSection>
-          <SheetFooter></SheetFooter>
-        </div>
-      </SheetContent>
-    </Sheet>
   )
 }
