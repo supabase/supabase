@@ -1,0 +1,75 @@
+# Vector Configuration for ADS-BaaS
+
+# Data Sources
+[sources]
+[sources.docker_logs]
+type = "docker_logs"
+docker_host = "unix:///var/run/docker.sock"
+include_containers = [
+    "ads-studio",
+    "ads-kong",
+    "ads-auth",
+    "ads-rest",
+    "ads-realtime",
+    "ads-edge-functions",
+    "ads-meta",
+    "ads-analytics",
+    "ads-db",
+    "ads-storage",
+    "ads-pooler"
+]
+exclude_containers = []
+
+# Transformations
+[transforms.parse_docker]
+type = "remap"
+inputs = ["docker_logs"]
+source = '''
+# Attempt to parse JSON message with explicit error handling
+parsed, err = parse_json(.message)
+
+# If parsing fails, maintain original message in a structured format
+# If parsing succeeds, use the parsed object
+. = if err != null {
+    {
+        "message": .message,
+        "parse_error": err
+    }
+} else {
+    parsed
+}
+'''
+
+[transforms.add_metadata]
+type = "remap"
+inputs = ["parse_docker"]
+source = '''
+.metadata = {}
+.metadata.container_name = .container_name
+.metadata.timestamp = now()
+.metadata.environment = "production"
+.metadata.tenant = "ArivantOne"
+'''
+
+# Sinks
+[sinks.console]
+type = "console"
+inputs = ["add_metadata"]
+encoding.codec = "json"
+
+[sinks.logflare]
+type = "http"
+inputs = ["add_metadata"]
+uri = "http://localhost:9001/api/logs"
+encoding.codec = "json"
+auth.strategy = "bearer"
+auth.token = "${LOGFLARE_API_KEY}"
+
+[sinks.logflare.request]
+headers = {"Content-Type" = "application/json"}
+
+# Health Check Configuration
+[api]
+enabled = true
+address = "0.0.0.0:8686"
+playground = false
