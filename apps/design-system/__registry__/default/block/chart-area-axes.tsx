@@ -1,12 +1,14 @@
 'use client'
 
 import { TrendingUp } from 'lucide-react'
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 'ui'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import { ChartConfig, ChartContainer, ChartTooltipContent } from 'ui'
 
-export const description = 'An area chart with axes'
+// Constants for colors
+const mobileColor = 'var(--color-mobile)';
+const desktopColor = 'var(--color-desktop)';
 
 const chartData = [
   { month: 'January', desktop: 186, mobile: 80 },
@@ -17,16 +19,16 @@ const chartData = [
   { month: 'June', desktop: 214, mobile: 140 },
 ]
 
-const chartConfig = {
+const chartConfig: ChartConfig = {
   desktop: {
     label: 'Desktop',
-    color: 'hsl(var(--chart-1))',
+    color: desktopColor,
   },
   mobile: {
     label: 'Mobile',
-    color: 'hsl(var(--chart-2))',
+    color: mobileColor,
   },
-} satisfies ChartConfig
+}
 
 export default function Component() {
   return (
@@ -37,41 +39,42 @@ export default function Component() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: -20,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Area
-              dataKey="mobile"
-              type="natural"
-              fill="var(--color-mobile)"
-              fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
-            />
-            <Area
-              dataKey="desktop"
-              type="natural"
-              fill="var(--color-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
-              stackId="a"
-            />
-          </AreaChart>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart
+              data={chartData}
+              margin={{
+                left: -20,
+                right: 12,
+              }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => value.slice(0, 3)}
+              />
+              <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />
+              <Tooltip cursor={false} content={<ChartTooltipContent />} />
+              <Area
+                dataKey="mobile"
+                type="natural"
+                fill={mobileColor}
+                fillOpacity={0.4}
+                stroke={mobileColor}
+                stackId="a"
+              />
+              <Area
+                dataKey="desktop"
+                type="natural"
+                fill={desktopColor}
+                fillOpacity={0.4}
+                stroke={desktopColor}
+                stackId="a"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
       <CardFooter>
