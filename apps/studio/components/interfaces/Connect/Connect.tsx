@@ -251,20 +251,26 @@ export const Connect = () => {
     const parent =
       newConnectionObject.find((item) => item.key === queryFramework) ?? newConnectionObject[0]
     setSelectedParent(parent?.key ?? '')
-    if (parent?.key) setQueryFramework(parent.key)
-    else setQueryFramework(null)
+
+    if (queryFramework) {
+      if (parent?.key !== queryFramework) setQueryFramework(parent?.key ?? null)
+    }
 
     const child =
       parent?.children.find((child) => child.key === queryUsing) ?? parent?.children?.[0]
     setSelectedChild(child?.key ?? '')
-    if (child?.key) setQueryUsing(child.key)
-    else setQueryUsing(null)
+
+    if (queryUsing) {
+      if (child?.key !== queryUsing) setQueryUsing(child?.key ?? null)
+    }
 
     const grandchild =
       child?.children.find((child) => child.key === queryWith) ?? child?.children?.[0]
     setSelectedGrandchild(grandchild?.key ?? '')
-    if (grandchild?.key) setQueryWith(grandchild.key)
-    else setQueryWith(null)
+
+    if (queryWith) {
+      if (grandchild?.key !== queryWith) setQueryWith(grandchild?.key ?? null)
+    }
   }, [showConnect, tab, frameworks, queryFramework, queryUsing, queryWith])
 
   if (!isActiveHealthy) {
