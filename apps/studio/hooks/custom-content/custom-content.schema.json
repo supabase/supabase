@@ -31,6 +31,22 @@
       }
     },
 
+    "project_homepage:client_libraries": {
+      "type": "array",
+      "description": "Renders a provided set of client libraries under the project's home page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "language": { "type": "string" },
+          "officialSupport": { "type": "boolean" },
+          "releaseState": { "type": "string" },
+          "docsUrl": { "type": "string" },
+          "gitUrl": { "type": "string" },
+          "altIconName": { "type": "string" }
+        },
+        "required": ["language", "officialSupport", "docsUrl", "gitUrl"]
+      }
+    },
     "project_homepage:example_projects": {
       "type": ["array", "null"],
       "description": "Renders a provided set of example projects under the project's home page",
@@ -95,6 +111,7 @@
   },
   "required": [
     "organization:legal_documents",
+    "project_homepage:client_libraries",
     "project_homepage:example_projects",
     "logs:default_query",
     "connect:frameworks",

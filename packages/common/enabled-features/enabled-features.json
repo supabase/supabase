@@ -53,7 +53,6 @@
 
   "project_creation:show_advanced_config": true,
 
-  "project_homepage:show_all_client_libraries": true,
   "project_homepage:show_instance_size": true,
   "project_homepage:show_examples": true,
 

@@ -6,7 +6,7 @@ import { formatSql } from 'lib/formatSql'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
-  QUERY_PERFORMANCE_REPORTS,
+  QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
 
@@ -24,14 +24,10 @@ const SqlMonacoBlock = dynamic(
   }
 )
 
-export const QueryDetail = ({
-  reportType,
-  selectedRow,
-  onClickViewSuggestion,
-}: QueryDetailProps) => {
+export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
-  const report = QUERY_PERFORMANCE_REPORTS[reportType]
+  const report = QUERY_PERFORMANCE_COLUMNS
   const [query, setQuery] = useState(selectedRow?.['query'])
 
   useEffect(() => {

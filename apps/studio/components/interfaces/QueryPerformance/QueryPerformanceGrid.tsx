@@ -26,7 +26,7 @@ import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
 import {
-  QUERY_PERFORMANCE_REPORTS,
+  QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
@@ -38,15 +38,14 @@ interface QueryPerformanceGridProps {
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
-  const { preset, sort: urlSort, order, roles, search } = useParams()
+  const { sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
-  const reportType =
-    (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
+  const reportType = QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED
 
-  const columns = QUERY_PERFORMANCE_REPORTS[reportType].map((col) => {
+  const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
     const nonSortableColumns = ['query']
 
     const result: Column<any> = {
@@ -214,7 +213,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [preset, search, roles, urlSort, order])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, roles, urlSort, order])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
