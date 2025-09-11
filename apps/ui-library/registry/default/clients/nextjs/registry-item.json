@@ -14,15 +14,18 @@
   "files": [
     {
       "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-      "type": "registry:lib"
+      "type": "registry:lib",
+      "target": "lib/supabase/client.ts"
     },
     {
       "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-      "type": "registry:lib"
+      "type": "registry:lib",
+      "target": "lib/supabase/middleware.ts"
     },
     {
       "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-      "type": "registry:lib"
+      "type": "registry:lib",
+      "target": "lib/supabase/server.ts"
     }
   ]
 }
