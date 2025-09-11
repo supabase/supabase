@@ -1,7 +1,8 @@
-import { AuthProvidersLayout } from 'components/layouts/AuthLayout/AuthProvidersLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import OAuthServerSettingsForm from 'components/interfaces/Auth/OAuthApps/OAuthServerSettingsForm'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 
 const ProvidersPage: NextPageWithLayout = () => {
@@ -14,7 +15,14 @@ const ProvidersPage: NextPageWithLayout = () => {
 
 ProvidersPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthProvidersLayout>{page}</AuthProvidersLayout>
+    <AuthLayout>
+      <PageLayout
+        title="OAuth Server"
+        subtitle="Configure your project to act as an identity provider for third-party applications."
+      >
+        {page}
+      </PageLayout>
+    </AuthLayout>
   </DefaultLayout>
 )
 

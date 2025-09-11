@@ -18,11 +18,6 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
       label: 'Supabase Auth',
       href: `/project/${ref}/auth/providers`,
     },
-    {
-      label: 'OAuth Server',
-      badge: 'Beta',
-      href: `/project/${ref}/auth/oauth-server`,
-    },
     ...(authenticationThirdPartyAuth
       ? [
           {

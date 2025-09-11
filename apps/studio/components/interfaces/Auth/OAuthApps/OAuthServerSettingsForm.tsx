@@ -262,11 +262,6 @@ const OAuthServerSettingsForm = () => {
   return (
     <>
       <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">OAuth Server</ScaffoldSectionTitle>
-        <ScaffoldSectionDescription className="mb-4">
-          Turn your Supabase project into a full OAuth authorization server and act as an identity
-          provider for third-party applications.
-        </ScaffoldSectionDescription>
         <ScaffoldSectionContent>
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-10">
