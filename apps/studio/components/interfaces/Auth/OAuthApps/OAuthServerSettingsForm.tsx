@@ -41,7 +41,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useAuthConfigQuery } from '../../../../data/auth/auth-config-query'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -80,8 +80,8 @@ const OAuthServerSettingsForm = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [oAuthAppsCount, setOAuthAppsCount] = useState(0)
   const [showDynamicAppsConfirmation, setShowDynamicAppsConfirmation] = useState(false)
-
-  const canOAuthServerBeDisabled = oAuthAppsCount === 0
+  const [showDisableOAuthServerConfirmation, setShowDisableOAuthServerConfirmation] =
+    useState(false)
 
   const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
     PermissionAction.READ,
@@ -190,24 +190,41 @@ const OAuthServerSettingsForm = () => {
   const removeScope = (scopeToRemove: string) => {
     const currentScopes = form.getValues('availableScopes')
     const updatedScopes = currentScopes.filter((scope) => scope !== scopeToRemove)
-    form.setValue('availableScopes', updatedScopes)
+    form.setValue('availableScopes', updatedScopes, { shouldDirty: true })
   }
 
   const handleDynamicAppsToggle = (checked: boolean) => {
     if (checked) {
       setShowDynamicAppsConfirmation(true)
     } else {
-      form.setValue('GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION', false)
+      form.setValue('GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION', false, { shouldDirty: true })
     }
   }
 
   const confirmDynamicApps = () => {
-    form.setValue('GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION', true)
+    form.setValue('GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION', true, { shouldDirty: true })
     setShowDynamicAppsConfirmation(false)
   }
 
   const cancelDynamicApps = () => {
     setShowDynamicAppsConfirmation(false)
+  }
+
+  const handleOAuthServerToggle = (checked: boolean) => {
+    if (!checked && oAuthAppsCount > 0) {
+      setShowDisableOAuthServerConfirmation(true)
+    } else {
+      form.setValue('GOTRUE_OAUTH_SERVER_ENABLED', checked, { shouldDirty: true })
+    }
+  }
+
+  const confirmDisableOAuthServer = () => {
+    form.setValue('GOTRUE_OAUTH_SERVER_ENABLED', false, { shouldDirty: true })
+    setShowDisableOAuthServerConfirmation(false)
+  }
+
+  const cancelDisableOAuthServer = () => {
+    setShowDisableOAuthServerConfirmation(false)
   }
 
   const generateConfigUrls = (): ConfigUrl[] => {
@@ -288,10 +305,8 @@ const OAuthServerSettingsForm = () => {
                         <FormControl_Shadcn_>
                           <Switch
                             checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={
-                              !canUpdateConfig || (!canOAuthServerBeDisabled && field.value)
-                            }
+                            onCheckedChange={handleOAuthServerToggle}
+                            disabled={!canUpdateConfig}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -382,37 +397,48 @@ const OAuthServerSettingsForm = () => {
                         />
                       </div>
                     </CardContent>
+                    {oAuthAppsCount > 0 && (
+                      <CardFooter className="p-0">
+                        <Admonition
+                          className="border-none m-0 rounded-none"
+                          type="warning"
+                          title={`You have ${oAuthAppsCount} active OAuth app${oAuthAppsCount > 1 ? 's' : ''}`}
+                          description={
+                            <>
+                              Disabling the OAuth server will deactivate all OAuth apps and prevent
+                              new authentication flows.{' '}
+                              <Button
+                                type="default"
+                                className="block place-self-start mt-2"
+                                asChild
+                              >
+                                <Link href={`/project/${projectRef}/auth/oauth-apps`}>
+                                  View OAuth apps
+                                </Link>
+                              </Button>
+                            </>
+                          }
+                        />
+                      </CardFooter>
+                    )}
                   </>
                 )}
 
-                {canOAuthServerBeDisabled ? (
-                  <CardFooter className="justify-end space-x-2">
-                    {form.formState.isDirty && (
-                      <Button type="default" onClick={() => form.reset()}>
-                        Cancel
-                      </Button>
-                    )}
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      disabled={!canUpdateConfig || isSaving || !form.formState.isDirty}
-                      loading={isSaving}
-                    >
-                      Save changes
+                <CardFooter className="justify-end space-x-2">
+                  {form.formState.isDirty && (
+                    <Button type="default" onClick={() => form.reset()}>
+                      Cancel
                     </Button>
-                  </CardFooter>
-                ) : (
-                  <CardFooter className="p-0">
-                    <Admonition
-                      className="border-none m-0 rounded-none"
-                      type="warning"
-                      title="Cannot disable OAuth server while OAuth apps exist. Delete all OAuth apps first."
-                      description={
-                        <Link href={`/project/${projectRef}/auth/oauth-apps`}>View apps</Link>
-                      }
-                    />
-                  </CardFooter>
-                )}
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={!canUpdateConfig || isSaving || !form.formState.isDirty}
+                    loading={isSaving}
+                  >
+                    Save changes
+                  </Button>
+                </CardFooter>
               </Card>
 
               {/* Additional Settings Section - Only show when OAuth Server is enabled */}
@@ -534,6 +560,38 @@ const OAuthServerSettingsForm = () => {
           If dynamic client registration is enabled, the consent screen is forced to be enabled for
           all OAuth flows and can no longer be disabled. Disabling the consent screen opens up a
           CSRF vulnerability in your app.
+        </p>
+      </ConfirmationModal>
+
+      {/* Disable OAuth Server Confirmation Modal */}
+      <ConfirmationModal
+        variant="warning"
+        visible={showDisableOAuthServerConfirmation}
+        size="large"
+        title="Disable OAuth Server"
+        confirmLabel="Disable OAuth Server"
+        onConfirm={confirmDisableOAuthServer}
+        onCancel={cancelDisableOAuthServer}
+        alert={{
+          title: `You have ${oAuthAppsCount} active OAuth app${oAuthAppsCount > 1 ? 's' : ''} that will be deactivated.`,
+        }}
+      >
+        <p className="text-sm text-foreground-lighter pb-4">
+          Disabling the OAuth server will immediately deactivate all OAuth applications and prevent
+          new authentication flows from working. This action will affect all users currently using
+          your OAuth applications.
+        </p>
+        <p className="text-sm text-foreground-lighter pb-4">
+          <strong>What will happen:</strong>
+        </p>
+        <ul className="text-sm text-foreground-lighter pb-4 list-disc list-inside space-y-1">
+          <li>All OAuth apps will be deactivated</li>
+          <li>Existing access tokens will become invalid</li>
+          <li>Users won't be able to sign in through OAuth flows</li>
+          <li>Third-party integrations will stop working</li>
+        </ul>
+        <p className="text-sm text-foreground-lighter pb-4">
+          You can re-enable the OAuth server at any time.
         </p>
       </ConfirmationModal>
     </>

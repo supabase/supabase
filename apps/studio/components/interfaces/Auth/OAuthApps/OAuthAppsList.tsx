@@ -28,6 +28,7 @@ import {
 import CreateOAuthAppModal from './CreateOAuthAppModal'
 import UpdateOAuthAppSidePanel from './UpdateOAuthAppSidePanel'
 import DeleteOAuthAppModal from './DeleteOAuthAppModal'
+import { Admonition } from 'ui-patterns'
 
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useParams } from 'common'
@@ -152,7 +153,7 @@ const OAuthAppsList = () => {
     return <AlertError error={error} subject="Failed to retrieve database triggers" />
   }
 
-  if (!isOAuthServerEnabled) {
+  if (!isOAuthServerEnabled && oAuthApps.length === 0) {
     return (
       <div className="space-y-4">
         <Card>
@@ -176,6 +177,20 @@ const OAuthAppsList = () => {
   return (
     <>
       <div className="space-y-4">
+        {!isOAuthServerEnabled && (
+          <Admonition
+            type="warning"
+            title="OAuth Server is disabled"
+            description={
+              <div className="flex flex-col items-start gap-2">
+                Enable the OAuth server again to re-activate your OAuth apps.
+                <Button type="default" className="lg:absolute lg:right-4 lg:top-4" asChild>
+                  <Link href={`/project/${projectRef}/auth/oauth-server`}>Go to Settings</Link>
+                </Button>
+              </div>
+            }
+          />
+        )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
             <Input

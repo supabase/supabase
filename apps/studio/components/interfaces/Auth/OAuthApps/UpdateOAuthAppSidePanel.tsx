@@ -33,8 +33,9 @@ import { MultiSelector } from 'ui-patterns/multi-select'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
-import Panel from '../../../ui/Panel'
+import Panel from 'components/ui/Panel'
 import { Admonition } from 'ui-patterns'
+
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 
 interface UpdateOAuthAppSidePanelProps {
