@@ -84,9 +84,6 @@ export const ReportChartV2 = ({
     interval
   )
 
-  const finalChartData =
-    filledChartData && filledChartData.length > 0 && !isFillError ? filledChartData : chartData
-
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
 
   if (!isAvailable) {
