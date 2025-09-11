@@ -10,7 +10,7 @@ import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -71,7 +71,7 @@ export const Connect = () => {
   const isFrameworkSelected = frameworks.some((x) => x.key === selectedParent)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
-  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )

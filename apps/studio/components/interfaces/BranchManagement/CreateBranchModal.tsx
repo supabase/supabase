@@ -27,7 +27,7 @@ import { projectKeys } from 'data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
@@ -72,7 +72,7 @@ export const CreateBranchModal = () => {
   const gitlessBranching = useIsBranching2Enabled()
   const allowDataBranching = useFlag('allowDataBranching')
 
-  const { can: canCreateBranch } = useAsyncCheckProjectPermissions(
+  const { can: canCreateBranch } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'preview_branches'
   )

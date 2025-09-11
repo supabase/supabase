@@ -135,7 +135,7 @@ function useGetProjectPermissions(
 
 /** [Joshen] To be renamed to be useAsyncCheckPermissions, more generic as it covers both org and project perms */
 // Useful when you want to avoid layout changes while waiting for permissions to load
-export function useAsyncCheckProjectPermissions(
+export function useAsyncCheckPermissions(
   action: string,
   resource: string,
   data?: object,
