@@ -14,7 +14,6 @@ import 'reactflow/dist/style.css'
 import type { PlanMeta, PlanNodeData } from './types'
 import { Button, cn } from 'ui'
 import { MetaOverlay } from './meta-overlay'
-import { SubplanOverlay } from './subplan-overlay'
 import { ControlsOverlay } from './controls-overlay'
 import { NODE_TYPE } from './constants'
 import {
@@ -205,10 +204,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             planningTime={meta?.planningTime}
             executionTime={meta?.executionTime}
             jitTotalTime={meta?.jitTotalTime}
-            className={isFullscreen ? 'text-xs p-2' : 'text-[9px]'}
-          />
-          <SubplanOverlay
-            subplanRoots={meta?.subplanRoots}
             className={isFullscreen ? 'text-xs p-2' : 'text-[9px]'}
           />
         </div>
