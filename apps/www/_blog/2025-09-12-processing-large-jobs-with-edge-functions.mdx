@@ -48,10 +48,10 @@ Everything starts with the [database](/database), and Supabase is Postgres at it
 The database design for the application follows a clean pattern. You have content tables for storing articles and videos, queue tables for managing work, entity tables for NFL players and teams, and relationship tables linking everything together. For example:
 
 ```sql
-CREATE TABLE articles (
-  url TEXT UNIQUE NOT NULL,
-  headline TEXT,
-  content TEXT,
+create table articles (
+  url text unique not null,
+  headline text,
+  content text,
   embedding vector(1536)
 );
 ```
@@ -72,7 +72,7 @@ The Edge Function does the actual scraping. The trick is being selective about w
 
 ```tsx
 function isRelevantArticle(url: string): boolean {
-  return url.includes("/news/") && !url.includes("/video/");
+  return url.includes('/news/') && !url.includes('/video/')
 }
 ```
 
@@ -81,27 +81,27 @@ This simple filter prevents collecting promotional content or videos. You only w
 When parsing HTML, you need to handle relative URLs properly:
 
 ```tsx
-if (href.startsWith("/")) {
-  href = BASE_URL + href;
+if (href.startsWith('/')) {
+  href = BASE_URL + href
 }
 ```
 
 And always deduplicate within a single scraping session:
 
 ```tsx
-const seen = new Set<string>();
+const seen = new Set<string>()
 if (!seen.has(href)) {
-  seen.add(href);
-  articles.push({ url: href, site: "nfl" });
+  seen.add(href)
+  articles.push({ url: href, site: 'nfl' })
 }
 ```
 
 For database insertion, let the database handle duplicates rather than checking in your application:
 
 ```tsx
-const { error } = await supabase.from("articles").insert({ url, site });
-if (error && !error.message.includes("duplicate")) {
-  console.error(`Error inserting: ${url}`, error);
+const { error } = await supabase.from('articles').insert({ url, site })
+if (error && !error.message.includes('duplicate')) {
+  console.error(`Error inserting: ${url}`, error)
 }
 ```
 
@@ -123,10 +123,10 @@ The Edge Function finds unprocessed articles using a simple SQL query:
 
 ```tsx
 const { data } = await supabase
-  .from("articles")
-  .select("url, site")
-  .is("headline", null)  // Missing headline means unprocessed
-  .limit(50);
+  .from('articles')
+  .select('url, site')
+  .is('headline', null) // Missing headline means unprocessed
+  .limit(50)
 ```
 
 Then it routes based on the source site:
@@ -157,36 +157,36 @@ The processor handles one article at a time to stay within Edge Function timeout
 
 ```tsx
 const { data } = await supabase
-  .from("nfl_queue")
-  .select("id, url")
-  .eq("processed", false)
-  .order("created_at")
-  .limit(1);
+  .from('nfl_queue')
+  .select('id, url')
+  .eq('processed', false)
+  .order('created_at')
+  .limit(1)
 ```
 
 Content extraction requires site-specific CSS selectors:
 
 ```tsx
-const headline = $("h1").first().text().trim();
-const content = $(".article-body").text().trim() || $("article").text().trim();
+const headline = $('h1').first().text().trim()
+const content = $('.article-body').text().trim() || $('article').text().trim()
 ```
 
 Date parsing often needs custom logic for each site's format:
 
 ```tsx
-const dateText = $(".publish-date").text();
-const match = dateText.match(/(\w+ \d+, \d{4})/);
+const dateText = $('.publish-date').text()
+const match = dateText.match(/(\w+ \d+, \d{4})/)
 if (match) {
-  publication_date = new Date(match[1]);
+  publication_date = new Date(match[1])
 }
 ```
 
 After scraping, the article gets analyzed with AI to extract entities:
 
 ```tsx
-const result = await classifyArticle(headline, content);
-const playerIds = await upsertPlayers(supabase, result.players);
-const teamIds = await upsertTeams(supabase, result.teams);
+const result = await classifyArticle(headline, content)
+const playerIds = await upsertPlayers(supabase, result.players)
+const teamIds = await upsertTeams(supabase, result.teams)
 ```
 
 Finally, create the relationships and generate embeddings:
@@ -219,12 +219,12 @@ While the finally block prevents infinite loops, you still need visibility into 
 First, set up Sentry in your Edge Function:
 
 ```jsx
-import { captureException, init } from "https://deno.land/x/sentry/index.js";
+import { captureException, init } from 'https://deno.land/x/sentry/index.js'
 
 init({
-  dsn: Deno.env.get("SENTRY_DSN"),
-  environment: Deno.env.get("ENVIRONMENT") || "production"
-});
+  dsn: Deno.env.get('SENTRY_DSN'),
+  environment: Deno.env.get('ENVIRONMENT') || 'production',
+})
 ```
 
 Then wrap your processing logic with proper error capture:
@@ -264,11 +264,11 @@ Instead, treat interactions like any other job to be processed:
 
 ```tsx
 // Just record the interaction quickly
-await supabase.from("interaction_queue").insert({
+await supabase.from('interaction_queue').insert({
   article_url: url,
   user_id: userId,
-  interaction_type: "share"
-});
+  interaction_type: 'share',
+})
 ```
 
 Then let a separate cron job process the trending updates in batches:
@@ -285,10 +285,10 @@ The processor can handle multiple interactions efficiently:
 
 ```tsx
 const { data: interactions } = await supabase
-  .from("interaction_queue")
-  .select("*")
-  .eq("processed", false)
-  .limit(100);
+  .from('interaction_queue')
+  .select('*')
+  .eq('processed', false)
+  .limit(100)
 ```
 
 This keeps your user interface snappy while ensuring trending scores get updated reliably. If the trending processor goes down, interactions are safely queued and will be processed when it recovers.
@@ -304,8 +304,8 @@ const CONTEXT_SCORES = {
   championship: 9,
   trade: 6,
   injury: 4,
-  practice: 1
-};
+  practice: 1,
+}
 ```
 
 Prompt OpenAI with structured output:
@@ -323,11 +323,11 @@ const result = await [openai.chat](http://openai.chat).completions.create({
 Process articles in batches to manage API costs:
 
 ```tsx
-const unprocessed = articles.filter(a => !processedUrls.has(a.url)).slice(0, 10);
+const unprocessed = articles.filter((a) => !processedUrls.has(a.url)).slice(0, 10)
 
 for (const article of unprocessed) {
-  const analysis = await analyzeArticle(article);
-  await storeAnalysis(article.url, analysis);
+  const analysis = await analyzeArticle(article)
+  await storeAnalysis(article.url, analysis)
 }
 ```
 
@@ -370,7 +370,7 @@ typescript
 async function generateEmbeddingInBackground(article: Article) {
   *// Process content in chunks*
   const chunks = splitIntoChunks(article.content, 1000);
-  
+
   for (const chunk of chunks) {
     await new Promise(resolve => {
       *// Use background task for each chunk*
