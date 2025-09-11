@@ -162,10 +162,10 @@
   <pubDate>Wed, 17 May 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/customers/mendableai</guid>
-  <title>Mendable switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.</title>
-  <link>https://supabase.com/customers/mendableai</link>
-  <description>How Mendable boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.</description>
+  <guid>https://supabase.com/customers/firecrawl</guid>
+  <title>Firecrawl switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.</title>
+  <link>https://supabase.com/customers/firecrawl</link>
+  <description>How Firecrawl boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.</description>
   <pubDate>Fri, 05 May 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
