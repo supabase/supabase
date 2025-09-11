@@ -1,41 +1,42 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  Command_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandList_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-} from 'ui'
+import { useIntersectionObserver } from '@uidotdev/usehooks'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import type { Content } from 'data/content/content-query'
 import { SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
-import { useIntersectionObserver } from '@uidotdev/usehooks'
+import {
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from 'ui'
 
 type SnippetDropdownProps = {
   projectRef?: string
-  onSelect: (snippet: { id: string; name: string }) => void
-  trigger: React.ReactNode
+  trigger: ReactNode
   side?: 'top' | 'bottom' | 'left' | 'right'
   align?: 'start' | 'center' | 'end'
   className?: string
   autoFocus?: boolean
+  onSelect: (snippet: { id: string; name: string }) => void
 }
 
 type SqlContentItem = Extract<Content, { type: 'sql' }>
 
-export default function SnippetDropdown({
+export const SnippetDropdown = ({
   projectRef,
-  onSelect,
   trigger,
   side = 'bottom',
   align = 'end',
   className,
   autoFocus = false,
-}: SnippetDropdownProps) {
+  onSelect,
+}: SnippetDropdownProps) => {
   const [snippetSearch, setSnippetSearch] = useState('')
   const scrollRootRef = useRef<HTMLDivElement | null>(null)
 

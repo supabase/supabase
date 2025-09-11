@@ -1,33 +1,33 @@
-import type { CSSProperties, ReactNode } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import dayjs from 'dayjs'
-import { Plus } from 'lucide-react'
 import {
   DndContext,
   DragEndEvent,
   PointerSensor,
+  closestCenter,
   useSensor,
   useSensors,
-  closestCenter,
 } from '@dnd-kit/core'
-import { SortableContext, rectSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable'
+import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
+import { Plus } from 'lucide-react'
+import type { CSSProperties, ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import { SnippetDropdown } from 'components/interfaces/HomeNew/SnippetDropdown'
 import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
+import type { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
-import { Content } from 'data/content/content-query'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
+import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { Dashboards } from 'types'
-import type { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { uuidv4 } from 'lib/helpers'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
-import SnippetDropdown from 'components/interfaces/HomeNew/SnippetDropdown'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
@@ -70,10 +70,13 @@ export function CustomReportSection() {
 
   const { mutate: upsertContent } = useContentUpsertMutation()
 
-  const persistReport = (updated: Dashboards.Content) => {
-    if (!ref || !homeReport) return
-    upsertContent({ projectRef: ref, payload: { ...homeReport, content: updated } })
-  }
+  const persistReport = useCallback(
+    (updated: Dashboards.Content) => {
+      if (!ref || !homeReport) return
+      upsertContent({ projectRef: ref, payload: { ...homeReport, content: updated } })
+    },
+    [homeReport, ref, upsertContent]
+  )
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
