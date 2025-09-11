@@ -119,6 +119,7 @@ export const ReportChartV2 = ({
               format={report.format ?? undefined}
               xAxisKey={report.xAxisKey ?? 'timestamp'}
               yAxisKey={report.yAxisKey ?? dynamicAttributes[0]?.attribute}
+              hideHighlightedValue={report.hideHighlightedValue}
               highlightedValue={0}
               title={report.label}
               customDateFormat={undefined}
