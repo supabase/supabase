@@ -230,7 +230,7 @@ export const ControlsOverlay = ({
             onCheckedChange={(checked) => setShowMiniMap?.(Boolean(checked))}
           />
           <Label_Shadcn_ htmlFor="mini-map" className="text-xs">
-            Mini map
+            Map
           </Label_Shadcn_>
         </div>
       </div>
