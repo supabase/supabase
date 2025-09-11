@@ -186,7 +186,28 @@ functions:
           - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
           - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
           - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+      - id: server-side
+        name: Server-side
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
 
+          // Create a single supabase client for interacting with your database
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+              detectSessionInUrl: false
+            }
+          })          
+          ```
+        description: |
+          By default, the supabase client sets `persistSession` to true and attempts to store the session in local storage. When using the supabase client in an environment that doesn't support local storage, you might notice the following warning message being logged:
+
+          > No storage option exists to persist the session, which may result in unexpected behavior when using auth. If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
+
+          This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/gotrue-js/blob/master/src/lib/types.ts#L1027).
+          
   - id: auth-api
     title: 'Overview'
     notes: |
