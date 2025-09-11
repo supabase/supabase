@@ -39,9 +39,9 @@ for all using (
   and auth.role() = 'authenticated'
   and (storage.foldername(name))[1] = 'authenticated'
 );`,
-    detail_title: 'Allow any authenticated user access to a folder',
+    detail_title: 'Allow any authenticated user access to a bucket',
     detail_text:
-      "This will allow any authenticated user access to the folder named 'authenticated' in the bucket 'avatars'",
+      "This will allow any authenticated user access to the bucket 'avatars'",
     badges_label: '',
     badges: [],
     url: '',
