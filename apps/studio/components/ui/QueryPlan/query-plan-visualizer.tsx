@@ -132,7 +132,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         showMiniMap={showMiniMap}
         setShowMiniMap={setShowMiniMap}
         variant="toolbar"
-        className="mb-2 self-start"
+        className="mb-2"
       />
       <div className="relative w-full h-full border rounded-md">
         {meta?.errorMessage && (
