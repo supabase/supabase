@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "next build --turbopack",
     "build:analyze": "ANALYZE=true next build",
     "build:llms": "tsx --conditions=react-server ./scripts/llms.ts",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
