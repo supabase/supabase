@@ -4,6 +4,8 @@ import { Presets } from './Reports.types'
 
 export type QueryPerformanceSort = {
   column:
+    | 'query'
+    | 'rolname'
     | 'total_time'
     | 'prop_total_time'
     | 'calls'
@@ -36,7 +38,7 @@ export const useQueryPerformanceQuery = ({
     roles !== undefined && roles.length > 0
       ? `auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`
       : '',
-    searchQuery.length > 0 ? `statements.query ~ '${searchQuery}'` : '',
+    searchQuery.length > 0 ? `statements.query ~* '${searchQuery}'` : '',
   ]
     .filter((x) => x.length > 0)
     .join(' AND ')

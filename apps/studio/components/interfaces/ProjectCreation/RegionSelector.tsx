@@ -1,9 +1,8 @@
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -88,9 +87,14 @@ export const RegionSelector = ({
         <>
           <p>Select the region closest to your users for the best performance.</p>
           {showNonProdFields && (
-            <p className="text-warning">
-              Note: Only US (NV), Frankfurt and SG are supported for local/staging projects
-            </p>
+            <div className="mt-2 text-warning">
+              <p>Only these regions are supported for local/staging projects:</p>
+              <ul className="list-disc list-inside mt-1">
+                <li>East US (North Virginia)</li>
+                <li>Central EU (Frankfurt)</li>
+                <li>Southeast Asia (Singapore)</li>
+              </ul>
+            </div>
           )}
         </>
       }

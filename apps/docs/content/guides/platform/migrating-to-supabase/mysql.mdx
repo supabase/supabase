@@ -20,10 +20,10 @@ Before you begin the migration, you need to collect essential information about 
 
 ## Retrieve your Supabase host [#retrieve-supabase-host]
 
-1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
-   Make a note of your password, you will need this later. If you forget it, you can [reset it here](https://supabase.com/dashboard/project/_/database/settings).
+1. If you're new to Supabase, [create a project](/dashboard).
+   Make a note of your password, you will need this later. If you forget it, you can [reset it here](/dashboard/project/_/database/settings).
 
-1. On your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true)
+1. On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true)
 1. Under the Session pooler, click on the View parameters under the connect string. Note your Host (`$SUPABASE_HOST`).
 
 ![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/mysql/database-settings-host.png)
@@ -55,7 +55,7 @@ Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a fl
 1. Install pgloader.
 2. Create a configuration file (e.g., config.load).
 
-   For your destination, use your Supabase connection string with `Use connection pooling` enabled, and the mode set to `Session`. You can get the string from your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/general).
+   For your destination, use your Supabase connection string with `Use connection pooling` enabled, and the mode set to `Session`. You can get the string from your [`Database Settings`](/dashboard/project/_/settings/general).
 
    ```sql
    load database

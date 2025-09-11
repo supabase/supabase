@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import ReportChart from 'components/interfaces/Reports/ReportChart'
+import { useFlag, useParams } from 'common'
+import { ReportChart } from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -22,13 +22,13 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
-import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
@@ -38,7 +38,6 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
@@ -270,7 +269,7 @@ const DatabaseUsage = () => {
           orgPlan?.id &&
           (showChartsV2
             ? REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
+                <LazyComposedChartHandler
                   key={chart.id}
                   {...chart}
                   attributes={chart.attributes as MultiAttribute[]}
@@ -289,7 +288,7 @@ const DatabaseUsage = () => {
               ))
             : REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart, i) =>
                 chart.availableIn?.includes(orgPlan?.id) ? (
-                  <ComposedChartHandler
+                  <LazyComposedChartHandler
                     key={chart.id}
                     {...chart}
                     attributes={chart.attributes as MultiAttribute[]}
@@ -311,7 +310,6 @@ const DatabaseUsage = () => {
                   <ReportChart
                     key={`${chart.id}-${i}`}
                     chart={chart}
-                    className="!mb-0"
                     interval={selectedDateRange.interval}
                     startDate={selectedDateRange?.period_start?.date}
                     endDate={selectedDateRange?.period_end?.date}
