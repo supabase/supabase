@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "pnpm run content:build && next --port 3000",
-    "build": "pnpm run content:build && next build --turbopack",
+    "build": "pnpm run content:build && next build",
     "export": "next export",
     "start": "next start",
     "lint": "next lint",
