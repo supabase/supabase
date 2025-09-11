@@ -6,6 +6,8 @@ import { ChevronRightIcon } from 'lucide-react'
 interface Props {
   url: string
   announcement: string | ReactNode
+  /* Text or node to display on mobile */
+  announcementMobile?: string | ReactNode
   badge?: string | ReactNode
   target?: '_self' | '_blank' | string
   className?: string
@@ -16,6 +18,7 @@ interface Props {
 const AnnouncementBadge = ({
   url,
   announcement,
+  announcementMobile,
   badge,
   target = '_self',
   className,
@@ -56,7 +59,20 @@ const AnnouncementBadge = ({
           {badge}
         </Badge>
       )}
-      <span className="text-foreground announcement-text">{announcement}</span>
+      <span
+        className={cn('text-foreground announcement-text line-clamp-1 w-full', {
+          // only hide if announcementMobile is provided
+          'hidden md:[display:-webkit-box]': announcementMobile,
+        })}
+      >
+        {announcement}
+      </span>
+      {announcementMobile && (
+        <span className="text-foreground announcement-text-mobile md:hidden line-clamp-1">
+          {announcementMobile}
+        </span>
+      )}
+
       {hasArrow && (
         <ChevronRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}

@@ -3,7 +3,7 @@ export { default as uuidv4 } from './uuid'
 import { UIEvent } from 'react'
 import type { TablesData } from '../data/tables/tables-query'
 
-export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
+export const isAtBottom = ({ currentTarget }: UIEvent<HTMLElement>): boolean => {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
 }
 

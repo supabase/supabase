@@ -1,4 +1,4 @@
-import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash, ArrowUpCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -38,6 +38,8 @@ interface RowMenuProps {
   isError: boolean
   onEditClick: () => void
   onDeleteClick: () => void
+  hasUpdate?: boolean
+  onUpdateClick?: () => void
 }
 
 export const RowMenu = ({
@@ -48,6 +50,8 @@ export const RowMenu = ({
   isError,
   onEditClick,
   onDeleteClick,
+  hasUpdate = false,
+  onUpdateClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
   const statusName = getStatusName(pipelineStatus)
@@ -138,10 +142,24 @@ export const RowMenu = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+          <div className="relative">
+            <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+            {hasUpdate && (
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full" />
+            )}
+          </div>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end" className="w-52">
+          {hasUpdate && (
+            <>
+              <DropdownMenuItem className="space-x-2" onClick={() => onUpdateClick?.()}>
+                <ArrowUpCircle size={14} />
+                <p>Update available</p>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
           {hasPipelineAction && (
             <>
               <DropdownMenuItem
