@@ -17,7 +17,12 @@ export type QueryPerformanceSort = {
 }
 
 export type QueryPerformanceQueryOpts = {
-  preset: 'mostFrequentlyInvoked' | 'mostTimeConsuming' | 'slowestExecutionTime' | 'queryHitRate'
+  preset:
+    | 'mostFrequentlyInvoked'
+    | 'mostTimeConsuming'
+    | 'slowestExecutionTime'
+    | 'queryHitRate'
+    | 'unified'
   searchQuery?: string
   orderBy?: QueryPerformanceSort
   roles?: string[]
