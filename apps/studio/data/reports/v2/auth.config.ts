@@ -355,7 +355,7 @@ export const createAuthReportConfig = ({
     label: 'Auth Errors',
     valuePrecision: 0,
     hide: false,
-    showTooltip: false,
+    showTooltip: true,
     showLegend: false,
     showMaxValue: false,
     hideChartType: false,
