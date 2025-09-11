@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, Fragment } from 'react'
-import { useParams } from 'common'
 import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2 } from 'lucide-react'
-import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -39,7 +37,6 @@ interface CreateOAuthAppModalProps {
 }
 
 const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModalProps) => {
-  const { ref: projectRef } = useParams()
   const initialValues = {
     name: '',
     type: 'manual' as const,
@@ -90,17 +87,10 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
     fields: redirectUriFields,
     append: appendRedirectUri,
     remove: removeRedirectUri,
-    move: moveRedirectUri,
   } = useFieldArray({
     name: 'redirect_uris',
     control: form.control,
   })
-
-  const updateOrder = (result: any) => {
-    // Dropped outside of the list
-    if (!result.destination) return
-    moveRedirectUri(result.source.index, result.destination.index)
-  }
 
   const generateClientSecret = () => {
     // Generate a secure random client secret (32 characters)
@@ -244,44 +234,37 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
                     layout="vertical"
                     description="URLs where users will be redirected after authentication."
                   >
-                    <DragDropContext onDragEnd={(result: any) => updateOrder(result)}>
-                      <Droppable droppableId="redirect_uris_droppable">
-                        {(droppableProvided: DroppableProvided) => (
-                          <div ref={droppableProvided.innerRef} className="space-y-2">
-                            {redirectUriFields.map((field, index) => (
-                              <FormField_Shadcn_
-                                control={form.control}
-                                key={field.id}
-                                name={`redirect_uris.${index}.value`}
-                                render={({ field: inputField }) => (
-                                  <FormItem_Shadcn_>
-                                    <FormControl_Shadcn_>
-                                      <div className="flex items-center space-x-2">
-                                        <Input_Shadcn_
-                                          {...inputField}
-                                          placeholder="https://example.com/callback"
-                                          className="flex-1"
-                                        />
-                                        {redirectUriFields.length > 1 && (
-                                          <Button
-                                            type="default"
-                                            size="tiny"
-                                            icon={<Trash2 size={14} />}
-                                            onClick={() => removeRedirectUri(index)}
-                                          />
-                                        )}
-                                      </div>
-                                    </FormControl_Shadcn_>
-                                    <FormMessage_Shadcn_ />
-                                  </FormItem_Shadcn_>
-                                )}
-                              />
-                            ))}
-                            {droppableProvided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
+                    <div className="space-y-2">
+                      {redirectUriFields.map((field, index) => (
+                        <FormField_Shadcn_
+                          control={form.control}
+                          key={field.id}
+                          name={`redirect_uris.${index}.value`}
+                          render={({ field: inputField }) => (
+                            <FormItem_Shadcn_>
+                              <FormControl_Shadcn_>
+                                <div className="flex items-center space-x-2">
+                                  <Input_Shadcn_
+                                    {...inputField}
+                                    placeholder="https://example.com/callback"
+                                    className="flex-1"
+                                  />
+                                  {redirectUriFields.length > 1 && (
+                                    <Button
+                                      type="default"
+                                      size="tiny"
+                                      icon={<Trash2 size={14} />}
+                                      onClick={() => removeRedirectUri(index)}
+                                    />
+                                  )}
+                                </div>
+                              </FormControl_Shadcn_>
+                              <FormMessage_Shadcn_ />
+                            </FormItem_Shadcn_>
+                          )}
+                        />
+                      ))}
+                    </div>
                     <Button
                       type="default"
                       icon={<Plus strokeWidth={1.5} />}

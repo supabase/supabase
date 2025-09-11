@@ -397,30 +397,6 @@ const OAuthServerSettingsForm = () => {
                         />
                       </div>
                     </CardContent>
-                    {oAuthAppsCount > 0 && (
-                      <CardFooter className="p-0">
-                        <Admonition
-                          className="border-none m-0 rounded-none"
-                          type="warning"
-                          title={`You have ${oAuthAppsCount} active OAuth app${oAuthAppsCount > 1 ? 's' : ''}`}
-                          description={
-                            <>
-                              Disabling the OAuth server will deactivate all OAuth apps and prevent
-                              new authentication flows.{' '}
-                              <Button
-                                type="default"
-                                className="block place-self-start mt-2"
-                                asChild
-                              >
-                                <Link href={`/project/${projectRef}/auth/oauth-apps`}>
-                                  View OAuth apps
-                                </Link>
-                              </Button>
-                            </>
-                          }
-                        />
-                      </CardFooter>
-                    )}
                   </>
                 )}
 
@@ -577,7 +553,7 @@ const OAuthServerSettingsForm = () => {
         }}
       >
         <p className="text-sm text-foreground-lighter pb-4">
-          Disabling the OAuth server will immediately deactivate all OAuth applications and prevent
+          Disabling the OAuth Server will immediately deactivate all OAuth applications and prevent
           new authentication flows from working. This action will affect all users currently using
           your OAuth applications.
         </p>
@@ -591,7 +567,7 @@ const OAuthServerSettingsForm = () => {
           <li>Third-party integrations will stop working</li>
         </ul>
         <p className="text-sm text-foreground-lighter pb-4">
-          You can re-enable the OAuth server at any time.
+          You can re-enable the OAuth Server at any time.
         </p>
       </ConfirmationModal>
     </>
