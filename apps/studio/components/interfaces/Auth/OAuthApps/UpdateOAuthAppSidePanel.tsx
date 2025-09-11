@@ -34,7 +34,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
 import Panel from 'components/ui/Panel'
-import { Admonition } from 'ui-patterns'
 
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 
@@ -214,8 +213,10 @@ const UpdateOAuthAppSidePanel = ({
         loading={isUpdating}
         visible={visible}
         onCancel={closePanel}
-        header="Update OAuth app"
-        confirmText="Update app"
+        onDelete={() => onDeleteClick(selectedApp as OAuthApp)}
+        header="Update OAuth App"
+        confirmText="Update OAuth App"
+        deleteText="Delete OAuth App"
         onConfirm={() => {
           if (submitRef.current) submitRef.current.click()
         }}
@@ -423,22 +424,6 @@ const UpdateOAuthAppSidePanel = ({
                 )}
               />
 
-              <Separator />
-
-              <Admonition
-                type="destructive"
-                title="Delete OAuth App"
-                description="This action cannot be undone."
-              >
-                <Button
-                  type="danger"
-                  size="tiny"
-                  className="mt-4"
-                  onClick={() => onDeleteClick(selectedApp as OAuthApp)}
-                >
-                  Delete App
-                </Button>
-              </Admonition>
               <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
                 Update
               </Button>

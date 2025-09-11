@@ -33,6 +33,8 @@ interface CustomProps {
   customFooter?: React.ReactNode
   onCancel?: () => void
   cancelText?: String
+  deleteText?: String
+  onDelete?: () => void
   onConfirm?: () => void
   confirmText?: String
   triggerElement?: React.ReactNode
@@ -54,8 +56,10 @@ const SidePanel = ({
   customFooter = undefined,
   onConfirm,
   onCancel,
+  onDelete,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
+  deleteText = 'delete',
   triggerElement,
   defaultOpen,
   tooltip,
@@ -67,6 +71,13 @@ const SidePanel = ({
     customFooter
   ) : (
     <div className={__styles.footer}>
+      {onDelete && (
+        <div className="flex-1">
+          <Button type="danger" onClick={() => onDelete()}>
+            {deleteText}
+          </Button>
+        </div>
+      )}
       <div>
         <Button disabled={loading} type="default" onClick={() => (onCancel ? onCancel() : null)}>
           {cancelText}
