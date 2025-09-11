@@ -1,0 +1,30 @@
+---
+title: "Self-Hosting with Coolify"
+description: "Learn how to configure and deploy Supabase with Coolify."
+subtitle: "Learn how to configure and deploy Supabase with Coolify."
+---
+
+Coolify is an open-source, self-hosting platform that simplifies deploying and managing applications like Supabase. This guide assumes you are running the commands from the machine you intend to host from.
+
+## Before you begin
+
+You need the following installed on your system:
+
+- A server or virtual machine with a Linux-based OS (Ubuntu, Debian, etc.)
+- Root or sudo access to the server
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+- [Git](https://git-scm.com/downloads)
+- A domain name pointed to your server's IP (optional but recommended)
+
+## Running Supabase
+
+Follow these steps to start Supabase using Coolify:
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube.com/embed/NlBsJuUndws"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
