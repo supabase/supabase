@@ -204,7 +204,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             planningTime={meta?.planningTime}
             executionTime={meta?.executionTime}
             jitTotalTime={meta?.jitTotalTime}
-            className={isFullscreen ? 'text-xs p-2' : 'text-[9px]'}
+            className={isFullscreen ? 'p-2' : 'text-[10px]'}
           />
         </div>
 

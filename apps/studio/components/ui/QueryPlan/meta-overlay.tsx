@@ -20,7 +20,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
   return (
     <div
       className={cn(
-        'text-[9px] px-2 py-1 rounded-md border bg-foreground-muted/20 backdrop-blur-sm',
+        'text-xs px-2 py-1 rounded-md border bg-foreground-muted/20 backdrop-blur-sm',
         className
       )}
     >
