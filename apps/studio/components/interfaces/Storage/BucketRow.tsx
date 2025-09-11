@@ -47,7 +47,7 @@ export const BucketRow = ({ bucket, projectRef = '', isSelected = false }: Bucke
       {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
       <Link
         href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
-        className={'py-1 px-3 grow'}
+        className="py-1 pl-3 pr-2 grow"
       >
         <div className="flex items-center justify-between space-x-2 truncate w-full">
           <p
@@ -109,7 +109,7 @@ export const BucketRow = ({ bucket, projectRef = '', isSelected = false }: Bucke
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <div className="w-7 mr-1" />
+        <div className="mr-1 w-6" />
       )}
 
       <EditBucketModal visible={modal === `edit`} bucket={bucket} onClose={onClose} />
