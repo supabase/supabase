@@ -1,19 +1,21 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { Plus, Search } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
+import { replicationKeys } from 'data/replication/keys'
+import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
-import { replicationKeys } from 'data/replication/keys'
-import { useQueryClient } from '@tanstack/react-query'
 import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { DestinationPanel } from './DestinationPanel'
 import { DestinationRow } from './DestinationRow'
+import { EnableReplicationModal } from './EnableReplicationModal'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
 export const Destinations = () => {
@@ -26,11 +28,13 @@ export const Destinations = () => {
     error: sourcesError,
     isLoading: isSourcesLoading,
     isError: isSourcesError,
+    isSuccess: isSourcesSuccess,
   } = useReplicationSourcesQuery({
     projectRef,
   })
 
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  const replicationNotEnabled = isSourcesSuccess && !sourceId
 
   const {
     data: destinationsData,
@@ -52,7 +56,7 @@ export const Destinations = () => {
     projectRef,
   })
 
-  const anyDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
+  const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
 
   const filteredDestinations =
     filterString.length === 0
@@ -103,9 +107,11 @@ export const Destinations = () => {
               />
             </div>
           </div>
-          <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
-            Add destination
-          </Button>
+          {!!sourceId && (
+            <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
+              Add destination
+            </Button>
+          )}
         </div>
       </div>
 
@@ -119,7 +125,21 @@ export const Destinations = () => {
           />
         )}
 
-        {anyDestinations ? (
+        {replicationNotEnabled ? (
+          <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
+            <div className="flex flex-col gap-y-1">
+              <h3>Run analysis on your data via integrations with Replication</h3>
+              <p className="text-sm text-foreground-light">
+                Enable replication on your project to send data to your first destination
+              </p>
+            </div>
+            <div className="flex gap-x-2">
+              <EnableReplicationModal />
+              {/* [Joshen] Placeholder for when we have documentation */}
+              <DocsButton href="https://supabase.com/docs" />
+            </div>
+          </div>
+        ) : hasDestinations ? (
           <Table
             head={[
               <Table.th key="name">Name</Table.th>,
@@ -147,7 +167,7 @@ export const Destinations = () => {
                 />
               )
             })}
-          ></Table>
+          />
         ) : (
           !isSourcesLoading &&
           !isDestinationsLoading &&
@@ -180,7 +200,7 @@ export const Destinations = () => {
       {!isSourcesLoading &&
         !isDestinationsLoading &&
         filteredDestinations.length === 0 &&
-        anyDestinations && (
+        hasDestinations && (
           <div className="text-center py-8 text-foreground-light">
             <p>No destinations match "{filterString}"</p>
           </div>
