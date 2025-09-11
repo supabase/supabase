@@ -42,7 +42,6 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
-  hideHighlightedValue?: boolean
   displayDateInUtc?: boolean
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
   emptyStateMessage?: string
