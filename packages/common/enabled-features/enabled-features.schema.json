@@ -183,10 +183,6 @@
       "type": "boolean",
       "description": "Show the example projects in the project homepage"
     },
-    "project_homepage:show_all_client_libraries": {
-      "type": "boolean",
-      "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
-    },
 
     "project_addons:dedicated_ipv4_address": {
       "type": "boolean",
@@ -276,7 +272,6 @@
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
-    "project_homepage:show_all_client_libraries",
     "project_addons:dedicated_ipv4_address",
     "project_settings:custom_domains",
     "project_settings:show_disable_legacy_api_keys",
