@@ -175,7 +175,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           className="mb-2"
         />
       )}
-      <div ref={containerRef} className="relative w-full h-full border rounded-md">
+      <div ref={containerRef} className="relative w-full h-full border rounded-md bg-background">
         {meta?.errorMessage && (
           <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
             <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
