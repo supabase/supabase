@@ -52,7 +52,7 @@ export const QueryPerformanceMetrics = () => {
             </div>
             <div className="flex flex-col w-full divide-y divide-dashed last:[&>div]:pb-0">
               {card.values.map((value, index) => (
-                <div key={index} className="text-xs pb-0 flex justify-between items-center w-full">
+                <div key={index} className=" pb-0 flex justify-between items-center w-full">
                   <span className="text-xl font-mono">{value.value}</span>
                 </div>
               ))}
