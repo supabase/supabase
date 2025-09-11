@@ -50,53 +50,6 @@ export const ControlsOverlay = ({
       )}
     >
       <div className="flex flex-wrap gap-2 items-center">
-        <div className="font-medium">Display:</div>
-        <Label_Shadcn_ className="inline-flex items-center gap-1 text-xs">
-          <Checkbox_Shadcn_
-            checked={metricsVisibility.time}
-            onCheckedChange={(checked) =>
-              setMetricsVisibility((v) => ({ ...v, time: Boolean(checked) }))
-            }
-          />
-          <span>Time</span>
-        </Label_Shadcn_>
-        <Label_Shadcn_ className="inline-flex items-center gap-1 text-xs">
-          <Checkbox_Shadcn_
-            checked={metricsVisibility.rows}
-            onCheckedChange={(checked) =>
-              setMetricsVisibility((v) => ({ ...v, rows: Boolean(checked) }))
-            }
-          />
-          <span>Rows</span>
-        </Label_Shadcn_>
-        <Label_Shadcn_ className="inline-flex items-center gap-1 text-xs">
-          <Checkbox_Shadcn_
-            checked={metricsVisibility.cost}
-            onCheckedChange={(checked) =>
-              setMetricsVisibility((v) => ({ ...v, cost: Boolean(checked) }))
-            }
-          />
-          <span>Cost</span>
-        </Label_Shadcn_>
-        <Label_Shadcn_ className="inline-flex items-center gap-1 text-xs">
-          <Checkbox_Shadcn_
-            checked={metricsVisibility.buffers}
-            onCheckedChange={(checked) =>
-              setMetricsVisibility((v) => ({ ...v, buffers: Boolean(checked) }))
-            }
-          />
-          <span>Buffers</span>
-        </Label_Shadcn_>
-        <Label_Shadcn_ className="inline-flex items-center gap-1 text-xs">
-          <Checkbox_Shadcn_
-            checked={metricsVisibility.output}
-            onCheckedChange={(checked) =>
-              setMetricsVisibility((v) => ({ ...v, output: Boolean(checked) }))
-            }
-          />
-          <span>Output</span>
-        </Label_Shadcn_>
-
         <Popover_Shadcn_>
           <PopoverTrigger_Shadcn_ asChild>
             <Button
