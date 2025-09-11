@@ -68,7 +68,6 @@ const UpdateOAuthAppSidePanel = ({
     clientId: string
     clientSecret: string
   } | null>(null)
-  const [allowPublicApps, setAllowPublicApps] = useState(false)
 
   useEffect(() => {
     if (selectedApp) {
@@ -84,43 +83,6 @@ const UpdateOAuthAppSidePanel = ({
       form.reset(values)
     }
   }, [visible, selectedApp])
-
-  // Load OAuth server settings to check if public apps are allowed
-  useEffect(() => {
-    const loadOAuthServerSettings = () => {
-      try {
-        const stored = localStorage.getItem('oauth_server_settings')
-        if (stored) {
-          const parsedSettings = JSON.parse(stored)
-          setAllowPublicApps(parsedSettings.allowPublicApps || false)
-        }
-      } catch (error) {
-        console.error('Error loading OAuth server settings from localStorage:', error)
-      }
-    }
-
-    loadOAuthServerSettings()
-
-    // Listen for changes to OAuth server settings
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'oauth_server_settings') {
-        loadOAuthServerSettings()
-      }
-    }
-
-    // Listen for custom events when OAuth server settings are modified in the same tab
-    const handleOAuthServerSettingsChange = () => {
-      loadOAuthServerSettings()
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('oauth-server-settings-changed', handleOAuthServerSettingsChange)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('oauth-server-settings-changed', handleOAuthServerSettingsChange)
-    }
-  }, [])
 
   const FormSchema = z.object({
     name: z
@@ -278,25 +240,19 @@ const UpdateOAuthAppSidePanel = ({
                     <TableRow>
                       <TableHead key="users">Users</TableHead>
                       <TableHead key="last_used">Last used</TableHead>
-                      <TableHead key="last_used">Registration type</TableHead>
-                      <TableHead key="buttons" className="w-8"></TableHead>
+                      <TableHead key="registration_type">Registration type</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <TableRow>
                       <TableCell>{selectedApp?.users_count || 0}</TableCell>
                       <TableCell>
-                        {!!selectedApp?.last_used_at
+                        {selectedApp?.last_used_at
                           ? dayjs(selectedApp?.last_used_at).format('D MMM, YYYY')
                           : 'Never'}
                       </TableCell>
                       <TableCell className="w-48">
                         <Badge>{selectedApp?.type}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button type="danger" size="tiny">
-                          Revoke all tokens
-                        </Button>
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -445,33 +401,22 @@ const UpdateOAuthAppSidePanel = ({
                     layout="flex"
                     description={
                       <>
-                        {allowPublicApps ? (
-                          <>
-                            If enabled, the Authorization Code with PKCE (Proof Key for Code
-                            Exchange) flow can be used, particularly beneficial for applications
-                            that cannot securely store Client Secrets, such as native and mobile
-                            apps.{' '}
-                            <Link
-                              href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-foreground-light underline hover:text-foreground transition"
-                            >
-                              Learn more
-                            </Link>
-                          </>
-                        ) : (
-                          'Public OAuth apps are disabled. Enable "Allow Public OAuth Apps" in OAuth Server settings to use this feature.'
-                        )}
+                        If enabled, the Authorization Code with PKCE (Proof Key for Code Exchange)
+                        flow can be used, particularly beneficial for applications that cannot
+                        securely store Client Secrets, such as native and mobile apps.{' '}
+                        <Link
+                          href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-foreground-light underline hover:text-foreground transition"
+                        >
+                          Learn more
+                        </Link>
                       </>
                     }
                   >
                     <FormControl_Shadcn_>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={!allowPublicApps}
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
