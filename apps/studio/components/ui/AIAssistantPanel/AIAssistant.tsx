@@ -394,7 +394,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         <Conversation className={cn('flex-1')}>
           <AIAssistantHeader
             isChatLoading={isChatLoading}
-            onClearMessages={handleClearMessages}
+            onNewChat={snap.newChat}
             onCloseAssistant={snap.closeAssistant}
             showMetadataWarning={showMetadataWarning}
             updatedOptInSinceMCP={updatedOptInSinceMCP}
