@@ -1,9 +1,14 @@
 import { useMemo } from 'react'
-import { Database, Clock, Target } from 'lucide-react'
+import { Database, Target, List } from 'lucide-react'
 
 import { Card, CardContent } from 'ui'
+import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
 
 export const QueryPerformanceMetrics = () => {
+  const { data: queryMetrics, isLoading } = useQueryPerformanceQuery({
+    preset: 'queryMetrics',
+  })
+
   const cards = useMemo(() => {
     return [
       {
@@ -11,18 +16,8 @@ export const QueryPerformanceMetrics = () => {
         title: 'Slow Queries',
         values: [
           {
-            label: 'Unique',
-            value: '2',
-          },
-        ],
-      },
-      {
-        icon: <Clock size={14} strokeWidth={1} />,
-        title: 'Average Latency',
-        values: [
-          {
             label: 'Count',
-            value: '0.93s',
+            value: queryMetrics?.[0]?.slow_queries || '0',
           },
         ],
       },
@@ -31,19 +26,29 @@ export const QueryPerformanceMetrics = () => {
         title: 'Cache Hit Rate',
         values: [
           {
-            label: 'Average',
-            value: '99.9%',
+            label: 'Hit Rate',
+            value: queryMetrics?.[0]?.cache_hit_rate || '0%',
+          },
+        ],
+      },
+      {
+        icon: <List size={14} strokeWidth={1} />,
+        title: 'Average Rows Per Call',
+        values: [
+          {
+            label: 'Avg Rows',
+            value: queryMetrics?.[0]?.avg_rows_per_call || '0',
           },
         ],
       },
     ]
-  }, [])
+  }, [queryMetrics])
 
   return (
     <section className="px-6 pt-0 pb-4 grid grid-cols-3 gap-4 w-full">
       {cards.map((card, index) => (
         <Card key={index}>
-          <CardContent className="flex flex-col items-start gap-1 p-4">
+          <CardContent className="flex flex-col items-start gap-1 p-3">
             <div className="flex gap-2 items-center text-foreground-light">
               <span>{card.icon}</span>
               <span className="text-xs font-mono uppercase truncate max-w-[24ch]">
@@ -52,8 +57,8 @@ export const QueryPerformanceMetrics = () => {
             </div>
             <div className="flex flex-col w-full divide-y divide-dashed last:[&>div]:pb-0">
               {card.values.map((value, index) => (
-                <div key={index} className=" pb-0 flex justify-between items-center w-full">
-                  <span className="text-xl font-mono">{value.value}</span>
+                <div key={index} className="pb-0 flex justify-between items-center w-full">
+                  <span className="text-lg font-mono">{value.value}</span>
                 </div>
               ))}
             </div>

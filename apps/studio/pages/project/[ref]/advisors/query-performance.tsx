@@ -5,10 +5,6 @@ import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
-import {
-  QUERY_PERFORMANCE_PRESET_MAP,
-  QUERY_PERFORMANCE_REPORT_TYPES,
-} from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
