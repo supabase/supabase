@@ -334,6 +334,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'RedwoodJS',
           url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
         },
+        {
+          name: 'Rust',
+          url: '/guides/getting-started/quickstarts/rust',
+        },
         { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
       ],
     },
