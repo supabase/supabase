@@ -16,7 +16,7 @@ import {
   TextArea_Shadcn_,
   FormDescription_Shadcn_,
 } from 'ui'
-import { Alert, AlertTitle, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
+import { Alert, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -249,7 +249,12 @@ const FormContent = memo(function FormContent({
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative">
-                      <TextArea_Shadcn_ autoComplete="off" {...field} />
+                      <TextArea_Shadcn_
+                        autoComplete="off"
+                        rows={3}
+                        className="bg-foreground/[.026]"
+                        {...field}
+                      />
                     </div>
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
