@@ -4856,7 +4856,7 @@ functions:
         code: |
           ```swift
           let fileData = "Hello World".data(using: .utf8)!
-          
+
           try await supabase.storage
             .from("avatars")
             .uploadToSignedURL(
@@ -4873,7 +4873,7 @@ functions:
         code: |
           ```swift
           let fileURL = URL(fileURLWithPath: "/path/to/file.txt")
-          
+
           try await supabase.storage
             .from("avatars")
             .uploadToSignedURL(
