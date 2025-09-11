@@ -42,6 +42,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
+  hideHighlightedValue?: boolean
   displayDateInUtc?: boolean
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
   emptyStateMessage?: string
@@ -116,7 +117,7 @@ export function ComposedChart({
 
   useEffect(() => {
     updateStackedChartColors(isDarkMode ?? false)
-  }, [resolvedTheme])
+  }, [resolvedTheme, isDarkMode])
 
   const { Container } = useChartSize(size)
 
@@ -307,6 +308,7 @@ export function ComposedChart({
   return (
     <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
+        hideHighlightedValue={hideHighlightedValue}
         title={title}
         format={format}
         customDateFormat={customDateFormat}
@@ -318,7 +320,6 @@ export function ComposedChart({
         onChartStyleChange={onChartStyleChange}
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
-        hideHighlightedValue={hideHighlightedValue}
         docsUrl={docsUrl}
         syncId={syncId}
         data={data}
