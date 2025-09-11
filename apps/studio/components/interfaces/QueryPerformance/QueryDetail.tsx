@@ -57,16 +57,9 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
          "Workers Launched":3,
          "Hash Cond":"(t1.id = t2.id)",
          "Rows Removed by Join Filter":50,
-         "Group Key":[
-            "t1.category"
-         ],
-         "Sort Key":[
-            "(t1.created_at)",
-            "t2.name"
-         ],
-         "Presorted Key":[
-            "(t1.created_at)"
-         ],
+         "Group Key":["t1.category"],
+         "Sort Key":["(t1.created_at)","t2.name"],
+         "Presorted Key":["(t1.created_at)"],
          "Plans":[
             {
                "Node Type":"Seq Scan",
@@ -108,7 +101,20 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
                      "Actual Total Time":1.50,
                      "Actual Rows":120,
                      "Actual Loops":0,
-                     "Index Cond":"(id < 1000)"
+                     "Index Cond":"(id < 1000)",
+                     "Subplan Name":"SubPlan 1"
+                  }
+               ]
+            },
+            {
+               "Node Type":"Result",
+               "Subplan Name":"CTE recent_msgs",
+               "Plans":[
+                  {
+                     "Node Type":"CTE Scan",
+                     "CTE Name":"recent_msgs",
+                     "Actual Rows":50,
+                     "Actual Loops":1
                   }
                ]
             }
