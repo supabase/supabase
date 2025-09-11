@@ -3,10 +3,13 @@ import { useMemo } from 'react'
 
 import { useParams } from 'common'
 import {
-  ScaffoldContainer,
+  ScaffoldDescription,
   ScaffoldSection,
   ScaffoldSectionContent,
+  ScaffoldSectionDescription,
   ScaffoldSectionDetail,
+  ScaffoldSectionTitle,
+  ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -21,7 +24,7 @@ import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
     <img
-      className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
+      className="border rounded-lg shadow w-full sm:w-32 border-body"
       src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
       alt={`${title} cover`}
     />
@@ -51,44 +54,40 @@ const GitHubSection = () => {
   const GitHubTitle = `GitHub Integration`
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail title={GitHubTitle}>
-          <p>Connect any of your GitHub repositories to a project.</p>
-          <IntegrationImageHandler title="github" />
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
-          {isLoadingPermissions ? (
-            <GenericSkeletonLoader />
-          ) : !canReadGitHubConnection ? (
-            <NoPermission resourceText="view this organization's GitHub connections" />
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <h5 className="text-foreground mb-2">How does the GitHub integration work?</h5>
-                <p className="text-foreground-light text-sm mb-6">
-                  Connecting to GitHub allows you to sync preview branches with a chosen GitHub
-                  branch, keep your production branch in sync, and automatically create preview
-                  branches for every pull request.
-                </p>
-                {promptProPlanUpgrade && (
-                  <div className="mb-6">
-                    <UpgradeToPro
-                      primaryText="Upgrade to unlock GitHub integration"
-                      secondaryText="Connect your GitHub repository to automatically sync preview branches and deploy changes."
-                      source="github-integration"
-                    />
-                  </div>
-                )}
-                <div className={cn(promptProPlanUpgrade && 'opacity-25 pointer-events-none')}>
-                  <GitHubIntegrationConnectionForm connection={existingConnection} />
-                </div>
+    <ScaffoldSection isFullWidth>
+      <div className="flex items-center gap-6 mb-8">
+        <IntegrationImageHandler title="github" />
+        <div>
+          <ScaffoldSectionTitle>{GitHubTitle}</ScaffoldSectionTitle>
+          <ScaffoldSectionDescription className="mb-0 mt-1 max-w-2xl">
+            Connect your GitHub repositories to sync preview branches, keep production in sync, and
+            automatically create preview branches for pull requests.
+          </ScaffoldSectionDescription>
+        </div>
+      </div>
+      <div>
+        {isLoadingPermissions ? (
+          <GenericSkeletonLoader />
+        ) : !canReadGitHubConnection ? (
+          <NoPermission resourceText="view this organization's GitHub connections" />
+        ) : (
+          <div>
+            {promptProPlanUpgrade && (
+              <div className="mb-6">
+                <UpgradeToPro
+                  primaryText="Upgrade to unlock GitHub integration"
+                  secondaryText="Connect your GitHub repository to automatically sync preview branches and deploy changes."
+                  source="github-integration"
+                />
               </div>
+            )}
+            <div className={cn(promptProPlanUpgrade && 'opacity-25 pointer-events-none')}>
+              <GitHubIntegrationConnectionForm connection={existingConnection} />
             </div>
-          )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+          </div>
+        )}
+      </div>
+    </ScaffoldSection>
   )
 }
 
