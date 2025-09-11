@@ -1,10 +1,18 @@
 import { useTheme } from 'next-themes'
-import { useMemo, useState } from 'react'
-import ReactFlow, { Background, BackgroundVariant, MiniMap, type Node, type Edge } from 'reactflow'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import ReactFlow, {
+  Background,
+  BackgroundVariant,
+  MiniMap,
+  type Node,
+  type Edge,
+  type ReactFlowInstance,
+} from 'reactflow'
+import { Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 
 import type { PlanMeta, PlanNodeData } from './types'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 import { MetaOverlay } from './meta-overlay'
 import { SubplanOverlay } from './subplan-overlay'
 import { ControlsOverlay } from './controls-overlay'
@@ -89,6 +97,37 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
   const [showMiniMap, setShowMiniMap] = useState(true)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
+
+  // Sync with native fullscreen changes
+  useEffect(() => {
+    const handler = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement))
+      requestAnimationFrame(() => rfInstance?.fitView({ padding: 0.2 }))
+    }
+
+    document.addEventListener('fullscreenchange', handler)
+    return () => {
+      document.removeEventListener('fullscreenchange', handler)
+    }
+  }, [rfInstance])
+
+  const toggleFullscreen = async () => {
+    const el = containerRef.current as any
+    if (!el) return
+
+    try {
+      if (!isFullscreen) {
+        await el.requestFullscreen()
+      } else {
+        await document.exitFullscreen()
+      }
+    } catch (e) {
+      console.error('Failed to toggle fullscreen mode:', e)
+    }
+  }
 
   // Estimate node sizes from data (fixed row heights) and layout with Dagre
   const layout = useMemo(() => {
@@ -124,17 +163,19 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
 
   return (
     <div className={cn('w-full h-full flex flex-col', className)}>
-      <ControlsOverlay
-        metricsVisibility={metricsVisibility}
-        setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
-        heatmapMode={heatmapMode}
-        setHeatmapMode={(m) => setHeatmapMode(m)}
-        showMiniMap={showMiniMap}
-        setShowMiniMap={setShowMiniMap}
-        variant="toolbar"
-        className="mb-2"
-      />
-      <div className="relative w-full h-full border rounded-md">
+      {!isFullscreen && (
+        <ControlsOverlay
+          metricsVisibility={metricsVisibility}
+          setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
+          heatmapMode={heatmapMode}
+          setHeatmapMode={(m) => setHeatmapMode(m)}
+          showMiniMap={showMiniMap}
+          setShowMiniMap={setShowMiniMap}
+          variant="toolbar"
+          className="mb-2"
+        />
+      )}
+      <div ref={containerRef} className="relative w-full h-full border rounded-md">
         {meta?.errorMessage && (
           <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
             <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
@@ -155,6 +196,19 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         <SubplanOverlay subplanRoots={meta?.subplanRoots} />
         {selectedNode && (
           <DetailsPanel selectedNode={selectedNode} setSelectedNode={setSelectedNode} />
+        )}
+        {isFullscreen && (
+          <ControlsOverlay
+            metricsVisibility={metricsVisibility}
+            setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
+            heatmapMode={heatmapMode}
+            setHeatmapMode={(m) => setHeatmapMode(m)}
+            showMiniMap={showMiniMap}
+            setShowMiniMap={setShowMiniMap}
+            variant="overlay"
+            className="left-48 right-auto"
+            portal={false}
+          />
         )}
         <MetricsVisibilityContext.Provider value={metricsVisibility}>
           <HeatmapContext.Provider
@@ -187,6 +241,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               proOptions={{ hideAttribution: true }}
               onNodeClick={(e, node) => setSelectedNode(node.data as PlanNodeData)}
               onPaneClick={() => setSelectedNode(null)}
+              onInit={(instance) => setRfInstance(instance)}
             >
               <Background
                 gap={16}
@@ -206,6 +261,21 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             </ReactFlow>
           </HeatmapContext.Provider>
         </MetricsVisibilityContext.Provider>
+        <Button
+          type="default"
+          size="tiny"
+          icon={
+            isFullscreen ? (
+              <Minimize2 size={14} className="text-foreground" />
+            ) : (
+              <Maximize2 size={14} className="text-foreground" />
+            )
+          }
+          onClick={toggleFullscreen}
+          title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          className="absolute top-2 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border bg-foreground-muted/20 hover:bg-foreground-muted/30"
+        />
       </div>
     </div>
   )

@@ -28,6 +28,7 @@ type Props = {
   setShowMiniMap?: (show: boolean) => void
   variant?: 'overlay' | 'toolbar'
   className?: string
+  portal?: boolean
 }
 
 export const ControlsOverlay = ({
@@ -39,6 +40,7 @@ export const ControlsOverlay = ({
   setShowMiniMap,
   variant = 'overlay',
   className,
+  portal = true,
 }: Props) => {
   const [heatmapPopoverOpen, setHeatmapPopoverOpen] = useState(false)
 
@@ -46,7 +48,7 @@ export const ControlsOverlay = ({
     <div
       className={cn(
         variant === 'overlay'
-          ? 'absolute z-10 top-2 right-2 p-2 bg-foreground-muted/20 backdrop-blur-sm border'
+          ? 'absolute z-20 top-2 right-2 p-2 bg-foreground-muted/20 backdrop-blur-sm border rounded-md'
           : null,
         'text-xs',
         className
@@ -85,7 +87,7 @@ export const ControlsOverlay = ({
               className="p-0 min-w-[200px] pointer-events-auto"
               side="bottom"
               align="start"
-              portal
+              portal={portal}
               sameWidthAsTrigger
             >
               <Command_Shadcn_>
@@ -133,7 +135,7 @@ export const ControlsOverlay = ({
               icon={<Filter />}
             />
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={true}>
+          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={portal}>
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Show items</p>
               <div className="flex flex-col">
