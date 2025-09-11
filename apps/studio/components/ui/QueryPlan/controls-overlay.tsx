@@ -1,4 +1,5 @@
-import { Filter } from 'lucide-react'
+import { useState } from 'react'
+import { Filter, ChevronsUpDown, Check } from 'lucide-react'
 
 import type { MetricsVisibility, HeatmapMode } from './contexts'
 import {
@@ -9,13 +10,19 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import {
+  cn,
   Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  cn,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
 } from 'ui'
 
 type Props = {
@@ -39,12 +46,14 @@ export const ControlsOverlay = ({
   variant = 'overlay',
   className,
 }: Props) => {
+  const [heatmapPopoverOpen, setHeatmapPopoverOpen] = useState(false)
+
   return (
     <div
       className={cn(
         variant === 'overlay'
           ? 'absolute z-10 top-2 right-2 p-2 bg-foreground-muted/20 backdrop-blur-sm border'
-          : 'p-2 bg-foreground-muted/20 border',
+          : 'p-2',
         'text-xs',
         className
       )}
@@ -168,6 +177,70 @@ export const ControlsOverlay = ({
               <SelectItem value="cost">cost</SelectItem>
             </SelectContent>
           </Select>
+
+          <Popover_Shadcn_
+            open={heatmapPopoverOpen}
+            onOpenChange={setHeatmapPopoverOpen}
+            modal={false}
+          >
+            <PopoverTrigger_Shadcn_ asChild>
+              <Button
+                size="tiny"
+                type="default"
+                data-testid="schema-selector"
+                className={`w-full [&>span]:w-full !pr-1 space-x-1`}
+                iconRight={
+                  <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                }
+              >
+                {heatmapMode !== 'none' ? (
+                  <div className="w-full flex gap-1">
+                    <p className="text-foreground-lighter">heatmap</p>
+                    <p className="text-foreground">{heatmapMode}</p>
+                  </div>
+                ) : (
+                  <div className="w-full flex gap-1">
+                    <p className="text-foreground-lighter">Choose a heatmap…</p>
+                  </div>
+                )}
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_
+              className="p-0 min-w-[200px] pointer-events-auto"
+              side="bottom"
+              align="start"
+              portal
+              sameWidthAsTrigger
+            >
+              <Command_Shadcn_>
+                <CommandInput_Shadcn_ placeholder="Find schema..." />
+                <CommandList_Shadcn_>
+                  <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    {['time', 'rows', 'cost', 'none']?.map((heatmapItem) => (
+                      <CommandItem_Shadcn_
+                        key={heatmapItem}
+                        className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                        onSelect={() => {
+                          setHeatmapMode(heatmapItem as HeatmapMode)
+                          setHeatmapPopoverOpen(false)
+                        }}
+                        onClick={() => {
+                          setHeatmapMode(heatmapItem as HeatmapMode)
+                          setHeatmapPopoverOpen(false)
+                        }}
+                      >
+                        <span>{heatmapItem}</span>
+                        {heatmapMode === heatmapItem && (
+                          <Check className="text-brand" strokeWidth={2} size={16} />
+                        )}
+                      </CommandItem_Shadcn_>
+                    ))}
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
         </div>
         <div className="h-[14px] w-px bg-border mx-1" />
         <Label_Shadcn_ className="inline-flex items-center gap-1 text-xs">
