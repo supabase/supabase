@@ -25,10 +25,11 @@ export interface AnimatedCounterProps {
    */
   isPercentage?: boolean
   /**
-   * Whether to show a plus sign for positive values (useful for percentages)
-   * @default false
+   * Show a prefix before the value, useful for percentages or negative values
+   * @default undefined
    */
-  showPlus?: boolean
+  // showPlus?: boolean
+  prefix?: string
   /**
    * Additional CSS classes to apply
    */
@@ -37,7 +38,7 @@ export interface AnimatedCounterProps {
    * Animation easing function
    * @default 'linear'
    */
-  ease?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut'
+  ease?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | [number, number, number, number]
 }
 
 /**
@@ -71,9 +72,9 @@ export const AnimatedCounter: FC<AnimatedCounterProps> = ({
   duration = 2.5,
   delay = 0.25,
   isPercentage = false,
-  showPlus = false,
+  prefix = '',
   className = '',
-  ease = 'linear',
+  ease = [0.175, 0.885, 0.32, 1],
 }) => {
   const count = useMotionValue(0)
   const rounded = useTransform(count, (latest) =>
@@ -83,11 +84,11 @@ export const AnimatedCounter: FC<AnimatedCounterProps> = ({
   // Calculate padding based on final value
   const getPaddedValue = (currentValue: number, targetValue: number, isPercentage: boolean) => {
     if (isPercentage) {
-      const prefix = showPlus && currentValue > 0 ? '+' : showPlus ? '+' : ''
+      const prefixed = prefix && currentValue > 0 ? '+' : prefix ? prefix : ''
       const targetString = targetValue.toFixed(1)
       const currentString = currentValue.toFixed(1)
       const paddedCurrent = currentString.padStart(targetString.length, '0')
-      return `${prefix}${paddedCurrent}%`
+      return `${prefixed}${paddedCurrent}%`
     } else {
       const targetString = targetValue.toLocaleString()
       const currentString = currentValue.toLocaleString()
@@ -122,6 +123,7 @@ export const AnimatedCounter: FC<AnimatedCounterProps> = ({
         duration,
         delay,
         ease,
+        // type: 'spring',
       })
 
       return controls.stop

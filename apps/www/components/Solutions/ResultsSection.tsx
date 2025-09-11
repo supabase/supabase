@@ -86,8 +86,10 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
       }
     : undefined
 
+  const Component = isMobileOrTablet ? 'div' : motion.div
+
   return (
-    <motion.div
+    <Component
       className={cn(
         'absolute z-10 -top-10 2xl:top-[20%] left-[38%] md:top-[10%] md:left-[50%] lg:top-0 xl:left-0 w-fit h-[200px] lg:h-[400px]',
         'flex flex-col items-center gap-1',
@@ -99,16 +101,24 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
         <span className="label !text-[10px] !leading-3">Users</span>
         <div className="flex items-center gap-2">
           <span className="text-foreground-light text-2xl">
-            <AnimatedCounter value={230550} duration={2.5} delay={isMobileOrTablet ? 0 : 0.5} />
+            {isMobileOrTablet ? (
+              '5,230,550'
+            ) : (
+              <AnimatedCounter value={5230550} duration={2.68} delay={0.5} />
+            )}
           </span>
           <Badge variant="success" size="small" className="h-[24px] px-2">
-            <AnimatedCounter
-              value={13.4}
-              duration={2.5}
-              delay={isMobileOrTablet ? 0 : 0.5}
-              isPercentage={true}
-              showPlus={true}
-            />
+            {isMobileOrTablet ? (
+              '+28.3%'
+            ) : (
+              <AnimatedCounter
+                value={28.3}
+                duration={2.68}
+                delay={0.5}
+                isPercentage={true}
+                prefix="+"
+              />
+            )}
           </Badge>
         </div>
       </div>
@@ -119,7 +129,7 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
           'after:bg-gradient-to-b after:from-border-stronger after:to-transparent'
         )}
       />
-    </motion.div>
+    </Component>
   )
 }
 
