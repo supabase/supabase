@@ -5,7 +5,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --turbopack -p 8082",
-    "build": "next build --turbopack && ./../../scripts/upload-static-assets.sh",
+    "build": "next build && ./../../scripts/upload-static-assets.sh",
     "start": "next start",
     "lint": "next lint",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
