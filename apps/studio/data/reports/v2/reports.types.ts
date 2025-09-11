@@ -27,6 +27,7 @@ export interface ReportConfig<FiltersType = any> {
   dataProvider: ReportDataProvider<FiltersType>
   valuePrecision: number
   hide: boolean
+  hideHighlightedValue?: boolean
   showTooltip: boolean
   showLegend: boolean
   showMaxValue: boolean
