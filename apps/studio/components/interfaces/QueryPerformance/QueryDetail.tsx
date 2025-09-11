@@ -24,11 +24,7 @@ const SqlMonacoBlock = dynamic(
   }
 )
 
-export const QueryDetail = ({
-  // reportType,
-  selectedRow,
-  onClickViewSuggestion,
-}: QueryDetailProps) => {
+export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
   const report = QUERY_PERFORMANCE_COLUMNS
