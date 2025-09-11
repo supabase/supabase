@@ -35,59 +35,61 @@ export const ControlsOverlay = ({
     <div
       className={cn(
         variant === 'overlay'
-          ? 'absolute z-10 top-2 right-2 text-[10px] p-2 rounded bg-foreground-muted/20 backdrop-blur-sm border'
-          : 'text-[10px] p-2 rounded bg-foreground-muted/20 border',
+          ? 'absolute z-10 top-2 right-2 p-2 bg-foreground-muted/20 backdrop-blur-sm border'
+          : 'p-2 bg-foreground-muted/20 border',
+        'text-xs',
         className
       )}
     >
       <div className="flex flex-wrap gap-2 items-center">
-        <Label className="inline-flex items-center gap-1">
+        <div className="font-medium">Display:</div>
+        <Label className="inline-flex items-center gap-1 text-xs">
           <Checkbox
             checked={metricsVisibility.time}
             onCheckedChange={(checked) =>
               setMetricsVisibility((v) => ({ ...v, time: Boolean(checked) }))
             }
           />
-          <span>time</span>
+          <span>Time</span>
         </Label>
-        <Label className="inline-flex items-center gap-1">
+        <Label className="inline-flex items-center gap-1 text-xs">
           <Checkbox
             checked={metricsVisibility.rows}
             onCheckedChange={(checked) =>
               setMetricsVisibility((v) => ({ ...v, rows: Boolean(checked) }))
             }
           />
-          <span>rows</span>
+          <span>Rows</span>
         </Label>
-        <Label className="inline-flex items-center gap-1">
+        <Label className="inline-flex items-center gap-1 text-xs">
           <Checkbox
             checked={metricsVisibility.cost}
             onCheckedChange={(checked) =>
               setMetricsVisibility((v) => ({ ...v, cost: Boolean(checked) }))
             }
           />
-          <span>cost</span>
+          <span>Cost</span>
         </Label>
-        <Label className="inline-flex items-center gap-1">
+        <Label className="inline-flex items-center gap-1 text-xs">
           <Checkbox
             checked={metricsVisibility.buffers}
             onCheckedChange={(checked) =>
               setMetricsVisibility((v) => ({ ...v, buffers: Boolean(checked) }))
             }
           />
-          <span>buffers</span>
+          <span>Buffers</span>
         </Label>
-        <Label className="inline-flex items-center gap-1">
+        <Label className="inline-flex items-center gap-1 text-xs">
           <Checkbox
             checked={metricsVisibility.output}
             onCheckedChange={(checked) =>
               setMetricsVisibility((v) => ({ ...v, output: Boolean(checked) }))
             }
           />
-          <span>output</span>
+          <span>Output</span>
         </Label>
         <div className="h-[14px] w-px bg-border mx-1" />
-        <div className="flex items-center gap-x-1">
+        <div className="flex items-center gap-x-1 text-xs">
           <span>Heatmap:</span>
           <Select value={heatmapMode} onValueChange={(v) => setHeatmapMode(v as HeatmapMode)}>
             <SelectTrigger size="tiny" className="w-20">
@@ -102,7 +104,7 @@ export const ControlsOverlay = ({
           </Select>
         </div>
         <div className="h-[14px] w-px bg-border mx-1" />
-        <Label className="inline-flex items-center gap-1">
+        <Label className="inline-flex items-center gap-1 text-xs">
           <Checkbox
             checked={!!showMiniMap}
             onCheckedChange={(checked) => setShowMiniMap?.(Boolean(checked))}
