@@ -5,6 +5,7 @@ on:
     branches: ['master']
     paths:
       - 'apps/docs/**/*.ts*'
+      - 'apps/docs/spec/**/*.json'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
