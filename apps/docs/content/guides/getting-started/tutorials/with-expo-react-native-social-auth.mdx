@@ -159,7 +159,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
 Next, we need to protect our navigation to prevent unauthenticated users from accessing protected routes. We'll use the [Expo SplashScreen](https://docs.expo.dev/versions/latest/sdk/splash-screen/) to display a loading screen while fetching the user profile and verifying authentication status.
 
-#### Create the AuthContext
+#### Create the `AuthContext`
 
 Let's create [a React context](https://react.dev/learn/passing-data-deeply-with-context) to manage the authentication session, making it accessible from any component:
 
@@ -189,7 +189,7 @@ export const useAuthContext = () => useContext(AuthContext)
 
 </$CodeTabs>
 
-#### Create the AuthProvider
+#### Create the `AuthProvider`
 
 Next, let's create a provider component to manage the authentication session throughout our app:
 
@@ -275,9 +275,9 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 </$CodeTabs>
 
 
-#### Create the SplashScreenController
+#### Create the `SplashScreenController`
 
-Let's create a `SplashScreenController` component to display the [Expo SplashScreen](https://docs.expo.dev/versions/latest/sdk/splash-screen/) while the authentication session is loading:
+Let's create a `SplashScreenController` component to display the [Expo `SplashScreen`](https://docs.expo.dev/versions/latest/sdk/splash-screen/) while the authentication session is loading:
 
 <$CodeTabs>
 
@@ -563,7 +563,7 @@ For either option, you'll need to obtain a Service ID from the [Apple Developer 
 
 <Admonition type="note">
 
-To enable Apple sign-up on Android and Web, you'll also need to register the tunneled URL (e.g., `https://arnrer1-anonymous-8081.exp.direct`) obtained by running:
+To enable Apple sign-up on Android and Web, you'll also need to register the tunnelled URL (e.g., `https://arnrer1-anonymous-8081.exp.direct`) obtained by running:
 
 ```bash
 npx expo start --tunnel
@@ -704,6 +704,7 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
     and add the capabilities to the `Info.plist` file by following the [Expo documentation](https://docs.expo.dev/build-reference/ios-capabilities/#xcode).
 
     <Admonition type="note">
+
     Before testing the app, if you've already built the iOS app, clean the project artifacts:
 
     ```bash
@@ -821,7 +822,7 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
 
     </$CodeTabs>
 
-    We should now be able to test the authentication by running it on a phisical device or simulator:
+    We should now be able to test the authentication by running it on a physical device or simulator:
 
     ```bash
     npx expo run:android --no-build-cache
@@ -1067,7 +1068,7 @@ export default function LoginScreen() {
 
 For Google authentication, you can choose between the following options:
 
-- [GN Google Sign In Premium](https://react-native-google-signin.github.io/docs/install#sponsor-only-version) - that supports iOS, Android, and Web by using the latest Google's OneTap sign-in (but [it requires a subscription](https://universal-sign-in.com/))
+- [GN Google Sign In Premium](https://react-native-google-signin.github.io/docs/install#sponsor-only-version) - that supports iOS, Android, and Web by using the latest Google's One Tap sign-in (but [it requires a subscription](https://universal-sign-in.com/))
 - [@react-oauth/google](https://github.com/MomenSherif/react-oauth#googlelogin) - that supports Web (so it's not a good option for mobile, but it works)
 - Relying on the [signInWithOAuth](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) function of the Supabase Auth - that also supports iOS, Android and Web (__useful also to manage any other OAuth provider__)
 
@@ -1080,7 +1081,7 @@ The [GN Google Sign In Free](https://react-native-google-signin.github.io/docs/i
 
 For either option, you'll need to obtain a Web Client ID from the Google Cloud Engine, as explained in the [Google Sign In](https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platform&platform=react-native#react-native) guide.
 
-In this guide we will only use the [@react-oauth/google@latest](https://github.com/MomenSherif/react-oauth#googlelogin) option for the Web, and the [signInWithOAuth](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) for the mobile platforms.
+In this guide we will only use the [@react-oauth/google@latest](https://github.com/MomenSherif/react-oauth#googlelogin) option for the Web, and the [`signInWithOAuth`](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) for the mobile platforms.
 
 Before proceeding, you'll need to add a new environment variable to the `.env` file:
 
@@ -1211,7 +1212,7 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
     </$CodeTabs>
 
 
-    Test the authentication in your browser using the tunneled HTTPS URL:
+    Test the authentication in your browser using the tunnelled HTTPS URL:
 
     ```bash
     npx expo start --tunnel
@@ -1219,7 +1220,7 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
 
     <Admonition type="note">
 
-    To allow the Google Sign In to work, as we did before for Apple, you'll need to register the tunneled URL (e.g., `https://arnrer1-anonymous-8081.exp.direct`) obtained to the Authorized JavaScript origins list of your [Google Cloud Console's OAuth 2.0 Client IDs](https://console.cloud.google.com/auth/clients/) configuration.
+    To allow the Google Sign In to work, as we did before for Apple, you'll need to register the tunnelled URL (e.g., `https://arnrer1-anonymous-8081.exp.direct`) obtained to the Authorized JavaScript origins list of your [Google Cloud Console's OAuth 2.0 Client IDs](https://console.cloud.google.com/auth/clients/) configuration.
 
     </Admonition>
 
