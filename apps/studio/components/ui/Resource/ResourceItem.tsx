@@ -17,7 +17,6 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
         ref={ref}
         className={cn(
           'flex items-center justify-between text-sm gap-4',
-          '!border-b-0',
           onClick && 'cursor-pointer hover:bg-surface-200',
           className
         )}
@@ -25,7 +24,9 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
         {...props}
       >
         {media && (
-          <div className="text-foreground-light flex items-center justify-center">{media}</div>
+          <div className="hidden @lg:block text-foreground-light flex items-center justify-center">
+            {media}
+          </div>
         )}
         <div className="flex-1">{children}</div>
         {meta && <div>{meta}</div>}
