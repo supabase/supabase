@@ -3,7 +3,7 @@ title: 'Build a Social Auth App with Expo React Native'
 description: 'Learn how to implement social authentication in an app with Expo React Native and Supabase Database and Auth functionality.'
 ---
 
-This tutorial demonstrates how to build a React Native app with Expo that implements social authentication. The app showcases a complete authentication flow with protected navigation using:
+This tutorial demonstrates how to build a React Native app with [Expo](https://expo.dev) that implements social authentication. The app showcases a complete authentication flow with protected navigation using:
 
 - [Supabase Database](/docs/guides/database) - a Postgres database for storing your user data with [Row Level Security](/docs/guides/auth#row-level-security) to ensure data is protected and users can only access their own information.
 - [Supabase Auth](/docs/guides/auth) - enables users to log in through social authentication providers (Apple and Google).
@@ -20,12 +20,11 @@ If you get stuck while working through this guide, refer to the [full example on
 
 ## Building the app
 
-Let's start building the React Native app from scratch.
+Start by building the React Native app from scratch.
 
 ### Initialize a React Native app
 
-We can use [`expo`](https://docs.expo.dev/get-started/create-a-project/) to initialize
-an app called `expo-social-auth` with the [`standard template`](https://docs.expo.dev/more/create-expo/#--template):
+Use [Expo](https://docs.expo.dev/get-started/create-a-project/) to initialize an app called `expo-social-auth` with the [standard template](https://docs.expo.dev/more/create-expo/#--template):
 
 ```bash
 npx create-expo-app@latest
@@ -33,13 +32,18 @@ npx create-expo-app@latest
 cd expo-social-auth
 ```
 
-Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
+Install the additional dependencies:
+
+- [supabase-js](https://github.com/supabase/supabase-js)
+- [@react-native-async-storage/async-storage](https://github.com/react-native-async-storage/async-storage) - A key-value store for React Native.
+- [expo-secure-store](https://docs.expo.dev/versions/latest/sdk/securestore/) - Provides a way to securely store key-value pairs locally on the device.
+- [expo-splash-screen](https://docs.expo.dev/versions/latest/sdk/splash-screen/) - Provides a way to programmatically manage the splash screen.
 
 ```bash
 npx expo install @supabase/supabase-js @react-native-async-storage/async-storage expo-secure-store expo-splash-screen
 ```
 
-Now let's create a helper file to initialize the Supabase client for both web and React Native platforms. We'll use platform-specific [storage adapters](https://docs.expo.dev/develop/user-interface/store-data/): [Expo SecureStore](https://docs.expo.dev/develop/user-interface/store-data/#secure-storage) for mobile and [AsyncStorage](https://docs.expo.dev/develop/user-interface/store-data/#async-storage) for web.
+Now, create a helper file to initialize the Supabase client for both web and React Native platforms using platform-specific [storage adapters](https://docs.expo.dev/develop/user-interface/store-data/): [Expo SecureStore](https://docs.expo.dev/develop/user-interface/store-data/#secure-storage) for mobile and [AsyncStorage](https://docs.expo.dev/develop/user-interface/store-data/#async-storage) for web.
 
 <Tabs
   scrollable
@@ -49,7 +53,7 @@ Now let's create a helper file to initialize the Supabase client for both web an
   queryGroup="auth-store"
 >
   <TabPanel id="async-storage" label="AsyncStorage">
-
+{/* TODO: Future task to extract to repo and transclude */}
     <$CodeTabs>
 
     ```ts name=lib/supabase.web.ts
@@ -89,7 +93,7 @@ Now let's create a helper file to initialize the Supabase client for both web an
   </TabPanel>
   <TabPanel id="secure-store" label="SecureStore">
 
-    If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
+    If you want to encrypt the user's session information, use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
 
     Make sure that:
     - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
@@ -141,10 +145,10 @@ Now let's create a helper file to initialize the Supabase client for both web an
 
 ### Set up environment variables
 
-We need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+You need the API URL and the `anon` key copied [earlier](#get-the-api-keys).
 These variables are safe to expose in your Expo app since Supabase has [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled on your database.
 
-Let's create a `.env` file containing these variables:
+Create a `.env` file containing these variables:
 
 <$CodeTabs>
 
@@ -157,11 +161,11 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
 ### Set up protected navigation
 
-Next, we need to protect our navigation to prevent unauthenticated users from accessing protected routes. We'll use the [Expo SplashScreen](https://docs.expo.dev/versions/latest/sdk/splash-screen/) to display a loading screen while fetching the user profile and verifying authentication status.
+Next, you need to protect app navigation to prevent unauthenticated users from accessing protected routes. Use the [Expo SplashScreen](https://docs.expo.dev/versions/latest/sdk/splash-screen/) to display a loading screen while fetching the user profile and verifying authentication status.
 
 #### Create the `AuthContext`
 
-Let's create [a React context](https://react.dev/learn/passing-data-deeply-with-context) to manage the authentication session, making it accessible from any component:
+Create [a React context](https://react.dev/learn/passing-data-deeply-with-context) to manage the authentication session, making it accessible from any component:
 
 <$CodeTabs>
 
@@ -190,7 +194,7 @@ export const useAuthContext = () => useContext(AuthContext)
 
 #### Create the `AuthProvider`
 
-Next, let's create a provider component to manage the authentication session throughout our app:
+Next, create a provider component to manage the authentication session throughout the app:
 
 <$CodeTabs>
 
@@ -280,7 +284,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
 #### Create the `SplashScreenController`
 
-Let's create a `SplashScreenController` component to display the [Expo `SplashScreen`](https://docs.expo.dev/versions/latest/sdk/splash-screen/) while the authentication session is loading:
+Create a `SplashScreenController` component to display the [Expo `SplashScreen`](https://docs.expo.dev/versions/latest/sdk/splash-screen/) while the authentication session is loading:
 
 <$CodeTabs>
 
@@ -305,7 +309,7 @@ export function SplashScreenController() {
 
 ### Create a logout component
 
-Let's create a logout button component to handle user sign-out:
+Create a logout button component to handle user sign-out:
 
 <$CodeTabs>
 
@@ -329,7 +333,7 @@ export default function SignOutButton() {
 
 </$CodeTabs>
 
-and add it to the `app/(tabs)/index.tsx` file, that will be used to display the user profile data and the logout button:
+And add it to the `app/(tabs)/index.tsx` file used to display the user profile data and the logout button:
 
 <$CodeTabs>
 
@@ -396,7 +400,7 @@ const styles = StyleSheet.create({
 
 ### Create a login screen
 
-Next, let's create a basic login screen component:
+Next, create a basic login screen component:
 
 <$CodeTabs>
 
@@ -439,9 +443,9 @@ const styles = StyleSheet.create({
 
 #### Implement protected routes
 
-Now let's wrap our navigation with the `AuthProvider` and `SplashScreenController`.
+Wrap the navigation with the `AuthProvider` and `SplashScreenController`.
 
-Using [Expo Router's protected routes](https://docs.expo.dev/router/advanced/authentication/#using-protected-routes), we can secure our navigation:
+Using [Expo Router's protected routes](https://docs.expo.dev/router/advanced/authentication/#using-protected-routes), you can secure navigation:
 
 <$CodeTabs>
 
@@ -501,15 +505,15 @@ export default function RootLayout() {
 
 </$CodeTabs>
 
-We can now test the app by running:
+You can now test the app by running:
 
 ```bash
 npx expo prebuild
 npx expo start --clear
 ```
 
-Verify that the app works as expected: the splash screen displays while fetching the user profile, and the login page appears even when attempting to navigate to the home screen using the `Link` button.
-
+Verify that the app works as expected. The splash screen displays while fetching the user profile, and the login page appears even when attempting to navigate to the home screen using the `Link` button.
+{/* TODO: HERE */}
 <Admonition type="note">
 
 By default Supabase Auth requires email verification before a session is created for the users. To support email verification you need to [implement deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=react-native)!
