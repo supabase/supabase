@@ -25,11 +25,10 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
-  const [{ preset: urlPreset, search: searchQuery, roles }] = useQueryStates({
+  const [{ search: searchQuery, roles }] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
-    preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
   })
 
@@ -37,12 +36,10 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const hooks = queriesFactory(config.queries, ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
 
-  const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
-
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
     orderBy: sortConfig || undefined,
-    preset,
+    preset: 'unified',
     roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
   })
