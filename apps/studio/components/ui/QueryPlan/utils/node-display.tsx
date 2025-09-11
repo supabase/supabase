@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react'
 import { capitalize } from 'lodash'
 
 import type { PlanNodeData } from '../types'
@@ -14,8 +15,8 @@ import { stripParens } from './formats'
  * Returns the list of header lines rendered above the metrics list.
  * Order matches the visual rendering in PlanNode.
  */
-export function computeHeaderLines(d: PlanNodeData): string[] {
-  const lines: string[] = []
+export function computeHeaderLines(d: PlanNodeData): ReactNode[] {
+  const lines: ReactNode[] = []
 
   // CTE/Subplan badge
   if (d.cteName) {
@@ -27,26 +28,62 @@ export function computeHeaderLines(d: PlanNodeData): string[] {
   if (d.parallelAware) {
     lines.push('[Parallel]')
   }
+
+  // Keys (Group/Sort with presorted markers)
+  const groupKeys = formatKeys(d.groupKey)
+  if (groupKeys)
+    lines.push(
+      <>
+        <span className="text-foreground-light">by</span> {groupKeys}
+      </>
+    )
+  const sortKeys = formatKeys(d.sortKey, d.presortedKey)
+  if (sortKeys)
+    lines.push(
+      <>
+        <span className="text-foreground-light">by</span> {sortKeys}
+      </>
+    )
+
   // Join type
   if (d.joinType) {
-    lines.push(`${capitalize(d.joinType)} join`)
+    lines.push(
+      <>
+        {capitalize(d.joinType)} <span className="text-foreground-light">join</span>
+      </>
+    )
   }
+
   // Join condition or relation
   const cond = d.hashCond ?? d.mergeCond ?? d.joinFilter
   if (cond) {
-    lines.push(`on ${stripParens(cond)}`)
+    lines.push(
+      <>
+        <span className="text-foreground-light">on</span> {stripParens(cond)}
+      </>
+    )
   } else if (d.relationName) {
-    lines.push(`on ${d.relationName}${d.alias ? ` as ${d.alias}` : ''}`)
+    lines.push(
+      <>
+        <span className="text-foreground-light">on</span> {d.relationName}
+        {d.alias ? (
+          <>
+            {' '}
+            <span className="text-foreground-light">as</span> {d.alias}
+          </>
+        ) : null}
+      </>
+    )
   }
+
   // Index name when label includes "index"
   if (d.indexName && d.label?.toLowerCase().includes('index')) {
-    lines.push(`using ${d.indexName}`)
+    lines.push(
+      <>
+        <span className="text-foreground-light">using</span> {d.indexName}
+      </>
+    )
   }
-  // Keys (Group/Sort with presorted markers)
-  const groupKeys = formatKeys(d.groupKey)
-  if (groupKeys) lines.push(`by ${groupKeys}`)
-  const sortKeys = formatKeys(d.sortKey, d.presortedKey)
-  if (sortKeys) lines.push(`by ${sortKeys}`)
 
   return lines
 }

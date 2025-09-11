@@ -146,7 +146,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
       {headerLines.length > 0 && (
         <div className="px-2 bg-alternative pb-3">
           {headerLines.map((line, i) => (
-            <div key={i} className="text-[0.55rem] text-foreground-lighter break-words h-[15px]">
+            <div key={i} className="text-[0.55rem] break-words h-[15px]">
               {line}
             </div>
           ))}
