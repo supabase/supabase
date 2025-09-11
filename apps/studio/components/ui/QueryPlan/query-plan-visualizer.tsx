@@ -4,6 +4,7 @@ import ReactFlow, { Background, BackgroundVariant, MiniMap, type Node, type Edge
 import 'reactflow/dist/style.css'
 
 import type { PlanMeta, PlanNodeData } from './types'
+import { cn } from 'ui'
 import { MetaOverlay } from './meta-overlay'
 import { SubplanOverlay } from './subplan-overlay'
 import { ControlsOverlay } from './controls-overlay'
@@ -21,7 +22,7 @@ import { getLayoutedElementsViaDagre } from './utils/layout'
 import { estimateNodeHeight } from './utils/node-display'
 import { DetailsPanel } from './details-panel'
 
-export const QueryPlanVisualizer = ({ json }: { json: string }) => {
+export const QueryPlanVisualizer = ({ json, className }: { json: string; className?: string }) => {
   const { nodes, edges, meta } = useMemo((): {
     nodes: Node<PlanNodeData>[]
     edges: Edge[]
@@ -121,7 +122,7 @@ export const QueryPlanVisualizer = ({ json }: { json: string }) => {
   )
 
   return (
-    <div className="w-full h-full border relative">
+    <div className={cn('w-full h-full border relative', className)}>
       {meta?.errorMessage && (
         <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
           <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
