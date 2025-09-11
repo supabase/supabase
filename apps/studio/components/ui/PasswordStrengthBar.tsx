@@ -1,4 +1,5 @@
 import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
+import { Admonition } from 'ui'
 
 interface Props {
   passwordStrengthScore: number
@@ -46,6 +47,12 @@ const PasswordStrengthBar = ({
         </span>
         .
       </p>
+      <Admonition type="danger">
+        Be careful when using special characters in your database password as they may cause
+        problems when connecting. See the
+        [documentation](https://supabase.com/docs/guides/database/postgres/roles#special-symbols-in-passwords)
+        for recommendations.
+      </Admonition>
     </>
   )
 }
