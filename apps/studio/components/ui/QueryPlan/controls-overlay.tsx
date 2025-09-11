@@ -71,7 +71,6 @@ export const ControlsOverlay = ({
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Show items</p>
               <div className="flex flex-col">
-                {/* here start */}
                 <div className="group flex items-center justify-between py-0.5">
                   <div className="flex items-center gap-x-2">
                     <Checkbox_Shadcn_
@@ -151,13 +150,11 @@ export const ControlsOverlay = ({
                     </Label_Shadcn_>
                   </div>
                 </div>
-                {/* here end */}
               </div>
             </div>
           </PopoverContent_Shadcn_>
         </Popover_Shadcn_>
 
-        <div className="h-[14px] w-px bg-border mx-1" />
         <div className="flex items-center gap-x-1 text-xs">
           <Popover_Shadcn_
             open={heatmapPopoverOpen}
@@ -223,7 +220,6 @@ export const ControlsOverlay = ({
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </div>
-        <div className="h-[14px] w-px bg-border mx-1" />
         <div className="flex items-center gap-x-1">
           <Switch
             id="mini-map"
