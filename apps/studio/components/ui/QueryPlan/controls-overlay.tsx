@@ -16,6 +16,7 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
+  Switch,
 } from 'ui'
 
 type Props = {
@@ -223,13 +224,16 @@ export const ControlsOverlay = ({
           </Popover_Shadcn_>
         </div>
         <div className="h-[14px] w-px bg-border mx-1" />
-        <Label_Shadcn_ className="inline-flex items-center gap-1 text-xs">
-          <Checkbox_Shadcn_
+        <div className="flex items-center gap-x-1">
+          <Switch
+            id="mini-map"
             checked={!!showMiniMap}
             onCheckedChange={(checked) => setShowMiniMap?.(Boolean(checked))}
           />
-          <span>Mini map</span>
-        </Label_Shadcn_>
+          <Label_Shadcn_ htmlFor="mini-map" className="text-xs">
+            Mini map
+          </Label_Shadcn_>
+        </div>
       </div>
     </div>
   )
