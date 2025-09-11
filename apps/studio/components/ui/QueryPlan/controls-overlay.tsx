@@ -48,7 +48,7 @@ export const ControlsOverlay = ({
     <div
       className={cn(
         variant === 'overlay'
-          ? 'absolute z-20 top-2 right-2 p-2 bg-foreground-muted/20 backdrop-blur-sm border rounded-md'
+          ? 'px-2 py-1 bg-foreground-muted/20 backdrop-blur-sm border rounded-md'
           : null,
         'text-xs',
         className

@@ -5,7 +5,7 @@ type Props = {
 export const SubplanOverlay = ({ subplanRoots }: Props) => {
   if (!subplanRoots || subplanRoots.length === 0) return null
   return (
-    <div className="absolute z-10 top-14 left-2 text-[10px] px-2 py-1 rounded bg-foreground-muted/20 backdrop-blur-sm border">
+    <div className="text-[10px] px-2 py-1 rounded bg-foreground-muted/20 backdrop-blur-sm border">
       <div>
         <span className="font-bold">Subplans:</span>{' '}
         {subplanRoots.map((sp, i) => (

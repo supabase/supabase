@@ -188,27 +188,29 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             </div>
           </div>
         )}
-        <MetaOverlay
-          planningTime={meta?.planningTime}
-          executionTime={meta?.executionTime}
-          jitTotalTime={meta?.jitTotalTime}
-        />
-        <SubplanOverlay subplanRoots={meta?.subplanRoots} />
+        <div className="absolute z-10 top-2 left-2 right-2 flex items-center justify-start pr-8 gap-x-2">
+          {isFullscreen && (
+            <ControlsOverlay
+              metricsVisibility={metricsVisibility}
+              setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
+              heatmapMode={heatmapMode}
+              setHeatmapMode={(m) => setHeatmapMode(m)}
+              showMiniMap={showMiniMap}
+              setShowMiniMap={setShowMiniMap}
+              variant="overlay"
+              portal={false}
+            />
+          )}
+          <MetaOverlay
+            planningTime={meta?.planningTime}
+            executionTime={meta?.executionTime}
+            jitTotalTime={meta?.jitTotalTime}
+          />
+          <SubplanOverlay subplanRoots={meta?.subplanRoots} />
+        </div>
+
         {selectedNode && (
           <DetailsPanel selectedNode={selectedNode} setSelectedNode={setSelectedNode} />
-        )}
-        {isFullscreen && (
-          <ControlsOverlay
-            metricsVisibility={metricsVisibility}
-            setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
-            heatmapMode={heatmapMode}
-            setHeatmapMode={(m) => setHeatmapMode(m)}
-            showMiniMap={showMiniMap}
-            setShowMiniMap={setShowMiniMap}
-            variant="overlay"
-            className="left-48 right-auto"
-            portal={false}
-          />
         )}
         <MetricsVisibilityContext.Provider value={metricsVisibility}>
           <HeatmapContext.Provider

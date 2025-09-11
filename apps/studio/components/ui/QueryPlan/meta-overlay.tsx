@@ -10,7 +10,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime }: Props
   }
 
   return (
-    <div className="absolute z-10 top-2 left-2 text-[10px] px-2 py-1 rounded-md border bg-foreground-muted/20 backdrop-blur-sm">
+    <div className="text-[10px] px-2 py-1 rounded-md border bg-foreground-muted/20 backdrop-blur-sm">
       <div className="flex gap-3">
         {planningTime !== undefined && <span>planning: {planningTime} ms</span>}
         {executionTime !== undefined && <span>exec: {executionTime} ms</span>}
