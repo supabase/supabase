@@ -125,7 +125,7 @@ export const Destinations = () => {
           />
         )}
 
-        {replicationNotEnabled && (
+        {replicationNotEnabled ? (
           <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1">
               <h3>Run analysis on your data via integrations with Replication</h3>
@@ -139,9 +139,7 @@ export const Destinations = () => {
               <DocsButton href="https://supabase.com/docs" />
             </div>
           </div>
-        )}
-
-        {hasDestinations ? (
+        ) : hasDestinations ? (
           <Table
             head={[
               <Table.th key="name">Name</Table.th>,
