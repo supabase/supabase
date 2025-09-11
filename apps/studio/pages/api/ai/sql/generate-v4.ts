@@ -1,8 +1,15 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
+import {
+  convertToModelMessages,
+  ModelMessage,
+  stepCountIs,
+  streamText,
+  wrapLanguageModel,
+} from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
+import { traced, BraintrustMiddleware, wrapTraced, initLogger } from 'braintrust'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -53,6 +60,11 @@ const requestBodySchema = z.object({
   table: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
+})
+
+const logger = initLogger({
+  projectName: 'supabase-studio-ai-assistant',
+  apiKey: process.env.BRAINTRUST_API_KEY,
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -118,7 +130,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const {
-    model,
+    model: rawModel,
     error: modelError,
     promptProviderOptions,
     providerOptions,
@@ -129,9 +141,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     isLimited,
   })
 
+  // Wrap AI SDK v5 model with Braintrust middleware for tracing
+  const model = wrapLanguageModel({
+    model: rawModel as any,
+    middleware: BraintrustMiddleware(),
+  })
+
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
   }
+
+  // Best-effort model/provider identification for metrics
+  const modelId = (rawModel as any)?.modelId ?? (rawModel as any)?.spec?.modelId ?? 'unknown'
+  const providerName = (rawModel as any)?.provider ?? (rawModel as any)?.spec?.provider ?? 'unknown'
 
   try {
     // Get a list of all schemas to add to context
@@ -185,10 +207,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...convertToModelMessages(messages),
     ]
 
-    const abortController = new AbortController()
-    req.on('close', () => abortController.abort())
-    req.on('aborted', () => abortController.abort())
-
     // Get tools
     const tools = await getTools({
       projectRef,
@@ -198,33 +216,162 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
-      model,
-      stopWhen: stepCountIs(5),
-      messages: coreMessages,
-      ...(providerOptions && { providerOptions }),
-      tools,
-      abortSignal: abortController.signal,
-    })
+    // Trace tool calls
+    const tracedTools = Object.fromEntries(
+      Object.entries(tools).map(([name, t]: any) => [
+        name,
+        {
+          ...t,
+          execute: wrapTraced(async (...args: any[]) => t.execute(...args), { type: 'tool', name }),
+        },
+      ])
+    ) as typeof tools
 
-    result.pipeUIMessageStreamToResponse(res, {
-      sendReasoning: true,
-      onError: (error) => {
-        if (error == null) {
-          return 'unknown error'
-        }
+    return traced(
+      async (span) => {
+        // log things scorers consume
+        span.log({
+          input: coreMessages,
+          metadata: {
+            route: '/api/ai/sql/generate-v4',
+            endpoint: '/api/ai/sql/generate-v4',
+            use_case: 'sql_gen',
+            model: modelId,
+            provider: providerName,
+            projectRef,
+            orgSlug,
+            chatName,
+          },
+        })
 
-        if (typeof error === 'string') {
-          return error
-        }
+        // Latency/TTFT measurement
+        const startTime = Date.now()
+        let firstTokenMs: number | undefined
 
-        if (error instanceof Error) {
-          return error.message
-        }
+        const abortController = new AbortController()
+        let abortReason: string | undefined
 
-        return JSON.stringify(error)
+        req.once('aborted', () => {
+          abortReason = 'request_aborted'
+          abortController.abort()
+        })
+        req.once('close', () => {
+          abortReason = 'request_closed'
+          abortController.abort()
+        })
+
+        abortController.signal.addEventListener('abort', () => {
+          const now = Date.now()
+          span.log({
+            error: 'Request aborted',
+            metadata: {
+              aborted: true,
+              abort_reason: abortReason ?? 'abort_signal',
+              status: 'abort',
+              endpoint: '/api/ai/sql/generate-v4',
+              use_case: 'sql_gen',
+              model: modelId,
+              provider: providerName,
+            },
+            metrics: {
+              latency_ms: now - startTime,
+              ...(firstTokenMs !== undefined ? { ttft_ms: firstTokenMs } : {}),
+            },
+          })
+        })
+
+        const result = streamText({
+          model,
+          stopWhen: stepCountIs(5),
+          messages: coreMessages,
+          tools: tracedTools,
+          onChunk: ({ chunk }) => {
+            if (
+              firstTokenMs === undefined &&
+              (chunk?.type === 'text-delta' || chunk?.type === 'reasoning-delta')
+            ) {
+              firstTokenMs = Date.now() - startTime
+              // Log TTFT once when the first text delta arrives
+              span.log({ time_to_first_token: firstTokenMs })
+            }
+          },
+          onFinish: ({ text, finishReason }) => {
+            const latencyMs = Date.now() - startTime
+
+            span.log({
+              output: text,
+              metadata: {
+                status: 'ok',
+                finish_reason: finishReason,
+                endpoint: '/api/ai/sql/generate-v4',
+                use_case: 'sql_gen',
+                model: modelId,
+                provider: providerName,
+              },
+              // time_to_first_token: firstTokenMs,
+              metrics: {
+                latency_ms: latencyMs,
+                ...(firstTokenMs !== undefined ? { time_to_first_token_ms: firstTokenMs } : {}),
+                // ...(totalTokens !== undefined ? { total_tokens: totalTokens } : {}),
+                // ...(inputTokens !== undefined ? { input_tokens: inputTokens } : {}),
+                // ...(outputTokens !== undefined ? { output_tokens: outputTokens } : {}),
+                // ...(reasoningTokens !== undefined ? { reasoning_tokens: reasoningTokens } : {}),
+                // ...(cachedInputTokens !== undefined
+                //   ? { cached_input_tokens: cachedInputTokens }
+                //   : {}),
+              },
+            })
+          },
+          abortSignal: abortController.signal,
+        })
+
+        result.pipeUIMessageStreamToResponse(res, {
+          sendReasoning: true,
+          onError: (error) => {
+            // Normalize error message
+            let errorMessage: string
+            if (error == null) {
+              errorMessage = 'unknown error'
+            } else if (typeof error === 'string') {
+              errorMessage = error
+            } else if (error instanceof Error) {
+              errorMessage = error.message
+            } else {
+              try {
+                errorMessage = JSON.stringify(error)
+              } catch {
+                errorMessage = String(error)
+              }
+            }
+
+            const latencyMs = Date.now() - startTime
+
+            // Log error to Braintrust with breakdown-friendly fields
+            span.log({
+              error: errorMessage,
+              metadata: {
+                status: 'error',
+                error_type: (error as any)?.name ?? 'stream_error',
+                error_name: error instanceof Error ? error.name : 'unknown',
+                error_stack: error instanceof Error ? error.stack : undefined,
+                endpoint: '/api/ai/sql/generate-v4',
+                use_case: 'sql_gen',
+                model: modelId,
+                provider: providerName,
+              },
+              metrics: {
+                latency_ms: latencyMs,
+                ...(firstTokenMs !== undefined ? { ttft_ms: firstTokenMs } : {}),
+              },
+            })
+
+            return errorMessage
+          },
+        })
       },
-    })
+      // { name: 'AI Assistant' }
+      logger
+    )
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
