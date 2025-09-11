@@ -31,6 +31,12 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON ROUTI
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 ```
 
+<Admonition type="note">
+
+It is necessary to run these commands after adding new tables to the schema.
+
+</Admonition>
+
 Now you can access these schemas from data APIs:
 
 <Tabs
