@@ -198,7 +198,7 @@ export function defaultAuthReportFormatter(
   const data = Array.from(timestamps)
     .sort()
     .map((timestamp) => {
-      const point: any = { period_start: timestamp }
+      const point: any = { timestamp }
       chartAttributes.forEach((attr) => {
         point[attr.attribute] = 0
       })
