@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import type { MetricsVisibility, HeatmapMode } from './contexts'
+import { cn } from 'ui'
 
 type Props = {
   metricsVisibility: MetricsVisibility
@@ -16,6 +17,8 @@ type Props = {
   setHeatmapMode: (mode: HeatmapMode) => void
   showMiniMap?: boolean
   setShowMiniMap?: (show: boolean) => void
+  variant?: 'overlay' | 'toolbar'
+  className?: string
 }
 
 export const ControlsOverlay = ({
@@ -25,9 +28,18 @@ export const ControlsOverlay = ({
   setHeatmapMode,
   showMiniMap,
   setShowMiniMap,
+  variant = 'overlay',
+  className,
 }: Props) => {
   return (
-    <div className="absolute z-10 top-2 right-2 text-[10px] p-2 rounded bg-foreground-muted/20 backdrop-blur-sm border">
+    <div
+      className={cn(
+        variant === 'overlay'
+          ? 'absolute z-10 top-2 right-2 text-[10px] p-2 rounded bg-foreground-muted/20 backdrop-blur-sm border'
+          : 'text-[10px] p-2 rounded bg-foreground-muted/20 border',
+        className
+      )}
+    >
       <div className="flex flex-wrap gap-2 items-center">
         <Label className="inline-flex items-center gap-1">
           <Checkbox

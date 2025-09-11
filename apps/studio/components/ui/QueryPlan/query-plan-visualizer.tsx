@@ -123,25 +123,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   )
 
   return (
-    <div className={cn('w-full h-full border relative', className)}>
-      {meta?.errorMessage && (
-        <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
-          <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
-            <div className="font-semibold text-red-600">{meta.errorMessage}</div>
-            {meta.errorDetail && (
-              <div className="mt-1 whitespace-pre-wrap text-foreground-lighter">
-                {meta.errorDetail}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-      <MetaOverlay
-        planningTime={meta?.planningTime}
-        executionTime={meta?.executionTime}
-        jitTotalTime={meta?.jitTotalTime}
-      />
-      <SubplanOverlay subplanRoots={meta?.subplanRoots} />
+    <div className={cn('w-full h-full flex flex-col', className)}>
       <ControlsOverlay
         metricsVisibility={metricsVisibility}
         setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
@@ -149,60 +131,82 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         setHeatmapMode={(m) => setHeatmapMode(m)}
         showMiniMap={showMiniMap}
         setShowMiniMap={setShowMiniMap}
+        variant="toolbar"
+        className="mb-2 self-start"
       />
-      {selectedNode && (
-        <DetailsPanel selectedNode={selectedNode} setSelectedNode={setSelectedNode} />
-      )}
-      <MetricsVisibilityContext.Provider value={metricsVisibility}>
-        <HeatmapContext.Provider
-          value={{
-            mode: heatmapMode,
-            maxTime: heatMax.maxTime,
-            maxRows: heatMax.maxRows,
-            maxCost: heatMax.maxCost,
-          }}
-        >
-          <ReactFlow
-            defaultNodes={[]}
-            defaultEdges={[]}
-            nodesConnectable={false}
-            defaultEdgeOptions={{
-              type: 'smoothstep',
-              animated: true,
-              deletable: false,
-              style: {
-                stroke: 'hsl(var(--border-stronger))',
-                strokeWidth: 1,
-              },
+      <div className="relative w-full h-full border rounded-md">
+        {meta?.errorMessage && (
+          <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
+            <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
+              <div className="font-semibold text-red-600">{meta.errorMessage}</div>
+              {meta.errorDetail && (
+                <div className="mt-1 whitespace-pre-wrap text-foreground-lighter">
+                  {meta.errorDetail}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        <MetaOverlay
+          planningTime={meta?.planningTime}
+          executionTime={meta?.executionTime}
+          jitTotalTime={meta?.jitTotalTime}
+        />
+        <SubplanOverlay subplanRoots={meta?.subplanRoots} />
+        {selectedNode && (
+          <DetailsPanel selectedNode={selectedNode} setSelectedNode={setSelectedNode} />
+        )}
+        <MetricsVisibilityContext.Provider value={metricsVisibility}>
+          <HeatmapContext.Provider
+            value={{
+              mode: heatmapMode,
+              maxTime: heatMax.maxTime,
+              maxRows: heatMax.maxRows,
+              maxCost: heatMax.maxCost,
             }}
-            fitView
-            nodeTypes={nodeTypes}
-            nodes={layout.nodes}
-            edges={layout.edges}
-            minZoom={0.8}
-            maxZoom={1.8}
-            proOptions={{ hideAttribution: true }}
-            onNodeClick={(e, node) => setSelectedNode(node.data as PlanNodeData)}
-            onPaneClick={() => setSelectedNode(null)}
           >
-            <Background
-              gap={16}
-              className="[&>*]:stroke-foreground-muted opacity-[25%]"
-              variant={BackgroundVariant.Dots}
-              color={'inherit'}
-            />
-            {showMiniMap && (
-              <MiniMap
-                pannable
-                zoomable
-                nodeColor="#111318"
-                maskColor={miniMapMaskColor}
-                className="border rounded-md shadow-sm"
+            <ReactFlow
+              defaultNodes={[]}
+              defaultEdges={[]}
+              nodesConnectable={false}
+              defaultEdgeOptions={{
+                type: 'smoothstep',
+                animated: true,
+                deletable: false,
+                style: {
+                  stroke: 'hsl(var(--border-stronger))',
+                  strokeWidth: 1,
+                },
+              }}
+              fitView
+              nodeTypes={nodeTypes}
+              nodes={layout.nodes}
+              edges={layout.edges}
+              minZoom={0.8}
+              maxZoom={1.8}
+              proOptions={{ hideAttribution: true }}
+              onNodeClick={(e, node) => setSelectedNode(node.data as PlanNodeData)}
+              onPaneClick={() => setSelectedNode(null)}
+            >
+              <Background
+                gap={16}
+                className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                variant={BackgroundVariant.Dots}
+                color={'inherit'}
               />
-            )}
-          </ReactFlow>
-        </HeatmapContext.Provider>
-      </MetricsVisibilityContext.Provider>
+              {showMiniMap && (
+                <MiniMap
+                  pannable
+                  zoomable
+                  nodeColor="#111318"
+                  maskColor={miniMapMaskColor}
+                  className="border rounded-md shadow-sm"
+                />
+              )}
+            </ReactFlow>
+          </HeatmapContext.Provider>
+        </MetricsVisibilityContext.Provider>
+      </div>
     </div>
   )
 }

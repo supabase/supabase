@@ -177,7 +177,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
       <QueryPanelSection>
         <p className="text-sm">Execution plan</p>
         <div className="h-[420px]">
-          <QueryPlanVisualizer json={sampleExplainJson} className="rounded-md" />
+          <QueryPlanVisualizer json={sampleExplainJson} />
         </div>
       </QueryPanelSection>
     </QueryPanelContainer>
