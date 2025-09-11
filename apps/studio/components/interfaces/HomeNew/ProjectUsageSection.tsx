@@ -1,20 +1,23 @@
 import dayjs from 'dayjs'
-import { Archive, ChevronDown, Database, Key, Zap, Code } from 'lucide-react'
+import { Archive, ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
 import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
-import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { ChartIntervals } from 'types'
 import {
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -25,11 +28,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-
-type ChartIntervalKey = '1hr' | '1day' | '7day'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import { useServiceStats } from './ProjectUsageSection.utils'
 
 const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90 }
 
@@ -60,6 +61,8 @@ const CHART_INTERVALS: ChartIntervals[] = [
   },
 ]
 
+type ChartIntervalKey = '1hr' | '1day' | '7day'
+
 type LogsBarChartDatum = {
   timestamp: string
   error_count: number
@@ -84,95 +87,6 @@ type ServiceComputed = ServiceEntry & {
   warn: number
   err: number
   stats: ReturnType<typeof useProjectUsageStats>
-}
-
-type ServiceStatsMap = Record<
-  ServiceKey,
-  {
-    current: ReturnType<typeof useProjectUsageStats>
-    previous: ReturnType<typeof useProjectUsageStats>
-  }
->
-
-const useServiceStats = (
-  projectRef: string,
-  timestampStart: string,
-  timestampEnd: string,
-  previousStart: string,
-  previousEnd: string
-): ServiceStatsMap => {
-  const dbCurrent = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.POSTGRES,
-    timestampStart,
-    timestampEnd,
-  })
-  const dbPrevious = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.POSTGRES,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  const fnCurrent = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.FN_EDGE,
-    timestampStart,
-    timestampEnd,
-  })
-  const fnPrevious = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.FN_EDGE,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  const authCurrent = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.AUTH,
-    timestampStart,
-    timestampEnd,
-  })
-  const authPrevious = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.AUTH,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  const storageCurrent = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.STORAGE,
-    timestampStart,
-    timestampEnd,
-  })
-  const storagePrevious = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.STORAGE,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  const realtimeCurrent = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.REALTIME,
-    timestampStart,
-    timestampEnd,
-  })
-  const realtimePrevious = useProjectUsageStats({
-    projectRef,
-    table: LogsTableName.REALTIME,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  return {
-    db: { current: dbCurrent, previous: dbPrevious },
-    functions: { current: fnCurrent, previous: fnPrevious },
-    auth: { current: authCurrent, previous: authPrevious },
-    storage: { current: storageCurrent, previous: storagePrevious },
-    realtime: { current: realtimeCurrent, previous: realtimePrevious },
-  }
 }
 
 export const ProjectUsageSection = () => {
