@@ -99,8 +99,7 @@ const AUTH_REPORT_SQL: Record<
         --signin-latency
         select 
           timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          json_value(event_message, "$.grant_type") as grant_type,
-          count(*) as request_count,
+          count(*) as count,
           round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms,
           round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_latency_ms,
           round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_latency_ms,
@@ -109,8 +108,8 @@ const AUTH_REPORT_SQL: Record<
           round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_latency_ms
         from auth_logs
         where json_value(event_message, "$.path") = '/token'
-        group by timestamp, grant_type
-        order by timestamp desc, grant_type
+        group by timestamp
+        order by timestamp desc
       `
   },
   SignUpLatency: (interval) => {
@@ -182,10 +181,11 @@ export function defaultAuthReportFormatter(
 
   const rawDataSchema = z.object({
     result: z.array(
-      z.object({
-        timestamp: z.string(),
-        count: z.number(),
-      })
+      z
+        .object({
+          timestamp: z.coerce.number(),
+        })
+        .catchall(z.any())
     ),
   })
 
@@ -194,7 +194,7 @@ export function defaultAuthReportFormatter(
 
   if (!result) return { data: undefined, chartAttributes }
 
-  const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
+  const timestamps = new Set<string>(result.map((p: any) => String(p.timestamp)))
   const data = Array.from(timestamps)
     .sort()
     .map((timestamp) => {
@@ -202,9 +202,29 @@ export function defaultAuthReportFormatter(
       chartAttributes.forEach((attr) => {
         point[attr.attribute] = 0
       })
-      const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
+      const matchingPoints = result.filter((p: any) => String(p.timestamp) === timestamp)
+
       matchingPoints.forEach((p: any) => {
-        point[attributes[0].attribute] = p.count
+        chartAttributes.forEach((attr) => {
+          // Optional dimension filters used by some reports
+          if ('login_type_provider' in (attr as any)) {
+            if (p.login_type_provider !== (attr as any).login_type_provider) return
+          }
+          if ('providerType' in (attr as any)) {
+            if (p.provider !== (attr as any).providerType) return
+          }
+
+          const valueFromField =
+            typeof p[attr.attribute] === 'number'
+              ? p[attr.attribute]
+              : typeof p.count === 'number'
+                ? p.count
+                : undefined
+
+          if (typeof valueFromField === 'number') {
+            point[attr.attribute] = (point[attr.attribute] ?? 0) + valueFromField
+          }
+        })
       })
       return point
     })
@@ -391,7 +411,7 @@ export const createAuthReportConfig = ({
     id: 'sign-in-latency',
     label: 'Sign In Latency',
     valuePrecision: 2,
-    hide: true, // Jordi: Hidden until we can fix the query
+    hide: false,
     showTooltip: true,
     showLegend: true,
     showMaxValue: false,
@@ -402,38 +422,40 @@ export const createAuthReportConfig = ({
     dataProvider: async () => {
       const attributes = [
         {
-          attribute: 'SignInLatency',
-          provider: 'logs',
-          label: 'Password',
-          grantType: 'password',
-          enabled: true,
+          attribute: 'avg_latency_ms',
+          label: 'Avg. Latency (ms)',
         },
         {
-          attribute: 'SignInLatency',
-          provider: 'logs',
-          label: 'PKCE',
-          grantType: 'pkce',
-          enabled: true,
+          attribute: 'max_latency_ms',
+          label: 'Max. Latency (ms)',
         },
         {
-          attribute: 'SignInLatency',
-          provider: 'logs',
-          label: 'Refresh Token',
-          grantType: 'refresh_token',
-          enabled: true,
+          attribute: 'min_latency_ms',
+          label: 'Min. Latency (ms)',
         },
         {
-          attribute: 'SignInLatency',
-          provider: 'logs',
-          label: 'ID Token',
-          grantType: 'id_token',
-          enabled: true,
+          attribute: 'p50_latency_ms',
+          label: 'P50 Latency (ms)',
+        },
+        {
+          attribute: 'p95_latency_ms',
+          label: 'P95 Latency (ms)',
+        },
+        {
+          attribute: 'p99_latency_ms',
+          label: 'P99 Latency (ms)',
+        },
+        {
+          attribute: 'request_count',
+          label: 'Request Count',
         },
       ]
 
       const sql = AUTH_REPORT_SQL.SignInLatency(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
       const transformedData = defaultAuthReportFormatter(rawData, attributes)
+
+      console.log('sign in latency', { sql, rawData, transformedData })
 
       return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
     },
@@ -442,7 +464,7 @@ export const createAuthReportConfig = ({
     id: 'sign-up-latency',
     label: 'Sign Up Latency',
     valuePrecision: 2,
-    hide: true, // Jordi: Hidden until we can fix the query
+    hide: true,
     showTooltip: true,
     showLegend: true,
     showMaxValue: false,
