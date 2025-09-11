@@ -14,6 +14,8 @@ type Props = {
   setMetricsVisibility: (updater: (prev: MetricsVisibility) => MetricsVisibility) => void
   heatmapMode: HeatmapMode
   setHeatmapMode: (mode: HeatmapMode) => void
+  showMiniMap?: boolean
+  setShowMiniMap?: (show: boolean) => void
 }
 
 export const ControlsOverlay = ({
@@ -21,6 +23,8 @@ export const ControlsOverlay = ({
   setMetricsVisibility,
   heatmapMode,
   setHeatmapMode,
+  showMiniMap,
+  setShowMiniMap,
 }: Props) => {
   return (
     <div className="absolute z-10 top-2 right-2 text-[10px] p-2 rounded bg-foreground-muted/20 backdrop-blur-sm border">
@@ -85,6 +89,14 @@ export const ControlsOverlay = ({
             </SelectContent>
           </Select>
         </div>
+        <div className="h-[14px] w-px bg-border mx-1" />
+        <Label className="inline-flex items-center gap-1">
+          <Checkbox
+            checked={!!showMiniMap}
+            onCheckedChange={(checked) => setShowMiniMap?.(Boolean(checked))}
+          />
+          <span>Mini map</span>
+        </Label>
       </div>
     </div>
   )

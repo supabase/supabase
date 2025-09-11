@@ -88,6 +88,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   const heatMax = useHeatmapMax(nodes as Node<PlanNodeData>[])
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
+  const [showMiniMap, setShowMiniMap] = useState(true)
 
   // Estimate node sizes from data (fixed row heights) and layout with Dagre
   const layout = useMemo(() => {
@@ -146,6 +147,8 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
         heatmapMode={heatmapMode}
         setHeatmapMode={(m) => setHeatmapMode(m)}
+        showMiniMap={showMiniMap}
+        setShowMiniMap={setShowMiniMap}
       />
       {selectedNode && (
         <DetailsPanel selectedNode={selectedNode} setSelectedNode={setSelectedNode} />
@@ -188,13 +191,15 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               variant={BackgroundVariant.Dots}
               color={'inherit'}
             />
-            <MiniMap
-              pannable
-              zoomable
-              nodeColor="#111318"
-              maskColor={miniMapMaskColor}
-              className="border rounded-md shadow-sm"
-            />
+            {showMiniMap && (
+              <MiniMap
+                pannable
+                zoomable
+                nodeColor="#111318"
+                maskColor={miniMapMaskColor}
+                className="border rounded-md shadow-sm"
+              />
+            )}
           </ReactFlow>
         </HeatmapContext.Provider>
       </MetricsVisibilityContext.Provider>
