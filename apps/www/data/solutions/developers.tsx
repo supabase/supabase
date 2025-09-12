@@ -83,18 +83,7 @@ const data: () => {
           foundation for building powerful applications.
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/developers/developers-hero-dark.svg',
-            light: '/images/solutions/developers/developers-hero-light.svg',
-          }}
-          alt="Supabase for Developers"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',

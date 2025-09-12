@@ -2,7 +2,7 @@ import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useEffect, useRef } from 'react'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
 import { TopSection } from 'components/interfaces/HomeNew/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -21,6 +21,7 @@ import {
   GettingStartedSection,
   type GettingStartedState,
 } from './GettingStarted/GettingStartedSection'
+import { ProjectUsageSection } from './ProjectUsageSection'
 
 export const HomeV2 = () => {
   const { ref, enableBranching } = useParams()
@@ -106,6 +107,13 @@ export const HomeV2 = () => {
                 strategy={verticalListSortingStrategy}
               >
                 {sectionOrder.map((id) => {
+                  if (IS_PLATFORM && id === 'usage') {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        <ProjectUsageSection />
+                      </SortableSection>
+                    )
+                  }
                   if (id === 'getting-started') {
                     return gettingStartedState === 'hidden' ? null : (
                       <SortableSection key={id} id={id}>
