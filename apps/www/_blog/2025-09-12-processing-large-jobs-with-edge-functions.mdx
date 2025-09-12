@@ -2,8 +2,8 @@
 title: Processing large jobs with Edge Functions, Cron, and Queues
 description: Learn how to build scalable data processing pipelines using Supabase Edge Functions, cron jobs, and database queues and handle large workloads without timeouts or crashes.
 author: prashant
-image: 2025-09-processing-large-jobs-with-edge-functions/processing-large-jobs-with-edge-functions-og.png
-thumb: 2025-09-processing-large-jobs-with-edge-functions/processing-large-jobs-with-edge-functions-og.png
+image: 2025-09-processing-large-jobs-with-edge-functions/og-temp.png
+thumb: 2025-09-processing-large-jobs-with-edge-functions/og-temp.png
 categories:
   - postgres
   - edge functions
@@ -29,7 +29,14 @@ The architecture is simple but powerful. Think of it like an assembly line:
 
 **Processing**: Specialized workers handle specific types of tasks from their assigned queues
 
-[Diagram Here]
+<Img
+  src={{
+    dark: '/images/blog/2025-09-processing-large-jobs-with-edge-functions/three-layer-pattern-temp-diagram.png',
+    light:
+      '/images/blog/2025-09-processing-large-jobs-with-edge-functions/three-layer-pattern-temp-diagram.png',
+  }}
+  alt="A diagram of the three-layer pattern described above"
+/>
 
 This breaks apart the complexity. Instead of one giant function that scrapes websites, processes content with AI, and stores everything, you have focused functions that each do one thing well.
 
