@@ -22,7 +22,7 @@ import { QueryPerformanceGrid } from './QueryPerformanceGrid'
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
   queryPerformanceQuery: DbQueryHook<any>
-  queryMetrics: DbQueryHook<any>
+  queryMetrics: PresetHookResult
 }
 
 export const QueryPerformance = ({
