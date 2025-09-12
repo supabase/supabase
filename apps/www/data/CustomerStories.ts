@@ -20,6 +20,18 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title:
+      'Juniver built automated B2B workflows with Supabase Edge Functions and Row Level Security',
+    description:
+      'Juniver switched from Firebase to Supabase and saw immediate improvements in developer experience and performance.',
+    organization: 'Juniver',
+    imgUrl: 'images/customers/logos/juniver.png',
+    logo: '/images/customers/logos/juniver.png',
+    logo_inverse: '/images/customers/logos/light/juniver.png',
+    url: '/customers/juniver',
+  },
+  {
+    type: 'Customer Story',
     title: 'Kayhan Space saw 8x improvement in developer speed when moving to Supabase',
     description:
       'The Kayhan Space team migrated to Supabase from Amazon RDS and Auth0 to simplify infrastructure and unlock developer velocity.',
