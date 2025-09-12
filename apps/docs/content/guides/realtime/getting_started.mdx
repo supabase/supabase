@@ -25,7 +25,7 @@ First, get your project URL and key from your [Supabase Dashboard](/dashboard/pr
 ```ts
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://<project>.supabase.co', '<your-key>')
+const supabase = createClient('https://<project>.supabase.co', '<anon_key or sb_publishable_key>')
 ```
 
 </TabPanel>
@@ -37,7 +37,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   await Supabase.initialize(
     url: 'https://<project>.supabase.co',
-    anonKey: '<your-key>',
+    anonKey: '<anon_key or sb_publishable_key>',
   );
   runApp(MyApp());
 }
@@ -53,7 +53,7 @@ import Supabase
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<project>.supabase.co")!,
-  supabaseKey: "<your-key>"
+  supabaseKey: "<anon_key or sb_publishable_key>"
 )
 ```
 
@@ -64,7 +64,7 @@ let supabase = SupabaseClient(
 from supabase import create_client, Client
 
 url: str = "https://<project>.supabase.co"
-key: str = "<your-key>"
+key: str = "<anon_key or sb_publishable_key>"
 supabase: Client = create_client(url, key)
 ```
 
