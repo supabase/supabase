@@ -14,8 +14,10 @@ import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import MainProductsData from 'data/MainProducts'
 import ProductModulesData from 'data/ProductModules'
+import { useRouter } from 'next/router'
 
-const ProductDropdown = () => {
+export const ProductDropdown = () => {
+  const { basePath } = useRouter()
   const isTablet = useBreakpoint(1279)
 
   return (
@@ -182,5 +184,3 @@ const ProductDropdown = () => {
     </div>
   )
 }
-
-export default ProductDropdown

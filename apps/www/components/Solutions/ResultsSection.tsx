@@ -1,6 +1,8 @@
 import React, { FC } from 'react'
-import { cn, Badge } from 'ui'
+import { cn, Badge, AnimatedCounter } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { motion } from 'framer-motion'
+import { useMedia } from 'react-use'
 
 export interface ResultsSectionProps {
   id: string
@@ -31,6 +33,8 @@ const ResultsSection: FC<ResultsSectionProps> = (props) => {
       </div>
       <div className="relative xl:absolute z-0 inset-0 mt-4 -mb-8 sm:mt-0 sm:-mb-20 md:-mt-20 md:-mb-36 xl:mt-0 xl:top-10 w-full aspect-[2.15/1]">
         <GraphLabel className="" />
+        <GraphPath className="absolute inset-0 w-full h-full" />
+
         <svg
           width="100%"
           height="100%"
@@ -67,31 +71,85 @@ const ResultsSection: FC<ResultsSectionProps> = (props) => {
   )
 }
 
-const GraphLabel: FC<{ className?: string }> = ({ className }) => (
-  <div
-    className={cn(
-      'absolute z-10 inset-0 left-auto right-[20%] -top-8 md:top-0 xl:top-[15%] w-fit h-[200px] lg:h-[400px]',
-      'flex flex-col items-center gap-1',
-      className
-    )}
-  >
-    <div className="w-fit text-foreground bg-alternative p-4 rounded-lg border flex flex-col gap-1">
-      <span className="label !text-[10px] !leading-3">Users</span>
-      <div className="flex items-center gap-2">
-        <span className="text-foreground-light text-2xl">230,550</span>
-        <Badge variant="success" size="small" className="h-[24px] px-2">
-          +13.4%
-        </Badge>
-      </div>
-    </div>
-    <div
+const GraphLabel: FC<{ className?: string }> = ({ className }) => {
+  const isMobileOrTablet = useMedia('(max-width: 1280px)')
+
+  const motionProps = !isMobileOrTablet
+    ? {
+        initial: { offsetDistance: '0%', rotate: '0deg', opacity: 0 },
+        whileInView: { offsetDistance: '80%', rotate: '30deg', opacity: 1 },
+        viewport: { once: true },
+        transition: { type: 'spring', duration: 2.68, bounce: 0, delay: 0.25 },
+        style: {
+          offsetPath: 'path("M0 493.132C285.852 493.132 896.213 411.11 1401.8 1")',
+        },
+      }
+    : undefined
+
+  const Component = isMobileOrTablet ? 'div' : motion.div
+
+  return (
+    <Component
       className={cn(
-        'relative w-2 h-2 min-w-2 min-h-2 rounded-full border-2 border-stronger',
-        'after:absolute after:inset-0 after:top-full after:mx-auto after:w-[2px] after:h-[150px] after:lg:h-[250px]',
-        'after:bg-gradient-to-b after:from-border-stronger after:to-transparent'
+        'absolute z-10 -top-10 2xl:top-[20%] left-[38%] md:top-[10%] md:left-[50%] lg:top-0 xl:left-0 w-fit h-[200px] lg:h-[400px]',
+        'flex flex-col items-center gap-1',
+        className
       )}
+      {...motionProps}
+    >
+      <div className="w-fit text-foreground bg-alternative p-4 rounded-lg border flex flex-col gap-1">
+        <span className="label !text-[10px] !leading-3">Users</span>
+        <div className="flex items-center gap-2">
+          <span className="text-foreground-light text-2xl">
+            {isMobileOrTablet ? (
+              '5,230,550'
+            ) : (
+              <AnimatedCounter value={5230550} duration={2.68} delay={0.5} />
+            )}
+          </span>
+          <Badge variant="success" size="small" className="h-[24px] px-2">
+            {isMobileOrTablet ? (
+              '+28.3%'
+            ) : (
+              <AnimatedCounter
+                value={28.3}
+                duration={2.68}
+                delay={0.5}
+                isPercentage={true}
+                prefix="+"
+              />
+            )}
+          </Badge>
+        </div>
+      </div>
+      <div
+        className={cn(
+          'relative w-2 h-2 min-w-2 min-h-2 rounded-full border-2 border-stronger',
+          'after:absolute after:inset-0 after:top-full after:mx-auto after:w-[2px] after:h-[150px] after:lg:h-[250px]',
+          'after:bg-gradient-to-b after:from-border-stronger after:to-transparent'
+        )}
+      />
+    </Component>
+  )
+}
+
+const GraphPath: FC<{ className?: string }> = ({ className }) => (
+  <svg
+    width="100%"
+    height="100%"
+    viewBox="0 0 1403 494"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <motion.path
+      transition={{ duration: 0.5, delay: 0.5 }}
+      initial={{ pathLength: 0.001 }}
+      whileInView={{ pathLength: 1 }}
+      viewport={{ once: true }}
+      d="M0 493.132C285.852 493.132 896.213 411.11 1401.8 1"
     />
-  </div>
+  </svg>
 )
 
 interface HighlightItemProps {

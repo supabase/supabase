@@ -1,13 +1,13 @@
 'use client'
 
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type React from 'react'
+import type { ReactNode } from 'react'
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
-import type { ReactNode } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
-  // columns can be a fixed number or an array [lg, md, sm]
+  /** columns can be a fixed number or an array [lg, md, sm] */
   columns: number | [number, number, number]
   children: ReactNode
   className?: string
@@ -145,9 +145,8 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
           onClick={scrollLeft}
           className="absolute w-8 h-8 left-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
           aria-label="Scroll left"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </Button>
+          icon={<ChevronLeft className="w-4 h-4" />}
+        />
       )}
 
       {showArrows && canScrollRight && (
@@ -156,9 +155,8 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
           onClick={scrollRight}
           className="absolute w-8 h-8 right-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
           aria-label="Scroll right"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </Button>
+          icon={<ChevronRight className="w-4 h-4" />}
+        />
       )}
 
       <div

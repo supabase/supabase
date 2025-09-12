@@ -8,7 +8,7 @@ export const projectKeys = {
       search?: string
       statuses?: string[]
     }
-  ) => ['all-projects', slug, params] as const,
+  ) => ['all-projects-infinite', slug, params] as const,
   status: (projectRef: string | undefined) => ['project', projectRef, 'status'] as const,
   types: (projectRef: string | undefined) => ['project', projectRef, 'types'] as const,
   detail: (projectRef: string | undefined) => ['project', projectRef, 'detail'] as const,

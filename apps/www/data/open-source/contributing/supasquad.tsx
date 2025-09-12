@@ -10,10 +10,10 @@ export const data = {
   heroSection: {
     id: 'hero',
     title: 'Join the squad',
-    h1: <>Be a Cornerstone of the Supabase Community</>,
+    h1: <>Become a Cornerstone of the Supabase Community</>,
     subheader: [
       <>
-        Join passionate contributors who shape the entire Supabase experience. From helping
+        Join passionate contributors to shape the entire Supabase experience. From helping
         developers solve problems to creating guides, advocating on social channels, and maintaining
         code repositories, find your way to make a meaningful impact.
       </>,

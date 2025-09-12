@@ -11,6 +11,14 @@ export type CustomContentTypes = {
     action: { text: string; url: string }
   }[]
 
+  projectHomepageClientLibraries: {
+    language: string
+    officialSupport: boolean
+    releaseState?: string
+    docsUrl: string
+    gitUrl: string
+    altIconName?: string
+  }[]
   projectHomepageExampleProjects: {
     title: string
     description: string
