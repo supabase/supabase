@@ -71,5 +71,5 @@
   "sdk:python": true,
   "sdk:swift": true,
 
-  "search:fullIndex": false
+  "search:fullIndex": true
 }
