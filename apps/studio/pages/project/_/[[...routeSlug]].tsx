@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
+import { Header, LoadingCardView } from 'components/interfaces/Home/ProjectList/EmptyStates'
 import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from 'components/interfaces/HomePageActions'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -12,7 +13,6 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
-import { BASE_PATH } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -24,60 +24,6 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-
-const Header = () => {
-  return (
-    <div className="border-default border-b p-3">
-      <div className="flex items-center space-x-2">
-        <Link href="/projects">
-          <img
-            src={`${BASE_PATH}/img/supabase-logo.svg`}
-            alt="Supabase"
-            className="border-default rounded border p-1 hover:border-white"
-            style={{ height: 24 }}
-          />
-        </Link>
-      </div>
-    </div>
-  )
-}
-
-const OrganizationLoadingState = () => {
-  return (
-    <>
-      <ShimmeringLoader className="w-3/4" />
-      <ShimmeringLoader className="w-1/2" />
-      <ShimmeringLoader className="w-1/4" />
-    </>
-  )
-}
-
-const OrganizationErrorState = () => {
-  return (
-    <Alert_Shadcn_ variant="warning">
-      <AlertTriangleIcon />
-      <AlertTitle_Shadcn_>Failed to load your Supabase organizations</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>Try refreshing the page</AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
-  )
-}
-
-const OrganizationEmptyState = () => {
-  return (
-    <div className="w-full border rounded-lg p-8 flex flex-col items-center gap-6">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <p className="text-foreground text-base font-medium">No projects or organizations found</p>
-        <p className="text-sm text-foreground-lighter leading-relaxed">
-          Create your first organization to get started with Supabase
-        </p>
-      </div>
-      <Button asChild type="primary" size="medium">
-        <Link href="/new">Create organization</Link>
-      </Button>
-    </div>
-  )
-}
 
 // [Joshen] I'd say we don't do route validation here, this page will act more
 // like a proxy to the project specific pages, and we let those pages handle
@@ -159,11 +105,27 @@ const GenericProjectPage: NextPage = () => {
           )}
           <ScaffoldSection isFullWidth className="flex-grow pt-0 flex flex-col gap-y-4 h-px">
             {isLoadingOrganizations ? (
-              <OrganizationLoadingState />
+              <LoadingCardView />
             ) : isErrorOrganizations ? (
-              <OrganizationErrorState />
+              <Alert_Shadcn_ variant="warning">
+                <AlertTriangleIcon />
+                <AlertTitle_Shadcn_>Failed to load your Supabase organizations</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>Try refreshing the page</AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
             ) : organizations.length === 0 ? (
-              <OrganizationEmptyState />
+              <div className="w-full border rounded-lg p-8 flex flex-col items-center gap-6">
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <p className="text-foreground text-base font-medium">
+                    No projects or organizations found
+                  </p>
+                  <p className="text-sm text-foreground-lighter leading-relaxed">
+                    Create your first organization to get started with Supabase
+                  </p>
+                </div>
+                <Button asChild type="primary" size="medium">
+                  <Link href="/new">Create organization</Link>
+                </Button>
+              </div>
             ) : !!selectedOrganization ? (
               <ProjectList
                 organization={selectedOrganization}
