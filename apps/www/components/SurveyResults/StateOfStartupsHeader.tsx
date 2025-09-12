@@ -25,50 +25,35 @@ const DiagonalStripes = () => (
   />
 )
 
+interface TextBlockProps {
+  text: string
+  bgColor: string
+  textColor: string
+}
+
+const TextBlock = ({ text, bgColor, textColor }: TextBlockProps) => (
+  <div className="flex w-full">
+    <div className={`inline-block ${bgColor}`}>
+      <span
+        className={`${textColor} text-[4rem] px-5 py-3 inline-block leading-none tracking-tight`}
+        // style={{ fontFamily: SUISSE_FONT_FAMILY }}
+      >
+        {text}
+      </span>
+    </div>
+    <DiagonalStripes />
+  </div>
+)
+
 export function StateOfStartupsHeader({ title, subtitle, chapters }: StateOfStartupsHeaderProps) {
   return (
     <header className="mt-32">
       <div className="max-w-[60rem] mx-auto">
         <div className="flex flex-col gap-1">
-          {/* State */}
-          <div className="flex w-full">
-            <div className="inline-block bg-surface-300">
-              <span className="text-foreground-light text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
-                State
-              </span>
-            </div>
-            <DiagonalStripes />
-          </div>
-
-          {/* of */}
-          <div className="flex w-full">
-            <div className="inline-block bg-surface-300">
-              <span className="text-foreground-light text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
-                of
-              </span>
-            </div>
-            <DiagonalStripes />
-          </div>
-
-          {/* Startups */}
-          <div className="flex w-full">
-            <div className="inline-block bg-brand">
-              <span className="text-[#1c1c1c] text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
-                Startups
-              </span>
-            </div>
-            <DiagonalStripes />
-          </div>
-
-          {/* 2025 */}
-          <div className="flex w-full">
-            <div className="inline-block bg-foreground">
-              <span className="text-background text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
-                2025
-              </span>
-            </div>
-            <DiagonalStripes />
-          </div>
+          <TextBlock text="State" bgColor="bg-surface-300" textColor="text-foreground-lighter" />
+          <TextBlock text="of" bgColor="bg-surface-300" textColor="text-foreground-lighter" />
+          <TextBlock text="Startups" bgColor="bg-brand" textColor="text-brand-200" />
+          <TextBlock text="2025" bgColor="bg-foreground" textColor="text-background" />
         </div>
       </div>
     </header>
