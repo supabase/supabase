@@ -1,23 +1,9 @@
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 
 import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from 'data/table-rows/table-rows-count-query'
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
-
-export const USERS_THRESHOLD_COUNT = 10 // Set to 10 for testing, set back to 50_000 before merge
-
-const COUNT_ESTIMATE_SQL = /* SQL */ `
-CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
-    query text
-) RETURNS integer LANGUAGE plpgsql AS $$
-DECLARE
-    plan jsonb;
-BEGIN
-    EXECUTE 'EXPLAIN (FORMAT JSON)' || query INTO plan;
-    RETURN plan->0->'Plan'->'Plan Rows';
-END;
-$$;
-`.trim()
 
 type UsersCountVariables = {
   projectRef?: string
@@ -97,10 +83,10 @@ with approximation as (
 select 
   case 
     when estimate = -1 then (select pg_temp.count_estimate('${escapedSelectSql}'))::int
-    when estimate > ${USERS_THRESHOLD_COUNT} then ${conditions.length > 0 ? `(select pg_temp.count_estimate('${escapedSelectSql}'))::int` : 'estimate::int'}
+    when estimate > ${THRESHOLD_COUNT} then ${conditions.length > 0 ? `(select pg_temp.count_estimate('${escapedSelectSql}'))::int` : 'estimate::int'}
     else (${countBaseSql})
   end as count,
-  estimate = -1 or estimate > ${USERS_THRESHOLD_COUNT} as is_estimate
+  estimate = -1 or estimate > ${THRESHOLD_COUNT} as is_estimate
 from approximation;
 `.trim()
 

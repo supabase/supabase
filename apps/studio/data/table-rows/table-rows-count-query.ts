@@ -16,7 +16,7 @@ type GetTableRowsCountArgs = {
 }
 
 export const THRESHOLD_COUNT = 50000
-const COUNT_ESTIMATE_SQL = /* SQL */ `
+export const COUNT_ESTIMATE_SQL = /* SQL */ `
 CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
     query text
 ) RETURNS integer LANGUAGE plpgsql AS $$

@@ -24,8 +24,9 @@ import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { USERS_THRESHOLD_COUNT, useUsersCountQuery } from 'data/auth/users-count-query'
+import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { THRESHOLD_COUNT } from 'data/table-rows/table-rows-count-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -631,7 +632,7 @@ export const UsersV2 = () => {
                     </TooltipTrigger>
                     <TooltipContent side="top" className="w-72">
                       This is an estimated value as your project has more than{' '}
-                      {USERS_THRESHOLD_COUNT.toLocaleString()} users.
+                      {THRESHOLD_COUNT.toLocaleString()} users.
                       <br />
                       <span className="text-brand">Click to retrieve the exact count.</span>
                     </TooltipContent>
@@ -698,8 +699,8 @@ export const UsersV2 = () => {
         }}
       >
         <p className="text-sm text-foreground-light">
-          Your project has more than {USERS_THRESHOLD_COUNT.toLocaleString()} users, and fetching
-          the exact count may cause performance issues on your database.
+          Your project has more than {THRESHOLD_COUNT.toLocaleString()} users, and fetching the
+          exact count may cause performance issues on your database.
         </p>
       </ConfirmationModal>
     </>
