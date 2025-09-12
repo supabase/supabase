@@ -225,7 +225,7 @@ curl 'https://vdpfzijcqftxdatebvcx.supabase.co/rest/v1/cities?select=id' \
   -H "Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjNhMThjZmUyLTcyMjYtNDNiMC1iYmI0LTdjNTI0MmYyNDA2ZSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGZ6aWpjcWZ0eGRhdGVidmN4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTc1Nzc1MTc3Mn0.mxPJhHlNnEou7Qqu9TJHFZ9EMH9DVLSGbeVg4RiuAEzgN0gQgyxP7BRARrkZyrjCqPVtJe5HSsOW-OVvFQCOYw"
 ```
 
-Remember to provide your project's publishable key as the `apikey` header to bypass validation by our API gateway.
+Note that an `apikey` header is required to access your project's APIs. Use a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/api/api-keys) here. Using your minted JWT is not possible in this header.
 
 ### Why is a 5 minute wait imposed when changing signing key states?
 
