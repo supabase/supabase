@@ -21,6 +21,7 @@ export const DetailsPanel = ({
   isFullscreen?: boolean
 }) => {
   const [copiedConditions, setCopiedConditions] = useState(false)
+  const [copiedRelation, setCopiedRelation] = useState(false)
   const [copiedOutputCols, setCopiedOutputCols] = useState(false)
   const [copiedRawJson, setCopiedRawJson] = useState(false)
   const [jsonHeight, setJsonHeight] = useState<number>(isFullscreen ? 420 : 220)
@@ -39,6 +40,14 @@ export const DetailsPanel = ({
     window.addEventListener('resize', calc)
     return () => window.removeEventListener('resize', calc)
   }, [isFullscreen])
+
+  const hasNoConditions =
+    !selectedNode.hashCond &&
+    !selectedNode.mergeCond &&
+    !selectedNode.joinFilter &&
+    !selectedNode.indexCond &&
+    !selectedNode.recheckCond &&
+    !selectedNode.filter
 
   return (
     <div
@@ -66,24 +75,94 @@ export const DetailsPanel = ({
       </div>
 
       <div className="p-3 space-y-3 overflow-y-auto text-[11px] flex-1">
-        {/* Context line */}
-        {(selectedNode.relationName || selectedNode.alias) && (
-          <div className="text-foreground-lighter">
-            {selectedNode.relationName ?? ''}
-            {selectedNode.alias ? ` as ${selectedNode.alias}` : ''}
-          </div>
-        )}
+        {/* Relation */}
+        <div>
+          <div className="font-semibold mb-1">Relation</div>
+          {selectedNode.relationName || selectedNode.alias ? (
+            <div className="relative group p-2 border rounded bg-surface-100 whitespace-pre-wrap break-words">
+              <span>
+                {selectedNode.relationName ?? ''}
+                {selectedNode.alias && (
+                  <>
+                    {' '}
+                    <span className="text-foreground-lighter">as</span> {selectedNode.alias}
+                  </>
+                )}
+              </span>
+
+              <Button
+                type="outline"
+                size="tiny"
+                icon={copiedRelation ? <Check /> : <Copy />}
+                className="px-1.5 absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() =>
+                  copyToClipboard(
+                    `${selectedNode.relationName ?? ''}${selectedNode.alias ? ` as ${selectedNode.alias}` : ''}`,
+                    () => {
+                      setCopiedRelation(true)
+                      setTimeout(() => setCopiedRelation(false), 1200)
+                    }
+                  )
+                }
+              >
+                {copiedRelation ? 'Copied' : null}
+              </Button>
+            </div>
+          ) : (
+            <div className="text-foreground-lighter">(none)</div>
+          )}
+        </div>
 
         {/* Conditions */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <div className="font-semibold">Conditions</div>
-            <div className="flex gap-2">
+          <div className="font-semibold mb-1">Conditions</div>
+          {hasNoConditions ? (
+            <div className="text-foreground-lighter">(none)</div>
+          ) : (
+            <div className="relative group">
+              <ul className="p-2 border rounded bg-surface-100 whitespace-pre-wrap break-words">
+                {selectedNode.hashCond && (
+                  <li>
+                    <span className="text-foreground-lighter">Hash Cond:</span>{' '}
+                    {selectedNode.hashCond}
+                  </li>
+                )}
+                {selectedNode.mergeCond && (
+                  <li>
+                    <span className="text-foreground-lighter">Merge Cond:</span>{' '}
+                    {selectedNode.mergeCond}
+                  </li>
+                )}
+                {selectedNode.joinFilter && (
+                  <li>
+                    <span className="text-foreground-lighter">Join Filter:</span>{' '}
+                    {selectedNode.joinFilter}
+                  </li>
+                )}
+                {selectedNode.indexCond && (
+                  <li>
+                    <span className="text-foreground-lighter">Index Cond:</span>{' '}
+                    {selectedNode.indexCond}
+                  </li>
+                )}
+                {selectedNode.recheckCond && (
+                  <li>
+                    <span className="text-foreground-lighter">Recheck Cond:</span>{' '}
+                    {selectedNode.recheckCond}
+                  </li>
+                )}
+                {selectedNode.filter && (
+                  <li>
+                    <span className="text-foreground-lighter">Filter:</span> {selectedNode.filter}
+                  </li>
+                )}
+              </ul>
+
               <Button
                 type="outline"
                 size="tiny"
                 icon={copiedConditions ? <Check /> : <Copy />}
-                className="px-1.5"
+                className="px-1.5 absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() => {
                   const parts = [
                     selectedNode.hashCond && `Hash Cond: ${selectedNode.hashCond}`,
@@ -102,63 +181,21 @@ export const DetailsPanel = ({
                 {copiedConditions ? 'Copied' : null}
               </Button>
             </div>
-          </div>
-          <ul className="space-y-1">
-            {selectedNode.hashCond && (
-              <li>
-                <span className="text-foreground-lighter">Hash Cond:</span> {selectedNode.hashCond}
-              </li>
-            )}
-            {selectedNode.mergeCond && (
-              <li>
-                <span className="text-foreground-lighter">Merge Cond:</span>{' '}
-                {selectedNode.mergeCond}
-              </li>
-            )}
-            {selectedNode.joinFilter && (
-              <li>
-                <span className="text-foreground-lighter">Join Filter:</span>{' '}
-                {selectedNode.joinFilter}
-              </li>
-            )}
-            {selectedNode.indexCond && (
-              <li>
-                <span className="text-foreground-lighter">Index Cond:</span>{' '}
-                {selectedNode.indexCond}
-              </li>
-            )}
-            {selectedNode.recheckCond && (
-              <li>
-                <span className="text-foreground-lighter">Recheck Cond:</span>{' '}
-                {selectedNode.recheckCond}
-              </li>
-            )}
-            {selectedNode.filter && (
-              <li>
-                <span className="text-foreground-lighter">Filter:</span> {selectedNode.filter}
-              </li>
-            )}
-            {!(
-              selectedNode.hashCond ||
-              selectedNode.mergeCond ||
-              selectedNode.joinFilter ||
-              selectedNode.indexCond ||
-              selectedNode.recheckCond ||
-              selectedNode.filter
-            ) && <li className="text-foreground-lighter">(none)</li>}
-          </ul>
+          )}
         </div>
 
         {/* Output columns */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <div className="font-semibold">Output Columns</div>
-            {Array.isArray(selectedNode.outputCols) && selectedNode.outputCols.length > 0 && (
+          <div className="font-semibold mb-1">Output Columns</div>
+          {Array.isArray(selectedNode.outputCols) && selectedNode.outputCols.length > 0 ? (
+            <div className="relative group p-2 border rounded bg-surface-100 whitespace-pre-wrap break-words">
+              <span>{selectedNode.outputCols.join(', ')}</span>
+
               <Button
                 type="outline"
                 size="tiny"
                 icon={copiedOutputCols ? <Check /> : <Copy />}
-                className="px-1.5"
+                className="px-1.5 absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() =>
                   copyToClipboard(selectedNode.outputCols!.join(', '), () => {
                     setCopiedOutputCols(true)
@@ -168,11 +205,6 @@ export const DetailsPanel = ({
               >
                 {copiedOutputCols ? 'Copied' : null}
               </Button>
-            )}
-          </div>
-          {Array.isArray(selectedNode.outputCols) && selectedNode.outputCols.length > 0 ? (
-            <div className="p-2 border rounded bg-surface-100 whitespace-pre-wrap break-words">
-              {selectedNode.outputCols.join(', ')}
             </div>
           ) : (
             <div className="text-foreground-lighter">(none)</div>
