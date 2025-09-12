@@ -321,10 +321,10 @@ export const ReplicationPipelineStatus = () => {
                                   content: { side: 'bottom', text: 'Open in Table Editor' },
                                 }}
                               >
-                                <a
+                                <Link
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  href={`dashboard/project/${projectRef}/editor/${table.table_id}`}
+                                  href={`/project/${projectRef}/editor/${table.table_id}`}
                                 />
                               </ButtonTooltip>
                             </div>
