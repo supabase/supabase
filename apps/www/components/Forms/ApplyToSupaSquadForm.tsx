@@ -304,8 +304,7 @@ const FormContent = memo(function FormContent({
                     Share some of your recent contributions
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    Any relevant links that prove your current engagement with the Supabase
-                    community.
+                    Any relevant links to show your current engagement with the Supabase community.
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative">
