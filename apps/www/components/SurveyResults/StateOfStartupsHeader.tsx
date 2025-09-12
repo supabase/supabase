@@ -32,8 +32,8 @@ export function StateOfStartupsHeader({ title, subtitle, chapters }: StateOfStar
         <div className="flex flex-col gap-1">
           {/* State */}
           <div className="flex w-full">
-            <div className="inline-block" style={{ backgroundColor: '#ededed' }}>
-              <span className="text-[#1c1c1c] text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
+            <div className="inline-block bg-surface-300">
+              <span className="text-foreground-light text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
                 State
               </span>
             </div>
@@ -42,8 +42,8 @@ export function StateOfStartupsHeader({ title, subtitle, chapters }: StateOfStar
 
           {/* of */}
           <div className="flex w-full">
-            <div className="inline-block" style={{ backgroundColor: '#ededed' }}>
-              <span className="text-[#1c1c1c] text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
+            <div className="inline-block bg-surface-300">
+              <span className="text-foreground-light text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
                 of
               </span>
             </div>
@@ -52,7 +52,7 @@ export function StateOfStartupsHeader({ title, subtitle, chapters }: StateOfStar
 
           {/* Startups */}
           <div className="flex w-full">
-            <div className="inline-block" style={{ backgroundColor: '#3ecf8e' }}>
+            <div className="inline-block bg-brand">
               <span className="text-[#1c1c1c] text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
                 Startups
               </span>
@@ -62,8 +62,8 @@ export function StateOfStartupsHeader({ title, subtitle, chapters }: StateOfStar
 
           {/* 2025 */}
           <div className="flex w-full">
-            <div className="inline-block" style={{ backgroundColor: '#2e2e2e' }}>
-              <span className="text-white text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
+            <div className="inline-block bg-foreground">
+              <span className="text-background text-[4.5rem] font-normal px-4 py-2 inline-block leading-none">
                 2025
               </span>
             </div>
