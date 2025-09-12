@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Aaron Byrne
 Alaister Young
+Alan De Los Santos
 Aleksi Immonen
 Alexander Korotkov
 Amy Q
@@ -62,6 +63,7 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jeff Smick
 Jenny Kibiri
 Jess Shears
 Jim Chanco Jr
@@ -130,6 +132,7 @@ Thor Schaeff
 Timothy Lim
 Tom Ashley
 Tom G
+Tomás Pozo
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert

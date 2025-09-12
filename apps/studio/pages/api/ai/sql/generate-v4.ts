@@ -208,6 +208,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     result.pipeUIMessageStreamToResponse(res, {
+      sendReasoning: true,
       onError: (error) => {
         if (error == null) {
           return 'unknown error'

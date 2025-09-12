@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
@@ -54,6 +54,8 @@ export const Connect = () => {
     'showConnect',
     parseAsBoolean.withDefault(false)
   )
+
+  const [tab, setTab] = useQueryState('tab', parseAsString.withDefault('direct'))
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(frameworks)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -122,6 +124,8 @@ export const Connect = () => {
   }
 
   function handleConnectionType(type: string) {
+    setTab(type)
+
     if (type === 'frameworks') {
       setConnectionObject(frameworks)
       handleConnectionTypeChange(frameworks)
@@ -185,6 +189,15 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      setShowConnect(null)
+      setTab(null)
+    } else {
+      setShowConnect(open)
+    }
+  }
+
   if (!isActiveHealthy) {
     return (
       <ButtonTooltip
@@ -205,7 +218,7 @@ export const Connect = () => {
   }
 
   return (
-    <Dialog open={showConnect} onOpenChange={(open) => setShowConnect(!open ? null : open)}>
+    <Dialog open={showConnect} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
         <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
           <span>Connect</span>
@@ -219,7 +232,7 @@ export const Connect = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_ defaultValue="direct" onValueChange={(value) => handleConnectionType(value)}>
+        <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
           <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
             {connectionTypes.map((type) => (
               <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">

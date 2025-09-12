@@ -35,6 +35,7 @@ describe('tool allowance by opt-in level', () => {
       list_policies: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Log tools
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+      get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
 
     const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any)
@@ -61,6 +62,8 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).not.toContain('list_extensions')
     expect(tools).not.toContain('list_edge_functions')
     expect(tools).not.toContain('list_branches')
+    expect(tools).not.toContain('get_logs')
+    expect(tools).not.toContain('execute_sql')
   })
 
   it('should return UI and schema tools for schema opt-in level', () => {
@@ -75,6 +78,8 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).not.toContain('get_advisors')
+    expect(tools).not.toContain('get_logs')
+    expect(tools).not.toContain('execute_sql')
   })
 
   it('should return UI, schema and log tools for schema_and_log opt-in level', () => {
@@ -89,6 +94,8 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
+    expect(tools).toContain('get_logs')
+    expect(tools).not.toContain('execute_sql')
   })
 
   it('should return all tools for schema_and_log_and_data opt-in level', () => {
@@ -103,6 +110,8 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
+    expect(tools).toContain('get_logs')
+    expect(tools).not.toContain('execute_sql')
   })
 })
 
@@ -121,6 +130,7 @@ describe('filterToolsByOptInLevel', () => {
     search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Log tools
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+    get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Unknown tool - should be filtered out entirely
     some_other_tool: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
   } as unknown as ToolSet
@@ -176,6 +186,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_branches',
       'list_policies',
       'get_advisors',
+      'get_logs',
     ])
   })
 
@@ -189,13 +200,14 @@ describe('filterToolsByOptInLevel', () => {
       'list_branches',
       'list_policies',
       'get_advisors',
+      'get_logs',
     ])
   })
 
   it('should stub log tools for schema opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema')
 
-    await expectStubsFor(tools, ['get_advisors'])
+    await expectStubsFor(tools, ['get_advisors', 'get_logs'])
   })
 
   // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level

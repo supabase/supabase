@@ -2,6 +2,8 @@ import { CONNECTION_TYPES } from 'components/interfaces/Connect/Connect.constant
 import type { CloudProvider } from 'shared-data'
 
 export type CustomContentTypes = {
+  dashboardAuthCustomProvider: string
+
   organizationLegalDocuments: {
     id: string
     name: string
@@ -9,6 +11,14 @@ export type CustomContentTypes = {
     action: { text: string; url: string }
   }[]
 
+  projectHomepageClientLibraries: {
+    language: string
+    officialSupport: boolean
+    releaseState?: string
+    docsUrl: string
+    gitUrl: string
+    altIconName?: string
+  }[]
   projectHomepageExampleProjects: {
     title: string
     description: string
@@ -29,4 +39,6 @@ export type CustomContentTypes = {
   connectFrameworks: (typeof CONNECTION_TYPES)[number]
 
   infraCloudProviders: CloudProvider[]
+
+  sslCertificateUrl: string
 }

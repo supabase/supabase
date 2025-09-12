@@ -24,9 +24,15 @@
 
   "billing:all": true,
 
+  "dashboard_auth:sign_up": true,
+  "dashboard_auth:sign_in_with_github": true,
+  "dashboard_auth:sign_in_with_sso": true,
+  "dashboard_auth:sign_in_with_email": true,
+
   "database:replication": true,
   "database:roles": true,
 
+  "docs:compliance": true,
   "docs:self-hosting": true,
 
   "feedback:docs": true,
@@ -47,7 +53,6 @@
 
   "project_creation:show_advanced_config": true,
 
-  "project_homepage:show_all_client_libraries": true,
   "project_homepage:show_instance_size": true,
   "project_homepage:show_examples": true,
 

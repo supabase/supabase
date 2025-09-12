@@ -31,7 +31,10 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
-import { TAX_IDS, type TaxId } from '../BillingCustomerData/TaxID.constants'
+import {
+  TAX_IDS,
+  type TaxId,
+} from '../../../Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { Form } from '@ui/components/shadcn/ui/form'
