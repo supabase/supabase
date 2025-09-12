@@ -156,7 +156,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 className={`absolute inset-0 bg-foreground transition-all duration-200 z-0`}
                 style={{
                   width: `${fillWidth}%`,
-                  opacity: 0.03,
+                  opacity: 0.04,
                 }}
               />
               <p>{value ? `${value.toFixed(1)}%` : 'n/a'}</p>
