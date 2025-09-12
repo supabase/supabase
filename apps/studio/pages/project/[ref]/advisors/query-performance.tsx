@@ -31,6 +31,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
+  const queryMetrics = hooks.queryMetrics()
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
@@ -53,7 +54,11 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </div>
         }
       />
-      <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
+      <QueryPerformance
+        queryHitRate={queryHitRate}
+        queryPerformanceQuery={queryPerformanceQuery}
+        queryMetrics={queryMetrics}
+      />
     </div>
   )
 }

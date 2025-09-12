@@ -1,5 +1,4 @@
 import { X } from 'lucide-react'
-import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -23,22 +22,17 @@ import { QueryPerformanceGrid } from './QueryPerformanceGrid'
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
   queryPerformanceQuery: DbQueryHook<any>
+  queryMetrics: DbQueryHook<any>
 }
 
 export const QueryPerformance = ({
   queryHitRate,
   queryPerformanceQuery,
+  queryMetrics,
 }: QueryPerformanceProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
-
-  const [{ search: searchQuery, roles }] = useQueryStates({
-    sort: parseAsString,
-    search: parseAsString,
-    order: parseAsString,
-    roles: parseAsArrayOf(parseAsString).withDefault([]),
-  })
 
   const { isLoading, isRefetching } = queryPerformanceQuery
   const isPrimaryDatabase = state.selectedDatabaseId === ref
@@ -54,6 +48,7 @@ export const QueryPerformance = ({
   const handleRefresh = () => {
     queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
+    queryMetrics.runQuery()
   }
 
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
