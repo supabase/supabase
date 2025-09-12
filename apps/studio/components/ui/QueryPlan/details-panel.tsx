@@ -181,25 +181,7 @@ export const DetailsPanel = ({
 
         {/* Raw JSON */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <div className="font-semibold">Raw JSON</div>
-            {selectedNode.raw && (
-              <Button
-                type="outline"
-                size="tiny"
-                icon={copiedRawJson ? <Check /> : <Copy />}
-                className="px-1.5"
-                onClick={() =>
-                  copyToClipboard(JSON.stringify(selectedNode.raw, null, 2), () => {
-                    setCopiedRawJson(true)
-                    setTimeout(() => setCopiedRawJson(false), 1200)
-                  })
-                }
-              >
-                {copiedRawJson ? 'Copied' : null}
-              </Button>
-            )}
-          </div>
+          <div className="font-semibold mb-1">Raw JSON</div>
           {selectedNode.raw ? (
             <JsonMonacoBlock
               value={JSON.stringify(selectedNode.raw, null, 2)}
