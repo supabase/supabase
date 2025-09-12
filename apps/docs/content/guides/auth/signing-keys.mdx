@@ -176,6 +176,57 @@ supabase gen signing-key --algorithm ES256
 
 Make sure you store this private key in a secure location, as it will not be extractable from Supabase.
 
+You can import the generated private key to your project by creating a [new standby key](/dashboard/project/_/settings/jwt/signing-keys) from the dashboard. Remember to remove all unsupported fields, such as `use`, `key_ops`, `alg`, and `ext`. For e.g.
+
+```json
+{
+  "kty": "EC",
+  "kid": "3a18cfe2-7226-43b0-bbb4-7c5242f2406e",
+  "d": "RDbwqThwtGP4WnvACvO_0nL0oMMSmMFSYMPosprlAog",
+  "crv": "P-256",
+  "x": "gyLVvp9dyEgylYH7nR2E2qdQ_-9Pv5i1tk7c2qZD4Nk",
+  "y": "CD9RfYOTyjR5U-PC9UDlsthRpc7vAQQQ2FTt8UsX0fY"
+}
+```
+
+Once imported, click `Rotate key` to activate your new signing key. Any JWT signed by your old key will continue to be usable until your old signing key is manually revoked.
+
+To mint a new JWT using the asymmetric signing key, you will need to set the following JWT headers to match your generated private key.
+
+```json
+{
+  "alg": "ES256",
+  "kid": "3a18cfe2-7226-43b0-bbb4-7c5242f2406e",
+  "typ": "JWT"
+}
+```
+
+In addition, you need to provide the following custom claims as the JWT payload.
+
+```json
+{
+  "iss": "supabase",
+  "ref": "vdpfzijcqftxdatebvcx",
+  "role": "service_role",
+  "exp": 1757749466
+}
+```
+
+- `iss` is optional and can be set to any string that identifies the issuer of this JWT.
+- `ref` must be set to the project ref which you have imported the signing key.
+- `role` must be set to an existing Postgres role in your database, such as `anon`, `authenticated`, or `service_role`.
+- `exp` must be set to a timestamp in the future (seconds since epoch) when this token expires.
+
+Finally, you can use your newly minted JWT as the Bearer Token Authentication header in all PostgREST requests.
+
+```sh
+curl 'https://vdpfzijcqftxdatebvcx.supabase.co/rest/v1/cities?select=id' \
+  -H "apikey: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH" \
+  -H "Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjNhMThjZmUyLTcyMjYtNDNiMC1iYmI0LTdjNTI0MmYyNDA2ZSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGZ6aWpjcWZ0eGRhdGVidmN4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTc1Nzc1MTc3Mn0.mxPJhHlNnEou7Qqu9TJHFZ9EMH9DVLSGbeVg4RiuAEzgN0gQgyxP7BRARrkZyrjCqPVtJe5HSsOW-OVvFQCOYw"
+```
+
+Remember to provide your project's publishable key as the `apikey` header to bypass validation by our API gateway.
+
 ### Why is a 5 minute wait imposed when changing signing key states?
 
 Changing a JWT signing key's state sets off many changes inside the Supabase platform. To ensure a consistent setup, most actions that change the state of a JWT signing key are throttled for approximately 5 minutes.
