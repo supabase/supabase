@@ -75,6 +75,14 @@ export const ProjectDropdown = () => {
         onSelect={(project) => {
           router.push(`/project/${project.ref}`)
         }}
+        renderTrigger={() => (
+          <Button
+            type="text"
+            size="tiny"
+            className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+          />
+        )}
         renderRow={(project) => {
           // [Joshen] Temp while we're interim between v1 and v2 billing
           const sanitizedRoute = sanitizeRoute(router.route, router.query)
@@ -112,14 +120,7 @@ export const ProjectDropdown = () => {
             </CommandGroup_Shadcn_>
           )
         }
-      >
-        <Button
-          type="text"
-          size="tiny"
-          className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-          iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-        />
-      </OrganizationProjectSelector>
+      />
     </>
   ) : (
     <Button type="text">

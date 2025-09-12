@@ -2,7 +2,7 @@ import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Check, HelpCircle } from 'lucide-react'
-import { PropsWithChildren, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   Command_Shadcn_,
@@ -28,7 +28,15 @@ interface OrganizationProjectSelectorSelectorProps {
   sameWidthAsTrigger?: boolean
   setOpen?: (value: boolean) => void
   renderRow?: (project: OrgProject) => ReactNode
+  renderTrigger?: ({
+    isLoading,
+    project,
+  }: {
+    isLoading: boolean
+    project?: OrgProject
+  }) => ReactNode
   onSelect?: (project: OrgProject) => void
+  onInitialLoad?: (projects: OrgProject[]) => void
 }
 
 export const OrganizationProjectSelector = ({
@@ -38,10 +46,11 @@ export const OrganizationProjectSelector = ({
   selectedRef,
   searchPlaceholder = 'Find project...',
   sameWidthAsTrigger = false,
-  children,
   renderRow,
+  renderTrigger,
   onSelect,
-}: PropsWithChildren<OrganizationProjectSelectorSelectorProps>) => {
+  onInitialLoad,
+}: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
 
@@ -64,6 +73,7 @@ export const OrganizationProjectSelector = ({
     error: projectsError,
     isLoading: isLoadingProjects,
     isError: isErrorProjects,
+    isSuccess: isSuccessProjects,
     isFetching,
     isFetchingNextPage,
     hasNextPage,
@@ -74,6 +84,7 @@ export const OrganizationProjectSelector = ({
   )
 
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
+  const selectedProject = projects.find((p) => p.ref === selectedRef)
 
   useEffect(() => {
     if (
@@ -96,10 +107,19 @@ export const OrganizationProjectSelector = ({
     fetchNextPage,
   ])
 
+  useEffect(() => {
+    if (isSuccessProjects && !!onInitialLoad) onInitialLoad(projects)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessProjects])
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        {children ?? <p className="text-sm text-foreground-light">Children to be provided</p>}
+        {!!renderTrigger ? (
+          renderTrigger({ isLoading: isLoadingProjects, project: selectedProject })
+        ) : (
+          <p className="text-sm text-foreground-light">Children to be provided</p>
+        )}
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
         sameWidthAsTrigger={sameWidthAsTrigger}

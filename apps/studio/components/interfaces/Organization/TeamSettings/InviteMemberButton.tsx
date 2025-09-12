@@ -14,7 +14,6 @@ import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSe
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -41,6 +40,7 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 export const InviteMemberButton = () => {
@@ -56,14 +56,9 @@ export const InviteMemberButton = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
-  const { data } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
-
-  const orgProjects = (data?.projects ?? [])
-    .filter((project) => project.organization_id === organization?.id)
-    .sort((a, b) => a.name.localeCompare(b.name))
 
   const currentPlan = organization?.plan
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
@@ -108,7 +103,7 @@ export const InviteMemberButton = () => {
     defaultValues: { email: '', role: '', applyToOrg: true, projectRef: '' },
   })
 
-  const { applyToOrg, projectRef } = form.watch()
+  const { applyToOrg } = form.watch()
 
   const onInviteMember = async (values: z.infer<typeof FormSchema>) => {
     if (!slug) return console.error('Slug is required')
@@ -154,16 +149,8 @@ export const InviteMemberButton = () => {
       const developerRole = orgScopedRoles.find((role) => role.name === 'Developer')
       if (developerRole !== undefined) form.setValue('role', developerRole.id.toString())
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, isOpen])
-
-  useEffect(() => {
-    if (!applyToOrg) {
-      const firstProject = orgProjects?.[0]
-      if (firstProject !== undefined) form.setValue('projectRef', firstProject.ref)
-    } else {
-      form.setValue('projectRef', '')
-    }
-  }, [applyToOrg])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -270,26 +257,33 @@ export const InviteMemberButton = () => {
                       <FormControl_Shadcn_>
                         <OrganizationProjectSelector
                           sameWidthAsTrigger
-                          selectedRef={projectRef}
+                          selectedRef={field.value}
                           open={projectDropdownOpen}
                           setOpen={setProjectDropdownOpen}
                           searchPlaceholder="Search project..."
                           onSelect={(project) => form.setValue('projectRef', project.ref)}
-                        >
-                          <Button
-                            block
-                            type="default"
-                            role="combobox"
-                            size="small"
-                            className="justify-between max-w-[470px]"
-                            iconRight={
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            }
-                          >
-                            {orgProjects.find((project) => project.ref === field.value)?.name ??
-                              'Unknown'}
-                          </Button>
-                        </OrganizationProjectSelector>
+                          onInitialLoad={(projects) =>
+                            form.setValue('projectRef', projects[0]?.ref ?? '')
+                          }
+                          renderTrigger={({ isLoading, project }) => (
+                            <Button
+                              block
+                              type="default"
+                              role="combobox"
+                              size="small"
+                              className="justify-between max-w-[470px]"
+                              iconRight={
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              }
+                            >
+                              {isLoading ? (
+                                <ShimmeringLoader className="w-44 py-2" />
+                              ) : (
+                                project?.name ?? 'Unknown'
+                              )}
+                            </Button>
+                          )}
+                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
