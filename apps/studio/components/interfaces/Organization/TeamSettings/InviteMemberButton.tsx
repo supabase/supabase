@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -40,7 +39,6 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 export const InviteMemberButton = () => {
@@ -103,7 +101,7 @@ export const InviteMemberButton = () => {
     defaultValues: { email: '', role: '', applyToOrg: true, projectRef: '' },
   })
 
-  const { applyToOrg } = form.watch()
+  const { applyToOrg, projectRef } = form.watch()
 
   const onInviteMember = async (values: z.infer<typeof FormSchema>) => {
     if (!slug) return console.error('Slug is required')
@@ -257,32 +255,13 @@ export const InviteMemberButton = () => {
                       <FormControl_Shadcn_>
                         <OrganizationProjectSelector
                           sameWidthAsTrigger
-                          selectedRef={field.value}
+                          checkPosition="left"
+                          selectedRef={projectRef}
                           open={projectDropdownOpen}
                           setOpen={setProjectDropdownOpen}
                           searchPlaceholder="Search project..."
-                          onSelect={(project) => form.setValue('projectRef', project.ref)}
-                          onInitialLoad={(projects) =>
-                            form.setValue('projectRef', projects[0]?.ref ?? '')
-                          }
-                          renderTrigger={({ isLoading, project }) => (
-                            <Button
-                              block
-                              type="default"
-                              role="combobox"
-                              size="small"
-                              className="justify-between max-w-[470px]"
-                              iconRight={
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              }
-                            >
-                              {isLoading ? (
-                                <ShimmeringLoader className="w-44 py-2" />
-                              ) : (
-                                project?.name ?? 'Unknown'
-                              )}
-                            </Button>
-                          )}
+                          onSelect={(project) => field.onChange(project.ref)}
+                          onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>

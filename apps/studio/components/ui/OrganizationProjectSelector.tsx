@@ -1,10 +1,12 @@
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Check, HelpCircle } from 'lucide-react'
+import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
+  Button,
+  cn,
   Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -21,11 +23,12 @@ import {
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface OrganizationProjectSelectorSelectorProps {
+  slug?: string
   open?: boolean
-  actions?: ReactNode
   selectedRef?: string
   searchPlaceholder?: string
   sameWidthAsTrigger?: boolean
+  checkPosition?: 'right' | 'left'
   setOpen?: (value: boolean) => void
   renderRow?: (project: OrgProject) => ReactNode
   renderTrigger?: ({
@@ -35,24 +38,27 @@ interface OrganizationProjectSelectorSelectorProps {
     isLoading: boolean
     project?: OrgProject
   }) => ReactNode
+  renderActions?: (setOpen: (value: boolean) => void) => ReactNode
   onSelect?: (project: OrgProject) => void
   onInitialLoad?: (projects: OrgProject[]) => void
 }
 
 export const OrganizationProjectSelector = ({
+  slug: _slug,
   open: _open,
   setOpen: _setOpen,
-  actions,
   selectedRef,
   searchPlaceholder = 'Find project...',
   sameWidthAsTrigger = false,
+  checkPosition = 'right',
   renderRow,
   renderTrigger,
+  renderActions,
   onSelect,
   onInitialLoad,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
-  const slug = organization?.slug
+  const slug = _slug ?? organization?.slug
 
   const [openInternal, setOpenInternal] = useState(false)
   const open = _open ?? openInternal
@@ -95,7 +101,6 @@ export const OrganizationProjectSelector = ({
       !isFetchingNextPage &&
       !isLoadingProjects
     ) {
-      console.log('fetch')
       fetchNextPage()
     }
   }, [
@@ -108,17 +113,32 @@ export const OrganizationProjectSelector = ({
   ])
 
   useEffect(() => {
-    if (isSuccessProjects && !!onInitialLoad) onInitialLoad(projects)
+    if (isSuccessProjects && !isFetching && !isFetchingNextPage && !!onInitialLoad) {
+      onInitialLoad(projects)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessProjects])
+  }, [isSuccessProjects, isFetching, isFetchingNextPage, slug])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
         {!!renderTrigger ? (
-          renderTrigger({ isLoading: isLoadingProjects, project: selectedProject })
+          renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
         ) : (
-          <p className="text-sm text-foreground-light">Children to be provided</p>
+          <Button
+            block
+            type="default"
+            role="combobox"
+            size="small"
+            className="justify-between"
+            iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+          >
+            {isLoadingProjects || isFetching ? (
+              <ShimmeringLoader className="w-44 py-2" />
+            ) : (
+              selectedProject?.name ?? 'Select a project'
+            )}
+          </Button>
         )}
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
@@ -178,9 +198,20 @@ export const OrganizationProjectSelector = ({
                         {!!renderRow ? (
                           renderRow(project)
                         ) : (
-                          <div className="w-full flex items-center justify-between">
+                          <div
+                            className={cn(
+                              'w-full flex items-center',
+                              checkPosition === 'left' ? 'gap-x-2' : 'justify-between',
+                              project.ref !== selectedRef && checkPosition === 'left' && 'ml-6'
+                            )}
+                          >
+                            {checkPosition === 'left' && project.ref === selectedRef && (
+                              <Check size={16} />
+                            )}
                             {project.name}
-                            {project.ref === selectedRef && <Check size={16} />}
+                            {checkPosition === 'right' && project.ref === selectedRef && (
+                              <Check size={16} />
+                            )}
                           </div>
                         )}
                       </CommandItem_Shadcn_>
@@ -195,11 +226,11 @@ export const OrganizationProjectSelector = ({
                 </>
               )}
             </CommandGroup_Shadcn_>
-            {!!actions && (
+            {!!renderActions && (
               <>
                 {/* [Joshen] Not using CommandSeparator to persist this while searching */}
                 <div className="h-px bg-border-overlay -mx-1" />
-                {actions}
+                {renderActions(setOpen)}
               </>
             )}
           </CommandList_Shadcn_>
