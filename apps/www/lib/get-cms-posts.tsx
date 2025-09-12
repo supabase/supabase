@@ -491,7 +491,7 @@ export async function getAllCMSPosts({
           ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
         cache: 'no-store', // Ensure we always get fresh data
-        next: { revalidate: 0 }, // Disable caching for this fetch
+        next: { revalidate: 30 }, // Disable caching for this fetch
       }
     )
 

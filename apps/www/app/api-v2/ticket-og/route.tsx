@@ -24,7 +24,7 @@ const FONT_URLS = {
 const LW_TABLE = 'tickets'
 const LW_MATERIALIZED_VIEW = 'tickets_view'
 
-export async function GET(req: Request, res: Response) {
+export async function GET(req: Request) {
   const url = new URL(req.url)
 
   // Just here to silence snyk false positives
