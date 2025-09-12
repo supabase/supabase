@@ -55,7 +55,6 @@ export interface EntityListItemProps {
   isLocked: boolean
   isActive?: boolean
   onExportCLI: () => void
-  onSelectTable?: (tableId: number) => void
 }
 
 // [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
@@ -70,7 +69,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   isLocked,
   isActive: _isActive,
   onExportCLI,
-  onSelectTable,
 }) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
@@ -242,7 +240,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}`}
       role="button"
       aria-label={`View ${entity.name}`}
-      onClick={() => onSelectTable?.(entity.id)}
       className={cn(
         TreeViewItemVariant({
           isSelected: isActive && !isPreview,

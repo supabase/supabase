@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Filter, Plus } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
@@ -18,9 +18,9 @@ import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-que
 import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
@@ -40,27 +40,13 @@ import {
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
-import { useTemporarySchemaState } from './useTemporarySchemaState'
-
-const useMobileMenuOnClose = (callback: () => void, enabled: boolean) => {
-  const isMobile = useBreakpoint()
-  const { mobileMenuOpen } = useAppStateSnapshot()
-  const prevMobileMenuOpenRef = useRef(mobileMenuOpen)
-
-  if (isMobile && prevMobileMenuOpenRef.current && !mobileMenuOpen && enabled) {
-    callback()
-  }
-  prevMobileMenuOpenRef.current = mobileMenuOpen
-}
 
 export const TableEditorMenu = () => {
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
-  const { effectiveSchema, hasPendingChange, actions: schemaActions } = useTemporarySchemaState()
-
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const isMobile = useBreakpoint()
-  useMobileMenuOnClose(schemaActions.commitSelection, hasPendingChange)
 
   const [searchText, setSearchText] = useState<string>('')
   const [tableToExport, setTableToExport] = useState<SupaTable>()
@@ -84,7 +70,7 @@ export const TableEditorMenu = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schemas: [effectiveSchema],
+      schemas: [selectedSchema],
       search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
@@ -101,7 +87,7 @@ export const TableEditorMenu = () => {
 
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const { isSchemaLocked } = useIsProtectedSchema({ schema: effectiveSchema })
+  const { isSchemaLocked, reason } = useIsProtectedSchema({ schema: selectedSchema })
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -109,8 +95,8 @@ export const TableEditorMenu = () => {
     id,
   })
 
-  if (selectedTable?.schema && !effectiveSchema) {
-    schemaActions.selectSchema(selectedTable.schema, { forceCommit: true })
+  if (selectedTable?.schema && !selectedSchema) {
+    setSelectedSchema(selectedTable.schema)
   }
 
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
@@ -128,9 +114,9 @@ export const TableEditorMenu = () => {
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
     if (entityTypes && !searchText) {
-      tableEditorTabsCleanUp({ schemas: [effectiveSchema], entities: entityTypes })
+      tableEditorTabsCleanUp({ schemas: [selectedSchema], entities: entityTypes })
     }
-  }, [entityTypes, searchText, effectiveSchema, tableEditorTabsCleanUp])
+  }, [entityTypes, searchText, selectedSchema, tableEditorTabsCleanUp])
 
   return (
     <>
@@ -138,10 +124,10 @@ export const TableEditorMenu = () => {
         <div className="flex flex-col gap-y-1.5">
           <SchemaSelector
             className="mx-4"
-            selectedSchemaName={effectiveSchema}
+            selectedSchemaName={selectedSchema}
             onSelectSchema={(name: string) => {
               setSearchText('')
-              schemaActions.selectSchema(name)
+              setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />
@@ -170,7 +156,7 @@ export const TableEditorMenu = () => {
                 New table
               </ButtonTooltip>
             ) : (
-              <ProtectedSchemaWarning size="sm" schema={effectiveSchema} entity="table" />
+              <ProtectedSchemaWarning size="sm" schema={selectedSchema} entity="table" />
             )}
           </div>
         </div>
@@ -281,7 +267,6 @@ export const TableEditorMenu = () => {
                       id: Number(id),
                       isSchemaLocked,
                       onExportCLI: () => onSelectExportCLI(Number(id)),
-                      onSelectTable: () => schemaActions.commitSelection(),
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
