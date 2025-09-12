@@ -85,9 +85,9 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   const [metricsVisibility, setMetricsVisibility] = useState<MetricsVisibility>({
     time: true,
     rows: true,
-    cost: true,
-    buffers: true,
-    output: true,
+    cost: false,
+    buffers: false,
+    output: false,
   })
 
   // Heatmap mode and maxima across nodes

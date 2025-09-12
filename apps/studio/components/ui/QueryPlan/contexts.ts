@@ -1,6 +1,5 @@
 import { createContext } from 'react'
 
-// Metrics visibility context and types
 export type MetricsVisibility = {
   time: boolean
   rows: boolean
@@ -12,9 +11,9 @@ export type MetricsVisibility = {
 export const defaultMetricsVisibility: MetricsVisibility = {
   time: true,
   rows: true,
-  cost: true,
-  buffers: true,
-  output: true,
+  cost: false,
+  buffers: false,
+  output: false,
 }
 
 export const MetricsVisibilityContext = createContext<MetricsVisibility>(defaultMetricsVisibility)
