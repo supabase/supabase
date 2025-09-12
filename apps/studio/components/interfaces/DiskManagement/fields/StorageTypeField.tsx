@@ -91,7 +91,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
               />
             ) : (
               <FormControl_Shadcn_>
-                <SelectTrigger_Shadcn_ className="h-14 max-w-[420px] [&>span]:w-full">
+                <SelectTrigger_Shadcn_ className="h-14 max-w-[420px]">
                   <SelectValue_Shadcn_ />
                 </SelectTrigger_Shadcn_>
               </FormControl_Shadcn_>
