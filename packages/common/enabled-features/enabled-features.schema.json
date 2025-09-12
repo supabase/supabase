@@ -102,6 +102,10 @@
       "type": "boolean",
       "description": "Enable the sign in with email/password provider"
     },
+    "dashboard_auth:show_testimonial": {
+      "type": "boolean",
+      "description": "Enable the testimonial on the sign in/up page"
+    },
 
     "database:replication": {
       "type": "boolean",
