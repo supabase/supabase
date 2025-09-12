@@ -216,6 +216,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             }}
           >
             <ReactFlow
+              className="rounded-md"
               defaultNodes={[]}
               defaultEdges={[]}
               nodesConnectable={false}
@@ -235,7 +236,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               minZoom={0.8}
               maxZoom={1.8}
               proOptions={{ hideAttribution: true }}
-              onNodeClick={(e, node) => setSelectedNode(node.data as PlanNodeData)}
+              onNodeClick={(_event, node) => setSelectedNode(node.data)}
               onPaneClick={() => setSelectedNode(null)}
               onInit={(instance) => setRfInstance(instance)}
             >
