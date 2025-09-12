@@ -55,6 +55,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
 
+  const { computeSize, storageType } = form.watch()
+
   const {
     data: addons,
     isLoading: isAddonsLoading,
@@ -111,7 +113,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
         >
           <FormItemLayout
             layout="horizontal"
-            label={'Compute size'}
+            label="Compute size"
             id={field.name}
             className="gap-5"
             labelOptional={
@@ -125,7 +127,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   }
                   beforePrice={Number(computeSizePrice.oldPrice)}
                   afterPrice={Number(computeSizePrice.newPrice)}
-                  free={showUpgradeBadge && form.watch('computeSize') === 'ci_micro' ? true : false}
+                  free={showUpgradeBadge && computeSize === 'ci_micro' ? true : false}
                 />
                 <p className="text-foreground-lighter">
                   Hardware resources allocated to your Postgres database

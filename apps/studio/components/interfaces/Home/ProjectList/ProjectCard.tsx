@@ -1,19 +1,19 @@
 import { Github } from 'lucide-react'
+import InlineSVG from 'react-inlinesvg'
 
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import type { ProjectInfo } from 'data/projects/projects-query'
+import { OrgProject } from 'data/projects/projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
-import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
-  project: ProjectInfo
+  project: OrgProject
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection
@@ -28,20 +28,20 @@ export const ProjectCard = ({
   resourceWarnings,
 }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
-  const desc = `${project.cloud_provider} | ${project.region}`
+  const infraInformation = project.databases.find((x) => x.identifier === project.ref)
+  const desc = `${infraInformation?.cloud_provider} | ${project.region}`
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
 
-  const isBranchingEnabled = project.preview_branch_refs?.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
-  const projectStatus = inferProjectStatus(project)
+  const projectStatus = inferProjectStatus(project.status)
 
   return (
-    <li className="list-none">
+    <li className="list-none h-min">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         className="h-44 !px-0 group pt-5 pb-0"

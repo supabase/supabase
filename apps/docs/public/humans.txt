@@ -63,6 +63,7 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jeff Smick
 Jenny Kibiri
 Jess Shears
 Jim Chanco Jr
@@ -131,6 +132,7 @@ Thor Schaeff
 Timothy Lim
 Tom Ashley
 Tom G
+Tomás Pozo
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert

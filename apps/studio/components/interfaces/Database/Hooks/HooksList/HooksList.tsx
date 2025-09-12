@@ -10,10 +10,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import {
-  useAsyncCheckProjectPermissions,
-  usePermissionsLoaded,
-} from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { noop } from 'lib/void'
 import { Input } from 'ui'
@@ -49,11 +46,8 @@ export const HooksList = ({
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
 
-  const { can: canCreateWebhooks } = useAsyncCheckProjectPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
-  )
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canCreateWebhooks, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   return (
     <div className="w-full space-y-4">

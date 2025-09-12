@@ -83,22 +83,7 @@ const data: () => {
         </>,
       ],
       footer: <Logos showHeading={false} className="mt-12" />,
-      image: (
-        <DatabaseVisual
-          className="group
-            [&>span]:!w-[120%]
-            [&>span]:!h-[120%]
-            [&>span]:!inset-auto
-            [&>span]:!-left-10
-            [&>span]:sm:!-left-20
-            [&>span]:lg:!-left-10
-            [&>span]:!-top-16
-            [&>span]:md:!-top-28
-            [&>span]:lg:!-top-52
-          "
-          hasGlow={false}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',
