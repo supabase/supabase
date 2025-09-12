@@ -13,6 +13,7 @@ import { DecorativeProgressBar } from '~/components/SurveyResults/DecorativeProg
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
+import { StateOfStartupsHeader } from '~/components/SurveyResults/StateOfStartupsHeader'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
@@ -206,10 +207,51 @@ function StateOfStartupsPage() {
         <FloatingTableOfContents />
         {/* Intro section */}
         <section ref={heroRef} className="w-full">
-          {/* Text contents */}
+          {/* New Header Component */}
+          <StateOfStartupsHeader
+            title={pageData.heroSection.title}
+            subtitle={pageData.heroSection.subheader}
+            chapters={pageData.pageChapters.map((chapter, index) => ({
+              shortTitle: chapter.shortTitle,
+              number: index + 1,
+            }))}
+          />
+
+          {/* Original TOC and content below */}
+          <SurveySectionBreak className="hidden md:block" />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
+            {/* Intro text */}
+            <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
+              <p>{pageData.heroSection.subheader}</p>
+              <p>{pageData.heroSection.cta}</p>
+            </div>
+
+            {/* Table of contents */}
+            <ol className="flex flex-col py-5">
+              {pageData.pageChapters.map((chapter, chapterIndex) => (
+                <li key={chapterIndex + 1}>
+                  <Link
+                    href={`#chapter-${chapterIndex + 1}`}
+                    className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
+                  >
+                    <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
+                      {chapterIndex + 1}
+                    </span>{' '}
+                    {chapter.shortTitle}
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <SurveySectionBreak />
+        </section>
+
+        {/* Original Header - Commented Out 
+        <section ref={heroRef} className="w-full">
           <header className="w-full flex flex-col md:flex-col">
             <div className="flex flex-col md:flex-row">
-              {/* Intro area */}
               <div
                 style={
                   {
@@ -225,7 +267,6 @@ function StateOfStartupsPage() {
                 </p>
               </div>
 
-              {/* Headline area */}
               <div
                 className="px-8 pt-10 pb-16 md:pt-36 md:pb-28 flex-1"
                 style={{
@@ -242,13 +283,11 @@ function StateOfStartupsPage() {
             <SurveySectionBreak className="hidden md:block" />
 
             <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
-              {/* Intro text */}
               <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
                 <p>{pageData.heroSection.subheader}</p>
                 <p>{pageData.heroSection.cta}</p>
               </div>
 
-              {/* Table of contents */}
               <ol className="flex flex-col py-5">
                 {pageData.pageChapters.map((chapter, chapterIndex) => (
                   <li key={chapterIndex + 1}>
@@ -269,6 +308,7 @@ function StateOfStartupsPage() {
 
           <SurveySectionBreak />
         </section>
+        */}
 
         {pageData.pageChapters.map((chapter, chapterIndex) => (
           <SurveyChapter
