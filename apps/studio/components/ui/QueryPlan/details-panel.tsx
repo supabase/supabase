@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Check } from 'lucide-react'
 
-import { Button } from '@ui/components/shadcn/ui/button'
-import { cn, copyToClipboard } from 'ui'
+import { cn, copyToClipboard, Button_Shadcn_ as Button } from 'ui'
 import type { PlanNodeData } from './types'
 
 export const DetailsPanel = ({
