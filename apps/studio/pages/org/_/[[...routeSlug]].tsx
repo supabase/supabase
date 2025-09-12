@@ -1,15 +1,17 @@
-import { Plus } from 'lucide-react'
 import { NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Header, LoadingCardView } from 'components/interfaces/Home/ProjectList/EmptyStates'
+import {
+  Header,
+  LoadingCardView,
+  NoOrganizationsState,
+} from 'components/interfaces/Home/ProjectList/EmptyStates'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import CardButton from 'components/ui/CardButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 
 // [Joshen] Thinking we can deprecate this page in favor of /organizations
 const GenericOrganizationPage: NextPage = () => {
@@ -47,19 +49,7 @@ const GenericOrganizationPage: NextPage = () => {
                 {isLoading ? (
                   <LoadingCardView />
                 ) : organizations?.length === 0 ? (
-                  <div className="col-span-4 space-y-4 rounded-lg border border-dashed border-muted p-6 text-center">
-                    <div className="space-y-1">
-                      <p>You are not part of any organizations yet</p>
-                      <p className="text-sm text-foreground-light">
-                        Get started by creating a new organization.
-                      </p>
-                    </div>
-                    <div>
-                      <Button asChild icon={<Plus />}>
-                        <Link href="/new">New organization</Link>
-                      </Button>
-                    </div>
-                  </div>
+                  <NoOrganizationsState />
                 ) : (
                   <ul
                     className={cn(

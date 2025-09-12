@@ -140,3 +140,21 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
     </div>
   )
 }
+
+export const NoOrganizationsState = () => {
+  return (
+    <div className="col-span-4 space-y-4 rounded-lg border border-dashed border-muted p-6 text-center">
+      <div className="space-y-1">
+        <p>You are not part of any organizations yet</p>
+        <p className="text-sm text-foreground-light">
+          Create your first organization to get started with Supabase
+        </p>
+      </div>
+      <div>
+        <Button asChild icon={<Plus />}>
+          <Link href="/new">New organization</Link>
+        </Button>
+      </div>
+    </div>
+  )
+}

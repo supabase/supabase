@@ -1,11 +1,14 @@
 import { AlertTriangleIcon } from 'lucide-react'
 import { NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
-import { Header, LoadingCardView } from 'components/interfaces/Home/ProjectList/EmptyStates'
+import {
+  Header,
+  LoadingCardView,
+  NoOrganizationsState,
+} from 'components/interfaces/Home/ProjectList/EmptyStates'
 import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from 'components/interfaces/HomePageActions'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -17,7 +20,6 @@ import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Button,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -113,19 +115,7 @@ const GenericProjectPage: NextPage = () => {
                 <AlertDescription_Shadcn_>Try refreshing the page</AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             ) : organizations.length === 0 ? (
-              <div className="w-full border rounded-lg p-8 flex flex-col items-center gap-6">
-                <div className="flex flex-col items-center gap-3 text-center">
-                  <p className="text-foreground text-base font-medium">
-                    No projects or organizations found
-                  </p>
-                  <p className="text-sm text-foreground-lighter leading-relaxed">
-                    Create your first organization to get started with Supabase
-                  </p>
-                </div>
-                <Button asChild type="primary" size="medium">
-                  <Link href="/new">Create organization</Link>
-                </Button>
-              </div>
+              <NoOrganizationsState />
             ) : !!selectedOrganization ? (
               <ProjectList
                 organization={selectedOrganization}
