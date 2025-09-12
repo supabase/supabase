@@ -204,11 +204,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         </div>
 
         {selectedNode && (
-          <DetailsPanel
-            selectedNode={selectedNode}
-            setSelectedNode={setSelectedNode}
-            isFullscreen={isFullscreen}
-          />
+          <DetailsPanel selectedNode={selectedNode} setSelectedNode={setSelectedNode} />
         )}
         <MetricsVisibilityContext.Provider value={metricsVisibility}>
           <HeatmapContext.Provider

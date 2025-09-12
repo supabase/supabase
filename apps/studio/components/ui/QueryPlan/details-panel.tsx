@@ -2,33 +2,22 @@ import { useState } from 'react'
 import { Check } from 'lucide-react'
 
 import { Button } from '@ui/components/shadcn/ui/button'
-import { cn, copyToClipboard } from 'ui'
+import { copyToClipboard } from 'ui'
 import type { PlanNodeData } from './types'
 
 export const DetailsPanel = ({
   selectedNode,
   setSelectedNode,
-  isFullscreen = false,
 }: {
   selectedNode: PlanNodeData
   setSelectedNode: (node: PlanNodeData | null) => void
-  isFullscreen?: boolean
 }) => {
   const [copiedConditions, setCopiedConditions] = useState(false)
   const [copiedOutputCols, setCopiedOutputCols] = useState(false)
   const [copiedRawJson, setCopiedRawJson] = useState(false)
 
   return (
-    <div
-      className={cn(
-        // Full height always; if not fullscreen, also take the full width for easier reading
-        // Else behave like a right-side drawer
-        'absolute z-20 border bg-background shadow-xl flex flex-col rounded-md',
-        isFullscreen
-          ? 'inset-y-0 right-0 w-[420px] sm:w-[440px] md:w-[480px] max-w-[85%] border-y-0 border-r-0 rounded-l-none'
-          : 'inset-0 w-full'
-      )}
-    >
+    <div className="absolute z-20 top-16 right-2 w-[380px] max-h-[75%] overflow-x-hidden overflow-y-auto rounded border bg-background shadow-lg">
       <div className="flex items-center justify-between px-3 py-2 border-b">
         <div className="text-xs font-semibold truncate" title={selectedNode.label}>
           Details: {selectedNode.label}
@@ -43,7 +32,7 @@ export const DetailsPanel = ({
         </Button>
       </div>
 
-      <div className="p-3 space-y-3 overflow-y-auto text-[11px] flex-1">
+      <div className="p-3 space-y-3 overflow-y-auto max-h-[calc(75vh-48px)] text-[11px]">
         {/* Context line */}
         {(selectedNode.relationName || selectedNode.alias) && (
           <div className="text-foreground-lighter">
@@ -194,7 +183,7 @@ export const DetailsPanel = ({
             )}
           </div>
           {selectedNode.raw ? (
-            <pre className="p-2 border rounded bg-surface-100 overflow-auto text-[10px]">
+            <pre className="p-2 border rounded bg-surface-100 overflow-auto max-h-[240px] text-[10px]">
               {JSON.stringify(selectedNode.raw, null, 2)}
             </pre>
           ) : (
