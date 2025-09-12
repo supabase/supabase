@@ -71,6 +71,10 @@ export const ProjectDropdown = () => {
       <OrganizationProjectSelector
         open={open}
         setOpen={setOpen}
+        selectedRef={ref}
+        onSelect={(project) => {
+          router.push(`/project/${project.ref}`)
+        }}
         renderRow={(project) => {
           // [Joshen] Temp while we're interim between v1 and v2 billing
           const sanitizedRoute = sanitizeRoute(router.route, router.query)

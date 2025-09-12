@@ -24,6 +24,8 @@ interface OrganizationProjectSelectorSelectorProps {
   open?: boolean
   actions?: ReactNode
   selectedRef?: string
+  searchPlaceholder?: string
+  sameWidthAsTrigger?: boolean
   setOpen?: (value: boolean) => void
   renderRow?: (project: OrgProject) => ReactNode
   onSelect?: (project: OrgProject) => void
@@ -34,6 +36,8 @@ export const OrganizationProjectSelector = ({
   setOpen: _setOpen,
   actions,
   selectedRef,
+  searchPlaceholder = 'Find project...',
+  sameWidthAsTrigger = false,
   children,
   renderRow,
   onSelect,
@@ -97,13 +101,18 @@ export const OrganizationProjectSelector = ({
       <PopoverTrigger_Shadcn_ asChild>
         {children ?? <p className="text-sm text-foreground-light">Children to be provided</p>}
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+      <PopoverContent_Shadcn_
+        sameWidthAsTrigger={sameWidthAsTrigger}
+        className="p-0"
+        side="bottom"
+        align="start"
+      >
         <Command_Shadcn_ shouldFilter={false}>
           <CommandInput_Shadcn_
             showResetIcon
             value={search}
             onValueChange={setSearch}
-            placeholder="Find project..."
+            placeholder={searchPlaceholder}
             handleReset={() => setSearch('')}
           />
           <CommandList_Shadcn_>
