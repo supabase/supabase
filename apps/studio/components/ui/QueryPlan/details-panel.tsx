@@ -1,8 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Check } from 'lucide-react'
 
 import { cn, copyToClipboard, Button_Shadcn_ as Button } from 'ui'
 import type { PlanNodeData } from './types'
+
+// Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
+const JsonMonacoBlock = dynamic(
+  () => import('./json-monaco-block').then(({ JsonMonacoBlock }) => JsonMonacoBlock),
+  { ssr: false }
+)
 
 export const DetailsPanel = ({
   selectedNode,
@@ -16,6 +23,22 @@ export const DetailsPanel = ({
   const [copiedConditions, setCopiedConditions] = useState(false)
   const [copiedOutputCols, setCopiedOutputCols] = useState(false)
   const [copiedRawJson, setCopiedRawJson] = useState(false)
+  const [jsonHeight, setJsonHeight] = useState<number>(isFullscreen ? 420 : 220)
+
+  useEffect(() => {
+    const calc = () => {
+      if (typeof window === 'undefined') return
+      if (isFullscreen) {
+        const h = Math.floor(window.innerHeight * 0.6)
+        setJsonHeight(Math.max(320, Math.min(720, h)))
+      } else {
+        setJsonHeight(220)
+      }
+    }
+    calc()
+    window.addEventListener('resize', calc)
+    return () => window.removeEventListener('resize', calc)
+  }, [isFullscreen])
 
   return (
     <div
@@ -193,9 +216,12 @@ export const DetailsPanel = ({
             )}
           </div>
           {selectedNode.raw ? (
-            <pre className="p-2 border rounded bg-surface-100 overflow-auto text-[10px]">
-              {JSON.stringify(selectedNode.raw, null, 2)}
-            </pre>
+            <JsonMonacoBlock
+              value={JSON.stringify(selectedNode.raw, null, 2)}
+              height={jsonHeight}
+              lineNumbers="off"
+              wrapperClassName="bg-surface-100"
+            />
           ) : (
             <div className="text-foreground-lighter">(no data)</div>
           )}
