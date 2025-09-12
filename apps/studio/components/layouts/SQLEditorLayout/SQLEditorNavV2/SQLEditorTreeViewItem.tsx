@@ -16,7 +16,7 @@ import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
 
 import { IS_PLATFORM } from 'common'
-import { useParams } from 'common/hooks/useParams'
+import { useParams } from 'common/hooks'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { getContentById } from 'data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
