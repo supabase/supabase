@@ -11,7 +11,7 @@ export const QueryPerformanceMetrics = () => {
   const stats = useMemo(() => {
     return [
       {
-        title: 'Slow Query',
+        title: queryMetrics?.[0]?.slow_queries === '1' ? 'Slow Query' : 'Slow Queries',
         value: queryMetrics?.[0]?.slow_queries || '0',
       },
       {
@@ -19,7 +19,7 @@ export const QueryPerformanceMetrics = () => {
         value: queryMetrics?.[0]?.cache_hit_rate || '0%',
       },
       {
-        title: 'Avg Rows Per Call',
+        title: 'Avg. Rows Per Call',
         value: queryMetrics?.[0]?.avg_rows_per_call || '0',
       },
     ]
