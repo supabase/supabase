@@ -91,7 +91,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   })
 
   // Heatmap mode and maxima across nodes
-  const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>('none')
+  const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>('time')
   const heatMax = useHeatmapMax(nodes as Node<PlanNodeData>[])
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)

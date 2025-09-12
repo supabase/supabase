@@ -19,7 +19,6 @@ export const defaultMetricsVisibility: MetricsVisibility = {
 
 export const MetricsVisibilityContext = createContext<MetricsVisibility>(defaultMetricsVisibility)
 
-// Heatmap context and types
 export type HeatmapMode = 'none' | 'time' | 'rows' | 'cost'
 
 export type HeatmapMeta = {
@@ -30,7 +29,7 @@ export type HeatmapMeta = {
 }
 
 export const defaultHeatmapMeta: HeatmapMeta = {
-  mode: 'none',
+  mode: 'time',
   maxTime: 1,
   maxRows: 1,
   maxCost: 1,
