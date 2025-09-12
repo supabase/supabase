@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Check } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
 
-import { cn, copyToClipboard, Button_Shadcn_ as Button } from 'ui'
+import { cn, copyToClipboard, Button } from 'ui'
 import type { PlanNodeData } from './types'
 
 // Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
@@ -56,8 +56,8 @@ export const DetailsPanel = ({
           Details: {selectedNode.label}
         </div>
         <Button
-          variant="outline"
-          size="sm"
+          type="outline"
+          size="tiny"
           className="text-xs h-6 px-2 py-1"
           onClick={() => setSelectedNode(null)}
         >
@@ -80,9 +80,10 @@ export const DetailsPanel = ({
             <div className="font-semibold">Conditions</div>
             <div className="flex gap-2">
               <Button
-                variant="outline"
-                size="sm"
-                className="h-6 px-2 py-0.5 text-[11px]"
+                type="outline"
+                size="tiny"
+                icon={copiedConditions ? <Check /> : <Copy />}
+                className="px-1.5"
                 onClick={() => {
                   const parts = [
                     selectedNode.hashCond && `Hash Cond: ${selectedNode.hashCond}`,
@@ -98,13 +99,7 @@ export const DetailsPanel = ({
                   })
                 }}
               >
-                {copiedConditions ? (
-                  <span className="inline-flex items-center gap-1">
-                    <Check className="h-3.5 w-3.5" /> Copied
-                  </span>
-                ) : (
-                  'Copy'
-                )}
+                {copiedConditions ? 'Copied' : null}
               </Button>
             </div>
           </div>
@@ -160,9 +155,10 @@ export const DetailsPanel = ({
             <div className="font-semibold">Output Columns</div>
             {Array.isArray(selectedNode.outputCols) && selectedNode.outputCols.length > 0 && (
               <Button
-                variant="outline"
-                size="sm"
-                className="h-6 px-2 py-0.5 text-[11px]"
+                type="outline"
+                size="tiny"
+                icon={copiedOutputCols ? <Check /> : <Copy />}
+                className="px-1.5"
                 onClick={() =>
                   copyToClipboard(selectedNode.outputCols!.join(', '), () => {
                     setCopiedOutputCols(true)
@@ -170,13 +166,7 @@ export const DetailsPanel = ({
                   })
                 }
               >
-                {copiedOutputCols ? (
-                  <span className="inline-flex items-center gap-1">
-                    <Check className="h-3.5 w-3.5" /> Copied
-                  </span>
-                ) : (
-                  'Copy'
-                )}
+                {copiedOutputCols ? 'Copied' : null}
               </Button>
             )}
           </div>
@@ -195,9 +185,10 @@ export const DetailsPanel = ({
             <div className="font-semibold">Raw JSON</div>
             {selectedNode.raw && (
               <Button
-                variant="outline"
-                size="sm"
-                className="h-6 px-2 py-0.5 text-[11px]"
+                type="outline"
+                size="tiny"
+                icon={copiedRawJson ? <Check /> : <Copy />}
+                className="px-1.5"
                 onClick={() =>
                   copyToClipboard(JSON.stringify(selectedNode.raw, null, 2), () => {
                     setCopiedRawJson(true)
@@ -205,13 +196,7 @@ export const DetailsPanel = ({
                   })
                 }
               >
-                {copiedRawJson ? (
-                  <span className="inline-flex items-center gap-1">
-                    <Check className="h-3.5 w-3.5" /> Copied
-                  </span>
-                ) : (
-                  'Copy'
-                )}
+                {copiedRawJson ? 'Copied' : null}
               </Button>
             )}
           </div>
