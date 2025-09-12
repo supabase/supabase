@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import AppleSignin, { type AppleAuthResponse } from 'react-apple-signin-auth';
 import { Platform } from 'react-native';
 
+/**
+ * This is the Apple sign in button for the web.
+ */
 export default function AppleSignInButton() {
   const [nonce, setNonce] = useState('');
   const [sha256Nonce, setSha256Nonce] = useState('');

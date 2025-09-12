@@ -1,12 +1,12 @@
 import { Link, Stack } from 'expo-router';
 import { Platform, StyleSheet } from 'react-native';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 
-import AppleSignInButton from '@/components/social-auth-buttons/apple/AppleSignInButton';
-import ExpoAppleSignInButton from '@/components/social-auth-buttons/apple/ExpoAppleSignInButton';
-import GoogleSignInButton from '@/components/social-auth-buttons/google/GoogleSignInButton';
+import AppleSignInButton from '@/components/social-auth-buttons/apple/apple-sign-in-button';
+import ExpoAppleSignInButton from '@/components/social-auth-buttons/apple/expo-apple-sign-in-button';
+import GoogleSignInButton from '@/components/social-auth-buttons/google/google-sign-in-button';
 import { Image } from 'expo-image';
 
 export default function LoginScreen() {
