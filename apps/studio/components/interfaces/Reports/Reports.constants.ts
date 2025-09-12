@@ -558,7 +558,7 @@ select
       
         SELECT 
           COALESCE(ROUND(AVG(statements.rows::numeric / NULLIF(statements.calls, 0)), 1), 0) as avg_rows_per_call,
-          COUNT(*) FILTER (WHERE statements.mean_exec_time > 1000) as slow_queries,
+          COUNT(*) FILTER (WHERE statements.total_exec_time + statements.total_plan_time > 1000) as slow_queries,
           COALESCE(
             ROUND(
               SUM(statements.shared_blks_hit) * 100.0 / 
