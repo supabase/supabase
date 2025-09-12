@@ -513,10 +513,10 @@ npx expo start --clear
 ```
 
 Verify that the app works as expected. The splash screen displays while fetching the user profile, and the login page appears even when attempting to navigate to the home screen using the `Link` button.
-{/* TODO: HERE */}
+
 <Admonition type="note">
 
-By default Supabase Auth requires email verification before a session is created for the users. To support email verification you need to [implement deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=react-native)!
+By default Supabase Auth requires email verification before a session is created for the user. To support email verification you need to [implement deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=react-native)!
 
 While testing, you can disable email confirmation in your [project's email auth provider settings](/dashboard/project/_/auth/providers).
 
@@ -524,12 +524,12 @@ While testing, you can disable email confirmation in your [project's email auth 
 
 ## Integrate social authentication
 
-Now let's integrate social authentication with Supabase Auth, starting from the Apple authentication.
+Now integrate social authentication with Supabase Auth, starting with Apple authentication.
 If you only need to implement Google authentication, you can skip to the [Google authentication](#google-authentication) section.
 
 ### Apple authentication
 
-Let's start by adding the button that we are going to create inside the login screen previously made:
+Start by adding the button inside the login screen:
 
 <$CodeTabs>
 
@@ -560,17 +560,17 @@ For Apple authentication, you can choose between:
 - [react-apple-signin-auth](https://react-apple-signin-auth.ahmedtokyo.com/) - that supports Web, also suggested by Invertase
 - [Expo's AppleAuthentication library](https://docs.expo.dev/versions/latest/sdk/apple-authentication/) - that supports iOS only
 
-For either option, you'll need to obtain a Service ID from the [Apple Developer Console](https://supabase.com/docs/guides/auth/social-login/auth-apple?queryGroups=framework&framework=nextjs&queryGroups=platform&platform=web#configuration-web).
+For either option, you need to obtain a Service ID from the [Apple Developer Console](https://supabase.com/docs/guides/auth/social-login/auth-apple?queryGroups=framework&framework=nextjs&queryGroups=platform&platform=web#configuration-web).
 
 <Admonition type="note">
 
-To enable Apple sign-up on Android and Web, you'll also need to register the tunnelled URL (e.g., `https://arnrer1-anonymous-8081.exp.direct`) obtained by running:
+To enable Apple sign-up on Android and Web, you also need to register the tunnelled URL (e.g., `https://arnrer1-anonymous-8081.exp.direct`) obtained by running:
 
 ```bash
 npx expo start --tunnel
 ```
-
-and add it to the "Allowed Callback URLs" list in your Supabase dashboard Apple provider configuration.
+{/* TODO: HERE */}
+And add it to the "Allowed Callback URLs" list in your Supabase dashboard Apple provider configuration.
 
 For more information, follow the [Supabase Login with Apple](https://supabase.com/docs/guides/auth/social-login/auth-apple) guide.
 
