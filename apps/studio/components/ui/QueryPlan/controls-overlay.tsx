@@ -16,7 +16,6 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  Switch,
 } from 'ui'
 
 type Props = {
@@ -24,8 +23,6 @@ type Props = {
   setMetricsVisibility: (updater: (prev: MetricsVisibility) => MetricsVisibility) => void
   heatmapMode: HeatmapMode
   setHeatmapMode: (mode: HeatmapMode) => void
-  showMiniMap?: boolean
-  setShowMiniMap?: (show: boolean) => void
   variant?: 'overlay' | 'toolbar'
   className?: string
   portal?: boolean
@@ -36,8 +33,6 @@ export const ControlsOverlay = ({
   setMetricsVisibility,
   heatmapMode,
   setHeatmapMode,
-  showMiniMap,
-  setShowMiniMap,
   variant = 'overlay',
   className,
   portal = true,
@@ -222,17 +217,6 @@ export const ControlsOverlay = ({
             </div>
           </PopoverContent_Shadcn_>
         </Popover_Shadcn_>
-
-        <div className="flex items-center gap-x-1">
-          <Switch
-            id="mini-map"
-            checked={!!showMiniMap}
-            onCheckedChange={(checked) => setShowMiniMap?.(Boolean(checked))}
-          />
-          <Label_Shadcn_ htmlFor="mini-map" className="text-xs">
-            Map
-          </Label_Shadcn_>
-        </div>
       </div>
     </div>
   )

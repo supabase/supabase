@@ -95,7 +95,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   const heatMax = useHeatmapMax(nodes as Node<PlanNodeData>[])
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
-  const [showMiniMap, setShowMiniMap] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
@@ -168,8 +167,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
           heatmapMode={heatmapMode}
           setHeatmapMode={(m) => setHeatmapMode(m)}
-          showMiniMap={showMiniMap}
-          setShowMiniMap={setShowMiniMap}
           variant="toolbar"
           className="mb-2"
         />
@@ -194,8 +191,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
               heatmapMode={heatmapMode}
               setHeatmapMode={(m) => setHeatmapMode(m)}
-              showMiniMap={showMiniMap}
-              setShowMiniMap={setShowMiniMap}
               variant="overlay"
               portal={false}
             />
@@ -250,15 +245,13 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 variant={BackgroundVariant.Dots}
                 color={'inherit'}
               />
-              {showMiniMap && (
-                <MiniMap
-                  pannable
-                  zoomable
-                  nodeColor="#111318"
-                  maskColor={miniMapMaskColor}
-                  className="border rounded-md shadow-sm"
-                />
-              )}
+              <MiniMap
+                pannable
+                zoomable
+                nodeColor="#111318"
+                maskColor={miniMapMaskColor}
+                className="border rounded-md shadow-sm"
+              />
             </ReactFlow>
           </HeatmapContext.Provider>
         </MetricsVisibilityContext.Provider>
