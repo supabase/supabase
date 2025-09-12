@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -83,10 +83,7 @@ export const FileExplorerColumn = ({
   const fileExplorerColumnRef = useRef<any>(null)
 
   const snap = useStorageExplorerStateSnapshot()
-  const { can: canUpdateStorage } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
     if (fileExplorerColumnRef) {

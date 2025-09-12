@@ -11,7 +11,7 @@ import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import {
@@ -43,8 +43,10 @@ export const Usage = () => {
   const selectedProjectRef =
     selectedProjectRefInputValue === 'all-projects' ? undefined : selectedProjectRefInputValue
 
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const { data: organization } = useSelectedOrganizationQuery()
   const { data, isSuccess } = useProjectsQuery()

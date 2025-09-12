@@ -22,7 +22,7 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
@@ -82,7 +82,7 @@ const Reports = () => {
   const currentReport = userContents?.content.find((report) => report.id === id)
   const currentReportContent = currentReport?.content as Dashboards.Content
 
-  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'user_content',
     {
@@ -94,7 +94,7 @@ const Reports = () => {
       subject: { id: profile?.id },
     }
   )
-  const { can: canUpdateReport } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateReport } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'user_content',
     {

@@ -19,7 +19,7 @@ import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -42,7 +42,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'preview_branches'
   )
@@ -186,7 +186,7 @@ const BranchesPage: NextPageWithLayout = () => {
 BranchesPage.getLayout = (page) => {
   const BranchesPageWrapper = () => {
     const snap = useAppStateSnapshot()
-    const { can: canCreateBranches } = useAsyncCheckProjectPermissions(
+    const { can: canCreateBranches } = useAsyncCheckPermissions(
       PermissionAction.CREATE,
       'preview_branches',
       {

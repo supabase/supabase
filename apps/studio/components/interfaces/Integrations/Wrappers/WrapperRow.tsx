@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Sheet,
@@ -29,7 +29,7 @@ interface WrapperRowProps {
 
 const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   const { ref, id } = useParams()
-  const { can: canManageWrappers } = useAsyncCheckProjectPermissions(
+  const { can: canManageWrappers } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'wrappers'
   )

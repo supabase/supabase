@@ -9,7 +9,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 
@@ -17,8 +17,10 @@ const ProtectionPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const showAttackProtection = useIsFeatureEnabled('authentication:attack_protection')
 
-  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
 
   if (!showAttackProtection) {
     return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />

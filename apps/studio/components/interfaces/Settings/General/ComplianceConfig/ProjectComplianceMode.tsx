@@ -12,7 +12,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { InlineLink } from 'components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -21,7 +21,7 @@ const ComplianceConfig = () => {
   const { data: project } = useSelectedProjectQuery()
   const [isSensitive, setIsSensitive] = useState(false)
 
-  const { can: canUpdateComplianceConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateComplianceConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {

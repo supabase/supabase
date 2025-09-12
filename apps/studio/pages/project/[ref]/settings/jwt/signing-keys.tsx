@@ -6,11 +6,11 @@ import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const JWTSigningKeysPage: NextPageWithLayout = () => {
-  const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'auth_signing_keys'
   )

@@ -5,7 +5,7 @@ import { Lock, Table } from 'lucide-react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge, CardTitle } from 'ui'
 
@@ -35,11 +35,11 @@ export const PolicyTableRowHeader = ({
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
 
-  const { can: canCreatePolicies } = useAsyncCheckProjectPermissions(
+  const { can: canCreatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'policies'
   )
-  const { can: canToggleRLS } = useAsyncCheckProjectPermissions(
+  const { can: canToggleRLS } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )

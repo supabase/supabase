@@ -22,7 +22,7 @@ import {
 } from 'data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -115,9 +115,11 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       },
     })
 
-  const { can: canSqlWriteTables, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const { can: canSqlWriteColumns } = useAsyncCheckProjectPermissions(
+  const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+  const { can: canSqlWriteColumns } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'columns'
   )

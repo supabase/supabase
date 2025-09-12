@@ -17,7 +17,7 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import {
@@ -103,10 +103,7 @@ export const CreateBucketModal = () => {
   const [visible, setVisible] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
 
-  const { can: canCreateBuckets } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({

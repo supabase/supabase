@@ -17,7 +17,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from 'data/database/pgbouncer-config-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
@@ -51,7 +51,7 @@ export const ConnectionPooling = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     { resource: { project_id: project?.id } }

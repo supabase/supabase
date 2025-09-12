@@ -15,7 +15,7 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
@@ -64,24 +64,21 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   )
 
-  const { can: canUpdateUser } = useAsyncCheckProjectPermissions(PermissionAction.AUTH_EXECUTE, '*')
-  const { can: canSendMagicLink } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateUser } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+  const { can: canSendMagicLink } = useAsyncCheckPermissions(
     PermissionAction.AUTH_EXECUTE,
     'send_magic_link'
   )
-  const { can: canSendRecovery } = useAsyncCheckProjectPermissions(
+  const { can: canSendRecovery } = useAsyncCheckPermissions(
     PermissionAction.AUTH_EXECUTE,
     'send_recovery'
   )
-  const { can: canSendOtp } = useAsyncCheckProjectPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'send_otp'
-  )
-  const { can: canRemoveUser } = useAsyncCheckProjectPermissions(
+  const { can: canSendOtp } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
+  const { can: canRemoveUser } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_DELETE,
     'auth.users'
   )
-  const { can: canRemoveMFAFactors } = useAsyncCheckProjectPermissions(
+  const { can: canRemoveMFAFactors } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_DELETE,
     'auth.mfa_factors'
   )

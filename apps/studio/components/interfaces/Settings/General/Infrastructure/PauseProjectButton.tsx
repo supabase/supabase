@@ -9,7 +9,7 @@ import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectCont
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -25,7 +25,7 @@ const PauseProjectButton = () => {
 
   const projectRef = project?.ref ?? ''
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const { can: canPauseProject } = useAsyncCheckProjectPermissions(
+  const { can: canPauseProject } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )

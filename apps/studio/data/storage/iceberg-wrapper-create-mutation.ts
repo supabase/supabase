@@ -9,7 +9,7 @@ import {
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 
@@ -27,7 +27,7 @@ export const useIcebergWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
-  const { can: canCreateCredentials } = useAsyncCheckProjectPermissions(
+  const { can: canCreateCredentials } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
   )

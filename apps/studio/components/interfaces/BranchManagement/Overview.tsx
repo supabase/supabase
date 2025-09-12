@@ -23,7 +23,7 @@ import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -169,11 +169,11 @@ const PreviewBranchActions = ({
   const queryClient = useQueryClient()
   const projectRef = branch.parent_project_ref ?? branch.project_ref
 
-  const { can: canDeleteBranches } = useAsyncCheckProjectPermissions(
+  const { can: canDeleteBranches } = useAsyncCheckPermissions(
     PermissionAction.DELETE,
     'preview_branches'
   )
-  const { can: canUpdateBranches } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateBranches } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'preview_branches'
   )
@@ -387,7 +387,7 @@ const PreviewBranchActions = ({
 // Actions for main (production) branch
 const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateBranches } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateBranches } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'preview_branches'
   )

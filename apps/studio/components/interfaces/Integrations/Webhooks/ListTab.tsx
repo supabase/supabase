@@ -6,14 +6,14 @@ import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModa
 import { EditHookPanel } from 'components/interfaces/Database/Hooks/EditHookPanel'
 import { HooksList } from 'components/interfaces/Database/Hooks/HooksList/HooksList'
 import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 export const WebhooksListTab = () => {
   const [selectedHook, setSelectedHook] = useState<any>()
   const [showCreateHookForm, setShowCreateHookForm] = useState<boolean>(false)
   const [showDeleteHookForm, setShowDeleteHookForm] = useState<boolean>(false)
 
-  const { can: canReadWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canReadWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'triggers'
   )

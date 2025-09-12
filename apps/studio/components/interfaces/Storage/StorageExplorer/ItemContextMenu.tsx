@@ -4,7 +4,7 @@ import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
 import { useParams } from 'common'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
@@ -28,10 +28,7 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
   const isPublic = selectedBucket.public
-  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const onHandleClick = async (event: any, item: StorageItemWithColumn, expiresIn?: number) => {
     if (item.isCorrupted) return

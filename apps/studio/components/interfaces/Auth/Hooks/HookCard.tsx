@@ -3,7 +3,7 @@ import { Check, Webhook } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Input, copyToClipboard } from 'ui'
 import { Hook } from './hooks.constants'
 
@@ -13,10 +13,7 @@ interface HookCardProps {
 }
 
 export const HookCard = ({ hook, onSelect }: HookCardProps) => {
-  const { can: canUpdateAuthHook } = useAsyncCheckProjectPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    '*'
-  )
+  const { can: canUpdateAuthHook } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
 
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">

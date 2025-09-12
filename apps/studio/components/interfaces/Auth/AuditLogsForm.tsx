@@ -8,11 +8,10 @@ import { boolean, object } from 'yup'
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
-import { NoPermission } from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
@@ -40,8 +39,11 @@ const AUDIT_LOG_ENTRIES_TABLE = 'audit_log_entries'
 export const AuditLogsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
   const { data: tables = [] } = useTablesQuery({
     projectRef: project?.ref,
@@ -89,10 +91,6 @@ export const AuditLogsForm = () => {
         <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
-  }
-
-  if (!canReadConfig) {
-    return <NoPermission resourceText="view audit logs settings" />
   }
 
   return (

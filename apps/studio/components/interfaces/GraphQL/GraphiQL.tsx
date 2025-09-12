@@ -36,7 +36,7 @@ import { AlertTriangle, XIcon } from 'lucide-react'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
@@ -76,7 +76,7 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
 
-  const { can: canReadJWTSecret } = useAsyncCheckProjectPermissions(
+  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'field.jwt_secret'
   )

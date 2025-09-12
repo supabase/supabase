@@ -6,7 +6,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import type { DatabaseBackup } from 'data/database/backups-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
@@ -19,7 +19,7 @@ interface BackupItemProps {
 
 export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canTriggerScheduledBackups } = useAsyncCheckProjectPermissions(
+  const { can: canTriggerScheduledBackups } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )

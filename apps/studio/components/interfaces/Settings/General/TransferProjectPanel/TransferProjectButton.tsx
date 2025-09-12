@@ -9,7 +9,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -58,7 +58,7 @@ const TransferProjectButton = () => {
     }
   }, [isOpen])
 
-  const { can: canTransferProject } = useAsyncCheckProjectPermissions(
+  const { can: canTransferProject } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
   )

@@ -13,19 +13,21 @@ import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import UpcomingInvoice from './UpcomingInvoice'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
+import UpcomingInvoice from './UpcomingInvoice'
 
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const {
     data: subscription,

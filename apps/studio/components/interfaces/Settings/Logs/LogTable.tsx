@@ -10,7 +10,7 @@ import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import { toast } from 'sonner'
 import { ResponseError } from 'types'
@@ -94,7 +94,7 @@ const LogTable = ({
   const [selectionOpen, setSelectionOpen] = useState(false)
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
 
-  const { can: canCreateLogQuery } = useAsyncCheckProjectPermissions(
+  const { can: canCreateLogQuery } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
     {

@@ -7,7 +7,7 @@ import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketMod
 import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
 import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
 import type { Bucket } from 'data/storage/buckets-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,
@@ -29,10 +29,7 @@ export interface BucketRowProps {
 }
 
 export const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
-  const { can: canUpdateBuckets } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canUpdateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const [modal, setModal] = useState<string | null>(null)
   const onClose = () => setModal(null)
 
