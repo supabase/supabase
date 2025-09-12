@@ -6,12 +6,123 @@ subtitle: 'Learn how to build real-time applications with Supabase Realtime'
 sidebar_label: 'Getting Started'
 ---
 
-
 ## Quick start
 
-### 1. Initialize the client
+### 1. Install the client library
 
-First, get your project URL and key from your [Supabase Dashboard](/dashboard/project/_/settings/api).
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```bash
+npm install @supabase/supabase-js
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+```bash
+flutter pub add supabase_flutter
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let package = Package(
+    // ...
+    dependencies: [
+        // ...
+        .package(
+            url: "https://github.com/supabase/supabase-swift.git",
+            from: "2.0.0"
+        ),
+    ],
+    targets: [
+        .target(
+            name: "YourTargetName",
+            dependencies: [
+                .product(
+                    name: "Supabase",
+                    package: "supabase-swift"
+                ),
+            ]
+        )
+    ]
+)
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python - PIP">
+
+```bash
+pip install supabase
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python - Conda">
+
+```bash
+conda install -c conda-forge supabase
+```
+
+</TabPanel>
+</Tabs>
+
+### 3. Create your first Channel
+
+Channels are the foundation of Realtime. Think of them as rooms where clients can communicate. Each channel is identified by a topic name and if they are public or private.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+// Create a channel with a descriptive topic name
+const channel = supabase.channel('room:lobby:messages', {
+  config: { private: true }, // Recommended for production
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+```dart
+// Create a channel with a descriptive topic name
+final channel = supabase.channel('room:lobby:messages');
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+// Create a channel with a descriptive topic name
+let channel = supabase.realtimeV2.channel("room:lobby:messages")
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+# Create a channel with a descriptive topic name
+channel = supabase.channel('room:lobby:messages')
+```
+
+</TabPanel>
+</Tabs>
+### 2. Initialize the client
+
+Get your project URL and key from your [Supabase Dashboard](/dashboard/project/_/settings/api).
 
 <Tabs
   scrollable
@@ -71,7 +182,7 @@ supabase: Client = create_client(url, key)
 </TabPanel>
 </Tabs>
 
-### 2. Create your first Channel
+### 3. Create your first Channel
 
 Channels are the foundation of Realtime. Think of them as rooms where clients can communicate. Each channel is identified by a topic name and if they are public or private.
 
@@ -118,7 +229,7 @@ channel = supabase.channel('room:lobby:messages')
 </TabPanel>
 </Tabs>
 
-### 3. Set up authorization
+### 4. Set up authorization
 
 Since we're using a private channel, you need to create a basic RLS policy on the `realtime.messages` table to allow authenticated users to connect. Row Level Security (RLS) policies control who can access your Realtime channels based on user authentication and custom rules:
 
@@ -132,11 +243,11 @@ CREATE POLICY "authenticated_users_can_send" ON realtime.messages
   FOR INSERT TO authenticated WITH CHECK (true);
 ```
 
-### 4. Send and receive messages
+### 5. Send and receive messages
 
 There are three main ways to send messages with Realtime:
 
-#### 4.1 using client libraries
+#### 5.1 using client libraries
 
 Send and receive messages using the Supabase client:
 
@@ -238,7 +349,7 @@ channel.send_broadcast_message(
 </TabPanel>
 </Tabs>
 
-#### 4.2 using HTTP/REST API
+#### 5.2 using HTTP/REST API
 
 Send messages via HTTP requests, perfect for server-side applications:
 
@@ -362,7 +473,7 @@ response = requests.post(
 </TabPanel>
 </Tabs>
 
-#### 4.3 using database triggers
+#### 5.3 using database triggers
 
 Automatically broadcast database changes using triggers. Choose the approach that best fits your needs:
 
