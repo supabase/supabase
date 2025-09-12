@@ -233,8 +233,8 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
         <ul
           onScroll={handleScroll}
           className={cn(
-            'min-h-0 overflow-auto w-full mx-auto ',
-            'grid grid-cols-1 gap-2 md:gap-4 overflow-y-scroll',
+            'min-h-0 w-full mx-auto overflow-y-auto',
+            'grid grid-cols-1 gap-2 md:gap-4',
             'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 pb-6'
           )}
         >
