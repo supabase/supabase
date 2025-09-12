@@ -28,6 +28,7 @@ import { useProfile } from 'lib/profile'
 import type { Dashboards } from 'types'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
+import { toast } from 'sonner'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
@@ -147,6 +148,15 @@ export function CustomReportSection() {
   )
 
   const addSnippetToReport = (snippet: { id: string; name: string }) => {
+    if (
+      editableReport?.layout?.some(
+        (x) =>
+          String(x.id) === String(snippet.id) || String(x.attribute) === `snippet_${snippet.id}`
+      )
+    ) {
+      toast('This block is already in your report')
+      return
+    }
     // If the Home report doesn't exist yet, create it with the new block
     if (!editableReport || !homeReport) {
       if (!ref || !profile) return
