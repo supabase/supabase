@@ -215,7 +215,7 @@ In addition, you need to provide the following custom claims as the JWT payload.
 - `iss` is optional and can be set to any string that identifies the issuer of this JWT.
 - `ref` must be set to the project ref which you have imported the signing key.
 - `role` must be set to an existing Postgres role in your database, such as `anon`, `authenticated`, or `service_role`.
-- `exp` must be set to a timestamp in the future (seconds since epoch) when this token expires.
+- `exp` must be set to a timestamp in the future (seconds since 1970) when this token expires. Prefer shorter-lived tokens.
 
 Finally, you can use your newly minted JWT as the `Authorization: Bearer <JWT>` header to all Data API requests.
 
