@@ -184,7 +184,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {/* Rows (actual / est) */}
         {vis.rows && (data.actualRows !== undefined || data.planRows !== undefined) && (
           <NodeItem>
-            <span>Rows</span>
+            <span>rows</span>
             <span>
               {data.actualRows !== undefined ? data.actualRows : '-'}
               {data.planRows !== undefined ? ` / est ${data.planRows}` : ''}
@@ -215,7 +215,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {/* Costs (startup → total) */}
         {vis.cost && (data.startupCost !== undefined || data.totalCost !== undefined) && (
           <NodeItem>
-            <span>Cost</span>
+            <span>cost</span>
             <span>
               {data.startupCost !== undefined ? data.startupCost : '-'}
               {data.totalCost !== undefined ? ` → ${data.totalCost}` : ''}
@@ -225,7 +225,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {/* Cost (self/exclusive) */}
         {vis.cost && typeof data.exclusiveCost === 'number' && (
           <NodeItem>
-            <span>Self Cost</span>
+            <span>self cost</span>
             <span>{data.exclusiveCost.toFixed(2)}</span>
           </NodeItem>
         )}
@@ -233,7 +233,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {/* Width */}
         {data.planWidth !== undefined && (
           <NodeItem>
-            <span>Plan Width</span>
+            <span>plan width</span>
             <span>{data.planWidth} bytes</span>
           </NodeItem>
         )}
@@ -241,7 +241,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {/* Filters/Removals */}
         {data.rowsRemovedByFilter !== undefined && (
           <NodeItem>
-            <span>Removed (filter)</span>
+            <span>removed (filter)</span>
             <span className="flex items-center">
               {data.rowsRemovedByFilter} ({removedPercentValue(data.rowsRemovedByFilter)}%)
             </span>
@@ -249,7 +249,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
         {data.rowsRemovedByJoinFilter !== undefined && (
           <NodeItem>
-            <span>Removed (join filter)</span>
+            <span>removed (join filter)</span>
             <span>
               {data.rowsRemovedByJoinFilter} ({removedPercentValue(data.rowsRemovedByJoinFilter)}%)
             </span>
@@ -257,7 +257,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
         {data.rowsRemovedByIndexRecheck !== undefined && (
           <NodeItem>
-            <span>Removed (recheck)</span>
+            <span>removed (recheck)</span>
             <span>
               {data.rowsRemovedByIndexRecheck} (
               {removedPercentValue(data.rowsRemovedByIndexRecheck)}
@@ -267,7 +267,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
         {data.heapFetches !== undefined && (
           <NodeItem>
-            <span>Heap Fetches</span>
+            <span>heap fetches</span>
             <span>{data.heapFetches}</span>
           </NodeItem>
         )}
@@ -275,7 +275,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {/* BUFFERS */}
         {vis.buffers && hasShared(data) && (
           <NodeItem title={sharedTooltip()}>
-            <span>Shared (self)</span>
+            <span>shared (self)</span>
             <span>
               h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0} d:{data.exSharedDirtied ?? 0} w:
               {data.exSharedWritten ?? 0}
@@ -284,7 +284,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
         {vis.buffers && hasTemp(data) && (
           <NodeItem title={tempTooltip()}>
-            <span>Temp (self)</span>
+            <span>temp (self)</span>
             <span>
               r:{data.exTempRead ?? 0} w:{data.exTempWritten ?? 0}
             </span>
@@ -292,7 +292,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
         {vis.buffers && hasLocal(data) && (
           <NodeItem title={localTooltip()}>
-            <span>Local (self)</span>
+            <span>local (self)</span>
             <span>
               h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0} d:{data.exLocalDirtied ?? 0} w:
               {data.exLocalWritten ?? 0}
@@ -303,7 +303,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {/* Output cols (verbose) */}
         {vis.output && Array.isArray(data.outputCols) && data.outputCols.length > 0 && (
           <NodeItem heightClass="min-h-[22px]">
-            <span>Output</span>
+            <span>output</span>
             <span className="truncate max-w-[95px]" title={data.outputCols.join(', ')}>
               {data.outputCols.join(', ')}
             </span>
@@ -313,7 +313,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {/* I/O times */}
         {vis.buffers && (data.ioReadTime !== undefined || data.ioWriteTime !== undefined) && (
           <NodeItem>
-            <span>IO</span>
+            <span>io</span>
             <span>
               {typeof data.ioReadTime === 'number' ? `r:${data.ioReadTime}ms` : ''}
               {typeof data.ioWriteTime === 'number'
