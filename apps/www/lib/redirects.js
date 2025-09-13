@@ -2153,12 +2153,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/channels',
-    destination: '/docs/guides/realtime/concepts#channels',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/extensions',
-    destination: '/docs/guides/realtime/concepts',
+    destination: '/docs/guides/realtime/protocol#channels',
   },
   {
     permanent: true,
