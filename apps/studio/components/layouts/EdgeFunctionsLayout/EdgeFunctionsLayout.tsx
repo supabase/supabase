@@ -28,6 +28,12 @@ const EdgeFunctionsProductMenu = () => {
           url: `/project/${projectRef}/functions/secrets`,
           items: [],
         },
+        {
+          name: 'Versions',
+          key: 'versions',
+          url: `/project/${projectRef}/functions/versions`,
+          items: [],
+        },
       ],
     },
   ]
