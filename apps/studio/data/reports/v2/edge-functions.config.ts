@@ -14,6 +14,7 @@ import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
 import { ReportConfig } from './reports.types'
 import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
+import { fetchLogs } from 'data/reports/report.utils'
 
 type EdgeFunctionReportFilters = {
   status_code: NumericFilter | null
@@ -151,21 +152,6 @@ order by
   },
 }
 
-async function runQuery(projectRef: string, sql: string, startDate: string, endDate: string) {
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        sql,
-        iso_timestamp_start: startDate,
-        iso_timestamp_end: endDate,
-      },
-    },
-  })
-  if (error) throw error
-  return data
-}
-
 export function extractStatusCodesFromData(data: any[]): string[] {
   const statusCodes = new Set<string>()
 
@@ -272,7 +258,7 @@ export const edgeFunctionReports = ({
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async () => {
       const sql = METRIC_SQL.TotalInvocations(interval, filters)
-      const response = await runQuery(projectRef, sql, startDate, endDate)
+      const response = await fetchLogs(projectRef, sql, startDate, endDate)
 
       if (!response?.result) return { data: [] }
 
@@ -304,7 +290,7 @@ export const edgeFunctionReports = ({
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters)
-      const rawData = await runQuery(projectRef, sql, startDate, endDate)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
 
       if (!rawData?.result) return { data: [] }
 
@@ -341,7 +327,7 @@ export const edgeFunctionReports = ({
     format: (value: unknown) => `${Number(value).toFixed(0)}ms`,
     dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionTime(interval, filters)
-      const rawData = await runQuery(projectRef, sql, startDate, endDate)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
 
       if (!rawData?.result) return { data: [] }
 
@@ -398,7 +384,7 @@ export const edgeFunctionReports = ({
     availableIn: ['pro', 'team', 'enterprise'],
     dataProvider: async () => {
       const sql = METRIC_SQL.InvocationsByRegion(interval, filters)
-      const rawData = await runQuery(projectRef, sql, startDate, endDate)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
       const data = rawData.result?.map((point: any) => ({
         ...point,
         timestamp: isUnixMicro(point.timestamp)

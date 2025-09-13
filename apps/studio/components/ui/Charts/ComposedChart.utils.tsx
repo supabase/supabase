@@ -141,7 +141,12 @@ const CustomTooltip = ({
   isActiveHoveredChart,
 }: TooltipProps) => {
   if (active && payload && payload.length) {
-    const timestamp = payload[0].payload.timestamp
+    /**
+     * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
+     */
+    const firstItem = payload[0].payload
+    const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
+    const timestamp = payload[0].payload[timestampKey]
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
@@ -250,9 +255,18 @@ interface CustomLabelProps {
   attributes?: MultiAttribute[]
   showMaxValue?: boolean
   onLabelHover?: (label: string | null) => void
+  onToggleAttribute?: (attribute: string, options?: { exclusive?: boolean }) => void
+  hiddenAttributes?: Set<string>
 }
 
-const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: CustomLabelProps) => {
+const CustomLabel = ({
+  payload,
+  attributes,
+  showMaxValue,
+  onLabelHover,
+  onToggleAttribute,
+  hiddenAttributes,
+}: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
@@ -280,16 +294,12 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
     const attribute = attributes?.find((a) => a.attribute === entry.name)
     const isMax = entry.name === maxValueAttribute?.attribute
     const isHovered = hoveredLabel === entry.name
+    const isHidden = hiddenAttributes?.has(entry.name)
 
     const Label = () => (
-      <div className="flex items-center gap-1 p-1">
+      <div className="flex items-center gap-1">
         {getIcon(entry.name, entry.color)}
-        <span
-          className={cn(
-            'text-nowrap text-foreground-lighter cursor-default select-none',
-            hoveredLabel && !isHovered && 'opacity-50'
-          )}
-        >
+        <span className={cn('text-nowrap text-foreground-lighter', isHidden && 'opacity-50')}>
           {attribute?.label || entry.name}
         </span>
       </div>
@@ -298,11 +308,12 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
     if (!showMaxValue && isMax) return null
 
     return (
-      <div
+      <button
         key={entry.name}
-        className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground"
+        className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg p-1.5 hover:bg-background-overlay-hover"
         onMouseOver={() => handleMouseEnter(entry.name)}
         onMouseOutCapture={handleMouseLeave}
+        onClick={(e) => onToggleAttribute?.(entry.name, { exclusive: e.metaKey || e.ctrlKey })}
       >
         {!!attribute?.tooltip ? (
           <Tooltip>
@@ -316,12 +327,12 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
         ) : (
           <Label />
         )}
-      </div>
+      </button>
     )
   }
 
   return (
-    <div className="relative z-0 mx-auto flex flex-col items-center gap-1 text-xs w-full">
+    <div className="relative z-10 mx-auto flex flex-col items-center gap-1 text-xs w-full">
       <div className="flex flex-wrap items-center justify-center gap-2">
         {items?.map((entry, index) => <LabelItem key={`${entry.name}-${index}`} entry={entry} />)}
       </div>
