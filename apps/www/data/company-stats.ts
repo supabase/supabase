@@ -1,3 +1,6 @@
+// For each stat we provide text and number
+// Text is used for labels and static components
+// Number is used for animated components (eg. AnimatedCounter)
 export const companyStats = {
   databasesManaged: {
     number: 6_500_000,
