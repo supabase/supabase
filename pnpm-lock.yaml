@@ -897,6 +897,9 @@ importers:
       json-logic-js:
         specifier: ^2.0.2
         version: 2.0.2
+      libpg-query:
+        specifier: ^17
+        version: 17.6.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1207,6 +1210,9 @@ importers:
       require-in-the-middle:
         specifier: ^7.5.2
         version: 7.5.2(supports-color@8.1.1)
+      supports-color:
+        specifier: 8.1.1
+        version: 8.1.1
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.5.2))
@@ -5312,6 +5318,9 @@ packages:
 
   '@pgsql/types@15.0.2':
     resolution: {integrity: sha512-K3gtnbqbSUuUVmPm143qx5Gy2EmKuooshV95yMD48EUQ1256sgZBriEfY61OWJnlzdREdqHTIOxQqpZAb7XdZg==}
+
+  '@pgsql/types@17.6.1':
+    resolution: {integrity: sha512-Hk51+nyOxS7Dy5oySWywyNZxo5HndX1VDXT4ZEBD+p+vvMFM2Vc+sKSuByCiI8banou4edbgdnOC251IOuq7QQ==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -13208,6 +13217,9 @@ packages:
   libpg-query@15.2.0:
     resolution: {integrity: sha512-fBi14tsU3/ahtfU0C+/tvmtlt0EJM6kXe0Dl4/cSbiNmJ3IwLIuk3lawwiK5ByXU4sXwyAzbkvSl26jVXzYuaA==}
 
+  libpg-query@17.6.0:
+    resolution: {integrity: sha512-r4zOTcLTGYS5PlLQAicJ6Yi/tvZFag42YUuNEO8pi8bwt/ZZ4kj514J4QV5bOx0mZzPLF6agbfNXQVxGgmHR8g==}
+
   light-my-request@5.14.0:
     resolution: {integrity: sha512-aORPWntbpH5esaYpGOOmri0OHDOe3wC5M2MQxZ9dvMLZm6DnaAn0kJlcbU9hwsQgLzmZyReKwFwwPkR+nHu5kA==}
 
@@ -16196,11 +16208,6 @@ packages:
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
-    hasBin: true
-
-  semver@7.6.3:
-    resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
-    engines: {node: '>=10'}
     hasBin: true
 
   semver@7.7.1:
@@ -21617,7 +21624,7 @@ snapshots:
       nopt: 5.0.0
       npmlog: 5.0.1
       rimraf: 3.0.2
-      semver: 7.6.3
+      semver: 7.7.1
       tar: 6.2.1
     transitivePeerDependencies:
       - encoding
@@ -22879,6 +22886,8 @@ snapshots:
       - typescript
 
   '@pgsql/types@15.0.2': {}
+
+  '@pgsql/types@17.6.1': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -32433,6 +32442,10 @@ snapshots:
       - encoding
       - supports-color
 
+  libpg-query@17.6.0:
+    dependencies:
+      '@pgsql/types': 17.6.1
+
   light-my-request@5.14.0:
     dependencies:
       cookie: 0.7.2
@@ -34241,7 +34254,7 @@ snapshots:
       make-fetch-happen: 13.0.1(supports-color@8.1.1)
       nopt: 7.2.1
       proc-log: 3.0.0
-      semver: 7.6.3
+      semver: 7.7.1
       tar: 6.2.1
       which: 4.0.0
     transitivePeerDependencies:
@@ -36573,8 +36586,6 @@ snapshots:
   semver@5.7.2: {}
 
   semver@6.3.1: {}
-
-  semver@7.6.3: {}
 
   semver@7.7.1: {}
 

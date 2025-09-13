@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
+import { invalidateDataGranularly } from 'lib/granular-data-invalidation'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better
@@ -31,23 +32,23 @@ export const useExecuteSqlMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+
   return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>(
     (args) => executeSql(args),
     {
       async onSuccess(data, variables, context) {
         const { contextualInvalidation, sql, projectRef } = variables
 
-        // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
-        const sqlLower = sql.toLowerCase()
-        const isMutationSQL =
-          sqlLower.includes('create ') || sqlLower.includes('alter ') || sqlLower.includes('drop ')
-        if (contextualInvalidation && projectRef && isMutationSQL) {
-          const databaseRelatedKeys = queryClient
-            .getQueryCache()
-            .findAll(['projects', projectRef])
-            .map((x) => x.queryKey)
-            .filter((x) => !INVALIDATION_KEYS_IGNORE.some((a) => x.includes(a)))
-          await Promise.all(databaseRelatedKeys.map((key) => queryClient.invalidateQueries(key)))
+        if (contextualInvalidation && projectRef) {
+          const invalidationActions = await invalidateDataGranularly(sql, projectRef)
+          const promises = invalidationActions.map((action) =>
+            queryClient.invalidateQueries({
+              queryKey: action.key,
+              exact: action.exact,
+              refetchType: action.refetchType,
+            })
+          )
+          await Promise.allSettled(promises)
         }
         await onSuccess?.(data, variables, context)
       },
