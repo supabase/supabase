@@ -1494,6 +1494,9 @@
                               }
                             },
                             "required": ["id", "username"]
+                          },
+                          "favorite": {
+                            "type": "boolean"
                           }
                         },
                         "required": [
@@ -1506,7 +1509,8 @@
                           "description",
                           "project",
                           "owner",
-                          "updated_by"
+                          "updated_by",
+                          "favorite"
                         ]
                       }
                     },
@@ -1614,11 +1618,16 @@
                       },
                       "required": ["id", "username"]
                     },
+                    "favorite": {
+                      "type": "boolean"
+                    },
                     "content": {
                       "type": "object",
                       "properties": {
                         "favorite": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "deprecated": true,
+                          "description": "Deprecated: Rely on root-level favorite property instead."
                         },
                         "schema_version": {
                           "type": "string"
@@ -1627,7 +1636,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["favorite", "schema_version", "sql"]
+                      "required": ["schema_version", "sql"]
                     }
                   },
                   "required": [
@@ -1641,6 +1650,7 @@
                     "project",
                     "owner",
                     "updated_by",
+                    "favorite",
                     "content"
                   ]
                 }
@@ -16006,6 +16016,9 @@
                     }
                   },
                   "required": ["id", "username"]
+                },
+                "favorite": {
+                  "type": "boolean"
                 }
               },
               "required": [
@@ -16018,7 +16031,8 @@
                 "description",
                 "project",
                 "owner",
-                "updated_by"
+                "updated_by",
+                "favorite"
               ]
             }
           },
@@ -16091,11 +16105,16 @@
             },
             "required": ["id", "username"]
           },
+          "favorite": {
+            "type": "boolean"
+          },
           "content": {
             "type": "object",
             "properties": {
               "favorite": {
-                "type": "boolean"
+                "type": "boolean",
+                "deprecated": true,
+                "description": "Deprecated: Rely on root-level favorite property instead."
               },
               "schema_version": {
                 "type": "string"
@@ -16104,7 +16123,7 @@
                 "type": "string"
               }
             },
-            "required": ["favorite", "schema_version", "sql"]
+            "required": ["schema_version", "sql"]
           }
         },
         "required": [
@@ -16118,6 +16137,7 @@
           "project",
           "owner",
           "updated_by",
+          "favorite",
           "content"
         ]
       },

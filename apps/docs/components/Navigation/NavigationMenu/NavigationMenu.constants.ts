@@ -699,7 +699,7 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Web3 (Sign in with Solana)',
+          name: 'Web3 (Ethereum or Solana)',
           url: '/guides/auth/auth-web3',
           enabled: allAuthProvidersEnabled,
         },

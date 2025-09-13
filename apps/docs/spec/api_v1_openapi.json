@@ -4846,7 +4846,8 @@
                   "type": "object",
                   "properties": { "id": { "type": "number" }, "username": { "type": "string" } },
                   "required": ["id", "username"]
-                }
+                },
+                "favorite": { "type": "boolean" }
               },
               "required": [
                 "id",
@@ -4858,7 +4859,8 @@
                 "description",
                 "project",
                 "owner",
-                "updated_by"
+                "updated_by",
+                "favorite"
               ]
             }
           },
@@ -4891,14 +4893,19 @@
             "properties": { "id": { "type": "number" }, "username": { "type": "string" } },
             "required": ["id", "username"]
           },
+          "favorite": { "type": "boolean" },
           "content": {
             "type": "object",
             "properties": {
-              "favorite": { "type": "boolean" },
+              "favorite": {
+                "type": "boolean",
+                "deprecated": true,
+                "description": "Deprecated: Rely on root-level favorite property instead."
+              },
               "schema_version": { "type": "string" },
               "sql": { "type": "string" }
             },
-            "required": ["favorite", "schema_version", "sql"]
+            "required": ["schema_version", "sql"]
           }
         },
         "required": [
@@ -4912,6 +4919,7 @@
           "project",
           "owner",
           "updated_by",
+          "favorite",
           "content"
         ]
       },
