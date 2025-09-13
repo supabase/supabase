@@ -65,7 +65,7 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
   const motionProps = shouldShowAnimated
     ? {
         initial: { offsetDistance: '0%', rotate: '0deg', opacity: 0 },
-        whileInView: { offsetDistance: '80%', rotate: '30deg', opacity: 1 },
+        whileInView: { offsetDistance: '62%', rotate: '23.4deg', opacity: 1 },
         viewport: { once: true },
         transition: { type: 'spring', duration: 2.68, bounce: 0, delay: 0.25 },
         style: {
