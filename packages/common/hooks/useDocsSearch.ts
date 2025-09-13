@@ -3,6 +3,8 @@
 import { compact, debounce, uniqBy } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
+import { isFeatureEnabled } from '../enabled-features'
+
 const NUMBER_SOURCES = 2
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -200,7 +202,10 @@ const useDocsSearch = () => {
 
     let sourcesLoaded = 0
 
-    fetch(`${SUPABASE_URL}/rest/v1/rpc/docs_search_fts`, {
+    const useAlternateSearchIndex = !isFeatureEnabled('search:fullIndex')
+
+    const searchEndpoint = useAlternateSearchIndex ? 'docs_search_fts_nimbus' : 'docs_search_fts'
+    fetch(`${SUPABASE_URL}/rest/v1/rpc/${searchEndpoint}`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -244,7 +249,7 @@ const useDocsSearch = () => {
 
     fetch(`${SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`, {
       method: 'POST',
-      body: JSON.stringify({ query }),
+      body: JSON.stringify({ query, useAlternateSearchIndex }),
     })
       .then((response) => response.json())
       .then((results) => {

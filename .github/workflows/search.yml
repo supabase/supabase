@@ -68,8 +68,12 @@ jobs:
         run: |
           pnpm run codegen:examples
           pnpm run embeddings
+          pnpm run embeddings:nimbus
 
       - name: Refresh embeddings
         working-directory: ./apps/docs
         if: ${{ inputs.refresh }}
-        run: pnpm run embeddings:refresh
+        run: |
+          pnpm run codegen:examples
+          pnpm run embeddings:refresh
+          pnpm run embeddings:nimbus:refresh
