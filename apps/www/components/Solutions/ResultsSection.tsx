@@ -3,6 +3,7 @@ import { cn, Badge, AnimatedCounter } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { motion } from 'framer-motion'
 import { useMedia } from 'react-use'
+import { companyStats } from '~/data/company-stats'
 
 export interface ResultsSectionProps {
   id: string
@@ -102,17 +103,21 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
         <div className="flex items-center gap-2">
           <span className="text-foreground-light text-2xl">
             {isMobileOrTablet ? (
-              '5,230,550'
+              companyStats.developersRegistered.text
             ) : (
-              <AnimatedCounter value={5230550} duration={2.68} delay={0.5} />
+              <AnimatedCounter
+                value={companyStats.developersRegistered.number}
+                duration={2.68}
+                delay={0.5}
+              />
             )}
           </span>
           <Badge variant="success" size="small" className="h-[24px] px-2">
             {isMobileOrTablet ? (
-              '+28.3%'
+              companyStats.developersRegisteredChange.text
             ) : (
               <AnimatedCounter
-                value={28.3}
+                value={companyStats.developersRegisteredChange.number}
                 duration={2.68}
                 delay={0.5}
                 isPercentage={true}

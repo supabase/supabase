@@ -549,11 +549,11 @@ const data = {
     highlights: [
       {
         heading: 'databases managed',
-        subheading: companyStats.databasesManaged,
+        subheading: companyStats.databasesManaged.text,
       },
       {
         heading: 'databases launched daily',
-        subheading: companyStats.databasesLaunchedDaily,
+        subheading: companyStats.databasesLaunchedDaily.text,
       },
     ],
   },

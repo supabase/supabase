@@ -140,11 +140,11 @@ export default {
     highlights: [
       {
         heading: 'Databases managed',
-        subheading: companyStats.databasesManaged,
+        subheading: companyStats.databasesManaged.text,
       },
       {
         heading: 'Databases launched daily',
-        subheading: companyStats.databasesLaunchedDaily,
+        subheading: companyStats.databasesLaunchedDaily.text,
       },
     ],
   },
