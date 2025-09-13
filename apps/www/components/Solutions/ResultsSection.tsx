@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useMemo, useEffect, useState } from 'react'
 import { cn, Badge, AnimatedCounter } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { motion } from 'framer-motion'
@@ -74,8 +74,21 @@ const ResultsSection: FC<ResultsSectionProps> = (props) => {
 
 const GraphLabel: FC<{ className?: string }> = ({ className }) => {
   const isMobileOrTablet = useMedia('(max-width: 1280px)')
+  const [isClient, setIsClient] = useState(false)
 
-  const motionProps = !isMobileOrTablet
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Use client-side flag to prevent hydration mismatch
+  const shouldShowAnimated = useMemo(() => {
+    // Always show animated version until client-side hydration is complete
+    if (!isClient) return true
+    return !isMobileOrTablet
+  }, [isClient, isMobileOrTablet])
+
+  // Use the same server-safe logic for motion props
+  const motionProps = shouldShowAnimated
     ? {
         initial: { offsetDistance: '0%', rotate: '0deg', opacity: 0 },
         whileInView: { offsetDistance: '80%', rotate: '30deg', opacity: 1 },
@@ -87,7 +100,8 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
       }
     : undefined
 
-  const Component = isMobileOrTablet ? 'div' : motion.div
+  // Use the same server-safe logic for component selection
+  const Component = shouldShowAnimated ? motion.div : 'div'
 
   return (
     <Component
@@ -102,20 +116,18 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
         <span className="label !text-[10px] !leading-3">Users</span>
         <div className="flex items-center gap-2">
           <span className="text-foreground-light text-2xl">
-            {isMobileOrTablet ? (
-              companyStats.developersRegistered.text
-            ) : (
+            {shouldShowAnimated ? (
               <AnimatedCounter
                 value={companyStats.developersRegistered.number}
                 duration={2.68}
                 delay={0.5}
               />
+            ) : (
+              companyStats.developersRegistered.text
             )}
           </span>
           <Badge variant="success" size="small" className="h-[24px] px-2">
-            {isMobileOrTablet ? (
-              companyStats.developersRegisteredChange.text
-            ) : (
+            {shouldShowAnimated ? (
               <AnimatedCounter
                 value={companyStats.developersRegisteredChange.number}
                 duration={2.68}
@@ -123,6 +135,8 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
                 isPercentage={true}
                 prefix="+"
               />
+            ) : (
+              companyStats.developersRegisteredChange.text
             )}
           </Badge>
         </div>
