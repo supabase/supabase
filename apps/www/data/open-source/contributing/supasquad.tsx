@@ -138,11 +138,11 @@ export const data = {
       "Supabase's explosive growth means more builders need help. There are more opportunities to contribute, and more ways to make your mark. Join SupaSquad and help us support this thriving ecosystem of builders.",
     highlights: [
       {
-        heading: 'databases managed',
+        heading: companyStats.databasesManaged.label,
         subheading: companyStats.databasesManaged.text,
       },
       {
-        heading: 'databases launched daily',
+        heading: companyStats.databasesLaunchedDaily.label,
         subheading: companyStats.databasesLaunchedDaily.text,
       },
     ],
