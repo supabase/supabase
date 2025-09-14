@@ -5,10 +5,302 @@ import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
 import type { PlanNodeData } from './types'
 import { Badge, cn } from 'ui'
 import { NodeItem } from './node-item'
-import { HeatmapContext, MetricsVisibilityContext } from './contexts'
+import { HeatmapContext, MetricsVisibility, MetricsVisibilityContext } from './contexts'
 import { DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
 import { blocksToBytes } from './utils/formats'
 import { computeHeaderLines, hasShared, hasTemp, hasLocal } from './utils/node-display'
+
+const sharedTooltip = (data: PlanNodeData) => {
+  const incl = `incl: h=${data.sharedHit ?? 0} (${blocksToBytes(data.sharedHit)}), r=${
+    data.sharedRead ?? 0
+  } (${blocksToBytes(data.sharedRead)}), d=${data.sharedDirtied ?? 0} (${blocksToBytes(
+    data.sharedDirtied
+  )}), w=${data.sharedWritten ?? 0} (${blocksToBytes(data.sharedWritten)})`
+  const self = `self: h=${data.exSharedHit ?? 0} (${blocksToBytes(
+    data.exSharedHit
+  )}), r=${data.exSharedRead ?? 0} (${blocksToBytes(data.exSharedRead)}), d=${
+    data.exSharedDirtied ?? 0
+  } (${blocksToBytes(data.exSharedDirtied)}), w=${data.exSharedWritten ?? 0} (${blocksToBytes(
+    data.exSharedWritten
+  )})`
+
+  return `Shared Blocks\n${incl}\n${self}`
+}
+
+const localTooltip = (data: PlanNodeData) => {
+  const incl = `incl: h=${data.localHit ?? 0} (${blocksToBytes(data.localHit)}), r=${
+    data.localRead ?? 0
+  } (${blocksToBytes(data.localRead)}), d=${data.localDirtied ?? 0} (${blocksToBytes(
+    data.localDirtied
+  )}), w=${data.localWritten ?? 0} (${blocksToBytes(data.localWritten)})`
+  const self = `self: h=${data.exLocalHit ?? 0} (${blocksToBytes(
+    data.exLocalHit
+  )}), r=${data.exLocalRead ?? 0} (${blocksToBytes(data.exLocalRead)}), d=${
+    data.exLocalDirtied ?? 0
+  } (${blocksToBytes(data.exLocalDirtied)}), w=${data.exLocalWritten ?? 0} (${blocksToBytes(
+    data.exLocalWritten
+  )})`
+
+  return `Local Blocks\n${incl}\n${self}`
+}
+
+const tempTooltip = (data: PlanNodeData) => {
+  const incl = `incl: r=${data.tempRead ?? 0} (${blocksToBytes(
+    data.tempRead
+  )}), w=${data.tempWritten ?? 0} (${blocksToBytes(data.tempWritten)})`
+  const self = `self: r=${data.exTempRead ?? 0} (${blocksToBytes(
+    data.exTempRead
+  )}), w=${data.exTempWritten ?? 0} (${blocksToBytes(data.exTempWritten)})`
+
+  return `Temp Blocks\n${incl}\n${self}`
+}
+
+// Calculate removed percentage (0-100) based on removed and actual rows×loops
+const removedPercentValue = (data: PlanNodeData, removed?: number): number | undefined => {
+  const r = removed ?? 0
+  const actualTotal = (data.actualRows ?? 0) * (data.actualLoops ?? 1)
+  const denom = r + actualTotal
+  if (denom <= 0 || r <= 0) return undefined
+
+  return Math.round((r / denom) * 100)
+}
+
+const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
+  return [
+    // Workers planned/launched
+    {
+      id: 'workers',
+      condition: !(data.workersPlanned === undefined && data.workersLaunched === undefined),
+      element: (
+        <>
+          <span>Workers</span>
+          <ul className="flex flex-row items-center flex-1 justify-end gap-x-1">
+            <li>Planned:{data.workersPlanned}</li>
+            <li>Launched:{data.workersLaunched}</li>
+          </ul>
+        </>
+      ),
+    },
+    // Time (actual)
+    {
+      id: 'time',
+      condition: vis.time && data.actualTotalTime !== undefined,
+      element: (
+        <>
+          <span>time</span>
+          <span>
+            {data.actualTotalTime} ms{data.actualLoops ? ` ×${data.actualLoops}` : ''}
+          </span>
+        </>
+      ),
+    },
+    // Time (self/exclusive)
+    {
+      id: 'time-self',
+      condition: vis.time && data.exclusiveTimeMs !== undefined,
+      element: (
+        <>
+          <span>self time</span>
+          <span>{data.exclusiveTimeMs} ms</span>
+        </>
+      ),
+    },
+    // Rows (actual / est)
+    {
+      id: 'rows',
+      condition: vis.rows && (data.actualRows !== undefined || data.planRows !== undefined),
+      element: (
+        <>
+          <span>rows</span>
+          <span>
+            {data.actualRows !== undefined ? data.actualRows : '-'}
+            {data.planRows !== undefined ? ` / est ${data.planRows}` : ''}
+          </span>
+        </>
+      ),
+    },
+    // Estimation factor (actual_total / plan_est)
+    {
+      id: 'est-factor',
+      title:
+        typeof data.estActualTotalRows === 'number' && typeof data.planRows === 'number'
+          ? `actual_total_rows: ${data.estActualTotalRows} / plan_rows: ${data.planRows}`
+          : undefined,
+      condition: vis.rows && data.estFactor !== undefined,
+      element: (
+        <>
+          <span>estim</span>
+          <span className="inline-flex items-center gap-[2px]">
+            {data.estDirection === 'under' ? (
+              <ArrowBigDown size={10} strokeWidth={1} fill="currentColor" />
+            ) : data.estDirection === 'over' ? (
+              <ArrowBigUp size={10} strokeWidth={1} fill="currentColor" />
+            ) : null}
+            {data.estFactor?.toFixed(2)}×
+          </span>
+        </>
+      ),
+    },
+    // Costs (startup → total)
+    {
+      id: 'cost',
+      condition: vis.cost && (data.startupCost !== undefined || data.totalCost !== undefined),
+      element: (
+        <>
+          <span>cost</span>
+          <span>
+            {data.startupCost !== undefined ? data.startupCost : '-'}
+            {data.totalCost !== undefined ? ` → ${data.totalCost}` : ''}
+          </span>
+        </>
+      ),
+    },
+    // Cost (self/exclusive)
+    {
+      id: 'cost-self',
+      condition: vis.cost && data.exclusiveCost !== undefined,
+      element: (
+        <>
+          <span>self cost</span>
+          <span>{data.exclusiveCost?.toFixed(2)}</span>
+        </>
+      ),
+    },
+    // Plan width
+    {
+      id: 'plan-width',
+      condition: data.planWidth !== undefined,
+      element: (
+        <>
+          <span>plan width</span>
+          <span>{data.planWidth} bytes</span>
+        </>
+      ),
+    },
+    // Filters/Removals
+    {
+      id: 'removed-filter',
+      condition: data.rowsRemovedByFilter !== undefined,
+      element: (
+        <>
+          <span>removed (filter)</span>
+          <span className="flex items-center">
+            {data.rowsRemovedByFilter} ({removedPercentValue(data, data.rowsRemovedByFilter)}%)
+          </span>
+        </>
+      ),
+    },
+    {
+      id: 'removed-join-filter',
+      condition: data.rowsRemovedByJoinFilter !== undefined,
+      element: (
+        <>
+          <span>removed (join filter)</span>
+          <span>
+            {data.rowsRemovedByJoinFilter} (
+            {removedPercentValue(data, data.rowsRemovedByJoinFilter)}%)
+          </span>
+        </>
+      ),
+    },
+    {
+      id: 'removed-index-recheck',
+      condition: data.rowsRemovedByIndexRecheck !== undefined,
+      element: (
+        <>
+          <span>removed (recheck)</span>
+          <span>
+            {data.rowsRemovedByIndexRecheck} (
+            {removedPercentValue(data, data.rowsRemovedByIndexRecheck)}
+            %)
+          </span>
+        </>
+      ),
+    },
+    {
+      id: 'heap-fetches',
+      condition: data.heapFetches !== undefined,
+      element: (
+        <>
+          <span>heap fetches</span>
+          <span>{data.heapFetches}</span>
+        </>
+      ),
+    },
+    // Buffers
+    {
+      id: 'shared-buffers',
+      title: sharedTooltip(data),
+      condition: vis.buffers && hasShared(data),
+      element: (
+        <>
+          <span>shared (self)</span>
+          <span>
+            h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0} d:{data.exSharedDirtied ?? 0} w:
+            {data.exSharedWritten ?? 0}
+          </span>
+        </>
+      ),
+    },
+    {
+      id: 'temp-buffers',
+      title: tempTooltip(data),
+      condition: vis.buffers && hasTemp(data),
+      element: (
+        <>
+          <span>temp (self)</span>
+          <span>
+            r:{data.exTempRead ?? 0} w:{data.exTempWritten ?? 0}
+          </span>
+        </>
+      ),
+    },
+    {
+      id: 'local-buffers',
+      title: localTooltip(data),
+      condition: vis.buffers && hasLocal(data),
+      element: (
+        <>
+          <span>local (self)</span>
+          <span>
+            h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0} d:{data.exLocalDirtied ?? 0} w:
+            {data.exLocalWritten ?? 0}
+          </span>
+        </>
+      ),
+    },
+    // Output cols (verbose)
+    {
+      id: 'output-cols',
+      condition: vis.output && Array.isArray(data.outputCols) && data.outputCols.length > 0,
+      element: (
+        <>
+          <span>output</span>
+          <span className="truncate max-w-[95px]" title={data.outputCols?.join(', ')}>
+            {data.outputCols?.join(', ')}
+          </span>
+        </>
+      ),
+    },
+    // I/O times
+    {
+      id: 'io-times',
+      condition: vis.buffers && (data.ioReadTime !== undefined || data.ioWriteTime !== undefined),
+      element: (
+        <>
+          {' '}
+          <span>io</span>
+          <span>
+            {data.ioReadTime !== undefined ? `r:${data.ioReadTime}ms` : ''}
+            {data.ioWriteTime !== undefined
+              ? `${data.ioReadTime !== undefined ? ' ' : ''}w:${data.ioWriteTime}ms`
+              : ''}
+          </span>
+        </>
+      ),
+    },
+  ]
+}
 
 export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
@@ -16,57 +308,6 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const heat = useContext(HeatmapContext)
 
   const headerLines = computeHeaderLines(data)
-
-  const sharedTooltip = () => {
-    const incl = `incl: h=${data.sharedHit ?? 0} (${blocksToBytes(data.sharedHit)}), r=${
-      data.sharedRead ?? 0
-    } (${blocksToBytes(data.sharedRead)}), d=${data.sharedDirtied ?? 0} (${blocksToBytes(
-      data.sharedDirtied
-    )}), w=${data.sharedWritten ?? 0} (${blocksToBytes(data.sharedWritten)})`
-    const self = `self: h=${data.exSharedHit ?? 0} (${blocksToBytes(
-      data.exSharedHit
-    )}), r=${data.exSharedRead ?? 0} (${blocksToBytes(data.exSharedRead)}), d=${
-      data.exSharedDirtied ?? 0
-    } (${blocksToBytes(data.exSharedDirtied)}), w=${data.exSharedWritten ?? 0} (${blocksToBytes(
-      data.exSharedWritten
-    )})`
-    return `Shared Blocks\n${incl}\n${self}`
-  }
-
-  const localTooltip = () => {
-    const incl = `incl: h=${data.localHit ?? 0} (${blocksToBytes(data.localHit)}), r=${
-      data.localRead ?? 0
-    } (${blocksToBytes(data.localRead)}), d=${data.localDirtied ?? 0} (${blocksToBytes(
-      data.localDirtied
-    )}), w=${data.localWritten ?? 0} (${blocksToBytes(data.localWritten)})`
-    const self = `self: h=${data.exLocalHit ?? 0} (${blocksToBytes(
-      data.exLocalHit
-    )}), r=${data.exLocalRead ?? 0} (${blocksToBytes(data.exLocalRead)}), d=${
-      data.exLocalDirtied ?? 0
-    } (${blocksToBytes(data.exLocalDirtied)}), w=${data.exLocalWritten ?? 0} (${blocksToBytes(
-      data.exLocalWritten
-    )})`
-    return `Local Blocks\n${incl}\n${self}`
-  }
-
-  const tempTooltip = () => {
-    const incl = `incl: r=${data.tempRead ?? 0} (${blocksToBytes(
-      data.tempRead
-    )}), w=${data.tempWritten ?? 0} (${blocksToBytes(data.tempWritten)})`
-    const self = `self: r=${data.exTempRead ?? 0} (${blocksToBytes(
-      data.exTempRead
-    )}), w=${data.exTempWritten ?? 0} (${blocksToBytes(data.exTempWritten)})`
-    return `Temp Blocks\n${incl}\n${self}`
-  }
-
-  // Calculate removed percentage (0-100) based on removed and actual rows×loops
-  const removedPercentValue = (removed?: number): number | undefined => {
-    const r = removed ?? 0
-    const actualTotal = (data.actualRows ?? 0) * (data.actualLoops ?? 1)
-    const denom = r + actualTotal
-    if (denom <= 0 || r <= 0) return undefined
-    return Math.round((r / denom) * 100)
-  }
 
   // Heatmap progress bar (time/rows/cost)
   const valueForHeat = (() => {
@@ -154,174 +395,15 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
       )}
 
       <ul>
-        {/* Workers planned/launched */}
-        {(data.workersPlanned || data.workersLaunched) && (
-          <NodeItem title="Parallel workers summary">
-            <span>Workers</span>
-            <ul className="flex flex-row items-center flex-1 justify-end gap-x-1">
-              <li>Planned:{data.workersPlanned}</li>
-              <li>Launched:{data.workersLaunched}</li>
-            </ul>
-          </NodeItem>
-        )}
-        {/* Time (actual) */}
-        {vis.time && data.actualTotalTime !== undefined && (
-          <NodeItem>
-            <span>time</span>
-            <span>
-              {data.actualTotalTime} ms{data.actualLoops ? ` ×${data.actualLoops}` : ''}
-            </span>
-          </NodeItem>
-        )}
-        {/* Time (self/exclusive) */}
-        {vis.time && typeof data.exclusiveTimeMs === 'number' && (
-          <NodeItem>
-            <span>self time</span>
-            <span>{data.exclusiveTimeMs} ms</span>
-          </NodeItem>
-        )}
+        {metricsListData(data, vis).map((metric) => {
+          if (!metric.condition) return null
 
-        {/* Rows (actual / est) */}
-        {vis.rows && (data.actualRows !== undefined || data.planRows !== undefined) && (
-          <NodeItem>
-            <span>rows</span>
-            <span>
-              {data.actualRows !== undefined ? data.actualRows : '-'}
-              {data.planRows !== undefined ? ` / est ${data.planRows}` : ''}
-            </span>
-          </NodeItem>
-        )}
-        {/* Estimation factor (actual_total / plan_est) */}
-        {vis.rows && typeof data.estFactor === 'number' && (
-          <NodeItem
-            title={
-              typeof data.estActualTotalRows === 'number' && typeof data.planRows === 'number'
-                ? `actual_total_rows: ${data.estActualTotalRows} / plan_rows: ${data.planRows}`
-                : undefined
-            }
-          >
-            <span>estim</span>
-            <span className="inline-flex items-center gap-[2px]">
-              {data.estDirection === 'under' ? (
-                <ArrowBigDown size={10} strokeWidth={1} fill="currentColor" />
-              ) : data.estDirection === 'over' ? (
-                <ArrowBigUp size={10} strokeWidth={1} fill="currentColor" />
-              ) : null}
-              {data.estFactor.toFixed(2)}×
-            </span>
-          </NodeItem>
-        )}
-
-        {/* Costs (startup → total) */}
-        {vis.cost && (data.startupCost !== undefined || data.totalCost !== undefined) && (
-          <NodeItem>
-            <span>cost</span>
-            <span>
-              {data.startupCost !== undefined ? data.startupCost : '-'}
-              {data.totalCost !== undefined ? ` → ${data.totalCost}` : ''}
-            </span>
-          </NodeItem>
-        )}
-        {/* Cost (self/exclusive) */}
-        {vis.cost && typeof data.exclusiveCost === 'number' && (
-          <NodeItem>
-            <span>self cost</span>
-            <span>{data.exclusiveCost.toFixed(2)}</span>
-          </NodeItem>
-        )}
-
-        {/* Width */}
-        {data.planWidth !== undefined && (
-          <NodeItem>
-            <span>plan width</span>
-            <span>{data.planWidth} bytes</span>
-          </NodeItem>
-        )}
-
-        {/* Filters/Removals */}
-        {data.rowsRemovedByFilter !== undefined && (
-          <NodeItem>
-            <span>removed (filter)</span>
-            <span className="flex items-center">
-              {data.rowsRemovedByFilter} ({removedPercentValue(data.rowsRemovedByFilter)}%)
-            </span>
-          </NodeItem>
-        )}
-        {data.rowsRemovedByJoinFilter !== undefined && (
-          <NodeItem>
-            <span>removed (join filter)</span>
-            <span>
-              {data.rowsRemovedByJoinFilter} ({removedPercentValue(data.rowsRemovedByJoinFilter)}%)
-            </span>
-          </NodeItem>
-        )}
-        {data.rowsRemovedByIndexRecheck !== undefined && (
-          <NodeItem>
-            <span>removed (recheck)</span>
-            <span>
-              {data.rowsRemovedByIndexRecheck} (
-              {removedPercentValue(data.rowsRemovedByIndexRecheck)}
-              %)
-            </span>
-          </NodeItem>
-        )}
-        {data.heapFetches !== undefined && (
-          <NodeItem>
-            <span>heap fetches</span>
-            <span>{data.heapFetches}</span>
-          </NodeItem>
-        )}
-
-        {/* BUFFERS */}
-        {vis.buffers && hasShared(data) && (
-          <NodeItem title={sharedTooltip()}>
-            <span>shared (self)</span>
-            <span>
-              h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0} d:{data.exSharedDirtied ?? 0} w:
-              {data.exSharedWritten ?? 0}
-            </span>
-          </NodeItem>
-        )}
-        {vis.buffers && hasTemp(data) && (
-          <NodeItem title={tempTooltip()}>
-            <span>temp (self)</span>
-            <span>
-              r:{data.exTempRead ?? 0} w:{data.exTempWritten ?? 0}
-            </span>
-          </NodeItem>
-        )}
-        {vis.buffers && hasLocal(data) && (
-          <NodeItem title={localTooltip()}>
-            <span>local (self)</span>
-            <span>
-              h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0} d:{data.exLocalDirtied ?? 0} w:
-              {data.exLocalWritten ?? 0}
-            </span>
-          </NodeItem>
-        )}
-
-        {/* Output cols (verbose) */}
-        {vis.output && Array.isArray(data.outputCols) && data.outputCols.length > 0 && (
-          <NodeItem heightClass="min-h-[22px]">
-            <span>output</span>
-            <span className="truncate max-w-[95px]" title={data.outputCols.join(', ')}>
-              {data.outputCols.join(', ')}
-            </span>
-          </NodeItem>
-        )}
-
-        {/* I/O times */}
-        {vis.buffers && (data.ioReadTime !== undefined || data.ioWriteTime !== undefined) && (
-          <NodeItem>
-            <span>io</span>
-            <span>
-              {typeof data.ioReadTime === 'number' ? `r:${data.ioReadTime}ms` : ''}
-              {typeof data.ioWriteTime === 'number'
-                ? `${typeof data.ioReadTime === 'number' ? ' ' : ''}w:${data.ioWriteTime}ms`
-                : ''}
-            </span>
-          </NodeItem>
-        )}
+          return (
+            <NodeItem key={metric.id} title={metric.title}>
+              {metric.element}
+            </NodeItem>
+          )
+        })}
       </ul>
       <Handle type="source" position={Position.Bottom} className={HIDDEN_NODE_CONNECTOR} />
     </div>
