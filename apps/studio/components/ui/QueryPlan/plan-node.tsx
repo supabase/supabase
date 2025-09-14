@@ -1,11 +1,12 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import { Handle, Position } from 'reactflow'
 import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn } from 'ui'
 import { NodeItem } from './node-item'
-import { HeatmapContext, MetricsVisibility, MetricsVisibilityContext } from './contexts'
+import { Heatmap } from './heatmap'
+import { HeatmapContext, MetricsVisibilityContext, type MetricsVisibility } from './contexts'
 import { DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
 import {
   computeHeaderLines,
@@ -263,7 +264,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const headerLines = computeHeaderLines(data)
 
   // Heatmap progress bar (time/rows/cost)
-  const valueForHeat = (() => {
+  const valueForHeat = useMemo(() => {
     switch (heat.mode) {
       case 'time':
         return (data.exclusiveTimeMs ?? 0) || (data.actualTotalTime ?? 0) * (data.actualLoops ?? 1)
@@ -276,7 +277,15 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
       default:
         return 0
     }
-  })()
+  }, [
+    heat.mode,
+    data.exclusiveTimeMs,
+    data.actualTotalTime,
+    data.actualLoops,
+    data.actualRows,
+    data.planRows,
+    data.exclusiveCost,
+  ])
 
   const maxForHeat =
     heat.mode === 'time'
@@ -287,11 +296,11 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
           ? heat.maxCost
           : 1
   const pct = Math.max(0, Math.min(100, Math.round((valueForHeat / (maxForHeat || 1)) * 100)))
-  const heatColor = (() => {
+  const heatColor = useMemo(() => {
     if (heat.mode === 'none') return 'transparent'
     const hue = 120 - pct * 1.2 // 120->0 (green->red)
     return `hsl(${hue}, 85%, 45%)`
-  })()
+  }, [heat.mode, pct])
 
   return (
     <div
@@ -320,23 +329,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
           </Badge>
         )}
       </header>
-      {heat.mode !== 'none' && (
-        <div className="h-[3px] w-full bg-surface-100">
-          <div
-            className="h-full transition-all"
-            style={{ width: `${pct}%`, backgroundColor: heatColor }}
-            title={
-              heat.mode === 'time'
-                ? `time (self): ${valueForHeat.toFixed(2)} ms`
-                : heat.mode === 'rows'
-                  ? `rows: ${valueForHeat}`
-                  : heat.mode === 'cost'
-                    ? `self cost: ${valueForHeat.toFixed(2)}`
-                    : undefined
-            }
-          />
-        </div>
-      )}
+      {heat.mode !== 'none' && <Heatmap data={data} />}
       {headerLines.length > 0 && (
         <div className="px-2 bg-alternative pb-3">
           {headerLines.map((line, i) => (
