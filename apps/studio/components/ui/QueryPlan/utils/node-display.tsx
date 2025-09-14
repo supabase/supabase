@@ -3,7 +3,7 @@ import { capitalize } from 'lodash'
 
 import type { PlanNodeData } from '../types'
 import type { MetricsVisibility, HeatmapMode } from '../contexts'
-import { stripParens } from './formats'
+import { formatKeys, stripParens } from './formats'
 
 /**
  * Helpers for keeping display logic (what we render and when) in one place.
@@ -86,17 +86,6 @@ export function computeHeaderLines(d: PlanNodeData): ReactNode[] {
   }
 
   return lines
-}
-
-function formatKeys(keys?: string[], presorted?: string[]) {
-  if (!keys || keys.length === 0) return undefined
-  const pres = new Set((presorted || []).map((k) => stripParens(k)))
-  return keys
-    .map((k) => {
-      const kk = stripParens(k)
-      return pres.has(kk) ? `${kk} (presort)` : kk
-    })
-    .join(', ')
 }
 
 /** Buffers rows presence helpers */
