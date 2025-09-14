@@ -7,63 +7,16 @@ import { Badge, cn } from 'ui'
 import { NodeItem } from './node-item'
 import { HeatmapContext, MetricsVisibility, MetricsVisibilityContext } from './contexts'
 import { DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
-import { blocksToBytes } from './utils/formats'
-import { computeHeaderLines, hasShared, hasTemp, hasLocal } from './utils/node-display'
-
-const sharedTooltip = (data: PlanNodeData) => {
-  const incl = `incl: h=${data.sharedHit ?? 0} (${blocksToBytes(data.sharedHit)}), r=${
-    data.sharedRead ?? 0
-  } (${blocksToBytes(data.sharedRead)}), d=${data.sharedDirtied ?? 0} (${blocksToBytes(
-    data.sharedDirtied
-  )}), w=${data.sharedWritten ?? 0} (${blocksToBytes(data.sharedWritten)})`
-  const self = `self: h=${data.exSharedHit ?? 0} (${blocksToBytes(
-    data.exSharedHit
-  )}), r=${data.exSharedRead ?? 0} (${blocksToBytes(data.exSharedRead)}), d=${
-    data.exSharedDirtied ?? 0
-  } (${blocksToBytes(data.exSharedDirtied)}), w=${data.exSharedWritten ?? 0} (${blocksToBytes(
-    data.exSharedWritten
-  )})`
-
-  return `Shared Blocks\n${incl}\n${self}`
-}
-
-const localTooltip = (data: PlanNodeData) => {
-  const incl = `incl: h=${data.localHit ?? 0} (${blocksToBytes(data.localHit)}), r=${
-    data.localRead ?? 0
-  } (${blocksToBytes(data.localRead)}), d=${data.localDirtied ?? 0} (${blocksToBytes(
-    data.localDirtied
-  )}), w=${data.localWritten ?? 0} (${blocksToBytes(data.localWritten)})`
-  const self = `self: h=${data.exLocalHit ?? 0} (${blocksToBytes(
-    data.exLocalHit
-  )}), r=${data.exLocalRead ?? 0} (${blocksToBytes(data.exLocalRead)}), d=${
-    data.exLocalDirtied ?? 0
-  } (${blocksToBytes(data.exLocalDirtied)}), w=${data.exLocalWritten ?? 0} (${blocksToBytes(
-    data.exLocalWritten
-  )})`
-
-  return `Local Blocks\n${incl}\n${self}`
-}
-
-const tempTooltip = (data: PlanNodeData) => {
-  const incl = `incl: r=${data.tempRead ?? 0} (${blocksToBytes(
-    data.tempRead
-  )}), w=${data.tempWritten ?? 0} (${blocksToBytes(data.tempWritten)})`
-  const self = `self: r=${data.exTempRead ?? 0} (${blocksToBytes(
-    data.exTempRead
-  )}), w=${data.exTempWritten ?? 0} (${blocksToBytes(data.exTempWritten)})`
-
-  return `Temp Blocks\n${incl}\n${self}`
-}
-
-// Calculate removed percentage (0-100) based on removed and actual rows×loops
-const removedPercentValue = (data: PlanNodeData, removed?: number): number | undefined => {
-  const r = removed ?? 0
-  const actualTotal = (data.actualRows ?? 0) * (data.actualLoops ?? 1)
-  const denom = r + actualTotal
-  if (denom <= 0 || r <= 0) return undefined
-
-  return Math.round((r / denom) * 100)
-}
+import {
+  computeHeaderLines,
+  hasShared,
+  hasTemp,
+  hasLocal,
+  sharedTooltip,
+  localTooltip,
+  tempTooltip,
+  removedPercentValue,
+} from './utils/node-display'
 
 const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
   return [
