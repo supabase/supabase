@@ -91,56 +91,76 @@ export function computeHeaderLines(d: PlanNodeData): ReactNode[] {
 /**
  * Tooltip formatters and value helpers for metric rows
  */
-export const sharedTooltip = (data: PlanNodeData) => {
-  const incl = `incl: h=${data.sharedHit ?? 0} (${blocksToBytes(data.sharedHit)}), r=${
-    data.sharedRead ?? 0
-  } (${blocksToBytes(data.sharedRead)}), d=${data.sharedDirtied ?? 0} (${blocksToBytes(
-    data.sharedDirtied
-  )}), w=${data.sharedWritten ?? 0} (${blocksToBytes(data.sharedWritten)})`
-  const self = `self: h=${data.exSharedHit ?? 0} (${blocksToBytes(
-    data.exSharedHit
-  )}), r=${data.exSharedRead ?? 0} (${blocksToBytes(data.exSharedRead)}), d=${
-    data.exSharedDirtied ?? 0
-  } (${blocksToBytes(data.exSharedDirtied)}), w=${data.exSharedWritten ?? 0} (${blocksToBytes(
+function formatSharedBlocksLine(
+  prefix: string,
+  hit?: number,
+  read?: number,
+  dirtied?: number,
+  written?: number
+): string {
+  const h = hit ?? 0
+  const r = read ?? 0
+  const d = dirtied ?? 0
+  const w = written ?? 0
+
+  return `${prefix}: h=${h} (${blocksToBytes(hit)}), r=${r} (${blocksToBytes(read)}), d=${d} (${blocksToBytes(
+    dirtied
+  )}), w=${w} (${blocksToBytes(written)})`
+}
+
+export function sharedTooltip(data: PlanNodeData) {
+  const incl = formatSharedBlocksLine(
+    'incl',
+    data.sharedHit,
+    data.sharedRead,
+    data.sharedDirtied,
+    data.sharedWritten
+  )
+  const self = formatSharedBlocksLine(
+    'self',
+    data.exSharedHit,
+    data.exSharedRead,
+    data.exSharedDirtied,
     data.exSharedWritten
-  )})`
+  )
 
   return `Shared Blocks\n${incl}\n${self}`
 }
 
-export const localTooltip = (data: PlanNodeData) => {
-  const incl = `incl: h=${data.localHit ?? 0} (${blocksToBytes(data.localHit)}), r=${
-    data.localRead ?? 0
-  } (${blocksToBytes(data.localRead)}), d=${data.localDirtied ?? 0} (${blocksToBytes(
-    data.localDirtied
-  )}), w=${data.localWritten ?? 0} (${blocksToBytes(data.localWritten)})`
-  const self = `self: h=${data.exLocalHit ?? 0} (${blocksToBytes(
-    data.exLocalHit
-  )}), r=${data.exLocalRead ?? 0} (${blocksToBytes(data.exLocalRead)}), d=${
-    data.exLocalDirtied ?? 0
-  } (${blocksToBytes(data.exLocalDirtied)}), w=${data.exLocalWritten ?? 0} (${blocksToBytes(
+export function localTooltip(data: PlanNodeData) {
+  const incl = formatSharedBlocksLine(
+    'incl',
+    data.localHit,
+    data.localRead,
+    data.localDirtied,
+    data.localWritten
+  )
+  const self = formatSharedBlocksLine(
+    'self',
+    data.exLocalHit,
+    data.exLocalRead,
+    data.exLocalDirtied,
     data.exLocalWritten
-  )})`
+  )
 
   return `Local Blocks\n${incl}\n${self}`
 }
 
-export const tempTooltip = (data: PlanNodeData) => {
-  const incl = `incl: r=${data.tempRead ?? 0} (${blocksToBytes(
-    data.tempRead
-  )}), w=${data.tempWritten ?? 0} (${blocksToBytes(data.tempWritten)})`
-  const self = `self: r=${data.exTempRead ?? 0} (${blocksToBytes(
-    data.exTempRead
-  )}), w=${data.exTempWritten ?? 0} (${blocksToBytes(data.exTempWritten)})`
+function formatReadWriteLine(prefix: string, read?: number, written?: number): string {
+  const r = read ?? 0
+  const w = written ?? 0
+  return `${prefix}: r=${r} (${blocksToBytes(read)}), w=${w} (${blocksToBytes(written)})`
+}
+
+export function tempTooltip(data: PlanNodeData) {
+  const incl = formatReadWriteLine('incl', data.tempRead, data.tempWritten)
+  const self = formatReadWriteLine('self', data.exTempRead, data.exTempWritten)
 
   return `Temp Blocks\n${incl}\n${self}`
 }
 
 // Calculate removed percentage (0-100) based on removed and actual rows×loops
-export const removedPercentValue = (
-  data: PlanNodeData,
-  removed?: number
-): number | undefined => {
+export function removedPercentValue(data: PlanNodeData, removed?: number): number | undefined {
   const r = removed ?? 0
   const actualTotal = (data.actualRows ?? 0) * (data.actualLoops ?? 1)
   const denom = r + actualTotal
@@ -150,50 +170,62 @@ export const removedPercentValue = (
 }
 
 /** Buffers rows presence helpers */
-export const hasShared = (d: PlanNodeData) =>
-  (d.exSharedHit ?? 0) +
-    (d.exSharedRead ?? 0) +
-    (d.exSharedWritten ?? 0) +
-    (d.exSharedDirtied ?? 0) >
-  0
-export const hasTemp = (d: PlanNodeData) => (d.exTempRead ?? 0) + (d.exTempWritten ?? 0) > 0
-export const hasLocal = (d: PlanNodeData) =>
-  (d.exLocalHit ?? 0) + (d.exLocalRead ?? 0) + (d.exLocalWritten ?? 0) + (d.exLocalDirtied ?? 0) > 0
+export function hasShared(d: PlanNodeData) {
+  return (
+    (d.exSharedHit ?? 0) +
+      (d.exSharedRead ?? 0) +
+      (d.exSharedWritten ?? 0) +
+      (d.exSharedDirtied ?? 0) >
+    0
+  )
+}
+
+export function hasTemp(d: PlanNodeData) {
+  return (d.exTempRead ?? 0) + (d.exTempWritten ?? 0) > 0
+}
+
+export function hasLocal(d: PlanNodeData) {
+  return (
+    (d.exLocalHit ?? 0) + (d.exLocalRead ?? 0) + (d.exLocalWritten ?? 0) + (d.exLocalDirtied ?? 0) >
+    0
+  )
+}
 
 /**
  * Counts how many metric rows (NodeItem) will be rendered for a node,
  * based on the metric visibility toggles and the node's data.
  */
 export function countBodyRows(d: PlanNodeData, vis: MetricsVisibility): number {
-  let c = 0
+  let count = 0
   // Workers
-  if (typeof d.workersPlanned === 'number' || typeof d.workersLaunched === 'number') c += 1
+  if (d.workersPlanned !== undefined || d.workersLaunched !== undefined) count += 1
   // time
-  if (vis.time && typeof d.actualTotalTime === 'number') c += 1
-  if (vis.time && typeof d.exclusiveTimeMs === 'number') c += 1
+  if (vis.time && d.actualTotalTime !== undefined) count += 1
+  if (vis.time && d.exclusiveTimeMs !== undefined) count += 1
   // rows
-  if (vis.rows && (typeof d.actualRows === 'number' || typeof d.planRows === 'number')) c += 1
-  if (vis.rows && typeof d.estFactor === 'number') c += 1
+  if (vis.rows && (d.actualRows !== undefined || d.planRows !== undefined)) count += 1
+  if (vis.rows && d.estFactor !== undefined) count += 1
   // cost
-  if (vis.cost && (typeof d.startupCost === 'number' || typeof d.totalCost === 'number')) c += 1
-  if (vis.cost && typeof d.exclusiveCost === 'number') c += 1
+  if (vis.cost && (d.startupCost !== undefined || d.totalCost !== undefined)) count += 1
+  if (vis.cost && d.exclusiveCost !== undefined) count += 1
   // width
-  if (typeof d.planWidth === 'number') c += 1
+  if (d.planWidth !== undefined) count += 1
   // removed rows
-  if (typeof d.rowsRemovedByFilter === 'number') c += 1
-  if (typeof d.rowsRemovedByJoinFilter === 'number') c += 1
-  if (typeof d.rowsRemovedByIndexRecheck === 'number') c += 1
+  if (d.rowsRemovedByFilter !== undefined) count += 1
+  if (d.rowsRemovedByJoinFilter !== undefined) count += 1
+  if (d.rowsRemovedByIndexRecheck !== undefined) count += 1
   // heap fetches
-  if (typeof d.heapFetches === 'number') c += 1
+  if (d.heapFetches !== undefined) count += 1
   // buffers
-  if (vis.buffers && hasShared(d)) c += 1
-  if (vis.buffers && hasTemp(d)) c += 1
-  if (vis.buffers && hasLocal(d)) c += 1
+  if (vis.buffers && hasShared(d)) count += 1
+  if (vis.buffers && hasTemp(d)) count += 1
+  if (vis.buffers && hasLocal(d)) count += 1
   // output
-  if (vis.output && Array.isArray(d.outputCols) && d.outputCols.length > 0) c += 1
+  if (vis.output && Array.isArray(d.outputCols) && d.outputCols.length > 0) count += 1
   // io time
-  if (vis.buffers && (typeof d.ioReadTime === 'number' || typeof d.ioWriteTime === 'number')) c += 1
-  return c
+  if (vis.buffers && (d.ioReadTime !== undefined || d.ioWriteTime !== undefined)) count += 1
+
+  return count
 }
 
 /**
@@ -215,6 +247,7 @@ export function estimateNodeHeight(
   const headerLines = computeHeaderLines(d).length
   const bodyRows = countBodyRows(d, vis)
   const heat = heatmapMode !== 'none' ? constants.HEATMAP_H : 0
+
   return (
     constants.HEADER_H +
     heat +
