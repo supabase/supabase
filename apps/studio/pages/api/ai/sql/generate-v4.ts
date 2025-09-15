@@ -72,26 +72,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
 
-  // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
-  // Results property is used to cache results client-side after queries are run
-  // Tool results will still be included in history sent to model
-  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
-    if (msg && msg.role === 'assistant' && 'results' in msg) {
-      const cleanedMsg = { ...msg }
-      delete cleanedMsg.results
-      return cleanedMsg
-    }
-    // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
-    // this happens when a user stops the assistant response while the tool is being called
-    if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts.filter((part: any) => {
-        return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
-      })
-      return { ...msg, parts: cleanedParts }
-    }
-    return msg
-  })
-
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
 
@@ -116,6 +96,39 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         .json({ error: 'There was an error fetching your organization details' })
     }
   }
+
+  // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
+  // Results property is used to cache results client-side after queries are run
+  // Tool results will still be included in history sent to model
+  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
+    if (msg && msg.role === 'assistant' && 'results' in msg) {
+      const cleanedMsg = { ...msg }
+      delete cleanedMsg.results
+      return cleanedMsg
+    }
+    // Filter out tool calls with UI-specific states that the AI SDK doesn't understand
+    // These states are used for UI rendering but shouldn't be sent to the model
+    if (msg && msg.role === 'assistant' && msg.parts) {
+      const cleanedParts = msg.parts
+        .filter((part: any) => {
+          // Filter out tool calls with invalid states for AI SDK
+          if (part.type.startsWith('tool-')) {
+            const invalidStates = ['input-streaming', 'input-available', 'output-error']
+            return !invalidStates.includes(part.state)
+          }
+          return true
+        })
+        .map((part: any) => {
+          // If opt in level is schema_and_log_and_data, replace part output with permission message
+          if (aiOptInLevel !== 'schema_and_log_and_data' && part.output) {
+            return { ...part, output: 'Result not shared due to permission level' }
+          }
+          return part
+        })
+      return { ...msg, parts: cleanedParts }
+    }
+    return msg
+  })
 
   const {
     model,

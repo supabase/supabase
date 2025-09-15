@@ -68,78 +68,22 @@ export const ReportBlock = ({
     <>
       {isSnippet ? (
         <QueryBlock
-          runQuery
-          isChart
-          draggable
           id={item.id}
-          isLoading={isLoading}
-          isRefreshing={isRefreshing}
           label={item.label}
           chartConfig={chartConfig}
           sql={sql}
-          maxHeight={232}
-          queryHeight={232}
           actions={
-            <ButtonTooltip
-              type="text"
-              icon={<X />}
-              className="w-7 h-7"
-              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
-              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
-            />
+            !isLoading && (
+              <ButtonTooltip
+                type="text"
+                icon={<X />}
+                className="w-7 h-7"
+                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+                tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+              />
+            )
           }
           onUpdateChartConfig={onUpdateChart}
-          noResultPlaceholder={
-            <div
-              className={cn(
-                'flex flex-col gap-y-1 h-full w-full',
-                isLoading ? 'justify-start items-start p-2 gap-y-2' : 'justify-center px-4 gap-y-1'
-              )}
-            >
-              {isLoading ? (
-                <>
-                  <ShimmeringLoader className="w-full" />
-                  <ShimmeringLoader className="w-full w-3/4" />
-                  <ShimmeringLoader className="w-full w-1/2" />
-                </>
-              ) : isError ? (
-                <>
-                  <p className="text-xs text-foreground-light text-center">
-                    {snippetMissing ? 'SQL snippet cannot be found' : 'Error fetching SQL snippet'}
-                  </p>
-                  <p className="text-xs text-foreground-lighter text-center">
-                    {snippetMissing ? 'Please remove this block from your report' : error.message}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs text-foreground-light text-center">
-                    No results returned from query
-                  </p>
-                  <p className="text-xs text-foreground-lighter text-center">
-                    Results from the SQL query can be viewed as a table or chart here
-                  </p>
-                </>
-              )}
-            </div>
-          }
-          readOnlyErrorPlaceholder={
-            <div className="flex flex-col h-full justify-center items-center text-center">
-              <p className="text-xs text-foreground-light">
-                SQL query is not read-only and cannot be rendered
-              </p>
-              <p className="text-xs text-foreground-lighter text-center">
-                Queries that involve any mutation will not be run in reports
-              </p>
-              <Button
-                type="default"
-                className="mt-2"
-                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
-              >
-                Remove chart
-              </Button>
-            </div>
-          }
         />
       ) : isDeprecatedChart ? (
         <DeprecatedChartBlock

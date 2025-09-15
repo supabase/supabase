@@ -3,6 +3,8 @@ import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
 import type { ToolSet } from 'ai'
 
+const UI_EXECUTED_TOOLS = ['execute_sql', 'deploy_edge_function']
+
 export const getMcpTools = async ({
   accessToken,
   projectRef,
@@ -24,8 +26,9 @@ export const getMcpTools = async ({
 
   // Remove UI-executed tools handled locally
   const filteredMcpTools: ToolSet = { ...allowedMcpTools }
-  delete (filteredMcpTools as any)['execute_sql']
-  delete (filteredMcpTools as any)['deploy_edge_function']
+  UI_EXECUTED_TOOLS.forEach((toolName) => {
+    delete filteredMcpTools[toolName]
+  })
 
   // Validate that only known tools are provided
   const validation = toolSetValidationSchema.safeParse(filteredMcpTools)

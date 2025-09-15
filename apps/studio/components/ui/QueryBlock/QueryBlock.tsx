@@ -10,16 +10,14 @@ import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartC
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { type QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { type Parameter, parseParameters } from 'lib/sql-parameters'
-import type { Dashboards } from 'types'
-import { ChartContainer, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
+
+import { Badge, ChartContainer, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
 import SqlWarningAdmonition from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
-import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
@@ -33,68 +31,21 @@ export const DEFAULT_CHART_CONFIG: ChartConfig = {
 }
 
 interface QueryBlockProps {
-  /** Applicable if SQL is a snippet that's already saved (Used in Reports) */
   id?: string
-  /** Title of the QueryBlock */
   label: string
-  /** SQL query to render/run in the QueryBlock */
   sql?: string
-  /** Configuration of the output chart based on the query result */
+  isWriteQuery?: boolean
   chartConfig?: ChartConfig
-  /** Not implemented yet: Will be the next part of ReportsV2 */
-  parameterValues?: Record<string, string>
-  /** Any other actions specific to the parent to be rendered in the header */
   actions?: ReactNode
-  /** Toggle visiblity of SQL query on render */
-  showSql?: boolean
-  /** Indicate if SQL query can be rendered as a chart */
-  isChart?: boolean
-  /** For Assistant as QueryBlock is rendered while streaming response */
-  isLoading?: boolean
-  /** Override to prevent running the SQL query provided */
-  runQuery?: boolean
-  /** Prevent updating of columns for X and Y axes in the chart view */
-  lockColumns?: boolean
-  /** Max height set to render results / charts (Defaults to 250) */
-  maxHeight?: number
-  /** Whether query block is draggable */
-  draggable?: boolean
-  /** Tooltip when hovering over the header of the block (Used in Assistant Panel) */
-  tooltip?: ReactNode
-  /** Optional: Any initial results to render as part of the query*/
-  results?: any[]
-  /** Opt to show run button if query is not read only */
-  showRunButtonIfNotReadOnly?: boolean
-  /** Not implemented yet: Will be the next part of ReportsV2 */
-  onSetParameter?: (params: Parameter[]) => void
-  /** Optional callback the SQL query is run */
-  onRunQuery?: (queryType: 'select' | 'mutation') => void
-  /** Optional callback on drag start */
-  onDragStart?: (e: DragEvent<Element>) => void
-  /** Optional: callback when the results are returned from running the SQL query*/
+  initialResults?: any[]
   onResults?: (results: any[]) => void
-  /** Optional: callback when an error occurs while running the SQL query*/
+  onRunQuery?: (queryType: 'select' | 'mutation') => void
   onError?: (errorText: string) => void
-  /** Force showing confirmation (write) bar before executing */
-  forceShowConfirmation?: boolean
-
-  // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
-  /** Optional height set to render the SQL query (Used in Reports) */
-  queryHeight?: number
-  /** UI to render if there's a read-only error while running the query */
-  readOnlyErrorPlaceholder?: ReactNode
-  /** UI to render if there's no query results (Used in Reports) */
-  noResultPlaceholder?: ReactNode
-  /** To trigger a refresh of the query */
-  isRefreshing?: boolean
-  /** Optional callback whenever a chart configuration is updated (Used in Reports) */
-  onUpdateChartConfig?: ({
-    chart,
-    chartConfig,
-  }: {
-    chart?: Partial<Dashboards.Chart>
-    chartConfig: Partial<ChartConfig>
-  }) => void
+  onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
+  draggable?: boolean
+  onDragStart?: (e: DragEvent<Element>) => void
+  disabled?: boolean
+  isExternallyExecuting?: boolean
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -104,44 +55,34 @@ export const QueryBlock = ({
   label,
   sql,
   chartConfig = DEFAULT_CHART_CONFIG,
-  maxHeight = 250,
-  queryHeight,
-  parameterValues: extParameterValues,
   actions,
-  showSql: _showSql = false,
-  isChart = false,
-  isLoading = false,
-  runQuery = false,
-  lockColumns = false,
-  draggable = false,
-  isRefreshing = false,
-  noResultPlaceholder = null,
-  readOnlyErrorPlaceholder = null,
-  showRunButtonIfNotReadOnly = false,
-  tooltip,
-  results,
+  initialResults,
+  isWriteQuery = false,
   onRunQuery,
-  onSetParameter,
   onUpdateChartConfig,
-  onDragStart,
   onResults,
   onError,
-  forceShowConfirmation,
+  draggable = false,
+  onDragStart,
+  disabled = false,
+  isExternallyExecuting = false,
 }: QueryBlockProps) => {
   const { ref } = useParams()
 
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
   const { xKey, yKey, view = 'table' } = chartSettings
 
-  const [showSql, setShowSql] = useState(_showSql)
+  // Maintain local results state, seeded from initial results prop
+  const [localResults, setLocalResults] = useState<any[] | undefined>(initialResults)
+
+  const [showSql, setShowSql] = useState(!localResults)
   const [readOnlyError, setReadOnlyError] = useState(false)
   const [queryError, setQueryError] = useState<QueryResponseError>()
-  const [queryResult, setQueryResult] = useState<any[] | undefined>(results)
   const [focusDataIndex, setFocusDataIndex] = useState<number>()
 
   const formattedQueryResult = useMemo(() => {
     // Make sure Y axis values are numbers
-    return queryResult?.map((row) => {
+    return localResults?.map((row) => {
       return Object.fromEntries(
         Object.entries(row).map(([key, value]) => {
           if (key === yKey) return [key, Number(value)]
@@ -149,17 +90,9 @@ export const QueryBlock = ({
         })
       )
     })
-  }, [queryResult, yKey])
+  }, [localResults, yKey])
 
-  const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
-
-  const parameters = useMemo(() => {
-    if (!sql) return []
-    return parseParameters(sql)
-  }, [sql])
-  // [Joshen] This is for when we introduced the concept of parameters into our reports
-  // const combinedParameterValues = { ...extParameterValues, ...parameterValues }
 
   const { database: primaryDatabase } = usePrimaryDatabase({ projectRef: ref })
   const postgresConnectionString = primaryDatabase?.connectionString
@@ -169,10 +102,10 @@ export const QueryBlock = ({
     ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
     : formattedQueryResult
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: execute, isLoading: isInternallyExecuting } = useExecuteSqlMutation({
     onSuccess: (data) => {
+      setLocalResults(data.result)
       onResults?.(data.result)
-      setQueryResult(data.result)
 
       setReadOnlyError(false)
       setQueryError(undefined)
@@ -183,7 +116,7 @@ export const QueryBlock = ({
       const notOwner = error.message.includes('must be owner')
       if (readOnlyTransaction || permissionDenied || notOwner) {
         setReadOnlyError(true)
-        if (showRunButtonIfNotReadOnly) setShowWarning('hasWriteOperation')
+        setShowWarning('hasWriteOperation')
       } else {
         setQueryError(error)
       }
@@ -199,16 +132,17 @@ export const QueryBlock = ({
   }
   const xKeyDateFormat = getDateFormat(xKey)
 
+  // Combined loading state from internal execution or external execution
+  const isExecuting = isInternallyExecuting || isExternallyExecuting
+
   const handleExecute = useCallback(() => {
     if (!sql || isExecuting) return
 
-    if (readOnlyError) {
+    if (readOnlyError || isWriteQuery) {
       return setShowWarning('hasWriteOperation')
     }
 
     try {
-      // [Joshen] This is for when we introduced the concept of parameters into our reports
-      // const processedSql = processParameterizedSql(sql, combinedParameterValues)
       execute({
         projectRef: ref,
         connectionString: readOnlyConnectionString,
@@ -217,116 +151,72 @@ export const QueryBlock = ({
     } catch (error: any) {
       toast.error(`Failed to execute query: ${error.message}`)
     }
-  }, [sql, isExecuting, readOnlyError, execute, ref, readOnlyConnectionString])
-
-  useEffect(() => {
-    if (forceShowConfirmation) setShowWarning('hasWriteOperation')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [forceShowConfirmation])
+  }, [sql, isExecuting, readOnlyError, isWriteQuery, execute, ref, readOnlyConnectionString])
 
   useEffect(() => {
     setChartSettings(chartConfig)
   }, [chartConfig])
 
-  // Run once on mount to parse parameters and notify parent
+  // Sync local results when initialResults changes (from external execution)
   useEffect(() => {
-    if (!!sql && onSetParameter) {
-      const params = parseParameters(sql)
-      onSetParameter(params)
+    if (initialResults !== undefined) {
+      setLocalResults(initialResults)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql])
+  }, [initialResults])
 
-  useEffect(() => {
-    if (!!sql && runQuery && !!readOnlyConnectionString && !readOnlyError && !isExecuting) {
-      handleExecute()
-    }
-  }, [
-    sql,
-    isLoading,
-    runQuery,
-    readOnlyConnectionString,
-    isExecuting,
-    readOnlyError,
-    handleExecute,
-  ])
-
-  useEffect(() => {
-    if (isRefreshing) handleExecute()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRefreshing])
+  // Execution is only user-driven within this component
 
   return (
     <ReportBlockContainer
       draggable={draggable}
       showDragHandle={draggable}
-      tooltip={tooltip}
-      loading={isExecuting}
       onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
-      icon={
-        <SQL_ICON
-          size={18}
-          strokeWidth={1.5}
-          className={cn(
-            'transition-colors fill-foreground-muted group-aria-selected:fill-foreground',
-            'w-5 h-5 shrink-0 grow-0 -ml-0.5'
-          )}
-        />
+      loading={isExecuting}
+      label={
+        <div className="flex items-center gap-2">
+          <span>{label}</span>
+          {isWriteQuery && <Badge variant="warning">Write</Badge>}
+        </div>
       }
-      label={label}
       actions={
-        <>
-          <ButtonTooltip
-            type="text"
-            size="tiny"
-            className="w-7 h-7"
-            icon={<Code size={14} strokeWidth={1.5} />}
-            onClick={() => setShowSql(!showSql)}
-            tooltip={{
-              content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
-            }}
-          />
+        disabled ? null : (
+          <>
+            <ButtonTooltip
+              type="text"
+              size="tiny"
+              className="w-7 h-7"
+              icon={<Code size={14} strokeWidth={1.5} />}
+              onClick={() => setShowSql(!showSql)}
+              tooltip={{
+                content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
+              }}
+            />
+            {localResults && (
+              <BlockViewConfiguration
+                view={view}
+                isChart={view === 'chart'}
+                lockColumns={false}
+                chartConfig={chartSettings}
+                columns={Object.keys(localResults?.[0] || {})}
+                changeView={(view) => {
+                  if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view } })
+                  setChartSettings({ ...chartSettings, view })
+                }}
+                updateChartConfig={(config) => {
+                  if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
+                  setChartSettings(config)
+                }}
+              />
+            )}
 
-          {queryResult && (
-            <>
-              {/* [Joshen ReportsV2] Won't see this just yet as this is intended for Reports V2 */}
-              {parameters.length > 0 && (
-                <ParametersPopover
-                  parameters={parameters}
-                  parameterValues={parameterValues}
-                  onSubmit={setParameterValues}
-                />
-              )}
-              {isChart && (
-                <BlockViewConfiguration
-                  view={view}
-                  isChart={isChart}
-                  lockColumns={lockColumns}
-                  chartConfig={chartSettings}
-                  columns={Object.keys(queryResult[0] || {})}
-                  changeView={(view) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view } })
-                    setChartSettings({ ...chartSettings, view })
-                  }}
-                  updateChartConfig={(config) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
-                    setChartSettings(config)
-                  }}
-                />
-              )}
-            </>
-          )}
-
-          <EditQueryButton id={id} title={label} sql={sql} />
-
-          {(showRunButtonIfNotReadOnly || !readOnlyError) && (
+            <EditQueryButton id={id} title={label} sql={sql} />
             <ButtonTooltip
               type="text"
               size="tiny"
               className="w-7 h-7"
               icon={<Play size={14} strokeWidth={1.5} />}
-              loading={isExecuting || isLoading}
-              disabled={isLoading}
+              loading={isExecuting}
+              disabled={isExecuting}
               onClick={() => {
                 handleExecute()
                 if (!!sql) onRunQuery?.('select')
@@ -343,10 +233,10 @@ export const QueryBlock = ({
                 },
               }}
             />
-          )}
 
-          {actions}
-        </>
+            {actions}
+          </>
+        )
       }
     >
       {!!showWarning && (
@@ -383,9 +273,8 @@ export const QueryBlock = ({
       {showSql && (
         <div
           className={cn('shrink-0 w-full max-h-96 overflow-y-auto', {
-            'border-b': queryResult !== undefined,
+            'border-b': localResults !== undefined,
           })}
-          style={{ height: !!queryHeight ? `${queryHeight}px` : undefined }}
         >
           <CodeBlock
             hideLineNumbers
@@ -400,15 +289,15 @@ export const QueryBlock = ({
         </div>
       )}
 
-      {isExecuting && queryResult === undefined && (
+      {isExecuting && localResults === undefined && (
         <div className="p-3 w-full">
           <ShimmeringLoader />
         </div>
       )}
 
-      {view === 'chart' && queryResult !== undefined ? (
+      {view === 'chart' && localResults !== undefined ? (
         <>
-          {(queryResult ?? []).length === 0 ? (
+          {(localResults ?? []).length === 0 ? (
             <div className="flex w-full h-full items-center justify-center py-3">
               <p className="text-foreground-light text-xs">No results returned from query</p>
             </div>
@@ -420,10 +309,7 @@ export const QueryBlock = ({
             <div className="flex-1 w-full">
               <ChartContainer
                 className="aspect-auto px-3 py-2"
-                style={{
-                  height: maxHeight ? `${maxHeight}px` : undefined,
-                  minHeight: maxHeight ? `${maxHeight}px` : undefined,
-                }}
+                style={{ height: '250px', minHeight: '250px' }}
               >
                 <BarChart
                   accessibilityLayer
@@ -469,26 +355,16 @@ export const QueryBlock = ({
       ) : (
         <>
           {!isExecuting && !!queryError ? (
-            <div
-              className={cn('flex-1 w-full overflow-auto relative border-t px-3.5 py-2')}
-              style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
-            >
+            <div className={cn('flex-1 w-full overflow-auto relative border-t px-3.5 py-2')}>
               <span className="font-mono text-xs">ERROR: {queryError.message}</span>
             </div>
-          ) : queryResult ? (
-            <div
-              className={cn('flex-1 w-full overflow-auto relative')}
-              style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
-            >
-              <Results rows={queryResult} />
-            </div>
-          ) : !isExecuting ? (
-            readOnlyError ? (
-              readOnlyErrorPlaceholder
-            ) : (
-              noResultPlaceholder
+          ) : (
+            localResults && (
+              <div className={cn('flex-1 w-full overflow-auto relative max-h-64')}>
+                <Results rows={localResults} />
+              </div>
             )
-          ) : null}
+          )}
         </>
       )}
     </ReportBlockContainer>

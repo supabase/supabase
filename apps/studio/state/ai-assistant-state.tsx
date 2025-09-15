@@ -104,16 +104,34 @@ async function clearStorage(): Promise<void> {
   }
 }
 
+// Helper function to sanitize objects to ensure they're cloneable
+function sanitizeForCloning(obj: any): any {
+  if (obj === null || obj === undefined) return obj
+  if (typeof obj !== 'object') return obj
+
+  // Convert to plain object to remove any proxy wrappers
+  return JSON.parse(JSON.stringify(obj))
+}
+
 // Helper function to load state from IndexedDB
 async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantState | null> {
   try {
     const persistedState = await getAiState(projectRef)
     if (persistedState) {
-      // Revive dates
+      // Revive dates and sanitize message data
       Object.values(persistedState.chats).forEach((chat: ChatSession) => {
         if (chat && typeof chat === 'object') {
           chat.createdAt = new Date(chat.createdAt)
           chat.updatedAt = new Date(chat.updatedAt)
+
+          // Sanitize message parts to remove proxy objects
+          if (chat.messages) {
+            chat.messages.forEach((message: any) => {
+              if (message.parts) {
+                message.parts = message.parts.map((part: any) => sanitizeForCloning(part))
+              }
+            })
+          }
         }
       })
       return persistedState
@@ -337,26 +355,15 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
     },
 
-    updateMessage: ({
-      id,
-      resultId,
-      results,
-    }: {
-      id: string
-      resultId?: string
-      results: any[]
-    }) => {
+    updateMessage: (updatedMessage: MessageType) => {
       const chat = state.activeChat
-      if (!chat || !resultId) return
+      if (!chat) return
 
-      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
-
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        const msg = chat.messages[messageIndex]
-        if (!msg.results) {
-          msg.results = {}
-        }
-        msg.results[resultId] = results
+        // Replace entire message instance to capture latest tool parts/results
+        chat.messages[messageIndex] = updatedMessage as AssistantMessageType
+        chat.updatedAt = new Date()
       }
     },
 
@@ -435,7 +442,7 @@ export type AiAssistantState = AiAssistantData & {
   clearMessages: () => void
   deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
   saveMessage: (message: MessageType | MessageType[]) => void
-  updateMessage: (args: { id: string; resultId?: string; results: any[] }) => void
+  updateMessage: (message: MessageType) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
   getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined

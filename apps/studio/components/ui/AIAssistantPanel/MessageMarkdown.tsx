@@ -164,14 +164,12 @@ const MemoizedQueryBlock = memo(
       delay={isLoading ? 500 : 0}
       value={sql}
       fallback={
-        <div className="bg-surface-100 border-overlay rounded border shadow-sm px-3 py-2 text-xs">
+        <div className="heading-meta h-9 bg-surface-75 border-overlay rounded border shadow-sm px-3">
           Writing SQL...
         </div>
       }
     >
       <QueryBlock
-        lockColumns
-        showRunButtonIfNotReadOnly
         label={title}
         sql={sql}
         chartConfig={{
@@ -181,26 +179,12 @@ const MemoizedQueryBlock = memo(
           yKey: yAxis ?? '',
           view: isChart ? 'chart' : 'table',
         }}
-        tooltip={
-          isDraggable ? (
-            <div className="flex items-center gap-x-2">
-              <Badge variant="success" className="text-xs rounded px-1">
-                NEW
-              </Badge>
-              <p>Drag to add this chart into your custom report</p>
-            </div>
-          ) : undefined
-        }
-        showSql={!isChart}
-        isChart={isChart}
-        isLoading={isLoading}
-        draggable={isDraggable}
-        runQuery={runQuery}
-        results={results}
+        initialResults={results}
         onRunQuery={onRunQuery}
         onResults={onResults}
-        onDragStart={onDragStart}
         onUpdateChartConfig={onUpdateChartConfig}
+        draggable={isDraggable}
+        onDragStart={onDragStart}
       />
     </DebouncedComponent>
   )

@@ -14,9 +14,11 @@ import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
+import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
+import { ConfirmFooter } from './ConfirmFooter'
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
-import { ConfirmFooter } from './ConfirmFooter'
+
 import {
   Heading3,
   Hyperlink,
@@ -26,6 +28,7 @@ import {
   OrderedList,
 } from './MessageMarkdown'
 import { Reasoning } from './elements/Reasoning'
+import type { AssistantMessageType } from 'state/ai-assistant-state'
 
 interface MessageContextType {
   isLoading: boolean
@@ -47,27 +50,19 @@ interface MessageProps {
   message: VercelMessage
   isLoading: boolean
   readOnly?: boolean
-  status?: string
   action?: ReactNode
   variant?: 'default' | 'warning'
-  onResults: ({
-    messageId,
-    resultId,
-    results,
-  }: {
-    messageId: string
-    resultId?: string
-    results: any[]
-  }) => void
+  onResults: (message: VercelMessage) => void
   addToolResult?: (args: { tool: string; toolCallId: string; output: unknown }) => Promise<void>
   onDelete: (id: string) => void
   onEdit: (id: string) => void
   isAfterEditedMessage: boolean
   isBeingEdited: boolean
   onCancelEdit: () => void
+  isLastMessage?: boolean
 }
 
-const Message = function Message({
+export const Message = function Message({
   id,
   message,
   isLoading,
@@ -80,35 +75,35 @@ const Message = function Message({
   onEdit,
   isAfterEditedMessage = false,
   isBeingEdited = false,
-  status,
   onCancelEdit,
+  isLastMessage = false,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
-  const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const { mutateAsync: deployFunction } = useEdgeFunctionDeployMutation()
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
-  const [toolRunSignal, setToolRunSignal] = useState<Record<string, number>>({})
-  const [toolRunning, setToolRunning] = useState<Record<string, boolean>>({})
   const allMarkdownComponents: Partial<Components> = useMemo(
     () => ({
       ...markdownComponents,
       ...baseMarkdownComponents,
       pre: ({ children }) => (
-        <MarkdownPre id={id} onResults={onResults}>
+        <MarkdownPre
+          id={id}
+          onResults={(args: { messageId: string; resultId?: string; results: any[] }) => {
+            const updatedMessage: AssistantMessageType = {
+              ...(message as AssistantMessageType),
+              results: {
+                ...((message as AssistantMessageType).results ?? {}),
+                [args.resultId ?? 'default']: args.results as any[],
+              },
+            }
+            onResults(updatedMessage)
+          }}
+        >
           {children}
         </MarkdownPre>
       ),
     }),
-    [id, onResults]
+    [id, onResults, message]
   )
-  const safeStringify = (value: unknown) => {
-    try {
-      return JSON.stringify(value)
-    } catch (_e) {
-      return 'null'
-    }
-  }
 
   if (!message) {
     console.error(`Message component received undefined message prop for id: ${id}`)
@@ -130,7 +125,7 @@ const Message = function Message({
     <MessageContext.Provider value={{ isLoading, readOnly }}>
       <div
         className={cn(
-          'text-foreground-light text-sm first:mt-0',
+          'group text-foreground-light text-sm first:mt-0',
           isUser ? 'text-foreground mt-6' : '',
           variant === 'warning' && 'bg-warning-200',
           isAfterEditedMessage && 'opacity-50 cursor-pointer transition-opacity'
@@ -155,15 +150,17 @@ const Message = function Message({
               (() => {
                 return parts.map(
                   (part: NonNullable<VercelMessage['parts']>[number], index: number) => {
+                    const isLastPart = index === parts.length - 1
                     switch (part.type) {
                       case 'dynamic-tool': {
                         return (
                           <div
                             key={`${id}-tool-${part.toolCallId}`}
                             className={cn(
-                              'border rounded-md border-muted heading-meta flex items-center gap-2 text-foreground-lighter py-2 px-3 dynamic-tool-item',
-                              '[&:not(.dynamic-tool-item+.dynamic-tool-item)]:mt-4 [&.dynamic-tool-item+.dynamic-tool-item]:mt-1 first:!mt-0',
-                              '[&:not(:has(+.dynamic-tool-item))]:mb-4'
+                              'tool-item text-foreground-lighter flex items-center gap-2 py-2',
+                              '[&:not(.tool-item+.tool-item)]:mt-4 [&:not(:has(+.tool-item))]:mb-4',
+                              '[&:has(+.tool-item)]:border-b [&:has(+.tool-item)]:border-b-muted',
+                              'first:!mt-0 last:mb-0'
                             )}
                           >
                             {part.state === 'input-streaming' ? (
@@ -175,7 +172,10 @@ const Message = function Message({
                                 className="text-foreground-muted"
                               />
                             )}
-                            {`${part.toolName}`}
+                            <div>
+                              {part.state === 'input-streaming' ? 'Running ' : 'Ran '}
+                              <span className="text-foreground-lighter">{`${part.toolName}`}</span>
+                            </div>
                           </div>
                         )
                       }
@@ -199,7 +199,7 @@ const Message = function Message({
                           <ReactMarkdown
                             key={`${id}-part-${index}`}
                             className={cn(
-                              'max-w-none prose prose-sm [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+                              'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
                               isUser && 'text-foreground [&>p]:font-medium',
                               isBeingEdited && 'animate-pulse'
                             )}
@@ -210,45 +210,17 @@ const Message = function Message({
                           </ReactMarkdown>
                         )
 
-                      case 'tool-display_query': {
-                        const { toolCallId, state, input } = part
-                        if (state === 'input-streaming' || state === 'input-available') {
-                          return (
-                            <div
-                              key={`${id}-tool-loading-display_query`}
-                              className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
-                            >
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              {`Calling display_query...`}
-                            </div>
-                          )
-                        }
-                        if (state === 'output-available') {
-                          return (
-                            <DisplayBlockRenderer
-                              key={`${id}-tool-${toolCallId}`}
-                              messageId={id}
-                              toolCallId={toolCallId}
-                              manualId={(input as any).manualToolCallId}
-                              initialArgs={input as any}
-                              messageParts={parts}
-                              isLoading={false}
-                              onResults={onResults}
-                            />
-                          )
-                        }
-                        return null
-                      }
                       case 'tool-execute_sql': {
-                        const { toolCallId, state, input } = part
+                        const { toolCallId, state, input, output } = part
+
                         if (state === 'input-streaming') {
                           return (
                             <div
                               key={`${id}-tool-loading-execute_sql`}
-                              className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
+                              className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-2"
                             >
                               <Loader2 className="w-4 h-4 animate-spin" />
-                              {`Preparing SQL execution...`}
+                              {'Writing: ' + (input as any)?.label || 'SQL Query'}
                             </div>
                           )
                         }
@@ -262,14 +234,27 @@ const Message = function Message({
                               <DisplayBlockRenderer
                                 messageId={id}
                                 toolCallId={toolCallId}
-                                initialArgs={{ sql: (input as any).sql, label: 'SQL Query' }}
-                                messageParts={parts}
-                                isLoading={!!toolRunning[toolCallId]}
-                                onResults={({ results }) => {
-                                  addToolResult?.({
+                                initialArgs={{
+                                  sql: (input as any).sql,
+                                  label: (input as any).label,
+                                  isWriteQuery: (input as any).isWriteQuery,
+                                }}
+                                results={output}
+                                toolState={state}
+                                isLastPart={isLastPart}
+                                isLastMessage={isLastMessage}
+                                onResults={async (args: {
+                                  messageId: string
+                                  resultId?: string
+                                  results: unknown
+                                }) => {
+                                  const resultId = args.resultId
+                                  const results = args.results as any[]
+
+                                  await addToolResult?.({
                                     tool: 'execute_sql',
                                     toolCallId: String(toolCallId),
-                                    output: safeStringify(results),
+                                    output: results,
                                   })
                                 }}
                                 onError={async ({ errorText }) => {
@@ -278,38 +263,9 @@ const Message = function Message({
                                     toolCallId: String(toolCallId),
                                     output: `Error: ${errorText}`,
                                   })
+                                  onResults(message)
                                 }}
-                                triggerRunSignal={toolRunSignal[toolCallId] || 0}
-                                onRunStateChange={(isRunning) =>
-                                  setToolRunning((prev) => ({ ...prev, [toolCallId]: isRunning }))
-                                }
                               />
-
-                              {state === 'input-available' && (
-                                <div className="!-mt-5">
-                                  <ConfirmFooter
-                                    message="Assistant wants to run this query"
-                                    cancelLabel="Skip"
-                                    confirmLabel="Run Query"
-                                    isLoading={!!toolRunning[toolCallId]}
-                                    onCancel={async () => {
-                                      await addToolResult?.({
-                                        tool: 'execute_sql',
-                                        toolCallId: String(toolCallId),
-                                        output: 'The user skipped running the query',
-                                      })
-                                      setToolRunning((prev) => ({ ...prev, [toolCallId]: false }))
-                                    }}
-                                    onConfirm={() => {
-                                      setToolRunning((prev) => ({ ...prev, [toolCallId]: true }))
-                                      setToolRunSignal((prev) => ({
-                                        ...prev,
-                                        [toolCallId]: (prev[toolCallId] || 0) + 1,
-                                      }))
-                                    }}
-                                  />
-                                </div>
-                              )}
                             </div>
                           )
                         }
@@ -337,71 +293,29 @@ const Message = function Message({
                         }
                         if (state === 'input-available' || state === 'output-available') {
                           return (
-                            <div
+                            <EdgeFunctionRenderer
                               key={`${id}-tool-${toolCallId}`}
-                              className="w-auto overflow-x-hidden my-4"
-                            >
-                              <EdgeFunctionBlock
-                                label={(input as any).name || 'Edge Function'}
-                                code={(input as any).code}
-                                functionName={(input as any).name || 'my-function'}
-                                showCode={!readOnly}
-                                hideDeployButton
-                              />
-                              {state === 'input-available' && (
-                                <div className="mt-2">
-                                  <ConfirmFooter
-                                    message="Assistant wants to deploy this EdgeFunction"
-                                    cancelLabel="Skip"
-                                    confirmLabel={toolRunning[toolCallId] ? 'Deploying…' : 'Deploy'}
-                                    isLoading={!!toolRunning[toolCallId]}
-                                    onCancel={async () => {
-                                      await addToolResult?.({
-                                        tool: 'deploy_edge_function',
-                                        toolCallId: String(toolCallId),
-                                        output: 'Skipped',
-                                      })
-                                    }}
-                                    onConfirm={async () => {
-                                      try {
-                                        setToolRunning((prev) => ({
-                                          ...prev,
-                                          [toolCallId]: true,
-                                        }))
-                                        await deployFunction({
-                                          projectRef: ref!,
-                                          slug: (input as any).name || 'my-function',
-                                          metadata: {
-                                            entrypoint_path: 'index.ts',
-                                            name: (input as any).name || 'my-function',
-                                            verify_jwt: true,
-                                          },
-                                          files: [
-                                            { name: 'index.ts', content: (input as any).code },
-                                          ],
-                                        })
-                                        await addToolResult?.({
-                                          tool: 'deploy_edge_function',
-                                          toolCallId: String(toolCallId),
-                                          output: 'Deployed successfully',
-                                        })
-                                      } catch (e: any) {
-                                        await addToolResult?.({
-                                          tool: 'deploy_edge_function',
-                                          toolCallId: String(toolCallId),
-                                          output: `Error: ${e?.message ?? String(e)}`,
-                                        })
-                                      } finally {
-                                        setToolRunning((prev) => ({
-                                          ...prev,
-                                          [toolCallId]: false,
-                                        }))
-                                      }
-                                    }}
-                                  />
-                                </div>
-                              )}
-                            </div>
+                              label={(input as any).name || 'Edge Function'}
+                              code={(input as any).code}
+                              functionName={(input as any).name || 'my-function'}
+                              onDeployed={async (res) => {
+                                if (res.success) {
+                                  await addToolResult?.({
+                                    tool: 'deploy_edge_function',
+                                    toolCallId: String(toolCallId),
+                                    output: 'Deployed successfully',
+                                  })
+                                  onResults(message)
+                                } else {
+                                  await addToolResult?.({
+                                    tool: 'deploy_edge_function',
+                                    toolCallId: String(toolCallId),
+                                    output: res.errorText,
+                                  })
+                                  onResults(message)
+                                }
+                              }}
+                            />
                           )
                         }
                         if (state === 'output-error') {
@@ -413,36 +327,7 @@ const Message = function Message({
                         }
                         return null
                       }
-                      case 'tool-display_edge_function': {
-                        const { toolCallId, state, input } = part
-                        if (state === 'input-streaming' || state === 'input-available') {
-                          return (
-                            <div
-                              key={`${id}-tool-loading-display_edge_function`}
-                              className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
-                            >
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              {`Calling display_edge_function...`}
-                            </div>
-                          )
-                        }
-                        if (state === 'output-available') {
-                          return (
-                            <div
-                              key={`${id}-tool-${toolCallId}`}
-                              className="w-auto overflow-x-hidden my-4"
-                            >
-                              <EdgeFunctionBlock
-                                label={(input as any).name || 'Edge Function'}
-                                code={(input as any).code}
-                                functionName={(input as any).name || 'my-function'}
-                                showCode={!readOnly}
-                              />
-                            </div>
-                          )
-                        }
-                        return null
-                      }
+
                       case 'source-url':
                       case 'source-document':
                       case 'file':
@@ -464,44 +349,43 @@ const Message = function Message({
             ) : (
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
-
-            {/* Action button - only show for user messages on hover */}
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 mb-2">
-              {message.role === 'user' && (
-                <>
-                  <ButtonTooltip
-                    type="text"
-                    icon={<Pencil size={14} strokeWidth={1.5} />}
-                    onClick={
-                      isBeingEdited || isAfterEditedMessage ? onCancelEdit : () => onEdit(id)
-                    }
-                    className="text-foreground-light hover:text-foreground p-1 rounded"
-                    aria-label={
-                      isBeingEdited || isAfterEditedMessage ? 'Cancel editing' : 'Edit message'
-                    }
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text:
-                          isBeingEdited || isAfterEditedMessage ? 'Cancel editing' : 'Edit message',
-                      },
-                    }}
-                  />
-
-                  <ButtonTooltip
-                    type="text"
-                    icon={<Trash2 size={14} strokeWidth={1.5} />}
-                    tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
-                    onClick={() => setShowDeleteConfirmModal(true)}
-                    className="text-foreground-light hover:text-foreground p-1 rounded"
-                    title="Delete message"
-                    aria-label="Delete message"
-                  />
-                </>
-              )}
-            </div>
           </div>
         </div>
+        {message.role === 'user' && (
+          <div className="flex items-center gap-4 mt-2 mb-1">
+            <span className="h-0.5 w-5 bg-muted" />
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <>
+                <ButtonTooltip
+                  type="text"
+                  icon={<Pencil size={14} strokeWidth={1.5} />}
+                  onClick={isBeingEdited || isAfterEditedMessage ? onCancelEdit : () => onEdit(id)}
+                  className="text-foreground-light hover:text-foreground p-1 rounded"
+                  aria-label={
+                    isBeingEdited || isAfterEditedMessage ? 'Cancel editing' : 'Edit message'
+                  }
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text:
+                        isBeingEdited || isAfterEditedMessage ? 'Cancel editing' : 'Edit message',
+                    },
+                  }}
+                />
+
+                <ButtonTooltip
+                  type="text"
+                  icon={<Trash2 size={14} strokeWidth={1.5} />}
+                  tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
+                  onClick={() => setShowDeleteConfirmModal(true)}
+                  className="text-foreground-light hover:text-foreground p-1 rounded"
+                  title="Delete message"
+                  aria-label="Delete message"
+                />
+              </>
+            </div>
+          </div>
+        )}
       </div>
 
       <DeleteMessageConfirmModal
@@ -516,54 +400,3 @@ const Message = function Message({
     </MessageContext.Provider>
   )
 }
-
-export const MemoizedMessage = memo(
-  ({
-    message,
-    status,
-    onResults,
-    addToolResult,
-    onDelete,
-    onEdit,
-    isAfterEditedMessage,
-    isBeingEdited,
-    onCancelEdit,
-  }: {
-    message: VercelMessage
-    status: string
-    onResults: ({
-      messageId,
-      resultId,
-      results,
-    }: {
-      messageId: string
-      resultId?: string
-      results: any[]
-    }) => void
-    addToolResult?: (args: { tool: string; toolCallId: string; output: unknown }) => Promise<void>
-    onDelete: (id: string) => void
-    onEdit: (id: string) => void
-    isAfterEditedMessage: boolean
-    isBeingEdited: boolean
-    onCancelEdit: () => void
-  }) => {
-    return (
-      <Message
-        id={message.id}
-        message={message}
-        readOnly={message.role === 'user'}
-        isLoading={status === 'submitted' || status === 'streaming'}
-        status={status}
-        onResults={onResults}
-        addToolResult={addToolResult}
-        onDelete={onDelete}
-        onEdit={onEdit}
-        isAfterEditedMessage={isAfterEditedMessage}
-        isBeingEdited={isBeingEdited}
-        onCancelEdit={onCancelEdit}
-      />
-    )
-  }
-)
-
-MemoizedMessage.displayName = 'MemoizedMessage'

@@ -6,8 +6,13 @@ export const getRenderingTools = () => ({
     description: 'Asks the user to execute a SQL statement and return the results',
     inputSchema: z.object({
       sql: z.string().describe('The SQL statement to execute.'),
+      label: z.string().describe('A short 2-4 word label for the SQL statement.'),
+      isWriteQuery: z
+        .boolean()
+        .describe(
+          'Whether the SQL statement performs a write operation of any kind instead of a read operation'
+        ),
     }),
-    // No execute – runs client-side in the UI
   }),
   deploy_edge_function: tool({
     description:
@@ -16,7 +21,6 @@ export const getRenderingTools = () => ({
       name: z.string().describe('The URL-friendly name/slug of the Edge Function.'),
       code: z.string().describe('The TypeScript code for the Edge Function.'),
     }),
-    // No execute – runs client-side in the UI
   }),
   rename_chat: tool({
     description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,

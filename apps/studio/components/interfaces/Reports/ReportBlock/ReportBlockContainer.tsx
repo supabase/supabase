@@ -1,10 +1,10 @@
-import { GripHorizontal, Loader2 } from 'lucide-react'
+import { Code, GripHorizontal, Loader2 } from 'lucide-react'
 import { DragEvent, PropsWithChildren, ReactNode } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface ReportBlockContainerProps {
-  icon: ReactNode
-  label: string
+  icon?: ReactNode
+  label: string | ReactNode
   actions: ReactNode
   loading?: boolean
   draggable?: boolean
@@ -39,33 +39,18 @@ export const ReportBlockContainer = ({
         <TooltipTrigger asChild>
           <div
             className={cn(
-              'grid-item-drag-handle flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group',
+              'grid-item-drag-handle flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group h-9',
               draggable && 'cursor-move'
             )}
           >
-            <div
-              className={cn(
-                showDragHandle && 'transition-opacity opacity-100 group-hover:opacity-0'
-              )}
-            >
-              {loading ? (
-                <Loader2
-                  size={(icon as any)?.props?.size ?? 16}
-                  className="text-foreground-lighter animate-spin"
-                />
-              ) : (
-                icon
-              )}
-            </div>
-            {showDragHandle && (
+            {showDragHandle ? (
               <div className="absolute left-3 top-2.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">
                 <GripHorizontal size={16} strokeWidth={1.5} />
               </div>
+            ) : (
+              <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <h3
-              title={label}
-              className="!text-xs font-medium text-foreground-light flex-1 truncate"
-            >
+            <h3 title={label} className="heading-meta flex-1">
               {label}
             </h3>
             <div className="flex items-center">{actions}</div>

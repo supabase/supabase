@@ -19,13 +19,13 @@ export const ConfirmFooter = ({
   onConfirm,
 }: PropsWithChildren<ConfirmFooterProps>) => {
   return (
-    <div className="rounded-lg border bg-surface-75 text-xs text-foreground-lighter p-2 pl-3 flex items-center justify-between gap-3">
+    <div className="rounded-b-lg border border-t-0 text-xs text-foreground p-2 pl-4 flex items-center justify-between gap-3  bg-gradient-to-r from-background-surface-75 to-background-muted shadow-inset">
       <div className="flex-1">{message}</div>
       <div className="flex items-center gap-2">
         <Button size="tiny" type="outline" onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>
-        <Button size="tiny" type="outline" onClick={onConfirm} disabled={isLoading}>
+        <Button size="tiny" type="primary" onClick={onConfirm} disabled={isLoading}>
           {isLoading ? 'Working…' : confirmLabel}
         </Button>
       </div>
