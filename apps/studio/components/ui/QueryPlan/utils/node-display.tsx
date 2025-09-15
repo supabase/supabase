@@ -4,6 +4,7 @@ import { capitalize } from 'lodash'
 import type { PlanNodeData } from '../types'
 import type { MetricsVisibility, HeatmapMode } from '../contexts'
 import { formatKeys, stripParens, blocksToBytes } from './formats'
+import { DEFAULT_NODE_HEIGHT_CONSTANTS, type NodeHeightConstants } from '../constants'
 
 /**
  * Helpers for keeping display logic (what we render and when) in one place.
@@ -242,7 +243,7 @@ export function estimateNodeHeight(
   d: PlanNodeData,
   vis: MetricsVisibility,
   heatmapMode: HeatmapMode,
-  constants = { HEADER_H: 22, HEADER_LINE_H: 15, ITEM_H: 22, PADDING: 16, HEATMAP_H: 3 }
+  constants: NodeHeightConstants = DEFAULT_NODE_HEIGHT_CONSTANTS
 ): number {
   const headerLines = computeHeaderLines(d).length
   const bodyRows = countBodyRows(d, vis)

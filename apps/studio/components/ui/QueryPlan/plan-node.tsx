@@ -7,7 +7,11 @@ import { Badge, cn } from 'ui'
 import { NodeItem } from './node-item'
 import { Heatmap } from './heatmap'
 import { HeatmapContext, MetricsVisibilityContext, type MetricsVisibility } from './contexts'
-import { DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
+import {
+  DEFAULT_NODE_HEIGHT_CONSTANTS,
+  DEFAULT_NODE_WIDTH,
+  HIDDEN_NODE_CONNECTOR,
+} from './constants'
 import {
   computeHeaderLines,
   hasShared,
@@ -257,7 +261,6 @@ const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
 }
 
 export const PlanNode = ({ data }: { data: PlanNodeData }) => {
-  const itemHeight = 'h-[22px]'
   const vis = useContext(MetricsVisibilityContext)
   const heat = useContext(HeatmapContext)
 
@@ -311,7 +314,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
       <header
         className={cn(
           'text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between',
-          itemHeight
+          DEFAULT_NODE_HEIGHT_CONSTANTS.ITEM_H
         )}
       >
         <div className="flex gap-x-1 items-center">
