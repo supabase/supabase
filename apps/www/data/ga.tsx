@@ -20,11 +20,11 @@ export const data = (isDark: boolean) => ({
   highlightsSection: {
     highlights: [
       {
-        number: companyStats.databasesManaged,
+        number: companyStats.databasesManaged.text,
         text: 'databases managed',
       },
       {
-        number: companyStats.databasesLaunchedDaily,
+        number: companyStats.databasesLaunchedDaily.text,
         text: 'databases launched daily',
       },
       {

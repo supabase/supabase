@@ -44,6 +44,8 @@
   "logs:templates": true,
   "logs:collections": true,
 
+  "organization:show_sso_settings": true,
+
   "profile:show_email": true,
   "profile:show_information": true,
   "profile:show_analytics_and_marketing": true,
@@ -51,6 +53,9 @@
 
   "project_connection:javascript_example": true,
   "project_connection:dart_example": true,
+  "project_connection:show_app_frameworks": true,
+  "project_connection:show_mobile_frameworks": true,
+  "project_connection:show_orms": true,
 
   "project_creation:show_advanced_config": true,
 
@@ -58,6 +63,7 @@
   "project_homepage:show_examples": true,
 
   "project_addons:dedicated_ipv4_address": true,
+
   "project_settings:custom_domains": true,
   "project_settings:show_disable_legacy_api_keys": true,
   "project_settings:legacy_jwt_keys": true,
