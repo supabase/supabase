@@ -16,9 +16,7 @@ export async function getPermissions(signal?: AbortSignal) {
       sentryContext: {
         tags: {
           permissionsQuery: true,
-        },
-        contexts: {
-          rawError: error,
+          statusCode: (error as any)?.code || 'unknown',
         },
       },
     })
