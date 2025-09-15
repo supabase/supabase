@@ -18476,7 +18476,7 @@ export interface operations {
           | 'realtime_channel_db_events'
           | 'realtime_authorization_rls_execution_time'
           | 'realtime_payload_size'
-          | 'realtime_connected_clients'
+          | 'realtime_sum_connections_connected'
           | 'realtime_replication_connection_lag'
         databaseIdentifier?: string
         endDate: string

@@ -177,7 +177,7 @@ export const realtimeReports = ({
     },
   },
   {
-    id: 'realtime_connected_clients',
+    id: 'realtime_sum_connections_connected',
     label: 'Realtime Connected Clients',
     valuePrecision: 0,
     hide: false,
@@ -192,7 +192,7 @@ export const realtimeReports = ({
     dataProvider: async () => {
       const data = await runInfraMonitoringQuery(
         projectRef,
-        'realtime_connected_clients',
+        'realtime_sum_connections_connected',
         startDate,
         endDate,
         interval,
@@ -201,7 +201,7 @@ export const realtimeReports = ({
 
       const attributes = [
         {
-          attribute: 'realtime_connected_clients',
+          attribute: 'realtime_sum_connections_connected',
           label: 'Connected Clients',
         },
       ]
