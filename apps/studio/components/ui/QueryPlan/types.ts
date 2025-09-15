@@ -1,4 +1,4 @@
-export type RawPlan = {
+export type RawPlan = Readonly<{
   // Basic Plan Node Properties
   ['Node Type']?: string
   ['Parallel Aware']?: boolean
@@ -61,18 +61,18 @@ export type RawPlan = {
   // Subplan/CTE names
   ['Subplan Name']?: string
   ['CTE Name']?: string
-}
+}>
 
-export type PlanRoot = { Plan: RawPlan }
+export type PlanRoot = Readonly<{ Plan: RawPlan }>
 
-export type PlanMeta = {
+export type PlanMeta = Readonly<{
   planningTime?: number
   executionTime?: number
   jitTotalTime?: number
   subplanRoots?: { name: string; id: string }[]
   errorMessage?: string
   errorDetail?: string
-}
+}>
 
 export type PlanNodeData = {
   label: string

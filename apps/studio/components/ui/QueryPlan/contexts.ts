@@ -1,12 +1,12 @@
 import { createContext } from 'react'
 
-export type MetricsVisibility = {
+export type MetricsVisibility = Readonly<{
   time: boolean
   rows: boolean
   cost: boolean
   buffers: boolean
   output: boolean
-}
+}>
 
 export const defaultMetricsVisibility: MetricsVisibility = {
   time: true,
@@ -20,12 +20,12 @@ export const MetricsVisibilityContext = createContext<MetricsVisibility>(default
 
 export type HeatmapMode = 'none' | 'time' | 'rows' | 'cost'
 
-export type HeatmapMeta = {
+export type HeatmapMeta = Readonly<{
   mode: HeatmapMode
   maxTime: number
   maxRows: number
   maxCost: number
-}
+}>
 
 export const defaultHeatmapMeta: HeatmapMeta = {
   mode: 'time',
