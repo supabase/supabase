@@ -23,11 +23,13 @@ For public channels, any user can subscribe to the channel, send and receive mes
 
 You can set your project to use only private channels or both private and public channels in the [Realtime Settings](/docs/guides/realtime/settings).
 
-To note that if you have a private channel and a public channel with the same topic name, they will be seen as unique channels and messages won't be able to be sent between them.
+<Admonition type="note">
+If you have a private channel and a public channel with the same topic name, Realtime sees them as unique channels and won't send messages between them.
+</Admonition>
 
 ## Database resources
 
-Realtime uses several resources from your database to work properly. You need to ensure that your database has the following resources:
+Realtime uses several database connections to perform several operations. As a user, you are able to tune some of them using [Realtime Settings](/docs/guides/realtime/settings).
 
 ### Database connections
 
@@ -35,14 +37,14 @@ Realtime uses several database connections to do several operations. Some of the
 
 The connections are:
 
-- **Migrations**: Temporarily two connections when we need to run database migrations
+- **Migrations**: Two temporary connections to run database migrations when needed
 - **Authorization**: Configurable connection pool to check authorization policies on join
 - **Postgres Changes**: 3 connection pools required
   - **Subscription management**: To manage the subscribers to Postgres Changes
   - **Subscription cleanup**: To cleanup the subscribers to Postgres Changes
   - **WAL pull**: To pull the changes from the database
 
-The number of connections varies based on the instance size and your configuration.
+The number of connections varies based on the instance size and your configuration in [Realtime Settings](/docs/guides/realtime/settings).
 
 ### Replication slots
 
@@ -53,13 +55,26 @@ Realtime also uses, at maximum, 2 replication slots.
 
 ### Schema and tables
 
-On the `realtime` schema we will create the following tables:
+The `realtime` schema creates the following tables:
 
 - `schema_migrations` - To track the migrations that have been run on the database from Realtime
 - `subscription` - Track the subscribers to Postgres Changes
 - `messages` - Partitioned table per day that's used for Authorization and Broadcast from database
-  - **Authorization**: To check the authorization policies on join by checking if a given client can read and write to this table
-  - **Broadcast from database**: Replication slot tracks a publication to this table to broadcast the changes to the clients
+  - **Authorization**: To check the authorization policies on join by checking if a given user can read and write to this table
+  - **Broadcast from database**: Replication slot tracks a publication to this table to broadcast the changes to the connected clients.
+  - The schema from the table is the following:
+    ```sql
+    create table realtime.messages (
+    topic text not null, -- The topic of the message
+    extension text not null, -- The extension of the message (presence, broadcast)
+    payload jsonb null, -- The payload of the message
+    event text null, -- The event of the message
+    private boolean null default false, -- If the message is going to use a private channel
+    updated_at timestamp without time zone not null default now(), -- The timestamp of the message
+    inserted_at timestamp without time zone not null default now(), -- The timestamp of the message
+    id uuid not null default gen_random_uuid (), -- The id of the message
+    constraint messages_pkey primary key (id, inserted_at)) partition by RANGE (inserted_at);
+    ```
 
 <Admonition type="note">
 

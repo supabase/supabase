@@ -14,10 +14,10 @@ sidebar_label: 'Getting Started'
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="ts"
   queryGroup="language"
 >
-<TabPanel id="js" label="JavaScript">
+<TabPanel id="ts" label="TypeScript">
 
 ```bash
 npm install @supabase/supabase-js
@@ -74,64 +74,20 @@ conda install -c conda-forge supabase
 </TabPanel>
 </Tabs>
 
-### 3. Create your first Channel
 
-Channels are the foundation of Realtime. Think of them as rooms where clients can communicate. Each channel is identified by a topic name and if they are public or private.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-```ts
-// Create a channel with a descriptive topic name
-const channel = supabase.channel('room:lobby:messages', {
-  config: { private: true }, // Recommended for production
-})
-```
-
-</TabPanel>
-<TabPanel id="dart" label="Flutter">
-
-```dart
-// Create a channel with a descriptive topic name
-final channel = supabase.channel('room:lobby:messages');
-```
-
-</TabPanel>
-<TabPanel id="swift" label="Swift">
-
-```swift
-// Create a channel with a descriptive topic name
-let channel = supabase.realtimeV2.channel("room:lobby:messages")
-```
-
-</TabPanel>
-<TabPanel id="python" label="Python">
-
-```python
-# Create a channel with a descriptive topic name
-channel = supabase.channel('room:lobby:messages')
-```
-
-</TabPanel>
-</Tabs>
 ### 2. Initialize the client
 
-Get your project URL and key from your [Supabase Dashboard](/dashboard/project/_/settings/api).
+Get your project URL and key.
+<$Partial path="api_settings.mdx" />
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="ts"
   queryGroup="language"
 >
-<TabPanel id="js" label="JavaScript">
+<TabPanel id="ts" label="TypeScript">
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
@@ -190,10 +146,10 @@ Channels are the foundation of Realtime. Think of them as rooms where clients ca
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="ts"
   queryGroup="language"
 >
-<TabPanel id="js" label="JavaScript">
+<TabPanel id="ts" label="TypeScript">
 
 ```ts
 // Create a channel with a descriptive topic name
@@ -223,7 +179,7 @@ let channel = supabase.realtimeV2.channel("room:lobby:messages")
 
 ```python
 # Create a channel with a descriptive topic name
-channel = supabase.channel('room:lobby:messages')
+channel = supabase.channel('room:lobby:messages', params={config={private= True }})
 ```
 
 </TabPanel>
@@ -255,10 +211,10 @@ Send and receive messages using the Supabase client:
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="ts"
   queryGroup="language"
 >
-<TabPanel id="js" label="JavaScript">
+<TabPanel id="ts" label="TypeScript">
 
 ```ts
 // Listen for messages
@@ -357,10 +313,10 @@ Send messages via HTTP requests, perfect for server-side applications:
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="ts"
   queryGroup="language"
 >
-<TabPanel id="js" label="JavaScript">
+<TabPanel id="ts" label="TypeScript">
 
 ```ts
 // Send message via REST API
@@ -567,10 +523,10 @@ Always unsubscribe when you are done with a channel to ensure you free up resour
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="ts"
   queryGroup="language"
 >
-<TabPanel id="js" label="JavaScript">
+<TabPanel id="ts" label="TypeScript">
 
 ```ts
 // React example
