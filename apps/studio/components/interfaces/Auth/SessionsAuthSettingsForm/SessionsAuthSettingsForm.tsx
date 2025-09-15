@@ -44,9 +44,7 @@ function HoursOrNeverText({ value }: { value: number }) {
 
 const RefreshTokenSchema = z.object({
   REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce
-    .number()
-    .min(0, 'Must be a value more than 0'),
+  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
 })
 
 const UserSessionsSchema = z.object({
