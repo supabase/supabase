@@ -19,6 +19,8 @@ import { NODE_TYPE } from './constants'
 import {
   MetricsVisibilityContext,
   HeatmapContext,
+  defaultMetricsVisibility,
+  defaultHeatmapMeta,
   type MetricsVisibility,
   type HeatmapMode,
 } from './contexts'
@@ -82,16 +84,12 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     }
   }, [json])
 
-  const [metricsVisibility, setMetricsVisibility] = useState<MetricsVisibility>({
-    time: true,
-    rows: true,
-    cost: false,
-    buffers: false,
-    output: false,
-  })
+  const [metricsVisibility, setMetricsVisibility] = useState<MetricsVisibility>(
+    defaultMetricsVisibility
+  )
 
   // Heatmap mode and maxima across nodes
-  const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>('time')
+  const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>(defaultHeatmapMeta.mode)
   const heatMax = useHeatmapMax(nodes as Node<PlanNodeData>[])
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)

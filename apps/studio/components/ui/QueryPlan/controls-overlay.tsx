@@ -2,6 +2,7 @@ import { type SetStateAction, useState } from 'react'
 import { Filter, ChevronsUpDown, Check } from 'lucide-react'
 
 import type { MetricsVisibility, HeatmapMode } from './contexts'
+import { HEATMAP_ITEMS, SHOW_ITEMS } from './constants'
 import {
   cn,
   Button,
@@ -25,16 +26,6 @@ type Props = {
   className?: string
   portal?: boolean
 }
-
-const HEATMAP_ITEMS: HeatmapMode[] = ['time', 'rows', 'cost', 'none']
-
-const SHOW_ITEMS: { label: string; value: keyof MetricsVisibility }[] = [
-  { label: 'Time', value: 'time' },
-  { label: 'Rows', value: 'rows' },
-  { label: 'Cost', value: 'cost' },
-  { label: 'Buffers', value: 'buffers' },
-  { label: 'Output', value: 'output' },
-]
 
 export const ControlsOverlay = ({
   metricsVisibility,
@@ -97,7 +88,7 @@ export const ControlsOverlay = ({
               <Command_Shadcn_>
                 <CommandList_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    {HEATMAP_ITEMS?.map((heatmapItem) => (
+                    {HEATMAP_ITEMS.map((heatmapItem) => (
                       <CommandItem_Shadcn_
                         key={heatmapItem}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
