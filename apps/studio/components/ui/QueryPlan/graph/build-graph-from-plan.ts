@@ -19,7 +19,7 @@ const zeroAgg = (): Agg => ({
 })
 
 export const buildGraphFromPlan = (
-  planJson: PlanRoot[],
+  planJson: PlanRoot,
   opts?: { executionTime?: number }
 ): {
   nodes: Node<PlanNodeData>[]
@@ -227,9 +227,7 @@ export const buildGraphFromPlan = (
     }
   }
 
-  if (Array.isArray(planJson) && planJson.length > 0 && planJson[0].Plan) {
-    addPlan(planJson[0].Plan)
-  }
+  addPlan(planJson.Plan)
 
   return { nodes, edges, subplanRoots }
 }

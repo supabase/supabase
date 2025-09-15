@@ -63,7 +63,16 @@ export type RawPlan = Readonly<{
   ['CTE Name']?: string
 }>
 
-export type PlanRoot = Readonly<{ Plan: RawPlan }>
+export type PlanRoot = Readonly<{
+  Plan: RawPlan
+  ['Planning Time']?: number
+  ['Execution Time']?: number
+  JIT?: {
+    Timing?: {
+      Total?: number
+    }
+  }
+}>
 
 export type PlanMeta = Readonly<{
   planningTime?: number

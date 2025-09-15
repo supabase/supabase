@@ -4,14 +4,12 @@ import ReactFlow, {
   Background,
   BackgroundVariant,
   MiniMap,
-  type Node,
-  type Edge,
   type ReactFlowInstance,
 } from 'reactflow'
 import { Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 
-import type { PlanMeta, PlanNodeData } from './types'
+import type { PlanNodeData } from './types'
 import { Button, cn } from 'ui'
 import { MetaOverlay } from './meta-overlay'
 import { ControlsOverlay } from './controls-overlay'
@@ -26,124 +24,30 @@ import {
 } from './contexts'
 import { PlanNode } from './plan-node'
 import { useHeatmapMax } from './hooks/use-heatmap-max'
-import { buildGraphFromPlan } from './graph/build-graph-from-plan'
-import { getLayoutedElementsViaDagre } from './utils/layout'
-import { estimateNodeHeight } from './utils/node-display'
 import { DetailsPanel } from './details-panel'
+import { usePlanGraph } from './hooks/use-plan-graph'
+import { useFullscreen } from './hooks/use-fullscreen'
+import { useDagreLayout } from './hooks/use-dagre-layout'
 
 export const QueryPlanVisualizer = ({ json, className }: { json: string; className?: string }) => {
-  const { nodes, edges, meta } = useMemo((): {
-    nodes: Node<PlanNodeData>[]
-    edges: Edge[]
-    meta?: PlanMeta
-  } => {
-    try {
-      const parsed = JSON.parse(json) as any
-      const root = Array.isArray(parsed) ? parsed[0] : parsed
-      const meta: PlanMeta = {
-        planningTime:
-          typeof root?.['Planning Time'] === 'number' ? root['Planning Time'] : undefined,
-        executionTime:
-          typeof root?.['Execution Time'] === 'number' ? root['Execution Time'] : undefined,
-        jitTotalTime:
-          typeof root?.JIT?.Timing?.Total === 'number'
-            ? root.JIT.Timing.Total
-            : typeof root?.JIT?.['Total Time'] === 'number'
-              ? root.JIT['Total Time']
-              : undefined,
-      }
-      const planPart = root?.Plan ? [root] : parsed
-      const graph = buildGraphFromPlan(planPart, { executionTime: meta.executionTime })
-      if (!graph.nodes.length) {
-        return {
-          nodes: [],
-          edges: [],
-          meta: {
-            ...meta,
-            errorMessage: 'Invalid EXPLAIN JSON: Plan node not found.',
-            errorDetail:
-              'Provide output from EXPLAIN (FORMAT JSON) or EXPLAIN (ANALYZE, FORMAT JSON). The root should be an array and its first element must contain a "Plan" object.',
-          },
-        }
-      }
-      return {
-        nodes: graph.nodes,
-        edges: graph.edges,
-        meta: { ...meta, subplanRoots: graph.subplanRoots },
-      }
-    } catch (e: any) {
-      return {
-        nodes: [],
-        edges: [],
-        meta: {
-          errorMessage: 'Failed to parse JSON',
-          errorDetail:
-            (e?.message ? e.message : '') + '\nPaste valid JSON from EXPLAIN (FORMAT JSON).',
-        },
-      }
-    }
-  }, [json])
+  const { nodes, edges, meta } = usePlanGraph(json)
 
-  const [metricsVisibility, setMetricsVisibility] = useState<MetricsVisibility>(
-    defaultMetricsVisibility
-  )
+  const [metricsVisibility, setMetricsVisibility] =
+    useState<MetricsVisibility>(defaultMetricsVisibility)
 
   // Heatmap mode and maxima across nodes
   const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>(defaultHeatmapMeta.mode)
-  const heatMax = useHeatmapMax(nodes as Node<PlanNodeData>[])
+  const heatMax = useHeatmapMax(nodes)
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const containerRef = useRef<HTMLDivElement | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef)
+  const layout = useDagreLayout(nodes, edges, metricsVisibility, heatmapMode)
 
-  // Sync with native fullscreen changes
   useEffect(() => {
-    const handler = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement))
-      requestAnimationFrame(() => rfInstance?.fitView())
-    }
-
-    document.addEventListener('fullscreenchange', handler)
-    return () => {
-      document.removeEventListener('fullscreenchange', handler)
-    }
-  }, [rfInstance])
-
-  const toggleFullscreen = async () => {
-    const el = containerRef.current
-    if (!el) return
-
-    try {
-      if (!isFullscreen) {
-        await el.requestFullscreen()
-      } else {
-        await document.exitFullscreen()
-      }
-    } catch (e) {
-      console.error('Failed to toggle fullscreen mode:', e)
-    }
-  }
-
-  // Estimate node sizes from data (fixed row heights) and layout with Dagre
-  const layout = useMemo(() => {
-    if (!nodes.length) return { nodes: [], edges: [] }
-
-    const sizes: Record<string, { width: number; height: number }> = {}
-
-    nodes.forEach((n) => {
-      const d = n.data
-      const height = estimateNodeHeight(d, metricsVisibility, heatmapMode)
-      sizes[n.id] = { width: 180, height }
-    })
-
-    const { nodes: nl, edges: el } = getLayoutedElementsViaDagre(
-      nodes.map((n) => ({ ...n })),
-      edges.map((e) => ({ ...e })),
-      sizes
-    )
-    return { nodes: nl, edges: el }
-  }, [nodes, edges, metricsVisibility, heatmapMode])
+    requestAnimationFrame(() => rfInstance?.fitView())
+  }, [isFullscreen, rfInstance])
 
   const { resolvedTheme } = useTheme()
   const miniMapMaskColor = resolvedTheme?.includes('dark')
