@@ -12,10 +12,10 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
     return null
   }
 
-  const parts: string[] = []
-  if (planningTime !== undefined) parts.push(`planning: ${planningTime} ms`)
-  if (executionTime !== undefined) parts.push(`exec: ${executionTime} ms`)
-  if (jitTotalTime !== undefined) parts.push(`jit: ${jitTotalTime} ms`)
+  const metrics: { label: string; value: number }[] = []
+  if (planningTime !== undefined) metrics.push({ label: 'planning', value: planningTime })
+  if (executionTime !== undefined) metrics.push({ label: 'exec', value: executionTime })
+  if (jitTotalTime !== undefined) metrics.push({ label: 'jit', value: jitTotalTime })
 
   return (
     <div
@@ -24,7 +24,14 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
         className
       )}
     >
-      <span>{parts.join(', ')}</span>
+      <div className="flex items-center gap-x-2">
+        {metrics.map((metric) => (
+          <span key={metric.label} className="flex items-baseline gap-x-1">
+            <span className="text-foreground-lighter">{metric.label}:</span>
+            <span>{metric.value} ms</span>
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
