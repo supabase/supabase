@@ -17,7 +17,7 @@ export async function getPermissions(signal?: AbortSignal) {
         tags: {
           permissionsQuery: true,
         },
-        addAtachment: {
+        contexts: {
           rawError: error,
         },
       },
