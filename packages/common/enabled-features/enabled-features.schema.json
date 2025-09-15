@@ -148,6 +148,11 @@
       "description": "Enable the logs collections page"
     },
 
+    "organization:show_sso_settings": {
+      "type": "boolean",
+      "description": "Show the SSO settings tab in the organization settings page"
+    },
+
     "profile:show_email": {
       "type": "boolean",
       "description": "Show the user's email address in the toolbar"
@@ -172,6 +177,18 @@
     "project_connection:dart_example": {
       "type": "boolean",
       "description": "Show the dart example in the project connection settings"
+    },
+    "project_connection:show_app_frameworks": {
+      "type": "boolean",
+      "description": "Show the app frameworks tab in the connect modal"
+    },
+    "project_connection:show_mobile_frameworks": {
+      "type": "boolean",
+      "description": "Show the mobile frameworks tab in the connect modal"
+    },
+    "project_connection:show_orms": {
+      "type": "boolean",
+      "description": "Show the orms tab in the connect modal"
     },
 
     "project_creation:show_advanced_config": {
@@ -273,6 +290,7 @@
     "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
+    "organization:show_sso_settings",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
@@ -283,6 +301,9 @@
     "project_settings:log_drains",
     "project_connection:javascript_example",
     "project_connection:dart_example",
+    "project_connection:show_app_frameworks",
+    "project_connection:show_mobile_frameworks",
+    "project_connection:show_orms",
     "reports:all",
     "sdk:csharp",
     "sdk:dart",

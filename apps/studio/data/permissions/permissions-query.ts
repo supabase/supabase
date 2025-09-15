@@ -24,6 +24,9 @@ export async function getPermissions(signal?: AbortSignal) {
           permissionsQuery: true,
           statusCode: (error as any)?.code || 'unknown',
         },
+        contexts: {
+          rawError: error,
+        },
       },
     })
   }
