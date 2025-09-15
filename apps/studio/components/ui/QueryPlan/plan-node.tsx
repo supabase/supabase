@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react'
+import { useContext } from 'react'
 import { Handle, Position } from 'reactflow'
 import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
 
@@ -81,7 +81,7 @@ const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
     {
       id: 'est-factor',
       title:
-        typeof data.estActualTotalRows === 'number' && typeof data.planRows === 'number'
+        data.estActualTotalRows !== undefined && data.planRows !== undefined
           ? `actual_total_rows: ${data.estActualTotalRows} / plan_rows: ${data.planRows}`
           : undefined,
       condition: vis.rows && data.estFactor !== undefined,
@@ -263,47 +263,7 @@ const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
 export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const vis = useContext(MetricsVisibilityContext)
   const heat = useContext(HeatmapContext)
-
   const headerLines = computeHeaderLines(data)
-
-  // Heatmap progress bar (time/rows/cost)
-  const valueForHeat = useMemo(() => {
-    switch (heat.mode) {
-      case 'time':
-        return (data.exclusiveTimeMs ?? 0) || (data.actualTotalTime ?? 0) * (data.actualLoops ?? 1)
-      case 'rows': {
-        const actualTotal = (data.actualRows ?? 0) * (data.actualLoops ?? 1)
-        return actualTotal || (data.planRows ?? 0)
-      }
-      case 'cost':
-        return data.exclusiveCost ?? 0
-      default:
-        return 0
-    }
-  }, [
-    heat.mode,
-    data.exclusiveTimeMs,
-    data.actualTotalTime,
-    data.actualLoops,
-    data.actualRows,
-    data.planRows,
-    data.exclusiveCost,
-  ])
-
-  const maxForHeat =
-    heat.mode === 'time'
-      ? heat.maxTime
-      : heat.mode === 'rows'
-        ? heat.maxRows
-        : heat.mode === 'cost'
-          ? heat.maxCost
-          : 1
-  const pct = Math.max(0, Math.min(100, Math.round((valueForHeat / (maxForHeat || 1)) * 100)))
-  const heatColor = useMemo(() => {
-    if (heat.mode === 'none') return 'transparent'
-    const hue = 120 - pct * 1.2 // 120->0 (green->red)
-    return `hsl(${hue}, 85%, 45%)`
-  }, [heat.mode, pct])
 
   return (
     <div
