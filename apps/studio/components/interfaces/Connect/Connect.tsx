@@ -9,8 +9,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -21,6 +21,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
   TabsContent_Shadcn_,
@@ -40,15 +41,28 @@ export const Connect = () => {
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const { connectFrameworks } = useCustomContent(['connect:frameworks'])
-  const connectionTypes = !connectFrameworks
-    ? CONNECTION_TYPES
-    : [
-        { key: 'direct', label: 'Connection String', obj: [] },
-        connectFrameworks,
-        { key: 'orms', label: 'ORMs', obj: ORMS },
-      ]
-  const frameworks = !connectFrameworks ? FRAMEWORKS : connectFrameworks.obj
+  const {
+    projectConnectionShowAppFrameworks: showAppFrameworks,
+    projectConnectionShowMobileFrameworks: showMobileFrameworks,
+    projectConnectionShowOrms: showOrms,
+  } = useIsFeatureEnabled([
+    'project_connection:show_app_frameworks',
+    'project_connection:show_mobile_frameworks',
+    'project_connection:show_orms',
+  ])
+
+  const connectionTypes = CONNECTION_TYPES.filter(({ key }) => {
+    if (key === 'frameworks') {
+      return showAppFrameworks
+    }
+    if (key === 'mobiles') {
+      return showMobileFrameworks
+    }
+    if (key === 'orms') {
+      return showOrms
+    }
+    return true
+  })
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
@@ -57,7 +71,7 @@ export const Connect = () => {
 
   const [tab, setTab] = useQueryState('tab', parseAsString.withDefault('direct'))
 
-  const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(frameworks)
+  const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
   const [selectedChild, setSelectedChild] = useState(
     connectionObject.find((item) => item.key === selectedParent)?.children[0]?.key ?? ''
@@ -68,7 +82,7 @@ export const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
-  const isFrameworkSelected = frameworks.some((x) => x.key === selectedParent)
+  const isFrameworkSelected = FRAMEWORKS.some((x) => x.key === selectedParent)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
   const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
@@ -127,8 +141,8 @@ export const Connect = () => {
     setTab(type)
 
     if (type === 'frameworks') {
-      setConnectionObject(frameworks)
-      handleConnectionTypeChange(frameworks)
+      setConnectionObject(FRAMEWORKS)
+      handleConnectionTypeChange(FRAMEWORKS)
     }
 
     if (type === 'mobiles') {
@@ -226,20 +240,27 @@ export const Connect = () => {
       </DialogTrigger>
       <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
         <DialogHeader className={DIALOG_PADDING_X}>
-          <DialogTitle>Connect to your project</DialogTitle>
+          <DialogTitle>
+            Connect to your project
+            {connectionTypes.length === 1 ? ` via ${connectionTypes[0].label.toLowerCase()}` : null}
+          </DialogTitle>
           <DialogDescription>
             Get the connection strings and environment variables for your app
           </DialogDescription>
         </DialogHeader>
 
         <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
-          <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
-            {connectionTypes.map((type) => (
-              <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
-                {type.label}
-              </TabsTrigger_Shadcn_>
-            ))}
-          </TabsList_Shadcn_>
+          {connectionTypes.length > 1 ? (
+            <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
+              {connectionTypes.map((type) => (
+                <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
+                  {type.label}
+                </TabsTrigger_Shadcn_>
+              ))}
+            </TabsList_Shadcn_>
+          ) : (
+            <DialogSectionSeparator />
+          )}
 
           {connectionTypes.map((type) => {
             const hasChildOptions =
@@ -317,10 +338,10 @@ export const Connect = () => {
                 <p className="text-xs text-foreground-lighter my-3">
                   Add the following files below to your application
                 </p>
-                {!!connectFrameworks && isFrameworkSelected ? (
+                {isFrameworkSelected ? (
                   <ConnectTabContentCustom
                     projectKeys={projectKeys}
-                    framework={frameworks.find((x) => x.key === selectedParent)}
+                    framework={FRAMEWORKS.find((x) => x.key === selectedParent)}
                   />
                 ) : (
                   <ConnectTabContent
