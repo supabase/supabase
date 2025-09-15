@@ -2,4 +2,4 @@
 # https://github.com/marketplace/actions/labeler
 documentation:
 - changed-files:
-  - any-glob-to-any-file: 'apps/docs'
+  - any-glob-to-any-file: 'apps/docs/**/*'
