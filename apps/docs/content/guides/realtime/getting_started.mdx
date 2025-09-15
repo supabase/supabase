@@ -170,7 +170,9 @@ final channel = supabase.channel('room:lobby:messages');
 
 ```swift
 // Create a channel with a descriptive topic name
-let channel = supabase.realtimeV2.channel("room:lobby:messages")
+let channel = supabase.channel("room:lobby:messages") {
+  $0.isPrivate = true
+}
 ```
 
 </TabPanel>
