@@ -98,9 +98,6 @@ export const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
-  const isFrameworkSelected = FRAMEWORKS.some((x) => x.key === selectedParent)
-  console.log({ isFrameworkSelected })
-
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
   const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
     PermissionAction.READ,
