@@ -34,7 +34,6 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
-import { ConnectTabContentCustom } from './ConnectTabContentCustom'
 
 export const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -100,6 +99,7 @@ export const Connect = () => {
   )
 
   const isFrameworkSelected = FRAMEWORKS.some((x) => x.key === selectedParent)
+  console.log({ isFrameworkSelected })
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
   const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
@@ -413,18 +413,11 @@ export const Connect = () => {
                 <p className="text-xs text-foreground-lighter my-3">
                   Add the following files below to your application
                 </p>
-                {isFrameworkSelected ? (
-                  <ConnectTabContentCustom
-                    projectKeys={projectKeys}
-                    framework={FRAMEWORKS.find((x) => x.key === selectedParent)}
-                  />
-                ) : (
-                  <ConnectTabContent
-                    projectKeys={projectKeys}
-                    filePath={filePath}
-                    className="rounded-b-none"
-                  />
-                )}
+                <ConnectTabContent
+                  projectKeys={projectKeys}
+                  filePath={filePath}
+                  className="rounded-b-none"
+                />
                 <Panel.Notice
                   className="border border-t-0 rounded-lg rounded-t-none"
                   title="New API keys coming 2025"
