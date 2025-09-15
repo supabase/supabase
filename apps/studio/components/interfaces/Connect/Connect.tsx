@@ -34,7 +34,6 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
-import { ConnectTabContentCustom } from './ConnectTabContentCustom'
 
 export const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -70,10 +69,10 @@ export const Connect = () => {
   )
 
   // helper to get the connection type object
-  function getConnectionObjectForTab(tab: string | null, frameworks: ConnectionType[]) {
+  function getConnectionObjectForTab(tab: string | null) {
     switch (tab) {
       case 'frameworks':
-        return frameworks
+        return FRAMEWORKS
       case 'mobiles':
         return MOBILES
       case 'orms':
@@ -98,8 +97,6 @@ export const Connect = () => {
       .find((item) => item.key === selectedParent)
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
-
-  const isFrameworkSelected = FRAMEWORKS.some((x) => x.key === selectedParent)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
   const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
@@ -259,7 +256,7 @@ export const Connect = () => {
   useEffect(() => {
     if (!showConnect) return
 
-    const newConnectionObject = getConnectionObjectForTab(tab, FRAMEWORKS)
+    const newConnectionObject = getConnectionObjectForTab(tab)
     setConnectionObject(newConnectionObject)
 
     const parent =
@@ -413,18 +410,11 @@ export const Connect = () => {
                 <p className="text-xs text-foreground-lighter my-3">
                   Add the following files below to your application
                 </p>
-                {isFrameworkSelected ? (
-                  <ConnectTabContentCustom
-                    projectKeys={projectKeys}
-                    framework={FRAMEWORKS.find((x) => x.key === selectedParent)}
-                  />
-                ) : (
-                  <ConnectTabContent
-                    projectKeys={projectKeys}
-                    filePath={filePath}
-                    className="rounded-b-none"
-                  />
-                )}
+                <ConnectTabContent
+                  projectKeys={projectKeys}
+                  filePath={filePath}
+                  className="rounded-b-none"
+                />
                 <Panel.Notice
                   className="border border-t-0 rounded-lg rounded-t-none"
                   title="New API keys coming 2025"
