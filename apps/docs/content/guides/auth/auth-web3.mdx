@@ -92,7 +92,7 @@ For example if the user is signing in to the page `https://example.com/sign-in` 
 
 ## Sign in with Ethereum
 
-Ethereum defines the [`wallet.ethereum` global scope object](https://eips.ethereum.org/EIPS/eip-1193) that your app uses to interact with your application. Additionally there is a [wallet discovery mechanism (EIP-6963)](https://eips.ethereum.org/EIPS/eip-6963) that your app can use to discover all of the available wallets on the user's browser.
+Ethereum defines the [`window.ethereum` global scope object](https://eips.ethereum.org/EIPS/eip-1193) that your app uses to interact with Ethereum Wallets. Additionally there is a [wallet discovery mechanism (EIP-6963)](https://eips.ethereum.org/EIPS/eip-6963) that your app can use to discover all of the available wallets on the user's browser.
 
 To sign in a user with their Ethereum wallet make sure that the user has installed a wallet application. There are two ways to do this:
 
@@ -104,7 +104,7 @@ To sign in a user with their Ethereum wallet make sure that the user has install
   size="small"
   type="underlined"
   defaultActiveId="window"
-  queryGroup="solanaWallet"
+  queryGroup="ethWallet"
 >
 
 <TabPanel id="window" label="Ethereum Window API (EIP-1193)">
