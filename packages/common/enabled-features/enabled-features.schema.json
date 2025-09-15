@@ -148,6 +148,11 @@
       "description": "Enable the logs collections page"
     },
 
+    "organization:show_sso_settings": {
+      "type": "boolean",
+      "description": "Show the SSO settings tab in the organization settings page"
+    },
+
     "profile:show_email": {
       "type": "boolean",
       "description": "Show the user's email address in the toolbar"
@@ -273,6 +278,7 @@
     "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
+    "organization:show_sso_settings",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
