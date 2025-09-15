@@ -12,7 +12,7 @@ const OrgSSO: NextPageWithLayout = () => {
   const showSsoSettings = useIsFeatureEnabled('organization:show_sso_settings')
 
   if (!showSsoSettings) {
-    return <UnknownInterface fullHeight={false} urlBack={`/org/${slug}/general`} />
+    return <UnknownInterface urlBack={`/org/${slug}/general`} />
   }
 
   return <SSOConfig />

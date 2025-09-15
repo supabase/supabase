@@ -60,7 +60,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
           ))}
         </NavMenu>
       </ScaffoldContainerLegacy>
-      <main className="h-full w-full overflow-y-auto">{children}</main>
+      <div className="h-full w-full overflow-y-auto">{children}</div>
     </>
   )
 }
