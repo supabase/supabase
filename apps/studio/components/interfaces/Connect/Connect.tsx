@@ -69,7 +69,7 @@ export const Connect = () => {
     parseAsBoolean.withDefault(false)
   )
 
-  // helper to get tthe connection type object
+  // helper to get the connection type object
   function getConnectionObjectForTab(tab: string | null, frameworks: ConnectionType[]) {
     switch (tab) {
       case 'frameworks':
@@ -259,7 +259,7 @@ export const Connect = () => {
   useEffect(() => {
     if (!showConnect) return
 
-    const newConnectionObject = getConnectionObjectForTab(tab, frameworks)
+    const newConnectionObject = getConnectionObjectForTab(tab, FRAMEWORKS)
     setConnectionObject(newConnectionObject)
 
     const parent =
@@ -285,7 +285,7 @@ export const Connect = () => {
     if (queryWith) {
       if (grandchild?.key !== queryWith) setQueryWith(grandchild?.key ?? null)
     }
-  }, [showConnect, tab, frameworks, queryFramework, queryUsing, queryWith])
+  }, [showConnect, tab, FRAMEWORKS, queryFramework, queryUsing, queryWith])
 
   if (!isActiveHealthy) {
     return (
@@ -429,7 +429,7 @@ export const Connect = () => {
                   className="border border-t-0 rounded-lg rounded-t-none"
                   title="New API keys coming 2025"
                   description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.   
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
 `}
                   href="https://github.com/orgs/supabase/discussions/29260"
                   buttonText="Read the announcement"
