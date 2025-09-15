@@ -69,10 +69,10 @@ export const Connect = () => {
   )
 
   // helper to get the connection type object
-  function getConnectionObjectForTab(tab: string | null, frameworks: ConnectionType[]) {
+  function getConnectionObjectForTab(tab: string | null) {
     switch (tab) {
       case 'frameworks':
-        return frameworks
+        return FRAMEWORKS
       case 'mobiles':
         return MOBILES
       case 'orms':
@@ -256,7 +256,7 @@ export const Connect = () => {
   useEffect(() => {
     if (!showConnect) return
 
-    const newConnectionObject = getConnectionObjectForTab(tab, FRAMEWORKS)
+    const newConnectionObject = getConnectionObjectForTab(tab)
     setConnectionObject(newConnectionObject)
 
     const parent =
