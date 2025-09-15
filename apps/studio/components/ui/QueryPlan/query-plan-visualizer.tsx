@@ -164,9 +164,9 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
       {!isFullscreen && (
         <ControlsOverlay
           metricsVisibility={metricsVisibility}
-          setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
+          setMetricsVisibility={setMetricsVisibility}
           heatmapMode={heatmapMode}
-          setHeatmapMode={(m) => setHeatmapMode(m)}
+          setHeatmapMode={setHeatmapMode}
           variant="toolbar"
           className="mb-2"
         />
@@ -188,9 +188,9 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           {isFullscreen && (
             <ControlsOverlay
               metricsVisibility={metricsVisibility}
-              setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
+              setMetricsVisibility={setMetricsVisibility}
               heatmapMode={heatmapMode}
-              setHeatmapMode={(m) => setHeatmapMode(m)}
+              setHeatmapMode={setHeatmapMode}
               variant="overlay"
               portal={false}
             />
@@ -248,7 +248,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 gap={16}
                 className="[&>*]:stroke-foreground-muted opacity-[25%]"
                 variant={BackgroundVariant.Dots}
-                color={'inherit'}
+                color="inherit"
               />
               <MiniMap
                 pannable

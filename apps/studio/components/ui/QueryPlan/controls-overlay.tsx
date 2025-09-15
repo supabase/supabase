@@ -10,9 +10,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
@@ -22,13 +20,15 @@ type Props = {
   metricsVisibility: MetricsVisibility
   setMetricsVisibility: (value: SetStateAction<MetricsVisibility>) => void
   heatmapMode: HeatmapMode
-  setHeatmapMode: (mode: HeatmapMode) => void
+  setHeatmapMode: (value: SetStateAction<HeatmapMode>) => void
   variant?: 'overlay' | 'toolbar'
   className?: string
   portal?: boolean
 }
 
-const DISPLAY_ITEMS: { label: string; value: keyof MetricsVisibility }[] = [
+const HEATMAP_ITEMS: HeatmapMode[] = ['time', 'rows', 'cost', 'none']
+
+const SHOW_ITEMS: { label: string; value: keyof MetricsVisibility }[] = [
   { label: 'Time', value: 'time' },
   { label: 'Rows', value: 'rows' },
   { label: 'Cost', value: 'cost' },
@@ -74,14 +74,15 @@ export const ControlsOverlay = ({
                   <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
                 }
               >
-                {heatmapMode !== 'none' ? (
+                {heatmapMode === 'none' ? (
                   <div className="w-full flex gap-1">
-                    <p className="text-foreground-lighter">heatmap</p>
+                    <p className="text-foreground-lighter">Choose a heatmap…</p>
                     <p className="text-foreground">{heatmapMode}</p>
                   </div>
                 ) : (
                   <div className="w-full flex gap-1">
-                    <p className="text-foreground-lighter">Choose a heatmap…</p>
+                    <p className="text-foreground-lighter">Heatmap</p>
+                    <p className="text-foreground">{heatmapMode}</p>
                   </div>
                 )}
               </Button>
@@ -94,11 +95,9 @@ export const ControlsOverlay = ({
               sameWidthAsTrigger
             >
               <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Find schema..." />
                 <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    {['time', 'rows', 'cost', 'none']?.map((heatmapItem) => (
+                    {HEATMAP_ITEMS?.map((heatmapItem) => (
                       <CommandItem_Shadcn_
                         key={heatmapItem}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
