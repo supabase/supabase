@@ -16324,7 +16324,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           },
                           "isOptional": true,
                           "comment": {
-                            "shortText": "Wallet interface to use. If not specified will default to `window.ethereum`."
+                            "shortText": "Wallet interface to use. If not specified will default to \`window.ethereum\`."
                           }
                         }
                       ]
