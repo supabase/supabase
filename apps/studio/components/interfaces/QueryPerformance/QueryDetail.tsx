@@ -1,5 +1,5 @@
 import { Lightbulb } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 import { formatSql } from 'lib/formatSql'
@@ -41,6 +41,33 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const connectionString = project?.connectionString
+
+  // Validation helpers for EXPLAIN eligibility
+  // Mirror logic from SQLEditor.utils.ts:checkIfAppendLimitRequired (cleanedSql + semicolon detection)
+  const cleanedSql = useMemo(() => {
+    const sql = (query ?? '').toString()
+    return sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
+  }, [query])
+
+  const isSingleStatement = useMemo(() => {
+    const cleaned = cleanedSql
+    if (!cleaned) return false
+    const queries = Array.from(cleaned.matchAll(/[a-zA-Z]*[0-9]*[;]+/g))
+    const indexSemiColon = cleaned.lastIndexOf(';')
+    const hasComments = cleaned.includes('--')
+    const hasMultipleQueries =
+      queries.length > 1 || (indexSemiColon > 0 && indexSemiColon !== cleaned.length - 1)
+    // Comments don't affect single-statement detection (preserve behavior)
+    return !hasMultipleQueries
+  }, [cleanedSql])
+
+  const isSelectOrWithSelect = useMemo(() => {
+    const s = cleanedSql.toLowerCase()
+    if (!s) return false
+    if (s.startsWith('select')) return true
+    if (s.startsWith('with') && s.includes(' select ')) return true
+    return false
+  }, [cleanedSql])
 
   useEffect(() => {
     if (selectedRow !== undefined) {
