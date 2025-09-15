@@ -12,6 +12,7 @@ import {
   isMaterializedView,
   isTableLike,
   isView,
+  TableLike,
 } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
@@ -190,7 +191,9 @@ export const TableGridEditor = ({
 
         <SidePanelEditor
           editable={editable}
-          selectedTable={isTableSelected || isForeignTableSelected ? selectedTable : undefined}
+          selectedTable={
+            isTableSelected || isForeignTableSelected ? (selectedTable as TableLike) : undefined
+          }
           onTableCreated={onTableCreated}
         />
         <DeleteConfirmationDialogs
