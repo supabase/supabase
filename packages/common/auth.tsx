@@ -1,6 +1,7 @@
 'use client'
 
-import type { AuthError, Session } from '@supabase/supabase-js'
+import type { Session } from '@supabase/supabase-js'
+import type { AuthError } from '@supabase/auth-js'
 import {
   createContext,
   PropsWithChildren,

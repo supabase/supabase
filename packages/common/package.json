@@ -19,6 +19,8 @@
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
+    "@supabase/auth-js": "catalog:",
+    "@supabase/supabase-js": "catalog:",
     "@types/dat.gui": "^0.7.12",
     "@usercentrics/cmp-browser-sdk": "^4.42.0",
     "api-types": "workspace:*",
