@@ -176,7 +176,7 @@ supabase gen signing-key --algorithm ES256
 
 Make sure you store this private key in a secure location, as it will not be extractable from Supabase.
 
-You can import the generated private key to your project by creating a [new standby key](/dashboard/project/_/settings/jwt/signing-keys) from the dashboard. Remember to remove all unsupported fields, such as `use`, `key_ops`, `alg`, and `ext`. For e.g.
+You can import the generated private key to your project by creating a [new standby key](/dashboard/project/_/settings/jwt/signing-keys) from the dashboard.
 
 ```json
 {
@@ -191,7 +191,7 @@ You can import the generated private key to your project by creating a [new stan
 
 Once imported, click `Rotate key` to activate your new signing key. Any JWT signed by your old key will continue to be usable until your old signing key is manually revoked.
 
-To mint a new JWT using the asymmetric signing key, you will need to set the following JWT headers to match your generated private key.
+To mint a new JWT using the asymmetric signing key, you will need to set the following [JWT headers](/docs/guides/auth/jwts#introduction) to match your generated private key.
 
 ```json
 {
@@ -201,31 +201,33 @@ To mint a new JWT using the asymmetric signing key, you will need to set the fol
 }
 ```
 
+<Admonition type="note">
+
+The `kid` header is used to identify your public key for verification. You must set the same value when importing on platform.
+
+</Admonition>
+
 In addition, you need to provide the following custom claims as the JWT payload.
 
 ```json
 {
-  "iss": "supabase",
-  "ref": "vdpfzijcqftxdatebvcx",
-  "role": "service_role",
+  "sub": "ef0493c9-3582-425f-a362-aef909588df7",
+  "role": "authenticated",
   "exp": 1757749466
 }
 ```
 
-- `iss` is optional and can be set to any string that identifies the issuer of this JWT.
-- `ref` must be set to the project ref which you have imported the signing key.
+- `sub` is an optional UUID that uniquely identifies a user you want to impersonate in `auth.users` table.
 - `role` must be set to an existing Postgres role in your database, such as `anon`, `authenticated`, or `service_role`.
 - `exp` must be set to a timestamp in the future (seconds since 1970) when this token expires. Prefer shorter-lived tokens.
 
-Finally, you can use your newly minted JWT as the `Authorization: Bearer <JWT>` header to all Data API requests.
+Finally, you can [use your newly minted JWT](/docs/guides/auth/jwts#using-custom-or-third-party-jwts) as the `Authorization: Bearer <JWT>` header to all Data API requests.
 
-```sh
-curl 'https://vdpfzijcqftxdatebvcx.supabase.co/rest/v1/cities?select=id' \
-  -H "apikey: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH" \
-  -H "Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjNhMThjZmUyLTcyMjYtNDNiMC1iYmI0LTdjNTI0MmYyNDA2ZSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGZ6aWpjcWZ0eGRhdGVidmN4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTc1Nzc1MTc3Mn0.mxPJhHlNnEou7Qqu9TJHFZ9EMH9DVLSGbeVg4RiuAEzgN0gQgyxP7BRARrkZyrjCqPVtJe5HSsOW-OVvFQCOYw"
-```
+<Admonition type="note">
 
-Note that an `apikey` header is required to access your project's APIs. Use a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/api/api-keys) here. Using your minted JWT is not possible in this header.
+A separate `apikey` header is required to access your project's APIs. This can be a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/api/api-keys). Using your minted JWT is not possible in this header.
+
+</Admonition>
 
 ### Why is a 5 minute wait imposed when changing signing key states?
 
