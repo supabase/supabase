@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
 import type { Node } from 'reactflow'
 import type { PlanNodeData } from '../types'
+import { useMemo } from 'react'
 
 export function useHeatmapMax(nodes: Node<PlanNodeData>[]) {
   return useMemo(() => {
@@ -9,17 +9,18 @@ export function useHeatmapMax(nodes: Node<PlanNodeData>[]) {
     let maxCost = 0
 
     nodes.forEach((n) => {
-      const d = n.data as PlanNodeData
-      const t = (d.exclusiveTimeMs ?? 0) || (d.actualTotalTime ?? 0) * (d.actualLoops ?? 1)
-      if (t > maxTime) maxTime = t
+      const data = n.data
 
-      const rowsMetric = (d.actualRows ?? 0) * (d.actualLoops ?? 1) || d.planRows || 0
+      const time = data.exclusiveTimeMs ?? (data.actualTotalTime ?? 0) * (data.actualLoops ?? 1)
+      if (time > maxTime) maxTime = time
+
+      const rowsMetric = (data.actualRows ?? 0) * (data.actualLoops ?? 1) || data.planRows || 0
       if (rowsMetric > maxRows) maxRows = rowsMetric
 
-      const c = d.exclusiveCost ?? 0
-      if (c > maxCost) maxCost = c
+      const cost = data.exclusiveCost || 0
+      if (cost > maxCost) maxCost = cost
     })
 
-    return { maxTime: maxTime || 1, maxRows: maxRows || 1, maxCost: maxCost || 1 }
+    return { maxTime, maxRows, maxCost }
   }, [nodes])
 }
