@@ -51,9 +51,9 @@
 
   "project_connection:javascript_example": true,
   "project_connection:dart_example": true,
-  "project_connection:show_app_frameworks": true,
-  "project_connection:show_mobile_frameworks": true,
-  "project_connection:show_orms": true,
+  "project_connection:show_app_frameworks": false,
+  "project_connection:show_mobile_frameworks": false,
+  "project_connection:show_orms": false,
 
   "project_creation:show_advanced_config": true,
 

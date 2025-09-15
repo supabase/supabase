@@ -240,7 +240,10 @@ export const Connect = () => {
       </DialogTrigger>
       <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
         <DialogHeader className={DIALOG_PADDING_X}>
-          <DialogTitle>Connect to your project</DialogTitle>
+          <DialogTitle>
+            Connect to your project
+            {connectionTypes.length === 1 ? ` via ${connectionTypes[0].label.toLowerCase()}` : null}
+          </DialogTitle>
           <DialogDescription>
             Get the connection strings and environment variables for your app
           </DialogDescription>
