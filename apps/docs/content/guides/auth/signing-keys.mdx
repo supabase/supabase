@@ -176,7 +176,7 @@ supabase gen signing-key --algorithm ES256
 
 Make sure you store this private key in a secure location, as it will not be extractable from Supabase.
 
-You can import the generated private key to your project by creating a [new standby key](/dashboard/project/_/settings/jwt/signing-keys) from the dashboard.
+Import the generated private key to your project by creating a [new standby key](/dashboard/project/_/settings/jwt/signing-keys) from the dashboard:
 
 ```json
 {
@@ -203,7 +203,7 @@ To mint a new JWT using the asymmetric signing key, you will need to set the fol
 
 <Admonition type="note">
 
-The `kid` header is used to identify your public key for verification. You must set the same value when importing on platform.
+The `kid` header is used to identify your public key for verification. You must use the same value when importing on platform.
 
 </Admonition>
 
@@ -221,7 +221,7 @@ In addition, you need to provide the following custom claims as the JWT payload.
 - `role` must be set to an existing Postgres role in your database, such as `anon`, `authenticated`, or `service_role`.
 - `exp` must be set to a timestamp in the future (seconds since 1970) when this token expires. Prefer shorter-lived tokens.
 
-Finally, you can [use your newly minted JWT](/docs/guides/auth/jwts#using-custom-or-third-party-jwts) as the `Authorization: Bearer <JWT>` header to all Data API requests.
+Finally, you can use your newly minted JWT as the `Authorization: Bearer <JWT>` header to all [Data API requests](/docs/guides/auth/jwts#using-custom-or-third-party-jwts).
 
 <Admonition type="note">
 
