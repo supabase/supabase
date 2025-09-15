@@ -1,15 +1,15 @@
+import { useEffect, useState } from 'react'
 import { Lightbulb } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 import { formatSql } from 'lib/formatSql'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { QueryPlan } from './QueryPlan'
 
 interface QueryDetailProps {
   reportType: QUERY_PERFORMANCE_REPORT_TYPES
@@ -25,49 +25,11 @@ const SqlMonacoBlock = dynamic(
   }
 )
 
-const QueryPlanVisualizer = dynamic(
-  () =>
-    import('components/ui/QueryPlan/query-plan-visualizer').then(
-      ({ QueryPlanVisualizer }) => QueryPlanVisualizer
-    ),
-  { ssr: false }
-)
-
 export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
   const report = QUERY_PERFORMANCE_COLUMNS
   const [query, setQuery] = useState(selectedRow?.['query'])
-  const { data: project } = useSelectedProjectQuery()
-  const projectRef = project?.ref
-  const connectionString = project?.connectionString
-
-  // Validation helpers for EXPLAIN eligibility
-  // Mirror logic from SQLEditor.utils.ts:checkIfAppendLimitRequired (cleanedSql + semicolon detection)
-  const cleanedSql = useMemo(() => {
-    const sql = (query ?? '').toString()
-    return sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
-  }, [query])
-
-  const isSingleStatement = useMemo(() => {
-    const cleaned = cleanedSql
-    if (!cleaned) return false
-    const queries = Array.from(cleaned.matchAll(/[a-zA-Z]*[0-9]*[;]+/g))
-    const indexSemiColon = cleaned.lastIndexOf(';')
-    const hasComments = cleaned.includes('--')
-    const hasMultipleQueries =
-      queries.length > 1 || (indexSemiColon > 0 && indexSemiColon !== cleaned.length - 1)
-    // Comments don't affect single-statement detection (preserve behavior)
-    return !hasMultipleQueries
-  }, [cleanedSql])
-
-  const isSelectOrWithSelect = useMemo(() => {
-    const s = cleanedSql.toLowerCase()
-    if (!s) return false
-    if (s.startsWith('select')) return true
-    if (s.startsWith('with') && s.includes(' select ')) return true
-    return false
-  }, [cleanedSql])
 
   useEffect(() => {
     if (selectedRow !== undefined) {
@@ -125,12 +87,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
       </QueryPanelSection>
       <div className="border-t" />
       <QueryPanelSection>
-        <p className="text-sm">Execution plan</p>
-        <div className="h-[420px] flex items-center text-foreground-lighter text-[12px]">
-          <span>
-            Project: {projectRef ?? 'N/A'} / Conn: {connectionString ? 'available' : 'N/A'}
-          </span>
-        </div>
+        <QueryPlan query={query} />
       </QueryPanelSection>
     </QueryPanelContainer>
   )
