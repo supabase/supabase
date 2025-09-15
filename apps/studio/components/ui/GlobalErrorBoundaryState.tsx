@@ -15,7 +15,6 @@ import {
 } from 'ui'
 import { InlineLinkClassName } from './InlineLink'
 
-// More correct version of FallbackProps from react-error-boundary
 export type FallbackProps = {
   error: unknown
   resetErrorBoundary: (...args: any[]) => void
@@ -30,6 +29,9 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
   const isRemoveChildError = checkIsError
     ? errorMessage.includes("Failed to execute 'removeChild' on 'Node'")
     : false
+
+  // Get Sentry issue ID from error if available
+  const sentryIssueId = (error as any)?.sentryId || (error as any)?.eventId || ''
 
   const handleClearStorage = () => {
     try {
@@ -134,7 +136,7 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
         <div className="w-full sm:w-1/2 mx-auto grid grid-cols-2 gap-2">
           <Button asChild type="default" icon={<ExternalLink />}>
             <Link
-              href={`/support/new?category=dashboard_bug&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}`}
+              href={`/support/new?category=dashboard_bug&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}${sentryIssueId ? `&sid=${sentryIssueId}` : ''}`}
               target="_blank"
             >
               Contact support

@@ -77,6 +77,7 @@ export const SupportFormV2 = ({
     subject: urlSubject,
     message: urlMessage,
     error,
+    sid: sentryIssueId,
   } = useParams()
 
   const uploadButtonRef = useRef(null)
@@ -224,6 +225,7 @@ export const SupportFormV2 = ({
         .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
         .join(';'),
       browserInformation: detectBrowser(),
+      ...(sentryIssueId && { sentryIssueId }),
     }
 
     if (values.projectRef !== 'no-project') {

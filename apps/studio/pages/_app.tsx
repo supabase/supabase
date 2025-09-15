@@ -90,7 +90,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
-      Sentry.captureException(error)
+      const eventId = Sentry.captureException(error)
+      // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
+      if (eventId) {
+        ;(error as any).sentryId = eventId
+      }
     })
 
     console.error(error.stack)
@@ -112,6 +116,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
+      <button
+        onClick={() => {
+          const error = new Error('Test error')
+          throw error
+        }}
+      >
+        error
+      </button>
       <QueryClientProvider client={queryClient}>
         <NuqsAdapter>
           <Hydrate state={pageProps.dehydratedState}>
