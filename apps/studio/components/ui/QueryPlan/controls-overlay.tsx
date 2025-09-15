@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type SetStateAction, useState } from 'react'
 import { Filter, ChevronsUpDown, Check } from 'lucide-react'
 
 import type { MetricsVisibility, HeatmapMode } from './contexts'
@@ -20,13 +20,21 @@ import {
 
 type Props = {
   metricsVisibility: MetricsVisibility
-  setMetricsVisibility: (updater: (prev: MetricsVisibility) => MetricsVisibility) => void
+  setMetricsVisibility: (value: SetStateAction<MetricsVisibility>) => void
   heatmapMode: HeatmapMode
   setHeatmapMode: (mode: HeatmapMode) => void
   variant?: 'overlay' | 'toolbar'
   className?: string
   portal?: boolean
 }
+
+const DISPLAY_ITEMS: { label: string; value: keyof MetricsVisibility }[] = [
+  { label: 'Time', value: 'time' },
+  { label: 'Rows', value: 'rows' },
+  { label: 'Cost', value: 'cost' },
+  { label: 'Buffers', value: 'buffers' },
+  { label: 'Output', value: 'output' },
+]
 
 export const ControlsOverlay = ({
   metricsVisibility,
@@ -42,10 +50,10 @@ export const ControlsOverlay = ({
   return (
     <div
       className={cn(
+        'text-xs',
         variant === 'overlay'
           ? 'px-2 py-1 bg-foreground-muted/20 backdrop-blur-sm border rounded-md'
           : null,
-        'text-xs',
         className
       )}
     >
@@ -98,10 +106,6 @@ export const ControlsOverlay = ({
                           setHeatmapMode(heatmapItem as HeatmapMode)
                           setHeatmapPopoverOpen(false)
                         }}
-                        onClick={() => {
-                          setHeatmapMode(heatmapItem as HeatmapMode)
-                          setHeatmapPopoverOpen(false)
-                        }}
                       >
                         <span>{heatmapItem}</span>
                         {heatmapMode === heatmapItem && (
@@ -133,87 +137,25 @@ export const ControlsOverlay = ({
           <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={portal}>
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Show items</p>
-              <div className="flex flex-col">
-                <div className="group flex items-center justify-between py-0.5">
-                  <div className="flex items-center gap-x-2">
-                    <Checkbox_Shadcn_
-                      id="time"
-                      name="time"
-                      checked={metricsVisibility.time}
-                      onCheckedChange={(checked) =>
-                        setMetricsVisibility((v) => ({ ...v, time: Boolean(checked) }))
-                      }
-                    />
-                    <Label_Shadcn_ htmlFor="time" className="capitalize text-xs">
-                      Time
-                    </Label_Shadcn_>
-                  </div>
-                </div>
-
-                <div className="group flex items-center justify-between py-0.5">
-                  <div className="flex items-center gap-x-2">
-                    <Checkbox_Shadcn_
-                      id="rows"
-                      name="rows"
-                      checked={metricsVisibility.rows}
-                      onCheckedChange={(checked) =>
-                        setMetricsVisibility((v) => ({ ...v, rows: Boolean(checked) }))
-                      }
-                    />
-                    <Label_Shadcn_ htmlFor="rows" className="capitalize text-xs">
-                      Rows
-                    </Label_Shadcn_>
-                  </div>
-                </div>
-
-                <div className="group flex items-center justify-between py-0.5">
-                  <div className="flex items-center gap-x-2">
-                    <Checkbox_Shadcn_
-                      id="cost"
-                      name="cost"
-                      checked={metricsVisibility.cost}
-                      onCheckedChange={(checked) =>
-                        setMetricsVisibility((v) => ({ ...v, cost: Boolean(checked) }))
-                      }
-                    />
-                    <Label_Shadcn_ htmlFor="cost" className="capitalize text-xs">
-                      Cost
-                    </Label_Shadcn_>
-                  </div>
-                </div>
-
-                <div className="group flex items-center justify-between py-0.5">
-                  <div className="flex items-center gap-x-2">
-                    <Checkbox_Shadcn_
-                      id="buffers"
-                      name="buffers"
-                      checked={metricsVisibility.buffers}
-                      onCheckedChange={(checked) =>
-                        setMetricsVisibility((v) => ({ ...v, buffers: Boolean(checked) }))
-                      }
-                    />
-                    <Label_Shadcn_ htmlFor="buffers" className="capitalize text-xs">
-                      Buffers
-                    </Label_Shadcn_>
-                  </div>
-                </div>
-
-                <div className="group flex items-center justify-between py-0.5">
-                  <div className="flex items-center gap-x-2">
-                    <Checkbox_Shadcn_
-                      id="output"
-                      name="output"
-                      checked={metricsVisibility.output}
-                      onCheckedChange={(checked) =>
-                        setMetricsVisibility((v) => ({ ...v, output: Boolean(checked) }))
-                      }
-                    />
-                    <Label_Shadcn_ htmlFor="output" className="capitalize text-xs">
-                      Output
-                    </Label_Shadcn_>
-                  </div>
-                </div>
-              </div>
+              <ul className="flex flex-col">
+                {SHOW_ITEMS.map((item) => (
+                  <li className="group flex items-center justify-between py-0.5" key={item.value}>
+                    <div className="flex items-center gap-x-2">
+                      <Checkbox_Shadcn_
+                        id={item.value}
+                        name={item.value}
+                        checked={metricsVisibility[item.value]}
+                        onCheckedChange={(checked) =>
+                          setMetricsVisibility((v) => ({ ...v, [item.value]: Boolean(checked) }))
+                        }
+                      />
+                      <Label_Shadcn_ htmlFor={item.value} className="capitalize text-xs">
+                        {item.label}
+                      </Label_Shadcn_>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </PopoverContent_Shadcn_>
         </Popover_Shadcn_>
