@@ -4,7 +4,8 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface ReportBlockContainerProps {
   icon?: ReactNode
-  label: string | ReactNode
+  label: string
+  badge?: ReactNode
   actions: ReactNode
   loading?: boolean
   draggable?: boolean
@@ -16,6 +17,7 @@ interface ReportBlockContainerProps {
 export const ReportBlockContainer = ({
   icon,
   label,
+  badge,
   actions,
   loading = false,
   draggable = false,
@@ -50,9 +52,10 @@ export const ReportBlockContainer = ({
             ) : (
               <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <h3 title={label} className="heading-meta flex-1">
-              {label}
-            </h3>
+            <div className="flex items-center gap-2 flex-1">
+              <h3 className="heading-meta truncate">{label}</h3>
+              {badge && <div className="flex items-center shrink-0">{badge}</div>}
+            </div>
             <div className="flex items-center">{actions}</div>
           </div>
         </TooltipTrigger>

@@ -7,15 +7,10 @@ import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
-import { useParams } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
-import { ConfirmFooter } from './ConfirmFooter'
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 
@@ -217,10 +212,10 @@ export const Message = function Message({
                           return (
                             <div
                               key={`${id}-tool-loading-execute_sql`}
-                              className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-2"
+                              className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2"
                             >
                               <Loader2 className="w-4 h-4 animate-spin" />
-                              {'Writing: ' + (input as any)?.label || 'SQL Query'}
+                              Writing SQL...
                             </div>
                           )
                         }
@@ -248,7 +243,6 @@ export const Message = function Message({
                                   resultId?: string
                                   results: unknown
                                 }) => {
-                                  const resultId = args.resultId
                                   const results = args.results as any[]
 
                                   await addToolResult?.({

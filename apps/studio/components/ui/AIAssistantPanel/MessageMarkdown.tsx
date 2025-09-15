@@ -19,9 +19,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import Link from 'next/link'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { Dashboards } from 'types'
 import {
-  Badge,
   Button,
   cn,
   CodeBlock,
@@ -43,6 +41,7 @@ import { identifyQueryType } from './AIAssistant.utils'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
 import { defaultUrlTransform } from './Message.utils'
+import { Loader2 } from 'lucide-react'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
@@ -124,73 +123,6 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children: Re
 })
 Hyperlink.displayName = 'Hyperlink'
 
-const MemoizedQueryBlock = memo(
-  ({
-    sql,
-    title,
-    xAxis,
-    yAxis,
-    isChart,
-    isLoading,
-    isDraggable,
-    runQuery,
-    results,
-    onRunQuery,
-    onResults,
-    onDragStart,
-    onUpdateChartConfig,
-  }: {
-    sql: string
-    title: string
-    xAxis?: string
-    yAxis?: string
-    isChart: boolean
-    isLoading: boolean
-    isDraggable: boolean
-    runQuery: boolean
-    results?: any[]
-    onRunQuery: (queryType: 'select' | 'mutation') => void
-    onResults: (results: any[]) => void
-    onDragStart: (e: DragEvent<Element>) => void
-    onUpdateChartConfig?: ({
-      chart,
-      chartConfig,
-    }: {
-      chart?: Partial<Dashboards.Chart>
-      chartConfig: Partial<ChartConfig>
-    }) => void
-  }) => (
-    <DebouncedComponent
-      delay={isLoading ? 500 : 0}
-      value={sql}
-      fallback={
-        <div className="heading-meta h-9 bg-surface-75 border-overlay rounded border shadow-sm px-3">
-          Writing SQL...
-        </div>
-      }
-    >
-      <QueryBlock
-        label={title}
-        sql={sql}
-        chartConfig={{
-          type: 'bar',
-          cumulative: false,
-          xKey: xAxis ?? '',
-          yKey: yAxis ?? '',
-          view: isChart ? 'chart' : 'table',
-        }}
-        initialResults={results}
-        onRunQuery={onRunQuery}
-        onResults={onResults}
-        onUpdateChartConfig={onUpdateChartConfig}
-        draggable={isDraggable}
-        onDragStart={onDragStart}
-      />
-    </DebouncedComponent>
-  )
-)
-MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
-
 export const MarkdownPre = ({
   children,
   id,
@@ -251,7 +183,6 @@ export const MarkdownPre = ({
   const snippetId = snippetProps.id
   const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
   const isChart = snippetProps.isChart === 'true'
-  const runQuery = snippetProps.runQuery === 'true'
   const results = snap.getCachedSQLResults({ messageId: id, snippetId })
 
   // Strip props from the content for both SQL and edge functions
@@ -305,28 +236,41 @@ export const MarkdownPre = ({
         readOnly ? (
           <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
         ) : (
-          <MemoizedQueryBlock
-            sql={cleanContent}
-            title={title}
-            xAxis={xAxis}
-            yAxis={yAxis}
-            isChart={isChart}
-            isLoading={isLoading}
-            isDraggable={isDraggableToReports}
-            runQuery={!results && runQuery}
-            results={results}
-            onRunQuery={onRunQuery}
-            onResults={onResultsReturned}
-            onUpdateChartConfig={({ chartConfig: config }) => {
-              chartConfig.current = { ...chartConfig.current, ...config }
-            }}
-            onDragStart={(e: DragEvent<Element>) => {
-              e.dataTransfer.setData(
-                'application/json',
-                JSON.stringify({ label: title, sql: cleanContent, config: chartConfig.current })
-              )
-            }}
-          />
+          <DebouncedComponent
+            delay={isLoading ? 500 : 0}
+            value={cleanContent}
+            fallback={
+              <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Writing SQL...
+              </div>
+            }
+          >
+            <QueryBlock
+              label={title}
+              sql={cleanContent}
+              chartConfig={{
+                type: 'bar',
+                cumulative: false,
+                xKey: xAxis ?? '',
+                yKey: yAxis ?? '',
+                view: isChart ? 'chart' : 'table',
+              }}
+              initialResults={results}
+              onRunQuery={onRunQuery}
+              onResults={onResultsReturned}
+              onUpdateChartConfig={({ chartConfig: config }) => {
+                chartConfig.current = { ...chartConfig.current, ...config }
+              }}
+              draggable={isDraggableToReports}
+              onDragStart={(e: DragEvent<Element>) => {
+                e.dataTransfer.setData(
+                  'application/json',
+                  JSON.stringify({ label: title, sql: cleanContent, config: chartConfig.current })
+                )
+              }}
+            />
+          </DebouncedComponent>
         )
       ) : (
         <CodeBlock

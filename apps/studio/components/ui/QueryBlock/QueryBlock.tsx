@@ -172,12 +172,8 @@ export const QueryBlock = ({
       showDragHandle={draggable}
       onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
       loading={isExecuting}
-      label={
-        <div className="flex items-center gap-2">
-          <span>{label}</span>
-          {isWriteQuery && <Badge variant="warning">Write</Badge>}
-        </div>
-      }
+      label={label}
+      badge={isWriteQuery && <Badge variant="warning">Write</Badge>}
       actions={
         disabled ? null : (
           <>
@@ -290,7 +286,7 @@ export const QueryBlock = ({
       )}
 
       {isExecuting && localResults === undefined && (
-        <div className="p-3 w-full">
+        <div className="p-3 w-full border-t">
           <ShimmeringLoader />
         </div>
       )}
