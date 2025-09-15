@@ -1,6 +1,10 @@
 name: 'Pull Request Labeler'
+
+# only docs uses the labeler at the moment
 on:
-  - pull_request_target
+  pull_request_target:
+    paths:
+      - 'apps/docs/**/*'
 
 jobs:
   labeler:
@@ -9,5 +13,4 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/labeler@v6
