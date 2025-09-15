@@ -8,6 +8,7 @@ import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { useLoadTableEditorStateFromLocalStorageIntoUrl } from 'components/grid/SupabaseGrid.utils'
 import {
   Entity,
+  isForeignTable,
   isMaterializedView,
   isTableLike,
   isView,
@@ -147,6 +148,7 @@ export const TableGridEditor = ({
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
   const isTableSelected = isTableLike(selectedTable)
+  const isForeignTableSelected = isForeignTable(selectedTable)
 
   const canEditViaTableEditor = isTableSelected && !isSchemaLocked
   const editable = !isReadOnly && canEditViaTableEditor
@@ -188,11 +190,11 @@ export const TableGridEditor = ({
 
         <SidePanelEditor
           editable={editable}
-          selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
+          selectedTable={isTableSelected || isForeignTableSelected ? selectedTable : undefined}
           onTableCreated={onTableCreated}
         />
         <DeleteConfirmationDialogs
-          selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
+          selectedTable={isTableSelected ? selectedTable : undefined}
           onTableDeleted={onTableDeleted}
         />
       </TableEditorTableStateContextProvider>
