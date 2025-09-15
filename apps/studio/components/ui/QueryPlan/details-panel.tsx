@@ -1,15 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { Check, Copy } from 'lucide-react'
 
-import { cn, copyToClipboard, Button } from 'ui'
 import type { PlanNodeData } from './types'
+import { cn, copyToClipboard, Button } from 'ui'
 
-// Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
+/**
+ * Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
+ * @see: apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx
+ */
 const JsonMonacoBlock = dynamic(
   () => import('./json-monaco-block').then(({ JsonMonacoBlock }) => JsonMonacoBlock),
   { ssr: false }
 )
+
+const NoData = () => {
+  return <div className="text-foreground-lighter">(none)</div>
+}
 
 export const DetailsPanel = ({
   selectedNode,
@@ -23,23 +30,6 @@ export const DetailsPanel = ({
   const [copiedConditions, setCopiedConditions] = useState(false)
   const [copiedRelation, setCopiedRelation] = useState(false)
   const [copiedOutputCols, setCopiedOutputCols] = useState(false)
-  const [copiedRawJson, setCopiedRawJson] = useState(false)
-  const [jsonHeight, setJsonHeight] = useState<number>(isFullscreen ? 420 : 220)
-
-  useEffect(() => {
-    const calc = () => {
-      if (typeof window === 'undefined') return
-      if (isFullscreen) {
-        const h = Math.floor(window.innerHeight * 0.6)
-        setJsonHeight(Math.max(320, Math.min(720, h)))
-      } else {
-        setJsonHeight(220)
-      }
-    }
-    calc()
-    window.addEventListener('resize', calc)
-    return () => window.removeEventListener('resize', calc)
-  }, [isFullscreen])
 
   const hasNoConditions =
     !selectedNode.hashCond &&
@@ -52,8 +42,9 @@ export const DetailsPanel = ({
   return (
     <div
       className={cn(
-        // Full height always; if not fullscreen, also take the full width for easier reading
-        // Else behave like a right-side drawer
+        // Position panel based on fullscreen mode:
+        // - Fullscreen: right-side drawer
+        // - Normal: full overlay for better readability
         'absolute z-20 border bg-background shadow-xl flex flex-col rounded-md',
         isFullscreen
           ? 'inset-y-0 right-0 w-[420px] sm:w-[440px] md:w-[480px] max-w-[85%] border-y-0 border-r-0 rounded-l-none'
@@ -109,7 +100,7 @@ export const DetailsPanel = ({
               </Button>
             </div>
           ) : (
-            <div className="text-foreground-lighter">(none)</div>
+            <NoData />
           )}
         </div>
 
@@ -117,7 +108,7 @@ export const DetailsPanel = ({
         <div>
           <div className="font-semibold mb-1">Conditions</div>
           {hasNoConditions ? (
-            <div className="text-foreground-lighter">(none)</div>
+            <NoData />
           ) : (
             <div className="relative group">
               <ul className="p-2 border rounded bg-surface-100 whitespace-pre-wrap break-words">
@@ -207,7 +198,7 @@ export const DetailsPanel = ({
               </Button>
             </div>
           ) : (
-            <div className="text-foreground-lighter">(none)</div>
+            <NoData />
           )}
         </div>
 
@@ -217,12 +208,12 @@ export const DetailsPanel = ({
           {selectedNode.raw ? (
             <JsonMonacoBlock
               value={JSON.stringify(selectedNode.raw, null, 2)}
-              height={jsonHeight}
+              height={isFullscreen ? 420 : 220}
               lineNumbers="off"
               wrapperClassName="bg-surface-100"
             />
           ) : (
-            <div className="text-foreground-lighter">(no data)</div>
+            <NoData />
           )}
         </div>
       </div>
