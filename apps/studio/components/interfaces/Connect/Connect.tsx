@@ -21,6 +21,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
   TabsContent_Shadcn_,
@@ -246,13 +247,17 @@ export const Connect = () => {
         </DialogHeader>
 
         <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
-          <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
-            {connectionTypes.map((type) => (
-              <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
-                {type.label}
-              </TabsTrigger_Shadcn_>
-            ))}
-          </TabsList_Shadcn_>
+          {connectionTypes.length > 1 ? (
+            <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
+              {connectionTypes.map((type) => (
+                <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
+                  {type.label}
+                </TabsTrigger_Shadcn_>
+              ))}
+            </TabsList_Shadcn_>
+          ) : (
+            <DialogSectionSeparator />
+          )}
 
           {connectionTypes.map((type) => {
             const hasChildOptions =
