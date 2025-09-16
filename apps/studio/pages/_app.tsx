@@ -116,14 +116,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
-      <button
-        onClick={() => {
-          const error = new Error('Test error')
-          throw error
-        }}
-      >
-        error
-      </button>
       <QueryClientProvider client={queryClient}>
         <NuqsAdapter>
           <Hydrate state={pageProps.dehydratedState}>

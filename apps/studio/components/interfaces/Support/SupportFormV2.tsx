@@ -51,6 +51,7 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { useRouter } from 'next/router'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -77,8 +78,9 @@ export const SupportFormV2 = ({
     subject: urlSubject,
     message: urlMessage,
     error,
-    sid: sentryIssueId,
   } = useParams()
+  const router = useRouter()
+  const dashboardSentryId = router.query.sid as string
 
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -225,7 +227,7 @@ export const SupportFormV2 = ({
         .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
         .join(';'),
       browserInformation: detectBrowser(),
-      ...(sentryIssueId && { sentryIssueId }),
+      ...(dashboardSentryId && { dashboardSentryId }),
     }
 
     if (values.projectRef !== 'no-project') {
