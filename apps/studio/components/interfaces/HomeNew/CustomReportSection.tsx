@@ -12,6 +12,7 @@ import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
 import type { CSSProperties, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { SnippetDropdown } from 'components/interfaces/HomeNew/SnippetDropdown'
@@ -22,13 +23,12 @@ import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { Dashboards } from 'types'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
-import { toast } from 'sonner'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
@@ -50,7 +50,7 @@ export function CustomReportSection() {
     if (reportContent) setEditableReport(reportContent)
   }, [reportContent])
 
-  const { can: canUpdateReport } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateReport } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'user_content',
     {
@@ -63,7 +63,7 @@ export function CustomReportSection() {
     }
   )
 
-  const { can: canCreateReport } = useAsyncCheckProjectPermissions(
+  const { can: canCreateReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
     { resource: { type: 'report', owner_id: profile?.id }, subject: { id: profile?.id } }
