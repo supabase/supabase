@@ -163,7 +163,7 @@ export const createTableEditorTableState = ({
 
 export type TableEditorTableState = ReturnType<typeof createTableEditorTableState>
 
-export const TableEditorTableStateContext = createContext<TableEditorTableState>(undefined as any)
+export const TableEditorTableStateContext = createContext<TableEditorTableState>({} as any)
 
 type TableEditorTableStateContextProviderProps = Omit<
   Parameters<typeof createTableEditorTableState>[0],
