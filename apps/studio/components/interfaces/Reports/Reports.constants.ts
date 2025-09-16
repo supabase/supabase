@@ -492,6 +492,85 @@ select
     sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
   from pg_statio_user_tables;`,
       },
+      unified: {
+        queryType: 'db',
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        -- reports-query-performance-unified
+        set search_path to public, extensions;
+
+        select
+            auth.rolname,
+            statements.query,
+            statements.calls,
+            -- -- Postgres 13, 14, 15
+            statements.total_exec_time + statements.total_plan_time as total_time,
+            statements.min_exec_time + statements.min_plan_time as min_time,
+            statements.max_exec_time + statements.max_plan_time as max_time,
+            statements.mean_exec_time + statements.mean_plan_time as mean_time,
+            -- -- Postgres <= 12
+            -- total_time,
+            -- min_time,
+            -- max_time,
+            -- mean_time,
+            statements.rows / statements.calls as avg_rows,
+            ((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100 as prop_total_time${
+              runIndexAdvisor
+                ? `,
+            case
+              when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+              then (
+                select json_build_object(
+                  'has_suggestion', array_length(index_statements, 1) > 0,
+                  'startup_cost_before', startup_cost_before,
+                  'startup_cost_after', startup_cost_after,
+                  'total_cost_before', total_cost_before,
+                  'total_cost_after', total_cost_after,
+                  'index_statements', index_statements
+                )
+                from index_advisor(statements.query)
+              )
+              else null
+            end as index_advisor_result`
+                : ''
+            }
+          from pg_stat_statements as statements
+            inner join pg_authid as auth on statements.userid = auth.oid
+          ${where || ''}
+          ${orderBy || 'order by statements.total_exec_time + statements.total_plan_time desc'}
+          limit 20`,
+      },
+      slowQueriesCount: {
+        queryType: 'db',
+        sql: () => `
+        -- reports-query-performance-slow-queries-count
+        set search_path to public, extensions;
+
+        -- Count of slow queries (> 1 second average)
+        SELECT count(*) as slow_queries_count
+        FROM pg_stat_statements 
+        WHERE statements.mean_exec_time > 1000;`,
+      },
+      queryMetrics: {
+        queryType: 'db',
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        -- reports-query-performance-metrics
+        set search_path to public, extensions;
+      
+        SELECT 
+          COALESCE(ROUND(AVG(statements.rows::numeric / NULLIF(statements.calls, 0)), 1), 0) as avg_rows_per_call,
+          COUNT(*) FILTER (WHERE statements.total_exec_time + statements.total_plan_time > 1000) as slow_queries,
+          COALESCE(
+            ROUND(
+              SUM(statements.shared_blks_hit) * 100.0 / 
+              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0), 
+              2
+            ), 0
+          ) || '%' as cache_hit_rate
+        FROM pg_stat_statements as statements
+        WHERE statements.calls > 0
+        ${where || ''}
+        ${orderBy || ''}`,
+      },
     },
   },
   [Presets.DATABASE]: {

@@ -3,6 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
@@ -11,6 +12,8 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   // Get the path without any hash values
   const fullCurrentPath = useCurrentPath()
   const [currentPath] = fullCurrentPath.split('#')
+
+  const showSsoSettings = useIsFeatureEnabled('organization:show_sso_settings')
 
   const navMenuItems = [
     {
@@ -26,10 +29,14 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       href: `/org/${slug}/apps`,
     },
 
-    {
-      label: 'SSO',
-      href: `/org/${slug}/sso`,
-    },
+    ...(showSsoSettings
+      ? [
+          {
+            label: 'SSO',
+            href: `/org/${slug}/sso`,
+          },
+        ]
+      : []),
 
     {
       label: 'Audit Logs',
@@ -53,7 +60,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
           ))}
         </NavMenu>
       </ScaffoldContainerLegacy>
-      <main className="h-full w-full overflow-y-auto">{children}</main>
+      <div className="h-full w-full overflow-y-auto">{children}</div>
     </>
   )
 }

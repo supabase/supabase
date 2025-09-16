@@ -17,7 +17,7 @@ export interface HeroSection {
   title: string
   h1: JSX.Element
   subheader: JSX.Element[]
-  image: JSX.Element
+  image: JSX.Element | undefined
   className?: string
   sectionContainerClassName?: string
   icon?: string

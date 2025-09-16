@@ -1,8 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
-import z from 'zod'
 
 import { CustomerioAppClient, CustomerioTrackClient } from '~/lib/customerio'
 import { insertPageInDatabase } from '~/lib/notion'
+
+import {
+  SupaSquadApplication,
+  supaSquadApplicationSchema,
+} from '~/data/open-source/contributing/supasquad.utils'
 
 // Using a separate Sentry client for community following this guide:
 // https://docs.sentry.io/platforms/javascript/best-practices/multiple-sentry-instances/
@@ -28,29 +32,6 @@ const captureSentryCommunityException = (error: any) => {
 
 const NOTION_API_KEY = process.env.NOTION_SUPASQUAD_API_KEY
 const NOTION_DB_ID = process.env.NOTION_SUPASQUAD_APPLICATIONS_DB_ID
-
-const applicationSchema = z.object({
-  first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Please enter a valid email address'),
-  tracks: z
-    .array(
-      z.object({
-        heading: z.string(),
-        description: z.string(),
-      })
-    )
-    .min(1, 'Select at least 1 track'),
-  areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
-  why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.string().optional(),
-  languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
-  skills: z.string().optional(),
-  city: z.string().min(1, 'Specify your city'),
-  country: z.string().min(1, 'Specify your country'),
-  github: z.string().optional(),
-  twitter: z.string().optional(),
-})
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -101,7 +82,7 @@ export async function POST(req: Request) {
     })
   }
 
-  const parsed = applicationSchema.safeParse(body)
+  const parsed = supaSquadApplicationSchema.safeParse(body)
   if (!parsed.success) {
     return new Response(JSON.stringify({ message: parsed.error.flatten() }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -158,6 +139,7 @@ const savePersonAndEventInCustomerIO = async (data: any) => {
         country: data.country,
         github: data.github,
         twitter: data.twitter,
+        discord: data.discord,
       })
 
       // Track the supasquad_application_form_submitted event
@@ -223,7 +205,7 @@ const sendConfirmationEmail = async (emailData: {
   }
 }
 
-const getNotionPageProps = (data: any) => {
+const getNotionPageProps = (data: SupaSquadApplication) => {
   const fullName =
     `${data.first_name?.trim() || ''} ${data.last_name?.trim() || ''}`.trim() || 'Unnamed'
 
@@ -262,6 +244,11 @@ const getNotionPageProps = (data: any) => {
       ],
     },
   }
+  if (data.contributions) {
+    props['Recent Contributions'] = {
+      rich_text: [{ type: 'text', text: { content: truncateRichText(data.contributions, 1900) } }],
+    }
+  }
   if (data.monthly_commitment) {
     props['Monthly commitment'] = {
       rich_text: [{ type: 'text', text: { content: truncateRichText(data.monthly_commitment) } }],
@@ -277,6 +264,11 @@ const getNotionPageProps = (data: any) => {
       rich_text: [
         { type: 'text', text: { content: truncateRichText(data.why_you_want_to_join, 1800) } },
       ],
+    }
+  }
+  if (data.discord) {
+    props['Discord username'] = {
+      rich_text: [{ type: 'text', text: { content: data.discord } }],
     }
   }
   if (data.github) {

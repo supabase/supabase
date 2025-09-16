@@ -5142,12 +5142,7 @@ export interface components {
            * @description Maximum fill time in milliseconds
            * @example 200
            */
-          max_fill_ms: number
-          /**
-           * @description Maximum batch size
-           * @example 5000
-           */
-          max_size: number
+          max_fill_ms?: number
         }
         /**
          * @description Publication name
@@ -5170,12 +5165,7 @@ export interface components {
            * @description Maximum fill time in milliseconds
            * @example 200
            */
-          max_fill_ms: number
-          /**
-           * @description Maximum batch size
-           * @example 5000
-           */
-          max_size: number
+          max_fill_ms?: number
         }
         /**
          * @description Publication name
@@ -8015,12 +8005,7 @@ export interface components {
            * @description Maximum fill time in milliseconds
            * @example 200
            */
-          max_fill_ms: number
-          /**
-           * @description Maximum batch size
-           * @example 5000
-           */
-          max_size: number
+          max_fill_ms?: number
         }
         /**
          * @description Publication name
@@ -8075,12 +8060,7 @@ export interface components {
              * @description Maximum fill time in milliseconds
              * @example 200
              */
-            max_fill_ms: number
-            /**
-             * @description Maximum batch size
-             * @example 5000
-             */
-            max_size: number
+            max_fill_ms?: number
           }
           /**
            * @description Publication name
@@ -9429,12 +9409,7 @@ export interface components {
            * @description Maximum fill time in milliseconds
            * @example 200
            */
-          max_fill_ms: number
-          /**
-           * @description Maximum batch size
-           * @example 5000
-           */
-          max_size: number
+          max_fill_ms?: number
         }
         /**
          * @description Publication name
@@ -9457,12 +9432,7 @@ export interface components {
            * @description Maximum fill time in milliseconds
            * @example 200
            */
-          max_fill_ms: number
-          /**
-           * @description Maximum batch size
-           * @example 5000
-           */
-          max_size: number
+          max_fill_ms?: number
         }
         /**
          * @description Publication name

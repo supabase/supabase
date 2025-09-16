@@ -723,7 +723,7 @@ functions:
         name: Native Facebook Sign in
         description: |
           You can perform native Facebook sign in using [flutter_facebook_auth](https://pub.dev/packages/flutter_facebook_auth).
-          
+
           First, set up your Facebook app in the [Facebook Developer Console](https://developers.facebook.com) and configure it in your Supabase dashboard under `Authentication -> Providers -> Facebook`.
         code: |
           ```dart

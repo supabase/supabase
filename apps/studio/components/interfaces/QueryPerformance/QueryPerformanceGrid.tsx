@@ -26,7 +26,7 @@ import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
 import {
-  QUERY_PERFORMANCE_REPORTS,
+  QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
@@ -38,20 +38,20 @@ interface QueryPerformanceGridProps {
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
-  const { preset, sort: urlSort, order, roles, search } = useParams()
+  const { sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
-  const reportType =
-    (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
+  const reportType = QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED
 
-  const columns = QUERY_PERFORMANCE_REPORTS[reportType].map((col) => {
+  const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
     const nonSortableColumns = ['query']
 
     const result: Column<any> = {
       key: col.id,
       name: col.name,
+      cellClass: `column-${col.id}`,
       resizable: true,
       minWidth: col.minWidth ?? 120,
       sortable: !nonSortableColumns.includes(col.id),
@@ -114,7 +114,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         const value = props.row?.[col.id]
         if (col.id === 'query') {
           return (
-            <div className="w-full flex items-center gap-x-3">
+            <div className="w-full flex items-center gap-x-3 ml-4">
               {hasIndexRecommendations(props.row.index_advisor_result, true) && (
                 <IndexSuggestionIcon
                   indexAdvisorResult={props.row.index_advisor_result}
@@ -147,8 +147,18 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         }
 
         if (col.id === 'prop_total_time') {
+          const percentage = props.row.prop_total_time || 0
+          const fillWidth = Math.min(percentage, 100)
+
           return (
             <div className="w-full flex flex-col justify-center text-xs">
+              <div
+                className={`absolute inset-0 bg-foreground transition-all duration-200 z-0`}
+                style={{
+                  width: `${fillWidth}%`,
+                  opacity: 0.04,
+                }}
+              />
               <p>{value ? `${value.toFixed(1)}%` : 'n/a'}</p>
             </div>
           )
@@ -214,7 +224,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [preset, search, roles, urlSort, order])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, roles, urlSort, order])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -274,7 +285,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
               '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-              '[&>.rdg-cell:first-child>div]:ml-4',
+              '[&>.rdg-cell.column-prop_total_time]:relative',
             ].join(' ')
           }}
           renderers={{

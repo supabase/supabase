@@ -2209,6 +2209,12 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
+  
+  <url>
+    <loc>https://supabase.com/customers/juniver</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
 
   <url>
     <loc>https://supabase.com/customers/kayhanspace</loc>
@@ -2229,7 +2235,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/customers/mendableai</loc>
+    <loc>https://supabase.com/customers/firecrawl</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
