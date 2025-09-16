@@ -10,12 +10,12 @@ export const HIDDEN_NODE_CONNECTOR = 'opacity-0'
 
 export const HEATMAP_ITEMS: readonly HeatmapMode[] = ['time', 'rows', 'cost', 'none']
 
-export const SHOW_ITEMS: Readonly<{ label: string; value: keyof MetricsVisibility }[]> = [
-  { label: 'Time', value: 'time' },
-  { label: 'Rows', value: 'rows' },
-  { label: 'Cost', value: 'cost' },
-  { label: 'Buffers', value: 'buffers' },
-  { label: 'Output', value: 'output' },
+export const SHOW_ITEMS: Readonly<keyof MetricsVisibility>[] = [
+  'time',
+  'rows',
+  'cost',
+  'buffers',
+  'output',
 ]
 
 export type NodeHeightConstants = Readonly<{

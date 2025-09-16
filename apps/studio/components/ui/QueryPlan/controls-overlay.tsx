@@ -129,18 +129,18 @@ export const ControlsOverlay = ({
               <p className="text-xs">Show items</p>
               <ul className="flex flex-col">
                 {SHOW_ITEMS.map((item) => (
-                  <li className="group flex items-center justify-between py-0.5" key={item.value}>
+                  <li className="group flex items-center justify-between py-0.5" key={item}>
                     <div className="flex items-center gap-x-2">
                       <Checkbox_Shadcn_
-                        id={item.value}
-                        name={item.value}
-                        checked={metricsVisibility[item.value]}
+                        id={item}
+                        name={item}
+                        checked={metricsVisibility[item]}
                         onCheckedChange={(checked) =>
-                          setMetricsVisibility((v) => ({ ...v, [item.value]: Boolean(checked) }))
+                          setMetricsVisibility((v) => ({ ...v, [item]: Boolean(checked) }))
                         }
                       />
-                      <Label_Shadcn_ htmlFor={item.value} className="capitalize text-xs">
-                        {item.label}
+                      <Label_Shadcn_ htmlFor={item} className="text-xs">
+                        {item}
                       </Label_Shadcn_>
                     </div>
                   </li>
