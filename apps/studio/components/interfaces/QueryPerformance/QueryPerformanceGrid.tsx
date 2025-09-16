@@ -237,8 +237,12 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           return (
             <div className="w-full flex flex-col justify-center text-xs">
               {typeof value === 'string' ? (
-                <p className={cn(cacheHitRateToNumber(value) === 0 && 'text-foreground-lighter')}>
-                  {cacheHitRateToNumber(value)}%
+                <p
+                  className={cn(
+                    cacheHitRateToNumber(value).toFixed(2) === '0.00' && 'text-foreground-lighter'
+                  )}
+                >
+                  {cacheHitRateToNumber(value).toFixed(2)}%
                 </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
