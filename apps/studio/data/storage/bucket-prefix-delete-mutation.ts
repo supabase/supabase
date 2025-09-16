@@ -24,7 +24,7 @@ export const deleteBucketPrefix = async (
   if (!prefix) throw new Error('prefix is required')
 
   const sql = /* SQL */ `
-delete from storage.prefixes where bucket_id = '${bucketId}' and name = '${prefix}' and level = 1;
+select storage.delete_prefix('${bucketId}', '${prefix}');
 `.trim()
 
   const { result } = await executeSql(
