@@ -15,7 +15,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -44,7 +44,7 @@ const SSLConfiguration = () => {
     }
   )
 
-  const { can: canUpdateSSLEnforcement } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {

@@ -33,6 +33,7 @@ import {
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 /**
  * to do: this could be a type from api-types
@@ -54,6 +55,10 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+
+  const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
+
+  const { computeSize, storageType } = form.watch()
 
   const {
     data: addons,
@@ -111,7 +116,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
         >
           <FormItemLayout
             layout="horizontal"
-            label={'Compute size'}
+            label="Compute size"
             id={field.name}
             className="gap-5"
             labelOptional={
@@ -125,7 +130,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   }
                   beforePrice={Number(computeSizePrice.oldPrice)}
                   afterPrice={Number(computeSizePrice.newPrice)}
-                  free={showUpgradeBadge && form.watch('computeSize') === 'ci_micro' ? true : false}
+                  free={showUpgradeBadge && computeSize === 'ci_micro' ? true : false}
                 />
                 <p className="text-foreground-lighter">
                   Hardware resources allocated to your Postgres database
@@ -219,21 +224,23 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                           <Lock size={14} />
                                         </div>
                                       ) : (
-                                        <>
-                                          <span
-                                            className="text-foreground text-sm font-semibold"
-                                            translate="no"
-                                          >
-                                            ${price}
-                                          </span>
-                                          <span className="text-foreground-light translate-y-[1px]">
-                                            {' '}
-                                            /{' '}
-                                            {compute.price_interval === 'monthly'
-                                              ? 'month'
-                                              : 'hour'}
-                                          </span>
-                                        </>
+                                        showComputePrice && (
+                                          <>
+                                            <span
+                                              className="text-foreground text-sm font-semibold"
+                                              translate="no"
+                                            >
+                                              ${price}
+                                            </span>
+                                            <span className="text-foreground-light translate-y-[1px]">
+                                              {' '}
+                                              /{' '}
+                                              {compute.price_interval === 'monthly'
+                                                ? 'month'
+                                                : 'hour'}
+                                            </span>
+                                          </>
+                                        )
                                       )}
                                     </div>
                                   </div>

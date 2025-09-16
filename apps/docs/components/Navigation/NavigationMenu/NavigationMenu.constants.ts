@@ -699,7 +699,7 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Web3 (Sign in with Solana)',
+          name: 'Web3 (Ethereum or Solana)',
           url: '/guides/auth/auth-web3',
           enabled: allAuthProvidersEnabled,
         },
@@ -793,6 +793,7 @@ export const auth: NavMenuConstant = {
         { name: 'Password Security', url: '/guides/auth/password-security' },
         { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
         { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
+        { name: 'Audit Logs', url: '/guides/auth/audit-logs' },
         {
           name: 'JSON Web Tokens (JWT)',
           url: '/guides/auth/jwts',

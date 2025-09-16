@@ -370,8 +370,10 @@ export const getFallbackTools = ({
               )
             : []
 
+          const dataArray = Array.isArray(data) ? data : []
+
           // Filter functions by requested schemas
-          const filteredFunctions = data.filter((func) => schemas.includes(func.schema))
+          const filteredFunctions = dataArray.filter((func) => schemas.includes(func.schema))
 
           const formattedFunctions = filteredFunctions
             .map(

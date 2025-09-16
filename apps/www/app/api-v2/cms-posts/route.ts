@@ -6,6 +6,12 @@ import { generateReadingTime } from '~/lib/helpers'
 // Lightweight runtime for better performance
 export const runtime = 'edge'
 
+// CORS headers for cross-origin requests
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 // Lightweight TOC generation for edge runtime
 type TocItem = { content: string; slug: string; lvl: number }
 
@@ -115,6 +121,14 @@ function convertRichTextToMarkdown(content: any): string {
     .join('\n\n')
 }
 
+// Handle preflight requests
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  })
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -212,12 +226,15 @@ export async function GET(request: NextRequest) {
                 _status: latestVersion._status,
               }
 
-              return NextResponse.json({
-                success: true,
-                post: processedPost,
-                mode,
-                isDraft: shouldFetchDraft,
-              })
+              return NextResponse.json(
+                {
+                  success: true,
+                  post: processedPost,
+                  mode,
+                  isDraft: shouldFetchDraft,
+                },
+                { headers: corsHeaders }
+              )
             }
           }
         }
@@ -289,12 +306,15 @@ export async function GET(request: NextRequest) {
               _status: post._status,
             }
 
-            return NextResponse.json({
-              success: true,
-              post: processedPost,
-              mode,
-              isDraft: shouldFetchDraft,
-            })
+            return NextResponse.json(
+              {
+                success: true,
+                post: processedPost,
+                mode,
+                isDraft: shouldFetchDraft,
+              },
+              { headers: corsHeaders }
+            )
           }
         }
 
@@ -364,12 +384,15 @@ export async function GET(request: NextRequest) {
               _status: post._status,
             }
 
-            return NextResponse.json({
-              success: true,
-              post: processedPost,
-              mode,
-              isDraft: shouldFetchDraft,
-            })
+            return NextResponse.json(
+              {
+                success: true,
+                post: processedPost,
+                mode,
+                isDraft: shouldFetchDraft,
+              },
+              { headers: corsHeaders }
+            )
           }
         }
       }
@@ -452,16 +475,21 @@ export async function GET(request: NextRequest) {
               toc_depth: post.toc_depth || 3,
             }
 
-            return NextResponse.json({
-              success: true,
-              post: processedPost,
-              mode,
-              source: 'versions-api',
-            })
+            return NextResponse.json(
+              {
+                success: true,
+                post: processedPost,
+                mode,
+                source: 'versions-api',
+              },
+              { headers: corsHeaders }
+            )
           }
         }
       } else {
-        console.log('[cms-posts] Versions API failed, response:', await versionsResponse.text())
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[cms-posts] Versions API failed, response:', await versionsResponse.text())
+        }
       }
 
       // Strategy 2: If versions API didn't work, try finding the parent post first, then get its latest published version
@@ -556,12 +584,15 @@ export async function GET(request: NextRequest) {
                   richContent: mode === 'full' ? post.content : undefined,
                 }
 
-                return NextResponse.json({
-                  success: true,
-                  post: processedPost,
-                  mode,
-                  source: 'versions-by-parent-api',
-                })
+                return NextResponse.json(
+                  {
+                    success: true,
+                    post: processedPost,
+                    mode,
+                    source: 'versions-by-parent-api',
+                  },
+                  { headers: corsHeaders }
+                )
               }
             }
           }
@@ -590,6 +621,12 @@ export async function GET(request: NextRequest) {
       // For individual post requests, don't cache to ensure fresh data
       cache: slug ? 'no-store' : 'default',
       next: slug ? undefined : { revalidate: 300 },
+      // Add SSL configuration for production
+      ...(process.env.NODE_ENV === 'production' && {
+        // Allow self-signed certificates in development, but use proper SSL in production
+        // This helps with Vercel's internal networking
+        agent: false,
+      }),
     })
 
     if (!response.ok) {
@@ -600,7 +637,7 @@ export async function GET(request: NextRequest) {
           error: 'Failed to fetch posts from CMS',
           status: response.status,
         },
-        { status: response.status }
+        { status: response.status, headers: corsHeaders }
       )
     }
 
@@ -613,7 +650,7 @@ export async function GET(request: NextRequest) {
           error: 'CMS returned non-JSON response',
           contentType,
         },
-        { status: 502 }
+        { status: 502, headers: corsHeaders }
       )
     }
 
@@ -695,20 +732,26 @@ export async function GET(request: NextRequest) {
 
     // For single post requests, return the post directly
     if (slug && posts.length > 0) {
-      return NextResponse.json({
-        success: true,
-        post: posts[0],
-        mode,
-      })
+      return NextResponse.json(
+        {
+          success: true,
+          post: posts[0],
+          mode,
+        },
+        { headers: corsHeaders }
+      )
     }
 
-    return NextResponse.json({
-      success: true,
-      posts,
-      total: posts.length,
-      mode,
-      cached: true,
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        posts,
+        total: posts.length,
+        mode,
+        cached: true,
+      },
+      { headers: corsHeaders }
+    )
   } catch (error) {
     console.error('[cms-posts] Error:', error)
     return NextResponse.json(
@@ -717,7 +760,7 @@ export async function GET(request: NextRequest) {
         error: 'Internal server error',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }

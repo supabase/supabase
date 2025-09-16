@@ -382,3 +382,23 @@ export const NoIssuesFound = ({ level }: { level: string }) => {
     </div>
   )
 }
+
+export const createLintSummaryPrompt = (lint: Lint) => {
+  const title = lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title
+  const entity =
+    (lint.metadata &&
+      (lint.metadata.entity ||
+        (lint.metadata.schema &&
+          lint.metadata.name &&
+          `${lint.metadata.schema}.${lint.metadata.name}`))) ||
+    'N/A'
+  const schema = lint.metadata?.schema ?? 'N/A'
+  const issue = lint.detail ? lint.detail.replace(/\\`/g, '`') : 'N/A'
+  const description = lint.description ? lint.description.replace(/\\`/g, '`') : 'N/A'
+  return `Summarize the issue and suggest fixes for the following lint item:
+Title: ${title}
+Entity: ${entity}
+Schema: ${schema}
+Issue Details: ${issue}
+Description: ${description}`
+}

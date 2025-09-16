@@ -66,18 +66,7 @@ const data: () => {
           infrastructure a lot less overwhelming. Ship faster and learn by doing with Supabase.
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/beginners/beginners-hero-dark.svg',
-            light: '/images/solutions/beginners/beginners-hero-light.svg',
-          }}
-          alt="Supabase for Beginners"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',

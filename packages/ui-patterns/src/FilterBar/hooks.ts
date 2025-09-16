@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { FilterProperty, FilterOptionObject, AsyncOptionsFunction } from './types'
 import { isAsyncOptionsFunction } from './utils'

@@ -1,4 +1,4 @@
-import { Eraser, Settings, X } from 'lucide-react'
+import { Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { AiIconAnimation, Button } from 'ui'
@@ -9,7 +9,7 @@ import { AIOptInModal } from './AIOptInModal'
 
 interface AIAssistantHeaderProps {
   isChatLoading: boolean
-  onClearMessages: () => void
+  onNewChat: () => void
   onCloseAssistant: () => void
   showMetadataWarning: boolean
   updatedOptInSinceMCP: boolean
@@ -19,7 +19,7 @@ interface AIAssistantHeaderProps {
 
 export const AIAssistantHeader = ({
   isChatLoading,
-  onClearMessages,
+  onNewChat,
   onCloseAssistant,
   showMetadataWarning,
   updatedOptInSinceMCP,
@@ -54,6 +54,15 @@ export const AIAssistantHeader = ({
             <ButtonTooltip
               type="text"
               size="tiny"
+              icon={<Plus strokeWidth={1.5} />}
+              onClick={onNewChat}
+              className="h-7 w-7 p-0"
+              disabled={isChatLoading}
+              tooltip={{ content: { side: 'bottom', text: 'New chat' } }}
+            />
+            <ButtonTooltip
+              type="text"
+              size="tiny"
               icon={<Settings strokeWidth={1.5} />}
               onClick={() => setIsOptInModalOpen(true)}
               className="h-7 w-7 p-0"
@@ -61,15 +70,6 @@ export const AIAssistantHeader = ({
               tooltip={{
                 content: { side: 'bottom', text: 'Permission settings' },
               }}
-            />
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              icon={<Eraser strokeWidth={1.5} />}
-              onClick={onClearMessages}
-              className="h-7 w-7 p-0"
-              disabled={isChatLoading}
-              tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
             />
             <ButtonTooltip
               type="text"
