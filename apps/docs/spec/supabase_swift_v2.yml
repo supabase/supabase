@@ -944,7 +944,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          // retrieve all identites linked to a user
+          // retrieve all identities linked to a user
           let identities = try await supabase.auth.userIdentities()
 
           // find the google identity
@@ -4856,7 +4856,7 @@ functions:
         code: |
           ```swift
           let fileData = "Hello World".data(using: .utf8)!
-          
+
           try await supabase.storage
             .from("avatars")
             .uploadToSignedURL(
@@ -4873,7 +4873,7 @@ functions:
         code: |
           ```swift
           let fileURL = URL(fileURLWithPath: "/path/to/file.txt")
-          
+
           try await supabase.storage
             .from("avatars")
             .uploadToSignedURL(

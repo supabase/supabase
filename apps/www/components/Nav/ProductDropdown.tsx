@@ -1,6 +1,7 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { ChevronRight, Sparkles } from 'lucide-react'
 
@@ -13,8 +14,9 @@ import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import MainProductsData from 'data/MainProducts'
 import ProductModulesData from 'data/ProductModules'
+import { useRouter } from 'next/router'
 
-const ProductDropdown = () => {
+export const ProductDropdown = () => {
   const { basePath } = useRouter()
   const isTablet = useBreakpoint(1279)
 
@@ -142,7 +144,7 @@ const ProductDropdown = () => {
                   >
                     <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-14 xl:w-20 flex-shrink-0 overflow-auto">
                       <Image
-                        src={`${basePath}/${customer.imgUrl}`}
+                        src={`/${customer.imgUrl}`}
                         alt={customer.title}
                         fill
                         className="!p-3 object-contain brightness-70 contrast-[.35] filter"
@@ -182,5 +184,3 @@ const ProductDropdown = () => {
     </div>
   )
 }
-
-export default ProductDropdown

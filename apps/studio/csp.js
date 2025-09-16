@@ -33,6 +33,10 @@ const isDevOrStaging =
 
 const NIMBUS_STAGING_PROJECTS_URL = 'https://*.nmb-proj.com'
 const NIMBUS_STAGING_PROJECTS_URL_WS = 'wss://*.nmb-proj.com'
+
+const NIMBUS_PROD_PROJECTS_URL = process.env.NIMBUS_PROD_PROJECTS_URL || ''
+const NIMBUS_PROD_PROJECTS_URL_WS = process.env.NIMBUS_PROD_PROJECTS_URL_WS || ''
+
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
@@ -66,6 +70,8 @@ const SUPABASE_ASSETS_URL =
     ? 'https://frontend-assets.supabase.green'
     : 'https://frontend-assets.supabase.com'
 const POSTHOG_URL = isDevOrStaging ? 'https://ph.supabase.green' : 'https://ph.supabase.com'
+// Required for feature flags and other PostHog features
+const POSTHOG_EXTERNAL_URL = 'https://*.posthog.com'
 
 const USERCENTRICS_URLS = 'https://*.usercentrics.eu'
 const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
@@ -98,6 +104,8 @@ module.exports.getCSP = function getCSP() {
     STAPE_URL,
     GOOGLE_MAPS_API_URL,
     POSTHOG_URL,
+    POSTHOG_EXTERNAL_URL,
+    ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -106,6 +114,7 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     STAPE_URL,
     POSTHOG_URL,
+    POSTHOG_EXTERNAL_URL,
   ]
   const FRAME_SRC_URLS = [HCAPTCHA_ASSET_URL, STRIPE_JS_URL, STAPE_URL]
   const IMG_SRC_URLS = [
@@ -117,6 +126,7 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     USERCENTRICS_APP_URL,
     STAPE_URL,
+    ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
   ]
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]

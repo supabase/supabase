@@ -6,7 +6,6 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
-import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
@@ -21,9 +20,6 @@ import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
@@ -43,7 +39,6 @@ import {
   SheetSection,
   SheetTitle,
   TextArea_Shadcn_,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import NewPublicationPanel from './NewPublicationPanel'
@@ -60,7 +55,6 @@ const FormSchema = z.object({
   datasetId: z.string().min(1, 'Dataset id is required'),
   serviceAccountKey: z.string().min(1, 'Service account key is required'),
   publicationName: z.string().min(1, 'Publication is required'),
-  maxSize: z.number().min(1, 'Max Size must be greater than 0').int().optional(),
   maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
   maxStalenessMins: z.number().nonnegative().optional(),
 })
@@ -74,6 +68,7 @@ interface DestinationPanelProps {
     destinationId: number
     pipelineId?: number
     enabled: boolean
+    statusName?: string
   }
 }
 
@@ -88,9 +83,6 @@ export const DestinationPanel = ({
 
   const editMode = !!existingDestination
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-
-  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
-    useCreateTenantSourceMutation()
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -128,7 +120,6 @@ export const DestinationPanel = ({
       // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
-      maxSize: pipelineData?.config?.batch?.max_size,
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
       maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
     }),
@@ -161,9 +152,8 @@ export const DestinationPanel = ({
         }
 
         const batchConfig: any = {}
-        if (!!data.maxSize) batchConfig.maxSize = data.maxSize
         if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
-        const hasBothBatchFields = Object.keys(batchConfig).length === 2
+        const hasBatchFields = Object.keys(batchConfig).length > 0
 
         await updateDestinationPipeline({
           destinationId: existingDestination.destinationId,
@@ -173,12 +163,13 @@ export const DestinationPanel = ({
           destinationConfig: { bigQuery: bigQueryConfig },
           pipelineConfig: {
             publicationName: data.publicationName,
-            ...(hasBothBatchFields ? { batch: batchConfig } : {}),
+            ...(hasBatchFields ? { batch: batchConfig } : {}),
           },
           sourceId,
         })
         // Set request status only right before starting, then fire and close
-        const snapshot = existingDestination.enabled ? 'started' : 'stopped'
+        const snapshot =
+          existingDestination.statusName ?? (existingDestination.enabled ? 'started' : 'stopped')
         if (existingDestination.enabled) {
           setRequestStatus(
             existingDestination.pipelineId,
@@ -207,9 +198,8 @@ export const DestinationPanel = ({
         }
 
         const batchConfig: any = {}
-        if (!!data.maxSize) batchConfig.maxSize = data.maxSize
         if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
-        const hasBothBatchFields = Object.keys(batchConfig).length === 2
+        const hasBatchFields = Object.keys(batchConfig).length > 0
 
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
@@ -218,7 +208,7 @@ export const DestinationPanel = ({
           sourceId,
           pipelineConfig: {
             publicationName: data.publicationName,
-            ...(hasBothBatchFields ? { batch: batchConfig } : {}),
+            ...(hasBatchFields ? { batch: batchConfig } : {}),
           },
         })
         // Set request status only right before starting, then fire and close
@@ -233,18 +223,20 @@ export const DestinationPanel = ({
     }
   }
 
-  const onEnableReplication = async () => {
-    if (!projectRef) return console.error('Project ref is required')
-    await createTenantSource({ projectRef })
-  }
-
   useEffect(() => {
     if (editMode && destinationData && pipelineData) {
       form.reset(defaultValues)
     }
   }, [destinationData, pipelineData, editMode, defaultValues, form])
 
-  return sourceId ? (
+  // Ensure the form always reflects the freshest data whenever the panel opens
+  useEffect(() => {
+    if (visible) {
+      form.reset(defaultValues)
+    }
+  }, [visible, defaultValues, form])
+
+  return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
         <SheetContent showClose={false} size="default">
@@ -392,31 +384,6 @@ export const DestinationPanel = ({
                         <AccordionContent_Shadcn_ asChild className="!pb-0">
                           <FormField_Shadcn_
                             control={form.control}
-                            name="maxSize"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                className="mb-4"
-                                label="Max size"
-                                layout="vertical"
-                                description="The maximum size of the data to send. Leave empty to use default value."
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_
-                                    {...field}
-                                    type="number"
-                                    value={field.value ?? ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value
-                                      field.onChange(val === '' ? undefined : Number(val))
-                                    }}
-                                    placeholder="Leave empty for default"
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                          <FormField_Shadcn_
-                            control={form.control}
                             name="maxFillMs"
                             render={({ field }) => (
                               <FormItemLayout
@@ -487,47 +454,12 @@ export const DestinationPanel = ({
           </div>
         </SheetContent>
       </Sheet>
+
       <NewPublicationPanel
         visible={publicationPanelVisible}
         sourceId={sourceId}
         onClose={() => setPublicationPanelVisible(false)}
       />
     </>
-  ) : (
-    <Sheet open={visible} onOpenChange={onClose}>
-      <SheetContent showClose={false} size="default">
-        <div className="flex flex-col h-full" tabIndex={-1}>
-          <SheetHeader>
-            <SheetTitle>Create a new destination</SheetTitle>
-          </SheetHeader>
-          <SheetSection className="flex-grow overflow-auto">
-            <Alert_Shadcn_>
-              <WarningIcon />
-              <AlertTitle_Shadcn_>
-                {/* Pricing to be decided yet */}
-                Enabling replication will cost additional $xx.xx
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                <span></span>
-                <div className="flex items-center gap-x-2 mt-3">
-                  <Button
-                    type="default"
-                    loading={creatingTenantSource}
-                    onClick={onEnableReplication}
-                  >
-                    Enable replication
-                  </Button>
-                </div>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </SheetSection>
-          <SheetFooter>
-            <Button disabled={creatingTenantSource} type="default" onClick={onClose}>
-              Cancel
-            </Button>
-          </SheetFooter>
-        </div>
-      </SheetContent>
-    </Sheet>
   )
 }
