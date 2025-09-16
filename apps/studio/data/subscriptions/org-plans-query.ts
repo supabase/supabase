@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { subscriptionKeys } from './keys'
 
 export type OrgPlansVariables = {
@@ -27,7 +27,7 @@ export const useOrgPlansQuery = <TData = OrgPlansData>(
   { orgSlug }: OrgPlansVariables,
   { enabled = true, ...options }: UseQueryOptions<OrgPlansData, OrgPlansError, TData> = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckProjectPermissions(
+  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )

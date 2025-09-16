@@ -7,6 +7,7 @@ import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 
+import { useFlag } from 'common'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
@@ -19,7 +20,7 @@ import {
 } from 'data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -28,7 +29,6 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { useFlag } from 'common'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -122,7 +122,7 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckProjectPermissions(
+  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     functionSlug as string
   )

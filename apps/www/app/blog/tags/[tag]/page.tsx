@@ -15,6 +15,7 @@ export async function generateStaticParams() {
   return tags.map((tag: string) => ({ tag }))
 }
 
+export const revalidate = 30
 export const dynamic = 'force-static'
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
