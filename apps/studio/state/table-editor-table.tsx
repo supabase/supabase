@@ -163,7 +163,29 @@ export const createTableEditorTableState = ({
 
 export type TableEditorTableState = ReturnType<typeof createTableEditorTableState>
 
-export const TableEditorTableStateContext = createContext<TableEditorTableState>({} as any)
+export const TableEditorTableStateContext = createContext<TableEditorTableState>({
+  allRowsSelected: false,
+  editable: false,
+  enforceExactCount: false,
+  gridColumns: [],
+  moveColumn: () => {},
+  page: 1,
+  selectedCellPosition: null,
+  selectedRows: proxySet(),
+  setEditable: () => {},
+  setEnforceExactCount: () => {},
+  setPage: () => {},
+  setSelectedCellPosition: () => {},
+  setSelectedRows: () => {},
+  updateColumnIdx: () => {},
+  updateColumnSize: () => {},
+  updateTable: () => {},
+  freezeColumn: () => {},
+  unfreezeColumn: () => {},
+  table: undefined as any,
+  originalTable: undefined as any,
+  _originalTableRef: undefined as any,
+})
 
 type TableEditorTableStateContextProviderProps = Omit<
   Parameters<typeof createTableEditorTableState>[0],
