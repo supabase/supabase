@@ -53,7 +53,7 @@ export const ProjectCard = ({
         title={
           <div className="w-full justify-between space-y-1.5 px-5">
             <p className="flex-shrink truncate text-sm pr-4">{name}</p>
-            <span className="text-sm lowercase text-foreground-light">{desc}</span>
+            <span className="text-sm text-foreground-light">{desc}</span>
             <div className="flex items-center gap-x-1.5">
               {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
                 <ComputeBadgeWrapper project={project} />
