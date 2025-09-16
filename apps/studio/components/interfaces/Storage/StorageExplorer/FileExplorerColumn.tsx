@@ -45,7 +45,7 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop }: DragOverOverlayProps) 
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         className="absolute top-0 flex h-full w-full items-center justify-center pointer-events-auto"
-        style={{ backgroundColor: folderIsEmpty ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.2)' }}
+        style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
       >
         <div
           className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
