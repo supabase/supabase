@@ -20,6 +20,7 @@ import {
   cn,
   CodeBlock,
 } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { hasIndexRecommendations } from './index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexSuggestionIcon'
@@ -28,6 +29,7 @@ import { QueryIndexes } from './QueryIndexes'
 import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
+  QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
@@ -253,8 +255,20 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'rolname') {
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs">
-              {value ? <p>{value}</p> : <p className="text-muted">&ndash;</p>}
+            <div className="w-full flex flex-col justify-center">
+              {value ? (
+                <span className="flex items-center gap-x-1">
+                  <p className="font-mono text-xs">{value}</p>
+                  <InfoTooltip align="end" alignOffset={-12} className="w-56">
+                    {
+                      QUERY_PERFORMANCE_ROLE_DESCRIPTION.find((role) => role.name === value)
+                        ?.description
+                    }
+                  </InfoTooltip>
+                </span>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
             </div>
           )
         }
