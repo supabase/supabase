@@ -221,7 +221,7 @@ In addition, you need to provide the following custom claims as the JWT payload.
 - `role` must be set to an existing Postgres role in your database, such as `anon`, `authenticated`, or `service_role`.
 - `exp` must be set to a timestamp in the future (seconds since 1970) when this token expires. Prefer shorter-lived tokens.
 
-For simplicity, use the `gen bearer-jwt` command to generate tokens with the desired header and payload.
+For simplicity, use the following CLI command to generate tokens with the desired header and payload.
 
 ```bash
 supabase gen bearer-jwt --role authenticated --sub ef0493c9-3582-425f-a362-aef909588df7
