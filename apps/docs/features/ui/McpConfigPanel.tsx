@@ -75,7 +75,7 @@ function ProjectSelector({
                   key={project.ref}
                   value={project.ref}
                   onSelect={() => {
-                    onProjectSelect?.(project)
+                    onProjectSelect?.(project.ref === selectedProject?.ref ? null : project)
                     setOpen(false)
                   }}
                   className="flex gap-2 items-center"
