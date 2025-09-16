@@ -20,6 +20,8 @@ export const QUERY_PERFORMANCE_COLUMNS = [
   { id: 'max_time', name: 'Max time', description: undefined, minWidth: 100 },
   { id: 'mean_time', name: 'Mean time', description: undefined, minWidth: 100 },
   { id: 'min_time', name: 'Min time', description: undefined, minWidth: 100 },
-  { id: 'avg_rows', name: 'Avg. Rows', description: undefined, minWidth: 100 },
+  // { id: 'avg_rows', name: 'Avg. Rows', description: undefined, minWidth: 100 },
+  { id: 'rows_read', name: 'Rows read', description: undefined, minWidth: 100 },
+  { id: 'cache_hit_rate', name: 'Cache hit rate', description: undefined, minWidth: 130 },
   { id: 'rolname', name: 'Role', description: undefined, minWidth: 120 },
 ] as const

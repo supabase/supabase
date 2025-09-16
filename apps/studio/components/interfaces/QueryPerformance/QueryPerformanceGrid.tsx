@@ -45,6 +45,16 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const [selectedRow, setSelectedRow] = useState<number>()
   const reportType = QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED
 
+  console.log(
+    'Cache Debug Data:',
+    data?.map((row) => ({
+      query: row.query?.substring(0, 50) + '...',
+      debug_hit: row.debug_hit,
+      debug_read: row.debug_read,
+      cache_hit_rate: row.cache_hit_rate,
+    }))
+  )
+
   const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
     const nonSortableColumns = ['query']
 
@@ -138,14 +148,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           )
         }
 
-        if (col.id === 'rolname') {
-          return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs">
-              <p>{value || 'n/a'}</p>
-            </div>
-          )
-        }
-
         if (col.id === 'prop_total_time') {
           const percentage = props.row.prop_total_time || 0
           const fillWidth = Math.min(percentage, 100)
@@ -159,7 +161,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   opacity: 0.04,
                 }}
               />
-              <p>{value ? `${value.toFixed(1)}%` : 'n/a'}</p>
+              {value ? <p>{value.toFixed(1)}%</p> : <p className="text-muted">&ndash;</p>}
             </div>
           )
         }
@@ -175,9 +177,62 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         if (col.id === 'total_time') {
           return (
             <div className="w-full flex flex-col justify-center text-xs">
-              {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
-                <p>{(value / 1000).toFixed(2) + 's' || 'n/a'}</p>
+              {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p>{(value / 1000).toFixed(2) + 's'}</p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
               )}
+            </div>
+          )
+        }
+
+        if (col.id === 'calls') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p>{value.toLocaleString()}</p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'rows_read') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p>{value.toLocaleString()}</p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        const cacheHitRateToNumber = (value: number | string) => {
+          if (typeof value === 'number') return value
+          return parseFloat(value.toString().replace('%', '')) || 0
+        }
+
+        if (col.id === 'cache_hit_rate') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p>{value.toFixed(1)}%</p>
+              ) : typeof value === 'string' ? (
+                <p>{cacheHitRateToNumber(value)}%</p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'rolname') {
+          return (
+            <div className="w-full flex flex-col justify-center font-mono text-xs">
+              {value ? <p>{value}</p> : <p className="text-muted">&ndash;</p>}
             </div>
           )
         }
