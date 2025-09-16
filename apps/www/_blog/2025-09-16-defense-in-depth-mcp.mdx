@@ -1,5 +1,5 @@
 ---
-title: Defense in Depth for AI Development, Lessons from the Supabase MCP Debate
+title: Defense in Depth for MCP Servers
 description: Learn about the security risks of connecting AI agents to databases and how to implement defense in depth strategies to protect your data from prompt injection attacks.
 author: bilharmer
 image: 2025-09-defense-in-depth-mcp/og.png
@@ -28,7 +28,7 @@ This problem applies to **any** tool, API, or database connection where a large 
 
 It’s worth clarifying a misconception in the post: **Supabase has never offered a hosted MCP server** (though it is on our roadmap). Our MCP implementation is open source and designed for developers to self-host or be hosted by a 3rd party (Cursor, Cline, etc).
 
-## **What’s Real and What’s Not**
+## What’s Real and What’s Not
 
 **First, the reality:**
 
@@ -41,7 +41,7 @@ It’s worth clarifying a misconception in the post: **Supabase has never offere
 - There has been **no reported incident** of any Supabase customer suffering a data leak via MCP.
 - MCP does not “bypass” our database-level protections like Row Level Security (RLS) - these remain fully enforced. Depending on the purpose of the MCP server it may operate at a higher privilege (as was this case).
 
-## **The Real Threat: Prompt Injection**
+## The Real Threat: Prompt Injection
 
 Most people think the biggest risk is “what if the LLM deletes or modifies my data?” That’s why we introduced:
 
@@ -59,7 +59,7 @@ If the AI follows that embedded instruction, it may expose sensitive data uninte
 
 Most MCP clients like Cursor and Claude Code mitigate this by requiring **manual user approval for each tool call** (but beware of user fatigue, it will happen). We recommend always keeping this setting enabled and ensure that nothing is being displayed off screen _(visibility attack)_.
 
-## **Where We Got It Wrong**
+## Where We Got It Wrong
 
 We engineered guardrails:
 
@@ -71,7 +71,7 @@ These approaches **reduced** risk but did not **eliminate** it.
 
 The lesson: **guardrails alone aren’t enough.**
 
-## **The Real Fix: Environment Strategy**
+## The Real Fix: Environment Strategy
 
 The safest approach is clear:
 
@@ -87,7 +87,7 @@ If you’re an AI development platform integrating with Supabase (or any private
 
 If you’re running the full stack including the LLM, strongly consider using CaMeL (CApabilities for MachinE Learning) to separate the untrusted data (quarantined LLM) from the control and data flows (privileged LLM).
 
-## **Our MCP Recommendations**
+## Our MCP Recommendations
 
 From our [MCP security guide](/docs/guides/getting-started/mcp#recommendations):
 
@@ -96,7 +96,7 @@ From our [MCP security guide](/docs/guides/getting-started/mcp#recommendations):
 3. Limit LLM capabilities via feature groups.
 4. Monitor and log all MCP queries.
 
-## **What’s Next**
+## What’s Next
 
 We’re prioritizing a set of security-focused improvements:
 
@@ -106,7 +106,7 @@ We’re prioritizing a set of security-focused improvements:
 - **PostgREST MCP** — leveraging your existing PostgREST permissions and RLS policies.
 - **Access token scopes** — fine-grained API tokens with explicit tool-level and data-level permissions.
 
-## **Trust Is Everything**
+## Trust Is Everything
 
 Please remember, letting an LLM talk directly to your database without controls is like giving an unvetted API client full production credentials. It will execute whatever it’s told—accurate or not—without understanding security, compliance, or business rules. Always keep a protective layer in place to enforce least privilege, validate requests, and prevent accidental or malicious data exposure.
 
