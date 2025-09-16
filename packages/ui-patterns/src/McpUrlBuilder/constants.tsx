@@ -197,4 +197,4 @@ export const MCP_CLIENTS: McpClient[] = [
   },
 ]
 
-export const DEFAULT_BASE_URL = 'https://api.supabase.com/mcp'
+export const DEFAULT_BASE_URL = 'https://mcp.supabase.com/mcp'

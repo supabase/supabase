@@ -1,3 +1,4 @@
+import { DEFAULT_BASE_URL } from '../constants'
 import type { McpClient, McpClientConfig } from '../types'
 
 interface GetMcpUrlOptions {
@@ -15,7 +16,7 @@ interface GetMcpUrlReturn {
 
 export function getMcpUrl({
   projectRef,
-  baseUrl = 'https://api.supabase.com/mcp',
+  baseUrl = DEFAULT_BASE_URL,
   readonly = false,
   features = [],
   selectedClient,
