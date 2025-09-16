@@ -487,7 +487,9 @@ export async function GET(request: NextRequest) {
           }
         }
       } else {
-        console.log('[cms-posts] Versions API failed, response:', await versionsResponse.text())
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[cms-posts] Versions API failed, response:', await versionsResponse.text())
+        }
       }
 
       // Strategy 2: If versions API didn't work, try finding the parent post first, then get its latest published version
