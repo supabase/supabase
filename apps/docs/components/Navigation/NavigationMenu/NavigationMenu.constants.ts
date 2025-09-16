@@ -2436,6 +2436,32 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/credits' as `/${string}`,
         },
         {
+          name: 'AWS Marketplace',
+          url: '/guides/platform/aws-marketplace' as `/${string}`,
+          items: [
+            {
+              name: 'Getting Started',
+              url: '/guides/platform/aws-marketplace/getting-started' as `/${string}`,
+            },
+            {
+              name: 'Account Setup',
+              url: '/guides/platform/aws-marketplace/account-setup' as `/${string}`,
+            },
+            {
+              name: 'Manage your subscription',
+              url: '/guides/platform/aws-marketplace/manage-your-subscription' as `/${string}`,
+            },
+            {
+              name: 'Invoices',
+              url: '/guides/platform/aws-marketplace/invoices' as `/${string}`,
+            },
+            {
+              name: 'FAQ',
+              url: '/guides/platform/aws-marketplace/faq' as `/${string}`,
+            },
+          ],
+        },
+        {
           name: 'Billing FAQ',
           url: '/guides/platform/billing-faq' as `/${string}`,
         },
