@@ -125,6 +125,11 @@
       "description": "Enable documentation for self-hosting"
     },
 
+    "edge_functions:show_all_templates": {
+      "type": "boolean",
+      "description": "Show all edge function templates in the edge functions page. If false, shows a subset of templates"
+    },
+
     "feedback:docs": {
       "type": "boolean",
       "description": "Enable feedback submission for docs site"

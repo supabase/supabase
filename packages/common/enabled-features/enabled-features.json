@@ -36,6 +36,8 @@
   "docs:compliance": true,
   "docs:self-hosting": true,
 
+  "edge_functions:show_all_templates": true,
+
   "feedback:docs": true,
 
   "integrations:vercel": true,
