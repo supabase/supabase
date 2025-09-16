@@ -167,7 +167,7 @@ const PreviewBranchActions = ({
 }) => {
   const gitlessBranching = useIsBranching2Enabled()
   const queryClient = useQueryClient()
-  const projectRef = branch.parent_project_ref ?? branch.project_ref
+  const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
   const { can: canDeleteBranches } = useAsyncCheckProjectPermissions(
     PermissionAction.DELETE,
@@ -178,7 +178,7 @@ const PreviewBranchActions = ({
     'preview_branches'
   )
 
-  const { data } = useBranchQuery({ projectRef, id: branch.id })
+  const { data } = useBranchQuery({ projectRef, branchRef })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
