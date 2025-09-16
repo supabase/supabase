@@ -45,16 +45,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const [selectedRow, setSelectedRow] = useState<number>()
   const reportType = QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED
 
-  console.log(
-    'Cache Debug Data:',
-    data?.map((row) => ({
-      query: row.query?.substring(0, 50) + '...',
-      debug_hit: row.debug_hit,
-      debug_read: row.debug_read,
-      cache_hit_rate: row.cache_hit_rate,
-    }))
-  )
-
   const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
     const nonSortableColumns = ['query']
 
