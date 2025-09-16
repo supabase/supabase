@@ -28,16 +28,16 @@ const useCustomContent = <T extends CustomContent[]>(
   contents: T
 ): {
   [key in CustomContentToCamelCase<T[number]>]:
-    | (typeof customContentStaticObj)[CustomContent]
     | CustomContentTypes[CustomContentToCamelCase<T[number]>]
+    | null
 } => {
   // [Joshen] Running into some TS errors without the `as` here - must be overlooking something super simple
   return Object.fromEntries(
     contents.map((content) => [contentToCamelCase(content), customContentStaticObj[content]])
   ) as {
     [key in CustomContentToCamelCase<T[number]>]:
-      | (typeof customContentStaticObj)[CustomContent]
       | CustomContentTypes[CustomContentToCamelCase<T[number]>]
+      | null
   }
 }
 

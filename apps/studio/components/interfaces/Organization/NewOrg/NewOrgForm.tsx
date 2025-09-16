@@ -9,14 +9,23 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { loadStripe } from '@stripe/stripe-js'
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
+import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useProfile } from 'lib/profile'
+import { useTheme } from 'next-themes'
 import {
   Button,
   Input_Shadcn_,
@@ -32,19 +41,10 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
-import { loadStripe } from '@stripe/stripe-js'
-import { useTheme } from 'next-themes'
-import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
-import { useProfile } from 'lib/profile'
-import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
-} from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
-import { components } from 'api-types'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
+} from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -102,9 +102,12 @@ const newMandatoryAddressInput = true
 const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
-  const { data: organizations, isSuccess } = useOrganizationsQuery()
-  const { data: projects } = useProjectsQuery()
   const { resolvedTheme } = useTheme()
+
+  const isBillingEnabled = useIsFeatureEnabled('billing:all')
+
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
+  const { data } = useProjectsQuery()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -114,8 +117,8 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
   const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
 
   const projectsByOrg = useMemo(() => {
-    return _.groupBy(projects || [], 'organization_slug')
-  }, [projects])
+    return _.groupBy(data?.projects ?? [], 'organization_slug')
+  }, [data])
 
   const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
     useState(false)
@@ -461,55 +464,57 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
           </Panel.Content>
         )}
 
-        <Panel.Content>
-          <div className="grid grid-cols-3">
-            <div className="flex flex-col gap-2">
-              <Label_Shadcn_ htmlFor="plan" className=" text-sm">
-                Plan
-              </Label_Shadcn_>
-
-              <a
-                href="https://supabase.com/pricing"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-sm flex items-center gap-2 opacity-75 hover:opacity-100 transition"
-              >
-                Pricing
-                <ExternalLink size={16} strokeWidth={1.5} />
-              </a>
-            </div>
-            <div className="col-span-2">
-              <Select_Shadcn_
-                value={formState.plan}
-                onValueChange={(value) => {
-                  updateForm('plan', value)
-                  onPlanSelected(value)
-                }}
-              >
-                <SelectTrigger_Shadcn_ id="plan" className="w-full">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
-
-                <SelectContent_Shadcn_>
-                  {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-                    <SelectItem_Shadcn_ key={k} value={k} translate="no">
-                      {v}
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-
-              <div className="mt-1">
-                <Label_Shadcn_
-                  htmlFor="plan"
-                  className="text-foreground-lighter leading-normal text-sm"
-                >
-                  The Plan applies to your new organization.
+        {isBillingEnabled && (
+          <Panel.Content>
+            <div className="grid grid-cols-3">
+              <div className="flex flex-col gap-2">
+                <Label_Shadcn_ htmlFor="plan" className=" text-sm">
+                  Plan
                 </Label_Shadcn_>
+
+                <a
+                  href="https://supabase.com/pricing"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-sm flex items-center gap-2 opacity-75 hover:opacity-100 transition"
+                >
+                  Pricing
+                  <ExternalLink size={16} strokeWidth={1.5} />
+                </a>
+              </div>
+              <div className="col-span-2">
+                <Select_Shadcn_
+                  value={formState.plan}
+                  onValueChange={(value) => {
+                    updateForm('plan', value)
+                    onPlanSelected(value)
+                  }}
+                >
+                  <SelectTrigger_Shadcn_ id="plan" className="w-full">
+                    <SelectValue_Shadcn_ />
+                  </SelectTrigger_Shadcn_>
+
+                  <SelectContent_Shadcn_>
+                    {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
+                      <SelectItem_Shadcn_ key={k} value={k} translate="no">
+                        {v}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+
+                <div className="mt-1">
+                  <Label_Shadcn_
+                    htmlFor="plan"
+                    className="text-foreground-lighter leading-normal text-sm"
+                  >
+                    The Plan applies to your new organization.
+                  </Label_Shadcn_>
+                </div>
               </div>
             </div>
-          </div>
-        </Panel.Content>
+          </Panel.Content>
+        )}
 
         {formState.plan === 'PRO' && (
           <>

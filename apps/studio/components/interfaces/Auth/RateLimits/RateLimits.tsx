@@ -30,7 +30,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 
-const RateLimits = () => {
+export const RateLimits = () => {
   const { ref: projectRef } = useParams()
   const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
@@ -505,5 +505,3 @@ const RateLimits = () => {
     </ScaffoldSection>
   )
 }
-
-export default RateLimits

@@ -1,3 +1,6 @@
+import Head from 'next/head'
+import { useMemo, useState } from 'react'
+
 import { useParams } from 'common'
 import { ProjectClaimBenefits } from 'components/interfaces/Organization/ProjectClaim/benefits'
 import { ProjectClaimChooseOrg } from 'components/interfaces/Organization/ProjectClaim/choose-org'
@@ -8,10 +11,8 @@ import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorizati
 import { useOrganizationProjectClaimQuery } from 'data/organizations/organization-project-claim-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
-import Head from 'next/head'
-import { useMemo, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { Alert } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const ClaimProjectPage: NextPageWithLayout = () => {
   const { auth_id, token: claimToken } = useParams()
@@ -48,8 +49,8 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 
   if ((selectedOrgSlug && claimToken && isLoadingProjectClaim) || isLoadingRequester) {
     return (
-      <ProjectClaimLayout title="Claim a project">
-        <div className="py-6 space-y-2">
+      <ProjectClaimLayout title="Claim a project" className="py-6">
+        <div className="space-y-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />
@@ -60,23 +61,16 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 
   if ((selectedOrgSlug && claimToken && isErrorProjectClaim) || isErrorRequester) {
     return (
-      <ProjectClaimLayout title="Claim a project">
-        <div className="py-6">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Failed to retrieve project claim request details"
-          >
-            <p>Please retry your claim request from the requesting app</p>
-            {errorProjectClaim != undefined && (
-              <p className="mt-2">Error: {errorProjectClaim?.message}</p>
-            )}
-            {errorRequester != undefined && (
-              <p className="mt-2">Error: {errorRequester?.message}</p>
-            )}
-            <p>Please go back to the requesting app and try again.</p>
-          </Alert>
-        </div>
+      <ProjectClaimLayout title="Claim a project" className="py-6">
+        <Admonition
+          type="warning"
+          className="mb-0"
+          title="Failed to retrieve project claim request details"
+        >
+          <p>Please retry your claim request from the requesting app</p>
+          {!!errorProjectClaim && <p className="mt-2">Error: {errorProjectClaim?.message}</p>}
+          {!!errorRequester && <p className="mt-2">Error: {errorRequester?.message}</p>}
+        </Admonition>
       </ProjectClaimLayout>
     )
   }
@@ -112,6 +106,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
       />
     )
   }
+
   return null
 }
 
@@ -120,7 +115,7 @@ ClaimProjectPage.getLayout = (page) => (
     <Head>
       <title>Claim project | Supabase</title>
     </Head>
-    <main className="flex-grow flex flex-col w-full h-full overflow-y-auto">{page}</main>
+    <main className="flex flex-col w-full min-h-screen overflow-y-auto">{page}</main>
   </>
 )
 

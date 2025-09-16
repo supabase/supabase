@@ -10,9 +10,8 @@ import {
   useState,
 } from 'react'
 
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 

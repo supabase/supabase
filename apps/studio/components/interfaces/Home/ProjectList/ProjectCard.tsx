@@ -1,26 +1,26 @@
-import { GitBranch, Github } from 'lucide-react'
+import { Github } from 'lucide-react'
+import InlineSVG from 'react-inlinesvg'
 
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import type { ProjectInfo } from 'data/projects/projects-query'
+import { OrgProject } from 'data/projects/projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
-import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
-  project: ProjectInfo
+  project: OrgProject
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection
   resourceWarnings?: ResourceWarning
 }
 
-const ProjectCard = ({
+export const ProjectCard = ({
   project,
   rewriteHref,
   githubIntegration,
@@ -34,14 +34,13 @@ const ProjectCard = ({
     'project_homepage:show_instance_size',
   ])
 
-  const isBranchingEnabled = project.preview_branch_refs?.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
-  const projectStatus = inferProjectStatus(project)
+  const projectStatus = inferProjectStatus(project.status)
 
   return (
-    <li className="list-none">
+    <li className="list-none h-min">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         className="h-44 !px-0 group pt-5 pb-0"
@@ -60,11 +59,6 @@ const ProjectCard = ({
                     title="Vercel Icon"
                     className="w-3"
                   />
-                </div>
-              )}
-              {isBranchingEnabled && (
-                <div className="w-fit p-1 border rounded-md flex items-center">
-                  <GitBranch size={12} strokeWidth={1.5} />
                 </div>
               )}
               {isGithubIntegrated && (
@@ -86,5 +80,3 @@ const ProjectCard = ({
     </li>
   )
 }
-
-export default ProjectCard

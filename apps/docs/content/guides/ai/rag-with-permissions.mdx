@@ -113,13 +113,13 @@ You may have an existing system that stores users, documents, and their permissi
 
 <Admonition type="caution">
 
-RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](https://supabase.com/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
+RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
 
 </Admonition>
 
 <Admonition type="tip">
 
-For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, contact [support](https://supabase.com/dashboard/support/new) and we'll be happy to discuss your use case.
+For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, contact [support](/dashboard/support/new) and we'll be happy to discuss your use case.
 
 </Admonition>
 
@@ -189,7 +189,7 @@ Since we're managing users and authentication outside of Supabase, we have two o
 
 #### Direct Postgres connection
 
-You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/database/settings) on your project's Database Settings page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
+You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/?showConnect=true) on a project page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
 
 ```sql
 -- enable row level security
@@ -271,4 +271,4 @@ order by document_sections.embedding <#> embedding;
 
 There are endless approaches to this problem based on the complexities of each system. Luckily Postgres comes with all the primitives needed to provide access control in the way that works best for your project.
 
-If the examples above didn't fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to [support](https://supabase.com/dashboard/support/new) and we'll be happy to assist you.
+If the examples above didn't fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to [support](/dashboard/support/new) and we'll be happy to assist you.
