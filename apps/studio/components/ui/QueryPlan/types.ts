@@ -74,6 +74,10 @@ export type PlanRoot = Readonly<{
   }
 }>
 
+export type ExplainPlanRow = Readonly<{
+  'QUERY PLAN': PlanRoot[]
+}>
+
 export type PlanMeta = Readonly<{
   planningTime?: number
   executionTime?: number

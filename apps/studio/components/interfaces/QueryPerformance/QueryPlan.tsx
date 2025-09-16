@@ -1,6 +1,7 @@
 import { type PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 
+import type { ExplainPlanRow } from 'components/ui/QueryPlan/types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -42,7 +43,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
 
   const [isExecutingExplain, setIsExecutingExplain] = useState(false)
   const [explainError, setExplainError] = useState<{ title: string; message?: string } | null>(null)
-  const [rawExplainResult, setRawExplainResult] = useState<any[] | null>(null)
+  const [rawExplainResult, setRawExplainResult] = useState<ExplainPlanRow[] | null>(null)
 
   const cleanedSql = useMemo(() => {
     const cleanedSql = removeCommentsFromSql(query)
@@ -91,7 +92,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
         setIsExecutingExplain(true)
 
         const explainSql = `EXPLAIN (ANALYZE, BUFFERS, VERBOSE, FORMAT JSON) ${cleanedSql}`
-        const { result } = await executeSql<any[]>({
+        const { result } = await executeSql<ExplainPlanRow[]>({
           projectRef,
           connectionString,
           sql: explainSql,
@@ -114,19 +115,10 @@ export const QueryPlan = ({ query }: { query: string }) => {
 
   const explainJsonString = useMemo(() => {
     if (!rawExplainResult || rawExplainResult.length === 0) return null
-    const row = rawExplainResult[0]
-    const value =
-      (row && (row['QUERY PLAN'] ?? row['query plan'] ?? row.query_plan ?? row.queryPlan)) ?? null
-    if (value == null) return null
 
-    if (typeof value === 'string') {
-      try {
-        const parsed = JSON.parse(value)
-        return JSON.stringify(parsed)
-      } catch {
-        return value
-      }
-    }
+    const value = rawExplainResult[0]['QUERY PLAN']
+    if (!value) return null
+
     try {
       return JSON.stringify(value)
     } catch {
