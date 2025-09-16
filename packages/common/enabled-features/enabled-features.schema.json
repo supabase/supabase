@@ -255,6 +255,11 @@
     "sdk:swift": {
       "type": "boolean",
       "description": "Enable the Swift SDK"
+    },
+
+    "search:fullIndex": {
+      "type": "boolean",
+      "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
     }
   },
   "required": [
@@ -314,7 +319,8 @@
     "sdk:dart",
     "sdk:kotlin",
     "sdk:python",
-    "sdk:swift"
+    "sdk:swift",
+    "search:fullIndex"
   ],
   "additionalProperties": false
 }
