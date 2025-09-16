@@ -15,7 +15,7 @@ const JsonMonacoBlock = dynamic(
 )
 
 const NoData = () => {
-  return <div className="text-foreground-lighter">(none)</div>
+  return <div className="text-foreground-lighter">none</div>
 }
 
 export const DetailsPanel = ({
