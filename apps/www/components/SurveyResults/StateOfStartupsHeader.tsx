@@ -58,7 +58,7 @@ const TextBlock = ({
   <div className="flex w-full items-stretch">
     <div className={`inline-block ${bgColor}`}>
       <span
-        className={`${textColor} text-[2rem] md:text-[4rem] px-2.5 md:px-5 py-1.5 md:py-3 inline-block leading-none tracking-tight`}
+        className={`${textColor} text-[2rem] md:text-[4rem] px-2.5 md:px-8 py-1.5 md:py-3 inline-block leading-none tracking-tight`}
         // style={{ fontFamily: SUISSE_FONT_FAMILY }}
       >
         {text}
@@ -95,21 +95,21 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
           <h1 className="sr-only">State of Startups 2025</h1>
           <TextBlock
             text="State"
-            bgColor="bg-foreground"
-            textColor="text-background"
+            bgColor="bg-brand-300"
+            textColor="text-brand"
             showProgressBar={showProgressBars}
             delay={randomDelays[0]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
-            progressFgColor="bg-brand-200 dark:bg-foreground"
+            progressFgColor="bg-brand-300"
           />
           <TextBlock
             text="of"
-            bgColor="bg-foreground"
-            textColor="text-background"
+            bgColor="bg-brand-300"
+            textColor="text-brand"
             showProgressBar={showProgressBars}
             delay={randomDelays[1]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
-            progressFgColor="bg-brand-200 dark:bg-foreground"
+            progressFgColor="bg-brand-300"
           />
           <TextBlock
             text="Startups"
@@ -122,12 +122,12 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
           />
           <TextBlock
             text="2025"
-            bgColor="bg-surface-300"
+            bgColor="bg-brand-500"
             textColor="text-foreground"
             showProgressBar={showProgressBars}
             delay={randomDelays[3]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
-            progressFgColor="bg-brand-400 dark:bg-surface-300"
+            progressFgColor="bg-brand-500"
           />
         </div>
       </div>
