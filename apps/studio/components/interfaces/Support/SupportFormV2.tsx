@@ -80,7 +80,7 @@ export const SupportFormV2 = ({
     error,
   } = useParams()
   const router = useRouter()
-  const dashboardSentryId = router.query.sid as string
+  const dashboardSentryIssueId = router.query.sid as string
 
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -227,7 +227,7 @@ export const SupportFormV2 = ({
         .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
         .join(';'),
       browserInformation: detectBrowser(),
-      ...(dashboardSentryId && { dashboardSentryId }),
+      ...(dashboardSentryIssueId && { dashboardSentryIssueId }),
     }
 
     if (values.projectRef !== 'no-project') {
