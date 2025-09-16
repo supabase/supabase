@@ -23,7 +23,13 @@ import {
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { FileExplorerRow } from './FileExplorerRow'
 
-const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
+interface DragOverOverlayProps {
+  isOpen: boolean
+  onDragLeave: () => void
+  onDrop: () => void
+}
+
+const DragOverOverlay = ({ isOpen, onDragLeave, onDrop }: DragOverOverlayProps) => {
   return (
     <Transition
       show={isOpen}
@@ -41,17 +47,15 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
         className="absolute top-0 flex h-full w-full items-center justify-center pointer-events-auto"
         style={{ backgroundColor: folderIsEmpty ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.2)' }}
       >
-        {!folderIsEmpty && (
-          <div
-            className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
-            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
-          >
-            <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
-            <p className="text-center text-sm  text-white mt-2 pointer-events-none">
-              Drop your files to upload to this folder
-            </p>
-          </div>
-        )}
+        <div
+          className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
+          style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+        >
+          <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+          <p className="text-center text-sm  text-white mt-2 pointer-events-none">
+            Drop your files to upload to this folder
+          </p>
+        </div>
       </div>
     </Transition>
   )
@@ -252,8 +256,31 @@ export const FileExplorerColumn = ({
     })
   }
 
+  // Handle external file drag over for uploads (separate from react-dnd)
+  const onDragOver = (event: any) => {
+    if (event) {
+      event.stopPropagation()
+      event.preventDefault()
+
+      // Only show overlay for external file drags (not internal storage-item drags)
+      // Check if this is an external file drag by looking for file types in dataTransfer
+      const hasFiles =
+        event.dataTransfer.items &&
+        Array.from(event.dataTransfer.items).some((item: any) => item.kind === 'file')
+      const hasInternalType = event.dataTransfer.types.includes('storage-item')
+
+      // Only show overlay for external file drags (has files but no internal storage-item type)
+      if (hasFiles && !hasInternalType && event.type === 'dragover' && !isDraggedOver) {
+        setIsDraggedOver(true)
+      }
+    }
+  }
+
   // Handle external file drops for uploads (separate from react-dnd)
   const handleExternalFileDrop = (event: any) => {
+    // Reset drag state
+    setIsDraggedOver(false)
+
     if (!canUpdateStorage) {
       toast('You need additional permissions to upload files to this project')
       return
@@ -301,6 +328,7 @@ export const FileExplorerColumn = ({
         (dropProps.isOver || isDraggedOver) && 'bg-selection/10'
       )}
       onContextMenu={displayMenu}
+      onDragOver={onDragOver}
       onDrop={handleExternalFileDrop}
       onDragLeave={(event) => {
         // Only reset if we're actually leaving the column (not just moving to a child element)
@@ -410,7 +438,6 @@ export const FileExplorerColumn = ({
       {/* Drag drop upload CTA for when column has files */}
       <DragOverOverlay
         isOpen={isDraggedOver}
-        folderIsEmpty={isEmpty}
         onDragLeave={() => {
           setIsDraggedOver(false)
         }}
