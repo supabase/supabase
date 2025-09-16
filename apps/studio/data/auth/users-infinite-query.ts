@@ -44,7 +44,22 @@ export const getUsersSQL = ({
 
   const conditions: string[] = []
   const baseQueryUsers = `
-  select *, coalesce((select array_agg(distinct i.provider) from auth.identities i where i.user_id = auth.users.id), '{}'::text[]) as providers from auth.users
+  select 
+    id,
+    email,
+    banned_until,
+    created_at,
+    confirmed_at,
+    confirmation_sent_at,
+    is_anonymous,
+    is_sso_user,
+    invited_at,
+    last_sign_in_at,
+    phone,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    updated_at,
+    coalesce((select array_agg(distinct i.provider) from auth.identities i where i.user_id = auth.users.id), '{}'::text[]) as providers from auth.users
   `.trim()
 
   if (hasValidKeywords) {
