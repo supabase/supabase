@@ -93,13 +93,13 @@ const BranchesPage: NextPageWithLayout = () => {
 
   const onConfirmDeleteBranch = () => {
     if (selectedBranchToDelete == undefined) return console.error('No branch selected')
-    if (projectRef == undefined) return console.error('Project ref is required')
+    const { project_ref: branchRef, parent_project_ref: projectRef } = selectedBranchToDelete
     deleteBranch(
-      { id: selectedBranchToDelete?.id, projectRef },
+      { branchRef, projectRef },
       {
         onSuccess: () => {
-          if (selectedBranchToDelete.project_ref === ref) {
-            router.push(`/project/${selectedBranchToDelete.parent_project_ref}/branches`)
+          if (branchRef === ref) {
+            router.push(`/project/${projectRef}/branches`)
           }
           // Track delete button click
           sendEvent({

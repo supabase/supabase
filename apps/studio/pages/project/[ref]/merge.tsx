@@ -286,9 +286,9 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const handleCloseBranch = () => {
-    if (!currentBranch?.id || !parentProjectRef) return
+    if (!ref || !parentProjectRef) return
     deleteBranch({
-      id: currentBranch.id,
+      branchRef: ref,
       projectRef: parentProjectRef,
     })
   }
