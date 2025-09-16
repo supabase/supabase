@@ -44,10 +44,7 @@ function HoursOrNeverText({ value }: { value: number }) {
 
 const RefreshTokenSchema = z.object({
   REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce
-    .number()
-    .positive()
-    .min(0, 'Must be a value more than 0'),
+  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
 })
 
 const UserSessionsSchema = z.object({
@@ -202,32 +199,30 @@ export const SessionsAuthSettingsForm = () => {
                   )}
                 />
               </CardContent>
-              {refreshTokenForm.watch('REFRESH_TOKEN_ROTATION_ENABLED') && (
-                <CardContent>
-                  <FormField_Shadcn_
-                    control={refreshTokenForm.control}
-                    name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Refresh token reuse interval"
-                        description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
-                      >
-                        <FormControl_Shadcn_>
-                          <PrePostTab postTab="seconds">
-                            <Input_Shadcn_
-                              type="number"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig}
-                            />
-                          </PrePostTab>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-              )}
+              <CardContent>
+                <FormField_Shadcn_
+                  control={refreshTokenForm.control}
+                  name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Refresh token reuse interval"
+                      description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
+                    >
+                      <FormControl_Shadcn_>
+                        <PrePostTab postTab="seconds">
+                          <Input_Shadcn_
+                            type="number"
+                            min={0}
+                            {...field}
+                            disabled={!canUpdateConfig}
+                          />
+                        </PrePostTab>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
               <CardFooter className="justify-end space-x-2">
                 {refreshTokenForm.formState.isDirty && (
                   <Button type="default" onClick={() => refreshTokenForm.reset()}>
