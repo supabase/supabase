@@ -539,6 +539,38 @@ select
           ${orderBy || 'order by statements.total_exec_time + statements.total_plan_time desc'}
           limit 20`,
       },
+      slowQueriesCount: {
+        queryType: 'db',
+        sql: () => `
+        -- reports-query-performance-slow-queries-count
+        set search_path to public, extensions;
+
+        -- Count of slow queries (> 1 second average)
+        SELECT count(*) as slow_queries_count
+        FROM pg_stat_statements 
+        WHERE statements.mean_exec_time > 1000;`,
+      },
+      queryMetrics: {
+        queryType: 'db',
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        -- reports-query-performance-metrics
+        set search_path to public, extensions;
+      
+        SELECT 
+          COALESCE(ROUND(AVG(statements.rows::numeric / NULLIF(statements.calls, 0)), 1), 0) as avg_rows_per_call,
+          COUNT(*) FILTER (WHERE statements.total_exec_time + statements.total_plan_time > 1000) as slow_queries,
+          COALESCE(
+            ROUND(
+              SUM(statements.shared_blks_hit) * 100.0 / 
+              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0), 
+              2
+            ), 0
+          ) || '%' as cache_hit_rate
+        FROM pg_stat_statements as statements
+        WHERE statements.calls > 0
+        ${where || ''}
+        ${orderBy || ''}`,
+      },
     },
   },
   [Presets.DATABASE]: {
