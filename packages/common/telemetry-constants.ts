@@ -29,7 +29,7 @@ export interface SignUpEvent {
 }
 
 /**
- * Triggered when a user signs in with Github, Email and Password or SSO.
+ * Triggered when a user signs in with GitHub, Email and Password or SSO.
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
@@ -907,6 +907,18 @@ export interface ImportDataButtonClickedEvent {
 }
 
 /**
+ * User dropped a file into the import data dropzone on an empty table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface ImportDataFileDroppedEvent {
+  action: 'import_data_dropzone_file_added'
+  groups: TelemetryGroups
+}
+
+/**
  * User added data from the import data via CSV/spreadsheet successfully.
  *
  * @group Events
@@ -1511,6 +1523,7 @@ export type TelemetryEvent =
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
   | ImportDataButtonClickedEvent
+  | ImportDataFileDroppedEvent
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent

@@ -6,19 +6,27 @@ import { useState } from 'react'
 
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Input } from 'ui'
+import {
+  AiIconAnimation,
+  Card,
+  Input,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
 
@@ -41,7 +49,7 @@ const TriggersList = ({
   const { data: protectedSchemas } = useProtectedSchemas()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
-  const { data = [], isSuccess } = useTablesQuery({
+  const { data = [] } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -58,7 +66,10 @@ const TriggersList = ({
     connectionString: project?.connectionString,
   })
 
-  const canCreateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const { can: canCreateTriggers } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   if (isLoading) {
     return <GenericSkeletonLoader />
@@ -178,30 +189,32 @@ const TriggersList = ({
           {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
           <div className="w-full overflow-hidden overflow-x-auto">
-            <Table
-              head={
-                <>
-                  <Table.th key="name">Name</Table.th>
-                  <Table.th key="table">Table</Table.th>
-                  <Table.th key="function">Function</Table.th>
-                  <Table.th key="events">Events</Table.th>
-                  <Table.th key="orientation">Orientation</Table.th>
-                  <Table.th key="enabled" className="w-20">
-                    Enabled
-                  </Table.th>
-                  <Table.th key="buttons" className="w-1/12"></Table.th>
-                </>
-              }
-              body={
-                <TriggerList
-                  schema={selectedSchema}
-                  filterString={filterString}
-                  isLocked={isSchemaLocked}
-                  editTrigger={editTrigger}
-                  deleteTrigger={deleteTrigger}
-                />
-              }
-            />
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead key="name">Name</TableHead>
+                    <TableHead key="table">Table</TableHead>
+                    <TableHead key="function">Function</TableHead>
+                    <TableHead key="events">Events</TableHead>
+                    <TableHead key="orientation">Orientation</TableHead>
+                    <TableHead key="enabled" className="w-20">
+                      Enabled
+                    </TableHead>
+                    <TableHead key="buttons" className="w-1/12"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TriggerList
+                    schema={selectedSchema}
+                    filterString={filterString}
+                    isLocked={isSchemaLocked}
+                    editTrigger={editTrigger}
+                    deleteTrigger={deleteTrigger}
+                  />
+                </TableBody>
+              </Table>
+            </Card>
           </div>
         </div>
       )}

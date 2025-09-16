@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useWatch } from '@ui/components/shadcn/ui/form'
+import { useParams } from 'common'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -16,7 +17,7 @@ import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/databa
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
@@ -201,11 +202,13 @@ export const CreateCronJobSheet = ({
   setIsClosing,
   onClose,
 }: CreateCronJobSheetProps) => {
+  const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [isLoadingGetCronJob, setIsLoadingGetCronJob] = useState(false)
 
+  const jobId = Number(childId)
   const isEditing = !!selectedCronJob?.jobname
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
 
@@ -220,7 +223,7 @@ export const CreateCronJobSheet = ({
   const { mutate: upsertCronJob, isLoading: isUpserting } = useDatabaseCronJobCreateMutation()
   const isLoading = isLoadingGetCronJob || isUpserting
 
-  const canToggleExtensions = useCheckPermissions(
+  const { can: canToggleExtensions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
@@ -340,6 +343,8 @@ export const CreateCronJobSheet = ({
         connectionString: project?.connectionString,
         query,
         searchTerm: searchQuery,
+        // [Joshen] Only need to invalidate a specific cron job if in the job's previous run tab
+        identifier: !!jobId ? jobId : undefined,
       },
       {
         onSuccess: () => {

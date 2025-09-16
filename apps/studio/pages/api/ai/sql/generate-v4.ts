@@ -117,7 +117,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
+  const {
+    model,
+    error: modelError,
+    promptProviderOptions,
+    providerOptions,
+  } = await getModel({
+    provider: 'openai',
+    model: 'gpt-5',
+    routingKey: projectRef,
+    isLimited,
+  })
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -165,12 +175,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        providerOptions: {
-          bedrock: {
-            // Always cache the system prompt (must not contain dynamic content)
-            cachePoint: { type: 'default' },
-          },
-        },
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
       },
       {
         role: 'assistant',
@@ -197,11 +202,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
+      ...(providerOptions && { providerOptions }),
       tools,
       abortSignal: abortController.signal,
     })
 
     result.pipeUIMessageStreamToResponse(res, {
+      sendReasoning: true,
       onError: (error) => {
         if (error == null) {
           return 'unknown error'

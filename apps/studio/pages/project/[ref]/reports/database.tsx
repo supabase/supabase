@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import ReportChart from 'components/interfaces/Reports/ReportChart'
+import { useFlag, useParams } from 'common'
+import { ReportChart } from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
@@ -21,26 +21,27 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { analyticsKeys } from 'data/analytics/keys'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
-import { formatBytes } from 'lib/helpers'
-
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { formatBytes } from 'lib/helpers'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -99,14 +100,37 @@ const DatabaseUsage = () => {
   const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
-  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
+  const { data: diskConfig } = useDiskAttributesQuery({ projectRef: project?.ref })
+  const { data: maxConnections } = useMaxConnectionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
   })
+  const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
 
-  const REPORT_ATTRIBUTES = getReportAttributes(org!, project!)
-  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(org!, project!)
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
+
+  const REPORT_ATTRIBUTES = getReportAttributes(
+    org!,
+    project!,
+    diskConfig,
+    maxConnections,
+    poolerConfig
+  )
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(
+    org!,
+    project!,
+    diskConfig,
+    maxConnections,
+    poolerConfig
+  )
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
@@ -193,7 +217,7 @@ const DatabaseUsage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
-  }, [db, chart])
+  }, [db, chart, state])
 
   return (
     <>
@@ -210,6 +234,7 @@ const DatabaseUsage = () => {
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={onRefreshReport}
             />
+            <ReportSettings chartId="database-charts" />
             <div className="flex items-center gap-3">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
@@ -244,7 +269,7 @@ const DatabaseUsage = () => {
           orgPlan?.id &&
           (showChartsV2
             ? REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
+                <LazyComposedChartHandler
                   key={chart.id}
                   {...chart}
                   attributes={chart.attributes as MultiAttribute[]}
@@ -253,6 +278,7 @@ const DatabaseUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  syncId="database-charts"
                   showMaxValue={
                     chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
                       ? true
@@ -262,7 +288,7 @@ const DatabaseUsage = () => {
               ))
             : REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart, i) =>
                 chart.availableIn?.includes(orgPlan?.id) ? (
-                  <ComposedChartHandler
+                  <LazyComposedChartHandler
                     key={chart.id}
                     {...chart}
                     attributes={chart.attributes as MultiAttribute[]}
@@ -273,18 +299,17 @@ const DatabaseUsage = () => {
                     defaultChartStyle={
                       chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'
                     }
+                    syncId="database-charts"
                     showMaxValue={
                       chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
                         ? true
                         : chart.showMaxValue
                     }
-                    syncId={chart.syncId}
                   />
                 ) : (
                   <ReportChart
                     key={`${chart.id}-${i}`}
                     chart={chart}
-                    className="!mb-0"
                     interval={selectedDateRange.interval}
                     startDate={selectedDateRange?.period_start?.date}
                     endDate={selectedDateRange?.period_end?.date}
@@ -303,6 +328,7 @@ const DatabaseUsage = () => {
                   label="Replication lag"
                   interval={selectedDateRange.interval}
                   provider="infra-monitoring"
+                  syncId="database-charts"
                 />
               </div>
             </Panel.Content>

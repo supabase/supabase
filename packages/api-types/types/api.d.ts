@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  '/v1/branches/{branch_id}': {
+  '/v1/branches/{branch_id_or_ref}': {
     parameters: {
       query?: never
       header?: never
@@ -32,7 +32,7 @@ export interface paths {
     patch: operations['v1-update-a-branch-config']
     trace?: never
   }
-  '/v1/branches/{branch_id}/diff': {
+  '/v1/branches/{branch_id_or_ref}/diff': {
     parameters: {
       query?: never
       header?: never
@@ -52,7 +52,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/merge': {
+  '/v1/branches/{branch_id_or_ref}/merge': {
     parameters: {
       query?: never
       header?: never
@@ -72,7 +72,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/push': {
+  '/v1/branches/{branch_id_or_ref}/push': {
     parameters: {
       query?: never
       header?: never
@@ -92,7 +92,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/reset': {
+  '/v1/branches/{branch_id_or_ref}/reset': {
     parameters: {
       query?: never
       header?: never
@@ -337,6 +337,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/analytics/endpoints/functions.combined-stats': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a project's function combined statistics */
+    get: operations['v1-get-project-function-combined-stats']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/analytics/endpoints/logs.all': {
     parameters: {
       query?: never
@@ -548,6 +565,24 @@ export interface paths {
     post: operations['v1-create-project-claim-token']
     /** Revokes project claim token */
     delete: operations['v1-delete-project-claim-token']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/cli/login-role': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Create a login role for CLI with temporary password */
+    post: operations['v1-create-login-role']
+    /** [Beta] Delete existing login roles used by CLI */
+    delete: operations['v1-delete-login-roles']
     options?: never
     head?: never
     patch?: never
@@ -946,7 +981,11 @@ export interface paths {
      * @description Modifies the roles that can be assumed and for how long
      */
     put: operations['v1-update-jit-access']
-    post?: never
+    /**
+     * Authorize user-id to role mappings for JIT access
+     * @description Authorizes the request to assume a role in the project database
+     */
+    post: operations['v1-authorize-jit-access']
     delete?: never
     options?: never
     head?: never
@@ -1234,7 +1273,8 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** [Alpha] Updates project's network restrictions by adding or removing CIDRs */
+    patch: operations['v1-patch-network-restrictions']
     trace?: never
   }
   '/v1/projects/{ref}/network-restrictions/apply': {
@@ -1773,6 +1813,7 @@ export interface components {
       external_twitter_client_id: string | null
       external_twitter_enabled: boolean | null
       external_twitter_secret: string | null
+      external_web3_ethereum_enabled: boolean | null
       external_web3_solana_enabled: boolean | null
       external_workos_client_id: string | null
       external_workos_enabled: boolean | null
@@ -1827,6 +1868,8 @@ export interface components {
       mfa_totp_verify_enabled: boolean | null
       mfa_web_authn_enroll_enabled: boolean | null
       mfa_web_authn_verify_enabled: boolean | null
+      nimbus_oauth_client_id: string | null
+      nimbus_oauth_client_secret: string | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       /** @enum {string|null} */
@@ -1893,6 +1936,10 @@ export interface components {
       smtp_user: string | null
       uri_allow_list: string | null
     }
+    AuthorizeJitAccessBody: {
+      rhost: string
+      role: string
+    }
     BranchActionBody: {
       migration_version?: string
     }
@@ -1958,6 +2005,7 @@ export interface components {
         | 'FUNCTIONS_FAILED'
       /** Format: date-time */
       updated_at: string
+      with_data: boolean
     }
     BranchUpdateResponse: {
       /** @enum {string} */
@@ -2075,6 +2123,12 @@ export interface components {
       domains?: string[]
       metadata_url?: string
       metadata_xml?: string
+      /** @enum {string} */
+      name_id_format?:
+        | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+        | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       /**
        * @description What type of provider will be created
        * @enum {string}
@@ -2105,8 +2159,23 @@ export interface components {
         id: string
         metadata_url?: string
         metadata_xml?: string
+        /** @enum {string} */
+        name_id_format?:
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
+    }
+    CreateRoleBody: {
+      read_only: boolean
+    }
+    CreateRoleResponse: {
+      password: string
+      role: string
+      /** Format: int64 */
+      ttl_seconds: number
     }
     CreateSecretBody: {
       /**
@@ -2219,8 +2288,18 @@ export interface components {
         id: string
         metadata_url?: string
         metadata_xml?: string
+        /** @enum {string} */
+        name_id_format?:
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
+    }
+    DeleteRolesResponse: {
+      /** @enum {string} */
+      message: 'ok'
     }
     DeployFunctionResponse: {
       /** Format: int64 */
@@ -2328,6 +2407,12 @@ export interface components {
         id: string
         metadata_url?: string
         metadata_xml?: string
+        /** @enum {string} */
+        name_id_format?:
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
     }
@@ -2335,16 +2420,48 @@ export interface components {
       /** Format: uuid */
       user_id: string
       user_roles: {
-        expires_at?: string
+        allowed_networks?: {
+          allowed_cidrs?: {
+            cidr: string
+          }[]
+          allowed_cidrs_v6?: {
+            cidr: string
+          }[]
+        }
+        expires_at?: number
         role: string
       }[]
+    }
+    JitAuthorizeAccessResponse: {
+      /** Format: uuid */
+      user_id: string
+      user_role: {
+        allowed_networks?: {
+          allowed_cidrs?: {
+            cidr: string
+          }[]
+          allowed_cidrs_v6?: {
+            cidr: string
+          }[]
+        }
+        expires_at?: number
+        role: string
+      }
     }
     JitListAccessResponse: {
       items: {
         /** Format: uuid */
         user_id: string
         user_roles: {
-          expires_at?: string
+          allowed_networks?: {
+            allowed_cidrs?: {
+              cidr: string
+            }[]
+            allowed_cidrs_v6?: {
+              cidr: string
+            }[]
+          }
+          expires_at?: number
           role: string
         }[]
       }[]
@@ -2482,6 +2599,12 @@ export interface components {
           id: string
           metadata_url?: string
           metadata_xml?: string
+          /** @enum {string} */
+          name_id_format?:
+            | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+            | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+            | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+            | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
         }
         updated_at?: string
       }[]
@@ -2496,11 +2619,23 @@ export interface components {
         type: string
       }[]
     }
+    NetworkRestrictionsPatchRequest: {
+      add?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+      remove?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+    }
     NetworkRestrictionsRequest: {
       dbAllowedCidrs?: string[]
       dbAllowedCidrsV6?: string[]
     }
     NetworkRestrictionsResponse: {
+      /** Format: date-time */
+      applied_at?: string
       /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
       config: {
         dbAllowedCidrs?: string[]
@@ -2515,6 +2650,34 @@ export interface components {
       }
       /** @enum {string} */
       status: 'stored' | 'applied'
+      /** Format: date-time */
+      updated_at?: string
+    }
+    NetworkRestrictionsV2Response: {
+      /** Format: date-time */
+      applied_at?: string
+      /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
+      config: {
+        dbAllowedCidrs?: {
+          address: string
+          /** @enum {string} */
+          type: 'v4' | 'v6'
+        }[]
+      }
+      /** @enum {string} */
+      entitlement: 'disallowed' | 'allowed'
+      /** @description Populated when a new config has been received, but not registered as successfully applied to a project. */
+      old_config?: {
+        dbAllowedCidrs?: {
+          address: string
+          /** @enum {string} */
+          type: 'v4' | 'v6'
+        }[]
+      }
+      /** @enum {string} */
+      status: 'stored' | 'applied'
+      /** Format: date-time */
+      updated_at?: string
     }
     OAuthRevokeTokenBody: {
       /** Format: uuid */
@@ -2663,7 +2826,13 @@ export interface components {
     }
     RemoveNetworkBanRequest: {
       identifier?: string
+      /** @description List of IP addresses to unban. */
       ipv4_addresses: string[]
+      /**
+       * @description Include requester's public IP in the list of addresses to unban.
+       * @default false
+       */
+      requester_ip?: boolean
     }
     RemoveReadReplicaBody: {
       database_identifier: string
@@ -2925,6 +3094,7 @@ export interface components {
       external_twitter_client_id?: string | null
       external_twitter_enabled?: boolean | null
       external_twitter_secret?: string | null
+      external_web3_ethereum_enabled?: boolean | null
       external_web3_solana_enabled?: boolean | null
       external_workos_client_id?: string | null
       external_workos_enabled?: boolean | null
@@ -2979,6 +3149,8 @@ export interface components {
       mfa_totp_verify_enabled?: boolean | null
       mfa_web_authn_enroll_enabled?: boolean | null
       mfa_web_authn_verify_enabled?: boolean | null
+      nimbus_oauth_client_id?: string | null
+      nimbus_oauth_client_secret?: string | null
       password_hibp_enabled?: boolean | null
       password_min_length?: number | null
       /** @enum {string|null} */
@@ -3105,7 +3277,15 @@ export interface components {
     }
     UpdateJitAccessBody: {
       roles: {
-        expires_at?: string
+        allowed_networks?: {
+          allowed_cidrs?: {
+            cidr: string
+          }[]
+          allowed_cidrs_v6?: {
+            cidr: string
+          }[]
+        }
+        expires_at?: number
         role: string
       }[]
       /** Format: uuid */
@@ -3155,6 +3335,12 @@ export interface components {
       domains?: string[]
       metadata_url?: string
       metadata_xml?: string
+      /** @enum {string} */
+      name_id_format?:
+        | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+        | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
     }
     UpdateProviderResponse: {
       created_at?: string
@@ -3180,6 +3366,12 @@ export interface components {
         id: string
         metadata_url?: string
         metadata_xml?: string
+        /** @enum {string} */
+        name_id_format?:
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
     }
@@ -3452,6 +3644,7 @@ export interface components {
           | 'auth_password_policy_missing'
           | 'leaked_service_key'
           | 'no_backup_admin'
+          | 'vulnerable_postgres_version'
         remediation: string
         title: string
       }[]
@@ -3573,7 +3766,15 @@ export interface components {
             healthy: boolean
           }
       /** @enum {string} */
-      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
+      name:
+        | 'auth'
+        | 'db'
+        | 'db_postgres_user'
+        | 'pooler'
+        | 'realtime'
+        | 'rest'
+        | 'storage'
+        | 'pg_bouncer'
       /** @enum {string} */
       status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
     }
@@ -3626,7 +3827,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3655,7 +3856,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3684,7 +3885,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3719,7 +3920,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3748,7 +3949,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3781,7 +3982,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -3814,7 +4015,7 @@ export interface operations {
       header?: never
       path: {
         /** @description Branch ID */
-        branch_id: string
+        branch_id_or_ref: string
       }
       cookie?: never
     }
@@ -4273,6 +4474,44 @@ export interface operations {
       }
     }
   }
+  'v1-get-project-function-combined-stats': {
+    parameters: {
+      query: {
+        function_id: string
+        interval: '15min' | '1hr' | '3hr' | '1day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's function combined statistics */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-project-logs': {
     parameters: {
       query?: {
@@ -4682,7 +4921,30 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        addon_variant: unknown
+        addon_variant:
+          | (
+              | 'ci_micro'
+              | 'ci_small'
+              | 'ci_medium'
+              | 'ci_large'
+              | 'ci_xlarge'
+              | 'ci_2xlarge'
+              | 'ci_4xlarge'
+              | 'ci_8xlarge'
+              | 'ci_12xlarge'
+              | 'ci_16xlarge'
+              | 'ci_24xlarge'
+              | 'ci_24xlarge_optimized_cpu'
+              | 'ci_24xlarge_optimized_memory'
+              | 'ci_24xlarge_high_memory'
+              | 'ci_48xlarge'
+              | 'ci_48xlarge_optimized_cpu'
+              | 'ci_48xlarge_optimized_memory'
+              | 'ci_48xlarge_high_memory'
+            )
+          | 'cd_default'
+          | ('pitr_7' | 'pitr_14' | 'pitr_28')
+          | 'ipv4_default'
         /** @description Project ref */
         ref: string
       }
@@ -4929,6 +5191,80 @@ export interface operations {
         content?: never
       }
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-create-login-role': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateRoleBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateRoleResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create login role */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-login-roles': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DeleteRolesResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete login roles */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -5576,6 +5912,12 @@ export interface operations {
           'application/json': components['schemas']['SupavisorConfigResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's supavisor config */
       500: {
         headers: {
@@ -6073,6 +6415,12 @@ export interface operations {
           'application/json': components['schemas']['V1RestorePointResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   'v1-undo': {
@@ -6199,6 +6547,45 @@ export interface operations {
         content?: never
       }
       /** @description Failed to upsert database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-authorize-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AuthorizeJitAccessBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAuthorizeAccessResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to authorize database jit access */
       500: {
         headers: {
           [name: string]: unknown
@@ -6520,6 +6907,13 @@ export interface operations {
           'application/json': components['schemas']['BulkUpdateFunctionResponse']
         }
       }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       403: {
         headers: {
           [name: string]: unknown
@@ -6569,6 +6963,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['FunctionResponse']
         }
+      }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       403: {
         headers: {
@@ -6774,6 +7175,13 @@ export interface operations {
           'application/json': components['schemas']['DeployFunctionResponse']
         }
       }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       403: {
         headers: {
           [name: string]: unknown
@@ -6792,7 +7200,16 @@ export interface operations {
   'v1-get-services-health': {
     parameters: {
       query: {
-        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
+        services: (
+          | 'auth'
+          | 'db'
+          | 'db_postgres_user'
+          | 'pooler'
+          | 'realtime'
+          | 'rest'
+          | 'storage'
+          | 'pg_bouncer'
+        )[]
         timeout_ms?: number
       }
       header?: never
@@ -6961,6 +7378,45 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve project's network restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-patch-network-restrictions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NetworkRestrictionsPatchRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NetworkRestrictionsV2Response']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project network restrictions */
       500: {
         headers: {
           [name: string]: unknown

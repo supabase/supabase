@@ -6,8 +6,17 @@ import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import {
+  cn,
+  EyeOffIcon,
+  Input_Shadcn_,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  WarningIcon,
+} from 'ui'
 
 // to add in later with follow up PR
 // import CreatePublishableAPIKeyDialog from './CreatePublishableAPIKeyDialog'
@@ -27,7 +36,7 @@ export const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
-  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     '*'
   )
@@ -47,14 +56,25 @@ export const PublishableAPIKeys = () => {
             <span className="text-sm">Publishable key</span>
             <div className="flex items-center gap-2">
               <ApiKeyInput />
-              <CopyButton
-                iconOnly
-                size="tiny"
-                type="default"
-                className="px-2 rounded-full"
-                disabled={isPermissionsLoading || isLoadingApiKeys || !canReadAPIKeys}
-                text={apiKey?.api_key}
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <CopyButton
+                    iconOnly
+                    size="tiny"
+                    type="default"
+                    className="px-2 rounded-full"
+                    disabled={isPermissionsLoading || isLoadingApiKeys || !canReadAPIKeys}
+                    text={apiKey?.api_key}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  {!canReadAPIKeys
+                    ? 'You need additional permissions to copy publishable keys'
+                    : isLoadingApiKeys
+                      ? 'Loading permissions...'
+                      : 'Copy publishable key'}
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
           {error && canReadAPIKeys ? (
@@ -86,7 +106,7 @@ const ApiKeyInput = () => {
     [apiKeysData]
   )
 
-  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     '*'
   )

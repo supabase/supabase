@@ -14,7 +14,7 @@ import { BillingCustomerData } from './BillingCustomerData/BillingCustomerData'
 import BillingEmail from './BillingEmail'
 import CostControl from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
-import PaymentMethods from './PaymentMethods/PaymentMethods'
+import PaymentMethods from '../../Billing/Payment/PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 
 export const BillingSettings = () => {

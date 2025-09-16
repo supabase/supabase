@@ -58,6 +58,7 @@ const LogsQueryPanel = ({
   onDateChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
+  const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
 
   const {
     projectAuthAll: authEnabled,
@@ -110,7 +111,7 @@ const LogsQueryPanel = ({
               <DropdownMenuContent
                 side="bottom"
                 align="start"
-                className="max-h-[70vh] overflow-auto"
+                className="max-h-[390px] overflow-auto"
               >
                 {logsTableNames
                   .sort((a, b) => a.localeCompare(b))
@@ -125,7 +126,7 @@ const LogsQueryPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {IS_PLATFORM && (
+            {IS_PLATFORM && logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>

@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { ModelMessage, stepCountIs, streamText } from 'ai'
+import { ModelMessage, stepCountIs, generateText, Output } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -62,7 +62,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       aiOptInLevel = orgAIOptInLevel
     }
 
-    const { model, error: modelError } = await getModel(projectRef)
+    // For code completion, we always use the limited model
+    const {
+      model,
+      error: modelError,
+      promptProviderOptions,
+    } = await getModel({
+      provider: 'openai',
+      routingKey: projectRef,
+    })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
@@ -108,12 +116,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        providerOptions: {
-          bedrock: {
-            // Always cache the system prompt (must not contain dynamic content)
-            cachePoint: { type: 'default' },
-          },
-        },
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
       },
       {
         role: 'assistant',
@@ -148,14 +151,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
+    const { text } = await generateText({
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,
     })
 
-    return result.pipeUIMessageStreamToResponse(res)
+    return res.status(200).json(text)
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({

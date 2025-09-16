@@ -26,7 +26,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import type { PaymentMethodElementRef } from '../PaymentMethods/NewPaymentMethodElement'
+import type { PaymentMethodElementRef } from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './PaymentMethodSelection'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -187,11 +187,11 @@ export const SubscriptionPlanUpdateDialog = ({
     })
   }
 
-  const features = subscriptionPlanMeta?.features?.[0]?.features || []
+  const features = subscriptionPlanMeta?.features || []
   const topFeatures = features
 
   // Get current plan features for downgrade comparison
-  const currentPlanFeatures = currentPlanMeta?.features?.[0]?.features || []
+  const currentPlanFeatures = currentPlanMeta?.features || []
 
   // Features that will be lost when downgrading
   const featuresToLose =

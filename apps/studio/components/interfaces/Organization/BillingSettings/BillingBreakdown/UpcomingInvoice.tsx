@@ -29,6 +29,8 @@ const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
     'https://supabase.com/docs/guides/platform/manage-your-usage/advanced-mfa-phone',
 
   [PricingMetric.EGRESS]: 'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
+  [PricingMetric.CACHED_EGRESS]:
+    'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
 
   [PricingMetric.FUNCTION_INVOCATIONS]:
     'https://supabase.com/docs/guides/platform/manage-your-usage/edge-function-invocations',

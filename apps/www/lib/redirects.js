@@ -2127,6 +2127,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/customers/mendableai',
+    destination: '/customers/firecrawl',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
     destination: '/docs/guides/auth/auth-helpers/nextjs',
   },

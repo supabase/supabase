@@ -1,5 +1,24 @@
 export const analyticsKeys = {
   // logs/reports endpoints
+  functionsCombinedStats: (
+    projectRef: string | undefined,
+    {
+      interval,
+      functionId,
+    }: {
+      functionId: string | undefined
+      interval: string | undefined
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'functions-combined-stats',
+      {
+        interval,
+        functionId,
+      },
+    ] as const,
   functionsInvStats: (
     projectRef: string | undefined,
     {

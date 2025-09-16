@@ -9,13 +9,13 @@ import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import APIDocsButton from 'components/ui/APIDocsButton'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import {
@@ -43,7 +43,7 @@ const EdgeFunctionDetailsLayout = ({
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const { isLoading, can: canReadFunctions } = useAsyncCheckProjectPermissions(
+  const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     '*'
   )
@@ -56,22 +56,23 @@ const EdgeFunctionDetailsLayout = ({
     isError,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
-  const { data: functionFiles = [], error: filesError } = useEdgeFunctionBodyQuery(
-    {
-      projectRef: ref,
-      slug: functionSlug,
-    },
-    {
-      retry: false,
-      retryOnMount: true,
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      refetchInterval: false,
-      refetchIntervalInBackground: false,
-    }
-  )
+  const { data: functionBody = { version: 0, files: [] }, error: filesError } =
+    useEdgeFunctionBodyQuery(
+      {
+        projectRef: ref,
+        slug: functionSlug,
+      },
+      {
+        retry: false,
+        retryOnMount: true,
+        refetchOnWindowFocus: false,
+        staleTime: Infinity,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchInterval: false,
+        refetchIntervalInBackground: false,
+      }
+    )
 
   const name = selectedFunction?.name || ''
 
@@ -112,7 +113,7 @@ const EdgeFunctionDetailsLayout = ({
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
-    functionFiles.forEach((file) => {
+    functionBody.files.forEach((file) => {
       const nameSections = file.name.split('/')
       const slugIndex = nameSections.indexOf(functionSlug ?? '')
       const fileName = nameSections.slice(slugIndex + 1).join('/')

@@ -17,11 +17,10 @@ export type BranchMergeVariables = {
 export async function mergeBranch({
   id,
   branchProjectRef,
-  baseProjectRef,
   migration_version,
 }: BranchMergeVariables) {
   // Step 1: Get the diff output from the branch
-  const diffContent = await getBranchDiff({ branchId: id, includedSchemas: 'public' })
+  const diffContent = await getBranchDiff({ branchId: id })
 
   let migrationCreated = false
 
@@ -41,8 +40,8 @@ export async function mergeBranch({
   }
 
   // Step 3: Call POST /v1/branches/id/merge to merge the branch
-  const { data, error } = await post('/v1/branches/{branch_id}/merge', {
-    params: { path: { branch_id: id } },
+  const { data, error } = await post('/v1/branches/{branch_id_or_ref}/merge', {
+    params: { path: { branch_id_or_ref: id } },
     body: { migration_version },
   })
 

@@ -1,12 +1,12 @@
 import { ArrowUp, Loader2, Square } from 'lucide-react'
-import React, { ChangeEvent, memo, useRef } from 'react'
+import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
 
 import { useBreakpoint } from 'common'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { type SqlSnippet } from './AIAssistant.types'
-import { SnippetRow, getSnippetContent } from './SnippetRow'
+import { getSnippetContent, SnippetRow } from './SnippetRow'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -41,9 +41,11 @@ export interface FormProps {
   snippetsClassName?: string
   /* Additional class name for the form wrapper */
   className?: string
+  /* If currently editing an existing message */
+  isEditing?: boolean
 }
 
-const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
+const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
   (
     {
       loading = false,
@@ -59,6 +61,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       snippetsClassName,
       includeSnippetsInMessage = false,
       className,
+      isEditing = false,
       ...props
     },
     ref
@@ -66,9 +69,9 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
     const formRef = useRef<HTMLFormElement>(null)
     const isMobile = useBreakpoint('md')
 
-    const handleSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
-      if (!value || loading) return
+      if (!value || (loading && !isEditing)) return
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
@@ -81,7 +84,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       onSubmit(finalMessage)
     }
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault()
         handleSubmit()
@@ -97,7 +100,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
           ref={formRef}
           {...props}
           onSubmit={handleSubmit}
-          className={cn('relative overflow-hidden', className)}
+          className={cn('relative', className)}
         >
           {sqlSnippets && sqlSnippets.length > 0 && (
             <SnippetRow
@@ -107,8 +110,8 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             />
           )}
           <ExpandingTextArea
+            autoFocus={!isMobile}
             ref={textAreaRef}
-            autoFocus={isMobile}
             disabled={disabled}
             className={cn(
               'text-sm pr-10 max-h-64',

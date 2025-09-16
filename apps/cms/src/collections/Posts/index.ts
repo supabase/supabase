@@ -9,16 +9,16 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { isAnyone } from '@/access/isAnyone'
-import { isAuthenticated } from '@/access/isAuthenticated'
+import { isAnyone } from '../../access/isAnyone.ts'
+import { isAuthenticated } from '../../access/isAuthenticated.ts'
 
-import { Banner } from '@/blocks/Banner/config'
-import { Code } from '@/blocks/Code/config'
-import { MediaBlock } from '@/blocks/MediaBlock/config'
-import { Quote } from '@/blocks/Quote/config'
-import { YouTube } from '@/blocks/YouTube/config'
-import { populateAuthors } from './hooks/populateAuthors'
-import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
+import { Banner } from '../../blocks/Banner/config.ts'
+import { Code } from '../../blocks/Code/config.ts'
+import { MediaBlock } from '../../blocks/MediaBlock/config.ts'
+import { Quote } from '../../blocks/Quote/config.ts'
+import { YouTube } from '../../blocks/YouTube/config.ts'
+import { populateAuthors } from './hooks/populateAuthors.ts'
+import { revalidateDelete, revalidatePost } from './hooks/revalidatePost.ts'
 
 import {
   MetaDescriptionField,
@@ -27,7 +27,8 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import { slugField } from '@/fields/slug'
+import { slugField } from '../../fields/slug/index.ts'
+import { WWW_SITE_ORIGIN } from '../../utilities/constants.ts'
 
 const launchweekOptions = [
   { label: '6', value: '6' },
@@ -45,38 +46,11 @@ export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'updatedAt'],
-    livePreview: {
-      url: ({ data }) => {
-        const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
-        // Always use the preview route for live preview to ensure draft mode is enabled
-        return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
-      },
-      breakpoints: [
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1920,
-          height: 1080,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-      ],
-    },
+    defaultColumns: ['title', 'slug', 'updatedAt', 'publishedAt'],
     preview: (data) => {
-      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+      const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
       // Always use the preview route to ensure draft mode is enabled
-      return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
+      return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'secret'}`
     },
   },
   access: {
@@ -99,8 +73,17 @@ export const Posts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      index: true,
     },
     ...slugField(),
+    {
+      name: 'description',
+      type: 'textarea',
+      label: 'Description / subtitle',
+      admin: {
+        description: 'Appears as subheading in the blog post preview.',
+      },
+    },
     {
       type: 'tabs',
       tabs: [
@@ -134,29 +117,26 @@ export const Posts: CollectionConfig = {
               type: 'upload',
               relationTo: 'media',
               required: false,
+              admin: {
+                description: 'Will show up as the blog post cover. Required.',
+              },
             },
             {
-              name: 'image',
-              type: 'upload',
-              relationTo: 'media',
-              required: false,
+              name: 'authors',
+              type: 'relationship',
+              relationTo: 'authors',
+              hasMany: true,
+              admin: {
+                description: 'Authors must be one or more. Required.',
+              },
             },
             {
               name: 'categories',
               type: 'relationship',
-              admin: {
-                position: 'sidebar',
-              },
               hasMany: true,
               relationTo: 'categories',
-            },
-            {
-              name: 'launchweek',
-              type: 'select',
-              options: launchweekOptions,
               admin: {
-                description:
-                  'Select a launch week to show launch week summary at the bottom of the blog post.',
+                description: 'Select only one category. Required.',
               },
             },
             {
@@ -167,40 +147,29 @@ export const Posts: CollectionConfig = {
               },
             },
             {
-              name: 'date',
-              type: 'date',
-              admin: {
-                position: 'sidebar',
-              },
-            },
-            {
-              name: 'toc_depth',
-              type: 'number',
-              defaultValue: 2,
-              admin: {
-                position: 'sidebar',
-              },
-            },
-            {
-              name: 'description',
-              type: 'textarea',
-            },
-            {
-              name: 'authors',
-              type: 'relationship',
-              relationTo: 'authors',
-              hasMany: true,
-              admin: {
-                position: 'sidebar',
-              },
-            },
-            {
               name: 'tags',
               type: 'relationship',
               relationTo: 'tags',
               hasMany: true,
               admin: {
-                position: 'sidebar',
+                description: 'Tags can be one or more. Optional.',
+              },
+            },
+            {
+              name: 'toc_depth',
+              type: 'number',
+              defaultValue: 3,
+              admin: {
+                hidden: true,
+              },
+            },
+            {
+              name: 'launchweek',
+              type: 'select',
+              options: launchweekOptions,
+              admin: {
+                description:
+                  'Select a launch week to show launch week summary at the bottom of the blog post. Optional.',
               },
             },
           ],
@@ -217,12 +186,28 @@ export const Posts: CollectionConfig = {
             }),
             MetaTitleField({
               hasGenerateFn: true,
+              overrides: {
+                admin: {
+                  description: 'Defaults to the title of the post, if not set.',
+                },
+              },
             }),
             MetaImageField({
               relationTo: 'media',
+              overrides: {
+                admin: {
+                  description: 'Defaults to the "thumb" image, if not set.',
+                },
+              },
             }),
 
-            MetaDescriptionField({}),
+            MetaDescriptionField({
+              overrides: {
+                admin: {
+                  description: 'Defaults to the description of the post, if not set.',
+                },
+              },
+            }),
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,
@@ -235,6 +220,9 @@ export const Posts: CollectionConfig = {
         },
       ],
     },
+    /**
+     * "publishedAt" is only internal to cms to determine if the blog post is published or not, but it's not used for sorting blog posts in www
+     * */
     {
       name: 'publishedAt',
       type: 'date',
@@ -243,16 +231,38 @@ export const Posts: CollectionConfig = {
           pickerAppearance: 'dayAndTime',
         },
         position: 'sidebar',
+        hidden: true,
       },
       hooks: {
         beforeChange: [
           ({ siblingData, value }) => {
+            /**
+             * Set the "date" field to the current date if user doesn't set it
+             */
+            if (!siblingData.date) {
+              siblingData.date = new Date()
+            }
             if (siblingData._status === 'published' && !value) {
               return new Date()
             }
             return value
           },
         ],
+      },
+    },
+    /**
+     * "date" is used to determine the chronological order of the blog post in www
+     */
+    {
+      name: 'date',
+      type: 'date',
+      label: 'Blog Post Date',
+      admin: {
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
+        description: 'This date will determine the chronological order of the blog post. Required.',
+        position: 'sidebar',
       },
     },
   ],
@@ -264,10 +274,12 @@ export const Posts: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 200,
-      },
-      schedulePublish: true,
+      // NOTE: disabled autosave as it might overload connections if many users are editing at the same time
+      // autosave: {
+      //   interval: 200,
+      // },
+      // TODO: enable schedulePublish to work with cron job
+      // schedulePublish: true,
     },
     maxPerDoc: 50,
   },

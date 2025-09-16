@@ -9,15 +9,15 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { isAnyone } from '@/access/isAnyone'
-import { isAuthenticated } from '@/access/isAuthenticated'
+import { isAnyone } from '../../access/isAnyone.ts'
+import { isAuthenticated } from '../../access/isAuthenticated.ts'
 
-import { Banner } from '@/blocks/Banner/config'
-import { Code } from '@/blocks/Code/config'
-import { MediaBlock } from '@/blocks/MediaBlock/config'
-import { Quote } from '@/blocks/Quote/config'
-import { YouTube } from '@/blocks/YouTube/config'
-import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent'
+import { Banner } from '../../blocks/Banner/config.ts'
+import { Code } from '../../blocks/Code/config.ts'
+import { MediaBlock } from '../../blocks/MediaBlock/config.ts'
+import { Quote } from '../../blocks/Quote/config.ts'
+import { YouTube } from '../../blocks/YouTube/config.ts'
+import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent.ts'
 
 import {
   MetaDescriptionField,
@@ -26,8 +26,9 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import { slugField } from '@/fields/slug'
-import { timezoneOptions } from '../../utilities/timezones'
+import { slugField } from '../../fields/slug/index.ts'
+import { timezoneOptions } from '../../utilities/timezones.ts'
+import { WWW_SITE_ORIGIN } from '../../utilities/constants.ts'
 
 const eventTypeOptions = [
   { label: 'Conference', value: 'conference' },
@@ -47,16 +48,20 @@ export const Events: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     preview: (data) => {
-      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
-      const isDraft = data?._status === 'draft'
-      return `${baseUrl}/events/${data?.slug}${isDraft ? '?preview=true' : ''}`
+      const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
+      // Always use the preview route to ensure draft mode is enabled
+      return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&path=events&secret=${process.env.PREVIEW_SECRET || 'secret'}`
     },
   },
   access: {
-    create: isAuthenticated,
-    delete: isAuthenticated,
-    read: isAnyone,
-    update: isAuthenticated,
+    // create: isAuthenticated,
+    // delete: isAuthenticated,
+    // read: isAnyone,
+    // update: isAuthenticated,
+    create: () => false,
+    delete: () => false,
+    read: () => false,
+    update: () => false,
   },
   defaultPopulate: {
     title: true,
@@ -393,9 +398,9 @@ export const Events: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 100,
-      },
+      // autosave: {
+      //   interval: 100,
+      // },
       schedulePublish: true,
     },
     maxPerDoc: 50,

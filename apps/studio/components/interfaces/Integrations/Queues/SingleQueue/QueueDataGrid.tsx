@@ -5,12 +5,12 @@ import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
+import AlertError from 'components/ui/AlertError'
 import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
+import { ResponseError } from 'types'
 import { Badge, Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
-import { ResponseError } from 'types'
-import AlertError from 'components/ui/AlertError'
 
 interface QueueDataGridProps {
   error?: ResponseError | null
@@ -60,14 +60,20 @@ const messagesCols = [
 
       if (row.archived_at) {
         return (
-          <Badge variant="default">Archived at {dayjs(row.archived_at).format(DATE_FORMAT)}</Badge>
+          <div className="flex items-center">
+            <Badge variant="default">
+              Archived at {dayjs(row.archived_at).format(DATE_FORMAT)}
+            </Badge>
+          </div>
         )
       }
 
       return (
-        <Badge variant={isAvailable ? 'brand' : 'warning'}>
-          {isAvailable ? 'Available ' : `Available at ${dayjs(row.vt).format(DATE_FORMAT)}`}
-        </Badge>
+        <div className="flex items-center">
+          <Badge variant={isAvailable ? 'brand' : 'warning'}>
+            {isAvailable ? 'Available ' : `Available at ${dayjs(row.vt).format(DATE_FORMAT)}`}
+          </Badge>
+        </div>
       )
     },
   },
@@ -77,14 +83,22 @@ const messagesCols = [
     description: undefined,
     minWidth: 50,
     width: 70,
-    value: (row: PostgresQueueMessage) => <span>{row.read_ct}</span>,
+    value: (row: PostgresQueueMessage) => (
+      <div className="flex items-center">
+        <span>{row.read_ct}</span>
+      </div>
+    ),
   },
   {
     id: 'payload',
     name: 'Payload',
     description: undefined,
     minWidth: 600,
-    value: (row: PostgresQueueMessage) => <span>{JSON.stringify(row.message)}</span>,
+    value: (row: PostgresQueueMessage) => (
+      <div className="flex items-center font-mono">
+        <span>{JSON.stringify(row.message)}</span>
+      </div>
+    ),
   },
 ]
 
@@ -95,30 +109,22 @@ const columns = messagesCols.map((col) => {
     resizable: true,
     minWidth: col.minWidth ?? 120,
     width: col.width,
-    headerCellClass: 'first:pl-6 cursor-pointer',
+    headerCellClass: undefined,
     renderHeaderCell: () => {
       return (
-        <div className="flex items-center justify-between font-normal text-xs w-full">
-          <div className="flex items-center gap-x-2">
-            <p className="!text-foreground">{col.name}</p>
-            {col.description && <p className="text-foreground-lighter">{col.description}</p>}
-          </div>
+        <div
+          className={cn(
+            'flex items-center justify-between font-normal text-xs w-full',
+            col.id === 'id' && 'ml-8'
+          )}
+        >
+          <p className="!text-foreground">{col.name}</p>
         </div>
       )
     },
     renderCell: (props) => {
       const value = col.value(props.row)
-
-      return (
-        <div
-          className={cn(
-            'w-full flex flex-col justify-center font-mono text-xs',
-            typeof value === 'number' ? 'text-right' : ''
-          )}
-        >
-          <span>{value}</span>
-        </div>
-      )
+      return value
     },
   }
   return result
@@ -156,14 +162,12 @@ export const QueueMessagesDataGrid = ({
         columns={columns}
         onScroll={handleScroll}
         rows={messages}
-        rowClass={(message) => {
-          const isSelected = message.msg_id === selectedMessageId
-          return [
-            `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-            `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+        rowClass={() => {
+          return cn(
+            'cursor-pointer',
             '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-            '[&>.rdg-cell:first-child>div]:ml-4',
-          ].join(' ')
+            '[&>.rdg-cell:first-child>div]:ml-8'
+          )
         }}
         renderers={{
           renderRow(idx, props) {

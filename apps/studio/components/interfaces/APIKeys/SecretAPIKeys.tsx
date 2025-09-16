@@ -1,13 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { useMemo, useRef } from 'react'
+import { ReactNode, useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { Card, CardContent, EyeOffIcon, Skeleton, WarningIcon, cn } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Card, CardContent, EyeOffIcon, Skeleton, cn } from 'ui'
 import {
   Table,
   TableBody,
@@ -52,11 +53,12 @@ export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
   const {
     data: apiKeysData,
-    isLoading: isLoadingApiKeys,
     error,
+    isLoading: isLoadingApiKeys,
+    isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false })
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     '*'
   )
@@ -90,14 +92,14 @@ export const SecretAPIKeys = () => {
     </TableRow>
   )
 
-  const TableContainer = ({ children }: { children: React.ReactNode }) => (
+  const TableContainer = ({ children, className }: { children: ReactNode; className?: string }) => (
     <div className="pb-30">
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
         actions={<CreateSecretAPIKeyDialog />}
       />
-      <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100')}>
+      <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100', className)}>
         <CardContent className="p-0">
           <Table className="p-5 table-auto">
             <TableHeader>
@@ -147,14 +149,10 @@ export const SecretAPIKeys = () => {
     )
   }
 
-  if (error) {
+  if (isErrorApiKeys) {
     return (
-      <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-          <WarningIcon />
-          <p className="text-sm text-warning-600">Error loading Secret API Keys</p>
-          <p className="text-warning/75">{error.message}</p>
-        </div>
+      <TableContainer className="border-0">
+        <AlertError error={error} subject="Failed to load secret API keys" />
       </TableContainer>
     )
   }

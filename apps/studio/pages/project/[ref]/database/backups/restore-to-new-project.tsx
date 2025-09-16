@@ -23,7 +23,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsAwsK8sCloudProvider,
@@ -80,12 +80,13 @@ const RestoreToNewProject = () => {
     isError,
   } = useCloneBackupsQuery({ projectRef: project?.ref }, { enabled: !isFreePlan })
 
-  const plan = organization?.plan?.id
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
-  const canTriggerPhysicalBackups = useCheckPermissions(
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'physical_backups'
+  )
+  const { can: canTriggerPhysicalBackups } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )

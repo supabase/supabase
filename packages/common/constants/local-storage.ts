@@ -6,6 +6,7 @@ export const LOCAL_STORAGE_KEYS = {
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
+  PROJECTS_VIEW: 'projects-view',
 
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
@@ -62,8 +63,6 @@ export const LOCAL_STORAGE_KEYS = {
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
 
-  // last visited logs page
-  LAST_VISITED_LOGS_PAGE: 'supabase-last-visited-logs-page',
   LAST_VISITED_ORGANIZATION: 'last-visited-organization',
 
   // user impersonation selector previous searches

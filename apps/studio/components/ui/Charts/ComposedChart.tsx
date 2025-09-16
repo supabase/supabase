@@ -1,10 +1,7 @@
-'use client'
-
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useState } from 'react'
-import { useChartSync } from './useChartSync'
 import {
   Area,
   Bar,
@@ -18,9 +15,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
-import ChartHeader from './ChartHeader'
+import { ChartHeader } from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
 import {
   CHART_COLORS,
@@ -38,6 +36,7 @@ import {
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -64,9 +63,10 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   hideHighlightedValue?: boolean
   syncId?: string
   docsUrl?: string
+  sql?: string
 }
 
-export default function ComposedChart({
+export function ComposedChart({
   data,
   attributes,
   yAxisKey,
@@ -100,13 +100,12 @@ export default function ComposedChart({
   hideHighlightedValue,
   syncId,
   docsUrl,
+  sql,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
-  const {
-    state: syncState,
-    updateState: updateSyncState,
-    clearState: clearSyncState,
-  } = useChartSync(syncId)
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -327,6 +326,7 @@ export default function ComposedChart({
         shouldFormatBytes={shouldFormatBytes}
         isNetworkChart={isNetworkChart}
         attributes={attributes}
+        sql={sql}
       />
       <Container className="relative z-10">
         <RechartComposedChart
@@ -339,14 +339,7 @@ export default function ComposedChart({
               setActivePayload(e.activePayload)
             }
 
-            if (syncId) {
-              updateSyncState({
-                activeIndex: e.activeTooltipIndex,
-                activePayload: e.activePayload,
-                activeLabel: e.activeLabel,
-                isHovering: true,
-              })
-            }
+            setHover(e.activeTooltipIndex)
 
             const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
@@ -367,9 +360,7 @@ export default function ComposedChart({
             setFocusDataIndex(null)
             setActivePayload(null)
 
-            if (syncId) {
-              clearSyncState()
-            }
+            clearHover()
           }}
           onClick={(tooltipData) => {
             const datum = tooltipData?.activePayload?.[0]?.payload
@@ -404,7 +395,9 @@ export default function ComposedChart({
                   attributes={attributes}
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
-                  isActiveHoveredChart={isActiveHoveredChart || (!!syncId && syncState.isHovering)}
+                  isActiveHoveredChart={
+                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredIndex !== null)
+                  }
                 />
               ) : null
             }
@@ -489,9 +482,9 @@ export default function ComposedChart({
               x1={chartHighlight?.coordinates.left}
               x2={chartHighlight?.coordinates.right}
               strokeOpacity={0.5}
-              stroke="#3ECF8E"
-              fill="#3ECF8E"
-              fillOpacity={0.3}
+              stroke={isDarkMode ? '#FFFFFF' : '#0C3925'}
+              fill={isDarkMode ? '#FFFFFF' : '#0C3925'}
+              fillOpacity={0.2}
             />
           )}
         </RechartComposedChart>

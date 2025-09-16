@@ -1,10 +1,11 @@
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { Admonition } from 'ui-patterns'
 import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 
-const OrganizationDeletePanel = () => {
+export const OrganizationDeletePanel = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   return (
@@ -20,7 +21,7 @@ const OrganizationDeletePanel = () => {
         </Admonition>
       ) : (
         <PartnerManagedResource
-          partner="vercel-marketplace"
+          managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
           resource="Organizations"
           cta={{
             installationId: selectedOrganization?.partner_id,
@@ -32,5 +33,3 @@ const OrganizationDeletePanel = () => {
     </ScaffoldSection>
   )
 }
-
-export default OrganizationDeletePanel
