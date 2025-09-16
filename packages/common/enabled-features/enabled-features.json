@@ -36,7 +36,7 @@
   "docs:compliance": true,
   "docs:self-hosting": true,
 
-  "edge_functions:show_all_templates": true,
+  "edge_functions:show_stripe_example": true,
 
   "feedback:docs": true,
 

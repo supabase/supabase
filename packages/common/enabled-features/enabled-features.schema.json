@@ -125,9 +125,9 @@
       "description": "Enable documentation for self-hosting"
     },
 
-    "edge_functions:show_all_templates": {
+    "edge_functions:show_stripe_example": {
       "type": "boolean",
-      "description": "Show all edge function templates in the edge functions page. If false, shows a subset of templates"
+      "description": "Show all the Stripe example in edge function templates in the edge functions page."
     },
 
     "feedback:docs": {

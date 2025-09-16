@@ -41,15 +41,15 @@ export const FunctionsEmptyState = () => {
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const showAllTemplates = useIsFeatureEnabled('edge_functions:show_all_templates')
+  const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
-    if (showAllTemplates) {
+    if (showStripeExample) {
       return EDGE_FUNCTION_TEMPLATES
     }
 
     // Filter out Stripe template
     return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
-  }, [showAllTemplates])
+  }, [showStripeExample])
 
   return (
     <>
@@ -193,15 +193,15 @@ export const FunctionsEmptyState = () => {
 }
 
 export const FunctionsEmptyStateLocal = () => {
-  const showAllTemplates = useIsFeatureEnabled('edge_functions:show_all_templates')
+  const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
-    if (showAllTemplates) {
+    if (showStripeExample) {
       return EDGE_FUNCTION_TEMPLATES
     }
 
     // Filter out Stripe template
     return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
-  }, [showAllTemplates])
+  }, [showStripeExample])
 
   return (
     <>
