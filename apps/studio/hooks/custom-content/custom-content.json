@@ -50,6 +50,7 @@
   "logs:default_query": null,
 
   "infra:cloud_providers": ["AWS", "AWS_K8S", "FLY"],
+  "infra:aws_nimbus_label": "AWS Nimbus",
 
   "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt"
 }

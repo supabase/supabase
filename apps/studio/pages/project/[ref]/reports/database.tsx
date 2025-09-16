@@ -34,7 +34,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -107,7 +107,7 @@ const DatabaseUsage = () => {
   })
   const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {

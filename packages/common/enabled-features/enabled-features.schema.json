@@ -209,6 +209,10 @@
       "type": "boolean",
       "description": "Show the dedicated IPv4 address addon"
     },
+    "project_addons:show_compute_price": {
+      "type": "boolean",
+      "description": "Show the compute price in the compute and disk page"
+    },
 
     "project_settings:custom_domains": {
       "type": "boolean",
@@ -295,6 +299,7 @@
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
     "project_addons:dedicated_ipv4_address",
+    "project_addons:show_compute_price",
     "project_settings:custom_domains",
     "project_settings:show_disable_legacy_api_keys",
     "project_settings:legacy_jwt_keys",
