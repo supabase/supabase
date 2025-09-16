@@ -1,4 +1,5 @@
 import { cn } from 'ui'
+import { formatMs } from './utils/formats'
 
 type Props = {
   planningTime?: number
@@ -28,7 +29,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
         {metrics.map((metric) => (
           <span key={metric.label} className="flex items-baseline gap-x-1">
             <span className="text-foreground-lighter">{metric.label}:</span>
-            <span>{metric.value} ms</span>
+            <span>{formatMs(metric.value)} ms</span>
           </span>
         ))}
       </div>
