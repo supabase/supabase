@@ -30,7 +30,6 @@ function getAssetPrefix() {
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-  productionBrowserSourceMaps: true,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
   output: 'standalone',
