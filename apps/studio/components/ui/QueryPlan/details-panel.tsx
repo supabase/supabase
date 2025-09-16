@@ -76,9 +76,9 @@ export const DetailsPanel = ({
         <div>
           <div className="font-semibold mb-1">Timing</div>
           {hasTimingMetrics ? (
-            <div className="p-2 border rounded bg-surface-100 space-y-1">
+            <ul className="p-2 border rounded bg-surface-100 space-y-1 list-none m-0">
               {selectedNode.actualTotalTime !== undefined && (
-                <div className="flex items-center justify-between gap-x-2">
+                <li className="flex items-center justify-between gap-x-2">
                   <span className="text-foreground-lighter">Total time</span>
                   <span>
                     {formatMs(selectedNode.actualTotalTime)} ms
@@ -86,35 +86,35 @@ export const DetailsPanel = ({
                       ? ` ×${formatNumber(selectedNode.actualLoops)}`
                       : ''}
                   </span>
-                </div>
+                </li>
               )}
               {totalTimeAllLoops !== undefined &&
                 selectedNode.actualLoops !== undefined &&
                 selectedNode.actualLoops > 1 && (
-                  <div className="flex items-center justify-between gap-x-2">
+                  <li className="flex items-center justify-between gap-x-2">
                     <span className="text-foreground-lighter">Total time (all loops)</span>
                     <span>{formatMs(totalTimeAllLoops)} ms</span>
-                  </div>
+                  </li>
                 )}
               {selectedNode.exclusiveTimeMs !== undefined && (
-                <div className="flex items-center justify-between gap-x-2">
+                <li className="flex items-center justify-between gap-x-2">
                   <span className="text-foreground-lighter">Self time</span>
                   <span>{formatMs(selectedNode.exclusiveTimeMs)} ms</span>
-                </div>
+                </li>
               )}
               {selectedNode.actualStartupTime !== undefined && (
-                <div className="flex items-center justify-between gap-x-2">
+                <li className="flex items-center justify-between gap-x-2">
                   <span className="text-foreground-lighter">Startup time</span>
                   <span>{formatMs(selectedNode.actualStartupTime)} ms</span>
-                </div>
+                </li>
               )}
               {selectedNode.actualLoops !== undefined && (
-                <div className="flex items-center justify-between gap-x-2">
+                <li className="flex items-center justify-between gap-x-2">
                   <span className="text-foreground-lighter">Loops</span>
                   <span>{formatNumber(selectedNode.actualLoops)}</span>
-                </div>
+                </li>
               )}
-            </div>
+            </ul>
           ) : (
             <NoData />
           )}
