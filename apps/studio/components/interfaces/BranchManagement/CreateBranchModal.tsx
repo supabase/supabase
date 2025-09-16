@@ -83,7 +83,6 @@ export const CreateBranchModal = () => {
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
-  const noPhysicalBackups = !projectDetails?.is_physical_backups_enabled
 
   const formId = 'create-branch-form'
   const FormSchema = z
@@ -384,7 +383,7 @@ export const CreateBranchModal = () => {
                       label={
                         <>
                           <Label className="mr-2">Include data</Label>
-                          {noPhysicalBackups && (
+                          {!hasPitrEnabled && (
                             <Badge variant="warning" size="small">
                               Requires PITR
                             </Badge>
@@ -397,7 +396,7 @@ export const CreateBranchModal = () => {
                     >
                       <FormControl_Shadcn_>
                         <Switch
-                          disabled={noPhysicalBackups}
+                          disabled={!hasPitrEnabled}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />

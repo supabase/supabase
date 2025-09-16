@@ -24,6 +24,14 @@
     }
   ],
 
+  "project_homepage:client_libraries": [
+    {
+      "language": "JavaScript",
+      "officialSupport": true,
+      "docsUrl": "https://supabase.com/docs/reference/javascript/installing",
+      "gitUrl": "https://github.com/supabase/supabase-js"
+    }
+  ],
   "project_homepage:example_projects": [
     {
       "title": "Framework 1",

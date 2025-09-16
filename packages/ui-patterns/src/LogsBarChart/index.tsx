@@ -26,11 +26,13 @@ export const LogsBarChart = ({
   onBarClick,
   EmptyState,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
+  height = '80px',
 }: {
   data: LogsBarChartDatum[]
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
   DateTimeFormat?: string
+  height?: string
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -58,7 +60,7 @@ export const LogsBarChart = ({
             },
           } satisfies ChartConfig
         }
-        className="h-[80px]"
+        style={{ height }}
       >
         <RechartBarChart
           data={data}

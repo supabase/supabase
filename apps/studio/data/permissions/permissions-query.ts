@@ -1,5 +1,4 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import * as Sentry from '@sentry/nextjs'
 
 import { useIsLoggedIn } from 'common'
 import { get, handleError } from 'data/fetchers'
@@ -17,6 +16,9 @@ export async function getPermissions(signal?: AbortSignal) {
       sentryContext: {
         tags: {
           permissionsQuery: true,
+        },
+        contexts: {
+          rawError: error,
         },
       },
     })
