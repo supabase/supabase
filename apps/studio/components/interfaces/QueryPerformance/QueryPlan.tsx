@@ -36,6 +36,37 @@ const QueryPlanVisualizer = dynamic(
 const SELECT_ONLY_SAFE_STRICT_REGEX =
   /^(?![\s\S]*\b(insert|update|delete|truncate|drop|alter|create|grant|revoke|call|do)\b)\s*(select\b|with\b[\s\S]*?\bselect\b)/i
 
+const getExplainValidationError = ({
+  projectRef,
+  sql,
+}: {
+  projectRef?: string | null
+  sql: string
+}): { title: string; message?: string } | null => {
+  if (!projectRef || !sql) {
+    return {
+      title: 'Missing required data',
+      message: 'Project reference and SQL query are required.',
+    }
+  }
+
+  if (!SELECT_ONLY_SAFE_STRICT_REGEX.test(sql)) {
+    return {
+      title: 'Unsupported query type',
+      message: 'Only SELECT queries are supported for EXPLAIN here.',
+    }
+  }
+
+  if (/\$\d+/.test(sql)) {
+    return {
+      title: 'EXPLAIN not run for parameterized query',
+      message: "We didn't run EXPLAIN because this query contains parameters (e.g. $1).",
+    }
+  }
+
+  return null
+}
+
 export const QueryPlan = ({ query }: { query: string }) => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
@@ -55,15 +86,16 @@ export const QueryPlan = ({ query }: { query: string }) => {
    * TODO: We should use sql parser like `@supabase/pg-parser` in this file when it's ready for Next.js
    */
   useEffect(() => {
-    setExplainError(null)
     setRawExplainResult(null)
+    const validationError = getExplainValidationError({
+      projectRef,
+      connectionString,
+      sql: cleanedSql,
+    })
 
-    if (!projectRef || !cleanedSql) {
-      setExplainError({
-        title: 'Missing required data',
-        message: 'Project reference, connection string, and SQL query are required.',
-      })
-
+    setExplainError(validationError)
+    if (validationError) {
+      setIsExecutingExplain(false)
       return
     }
 
