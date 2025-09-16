@@ -7,7 +7,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { useParams } from 'common'
 import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useMemo } from 'react'
@@ -19,12 +19,12 @@ interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
 }
 
-export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
+export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { formState, watch } = form
   const isDarkMode = resolvedTheme?.includes('dark')
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     data: diskUtil,
@@ -94,7 +94,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
         <div
           className={cn(
             'h-[35px] relative border rounded-sm w-full transition',
-            showNewSize ? 'bg-selection border border-brand-button' : 'bg-surface-300'
+            showNewSize ? 'bg-selection border border-brand' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>

@@ -19,18 +19,19 @@ import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorizat
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
   GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
 } from 'lib/github'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
-import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
-import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 import { useRouter } from 'next/router'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
+import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -43,18 +44,18 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
-  const org = useSelectedOrganization()
   const router = useRouter()
+  const { data: org } = useSelectedOrganizationQuery()
 
-  const canReadGithubConnection = useCheckPermissions(
-    PermissionAction.READ,
-    'integrations.github_connections'
-  )
-  const canCreateGitHubConnection = useCheckPermissions(
+  const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
+
+  const { can: canReadGithubConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
-  const canUpdateGitHubConnection = useCheckPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
@@ -64,7 +65,7 @@ const IntegrationSettings = () => {
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      toast.success('Successfully deleted Github connection')
+      toast.success('Successfully deleted GitHub connection')
     },
   })
 
@@ -119,7 +120,9 @@ The GitHub app will watch for changes in your repository such as file changes, b
           <IntegrationImageHandler title="github" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadGithubConnection ? (
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadGithubConnection ? (
             <NoPermission resourceText="view this organization's GitHub connections" />
           ) : (
             <>
@@ -180,10 +183,13 @@ The GitHub app will watch for changes in your repository such as file changes, b
         <ScaffoldTitle>Integrations</ScaffoldTitle>
       </ScaffoldContainerLegacy>
       <GitHubSection />
-      <ScaffoldDivider />
-      <VercelSection isProjectScoped={false} />
-      <SidePanelVercelProjectLinker />
-      <SidePanelGitHubRepoLinker />
+      {showVercelIntegration && (
+        <>
+          <ScaffoldDivider />
+          <VercelSection isProjectScoped={false} />
+          <SidePanelVercelProjectLinker />
+        </>
+      )}
     </>
   )
 }

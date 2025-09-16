@@ -10,7 +10,7 @@ import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
 import { LastSignInWrapper } from './LastSignInWrapper'
 
-const SignInWithGitHub = () => {
+export const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
   const [_, setLastSignInUsed] = useLastSignIn()
 
@@ -57,5 +57,3 @@ const SignInWithGitHub = () => {
     </LastSignInWrapper>
   )
 }
-
-export default SignInWithGitHub

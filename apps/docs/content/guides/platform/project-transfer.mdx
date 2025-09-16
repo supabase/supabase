@@ -4,7 +4,7 @@ title: 'Project Transfers'
 description: 'Transfer a project to another organization.'
 ---
 
-You can freely transfer projects between different organizations. Head to your [projects' general settings](https://supabase.com/dashboard/project/_/settings/general) to initiate a project transfer.
+You can freely transfer projects between different organizations. Head to your [projects' general settings](/dashboard/project/_/settings/general) to initiate a project transfer.
 
 <Image
   alt="Project Transfer: General Settings"
@@ -33,7 +33,10 @@ Target organization - the organization you want to move the project to
 
 - You need to be the owner of the source organization.
 - You need to be at least a member of the target organization you want to move the project to.
-- Projects with support tier add-ons cannot be transferred at this point. [Open a support ticket](https://supabase.com/dashboard/support/new?category=billing&subject=Transfer%20project).
+- No active GitHub integration connection
+- No project-scoped roles pointing to the project (Team/Enterprise plan)
+- No log drains configured
+- Target organization is not managed by Vercel Marketplace (currently unsupported)
 
 ## Usage-billing and project add-ons
 

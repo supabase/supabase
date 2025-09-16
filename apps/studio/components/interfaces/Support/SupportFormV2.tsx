@@ -140,11 +140,9 @@ export const SupportFormV2 = ({
     () => organizations?.find((org) => org.slug === organizationSlug),
     [organizationSlug, organizations]
   )
-  const {
-    data: allProjects,
-    isLoading: isLoadingProjects,
-    isSuccess: isSuccessProjects,
-  } = useProjectsQuery()
+  const { data, isLoading: isLoadingProjects, isSuccess: isSuccessProjects } = useProjectsQuery()
+  const allProjects = data?.projects ?? []
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
@@ -532,7 +530,7 @@ export const SupportFormV2 = ({
           {docsResults.length > 0 && hasResults && (
             <>
               <div className="flex items-center gap-2">
-                <h5 className="text-sm text-foreground-lighter">AI Suggested resources</h5>
+                <h5 className="text-foreground-lighter">AI Suggested resources</h5>
                 {searchState.status === 'loading' && (
                   <div className="flex items-center gap-2 text-xs text-foreground-light">
                     <Loader2 className="animate-spin" size={12} />
@@ -584,7 +582,7 @@ export const SupportFormV2 = ({
                 rel="noreferrer"
                 className="flex items-center gap-x-1 underline hover:text-foreground transition"
               >
-                Github discussions
+                GitHub discussions
                 <ExternalLink size={14} strokeWidth={2} />
               </Link>
               <span> for a quick answer</span>

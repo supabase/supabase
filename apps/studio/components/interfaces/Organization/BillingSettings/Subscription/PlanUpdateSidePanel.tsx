@@ -4,6 +4,7 @@ import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
+import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -17,11 +18,13 @@ import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import type { OrgPlan } from 'data/subscriptions/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { formatCurrency } from 'lib/helpers'
-import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
+import { Organization } from 'types/base'
 import { Button, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
@@ -30,10 +33,24 @@ import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 
+const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
+  if (selectedOrganization.managed_by === MANAGED_BY.VERCEL_MARKETPLACE) {
+    return {
+      installationId: selectedOrganization?.partner_id,
+      path: '/settings',
+      message: 'Change Plan on Vercel Marketplace',
+    }
+  }
+  if (selectedOrganization.managed_by === MANAGED_BY.AWS_MARKETPLACE) {
+    return {
+      organizationSlug: selectedOrganization?.slug,
+    }
+  }
+}
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
-  const selectedOrganization = useSelectedOrganization()
-  const slug = selectedOrganization?.slug
+  const { slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
@@ -43,12 +60,12 @@ const PlanUpdateSidePanel = () => {
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
-  const { data: allProjects } = useProjectsQuery()
-  const orgProjects = (allProjects || []).filter(
+  const { data: projectsData } = useProjectsQuery()
+  const orgProjects = (projectsData?.projects ?? []).filter(
     (it) => it.organization_id === selectedOrganization?.id
   )
 
@@ -70,8 +87,6 @@ const PlanUpdateSidePanel = () => {
   })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-
-  const billingPartner = subscription?.billing_partner
 
   const {
     data: subscriptionPreview,
@@ -143,16 +158,11 @@ const PlanUpdateSidePanel = () => {
           </div>
         }
       >
-        {selectedOrganization?.managed_by === 'vercel-marketplace' && (
+        {selectedOrganization && selectedOrganization.managed_by !== MANAGED_BY.SUPABASE && (
           <PartnerManagedResource
-            partner={selectedOrganization?.managed_by}
+            managedBy={selectedOrganization.managed_by}
             resource="Organization plans"
-            cta={{
-              installationId: selectedOrganization?.partner_id,
-              path: '/settings',
-              message: 'Change Plan on Vercel Marketplace',
-            }}
-            // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+            cta={getPartnerManagedResourceCta(selectedOrganization)}
           />
         )}
         <SidePanel.Content>
@@ -163,18 +173,11 @@ const PlanUpdateSidePanel = () => {
               const isDowngradeOption =
                 getPlanChangeType(subscription?.plan.id, plan?.planId) === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
-              const features = pickFeatures(plan, billingPartner)
-              const footer = pickFooter(plan, billingPartner)
+              const features = plan.features
+              const footer = plan.footer
 
               if (plan.id === 'tier_enterprise') {
-                return (
-                  <EnterpriseCard
-                    key={plan.id}
-                    plan={plan}
-                    isCurrentPlan={isCurrentPlan}
-                    billingPartner={billingPartner}
-                  />
-                )
+                return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
               }
 
               return (
@@ -222,8 +225,10 @@ const PlanUpdateSidePanel = () => {
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
-                          (selectedOrganization?.managed_by !== 'supabase' &&
+                          (selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE &&
                             plan.id !== 'tier_free') ||
+                          // Orgs managed by AWS marketplace are not allowed to change the plan
+                          selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ||
                           hasOrioleProjects ||
                           !canUpdateSubscription
                         }
@@ -249,7 +254,10 @@ const PlanUpdateSidePanel = () => {
                                   ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
                                   : !canUpdateSubscription
                                     ? 'You do not have permission to change the subscription plan'
-                                    : undefined,
+                                    : selectedOrganization?.managed_by ===
+                                        MANAGED_BY.AWS_MARKETPLACE
+                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                      : undefined,
                           },
                         }}
                       >

@@ -37,6 +37,8 @@ export const useLegacyJWTSigningKeyQuery = <TData = LegacyJWTSigningKeyData>(
     ({ signal }) => getLegacyJWTSigningKey({ projectRef }, signal),
     {
       enabled: enabled && !!projectRef,
+      retry: false,
+      refetchOnWindowFocus: false,
       ...options,
     }
   )

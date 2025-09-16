@@ -1,29 +1,41 @@
-import { useState, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { ArrowRight, ChevronDown, RefreshCw } from 'lucide-react'
 import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { ArrowRight, RefreshCw } from 'lucide-react'
+import { useMemo, useState } from 'react'
 
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
+import {
+  ReportsNumericFilter,
+  numericFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
+import { useChartHoverState } from 'components/ui/Charts/useChartHoverState'
 
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
-
-import type { NextPageWithLayout } from 'types'
-
-import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
-import ReportChart from 'components/interfaces/Reports/ReportChart'
-import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { Label } from '@ui/components/shadcn/ui/label'
+import { edgeFunctionReports } from 'data/reports/v2/edge-functions.config'
 
-const EdgeFunctionsReport: NextPageWithLayout = () => {
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+
+import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.constants'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
+import { BASE_PATH } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
+import { useQueryState, parseAsJson } from 'nuqs'
+
+const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (
     <ReportPadding>
       <EdgeFunctionsUsage />
@@ -31,234 +43,218 @@ const EdgeFunctionsReport: NextPageWithLayout = () => {
   )
 }
 
-EdgeFunctionsReport.getLayout = (page) => (
+EdgeFunctionsReportV2.getLayout = (page) => (
   <DefaultLayout>
     <ReportsLayout title="Edge Functions">{page}</ReportsLayout>
   </DefaultLayout>
 )
 
-export type UpdateDateRange = (from: string, to: string) => void
-export default EdgeFunctionsReport
+export default EdgeFunctionsReportV2
 
 const EdgeFunctionsUsage = () => {
   const { ref } = useParams()
-  const { data: functions, isLoading: isLoadingFunctions } = useEdgeFunctionsQuery({
+  const { data: functions } = useEdgeFunctionsQuery({
     projectRef: ref,
   })
-  const [isOpen, setIsOpen] = useState(false)
-  const [functionIds, setFunctionIds] = useState<string[]>([])
-  const [tempFunctionIds, setTempFunctionIds] = useState<string[]>(functionIds)
 
-  useEffect(() => {
-    if (isOpen) {
-      setTempFunctionIds(functionIds)
-    }
-  }, [isOpen, functionIds])
+  const chartSyncId = `edge-functions-${ref}`
+  useChartHoverState(chartSyncId)
 
-  const defaultStart = dayjs().subtract(1, 'day').toISOString()
-  const defaultEnd = dayjs().toISOString()
-  const [dateRange, setDateRange] = useState<any>({
-    period_start: { date: defaultStart, time_period: '1d' },
-    period_end: { date: defaultEnd, time_period: 'today' },
-    interval: '1h',
-  })
+  // Filters
+  const [statusCodeFilter, setStatusCodeFilter] = useQueryState(
+    'status_code',
+    parseAsJson(numericFilterSchema.parse)
+  )
+
+  const [regionFilter, setRegionFilter] = useQueryState(
+    'region',
+    parseAsJson(selectFilterSchema.parse)
+  )
+  const [executionTimeFilter, setExecutionTimeFilter] = useQueryState(
+    'execution_time',
+    parseAsJson(numericFilterSchema.parse)
+  )
+
+  const [functionFilter, setFunctionFilter] = useQueryState(
+    'functions',
+    parseAsJson(selectFilterSchema.parse)
+  )
+
+  const {
+    selectedDateRange,
+    updateDateRange,
+    datePickerValue,
+    datePickerHelpers,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  useCurrentOrgPlan()
-
-  const EDGEFN_CHARTS = getEdgeFunctionReportAttributes()
+  const reportConfig = useMemo(() => {
+    return edgeFunctionReports({
+      projectRef: ref!,
+      functions: functions ?? [],
+      startDate: selectedDateRange?.period_start?.date ?? '',
+      endDate: selectedDateRange?.period_end?.date ?? '',
+      interval: selectedDateRange?.interval ?? 'minute',
+      filters: {
+        functions: functionFilter ?? [],
+        status_code: statusCodeFilter,
+        region: regionFilter ?? [],
+        execution_time: executionTimeFilter,
+      },
+    })
+  }, [
+    ref,
+    functions,
+    selectedDateRange,
+    functionFilter,
+    statusCodeFilter,
+    regionFilter,
+    executionTimeFilter,
+  ])
 
   const onRefreshReport = async () => {
-    if (!dateRange) return
+    if (!selectedDateRange) return
 
     setIsRefreshing(true)
-    queryClient.invalidateQueries(['edge-function-report', ref])
+    queryClient.invalidateQueries({ queryKey: ['projects', ref, 'report-v2'] })
     setTimeout(() => setIsRefreshing(false), 1000)
-  }
-
-  const handleIntervalGranularity = (from: string, to: string) => {
-    const conditions = {
-      '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
-      '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
-      '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
-      '1h': dayjs(to).diff(from, 'day') < 10, // less than 10 days
-      '1d': dayjs(to).diff(from, 'day') >= 10, // more than 10 days
-    }
-
-    switch (true) {
-      case conditions['1m']:
-        return '1m'
-      case conditions['10m']:
-        return '10m'
-      case conditions['30m']:
-        return '30m'
-      default:
-        return '1h'
-    }
-  }
-
-  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    setDateRange({
-      period_start: { date: from, time_period: '1d' },
-      period_end: { date: to, time_period: 'today' },
-      interval: handleIntervalGranularity(from, to),
-    })
-  }
-
-  if (!ref) {
-    // Prevent rendering charts until the ref is available
-    return <></>
   }
 
   return (
     <>
-      <ReportHeader title="Edge Functions" />
-      <div className="w-full flex flex-col gap-1">
-        <div className="h-2 w-full">
-          <ShimmerLine active={isRefreshing || isLoadingFunctions} />
-        </div>
-      </div>
-      <section className="relative pt-16 -mt-2">
-        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
-            <ButtonTooltip
-              type="default"
-              disabled={isRefreshing}
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
-            <div className="flex items-center gap-3">
-              <DateRangePicker
-                loading={false}
-                value={'1d'}
-                options={TIME_PERIODS_INFRA}
-                currentBillingPeriodStart={undefined}
-                onChange={(values: any) => {
-                  if (values.interval === '1d') {
-                    setDateRange({ ...values, interval: '1h' })
-                  } else {
-                    setDateRange(values)
-                  }
-                }}
+      <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
+      <ReportStickyNav
+        content={
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <ButtonTooltip
+                type="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+                onClick={onRefreshReport}
               />
-              <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<ChevronDown />}>
-                    <span>
-                      {functionIds.length === 0
-                        ? 'All Functions'
-                        : `${functionIds.length} function${
-                            functionIds.length > 1 ? 's' : ''
-                          } selected`}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="start" className="w-72 p-0">
-                  <div className="space-y-px max-h-60 overflow-y-auto p-1">
-                    <Label
-                      key="all-functions"
-                      htmlFor="all-functions"
-                      className="flex items-center hover:bg-overlay-hover overflow-hidden p-2 rounded-sm"
-                    >
-                      <Checkbox
-                        id="all-functions"
-                        checked={tempFunctionIds.length === 0}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                          if (event.target.checked) {
-                            setTempFunctionIds([])
-                          }
-                        }}
-                      />
-                      <div className="flex flex-col">
-                        <span>All Functions</span>
-                      </div>
-                    </Label>
-                    {functions
-                      ?.filter((fn: { slug: string }) => typeof fn.slug === 'string')
-                      .map((fn) => (
-                        <Label
-                          key={fn.id}
-                          htmlFor={fn.id}
-                          className="flex items-center hover:bg-overlay-hover overflow-hidden p-2 rounded-sm"
-                        >
-                          <div>
-                            <Checkbox
-                              id={fn.id}
-                              checked={tempFunctionIds.includes(fn.id)}
-                              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                if (event.target.checked) {
-                                  setTempFunctionIds([...tempFunctionIds, fn.id])
-                                } else {
-                                  setTempFunctionIds(tempFunctionIds.filter((id) => id !== fn.id))
-                                }
-                              }}
-                            />
-                          </div>
-                          <div className="flex flex-col">
-                            <span>{fn.slug}</span>
-                          </div>
-                        </Label>
-                      ))}
-                  </div>
-                  <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-                    <Button
-                      size="tiny"
-                      type="default"
-                      onClick={() => setIsOpen(false)}
-                      htmlType="button"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="tiny"
-                      type="primary"
-                      htmlType="button"
-                      onClick={() => {
-                        setFunctionIds(tempFunctionIds)
-                        setIsOpen(false)
-                      }}
-                    >
-                      Apply
-                    </Button>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {dateRange && (
+
+              <ReportSettings chartId="edge-functions-charts" />
+
+              <LogsDatePicker
+                align="start"
+                value={datePickerValue}
+                helpers={datePickerHelpers}
+                onSubmit={handleDatePickerChange}
+              />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="edgeFunctionsReportDateRange"
+              />
+
+              {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
+                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRight size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
+                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
                   </p>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          {dateRange &&
-            EDGEFN_CHARTS.filter((attr) => !attr.hide).map((attr, i) => (
-              <ReportChart
-                key={`${attr.id}-${i}`}
-                chart={attr}
-                interval={dateRange.interval}
-                startDate={dateRange?.period_start?.date}
-                endDate={dateRange?.period_end?.date}
-                updateDateRange={updateDateRange}
-                functionIds={functionIds}
+            <div className="w-full flex items-center gap-2 flex-wrap">
+              <ReportsSelectFilter
+                label="Function"
+                options={
+                  functions?.map((fn: { name: string; id: string }) => ({
+                    label: fn.name,
+                    value: fn.id,
+                  })) ?? []
+                }
+                value={functionFilter ?? []}
+                onChange={setFunctionFilter}
+                isLoading={isRefreshing}
+                showSearch
               />
-            ))}
+
+              <ReportsNumericFilter
+                label="Status Code"
+                value={statusCodeFilter}
+                onChange={setStatusCodeFilter}
+                defaultOperator="="
+                isLoading={isRefreshing}
+              />
+
+              <ReportsNumericFilter
+                label="Execution Time"
+                value={executionTimeFilter}
+                onChange={setExecutionTimeFilter}
+                placeholder="Enter time in ms"
+                min={0}
+                max={99999}
+                defaultOperator=">="
+                isLoading={isRefreshing}
+              />
+
+              <ReportsSelectFilter
+                label="Region"
+                options={EDGE_FUNCTION_REGIONS.map((region) => ({
+                  value: region.key,
+                  label: (
+                    <div className="flex items-center gap-x-2">
+                      <img
+                        src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+                        alt={region.key}
+                        className="w-4 h-4"
+                      />
+                      <div className="flex flex-wrap gap-x-2 items-center">
+                        <span className="text-foreground text-xs">{region.label}</span>
+                        <span className="text-foreground-lighter text-xs">{region.key}</span>
+                      </div>
+                    </div>
+                  ),
+                }))}
+                value={regionFilter ?? []}
+                onChange={setRegionFilter}
+                showSearch
+              />
+            </div>
+          </div>
+        }
+      >
+        <div className="mt-8 flex flex-col gap-4 pb-24">
+          {selectedDateRange &&
+            reportConfig
+              .filter((report) => !report.hide)
+              .map((report) => (
+                <ReportChartV2
+                  key={`${report.id}`}
+                  report={report}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  syncId={chartSyncId}
+                  filters={{
+                    functions: functionFilter,
+                    status_code: statusCodeFilter,
+                    region: regionFilter,
+                    execution_time: executionTimeFilter,
+                  }}
+                />
+              ))}
         </div>
-      </section>
+      </ReportStickyNav>
     </>
   )
 }

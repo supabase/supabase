@@ -11,7 +11,6 @@ export const columnSchema = z.object({
   id: z.string(),
   log_type: z.enum(LOG_TYPES),
   method: z.enum(METHODS),
-  host: z.string(),
   pathname: z.string(),
   level: z.enum(LEVELS),
   status: z.number(),
@@ -36,12 +35,11 @@ export const columnFilterSchema = z.object({
     .transform((val) => val.split(ARRAY_DELIMITER))
     .pipe(z.enum(METHODS).array())
     .optional(),
-  host: z.string().optional(),
   pathname: z.string().optional(),
   status: z
     .string()
     .transform((val) => val.split(ARRAY_DELIMITER))
-    .pipe(z.coerce.number().array())
+    .pipe(z.string().array())
     .optional(),
   regions: z
     .string()

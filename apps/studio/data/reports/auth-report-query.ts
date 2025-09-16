@@ -64,14 +64,29 @@ const METRIC_SQL: Record<MetricKey, (interval: AnalyticsInterval) => string> = {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
       --sign-in-attempts
-      select 
+      SELECT
         timestamp_trunc(timestamp, ${granularity}) as timestamp,
-        json_value(event_message, "$.grant_type") as grant_type,
-        count(*) as count
-      from auth_logs
-      where json_value(event_message, "$.path") = '/token'
-      group by timestamp, grant_type
-      order by timestamp desc, grant_type
+        CASE
+          WHEN JSON_VALUE(event_message, "$.provider") IS NOT NULL
+              AND JSON_VALUE(event_message, "$.provider") != ''
+          THEN CONCAT(
+            JSON_VALUE(event_message, "$.login_method"),
+            ' (',
+            JSON_VALUE(event_message, "$.provider"),
+            ')'
+          )
+          ELSE JSON_VALUE(event_message, "$.login_method")
+        END as login_type_provider,
+        COUNT(*) as count
+      FROM
+        auth_logs
+      WHERE
+        JSON_VALUE(event_message, "$.action") = 'login'
+        AND JSON_VALUE(event_message, "$.metering") = "true"
+      GROUP BY
+        timestamp, login_type_provider
+      ORDER BY
+        timestamp desc, login_type_provider
     `
   },
   PasswordResetRequests: (interval) => {
@@ -196,8 +211,8 @@ const METRIC_FORMATTER: Record<
   ActiveUsers: (rawData, attributes) => defaultFormatter(rawData, attributes),
   SignInAttempts: (rawData, attributes) => {
     const chartAttributes = attributes.map((attr) => {
-      if (attr.attribute === 'SignInAttempts' && attr.grantType) {
-        return { ...attr, attribute: `${attr.attribute}_${attr.grantType}` }
+      if (attr.attribute === 'SignInAttempts' && attr.login_type_provider) {
+        return { ...attr, attribute: `${attr.attribute}_${attr.login_type_provider}` }
       }
       return attr
     })
@@ -213,7 +228,7 @@ const METRIC_FORMATTER: Record<
         })
         const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
         matchingPoints.forEach((p: any) => {
-          point[`SignInAttempts_${p.grant_type}`] = p.count
+          point[`SignInAttempts_${p.login_type_provider}`] = p.count
         })
         return point
       })
@@ -292,6 +307,7 @@ export function useAuthLogsReport({
     data: rawData,
     error,
     isLoading,
+    isFetching,
   } = useQuery(
     ['auth-logs-report', projectRef, logsMetric, startDate, endDate, interval, sql],
     async () => {
@@ -324,5 +340,6 @@ export function useAuthLogsReport({
     attributes: chartAttributes,
     isLoading,
     error,
+    isFetching,
   }
 }

@@ -8,7 +8,7 @@ export const SPACE_DELIMITER = '_'
 export const RANGE_DELIMITER = '-'
 export const SORT_DELIMITER = '.'
 
-export const LEVELS = ['success', 'warning', 'error', 'info'] as const
+export const LEVELS = ['success', 'warning', 'error'] as const
 
 export const presets = [
   {

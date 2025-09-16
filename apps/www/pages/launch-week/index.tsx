@@ -1,17 +1,27 @@
+import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
-import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
+import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
 import { useRouter } from 'next/router'
-import { Lw14ConfDataProvider } from '~/components/LaunchWeek/14/hooks/use-conf-data'
-import DefaultLayout from '~/components/Layouts/Default'
-import LWStickyNav from '~/components/LaunchWeek/14/Releases/LWStickyNav'
-import LWHeader from '~/components/LaunchWeek/14/Releases/LWHeader'
-import MainStage from '~/components/LaunchWeek/14/Releases/MainStage'
-import BuildStage from '~/components/LaunchWeek/14/Releases/BuildStage'
 
-const Lw14Page = () => {
-  const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
-  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/14/lw14-og.png?lw=14`
+import DefaultLayout from 'components/Layouts/Default'
+import LW15Heading from 'components/LaunchWeek/15/LW15Heading'
+import LW15MainStage from 'components/LaunchWeek/15/LW15MainStage'
+
+import type { GetServerSideProps } from 'next'
+import type { LumaEvent } from 'app/api-v2/luma-events/route'
+
+const LW15BuildStage = dynamic(() => import('components/LaunchWeek/15/LW15BuildStage'))
+const LW15Hackathon = dynamic(() => import('components/LaunchWeek/15/LW15Hackathon'))
+const LW15Meetups = dynamic(() => import('components/LaunchWeek/15/LW15Meetups'))
+
+interface Props {
+  meetups: LumaEvent[]
+}
+
+const Lw15Page = ({ meetups }: Props) => {
+  const TITLE = `${LW15_TITLE} | ${LW15_DATE}`
+  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 8AM PT.'
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/15/lw15-og.png?lw=15`
 
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
@@ -31,7 +41,7 @@ const Lw14Page = () => {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW14_URL,
+          url: LW15_URL,
           images: [
             {
               url: OG_IMAGE,
@@ -40,22 +50,53 @@ const Lw14Page = () => {
         }}
       />
 
-      <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData, partymodeStatus: 'on' }}>
-        <DefaultLayout>
-          <div
-            style={{
-              fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
-            }}
-          >
-            <LWStickyNav />
-            <LWHeader />
-            <MainStage className="relative z-10" />
-            <BuildStage />
-          </div>
+      <div
+        style={{
+          fontFamily:
+            "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+        }}
+      >
+        <DefaultLayout className="dark:bg-black">
+          <LW15Heading />
+          <LW15MainStage />
+          <LW15BuildStage />
+          <LW15Hackathon />
+          <LW15Meetups meetups={meetups} />
         </DefaultLayout>
-      </Lw14ConfDataProvider>
+      </div>
     </>
   )
 }
 
-export default Lw14Page
+export const getServerSideProps: GetServerSideProps = async () => {
+  try {
+    // Date range for Launch Week 15: July 14th, 2025 to September 1st, 2025
+    const afterDate = '2025-07-14T00:00:00.000Z'
+    const beforeDate = '2025-09-01T23:59:59.999Z'
+
+    const url = new URL(`${SITE_ORIGIN}/api-v2/luma-events`)
+    url.searchParams.append('after', afterDate)
+    url.searchParams.append('before', beforeDate)
+
+    const res = await fetch(url.toString())
+    const data = await res.json()
+
+    if (data.success) {
+      return {
+        props: {
+          meetups: data.events.filter((event: LumaEvent) =>
+            event.name?.toLowerCase().includes('lw15')
+          ),
+        },
+      }
+    } else {
+      console.error('Failed to fetch meetups:', data.error)
+      return { props: { meetups: [] } }
+    }
+  } catch (error) {
+    console.error('Error fetching meetups:', error)
+    return { props: { meetups: [] } }
+  }
+}
+
+export default Lw15Page

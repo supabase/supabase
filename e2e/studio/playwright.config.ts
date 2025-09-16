@@ -12,13 +12,14 @@ export default defineConfig({
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
-  retries: IS_CI ? 3 : 1,
+  retries: IS_CI ? 3 : 0,
   use: {
     baseURL: env.STUDIO_URL,
     screenshot: 'off',
     video: 'retain-on-failure',
     headless: IS_CI,
     trace: 'retain-on-failure',
+    permissions: ['clipboard-read', 'clipboard-write'],
   },
   projects: [
     {

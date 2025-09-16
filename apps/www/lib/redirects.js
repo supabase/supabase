@@ -1542,6 +1542,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/local-quickstart',
+    destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
@@ -2018,6 +2023,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/deployment/branching/branching-2',
+    destination: '/docs/guides/deployment/branching/dashboard',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/resources/postgres/dropping-all-tables-in-schema',
     destination: '/docs/guides/database/postgres/dropping-all-tables-in-schema',
   },
@@ -2114,6 +2124,11 @@ module.exports = [
     permanent: true,
     source: '/blog/case-study-happyteams',
     destination: '/customers/happyteams',
+  },
+  {
+    permanent: true,
+    source: '/customers/mendableai',
+    destination: '/customers/firecrawl',
   },
   {
     permanent: true,

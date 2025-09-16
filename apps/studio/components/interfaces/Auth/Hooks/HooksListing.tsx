@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddHookDropdown } from './AddHookDropdown'
@@ -19,7 +19,7 @@ import { extractMethod, getRevokePermissionStatements, isValidHook } from './hoo
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
 
   const [selectedHook, setSelectedHook] = useState<HOOK_DEFINITION_TITLE | null>(null)

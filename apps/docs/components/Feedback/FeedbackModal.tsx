@@ -49,6 +49,22 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
                 textAreaClassName="resize-none"
                 afterLabel=" (not anonymous)"
               />
+              <div className="flex gap-2 text-xs text-foreground-light leading-relaxed">
+                <span className="flex-shrink-0 mt-0.5">💡</span>
+                <div>
+                  <strong>Need help or support?</strong> This feedback form is for documentation
+                  improvements only. For technical support, please submit a{' '}
+                  <a
+                    href="https://supabase.com/dashboard/support/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand-link hover:underline"
+                  >
+                    support request
+                  </a>
+                  .
+                </div>
+              </div>
             </Modal.Content>
             <Modal.Separator />
             <Modal.Content className="pt-2 pb-4">

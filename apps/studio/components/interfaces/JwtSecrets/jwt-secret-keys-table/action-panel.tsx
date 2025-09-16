@@ -15,12 +15,12 @@ export const ActionPanel = forwardRef<HTMLDivElement, ActionPanelProps>(
   ({ title, description, buttonLabel, onClick, loading, icon, type, ...props }, ref) => {
     return (
       <Card
-        className="bg-surface-100 first:rounded-b-none last:rounded-t-none shadow-none only:rounded-lg"
+        className="first:rounded-b-none last:rounded-t-none shadow-none only:rounded-lg"
         ref={ref}
         {...props}
       >
         <CardHeader className="lg:flex-row lg:items-center gap-3 lg:gap-10 py-4 border-0">
-          <div className="flex flex-col gap-0 flex-1 grow">
+          <div className="flex flex-col gap-2 flex-1 grow">
             <CardTitle className="text-sm">{title}</CardTitle>
             <CardDescription className="max-w-xl">{description}</CardDescription>
           </div>

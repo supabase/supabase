@@ -655,6 +655,27 @@ export type Database = {
           subsections: Json[]
         }[]
       }
+      search_content_hybrid: {
+        Args: {
+          query_text: string
+          query_embedding: string
+          max_result?: number
+          full_text_weight?: number
+          semantic_weight?: number
+          rrf_k?: number
+          match_threshold?: number
+          include_full_content?: boolean
+        }
+        Returns: {
+          id: number
+          page_title: string
+          type: string
+          href: string
+          content: string
+          metadata: Json
+          subsections: Json[]
+        }[]
+      }
       update_last_changed_checksum: {
         Args: {
           new_parent_page: string

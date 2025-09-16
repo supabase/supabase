@@ -14,18 +14,19 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { ConnectionType } from './Connect.constants'
 import { ConnectionIcon } from './ConnectionIcon'
 
 interface ConnectDropdownProps {
   state: string
   updateState: (state: string) => void
   label: string
-  items: any[]
+  items: ConnectionType[]
   iconFolder?: string
   supportsDarkMode?: boolean
 }
 
-const ConnectDropdown = ({
+export const ConnectDropdown = ({
   state,
   updateState,
   label,
@@ -59,7 +60,7 @@ const ConnectDropdown = ({
             <div className="flex items-center gap-2">
               {selectedItem?.icon ? (
                 <ConnectionIcon
-                  connection={selectedItem.icon}
+                  icon={selectedItem.icon}
                   iconFolder={iconFolder}
                   supportsDarkMode={supportsDarkMode}
                 />
@@ -89,7 +90,7 @@ const ConnectDropdown = ({
                 >
                   {item.icon ? (
                     <ConnectionIcon
-                      connection={item.icon}
+                      icon={item.icon}
                       iconFolder={iconFolder}
                       supportsDarkMode={supportsDarkMode}
                     />
@@ -110,5 +111,3 @@ const ConnectDropdown = ({
     </Popover_Shadcn_>
   )
 }
-
-export default ConnectDropdown

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -23,7 +23,7 @@ import {
 export const DeployEdgeFunctionButton = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -93,9 +93,19 @@ export const DeployEdgeFunctionButton = () => {
                 title:
                   'I can help you create a new edge function. Here are a few example prompts to get you started:',
                 prompts: [
-                  'Create a new edge function that processes payments with Stripe',
-                  'Create a new edge function that sends emails with Resend',
-                  'Create a new edge function that generates PDFs from HTML templates',
+                  {
+                    label: 'Stripe Payments',
+                    description: 'Create a new edge function that processes payments with Stripe',
+                  },
+                  {
+                    label: 'Email with Resend',
+                    description: 'Create a new edge function that sends emails with Resend',
+                  },
+                  {
+                    label: 'PDF Generator',
+                    description:
+                      'Create a new edge function that generates PDFs from HTML templates',
+                  },
                 ],
               },
             })

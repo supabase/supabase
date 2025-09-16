@@ -5,17 +5,14 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { useFlag } from 'common'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   DropdownMenu,
@@ -29,7 +26,7 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 const RestartServerButton = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
@@ -38,7 +35,10 @@ const RestartServerButton = () => {
   const projectRegion = project?.region ?? ''
 
   const projectRestartDisabled = useFlag('disableProjectRestarts')
-  const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
+  const { can: canRestartProject } = useAsyncCheckPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'reboot'
+  )
 
   const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
     onSuccess: () => {
@@ -114,7 +114,7 @@ const RestartServerButton = () => {
                     ? 'Unable to restart project as project is not active'
                     : isAwsK8s
                       ? 'Project restart is not supported for AWS (Revamped) projects'
-                      : '',
+                      : undefined,
             },
           }}
         >

@@ -2,7 +2,6 @@ import { GripVertical, Settings2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import {
-  Button,
   Checkbox_Shadcn_,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
@@ -14,6 +13,7 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
+import { ButtonTooltip } from '../ButtonTooltip'
 import { Sortable, SortableDragHandle, SortableItem } from './primitives/Sortable'
 import { useDataTable } from './providers/DataTableProvider'
 
@@ -36,13 +36,14 @@ export function DataTableViewOptions() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
+        <ButtonTooltip
           type="outline"
           size="tiny"
           role="combobox"
           aria-expanded={open}
           className="w-[26px]"
           icon={<Settings2 className="text-foreground" />}
+          tooltip={{ content: { side: 'bottom', text: 'Toggle column visibility' } }}
         />
       </PopoverTrigger>
       <PopoverContent portal side="bottom" align="end" className="w-[200px] p-0">

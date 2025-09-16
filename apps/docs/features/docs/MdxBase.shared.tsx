@@ -1,11 +1,11 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Image } from 'ui'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { Admonition } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
@@ -28,7 +28,7 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
-import { AuthErrorCodes } from '../ui/AuthErrorCodes'
+import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
 const components = {
@@ -36,7 +36,6 @@ const components = {
   AccordionItem,
   Admonition,
   AiPromptsIndex,
-  AuthErrorCodes,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
@@ -45,6 +44,7 @@ const components = {
   CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,
+  ErrorCodes,
   Extensions,
   GlassPanel,
   IconArrowDown: ArrowDown,

@@ -10,9 +10,9 @@ hideToc: true
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create a new Supabase project">
 
-    [Launch a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    [Launch a new project](/dashboard) in the Supabase Dashboard.
 
-    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](https://supabase.com/dashboard/project/_/sql).
+    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](/dashboard/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -27,22 +27,20 @@ hideToc: true
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Details title="Create a React app">
 
-    <StepHikeCompact.Details title="Create a React app">
+    Create a React app using [Vite](https://vitejs.dev/).
 
-    Create a React app using the `create-react-app` command.
+  </StepHikeCompact.Details>
 
-    </StepHikeCompact.Details>
+  <StepHikeCompact.Code>
 
-    <StepHikeCompact.Code>
+    ```bash name=Terminal
+    npm create vite@latest my-app -- --template react
+    ```
 
-      ```bash name=Terminal
-      npx create-react-app my-app
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
+  </StepHikeCompact.Code>
+</StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
@@ -66,21 +64,23 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Set up your login component">
 
-    In `App.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    In `App.jsx`, create a Supabase client using your Project URL and key.
+
+    <$Partial path="api_settings_steps.mdx" />
 
     You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
-      ```js name=src/App.js
+      ```jsx name=src/App.jsx
         import './index.css'
         import { useState, useEffect } from 'react'
         import { createClient } from '@supabase/supabase-js'
         import { Auth } from '@supabase/auth-ui-react'
         import { ThemeSupa } from '@supabase/auth-ui-shared'
 
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+        const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 
         export default function App() {
           const [session, setSession] = useState(null)
@@ -122,7 +122,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash name=Terminal
-      npm start
+      npm run dev
       ```
 
     </StepHikeCompact.Code>

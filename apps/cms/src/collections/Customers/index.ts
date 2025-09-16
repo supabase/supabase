@@ -9,15 +9,15 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { isAnyone } from '@/access/isAnyone'
-import { isAuthenticated } from '@/access/isAuthenticated'
+import { isAnyone } from '../../access/isAnyone.ts'
+import { isAuthenticated } from '../../access/isAuthenticated.ts'
 
-import { Banner } from '../../blocks/Banner/config'
-import { Code } from '../../blocks/Code/config'
-import { MediaBlock } from '../../blocks/MediaBlock/config'
-import { Quote } from '../../blocks/Quote/config'
-import { YouTube } from '../../blocks/YouTube/config'
-import { revalidateDelete, revalidateCustomer } from './hooks/revalidateCustomer'
+import { Banner } from '../../blocks/Banner/config.ts'
+import { Code } from '../../blocks/Code/config.ts'
+import { MediaBlock } from '../../blocks/MediaBlock/config.ts'
+import { Quote } from '../../blocks/Quote/config.ts'
+import { YouTube } from '../../blocks/YouTube/config.ts'
+import { revalidateDelete, revalidateCustomer } from './hooks/revalidateCustomer.ts'
 
 import {
   MetaDescriptionField,
@@ -26,7 +26,8 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import { slugField } from '@/fields/slug'
+import { slugField } from '../../fields/slug/index.ts'
+import { WWW_SITE_ORIGIN } from '../../utilities/constants.ts'
 
 const industryOptions = [
   { label: 'Healthcare', value: 'healthcare' },
@@ -73,16 +74,20 @@ export const Customers: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'updatedAt'],
     preview: (data) => {
-      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+      const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
       const isDraft = data?._status === 'draft'
       return `${baseUrl}/customers/${data?.slug}${isDraft ? '?preview=true' : ''}`
     },
   },
   access: {
-    create: isAuthenticated,
-    delete: isAuthenticated,
-    read: isAnyone,
-    update: isAuthenticated,
+    // create: isAuthenticated,
+    // delete: isAuthenticated,
+    // read: isAnyone,
+    // update: isAuthenticated,
+    create: () => false,
+    delete: () => false,
+    read: () => false,
+    update: () => false,
   },
   defaultPopulate: {
     name: true,
@@ -303,9 +308,9 @@ export const Customers: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 100,
-      },
+      // autosave: {
+      //   interval: 100,
+      // },
       schedulePublish: true,
     },
     maxPerDoc: 50,

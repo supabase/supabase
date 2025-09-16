@@ -1,12 +1,12 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { useFlag } from 'common'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
   AWS_REGIONS_COORDINATES,
   FLY_REGIONS_COORDINATES,
 } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { fetchHandler } from 'data/fetchers'
-import { useFlag } from 'hooks/ui/useFlag'
 import { getDistanceLatLonKM, tryParseJson } from 'lib/helpers'
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
@@ -37,7 +37,9 @@ export async function getDefaultRegionOption({
 
     if (locLatLon === undefined) return undefined
 
-    const allRegions = cloudProvider === 'AWS' ? AWS_REGIONS_COORDINATES : FLY_REGIONS_COORDINATES
+    const isAWSProvider = ['AWS', 'AWS_K8S'].includes(cloudProvider)
+
+    const allRegions = isAWSProvider ? AWS_REGIONS_COORDINATES : FLY_REGIONS_COORDINATES
     const locations =
       useRestrictedPool && restrictedPool
         ? Object.entries(allRegions)
@@ -55,7 +57,7 @@ export async function getDefaultRegionOption({
     const shortestDistance = Math.min(...distances)
     const closestRegion = Object.keys(locations)[distances.indexOf(shortestDistance)]
 
-    return cloudProvider === 'AWS'
+    return isAWSProvider
       ? AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS].displayName
       : FLY_REGIONS[closestRegion as keyof typeof FLY_REGIONS].displayName
   } catch (error) {

@@ -1,8 +1,8 @@
-import { expect, test, describe, afterAll, beforeAll } from 'vitest'
-import { createTestDatabase, cleanupRoot } from '../db/utils'
+import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 import pgMeta from '../../src/index'
+import { Filter, Sort } from '../../src/query'
 import { getDefaultOrderByColumns, getTableRowsSql } from '../../src/query/table-row-query'
-import { Sort, Filter } from '../../src/query'
+import { cleanupRoot, createTestDatabase } from '../db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -1098,7 +1098,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_sql_filter where name ~~ 'Test%' and category = 'A' order by test_sql_filter.id asc nulls last limit 10 offset 0)
+        "with _base_query as (select * from public.test_sql_filter where name::text ~~ 'Test%' and category = 'A' order by test_sql_filter.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -1653,16 +1653,16 @@ describe('Table Row Query', () => {
               else subject_id::text
             end as subject_id,
               case 
-                when octet_length(timestamp::text) > 10240 
+                when octet_length("timestamp"::text) > 10240 
                 then
                   case
-                    when array_ndims(timestamp) = 1
+                    when array_ndims("timestamp") = 1
                     then
-                      (select array_cat(timestamp[1:50]::text[], array['...']::text[]))::text[]
+                      (select array_cat("timestamp"[1:50]::text[], array['...']::text[]))::text[]
                     else
-                      timestamp[1:50]::text[]
+                      "timestamp"[1:50]::text[]
                   end
-                else timestamp::text[]
+                else "timestamp"::text[]
               end
             ,
               case 
