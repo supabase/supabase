@@ -44,6 +44,8 @@
   "logs:templates": true,
   "logs:collections": true,
 
+  "organization:show_sso_settings": true,
+
   "profile:show_email": true,
   "profile:show_information": true,
   "profile:show_analytics_and_marketing": true,
@@ -51,6 +53,9 @@
 
   "project_connection:javascript_example": true,
   "project_connection:dart_example": true,
+  "project_connection:show_app_frameworks": true,
+  "project_connection:show_mobile_frameworks": true,
+  "project_connection:show_orms": true,
 
   "project_creation:show_advanced_config": true,
 
