@@ -74,6 +74,10 @@
         "enum": ["AWS", "AWS_K8S", "AWS_NIMBUS", "FLY"]
       }
     },
+    "infra:aws_nimbus_label": {
+      "type": "string",
+      "description": "The label of the AWS Nimbus provider"
+    },
 
     "ssl:certificate_url": {
       "type": "string",
@@ -86,6 +90,7 @@
     "project_homepage:example_projects",
     "logs:default_query",
     "infra:cloud_providers",
+    "infra:aws_nimbus_label",
     "ssl:certificate_url"
   ],
   "additionalProperties": false
