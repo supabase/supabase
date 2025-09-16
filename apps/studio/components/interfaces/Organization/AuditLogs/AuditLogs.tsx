@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -23,7 +23,7 @@ import {
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -32,13 +32,15 @@ import {
   WarningIcon,
 } from 'ui'
 
+const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
+
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
 // - We'll need pagination as well if the audit logs get too large, but that needs to be implemented on the API side first if possible
 // - I've hidden time input in the date picker for now cause the time support in the component is a bit iffy, need to investigate
 //   - Maybe a rule to follow from here is just everytime we call dayjs, use UTC(), one TZ to rule them all
 
-const AuditLogs = () => {
+export const AuditLogs = () => {
   const { slug } = useParams()
   const currentTime = dayjs().utc().set('millisecond', 0)
   const [dateSortDesc, setDateSortDesc] = useState(true)
@@ -52,7 +54,10 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
-  const canReadAuditLogs = useCheckPermissions(PermissionAction.READ, 'notifications')
+  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'notifications'
+  )
 
   const { data: projectsData } = useProjectsQuery()
   const projects = projectsData?.projects ?? []
@@ -69,13 +74,15 @@ const AuditLogs = () => {
       {
         enabled: canReadAuditLogs,
         retry: false,
+        refetchOnWindowFocus: (query) => {
+          return !query.state.error?.message.endsWith(logsUpgradeError)
+        },
       }
     )
 
   const activeMembers = (members ?? []).filter((x) => !x.invited_at)
   const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
 
-  const retentionPeriod = data?.retention_period ?? 0
   const logs = data?.result ?? []
   const sortedLogs = logs
     ?.sort((a, b) =>
@@ -99,8 +106,6 @@ const AuditLogs = () => {
     })
 
   const currentOrganization = organizations?.find((o) => o.slug === slug)
-  const minDate = dayjs().subtract(retentionPeriod, 'days')
-  const maxDate = dayjs()
 
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
@@ -119,300 +124,296 @@ const AuditLogs = () => {
     return () => clearInterval(interval)
   }, [dateRange.from, dateRange.to])
 
-  if (!canReadAuditLogs) {
-    return (
-      <ScaffoldContainerLegacy>
-        <NoPermission resourceText="view organization audit logs" />
-      </ScaffoldContainerLegacy>
-    )
-  }
-
   return (
     <>
-      <ScaffoldContainerLegacy>
-        <div className="space-y-4 flex flex-col">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <p className="text-xs prose">Filter by</p>
-              <FilterPopover
-                name="Users"
-                options={activeMembers}
-                labelKey="username"
-                valueKey="gotrue_id"
-                activeOptions={filters.users}
-                onSaveFilters={(values) => setFilters({ ...filters, users: values })}
-              />
-              <FilterPopover
-                name="Projects"
-                options={
-                  projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
-                }
-                labelKey="name"
-                valueKey="ref"
-                activeOptions={filters.projects}
-                onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-              />
-              <LogsDatePicker
-                hideWarnings
-                value={dateRange}
-                onSubmit={(value) => setDateRange(value)}
-                helpers={[
-                  {
-                    text: 'Last 1 hour',
-                    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-                  {
-                    text: 'Last 3 hours',
-                    calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
+      <ScaffoldContainer>
+        <ScaffoldSection isFullWidth>
+          <div className="space-y-4 flex flex-col">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <p className="text-xs prose">Filter by</p>
+                <FilterPopover
+                  name="Users"
+                  options={activeMembers}
+                  labelKey="username"
+                  valueKey="gotrue_id"
+                  activeOptions={filters.users}
+                  onSaveFilters={(values) => setFilters({ ...filters, users: values })}
+                />
+                <FilterPopover
+                  name="Projects"
+                  options={
+                    projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
+                  }
+                  labelKey="name"
+                  valueKey="ref"
+                  activeOptions={filters.projects}
+                  onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+                />
+                <LogsDatePicker
+                  hideWarnings
+                  value={dateRange}
+                  onSubmit={(value) => setDateRange(value)}
+                  helpers={[
+                    {
+                      text: 'Last 1 hour',
+                      calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
+                    {
+                      text: 'Last 3 hours',
+                      calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
 
-                  {
-                    text: 'Last 6 hours',
-                    calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-                  {
-                    text: 'Last 12 hours',
-                    calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-                  {
-                    text: 'Last 24 hours',
-                    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-                ]}
-              />
-              {isSuccess && (
-                <>
-                  <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
-                  <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
-                </>
-              )}
-            </div>
-            <Button
-              type="default"
-              disabled={isLoading || isRefetching}
-              icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-              onClick={() => refetch()}
-            >
-              {isRefetching ? 'Refreshing' : 'Refresh'}
-            </Button>
-          </div>
-
-          {isLoading && (
-            <div className="space-y-2">
-              <ShimmeringLoader />
-              <ShimmeringLoader className="w-3/4" />
-              <ShimmeringLoader className="w-1/2" />
-            </div>
-          )}
-
-          {isError ? (
-            error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.') ? (
-              <Alert_Shadcn_
-                variant="default"
-                title="Organization Audit Logs are not available on Free or Pro plans"
-              >
-                <WarningIcon />
-                <div className="flex flex-col md:flex-row pt-1 gap-4">
-                  <div className="grow">
-                    <AlertTitle_Shadcn_>
-                      Organization Audit Logs are not available on Free or Pro plans
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                      <p>
-                        Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
-                        organization.
-                      </p>
-                    </AlertDescription_Shadcn_>
-                  </div>
-
-                  <div className="flex items-center">
-                    <Button type="primary" asChild>
-                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=auditLogs`}>
-                        Upgrade subscription
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </Alert_Shadcn_>
-            ) : error.message.includes('range exceeded') ? (
-              <Alert_Shadcn_ variant="destructive" title="Date range too large">
-                <WarningIcon />
-                <AlertTitle_Shadcn_>Date range too large</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  The selected date range exceeds the maximum allowed period. Please select a
-                  smaller time range.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            ) : (
-              <AlertError error={error} subject="Failed to retrieve audit logs" />
-            )
-          ) : null}
-
-          {isSuccess && (
-            <>
-              {logs.length === 0 ? (
-                <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                  <p className="prose text-sm">
-                    Your organization does not have any audit logs available yet
-                  </p>
-                </div>
-              ) : logs.length > 0 && sortedLogs.length === 0 ? (
-                <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                  <p className="prose text-sm">No audit logs found based on the filters applied</p>
-                </div>
-              ) : (
-                <Table
-                  head={[
-                    <Table.th key="user" className="py-2">
-                      User
-                    </Table.th>,
-                    <Table.th key="action" className="py-2">
-                      Action
-                    </Table.th>,
-                    <Table.th key="target" className="py-2">
-                      Target
-                    </Table.th>,
-                    <Table.th key="date" className="py-2">
-                      <div className="flex items-center space-x-2">
-                        <p>Date</p>
-
-                        <ButtonTooltip
-                          type="text"
-                          className="px-1"
-                          icon={
-                            dateSortDesc ? (
-                              <ArrowDown strokeWidth={1.5} size={14} />
-                            ) : (
-                              <ArrowUp strokeWidth={1.5} size={14} />
-                            )
-                          }
-                          onClick={() => setDateSortDesc(!dateSortDesc)}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
-                            },
-                          }}
-                        />
-                      </div>
-                    </Table.th>,
-                    <Table.th key="actions" className="py-2"></Table.th>,
+                    {
+                      text: 'Last 6 hours',
+                      calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
+                    {
+                      text: 'Last 12 hours',
+                      calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
+                    {
+                      text: 'Last 24 hours',
+                      calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
                   ]}
-                  body={
-                    sortedLogs?.map((log) => {
-                      const user = (members ?? []).find(
-                        (member) => member.gotrue_id === log.actor.id
-                      )
-                      const role = roles.find((role) => user?.role_ids?.[0] === role.id)
-                      const project = projects?.find(
-                        (project) => project.ref === log.target.metadata.project_ref
-                      )
-                      const organization = organizations?.find(
-                        (org) => org.slug === log.target.metadata.org_slug
-                      )
+                />
+                {isSuccess && (
+                  <>
+                    <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
+                    <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
+                  </>
+                )}
+              </div>
+              <Button
+                type="default"
+                disabled={isLoading || isRefetching}
+                icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                onClick={() => refetch()}
+              >
+                {isRefetching ? 'Refreshing' : 'Refresh'}
+              </Button>
+            </div>
 
-                      const hasStatusCode = log.action.metadata[0]?.status !== undefined
-                      const userIcon =
-                        user === undefined ? (
-                          <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
-                            <p>?</p>
-                          </div>
-                        ) : user?.invited_id || user?.username === user?.primary_email ? (
-                          <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
-                            <User size={18} strokeWidth={2} />
-                          </div>
-                        ) : (
-                          <Image
-                            alt={user?.username}
-                            src={`https://github.com/${user?.username ?? ''}.png?size=80`}
-                            width="30"
-                            height="30"
-                            className="border rounded-full"
+            {isLoading || isLoadingPermissions ? (
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
+            ) : !canReadAuditLogs ? (
+              <NoPermission resourceText="view organization audit logs" />
+            ) : null}
+
+            {isError ? (
+              error.message.endsWith(logsUpgradeError) ? (
+                <Alert_Shadcn_
+                  variant="default"
+                  title="Organization Audit Logs are not available on Free or Pro plans"
+                >
+                  <WarningIcon />
+                  <div className="flex flex-col md:flex-row pt-1 gap-4">
+                    <div className="grow">
+                      <AlertTitle_Shadcn_>
+                        Organization Audit Logs are not available on Free or Pro plans
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
+                        <p>
+                          Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
+                          organization.
+                        </p>
+                      </AlertDescription_Shadcn_>
+                    </div>
+
+                    <div className="flex items-center">
+                      <Button type="primary" asChild>
+                        <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=auditLogs`}>
+                          Upgrade subscription
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </Alert_Shadcn_>
+              ) : error.message.includes('range exceeded') ? (
+                <Alert_Shadcn_ variant="destructive" title="Date range too large">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>Date range too large</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    The selected date range exceeds the maximum allowed period. Please select a
+                    smaller time range.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
+                <AlertError error={error} subject="Failed to retrieve audit logs" />
+              )
+            ) : null}
+
+            {isSuccess && (
+              <>
+                {logs.length === 0 ? (
+                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                    <p className="prose text-sm">
+                      Your organization does not have any audit logs available yet
+                    </p>
+                  </div>
+                ) : logs.length > 0 && sortedLogs.length === 0 ? (
+                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                    <p className="prose text-sm">
+                      No audit logs found based on the filters applied
+                    </p>
+                  </div>
+                ) : (
+                  <Table
+                    head={[
+                      <Table.th key="user" className="py-2">
+                        User
+                      </Table.th>,
+                      <Table.th key="action" className="py-2">
+                        Action
+                      </Table.th>,
+                      <Table.th key="target" className="py-2">
+                        Target
+                      </Table.th>,
+                      <Table.th key="date" className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <p>Date</p>
+
+                          <ButtonTooltip
+                            type="text"
+                            className="px-1"
+                            icon={
+                              dateSortDesc ? (
+                                <ArrowDown strokeWidth={1.5} size={14} />
+                              ) : (
+                                <ArrowUp strokeWidth={1.5} size={14} />
+                              )
+                            }
+                            onClick={() => setDateSortDesc(!dateSortDesc)}
+                            tooltip={{
+                              content: {
+                                side: 'bottom',
+                                text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
+                              },
+                            }}
                           />
+                        </div>
+                      </Table.th>,
+                      <Table.th key="actions" className="py-2"></Table.th>,
+                    ]}
+                    body={
+                      sortedLogs?.map((log) => {
+                        const user = (members ?? []).find(
+                          (member) => member.gotrue_id === log.actor.id
+                        )
+                        const role = roles.find((role) => user?.role_ids?.[0] === role.id)
+                        const project = projects?.find(
+                          (project) => project.ref === log.target.metadata.project_ref
+                        )
+                        const organization = organizations?.find(
+                          (org) => org.slug === log.target.metadata.org_slug
                         )
 
-                      return (
-                        <Table.tr
-                          key={log.occurred_at}
-                          onClick={() => setSelectedLog(log)}
-                          className="cursor-pointer hover:!bg-alternative transition duration-100"
-                        >
-                          <Table.td>
-                            <div className="flex items-center space-x-4">
-                              <div>{userIcon}</div>
-                              <div>
-                                <p className="text-foreground-light">{user?.username ?? '-'}</p>
-                                {role && (
-                                  <p className="mt-0.5 text-xs text-foreground-light">
-                                    {role?.name}
+                        const hasStatusCode = log.action.metadata[0]?.status !== undefined
+                        const userIcon =
+                          user === undefined ? (
+                            <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
+                              <p>?</p>
+                            </div>
+                          ) : user?.invited_id || user?.username === user?.primary_email ? (
+                            <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
+                              <User size={18} strokeWidth={2} />
+                            </div>
+                          ) : (
+                            <Image
+                              alt={user?.username}
+                              src={`https://github.com/${user?.username ?? ''}.png?size=80`}
+                              width="30"
+                              height="30"
+                              className="border rounded-full"
+                            />
+                          )
+
+                        return (
+                          <Table.tr
+                            key={log.occurred_at}
+                            onClick={() => setSelectedLog(log)}
+                            className="cursor-pointer hover:!bg-alternative transition duration-100"
+                          >
+                            <Table.td>
+                              <div className="flex items-center space-x-4">
+                                <div>{userIcon}</div>
+                                <div>
+                                  <p className="text-foreground-light">{user?.username ?? '-'}</p>
+                                  {role && (
+                                    <p className="mt-0.5 text-xs text-foreground-light">
+                                      {role?.name}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </Table.td>
+                            <Table.td className="max-w-[250px]">
+                              <div className="flex items-center space-x-2">
+                                {hasStatusCode && (
+                                  <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                                    {log.action.metadata[0].status}
                                   </p>
                                 )}
-                              </div>
-                            </div>
-                          </Table.td>
-                          <Table.td className="max-w-[250px]">
-                            <div className="flex items-center space-x-2">
-                              {hasStatusCode && (
-                                <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
-                                  {log.action.metadata[0].status}
+                                <p className="truncate" title={log.action.name}>
+                                  {log.action.name}
                                 </p>
-                              )}
-                              <p className="truncate" title={log.action.name}>
-                                {log.action.name}
+                              </div>
+                            </Table.td>
+                            <Table.td>
+                              <p
+                                className="text-foreground-light max-w-[230px] truncate"
+                                title={project?.name ?? organization?.name ?? '-'}
+                              >
+                                {project?.name
+                                  ? 'Project: '
+                                  : organization?.name
+                                    ? 'Organization: '
+                                    : null}
+                                {project?.name ?? organization?.name ?? 'Unknown'}
                               </p>
-                            </div>
-                          </Table.td>
-                          <Table.td>
-                            <p
-                              className="text-foreground-light max-w-[230px] truncate"
-                              title={project?.name ?? organization?.name ?? '-'}
-                            >
-                              {project?.name
-                                ? 'Project: '
-                                : organization?.name
-                                  ? 'Organization: '
-                                  : null}
-                              {project?.name ?? organization?.name ?? 'Unknown'}
-                            </p>
-                            <p
-                              className="text-foreground-light text-xs mt-0.5 truncate"
-                              title={
-                                log.target.metadata.project_ref ?? log.target.metadata.org_slug
-                              }
-                            >
-                              {log.target.metadata.project_ref
-                                ? 'Ref: '
-                                : log.target.metadata.org_slug
-                                  ? 'Slug: '
-                                  : null}
-                              {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
-                            </p>
-                          </Table.td>
-                          <Table.td>
-                            {dayjs(log.occurred_at).format('DD MMM YYYY, HH:mm:ss')}
-                          </Table.td>
-                          <Table.td align="right">
-                            <Button type="default">View details</Button>
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    }) ?? []
-                  }
-                />
-              )}
-            </>
-          )}
-        </div>
-      </ScaffoldContainerLegacy>
+                              <p
+                                className="text-foreground-light text-xs mt-0.5 truncate"
+                                title={
+                                  log.target.metadata.project_ref ?? log.target.metadata.org_slug
+                                }
+                              >
+                                {log.target.metadata.project_ref
+                                  ? 'Ref: '
+                                  : log.target.metadata.org_slug
+                                    ? 'Slug: '
+                                    : null}
+                                {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
+                              </p>
+                            </Table.td>
+                            <Table.td>
+                              {dayjs(log.occurred_at).format('DD MMM YYYY, HH:mm:ss')}
+                            </Table.td>
+                            <Table.td align="right">
+                              <Button type="default">View details</Button>
+                            </Table.td>
+                          </Table.tr>
+                        )
+                      }) ?? []
+                    }
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
 
       <LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
     </>
   )
 }
-
-export default AuditLogs

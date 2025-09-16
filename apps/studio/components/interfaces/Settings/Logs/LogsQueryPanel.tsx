@@ -111,7 +111,7 @@ const LogsQueryPanel = ({
               <DropdownMenuContent
                 side="bottom"
                 align="start"
-                className="max-h-[70vh] overflow-auto"
+                className="max-h-[390px] overflow-auto"
               >
                 {logsTableNames
                   .sort((a, b) => a.localeCompare(b))

@@ -1,6 +1,8 @@
 {
   "$schema": "./custom-content.schema.json",
 
+  "dashboard_auth:custom_provider": "Nimbus",
+
   "organization:legal_documents": [
     {
       "id": "doc1",
@@ -22,6 +24,14 @@
     }
   ],
 
+  "project_homepage:client_libraries": [
+    {
+      "language": "JavaScript",
+      "officialSupport": true,
+      "docsUrl": "https://supabase.com/docs/reference/javascript/installing",
+      "gitUrl": "https://github.com/supabase/supabase-js"
+    }
+  ],
   "project_homepage:example_projects": [
     {
       "title": "Framework 1",
@@ -39,40 +49,8 @@
 
   "logs:default_query": "This is a sample query",
 
-  "connect:frameworks": {
-    "key": "frameworks",
-    "label": "Frameworks",
-    "obj": [
-      {
-        "key": "framework-1",
-        "label": "Framework 1",
-        "icon": "https://supabase.com/dashboard/img/supabase-logo.svg",
-        "guideLink": "https://supabase.com/docs",
-        "children": [],
-        "files": [
-          {
-            "name": "sample_env",
-            "content": "NEXT_PUBLIC_SUPABASE_URL={{apiUrl}}\nNEXT_PUBLIC_SUPABASE_ANON_KEY={{anonKey}}"
-          },
-          {
-            "name": "sample.ts",
-            "content": "import { createClient } from \"@supabase/supabase-js\";\n\nconst supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;\nconst supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;\n\nexport const supabase = createClient(supabaseUrl, supabaseKey);"
-          }
-        ]
-      },
-      {
-        "key": "framework-2",
-        "label": "Framework 2",
-        "icon": "https://supabase.com/dashboard/img/supabase-logo.svg",
-        "guideLink": "https://supabase.com/docs",
-        "children": [],
-        "files": [
-          { "name": "file3.tsx", "content": "Content of File 3" },
-          { "name": "file4.tsx", "content": "Content of File 4" }
-        ]
-      }
-    ]
-  },
+  "infra:cloud_providers": ["AWS_NIMBUS"],
+  "infra:aws_nimbus_label": "AWS Nimbus",
 
-  "infra:cloud_providers": ["AWS_NIMBUS"]
+  "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt"
 }

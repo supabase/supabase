@@ -3,6 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
@@ -12,19 +13,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const fullCurrentPath = useCurrentPath()
   const [currentPath] = fullCurrentPath.split('#')
 
-  // Hide these settings in the new layout on the following paths
-  const isHidden = (path: string) => {
-    return (
-      path === `/org/${slug}/team` ||
-      path === `/org/${slug}/integrations` ||
-      path === `/org/${slug}/usage` ||
-      path === `/org/${slug}/billing`
-    )
-  }
-
-  if (isHidden(currentPath)) {
-    return children
-  }
+  const showSsoSettings = useIsFeatureEnabled('organization:show_sso_settings')
 
   const navMenuItems = [
     {
@@ -40,10 +29,14 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       href: `/org/${slug}/apps`,
     },
 
-    {
-      label: 'SSO',
-      href: `/org/${slug}/sso`,
-    },
+    ...(showSsoSettings
+      ? [
+          {
+            label: 'SSO',
+            href: `/org/${slug}/sso`,
+          },
+        ]
+      : []),
 
     {
       label: 'Audit Logs',
@@ -67,7 +60,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
           ))}
         </NavMenu>
       </ScaffoldContainerLegacy>
-      <main className="h-full w-full overflow-y-auto">{children}</main>
+      <div className="h-full w-full overflow-y-auto">{children}</div>
     </>
   )
 }

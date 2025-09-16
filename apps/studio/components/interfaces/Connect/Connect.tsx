@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -21,6 +21,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
   TabsContent_Shadcn_,
@@ -33,29 +34,60 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
-import { ConnectTabContentCustom } from './ConnectTabContentCustom'
 
 export const Connect = () => {
   const { ref: projectRef } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const { connectFrameworks } = useCustomContent(['connect:frameworks'])
-  const connectionTypes = !connectFrameworks
-    ? CONNECTION_TYPES
-    : [
-        { key: 'direct', label: 'Connection String', obj: [] },
-        connectFrameworks,
-        { key: 'orms', label: 'ORMs', obj: ORMS },
-      ]
-  const frameworks = !connectFrameworks ? FRAMEWORKS : connectFrameworks.obj
+  const {
+    projectConnectionShowAppFrameworks: showAppFrameworks,
+    projectConnectionShowMobileFrameworks: showMobileFrameworks,
+    projectConnectionShowOrms: showOrms,
+  } = useIsFeatureEnabled([
+    'project_connection:show_app_frameworks',
+    'project_connection:show_mobile_frameworks',
+    'project_connection:show_orms',
+  ])
+
+  const connectionTypes = CONNECTION_TYPES.filter(({ key }) => {
+    if (key === 'frameworks') {
+      return showAppFrameworks
+    }
+    if (key === 'mobiles') {
+      return showMobileFrameworks
+    }
+    if (key === 'orms') {
+      return showOrms
+    }
+    return true
+  })
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false)
   )
 
-  const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(frameworks)
+  // helper to get the connection type object
+  function getConnectionObjectForTab(tab: string | null) {
+    switch (tab) {
+      case 'frameworks':
+        return FRAMEWORKS
+      case 'mobiles':
+        return MOBILES
+      case 'orms':
+        return ORMS
+      default:
+        return FRAMEWORKS
+    }
+  }
+
+  const [tab, setTab] = useQueryState('tab', parseAsString.withDefault('direct'))
+  const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
+  const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
+  const [queryWith, setQueryWith] = useQueryState('with', parseAsString)
+
+  const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
   const [selectedChild, setSelectedChild] = useState(
     connectionObject.find((item) => item.key === selectedParent)?.children[0]?.key ?? ''
@@ -66,41 +98,63 @@ export const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
-  const isFrameworkSelected = frameworks.some((x) => x.key === selectedParent)
-
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
-  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )
 
   const handleParentChange = (value: string) => {
     setSelectedParent(value)
+    setQueryFramework(value)
 
-    // check if parent has children
-    setSelectedChild(connectionObject.find((item) => item.key === value)?.children[0]?.key ?? '')
+    const parent = connectionObject.find((item) => item.key === value)
+    const firstChild = parent?.children?.[0]
 
-    // check if child has grandchildren
-    setSelectedGrandchild(
-      connectionObject.find((item) => item.key === value)?.children[0]?.children[0]?.key ?? ''
-    )
+    if (firstChild) {
+      setSelectedChild(firstChild.key)
+      setQueryUsing(firstChild.key)
+
+      const firstGrandchild = firstChild.children?.[0]
+      if (firstGrandchild) {
+        setSelectedGrandchild(firstGrandchild.key)
+        setQueryWith(firstGrandchild.key)
+      } else {
+        setSelectedGrandchild('')
+        setQueryWith(null)
+      }
+    } else {
+      setSelectedChild('')
+      setQueryUsing(null)
+      setSelectedGrandchild('')
+      setQueryWith(null)
+    }
   }
 
   const handleChildChange = (value: string) => {
     setSelectedChild(value)
+    setQueryUsing(value)
 
     const parent = connectionObject.find((item) => item.key === selectedParent)
     const child = parent?.children.find((child) => child.key === value)
+    const firstGrandchild = child?.children?.[0]
 
-    if (child && child.children.length > 0) {
-      setSelectedGrandchild(child.children[0].key)
+    if (firstGrandchild) {
+      setSelectedGrandchild(firstGrandchild.key)
+      setQueryWith(firstGrandchild.key)
     } else {
       setSelectedGrandchild('')
+      setQueryWith(null)
     }
   }
 
   const handleGrandchildChange = (value: string) => {
     setSelectedGrandchild(value)
+    if (value) {
+      setQueryWith(value)
+    } else {
+      setQueryWith(null)
+    }
   }
 
   // reset the parent/child/grandchild when the connection type (tab) changes
@@ -122,9 +176,11 @@ export const Connect = () => {
   }
 
   function handleConnectionType(type: string) {
+    setTab(type)
+
     if (type === 'frameworks') {
-      setConnectionObject(frameworks)
-      handleConnectionTypeChange(frameworks)
+      setConnectionObject(FRAMEWORKS)
+      handleConnectionTypeChange(FRAMEWORKS)
     }
 
     if (type === 'mobiles') {
@@ -185,6 +241,49 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      setShowConnect(null)
+      setTab(null)
+      setQueryFramework(null)
+      setQueryUsing(null)
+      setQueryWith(null)
+    } else {
+      setShowConnect(open)
+    }
+  }
+
+  useEffect(() => {
+    if (!showConnect) return
+
+    const newConnectionObject = getConnectionObjectForTab(tab)
+    setConnectionObject(newConnectionObject)
+
+    const parent =
+      newConnectionObject.find((item) => item.key === queryFramework) ?? newConnectionObject[0]
+    setSelectedParent(parent?.key ?? '')
+
+    if (queryFramework) {
+      if (parent?.key !== queryFramework) setQueryFramework(parent?.key ?? null)
+    }
+
+    const child =
+      parent?.children.find((child) => child.key === queryUsing) ?? parent?.children?.[0]
+    setSelectedChild(child?.key ?? '')
+
+    if (queryUsing) {
+      if (child?.key !== queryUsing) setQueryUsing(child?.key ?? null)
+    }
+
+    const grandchild =
+      child?.children.find((child) => child.key === queryWith) ?? child?.children?.[0]
+    setSelectedGrandchild(grandchild?.key ?? '')
+
+    if (queryWith) {
+      if (grandchild?.key !== queryWith) setQueryWith(grandchild?.key ?? null)
+    }
+  }, [showConnect, tab, FRAMEWORKS, queryFramework, queryUsing, queryWith])
+
   if (!isActiveHealthy) {
     return (
       <ButtonTooltip
@@ -205,7 +304,7 @@ export const Connect = () => {
   }
 
   return (
-    <Dialog open={showConnect} onOpenChange={(open) => setShowConnect(!open ? null : open)}>
+    <Dialog open={showConnect} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
         <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
           <span>Connect</span>
@@ -213,20 +312,27 @@ export const Connect = () => {
       </DialogTrigger>
       <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
         <DialogHeader className={DIALOG_PADDING_X}>
-          <DialogTitle>Connect to your project</DialogTitle>
+          <DialogTitle>
+            Connect to your project
+            {connectionTypes.length === 1 ? ` via ${connectionTypes[0].label.toLowerCase()}` : null}
+          </DialogTitle>
           <DialogDescription>
             Get the connection strings and environment variables for your app
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_ defaultValue="direct" onValueChange={(value) => handleConnectionType(value)}>
-          <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
-            {connectionTypes.map((type) => (
-              <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
-                {type.label}
-              </TabsTrigger_Shadcn_>
-            ))}
-          </TabsList_Shadcn_>
+        <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
+          {connectionTypes.length > 1 ? (
+            <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
+              {connectionTypes.map((type) => (
+                <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
+                  {type.label}
+                </TabsTrigger_Shadcn_>
+              ))}
+            </TabsList_Shadcn_>
+          ) : (
+            <DialogSectionSeparator />
+          )}
 
           {connectionTypes.map((type) => {
             const hasChildOptions =
@@ -304,23 +410,16 @@ export const Connect = () => {
                 <p className="text-xs text-foreground-lighter my-3">
                   Add the following files below to your application
                 </p>
-                {!!connectFrameworks && isFrameworkSelected ? (
-                  <ConnectTabContentCustom
-                    projectKeys={projectKeys}
-                    framework={frameworks.find((x) => x.key === selectedParent)}
-                  />
-                ) : (
-                  <ConnectTabContent
-                    projectKeys={projectKeys}
-                    filePath={filePath}
-                    className="rounded-b-none"
-                  />
-                )}
+                <ConnectTabContent
+                  projectKeys={projectKeys}
+                  filePath={filePath}
+                  className="rounded-b-none"
+                />
                 <Panel.Notice
                   className="border border-t-0 rounded-lg rounded-t-none"
                   title="New API keys coming 2025"
                   description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.   
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
 `}
                   href="https://github.com/orgs/supabase/discussions/29260"
                   buttonText="Read the announcement"

@@ -1,12 +1,13 @@
 import type { ComponentProps } from 'react'
 
-import { isFeatureEnabled } from 'common'
+import { isFeatureEnabled } from 'common/enabled-features'
 import type { IconPanel } from 'ui-patterns/IconPanel'
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
   billingAll: billingEnabled,
+  docsCompliance: complianceEnabled,
   'docsSelf-hosting': selfHostingEnabled,
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
@@ -16,6 +17,7 @@ const {
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
+  'docs:compliance',
   'docs:self-hosting',
   'sdk:csharp',
   'sdk:dart',
@@ -460,7 +462,7 @@ export const NativeMobileLoginItems = [
   },
 ]
 
-export const SocialLoginItems = [
+export const SocialLoginItems: Array<Partial<NavMenuSection>> = [
   {
     name: 'Google',
     icon: '/docs/img/icons/google-icon',
@@ -591,7 +593,7 @@ export const PhoneLoginsItems = [
   },
 ]
 
-export const auth = {
+export const auth: NavMenuConstant = {
   icon: 'auth',
   title: 'Auth',
   items: [
@@ -697,7 +699,7 @@ export const auth = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Web3 (Sign in with Solana)',
+          name: 'Web3 (Ethereum or Solana)',
           url: '/guides/auth/auth-web3',
           enabled: allAuthProvidersEnabled,
         },
@@ -791,6 +793,7 @@ export const auth = {
         { name: 'Password Security', url: '/guides/auth/password-security' },
         { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
         { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
+        { name: 'Audit Logs', url: '/guides/auth/audit-logs' },
         {
           name: 'JSON Web Tokens (JWT)',
           url: '/guides/auth/jwts',
@@ -1440,6 +1443,10 @@ export const functions: NavMenuConstant = {
           name: 'Development Environment',
           url: '/guides/functions/development-environment' as `/${string}`,
         },
+        {
+          name: 'Architecture',
+          url: '/guides/functions/architecture',
+        },
       ],
     },
     {
@@ -1865,7 +1872,7 @@ export const storage: NavMenuConstant = {
   ],
 }
 
-export const vectorIndexItems = [
+export const vectorIndexItems: Array<Partial<NavMenuSection>> = [
   {
     name: 'HNSW indexes',
     url: '/guides/ai/vector-indexes/hnsw-indexes',
@@ -1876,7 +1883,7 @@ export const vectorIndexItems = [
   },
 ]
 
-export const ai = {
+export const ai: NavMenuConstant = {
   icon: 'ai',
   title: 'AI & Vectors',
   url: '/guides/ai',
@@ -2188,6 +2195,7 @@ export const security: NavMenuConstant = {
     {
       name: 'Compliance',
       url: undefined,
+      enabled: complianceEnabled,
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },

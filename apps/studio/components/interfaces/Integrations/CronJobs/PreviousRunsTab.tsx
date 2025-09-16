@@ -33,30 +33,34 @@ const cronJobColumns = [
     minWidth: 200,
     value: (row: CronJobRun) => (
       <div className="flex items-center gap-1.5">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="text-xs cursor-pointer truncate max-w-[300px]">
-              {row.return_message}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent
-            side="bottom"
-            align="start"
-            className="min-w-[200px] max-w-[300px] text-wrap p-0"
-          >
-            <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Message</p>
-            <CodeBlock
-              hideLineNumbers
-              language="sql"
-              value={row.return_message.trim()}
-              className={cn(
-                'py-0 px-3.5 max-w-full prose dark:prose-dark border-0 rounded-t-none',
-                '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11',
-                '[&>code]:text-xs'
-              )}
-            />
-          </TooltipContent>
-        </Tooltip>
+        {row.return_message ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-xs cursor-pointer truncate max-w-[300px]">
+                {row.return_message}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="bottom"
+              align="start"
+              className="min-w-[200px] max-w-[300px] text-wrap p-0"
+            >
+              <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Message</p>
+              <CodeBlock
+                hideLineNumbers
+                language="sql"
+                value={row.return_message.trim()}
+                className={cn(
+                  'py-0 px-3.5 max-w-full prose dark:prose-dark border-0 rounded-t-none',
+                  '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11',
+                  '[&>code]:text-xs'
+                )}
+              />
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <span>-</span>
+        )}
       </div>
     ),
   },
@@ -78,7 +82,9 @@ const cronJobColumns = [
     name: 'End Time',
     minWidth: 120,
     value: (row: CronJobRun) => (
-      <div className="text-xs">{row.status === 'succeeded' ? formatDate(row.end_time) : '-'}</div>
+      <div className="flex items-center text-xs">
+        {row.end_time ? formatDate(row.end_time) : '-'}
+      </div>
     ),
   },
 
@@ -89,7 +95,7 @@ const cronJobColumns = [
     value: (row: CronJobRun) => (
       <div className="flex items-center">
         <span className="text-xs">
-          {row.status === 'succeeded' ? calculateDuration(row.start_time, row.end_time) : ''}
+          {row.start_time && row.end_time ? calculateDuration(row.start_time, row.end_time) : ''}
         </span>
       </div>
     ),
@@ -119,16 +125,19 @@ const columns = cronJobColumns.map((col) => {
       const value = col.value(props.row)
 
       if (['start_time', 'end_time'].includes(col.id)) {
-        const formattedValue = dayjs((props.row as any)[(col as any).id]).valueOf()
-        return (
-          <div className="flex items-center">
-            <TimestampInfo
-              utcTimestamp={formattedValue}
-              labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-              className="text-xs"
-            />
-          </div>
-        )
+        const rawValue = (props.row as any)[(col as any).id]
+        if (rawValue) {
+          const formattedValue = dayjs(rawValue).valueOf()
+          return (
+            <div className="flex items-center">
+              <TimestampInfo
+                utcTimestamp={formattedValue}
+                labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                className="text-xs"
+              />
+            </div>
+          )
+        }
       }
 
       return value
