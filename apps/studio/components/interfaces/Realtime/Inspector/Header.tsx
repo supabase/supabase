@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
@@ -23,7 +23,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )

@@ -63,6 +63,7 @@
   "project_homepage:show_examples": true,
 
   "project_addons:dedicated_ipv4_address": true,
+  "project_addons:show_compute_price": true,
 
   "project_settings:custom_domains": true,
   "project_settings:show_disable_legacy_api_keys": true,

@@ -7,7 +7,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -38,7 +38,7 @@ const CreateUserFormSchema = z.object({
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canCreateUsers } = useAsyncCheckProjectPermissions(
+  const { can: canCreateUsers } = useAsyncCheckPermissions(
     PermissionAction.AUTH_EXECUTE,
     'create_user'
   )

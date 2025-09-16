@@ -11,7 +11,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { ResponseError } from 'types'
 import {
@@ -35,7 +35,7 @@ export const OrganizationDetailsForm = () => {
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { can: canUpdateOrganization } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
   )

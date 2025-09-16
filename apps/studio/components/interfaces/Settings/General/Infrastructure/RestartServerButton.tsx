@@ -11,7 +11,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -35,7 +35,7 @@ const RestartServerButton = () => {
   const projectRegion = project?.region ?? ''
 
   const projectRestartDisabled = useFlag('disableProjectRestarts')
-  const { can: canRestartProject } = useAsyncCheckProjectPermissions(
+  const { can: canRestartProject } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'reboot'
   )

@@ -20,6 +20,7 @@ import {
   cn,
   CodeBlock,
 } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { hasIndexRecommendations } from './index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexSuggestionIcon'
@@ -28,6 +29,7 @@ import { QueryIndexes } from './QueryIndexes'
 import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
+  QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
@@ -138,14 +140,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           )
         }
 
-        if (col.id === 'rolname') {
-          return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs">
-              <p>{value || 'n/a'}</p>
-            </div>
-          )
-        }
-
         if (col.id === 'prop_total_time') {
           const percentage = props.row.prop_total_time || 0
           const fillWidth = Math.min(percentage, 100)
@@ -159,7 +153,13 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   opacity: 0.04,
                 }}
               />
-              <p>{value ? `${value.toFixed(1)}%` : 'n/a'}</p>
+              {value ? (
+                <p className={cn(value.toFixed(1) === '0.0' && 'text-foreground-lighter')}>
+                  {value.toFixed(1)}%
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
             </div>
           )
         }
@@ -175,8 +175,99 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         if (col.id === 'total_time') {
           return (
             <div className="w-full flex flex-col justify-center text-xs">
-              {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
-                <p>{(value / 1000).toFixed(2) + 's' || 'n/a'}</p>
+              {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p
+                  className={cn((value / 1000).toFixed(2) === '0.00' && 'text-foreground-lighter')}
+                >
+                  {(value / 1000).toFixed(2) + 's'}
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'calls') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p className={cn(value === 0 && 'text-foreground-lighter')}>
+                  {value.toLocaleString()}
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'max_time' || col.id === 'mean_time' || col.id === 'min_time') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p className={cn(value.toFixed(0) === '0' && 'text-foreground-lighter')}>
+                  {value.toFixed(0)}ms
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'rows_read') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p className={cn(value === 0 && 'text-foreground-lighter')}>
+                  {value.toLocaleString()}
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        const cacheHitRateToNumber = (value: number | string) => {
+          if (typeof value === 'number') return value
+          return parseFloat(value.toString().replace('%', '')) || 0
+        }
+
+        if (col.id === 'cache_hit_rate') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {typeof value === 'string' ? (
+                <p
+                  className={cn(
+                    cacheHitRateToNumber(value).toFixed(2) === '0.00' && 'text-foreground-lighter'
+                  )}
+                >
+                  {cacheHitRateToNumber(value).toFixed(2)}%
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'rolname') {
+          return (
+            <div className="w-full flex flex-col justify-center">
+              {value ? (
+                <span className="flex items-center gap-x-1">
+                  <p className="font-mono text-xs">{value}</p>
+                  <InfoTooltip align="end" alignOffset={-12} className="w-56">
+                    {
+                      QUERY_PERFORMANCE_ROLE_DESCRIPTION.find((role) => role.name === value)
+                        ?.description
+                    }
+                  </InfoTooltip>
+                </span>
+              ) : (
+                <p className="text-muted">&ndash;</p>
               )}
             </div>
           )
