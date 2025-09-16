@@ -37,6 +37,7 @@ export const ControlsOverlay = ({
   portal = true,
 }: Props) => {
   const [heatmapPopoverOpen, setHeatmapPopoverOpen] = useState(false)
+  const metricKeys = Object.keys(defaultMetricsVisibility) as (keyof MetricsVisibility)[]
 
   return (
     <div
@@ -128,13 +129,13 @@ export const ControlsOverlay = ({
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Show items</p>
               <ul className="flex flex-col">
-                {Object.keys(defaultMetricsVisibility).map((item) => (
+                {metricKeys.map((item) => (
                   <li className="group flex items-center justify-between py-0.5" key={item}>
                     <div className="flex items-center gap-x-2">
                       <Checkbox_Shadcn_
                         id={item}
                         name={item}
-                        checked={metricsVisibility[item as keyof MetricsVisibility]}
+                        checked={metricsVisibility[item]}
                         onCheckedChange={(checked) =>
                           setMetricsVisibility((v) => ({ ...v, [item]: !!checked }))
                         }
@@ -143,6 +144,19 @@ export const ControlsOverlay = ({
                         {item}
                       </Label_Shadcn_>
                     </div>
+                    <Button
+                      size="tiny"
+                      type="default"
+                      className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
+                      onClick={() => {
+                        const next = Object.fromEntries(
+                          metricKeys.map((key) => [key, key === item])
+                        ) as MetricsVisibility
+                        setMetricsVisibility(next)
+                      }}
+                    >
+                      Select only
+                    </Button>
                   </li>
                 ))}
               </ul>
