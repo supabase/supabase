@@ -22,7 +22,7 @@ My initial reaction was to debate the MCP server setup but I realized that this 
 2. **Autonomous tool calling** (functions, APIs, or MCP tools)
 3. **Access to private or sensitive data sources**
 
-When these three elements combine without strong controls, data exposure becomes possible, no matter whose MCP server you’re using. This configuration would never pass the go/no go assessment of a Security team…..but there are no security teams in vibe coding. Someone with a great idea is building and deploying to the world solo. It’s up to us to help them deploy as securely as possible, so that’s why I’m actually thankful this issue has been raised.
+When these three elements combine without strong controls, data exposure becomes possible, no matter whose MCP server you’re using. This configuration would never pass the go/no-go assessment of a Security team…but there are no security teams in vibe coding. Someone with a great idea is building and deploying to the world solo. It’s up to us to help them deploy as securely as possible.
 
 This problem applies to **any** tool, API, or database connection where a large language model (LLM) can make iterative calls to retrieve or manipulate data. There have been documented issues with [GitHub’s MCP](https://invariantlabs.ai/blog/mcp-github-vulnerability), [Claude Desktop](https://joedivita.substack.com/p/mcp-its-the-wild-west-out-there), and [WhatsApp MCP](https://invariantlabs.ai/blog/whatsapp-mcp-exploited) as well.
 
