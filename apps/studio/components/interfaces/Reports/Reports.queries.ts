@@ -23,6 +23,8 @@ export type QueryPerformanceQueryOpts = {
     | 'slowestExecutionTime'
     | 'queryHitRate'
     | 'unified'
+    | 'slowQueriesCount'
+    | 'queryMetrics'
   searchQuery?: string
   orderBy?: QueryPerformanceSort
   roles?: string[]

@@ -1384,9 +1384,15 @@ const PROVIDER_SAML = {
 const PROVIDER_WEB3 = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Web3 Wallet (Solana)',
+  title: 'Web3 Wallet',
   link: 'https://supabase.com/docs/guides/auth/auth-web3',
   properties: {
+    EXTERNAL_WEB3_ETHEREUM_ENABLED: {
+      title: 'Enable Sign in with Ethereum',
+      description:
+        'Allow Ethereum wallets to sign in to your project via the Sign in with Ethereum (EIP-4361). Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
+      type: 'boolean',
+    },
     EXTERNAL_WEB3_SOLANA_ENABLED: {
       title: 'Enable Sign in with Solana',
       description:
@@ -1395,6 +1401,7 @@ const PROVIDER_WEB3 = {
     },
   },
   validationSchema: object().shape({
+    EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean().required(),
     EXTERNAL_WEB3_SOLANA_ENABLED: boolean().required(),
   }),
   misc: {

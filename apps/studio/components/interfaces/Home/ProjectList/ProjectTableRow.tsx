@@ -110,7 +110,7 @@ export const ProjectTableRow = ({
       </TableCell>
       <TableCell>
         <span className="lowercase text-sm text-foreground-light">
-          {infraInformation?.cloud_provider} | {project.region || 'N/A'}
+          {project.cloud_provider} | {project.region || 'N/A'}
         </span>
       </TableCell>
       <TableCell>
