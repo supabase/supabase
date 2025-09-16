@@ -1,8 +1,8 @@
 import { type SetStateAction, useState } from 'react'
 import { Filter, ChevronsUpDown, Check } from 'lucide-react'
 
-import type { MetricsVisibility, HeatmapMode } from './contexts'
-import { HEATMAP_ITEMS, SHOW_ITEMS } from './constants'
+import { type MetricsVisibility, type HeatmapMode, defaultMetricsVisibility } from './contexts'
+import { HEATMAP_ITEMS } from './constants'
 import {
   cn,
   Button,
@@ -128,15 +128,15 @@ export const ControlsOverlay = ({
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Show items</p>
               <ul className="flex flex-col">
-                {SHOW_ITEMS.map((item) => (
+                {Object.keys(defaultMetricsVisibility).map((item) => (
                   <li className="group flex items-center justify-between py-0.5" key={item}>
                     <div className="flex items-center gap-x-2">
                       <Checkbox_Shadcn_
                         id={item}
                         name={item}
-                        checked={metricsVisibility[item]}
+                        checked={metricsVisibility[item as keyof MetricsVisibility]}
                         onCheckedChange={(checked) =>
-                          setMetricsVisibility((v) => ({ ...v, [item]: Boolean(checked) }))
+                          setMetricsVisibility((v) => ({ ...v, [item]: !!checked }))
                         }
                       />
                       <Label_Shadcn_ htmlFor={item} className="text-xs">

@@ -1,4 +1,4 @@
-import type { HeatmapMode, MetricsVisibility } from './contexts'
+import type { HeatmapMode } from './contexts'
 
 export const NODE_TYPE = 'plan'
 export const DEFAULT_NODE_WIDTH = 180
@@ -9,14 +9,6 @@ export const DEFAULT_NODE_HEIGHT = 400
 export const HIDDEN_NODE_CONNECTOR = 'opacity-0'
 
 export const HEATMAP_ITEMS: readonly HeatmapMode[] = ['time', 'rows', 'cost', 'none']
-
-export const SHOW_ITEMS: Readonly<keyof MetricsVisibility>[] = [
-  'time',
-  'rows',
-  'cost',
-  'buffers',
-  'output',
-]
 
 export type NodeHeightConstants = Readonly<{
   HEADER_H: number
