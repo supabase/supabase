@@ -1,13 +1,14 @@
-'use client'
 import dayjs from 'dayjs'
+import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
+
+import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { useChartData } from 'hooks/useChartData'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { Loader2 } from 'lucide-react'
+import { useChartData } from 'hooks/useChartData'
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
   AXIS: 'hsl(var(--background-overlay-hover))',
@@ -55,14 +56,15 @@ export const UsersBarChart = ({
   }, [startDate, endDate])
 
   const attributes = useMemo(
-    () => [
-      { attribute: 'TotalSignUps', provider: 'logs', label: 'Sign Ups', enabled: true } as any,
-    ],
+    () =>
+      [
+        { attribute: 'TotalSignUps', provider: 'logs', label: 'Sign Ups', enabled: true },
+      ] as MultiAttribute[],
     []
   )
 
   const { data, isLoading } = useChartData({
-    attributes: attributes as any,
+    attributes: attributes,
     startDate,
     endDate,
     interval,
@@ -74,7 +76,7 @@ export const UsersBarChart = ({
   const { data: filledData, isError: isFillError } = useFillTimeseriesSorted(
     chartDataArray,
     'period_start',
-    attributes.map((attr: any) => attr.attribute),
+    attributes.map((attr) => attr.attribute),
     0,
     startDate,
     endDate,
@@ -187,5 +189,3 @@ export const UsersBarChart = ({
     </div>
   )
 }
-
-export default UsersBarChart

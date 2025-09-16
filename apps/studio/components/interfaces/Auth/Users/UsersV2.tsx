@@ -55,7 +55,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import UsersBarChart from './UsersBarChart'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
@@ -68,6 +67,7 @@ import {
   USERS_TABLE_COLUMNS,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
+import { UsersBarChart } from './UsersBarChart'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
