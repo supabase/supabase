@@ -54,6 +54,9 @@ export const QueryPlan = ({ query }: { query: string }) => {
    * TODO: We should use sql parser like `@supabase/pg-parser` in this file when it's ready for Next.js
    */
   useEffect(() => {
+    setExplainError(null)
+    setRawExplainResult(null)
+
     if (!projectRef || !cleanedSql) {
       setExplainError({
         title: 'Missing required data',
@@ -61,31 +64,6 @@ export const QueryPlan = ({ query }: { query: string }) => {
       })
 
       return
-    }
-
-    const run = async () => {
-      try {
-        setIsExecutingExplain(true)
-        setExplainError(null)
-        setRawExplainResult(null)
-
-        const explainSql = `EXPLAIN (ANALYZE, BUFFERS, VERBOSE, FORMAT JSON) ${cleanedSql}`
-        const { result } = await executeSql<any[]>({
-          projectRef,
-          connectionString,
-          sql: explainSql,
-          queryKey: ['query-performance', 'explain-plan', cleanedSql],
-        })
-
-        setRawExplainResult(result ?? null)
-      } catch (e: any) {
-        setExplainError({
-          title: 'Failed to run EXPLAIN',
-          message: e?.message ?? 'An unexpected error occurred.',
-        })
-      } finally {
-        setIsExecutingExplain(false)
-      }
     }
 
     const isSelectOrWithSelect = SELECT_ONLY_SAFE_STRICT_REGEX.test(cleanedSql)
@@ -106,6 +84,29 @@ export const QueryPlan = ({ query }: { query: string }) => {
       })
 
       return
+    }
+
+    const run = async () => {
+      try {
+        setIsExecutingExplain(true)
+
+        const explainSql = `EXPLAIN (ANALYZE, BUFFERS, VERBOSE, FORMAT JSON) ${cleanedSql}`
+        const { result } = await executeSql<any[]>({
+          projectRef,
+          connectionString,
+          sql: explainSql,
+          queryKey: ['query-performance', 'explain-plan'],
+        })
+
+        setRawExplainResult(result ?? null)
+      } catch (e: any) {
+        setExplainError({
+          title: 'Failed to run EXPLAIN',
+          message: e?.message ?? 'An unexpected error occurred.',
+        })
+      } finally {
+        setIsExecutingExplain(false)
+      }
     }
 
     run()
