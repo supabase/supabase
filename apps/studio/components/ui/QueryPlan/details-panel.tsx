@@ -1,10 +1,8 @@
-import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Check, Copy } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { formatMs, formatNumber } from './utils/formats'
-import { cn, copyToClipboard, Button } from 'ui'
+import { cn, Button } from 'ui'
 
 /**
  * Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
@@ -28,10 +26,6 @@ export const DetailsPanel = ({
   setSelectedNode: (node: PlanNodeData | null) => void
   isFullscreen?: boolean
 }) => {
-  const [copiedConditions, setCopiedConditions] = useState(false)
-  const [copiedRelation, setCopiedRelation] = useState(false)
-  const [copiedOutputCols, setCopiedOutputCols] = useState(false)
-
   const hasNoConditions =
     !selectedNode.hashCond &&
     !selectedNode.mergeCond &&
@@ -140,24 +134,6 @@ export const DetailsPanel = ({
                   </>
                 )}
               </span>
-
-              <Button
-                type="outline"
-                size="tiny"
-                icon={copiedRelation ? <Check /> : <Copy />}
-                className="px-1.5 absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() =>
-                  copyToClipboard(
-                    `${selectedNode.relationName ?? ''}${selectedNode.alias ? ` as ${selectedNode.alias}` : ''}`,
-                    () => {
-                      setCopiedRelation(true)
-                      setTimeout(() => setCopiedRelation(false), 1200)
-                    }
-                  )
-                }
-              >
-                {copiedRelation ? 'Copied' : null}
-              </Button>
             </div>
           ) : (
             <NoData />
@@ -208,29 +184,6 @@ export const DetailsPanel = ({
                   </li>
                 )}
               </ul>
-
-              <Button
-                type="outline"
-                size="tiny"
-                icon={copiedConditions ? <Check /> : <Copy />}
-                className="px-1.5 absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => {
-                  const parts = [
-                    selectedNode.hashCond && `Hash Cond: ${selectedNode.hashCond}`,
-                    selectedNode.mergeCond && `Merge Cond: ${selectedNode.mergeCond}`,
-                    selectedNode.joinFilter && `Join Filter: ${selectedNode.joinFilter}`,
-                    selectedNode.indexCond && `Index Cond: ${selectedNode.indexCond}`,
-                    selectedNode.recheckCond && `Recheck Cond: ${selectedNode.recheckCond}`,
-                    selectedNode.filter && `Filter: ${selectedNode.filter}`,
-                  ].filter(Boolean)
-                  copyToClipboard(parts.join('\n'), () => {
-                    setCopiedConditions(true)
-                    setTimeout(() => setCopiedConditions(false), 1200)
-                  })
-                }}
-              >
-                {copiedConditions ? 'Copied' : null}
-              </Button>
             </div>
           )}
         </div>
@@ -241,21 +194,6 @@ export const DetailsPanel = ({
           {Array.isArray(selectedNode.outputCols) && selectedNode.outputCols.length > 0 ? (
             <div className="relative group p-2 border rounded bg-surface-100 whitespace-pre-wrap break-words">
               <span>{selectedNode.outputCols.join(', ')}</span>
-
-              <Button
-                type="outline"
-                size="tiny"
-                icon={copiedOutputCols ? <Check /> : <Copy />}
-                className="px-1.5 absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() =>
-                  copyToClipboard(selectedNode.outputCols!.join(', '), () => {
-                    setCopiedOutputCols(true)
-                    setTimeout(() => setCopiedOutputCols(false), 1200)
-                  })
-                }
-              >
-                {copiedOutputCols ? 'Copied' : null}
-              </Button>
             </div>
           ) : (
             <NoData />
