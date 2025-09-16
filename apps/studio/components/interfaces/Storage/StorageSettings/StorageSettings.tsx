@@ -16,7 +16,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { formatBytes } from 'lib/helpers'
 import {
@@ -58,9 +58,11 @@ interface StorageSettingsState {
 
 export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
-  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const { can: canUpdateStorageSettings } = useAsyncCheckProjectPermissions(
+  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_READ,
+    '*'
+  )
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
   )

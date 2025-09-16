@@ -9,7 +9,7 @@ import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/Com
 import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
 import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
 import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useProfile } from 'lib/profile'
@@ -103,7 +103,7 @@ function RunSnippetPage() {
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
   const { profile } = useProfile()
-  const { can: canCreateSQLSnippet } = useAsyncCheckProjectPermissions(
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
     {

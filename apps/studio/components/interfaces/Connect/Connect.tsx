@@ -9,7 +9,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -99,7 +99,7 @@ export const Connect = () => {
   )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
-  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )

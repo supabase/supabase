@@ -19,7 +19,7 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { getURL } from 'lib/helpers'
@@ -44,9 +44,11 @@ const PaymentMethods = () => {
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug })
 
-  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.payment_methods')
-  const { can: canUpdatePaymentMethods } = useAsyncCheckProjectPermissions(
+  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.payment_methods'
+  )
+  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )

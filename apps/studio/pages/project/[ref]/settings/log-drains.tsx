@@ -18,15 +18,17 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
-  const { can: canManageLogDrains, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.ANALYTICS_ADMIN_WRITE, 'logflare')
+  const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.ANALYTICS_ADMIN_WRITE,
+    'logflare'
+  )
 
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
