@@ -58,7 +58,7 @@ const TextBlock = ({
   <div className="flex w-full items-stretch">
     <div className={`inline-block ${bgColor}`}>
       <span
-        className={`${textColor} text-[4rem] px-5 py-3 inline-block leading-none tracking-tight`}
+        className={`${textColor} text-[2rem] md:text-[4rem] px-2.5 md:px-5 py-1.5 md:py-3 inline-block leading-none tracking-tight`}
         // style={{ fontFamily: SUISSE_FONT_FAMILY }}
       >
         {text}
@@ -91,7 +91,7 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
   return (
     <header className="mt-16 md:mt-32">
       <div className="max-w-[60rem] ml-8 md:mx-auto">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5 md:gap-1">
           <h1 className="sr-only">State of Startups 2025</h1>
           <TextBlock
             text="State"
