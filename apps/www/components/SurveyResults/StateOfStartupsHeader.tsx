@@ -1,12 +1,7 @@
+import { useMemo } from 'react'
 import { ProgressBar } from './DecorativeProgressBar'
 
 interface StateOfStartupsHeaderProps {
-  title: string
-  subtitle: string
-  chapters: Array<{
-    shortTitle: string
-    number: number
-  }>
   showProgressBars?: boolean
 }
 
@@ -27,12 +22,10 @@ const DiagonalStripes = () => (
 
 const HeaderProgressBar = ({
   delay = 0,
-  bgColor,
   progressBgColor = 'bg-foreground-muted/80',
   progressFgColor,
 }: {
   delay?: number
-  bgColor?: string
   progressBgColor?: string
   progressFgColor?: string
 }) => (
@@ -74,7 +67,6 @@ const TextBlock = ({
     {showProgressBar ? (
       <HeaderProgressBar
         delay={delay}
-        bgColor={bgColor}
         progressBgColor={progressBgColor}
         progressFgColor={progressFgColor}
       />
@@ -84,51 +76,58 @@ const TextBlock = ({
   </div>
 )
 
-export function StateOfStartupsHeader({
-  title,
-  subtitle,
-  chapters,
-  showProgressBars = true,
-}: StateOfStartupsHeaderProps) {
+export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartupsHeaderProps) {
+  // Generate stable random delays between 0.2 and 2 seconds for each TextBlock
+  const randomDelays = useMemo(
+    () => [
+      0.2 + Math.random() * 1.8,
+      0.2 + Math.random() * 1.8,
+      0.2 + Math.random() * 1.8,
+      0.2 + Math.random() * 1.8,
+    ],
+    []
+  )
+
   return (
-    <header className="mt-32">
-      <div className="max-w-[60rem] mx-auto">
+    <header className="mt-16 md:mt-32">
+      <div className="max-w-[60rem] ml-8 md:mx-auto">
         <div className="flex flex-col gap-1">
+          <h1 className="sr-only">State of Startups 2025</h1>
           <TextBlock
             text="State"
-            bgColor="bg-brand-300"
-            textColor="text-brand"
+            bgColor="bg-foreground"
+            textColor="text-background"
             showProgressBar={showProgressBars}
-            delay={0}
+            delay={randomDelays[0]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
-            progressFgColor="bg-brand-200 dark:bg-brand-300"
+            progressFgColor="bg-brand-200 dark:bg-foreground"
           />
           <TextBlock
             text="of"
-            bgColor="bg-brand-300"
-            textColor="text-brand"
+            bgColor="bg-foreground"
+            textColor="text-background"
             showProgressBar={showProgressBars}
-            delay={0.3}
+            delay={randomDelays[1]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
-            progressFgColor="bg-brand-200 dark:bg-brand-300"
+            progressFgColor="bg-brand-200 dark:bg-foreground"
           />
           <TextBlock
             text="Startups"
             bgColor="bg-brand"
             textColor="text-background dark:text-brand-200"
             showProgressBar={showProgressBars}
-            delay={0.6}
+            delay={randomDelays[2]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
             progressFgColor="bg-brand dark:bg-brand"
           />
           <TextBlock
             text="2025"
-            bgColor="bg-brand-500"
+            bgColor="bg-surface-300"
             textColor="text-foreground"
             showProgressBar={showProgressBars}
-            delay={0.9}
+            delay={randomDelays[3]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
-            progressFgColor="bg-brand-400 dark:bg-brand-500"
+            progressFgColor="bg-brand-400 dark:bg-surface-300"
           />
         </div>
       </div>

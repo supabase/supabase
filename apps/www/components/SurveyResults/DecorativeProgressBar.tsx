@@ -34,7 +34,9 @@ export function ProgressBar({
           maskSize: '4px',
           maskRepeat: 'repeat',
           maskPosition: 'top left',
+          clipPath: 'inset(0 100% 0 0)',
           animation: `terminalLine 10s steps(8, end) ${animationDelay} infinite ${reverse ? 'reverse' : ''}`,
+          animationFillMode: 'both',
         }}
       />
     </div>
