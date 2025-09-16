@@ -32,7 +32,6 @@ import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-
 import {
   FeatureFlagProvider,
   getFlags,
@@ -149,15 +148,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         <AppBannerContextProvider>
                           <CommandProvider>
                             <FeaturePreviewContextProvider>
-                              <button
-                                onClick={() => {
-                                  const test: any = { foo: 'bar' }
-                                  console.log(test.random)
-                                  throw new Error('Test error')
-                                }}
-                              >
-                                throw
-                              </button>
                               {getLayout(<Component {...pageProps} />)}
                               <StudioCommandMenu />
                               <FeaturePreviewModal />

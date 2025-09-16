@@ -69,7 +69,6 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
           </p>
           <p className="text-foreground-light text-sm">{errorMessage}</p>
         </div>
-
         {isRemoveChildError ? (
           <Alert_Shadcn_>
             <WarningIcon />
@@ -132,11 +131,10 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
-
         <div className="w-full sm:w-1/2 mx-auto grid grid-cols-2 gap-2">
           <Button asChild type="default" icon={<ExternalLink />}>
             <Link
-              href={`/support/new?category=dashboard_bug&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}${sentryIssueId ? `&sid=${sentryIssueId}` : ''}`}
+              href={`/support/new?category=dashboard_bug${sentryIssueId ? `&sid=${sentryIssueId}` : ''}&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}`}
               target="_blank"
             >
               Contact support
