@@ -83,18 +83,7 @@ const data: () => {
           infrastructure.
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/startups/startups-hero-dark.svg',
-            light: '/images/solutions/startups/startups-hero-light.svg',
-          }}
-          alt="Supabase for Startups"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your company',
@@ -595,12 +584,12 @@ const data: () => {
         "Supabase ensures optimal database performance at any scale, so you can focus on innovating and growing without worrying about infrastructure limitations — whether you're handling high-traffic applications, complex queries, or massive data volumes.",
       highlights: [
         {
-          heading: 'databases managed',
-          subheading: companyStats.databasesManaged,
+          heading: companyStats.databasesManaged.label,
+          subheading: companyStats.databasesManaged.text,
         },
         {
-          heading: 'databases launched daily',
-          subheading: companyStats.databasesLaunchedDaily,
+          heading: companyStats.databasesLaunchedDaily.label,
+          subheading: companyStats.databasesLaunchedDaily.text,
         },
       ],
     },
