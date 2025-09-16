@@ -86,7 +86,6 @@ const MergePage: NextPageWithLayout = () => {
     isLoading: isCombinedDiffLoading,
     hasChanges: combinedHasChanges,
   } = useBranchMergeDiff({
-    branchId: currentBranch?.id,
     currentBranchRef: ref,
     parentProjectRef,
     currentBranchConnectionString: project?.connectionString || undefined,
@@ -294,7 +293,7 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const handleMerge = () => {
-    if (!currentBranch?.id || !parentProjectRef || !ref) return
+    if (!ref || !parentProjectRef) return
     setIsSubmitting(true)
 
     // Track merge attempt
@@ -307,7 +306,6 @@ const MergePage: NextPageWithLayout = () => {
     })
 
     mergeBranch({
-      id: currentBranch.id,
       branchProjectRef: ref,
       baseProjectRef: parentProjectRef,
       migration_version: undefined,
