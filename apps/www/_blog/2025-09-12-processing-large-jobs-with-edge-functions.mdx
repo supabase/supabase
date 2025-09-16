@@ -2,8 +2,8 @@
 title: Processing large jobs with Edge Functions, Cron, and Queues
 description: Learn how to build scalable data processing pipelines using Supabase Edge Functions, cron jobs, and database queues and handle large workloads without timeouts or crashes.
 author: prashant
-image: 2025-09-processing-large-jobs-with-edge-functions/og-temp.png
-thumb: 2025-09-processing-large-jobs-with-edge-functions/og-temp.png
+image: 2025-09-processing-large-jobs-with-edge-functions/og.png
+thumb: 2025-09-processing-large-jobs-with-edge-functions/og.png
 categories:
   - postgres
   - edge functions
@@ -31,11 +31,11 @@ The architecture is simple but powerful. Think of it like an assembly line:
 
 <Img
   src={{
-    dark: '/images/blog/2025-09-processing-large-jobs-with-edge-functions/three-layer-pattern-temp-diagram.png',
+    dark: '/images/blog/2025-09-processing-large-jobs-with-edge-functions/three-layer-pattern-diagram.png',
     light:
-      '/images/blog/2025-09-processing-large-jobs-with-edge-functions/three-layer-pattern-temp-diagram.png',
+      '/images/blog/2025-09-processing-large-jobs-with-edge-functions/three-layer-pattern-diagram.png',
   }}
-  alt="A diagram of the three-layer pattern described above"
+  alt="A diagram showing the three-layer pattern described above"
 />
 
 This breaks apart the complexity. Instead of one giant function that scrapes websites, processes content with AI, and stores everything, you have focused functions that each do one thing well.
@@ -399,4 +399,4 @@ This pattern succeeds because it embraces the constraints of serverless computin
 
 The result is a system that scales horizontally by adding more cron jobs and queues. Each component can fail independently without bringing down the whole pipeline. Users get fresh content as it becomes available rather than waiting for batch jobs to complete.
 
-Most importantly, it's built entirely with Supabase primitives - no external queue systems or job schedulers required. You get enterprise-grade reliability with startup simplicity.
+Most importantly, it's built entirely with Supabase primitives — no external queue systems or job schedulers required. You get enterprise-grade reliability with startup simplicity.
