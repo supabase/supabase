@@ -11,6 +11,7 @@ const getInitialState = () => {
     showAiSettingsModal: false,
     showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
+    showRealtimeSettingsSheet: false,
     mobileMenuOpen: false,
     showSidebar: true,
     showEditorPanel: false,
@@ -65,6 +66,11 @@ export const appState = proxy({
   showOngoingQueriesPanelOpen: false,
   setOnGoingQueriesPanelOpen: (value: boolean) => {
     appState.ongoingQueriesPanelOpen = value
+  },
+
+  showRealtimeSettingsSheet: false,
+  setShowRealtimeSettingsSheet: (value: boolean) => {
+    appState.showRealtimeSettingsSheet = value
   },
 
   mobileMenuOpen: false,
