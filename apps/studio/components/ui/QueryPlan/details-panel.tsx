@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic'
 import { Check, Copy } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
+import { formatMs, formatNumber } from './utils/formats'
 import { cn, copyToClipboard, Button } from 'ui'
 
 /**

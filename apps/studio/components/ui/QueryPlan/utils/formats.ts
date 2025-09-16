@@ -37,6 +37,12 @@ export const formatKeys = (keys: string[] | undefined, presorted?: string[]) => 
     .join(', ')
 }
 
+export const formatNumber = (value?: number) => {
+  if (value === undefined) return undefined
+
+  return value.toLocaleString()
+}
+
 export const formatMs = (value?: number) => {
   if (value === undefined) return undefined
 

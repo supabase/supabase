@@ -22,10 +22,11 @@ import {
   tempTooltip,
   removedPercentValue,
 } from './utils/node-display'
-import { formatMs } from './utils/formats'
+import { formatMs, formatNumber } from './utils/formats'
 
 const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
-  const loopsSuffix = data.actualLoops ? ` ×${data.actualLoops.toLocaleString()}` : ''
+  const loopsSuffix =
+    data.actualLoops !== undefined ? ` ×${formatNumber(data.actualLoops) ?? data.actualLoops}` : ''
   const formattedTotalTime = formatMs(data.actualTotalTime)
   const formattedSelfTime = formatMs(data.exclusiveTimeMs)
 
