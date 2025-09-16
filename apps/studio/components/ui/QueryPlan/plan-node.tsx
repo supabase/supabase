@@ -22,8 +22,13 @@ import {
   tempTooltip,
   removedPercentValue,
 } from './utils/node-display'
+import { formatMs } from './utils/formats'
 
 const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
+  const loopsSuffix = data.actualLoops ? ` ×${data.actualLoops.toLocaleString()}` : ''
+  const formattedTotalTime = formatMs(data.actualTotalTime)
+  const formattedSelfTime = formatMs(data.exclusiveTimeMs)
+
   return [
     // Workers planned/launched
     {
@@ -47,7 +52,8 @@ const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
         <>
           <span>time</span>
           <span>
-            {data.actualTotalTime} ms{data.actualLoops ? ` ×${data.actualLoops}` : ''}
+            {formattedTotalTime ?? data.actualTotalTime} ms
+            {loopsSuffix}
           </span>
         </>
       ),
@@ -59,7 +65,7 @@ const metricsListData = (data: PlanNodeData, vis: MetricsVisibility) => {
       element: (
         <>
           <span>self time</span>
-          <span>{data.exclusiveTimeMs} ms</span>
+          <span>{formattedSelfTime ?? data.exclusiveTimeMs} ms</span>
         </>
       ),
     },

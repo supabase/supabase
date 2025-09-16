@@ -36,3 +36,13 @@ export const formatKeys = (keys: string[] | undefined, presorted?: string[]) => 
     })
     .join(', ')
 }
+
+export const formatMs = (value?: number) => {
+  if (value === undefined) return undefined
+
+  const options: Intl.NumberFormatOptions = Number.isInteger(value)
+    ? { maximumFractionDigits: 0 }
+    : { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+
+  return value.toLocaleString(undefined, options)
+}
