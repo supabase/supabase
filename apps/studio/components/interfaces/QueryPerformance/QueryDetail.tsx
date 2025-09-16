@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
 import { Lightbulb } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 import { formatSql } from 'lib/formatSql'
