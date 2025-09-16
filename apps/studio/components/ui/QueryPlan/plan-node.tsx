@@ -3,7 +3,7 @@ import { Handle, Position } from 'reactflow'
 import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
-import { Badge, cn } from 'ui'
+import { Badge } from 'ui'
 import { NodeItem } from './node-item'
 import { Heatmap } from './heatmap'
 import { HeatmapContext, MetricsVisibilityContext, type MetricsVisibility } from './contexts'
@@ -279,10 +279,8 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
     >
       <Handle type="target" position={Position.Top} className={HIDDEN_NODE_CONNECTOR} />
       <header
-        className={cn(
-          'text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between',
-          DEFAULT_NODE_HEIGHT_CONSTANTS.ITEM_H
-        )}
+        style={{ height: `${DEFAULT_NODE_HEIGHT_CONSTANTS.HEADER_H}px` }}
+        className="text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between"
       >
         <div className="flex gap-x-1 items-center">
           <Workflow strokeWidth={1} size={12} className="text-light" />
