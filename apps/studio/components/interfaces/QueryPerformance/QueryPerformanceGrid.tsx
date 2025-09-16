@@ -161,7 +161,13 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   opacity: 0.04,
                 }}
               />
-              {value ? <p>{value.toFixed(1)}%</p> : <p className="text-muted">&ndash;</p>}
+              {value ? (
+                <p className={cn(value.toFixed(1) === '0.0' && 'text-foreground-lighter')}>
+                  {value.toFixed(1)}%
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
             </div>
           )
         }
@@ -178,7 +184,11 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           return (
             <div className="w-full flex flex-col justify-center text-xs">
               {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
-                <p>{(value / 1000).toFixed(2) + 's'}</p>
+                <p
+                  className={cn((value / 1000).toFixed(2) === '0.00' && 'text-foreground-lighter')}
+                >
+                  {(value / 1000).toFixed(2) + 's'}
+                </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
               )}
@@ -190,7 +200,23 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           return (
             <div className="w-full flex flex-col justify-center text-xs">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
-                <p>{value.toLocaleString()}</p>
+                <p className={cn(value === 0 && 'text-foreground-lighter')}>
+                  {value.toLocaleString()}
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'max_time' || col.id === 'mean_time' || col.id === 'min_time') {
+          return (
+            <div className="w-full flex flex-col justify-center text-xs">
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p className={cn(value.toFixed(0) === '0' && 'text-foreground-lighter')}>
+                  {value.toFixed(0)}ms
+                </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
               )}
@@ -202,7 +228,9 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           return (
             <div className="w-full flex flex-col justify-center text-xs">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
-                <p>{value.toLocaleString()}</p>
+                <p className={cn(value === 0 && 'text-foreground-lighter')}>
+                  {value.toLocaleString()}
+                </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
               )}
@@ -218,10 +246,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         if (col.id === 'cache_hit_rate') {
           return (
             <div className="w-full flex flex-col justify-center text-xs">
-              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
-                <p>{value.toFixed(1)}%</p>
-              ) : typeof value === 'string' ? (
-                <p>{cacheHitRateToNumber(value)}%</p>
+              {typeof value === 'string' ? (
+                <p className={cn(cacheHitRateToNumber(value) === 0 && 'text-foreground-lighter')}>
+                  {cacheHitRateToNumber(value)}%
+                </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
               )}
