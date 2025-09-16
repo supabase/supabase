@@ -66,35 +66,6 @@
       "description": "Renders a default query when landing on the logs explorer"
     },
 
-    "connect:frameworks": {
-      "type": ["object", "null"],
-      "description": "Replaces the frameworks tab in the Connect modal when a defined set of frameworks",
-      "properties": {
-        "key": { "type": "string" },
-        "label": { "type": "string" },
-        "obj": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": { "type": "string" },
-              "icon": { "type": "string" },
-              "label": { "type": "string" },
-              "guideLink": { "type": "string" },
-              "children": { "type": "array" },
-              "files": {
-                "type": "array",
-                "properties": {
-                  "name": { "type": "string" },
-                  "content": { "type": "string" }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-
     "infra:cloud_providers": {
       "type": ["array"],
       "description": "Filters the valid cloud providers",
@@ -102,6 +73,10 @@
         "type": "string",
         "enum": ["AWS", "AWS_K8S", "AWS_NIMBUS", "FLY"]
       }
+    },
+    "infra:aws_nimbus_label": {
+      "type": "string",
+      "description": "The label of the AWS Nimbus provider"
     },
 
     "ssl:certificate_url": {
@@ -114,8 +89,8 @@
     "project_homepage:client_libraries",
     "project_homepage:example_projects",
     "logs:default_query",
-    "connect:frameworks",
     "infra:cloud_providers",
+    "infra:aws_nimbus_label",
     "ssl:certificate_url"
   ],
   "additionalProperties": false

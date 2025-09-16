@@ -695,12 +695,12 @@ const data: () => {
         "Supabase ensures optimal database performance at any scale, so you can focus on innovating and growing without worrying about infrastructure limitations — whether you're handling high-traffic applications, complex queries, or massive data volumes.",
       highlights: [
         {
-          heading: 'databases managed',
-          subheading: companyStats.databasesManaged,
+          heading: companyStats.databasesManaged.label,
+          subheading: companyStats.databasesManaged.text,
         },
         {
-          heading: 'databases launched daily',
-          subheading: companyStats.databasesLaunchedDaily,
+          heading: companyStats.databasesLaunchedDaily.label,
+          subheading: companyStats.databasesLaunchedDaily.text,
         },
       ],
     },
