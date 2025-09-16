@@ -1,29 +1,29 @@
-const { withSentryConfig } = require('@sentry/nextjs')
+const { withSentryConfig } = require('@sentry/nextjs');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
-})
-const { getCSP } = require('./csp')
+});
+const { getCSP } = require('./csp');
 
 // Required for nextjs standalone build
-const path = require('path')
+const path = require('path');
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN
   if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
-    return undefined
+    return undefined;
   }
 
   // Force disable CDN
   if (process.env.FORCE_ASSET_CDN === '-1') {
-    return undefined
+    return undefined;
   }
 
   const SUPABASE_ASSETS_URL =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
       ? 'https://frontend-assets.supabase.green'
-      : 'https://frontend-assets.supabase.com'
+      : 'https://frontend-assets.supabase.com';
 
-  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`;
 }
 
 /**
@@ -43,87 +43,87 @@ const nextConfig = {
         destination: `https://supabase.com/.well-known/vercel/flags`,
         basePath: false,
       },
-    ]
+    ];
   },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
         ? [
-            {
-              source: '/',
-              has: [
-                {
-                  type: 'query',
-                  key: 'next',
-                  value: 'new-project',
-                },
-              ],
-              destination: '/new/new-project',
-              permanent: false,
-            },
-            {
-              source: '/',
-              destination: '/org',
-              permanent: false,
-            },
-            {
-              source: '/register',
-              destination: '/sign-up',
-              permanent: false,
-            },
-            {
-              source: '/signup',
-              destination: '/sign-up',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/sign-in',
-              permanent: false,
-            },
-            {
-              source: '/login',
-              destination: '/sign-in',
-              permanent: false,
-            },
-            {
-              source: '/log-in',
-              destination: '/sign-in',
-              permanent: false,
-            },
-          ]
+          {
+            source: '/',
+            has: [
+              {
+                type: 'query',
+                key: 'next',
+                value: 'new-project',
+              },
+            ],
+            destination: '/new/new-project',
+            permanent: false,
+          },
+          {
+            source: '/',
+            destination: '/org',
+            permanent: false,
+          },
+          {
+            source: '/register',
+            destination: '/sign-up',
+            permanent: false,
+          },
+          {
+            source: '/signup',
+            destination: '/sign-up',
+            permanent: false,
+          },
+          {
+            source: '/signin',
+            destination: '/sign-in',
+            permanent: false,
+          },
+          {
+            source: '/login',
+            destination: '/sign-in',
+            permanent: false,
+          },
+          {
+            source: '/log-in',
+            destination: '/sign-in',
+            permanent: false,
+          },
+        ]
         : [
-            {
-              source: '/',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/register',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signup',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/login',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/log-in',
-              destination: '/project/default',
-              permanent: false,
-            },
-          ]),
+          {
+            source: '/',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/register',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/signup',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/signin',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/login',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/log-in',
+            destination: '/project/default',
+            permanent: false,
+          },
+        ]),
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',
@@ -304,7 +304,7 @@ const nextConfig = {
       },
       {
         permanent: true,
-        source: '/project/:ref/reports/query-performance',
+        source: '/project/:ref/query-performance',
         destination: '/project/:ref/advisors/query-performance',
       },
       {
@@ -390,15 +390,15 @@ const nextConfig = {
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
-            {
-              source: '/',
-              destination: process.env.NEXT_PUBLIC_BASE_PATH,
-              basePath: false,
-              permanent: false,
-            },
-          ]
+          {
+            source: '/',
+            destination: process.env.NEXT_PUBLIC_BASE_PATH,
+            basePath: false,
+            permanent: false,
+          },
+        ]
         : []),
-    ]
+    ];
   },
   async headers() {
     return [
@@ -442,17 +442,17 @@ const nextConfig = {
       },
       {
         source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
+        headers: [ { key: 'cache-control', value: 'public, max-age=2592000' } ],
       },
       {
         source: '/favicon/:slug*',
-        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
+        headers: [ { key: 'cache-control', value: 'public, max-age=86400' } ],
       },
       {
         source: '/(.*).ts',
-        headers: [{ key: 'content-type', value: 'text/typescript' }],
+        headers: [ { key: 'content-type', value: 'text/typescript' } ],
       },
-    ]
+    ];
   },
   images: {
     // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
@@ -496,7 +496,7 @@ const nextConfig = {
   turbopack: {
     rules: {
       '*.md': {
-        loaders: ['raw-loader'],
+        loaders: [ 'raw-loader' ],
         as: '*.js',
       },
     },
@@ -506,20 +506,20 @@ const nextConfig = {
     config.module?.rules
       .find((rule) => rule.oneOf)
       .oneOf.forEach((rule) => {
-        if (rule.issuer?.and?.[0]?.toString().includes('_app')) {
-          const and = rule.issuer.and
-          rule.issuer.or = [/[\\/]node_modules[\\/]monaco-editor[\\/]/, { and }]
-          delete rule.issuer.and
+        if (rule.issuer?.and?.[ 0 ]?.toString().includes('_app')) {
+          const and = rule.issuer.and;
+          rule.issuer.or = [ /[\\/]node_modules[\\/]monaco-editor[\\/]/, { and } ];
+          delete rule.issuer.and;
         }
-      })
+      });
 
     // .md files to be loaded as raw text
     config.module.rules.push({
       test: /\.md$/,
       type: 'asset/source',
-    })
+    });
 
-    return config
+    return config;
   },
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
@@ -534,7 +534,7 @@ const nextConfig = {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
     ignoreDuringBuilds: true,
   },
-}
+};
 
 // module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
@@ -542,29 +542,29 @@ const nextConfig = {
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(withBundleAnalyzer(nextConfig), {
-        silent: true,
+      silent: true,
 
-        // For all available options, see:
-        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+      // For all available options, see:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-        // Upload a larger set of source maps for prettier stack traces (increases build time)
-        widenClientFileUpload: true,
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
 
-        // Automatically annotate React components to show their full name in breadcrumbs and session replay
-        reactComponentAnnotation: {
-          enabled: true,
-        },
+      // Automatically annotate React components to show their full name in breadcrumbs and session replay
+      reactComponentAnnotation: {
+        enabled: true,
+      },
 
-        // Hides source maps from generated client bundles
-        hideSourceMaps: true,
+      // Hides source maps from generated client bundles
+      hideSourceMaps: true,
 
-        // Automatically tree-shake Sentry logger statements to reduce bundle size
-        disableLogger: true,
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
 
-        // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-        // See the following for more information:
-        // https://docs.sentry.io/product/crons/
-        // https://vercel.com/docs/cron-jobs
-        automaticVercelMonitors: true,
-      })
-    : nextConfig
+      // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+      // See the following for more information:
+      // https://docs.sentry.io/product/crons/
+      // https://vercel.com/docs/cron-jobs
+      automaticVercelMonitors: true,
+    })
+    : nextConfig;
