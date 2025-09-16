@@ -5,6 +5,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
+import { removeCommentsFromSql } from 'lib/helpers'
+import { destructiveSqlRegex } from '../SQLEditor/SQLEditor.constants'
 
 type WarningMessageProps = PropsWithChildren<{ title: string }>
 const WarningMessage = ({ title, children }: WarningMessageProps) => {
@@ -40,38 +42,27 @@ export const QueryPlan = ({ query }: { query: string }) => {
   const [explainError, setExplainError] = useState<{ title: string; message?: string } | null>(null)
   const [rawExplainResult, setRawExplainResult] = useState<any[] | null>(null)
 
-  // Validation helpers for EXPLAIN eligibility
-  // Remove comments before normalizing whitespace to avoid breaking SQL with inline '--'
   const cleanedSql = useMemo(() => {
-    const sql = (query ?? '').toString()
-    // Strip block comments and line comments
-    const withoutBlock = sql.replace(/\/\*[\s\S]*?\*\//g, '')
-    const withoutLine = withoutBlock.replace(/--[^\r\n]*/g, '')
-    // Collapse whitespace and remove trailing semicolon
-    const normalized = withoutLine.replace(/\s+/g, ' ').trim()
+    const cleanedSql = removeCommentsFromSql(query)
+    const normalized = cleanedSql.replace(/\s+/g, ' ').trim()
     return normalized.replace(/;\s*$/, '')
   }, [query])
+
+  const isDestructiveSql = useMemo(
+    () => destructiveSqlRegex.some((regex) => regex.test(cleanedSql)),
+    [cleanedSql]
+  )
 
   /**
    * TODO: We should use sql parser like `@supabase/pg-parser` in this file when it's ready for Next.js
    */
-  const isSingleStatement = useMemo(() => {
-    const cleaned = cleanedSql
-    if (!cleaned) return false
-    const queries = Array.from(cleaned.matchAll(/[a-zA-Z]*[0-9]*[;]+/g))
-    const indexSemiColon = cleaned.lastIndexOf(';')
-    const hasComments = cleaned.includes('--')
-    const hasMultipleQueries =
-      queries.length > 1 || (indexSemiColon > 0 && indexSemiColon !== cleaned.length - 1)
-    // Comments don't affect single-statement detection (preserve behavior)
-    return !hasMultipleQueries
-  }, [cleanedSql])
-
   const isSelectOrWithSelect = useMemo(() => {
-    const s = cleanedSql.toLowerCase()
-    if (!s) return false
-    if (s.startsWith('select')) return true
-    if (s.startsWith('with') && s.includes(' select ')) return true
+    const cleaned = cleanedSql.toLowerCase()
+    if (!cleaned) return false
+
+    if (cleaned.startsWith('select')) return true
+    if (cleaned.startsWith('with') && cleaned.includes(' select ')) return true
+
     return false
   }, [cleanedSql])
 
@@ -79,8 +70,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
   const hasPositionalParams = useMemo(() => /\$\d+/.test(cleanedSql), [cleanedSql])
 
   const hasSql = cleanedSql.length > 0
-  const notSingleStatement = hasSql && !isSingleStatement
-  const notSelect = hasSql && isSingleStatement && !isSelectOrWithSelect
+  const notSelect = hasSql && !isSelectOrWithSelect
 
   useEffect(() => {
     if (!hasSql) {
@@ -93,21 +83,10 @@ export const QueryPlan = ({ query }: { query: string }) => {
       return
     }
 
-    if (notSelect) {
+    if (notSelect || isDestructiveSql) {
       setExplainError({
         title: 'Unsupported query type',
         message: 'Only SELECT queries are supported for EXPLAIN here.',
-      })
-      setRawExplainResult(null)
-      setIsExecutingExplain(false)
-
-      return
-    }
-
-    if (notSingleStatement) {
-      setExplainError({
-        title: 'Multiple statements detected',
-        message: 'Only single SELECT statements are supported for EXPLAIN here.',
       })
       setRawExplainResult(null)
       setIsExecutingExplain(false)
@@ -122,16 +101,6 @@ export const QueryPlan = ({ query }: { query: string }) => {
         title: 'EXPLAIN not run for parameterized query',
         message: "We didn't run EXPLAIN because this query contains parameters (e.g. $1).",
       })
-      setIsExecutingExplain(false)
-
-      return
-    }
-
-    const canExplain = !!projectRef && isSingleStatement && isSelectOrWithSelect
-
-    if (!canExplain) {
-      setRawExplainResult(null)
-      setExplainError(null)
       setIsExecutingExplain(false)
 
       return
@@ -171,13 +140,11 @@ export const QueryPlan = ({ query }: { query: string }) => {
     return () => controller.abort()
   }, [
     hasSql,
+    isDestructiveSql,
     notSelect,
-    notSingleStatement,
     projectRef,
     connectionString,
     cleanedSql,
-    isSingleStatement,
-    isSelectOrWithSelect,
     hasPositionalParams,
   ])
 
