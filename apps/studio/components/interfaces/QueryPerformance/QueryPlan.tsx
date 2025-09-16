@@ -6,7 +6,6 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 import { removeCommentsFromSql } from 'lib/helpers'
-import { destructiveSqlRegex } from '../SQLEditor/SQLEditor.constants'
 
 type WarningMessageProps = PropsWithChildren<{ title: string }>
 const WarningMessage = ({ title, children }: WarningMessageProps) => {
@@ -33,6 +32,9 @@ const QueryPlanVisualizer = dynamic(
   { ssr: false }
 )
 
+const SELECT_ONLY_SAFE_STRICT_REGEX =
+  /^(?![\s\S]*\b(insert|update|delete|truncate|drop|alter|create|grant|revoke|call|do)\b)\s*(select\b|with\b[\s\S]*?\bselect\b)/i
+
 export const QueryPlan = ({ query }: { query: string }) => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
@@ -48,65 +50,19 @@ export const QueryPlan = ({ query }: { query: string }) => {
     return normalized.replace(/;\s*$/, '')
   }, [query])
 
-  const isDestructiveSql = useMemo(
-    () => destructiveSqlRegex.some((regex) => regex.test(cleanedSql)),
-    [cleanedSql]
-  )
-
   /**
    * TODO: We should use sql parser like `@supabase/pg-parser` in this file when it's ready for Next.js
    */
-  const isSelectOrWithSelect = useMemo(() => {
-    const cleaned = cleanedSql.toLowerCase()
-    if (!cleaned) return false
-
-    if (cleaned.startsWith('select')) return true
-    if (cleaned.startsWith('with') && cleaned.includes(' select ')) return true
-
-    return false
-  }, [cleanedSql])
-
-  // Detect positional parameters like $1, $2
-  const hasPositionalParams = useMemo(() => /\$\d+/.test(cleanedSql), [cleanedSql])
-
-  const hasSql = cleanedSql.length > 0
-  const notSelect = hasSql && !isSelectOrWithSelect
-
   useEffect(() => {
-    if (!hasSql) {
+    if (!projectRef || !cleanedSql) {
       setExplainError({
-        title: 'No query to explain',
+        title: 'Missing required data',
+        message: 'Project reference, connection string, and SQL query are required.',
       })
-      setRawExplainResult(null)
-      setIsExecutingExplain(false)
 
       return
     }
 
-    if (notSelect || isDestructiveSql) {
-      setExplainError({
-        title: 'Unsupported query type',
-        message: 'Only SELECT queries are supported for EXPLAIN here.',
-      })
-      setRawExplainResult(null)
-      setIsExecutingExplain(false)
-
-      return
-    }
-
-    // Do not auto-run EXPLAIN when parameters like $1 are present
-    if (hasPositionalParams) {
-      setRawExplainResult(null)
-      setExplainError({
-        title: 'EXPLAIN not run for parameterized query',
-        message: "We didn't run EXPLAIN because this query contains parameters (e.g. $1).",
-      })
-      setIsExecutingExplain(false)
-
-      return
-    }
-
-    const controller = new AbortController()
     const run = async () => {
       try {
         setIsExecutingExplain(true)
@@ -114,15 +70,12 @@ export const QueryPlan = ({ query }: { query: string }) => {
         setRawExplainResult(null)
 
         const explainSql = `EXPLAIN (ANALYZE, BUFFERS, VERBOSE, FORMAT JSON) ${cleanedSql}`
-        const { result } = await executeSql<any[]>(
-          {
-            projectRef,
-            connectionString,
-            sql: explainSql,
-            queryKey: ['query-performance', 'explain-plan'],
-          },
-          controller.signal
-        )
+        const { result } = await executeSql<any[]>({
+          projectRef,
+          connectionString,
+          sql: explainSql,
+          queryKey: ['query-performance', 'explain-plan', cleanedSql],
+        })
 
         setRawExplainResult(result ?? null)
       } catch (e: any) {
@@ -135,26 +88,36 @@ export const QueryPlan = ({ query }: { query: string }) => {
       }
     }
 
+    const isSelectOrWithSelect = SELECT_ONLY_SAFE_STRICT_REGEX.test(cleanedSql)
+    if (!isSelectOrWithSelect) {
+      setExplainError({
+        title: 'Unsupported query type',
+        message: 'Only SELECT queries are supported for EXPLAIN here.',
+      })
+
+      return
+    }
+
+    const hasPositionalParams = /\$\d+/.test(cleanedSql)
+    if (hasPositionalParams) {
+      setExplainError({
+        title: 'EXPLAIN not run for parameterized query',
+        message: "We didn't run EXPLAIN because this query contains parameters (e.g. $1).",
+      })
+
+      return
+    }
+
     run()
+  }, [projectRef, connectionString, cleanedSql])
 
-    return () => controller.abort()
-  }, [
-    hasSql,
-    isDestructiveSql,
-    notSelect,
-    projectRef,
-    connectionString,
-    cleanedSql,
-    hasPositionalParams,
-  ])
-
-  // Extract JSON string
   const explainJsonString = useMemo(() => {
     if (!rawExplainResult || rawExplainResult.length === 0) return null
     const row = rawExplainResult[0]
     const value =
       (row && (row['QUERY PLAN'] ?? row['query plan'] ?? row.query_plan ?? row.queryPlan)) ?? null
     if (value == null) return null
+
     if (typeof value === 'string') {
       try {
         const parsed = JSON.parse(value)
