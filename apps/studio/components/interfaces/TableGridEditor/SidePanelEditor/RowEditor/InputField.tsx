@@ -100,7 +100,7 @@ const InputField = ({
       <Input
         data-testid={`${field.name}-input`}
         layout="horizontal"
-        placeholder="NULL"
+        placeholder={field.defaultValue !== null ? `Default: ${field.defaultValue}` : 'NULL'}
         label={field.name}
         value={field.value ?? ''}
         descriptionText={
@@ -168,11 +168,10 @@ const InputField = ({
           placeholder={
             field.value === null && field.defaultValue === null
               ? 'NULL'
-              : field.value === ''
+              : field.value === '' ||
+                  (typeof field.defaultValue === 'string' && field.defaultValue.length === 0)
                 ? 'EMPTY'
-                : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-                  ? 'EMPTY'
-                  : `NULL (Default: ${field.defaultValue})`
+                : `Default: ${field.defaultValue}`
           }
           actions={
             <DropdownMenu>
@@ -216,7 +215,7 @@ const InputField = ({
         }
         labelOptional={field.format}
         disabled={!isEditable || isTruncated}
-        placeholder={field?.defaultValue ?? 'NULL'}
+        placeholder={!!field?.defaultValue ? `Default: ${field.defaultValue}` : 'NULL'}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={

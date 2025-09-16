@@ -61,7 +61,7 @@ export interface AnimatedCounterProps {
  * <AnimatedCounter
  *   value={13.4}
  *   isPercentage
- *   showPlus
+ *   prefix="+"
  *   duration={3}
  *   delay={0.5}
  * />
