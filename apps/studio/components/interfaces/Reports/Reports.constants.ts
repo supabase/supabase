@@ -369,7 +369,17 @@ select
     -- min_time,
     -- max_time,
     -- mean_time,
-    statements.rows / statements.calls as avg_rows${
+    statements.rows / statements.calls as avg_rows,
+    statements.rows as rows_read,
+    case 
+      when (statements.shared_blks_hit + statements.shared_blks_read) > 0 
+      then round(
+        (statements.shared_blks_hit * 100.0) / 
+        (statements.shared_blks_hit + statements.shared_blks_read), 
+        2
+      )
+      else 0
+    end as cache_hit_rate${
       runIndexAdvisor
         ? `,
     case
@@ -513,6 +523,15 @@ select
             -- max_time,
             -- mean_time,
             statements.rows / statements.calls as avg_rows,
+            statements.rows as rows_read,
+            statements.shared_blks_hit as debug_hit,
+            statements.shared_blks_read as debug_read,
+            case 
+              when (statements.shared_blks_hit + statements.shared_blks_read) > 0 
+              then (statements.shared_blks_hit::numeric * 100.0) / 
+                   (statements.shared_blks_hit + statements.shared_blks_read)
+              else 0
+            end as cache_hit_rate,
             ((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100 as prop_total_time${
               runIndexAdvisor
                 ? `,
