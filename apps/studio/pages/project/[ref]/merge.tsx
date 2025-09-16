@@ -277,9 +277,9 @@ const MergePage: NextPageWithLayout = () => {
   })
 
   const handlePush = () => {
-    if (!currentBranch?.id || !parentProjectRef) return
+    if (!ref || !parentProjectRef) return
     pushBranch({
-      id: currentBranch.id,
+      branchRef: ref,
       projectRef: parentProjectRef,
     })
   }
