@@ -28,8 +28,7 @@ export const ProjectCard = ({
   resourceWarnings,
 }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
-  const infraInformation = project.databases.find((x) => x.identifier === project.ref)
-  const desc = `${infraInformation?.cloud_provider} | ${project.region}`
+  const desc = `${project.cloud_provider} | ${project.region}`
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
