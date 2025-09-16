@@ -117,10 +117,10 @@ const MergePage: NextPageWithLayout = () => {
       setWorkflowFinalStatus(status)
       refetchDiff()
       clearDiffsOptimistically()
-      if (parentProjectRef && currentBranch?.id && currentBranch.review_requested_at) {
+      if (ref && parentProjectRef && currentBranch?.review_requested_at) {
         updateBranch(
           {
-            id: currentBranch.id,
+            branchRef: ref,
             projectRef: parentProjectRef,
             requestReview: false,
           },
@@ -134,7 +134,7 @@ const MergePage: NextPageWithLayout = () => {
       refetchDiff,
       clearDiffsOptimistically,
       parentProjectRef,
-      currentBranch?.id,
+      ref,
       updateBranch,
       currentBranch?.review_requested_at,
     ]
@@ -313,10 +313,10 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const handleReadyForReview = () => {
-    if (!currentBranch?.id || !parentProjectRef) return
+    if (!ref || !parentProjectRef) return
     updateBranch(
       {
-        id: currentBranch.id,
+        branchRef: ref,
         projectRef: parentProjectRef,
         requestReview: true,
       },
@@ -431,10 +431,10 @@ const MergePage: NextPageWithLayout = () => {
           <DropdownMenuItem
             className="gap-x-2"
             onClick={() => {
-              if (!currentBranch?.id || !parentProjectRef) return
+              if (!ref || !parentProjectRef) return
               updateBranch(
                 {
-                  id: currentBranch.id,
+                  branchRef: ref,
                   projectRef: parentProjectRef,
                   requestReview: false,
                 },

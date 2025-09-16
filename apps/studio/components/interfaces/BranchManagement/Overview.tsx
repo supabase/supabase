@@ -203,13 +203,11 @@ const PreviewBranchActions = ({
   })
 
   const onConfirmReset = () => {
-    if (!projectRef) return
-    resetBranch({ id: branch.id, projectRef })
+    resetBranch({ branchRef, projectRef })
   }
 
   const onTogglePersistent = () => {
-    if (!projectRef) return
-    updateBranch({ id: branch.id, projectRef, persistent: !branch.persistent })
+    updateBranch({ branchRef, projectRef, persistent: !branch.persistent })
   }
 
   return (
