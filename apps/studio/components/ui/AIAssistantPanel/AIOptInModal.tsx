@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   cn,
@@ -24,7 +24,7 @@ interface AIOptInModalProps {
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
-  const { can: canUpdateOrganization } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
   )

@@ -1,7 +1,8 @@
 {
-  "text": "",
-  "launch": "",
-  "launchDate": "2025-07-17T08:00:00.000-07:00",
-  "link": "#",
-  "cta": "Learn more"
+  "title": "Supabase Select",
+  "desc": "Our first user conference · October 3, San Francisco",
+  "verbose": " · Guillermo Rauch, Dylan Field, and more",
+  "link": "https://select.supabase.com/",
+  "target": "_blank",
+  "button": "Save your seat"
 }

@@ -10,7 +10,7 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
@@ -75,7 +75,7 @@ const NetworkRestrictions = () => {
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
-  const { can: canUpdateNetworkRestrictions } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {
