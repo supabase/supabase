@@ -88,27 +88,32 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
 
       const hasQuotes =
         filter.value.toString().includes('"') || filter.value.toString().includes("'")
-      const value = hasQuotes ? filter.value : `'${filter.value}'`
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const valueWithQuotes = !valueIsNumber && hasQuotes ? filter.value : `'${filter.value}'`
+      const lowercaseValue = !valueIsNumber && String(valueWithQuotes).toLowerCase()
+
+      const finalValue = valueIsNumber ? filter.value : lowercaseValue
 
       // Handle different comparison operators
       switch (filter.compare) {
         case 'matches':
-          return `REGEXP_CONTAINS(${filterKey}, ${value})`
+          return `REGEXP_CONTAINS(${filterKey}, ${finalValue})`
         case 'is':
-          return `${filterKey} = ${value}`
+          return `${filterKey} = ${finalValue}`
         case '!=':
-          return `${filterKey} != ${value}`
+          return `${filterKey} != ${finalValue}`
         case '>=':
-          return `${filterKey} >= ${value}`
+          return `${filterKey} >= ${finalValue}`
         case '<=':
-          return `${filterKey} <= ${value}`
+          return `${filterKey} <= ${finalValue}`
         case '>':
-          return `${filterKey} > ${value}`
+          return `${filterKey} > ${finalValue}`
         case '<':
-          return `${filterKey} < ${value}`
+          return `${filterKey} < ${finalValue}`
         default:
           // Fallback to exact match for unknown operators
-          return `${filterKey} = ${value}`
+          return `${filterKey} = ${finalValue}`
       }
     })
     .filter(Boolean) // Remove any null/undefined conditions

@@ -47,7 +47,7 @@ describe('generateRegexpWhere', () => {
     ]
     const result = generateRegexpWhere(filters, true)
     expect(result).toBe(
-      "WHERE REGEXP_CONTAINS(request.path, '/api/*') AND response.status_code = '404'"
+      "WHERE REGEXP_CONTAINS(request.path, '/api/*') AND response.status_code = 404"
     )
   })
 
@@ -75,5 +75,31 @@ describe('generateRegexpWhere', () => {
 
     const result = generateRegexpWhere(filters, true)
     expect(result).toBe("WHERE request.path = '/api/users'")
+  })
+
+  it('should handle values with quotes and lowercase', () => {
+    const filters: ReportFilterItem[] = [
+      {
+        key: 'request.path',
+        value: '"/Api/Users"',
+        compare: 'is',
+      },
+    ]
+
+    const result = generateRegexpWhere(filters, true)
+    expect(result).toBe(`WHERE request.path = "/api/users"`)
+  })
+
+  it('should handle numbers', () => {
+    const filters: ReportFilterItem[] = [
+      {
+        key: 'request.status_code',
+        value: 200,
+        compare: 'is',
+      },
+    ]
+
+    const result = generateRegexpWhere(filters, true)
+    expect(result).toBe(`WHERE request.status_code = 200`)
   })
 })
