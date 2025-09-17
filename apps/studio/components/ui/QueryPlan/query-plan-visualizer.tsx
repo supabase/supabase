@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import ReactFlow, { Background, BackgroundVariant, type ReactFlowInstance } from 'reactflow'
 import { Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
@@ -20,7 +21,6 @@ import { PlanNode } from './plan-node'
 import { useHeatmapMax } from './hooks/use-heatmap-max'
 import { DetailsPanel } from './details-panel'
 import { usePlanGraph } from './hooks/use-plan-graph'
-import { useFullscreen } from './hooks/use-fullscreen'
 import { useDagreLayout } from './hooks/use-dagre-layout'
 
 export const QueryPlanVisualizer = ({ json, className }: { json: string; className?: string }) => {
@@ -36,12 +36,64 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [overlayRect, setOverlayRect] = useState<DOMRect | null>(null)
   const layout = useDagreLayout(nodes, edges, metricsVisibility, heatmapMode)
 
   useEffect(() => {
     requestAnimationFrame(() => rfInstance?.fitView())
-  }, [isFullscreen, rfInstance])
+  }, [isExpanded, rfInstance])
+
+  const updateOverlayRect = useCallback(() => {
+    const host = containerRef.current?.closest(
+      '[data-query-performance-grid]'
+    ) as HTMLElement | null
+    const target = host ?? containerRef.current
+    if (!target) return
+
+    setOverlayRect(target.getBoundingClientRect())
+  }, [])
+
+  useEffect(() => {
+    if (!isExpanded) {
+      setOverlayRect(null)
+
+      return
+    }
+
+    updateOverlayRect()
+
+    const handleResize = () => updateOverlayRect()
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [isExpanded, updateOverlayRect])
+
+  useEffect(() => {
+    if (!isExpanded) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsExpanded(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isExpanded])
+
+  const toggleExpanded = useCallback(() => {
+    setIsExpanded((prev) => {
+      const next = !prev
+      if (!prev) {
+        requestAnimationFrame(() => updateOverlayRect())
+      }
+      return next
+    })
+  }, [updateOverlayRect])
 
   const nodeTypes = useMemo(
     () => ({
@@ -50,9 +102,9 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     []
   )
 
-  return (
-    <div className={cn('w-full h-full flex flex-col', className)}>
-      {!isFullscreen && (
+  const renderVisualizer = (isExpanded: boolean) => (
+    <>
+      {!isExpanded && (
         <ControlsOverlay
           metricsVisibility={metricsVisibility}
           setMetricsVisibility={setMetricsVisibility}
@@ -62,7 +114,9 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           className="mb-2"
         />
       )}
-      <div ref={containerRef} className="relative w-full h-full border rounded-md bg-background">
+      <div
+        className={cn('relative w-full h-full bg-background', !isExpanded && 'border rounded-md')}
+      >
         {meta?.errorMessage && (
           <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
             <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
@@ -76,7 +130,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           </div>
         )}
         <div className="absolute z-10 top-2 left-2 right-2 flex items-center justify-start pr-8 gap-x-2">
-          {isFullscreen && (
+          {isExpanded && (
             <ControlsOverlay
               metricsVisibility={metricsVisibility}
               setMetricsVisibility={setMetricsVisibility}
@@ -90,7 +144,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             planningTime={meta?.planningTime}
             executionTime={meta?.executionTime}
             jitTotalTime={meta?.jitTotalTime}
-            className={isFullscreen ? 'p-2' : 'text-[10px]'}
+            className={cn(isExpanded ? 'p-2' : 'text-[10px]')}
           />
         </div>
 
@@ -98,7 +152,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           <DetailsPanel
             selectedNode={selectedNode}
             setSelectedNode={setSelectedNode}
-            isFullscreen={isFullscreen}
+            isFullscreen={isExpanded}
           />
         )}
         <MetricsVisibilityContext.Provider value={metricsVisibility}>
@@ -148,18 +202,56 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           type="default"
           size="tiny"
           icon={
-            isFullscreen ? (
+            isExpanded ? (
               <Minimize2 size={14} className="text-foreground" />
             ) : (
               <Maximize2 size={14} className="text-foreground" />
             )
           }
-          onClick={toggleFullscreen}
-          title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          onClick={toggleExpanded}
+          aria-label={isExpanded ? 'Exit expanded view' : 'Enter expanded view'}
           className="absolute top-2 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border bg-foreground-muted/20 hover:bg-foreground-muted/30"
         />
       </div>
-    </div>
+    </>
+  )
+
+  const expandedPortal =
+    isExpanded && overlayRect && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            className="fixed z-50"
+            style={{
+              position: 'fixed',
+              top: overlayRect.top,
+              left: overlayRect.left,
+              width: overlayRect.width,
+              height: overlayRect.height,
+            }}
+          >
+            <div
+              className={cn('w-full h-full flex flex-col bg-background overflow-hidden', className)}
+            >
+              {renderVisualizer(isExpanded)}
+            </div>
+          </div>,
+          document.body
+        )
+      : null
+
+  return (
+    <>
+      {expandedPortal}
+      <div
+        ref={containerRef}
+        className={cn(
+          'w-full h-full flex flex-col',
+          className,
+          isExpanded && 'invisible pointer-events-none'
+        )}
+      >
+        {renderVisualizer(isExpanded)}
+      </div>
+    </>
   )
 }
