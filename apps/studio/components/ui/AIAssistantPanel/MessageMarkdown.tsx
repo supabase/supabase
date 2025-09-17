@@ -1,10 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useRouter } from 'next/router'
 import { memo, ReactNode, useEffect, useMemo, useRef } from 'react'
 
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
 import Link from 'next/link'
 import {
   Button,
@@ -118,18 +114,6 @@ export const MarkdownPre = ({
   isLoading: boolean
   readOnly?: boolean
 }) => {
-  const router = useRouter()
-  const { profile } = useProfile()
-
-  const { can: canCreateSQLSnippet } = useAsyncCheckProjectPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
-  )
-
   // [Joshen] Using a ref as this data doesn't need to trigger a re-render
   const chartConfig = useRef<ChartConfig>({
     view: 'table',
@@ -159,7 +143,6 @@ export const MarkdownPre = ({
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
-  const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
   const toolCallId = String(snippetId ?? id)
 
   useEffect(() => {

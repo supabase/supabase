@@ -1,6 +1,6 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { CheckIcon, Loader2, Pencil, Trash2 } from 'lucide-react'
-import { PropsWithChildren, ReactNode, useMemo, useState } from 'react'
+import { PropsWithChildren, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
@@ -8,7 +8,9 @@ import { toast } from 'sonner'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useProfile } from 'lib/profile'
-import { cn, markdownComponents, WarningIcon } from 'ui'
+import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
+import { getGitHubProfileImgUrl } from 'lib/github'
+import { cn, markdownComponents } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
@@ -65,6 +67,7 @@ export const Message = function Message({
   isLastMessage = false,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
+  const { data: identitiesData } = useProfileIdentitiesQuery()
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
   const allMarkdownComponents: Partial<Components> = useMemo(
     () => ({
@@ -95,6 +98,15 @@ export const Message = function Message({
 
   const hasTextContent = content && content.trim().length > 0
 
+  const isGitHubProfile = !!profile?.auth0_id && profile.auth0_id.startsWith('github')
+  const gitHubUsername = isGitHubProfile
+    ? (identitiesData?.identities ?? []).find((x) => x.provider === 'github')?.identity_data
+        ?.user_name
+    : undefined
+  const profileImageUrl = isGitHubProfile
+    ? getGitHubProfileImgUrl(gitHubUsername as string)
+    : profile?.profileImageUrl
+
   return (
     <div
       className={cn(
@@ -109,7 +121,7 @@ export const Message = function Message({
         {isUser && (
           <ProfileImage
             alt={profile?.username}
-            src={profile?.profileImageUrl}
+            src={profileImageUrl}
             className="w-5 h-5 shrink-0 rounded-full translate-y-0.5"
           />
         )}
