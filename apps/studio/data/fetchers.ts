@@ -135,7 +135,6 @@ export const {
 } = client
 
 type HandleErrorOptions = {
-  alwaysCapture?: boolean
   sentryContext?: Parameters<typeof Sentry.captureException>[1]
   sampleRate?: number
 }
