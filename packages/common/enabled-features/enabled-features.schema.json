@@ -130,13 +130,17 @@
       "description": "Enable feedback submission for docs site"
     },
 
-    "integrations:vercel": {
+    "integrations:partners": {
       "type": "boolean",
-      "description": "Enable the vercel integration section in the organization and project settings pages"
+      "description": "Show all third-party-managed integrations"
     },
     "integrations:show_stripe_wrapper": {
       "type": "boolean",
       "description": "Show the Stripe wrapper under project integrations"
+    },
+    "integrations:vercel": {
+      "type": "boolean",
+      "description": "Enable the vercel integration section in the organization and project settings pages"
     },
 
     "logs:templates": {
@@ -291,8 +295,9 @@
     "docs:compliance",
     "docs:self-hosting",
     "feedback:docs",
-    "integrations:vercel",
+    "integrations:partners",
     "integrations:show_stripe_wrapper",
+    "integrations:vercel",
     "profile:show_email",
     "profile:show_information",
     "profile:show_analytics_and_marketing",
