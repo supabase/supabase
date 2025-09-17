@@ -25,14 +25,14 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
         className
       )}
     >
-      <div className="flex items-center gap-x-2">
+      <ul className="flex items-center gap-x-2">
         {metrics.map((metric) => (
-          <span key={metric.label} className="flex items-baseline gap-x-1">
+          <li key={metric.label} className="flex items-baseline gap-x-1">
             <span className="text-foreground-lighter">{metric.label}:</span>
             <span>{formatMs(metric.value)} ms</span>
-          </span>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }
