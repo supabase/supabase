@@ -368,7 +368,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       direction="horizontal"
       className="relative flex flex-grow bg-alternative min-h-0"
       autoSaveId="query-performance-layout-v1"
-      data-query-performance-grid
     >
       <ResizablePanel defaultSize={1}>
         <DataGrid

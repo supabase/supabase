@@ -45,9 +45,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   }, [isExpanded, rfInstance])
 
   const updateOverlayRect = useCallback(() => {
-    const host = containerRef.current?.closest(
-      '[data-query-performance-grid]'
-    ) as HTMLElement | null
+    const host = containerRef.current?.closest('[data-query-performance-body]')
     const target = host ?? containerRef.current
     if (!target) return
 
@@ -115,7 +113,10 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         />
       )}
       <div
-        className={cn('relative w-full h-full bg-background', !isExpanded && 'border rounded-md')}
+        className={cn(
+          'relative w-full h-full bg-background',
+          isExpanded ? 'border-t' : 'border rounded-md'
+        )}
       >
         {meta?.errorMessage && (
           <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
