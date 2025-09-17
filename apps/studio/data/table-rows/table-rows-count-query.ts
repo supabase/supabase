@@ -90,7 +90,7 @@ from approximation;
 }
 
 export type TableRowsCount = {
-  count: number
+  count?: number
   is_estimate?: boolean
 }
 
@@ -144,8 +144,8 @@ export async function getTableRowsCount(
   )
 
   return {
-    count: result[0].count,
-    is_estimate: result[0].is_estimate ?? false,
+    count: result?.[0]?.count,
+    is_estimate: result?.[0]?.is_estimate ?? false,
   } as TableRowsCount
 }
 

@@ -17,6 +17,7 @@ import {
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AdvisorSection } from './AdvisorSection'
+import { CustomReportSection } from './CustomReportSection'
 import {
   GettingStartedSection,
   type GettingStartedState,
@@ -128,6 +129,13 @@ export const HomeV2 = () => {
                     return (
                       <SortableSection key={id} id={id}>
                         <AdvisorSection />
+                      </SortableSection>
+                    )
+                  }
+                  if (id === 'custom-report') {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        <CustomReportSection />
                       </SortableSection>
                     )
                   }
