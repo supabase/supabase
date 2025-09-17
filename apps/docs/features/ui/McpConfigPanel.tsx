@@ -2,6 +2,7 @@
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import {
   Button,
@@ -101,6 +102,7 @@ function ProjectSelector({
 
 export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
+  const { theme } = useTheme()
 
   return (
     <div className="not-prose">
@@ -113,7 +115,12 @@ export function McpConfigPanel() {
         Scope the MCP server to a project. If no project is selected, all projects will be
         accessible.
       </p>
-      <McpConfigPanelBase basePath="/docs" className="mt-6" projectRef={selectedProject?.ref} />
+      <McpConfigPanelBase
+        basePath="/docs"
+        className="mt-6"
+        projectRef={selectedProject?.ref}
+        theme={theme as 'light' | 'dark'}
+      />
     </div>
   )
 }

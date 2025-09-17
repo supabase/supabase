@@ -18,7 +18,7 @@ export const ConnectionIcon = ({
       src={`${basePath}/img/${iconFolder}/${connection.toLowerCase()}${
         supportsDarkMode && theme === 'dark' ? '-dark' : ''
       }-icon.svg`}
-      alt=""
+      alt={`${connection} logo`}
       width={14}
       height={14}
     />
