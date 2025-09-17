@@ -9,6 +9,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
+import { DOCS_URL } from 'lib/constants'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from 'components/ui/DocsButton'
 import FunctionSelector from 'components/ui/FunctionSelector'
@@ -290,7 +291,7 @@ export const CreateHookSheet = ({
               {isCreating ? `Add ${title}` : `Update ${title}`}
             </SheetTitle>
           </div>
-          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
+          <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </SheetHeader>
         <Separator />
         <SheetSection className="overflow-auto flex-grow px-0">

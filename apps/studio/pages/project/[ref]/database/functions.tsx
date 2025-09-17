@@ -9,6 +9,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DOCS_URL } from 'lib/constants'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -67,7 +68,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
           <div className="col-span-12">
             <FormHeader
               title="Database Functions"
-              docsUrl={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/functions`}
+              docsUrl={`${DOCS_URL}/guides/database/functions`}
             />
             <FunctionsList
               createFunction={createFunction}

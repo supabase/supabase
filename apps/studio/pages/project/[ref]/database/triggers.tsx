@@ -7,6 +7,7 @@ import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTri
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { generateTriggerCreateSQL } from 'components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
+import { DOCS_URL } from 'lib/constants'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -69,7 +70,7 @@ const TriggersPage: NextPageWithLayout = () => {
             <FormHeader
               title="Database Triggers"
               description="Execute a set of actions automatically on specified table events"
-              docsUrl={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/postgres/triggers`}
+              docsUrl={`${DOCS_URL}/guides/database/postgres/triggers`}
             />
             <TriggersList
               createTrigger={createTrigger}

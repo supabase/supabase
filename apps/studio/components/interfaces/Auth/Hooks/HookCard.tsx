@@ -3,6 +3,7 @@ import { Check, Webhook } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Input, copyToClipboard } from 'ui'
 import { Hook } from './hooks.constants'
@@ -108,7 +109,7 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
           >
             Configure hook
           </ButtonTooltip>
-          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
+          <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </div>
       </div>
       <div className="flex-1">

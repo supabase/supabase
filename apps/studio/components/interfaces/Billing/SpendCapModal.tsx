@@ -1,5 +1,6 @@
 import { DocsButton } from 'components/ui/DocsButton'
 import { Button, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { DOCS_URL } from 'lib/constants'
 
 interface SpendCapModalProps {
   visible: boolean
@@ -15,7 +16,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
       header={
         <div className="flex justify-between items-center">
           <span>Spend Cap</span>
-          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/cost-control#spend-cap`} />
+          <DocsButton href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`} />
         </div>
       }
       showCloseButton={false}

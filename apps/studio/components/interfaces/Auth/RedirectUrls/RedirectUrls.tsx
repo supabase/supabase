@@ -9,6 +9,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
+import { DOCS_URL } from 'lib/constants'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import {
@@ -82,7 +83,7 @@ export const RedirectUrls = () => {
             allowed, for example, https://*.domain.com
           </ScaffoldDescription>
         </div>
-        <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/concepts/redirect-urls`} />
+        <DocsButton href={`${DOCS_URL}/guides/auth/concepts/redirect-urls`} />
       </div>
 
       {isLoading && (
