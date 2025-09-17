@@ -59,7 +59,6 @@ jobs:
       - name: Upload coverage results to Coveralls
         uses: coverallsapp/github-action@master
         with:
-          fail-on-error: false
           parallel: true
           flag-name: studio-tests
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -74,6 +73,5 @@ jobs:
       - name: Coveralls Finished
         uses: coverallsapp/github-action@master
         with:
-          fail-on-error: false
           parallel-finished: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
