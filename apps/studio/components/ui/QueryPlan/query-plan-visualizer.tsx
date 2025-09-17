@@ -1,11 +1,5 @@
-import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import ReactFlow, {
-  Background,
-  BackgroundVariant,
-  MiniMap,
-  type ReactFlowInstance,
-} from 'reactflow'
+import ReactFlow, { Background, BackgroundVariant, type ReactFlowInstance } from 'reactflow'
 import { Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 
@@ -48,11 +42,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   useEffect(() => {
     requestAnimationFrame(() => rfInstance?.fitView())
   }, [isFullscreen, rfInstance])
-
-  const { resolvedTheme } = useTheme()
-  const miniMapMaskColor = resolvedTheme?.includes('dark')
-    ? 'rgb(17, 19, 24, .8)'
-    : 'rgb(237, 237, 237, .8)'
 
   const nodeTypes = useMemo(
     () => ({
@@ -151,13 +140,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 className="[&>*]:stroke-foreground-muted opacity-[25%]"
                 variant={BackgroundVariant.Dots}
                 color="inherit"
-              />
-              <MiniMap
-                pannable
-                zoomable
-                nodeColor="#111318"
-                maskColor={miniMapMaskColor}
-                className="border rounded-md shadow-sm"
               />
             </ReactFlow>
           </HeatmapContext.Provider>
