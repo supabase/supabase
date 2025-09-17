@@ -137,9 +137,19 @@ export const {
 type HandleErrorOptions = {
   alwaysCapture?: boolean
   sentryContext?: Parameters<typeof Sentry.captureException>[1]
+  sampleRate?: number
 }
 
-export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
+export const handleError = (
+  error: unknown,
+  options: HandleErrorOptions = {
+    sampleRate: 0.1, // 10%
+  }
+): never => {
+  if (options.sampleRate && Math.random() > options.sampleRate) {
+    return
+  }
+
   if (error && typeof error === 'object') {
     if (options.alwaysCapture) {
       Sentry.captureException(error, options.sentryContext)
