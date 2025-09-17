@@ -86,25 +86,29 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
       const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
       const filterKey = filter.key.includes('.') ? normalizedKey : filter.key
 
+      const hasQuotes =
+        filter.value.toString().includes('"') || filter.value.toString().includes("'")
+      const value = hasQuotes ? filter.value : `'${filter.value}'`
+
       // Handle different comparison operators
       switch (filter.compare) {
         case 'matches':
-          return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
+          return `REGEXP_CONTAINS(${filterKey}, ${value})`
         case 'is':
-          return `${filterKey} = ${filter.value}`
+          return `${filterKey} = ${value}`
         case '!=':
-          return `${filterKey} != ${filter.value}`
+          return `${filterKey} != ${value}`
         case '>=':
-          return `${filterKey} >= ${filter.value}`
+          return `${filterKey} >= ${value}`
         case '<=':
-          return `${filterKey} <= ${filter.value}`
+          return `${filterKey} <= ${value}`
         case '>':
-          return `${filterKey} > ${filter.value}`
+          return `${filterKey} > ${value}`
         case '<':
-          return `${filterKey} < ${filter.value}`
+          return `${filterKey} < ${value}`
         default:
           // Fallback to exact match for unknown operators
-          return `${filterKey} = ${filter.value}`
+          return `${filterKey} = ${value}`
       }
     })
     .filter(Boolean) // Remove any null/undefined conditions
