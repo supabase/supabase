@@ -1,22 +1,15 @@
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
-import {
-  createSupabaseMcpServer,
-  currentFeatureGroupSchema,
-  SupabasePlatform,
-} from '@supabase/mcp-server-supabase'
+import { createSupabaseMcpServer, SupabasePlatform } from '@supabase/mcp-server-supabase'
 import { stripIndent } from 'common-tags'
-import { commaSeparatedStringIntoArray, constructHeaders, zBooleanString } from 'lib/api/apiHelpers'
+import { commaSeparatedStringIntoArray, constructHeaders } from 'lib/api/apiHelpers'
 import { getDatabaseOperations } from 'lib/api/local/mcp'
 import { DEFAULT_PROJECT } from 'lib/constants/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
+const supportedFeatureGroupSchema = z.enum(['docs', 'database'])
+
 const mcpQuerySchema = z.object({
-  read_only: zBooleanString()
-    .default('false')
-    .describe(
-      'Indicates whether or not the MCP server should operate in read-only mode. This prevents write operations on any of your databases by executing SQL as a read-only Postgres user.'
-    ),
   features: z
     .string()
     .transform(commaSeparatedStringIntoArray)
@@ -25,10 +18,10 @@ const mcpQuerySchema = z.object({
       stripIndent`
         A comma-separated list of feature groups to filter tools by. If not provided, all tools are available.
 
-        The following feature groups are supported: ${currentFeatureGroupSchema.options.map((group) => `\`${group}\``).join(', ')}.
+        The following feature groups are supported: ${supportedFeatureGroupSchema.options.map((group) => `\`${group}\``).join(', ')}.
       `
     )
-    .pipe(z.array(currentFeatureGroupSchema).optional()),
+    .pipe(z.array(supportedFeatureGroupSchema).optional()),
 })
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -48,7 +41,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: error.flatten().fieldErrors })
   }
 
-  const { read_only: isReadOnly, features } = data
+  const { features } = data
   const headers = constructHeaders(req.headers)
 
   const platform: SupabasePlatform = {
@@ -59,7 +52,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const server = createSupabaseMcpServer({
       platform,
       projectId: DEFAULT_PROJECT.ref,
-      readOnly: isReadOnly,
       features,
     })
 
