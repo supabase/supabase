@@ -627,23 +627,7 @@ function createStorageExplorerState({
           })
         }
       } catch (error) {
-        // Fallback to root if validation fails
-        state.openedFolders = []
-        state.columns = [state.selectedBucket.name].map((name) => ({
-          id: name,
-          name,
-          status: STORAGE_ROW_STATUS.READY,
-          items: [],
-          hasMoreItems: false,
-          isLoadingMoreItems: false,
-        }))
-        state.clearSelectedItems()
-        await state.fetchFolderContents({
-          bucketId: state.selectedBucket.id,
-          folderId: state.selectedBucket.id,
-          folderName: state.selectedBucket.name,
-          index: -1,
-        })
+        console.error(error)
       }
     },
 

@@ -159,7 +159,6 @@ export const getFile = async (fileEntry: FileSystemFileEntry): Promise<File | un
 
 // Referenced from: // https://stackoverflow.com/a/53058574
 export const getFilesDataTransferItems = async (items: DataTransferItemList) => {
-  const toastId = toast('Retrieving items to upload...')
   const files: (File & { path: string })[] = []
   const queue: FileSystemEntry[] = []
   for (const item of items) {
@@ -182,7 +181,6 @@ export const getFilesDataTransferItems = async (items: DataTransferItemList) => 
       queue.push(...(await readAllDirectoryEntries(dirEntry.createReader())))
     }
   }
-  toast.dismiss(toastId)
   return files
 }
 
