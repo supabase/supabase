@@ -61,7 +61,6 @@ export const Grid = memo(
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
       const isBranch = project?.parent_project_ref !== undefined
-      console.log({ isBranch })
 
       const onRowsChange = useOnRowsChange(rows)
 
