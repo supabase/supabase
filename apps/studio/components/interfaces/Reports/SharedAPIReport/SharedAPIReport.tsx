@@ -6,7 +6,11 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from '../renderers/ApiRenderers'
-import { SharedAPIReportKey } from './SharedAPIReport.constants'
+import {
+  SharedAPIReportFilterBy,
+  SharedAPIReportKey,
+  useSharedAPIReport,
+} from './SharedAPIReport.constants'
 
 type SharedAPIReportWidgetsProps = {
   data: any
@@ -14,6 +18,7 @@ type SharedAPIReportWidgetsProps = {
   isLoading: any
   isRefetching: boolean
   hiddenReports?: SharedAPIReportKey[]
+  sql: Record<SharedAPIReportKey, string>
 }
 
 export function SharedAPIReport({
@@ -22,6 +27,7 @@ export function SharedAPIReport({
   isLoading,
   isRefetching,
   hiddenReports = [],
+  sql,
 }: SharedAPIReportWidgetsProps) {
   return (
     <div className="grid grid-cols-1 gap-4">
@@ -34,6 +40,10 @@ export function SharedAPIReport({
           renderer={TotalRequestsChartRenderer}
           append={TopApiRoutesRenderer}
           appendProps={{ data: data.topRoutes }}
+          queryType="logs"
+          params={{
+            sql: sql.totalRequests,
+          }}
         />
       )}
       {!hiddenReports.includes('errorCounts') && (
@@ -48,6 +58,10 @@ export function SharedAPIReport({
             data: data.topErrorRoutes || [],
           }}
           append={TopApiRoutesRenderer}
+          queryType="logs"
+          params={{
+            sql: sql.errorCounts,
+          }}
         />
       )}
       {!hiddenReports.includes('responseSpeed') && (
@@ -60,6 +74,10 @@ export function SharedAPIReport({
           renderer={ResponseSpeedChartRenderer}
           appendProps={{ data: data.topSlowRoutes || [] }}
           append={TopApiRoutesRenderer}
+          queryType="logs"
+          params={{
+            sql: sql.responseSpeed,
+          }}
         />
       )}
       {!hiddenReports.includes('networkTraffic') && (
@@ -70,6 +88,10 @@ export function SharedAPIReport({
           tooltip="Ingress and egress of requests and responses respectively"
           data={data.networkTraffic || []}
           renderer={NetworkTrafficRenderer}
+          queryType="logs"
+          params={{
+            sql: sql.networkTraffic,
+          }}
         />
       )}
     </div>
