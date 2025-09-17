@@ -290,7 +290,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
             readOnly={message.role === 'user'}
-            onResults={updateMessage}
             addToolResult={addToolResult}
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
@@ -303,7 +302,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       }),
     [
       chatMessages,
-      updateMessage,
       deleteMessageFromHere,
       editMessage,
       cancelEdit,

@@ -27,8 +27,8 @@ interface DisplayBlockRendererProps {
     yAxis?: string
   }
   initialResults?: unknown
-  onResults?: (args: { messageId: string; resultId?: string; results: unknown }) => void
-  onError?: (args: { messageId: string; resultId?: string; errorText: string }) => void
+  onResults?: (args: { messageId: string; results: unknown }) => void
+  onError?: (args: { messageId: string; errorText: string }) => void
   toolState?: 'input-streaming' | 'input-available' | 'output-available' | 'output-error'
   isLastPart?: boolean
   isLastMessage?: boolean
@@ -73,7 +73,6 @@ export const DisplayBlockRenderer = ({
     yKey: initialArgs.yAxis ?? '',
   }))
 
-  const resultId = toolCallId
   const [rows, setRows] = useState<any[] | undefined>(
     Array.isArray(initialResults) ? initialResults : undefined
   )
@@ -120,7 +119,6 @@ export const DisplayBlockRenderer = ({
       setIsWriteQuery(lastQueryType.current === 'mutation' || initialArgs.isWriteQuery || false)
       onResults?.({
         messageId,
-        resultId,
         results: Array.isArray(data.result) ? data.result : undefined,
       })
     },
@@ -135,7 +133,7 @@ export const DisplayBlockRenderer = ({
         setIsWriteQuery(true)
       }
 
-      onError?.({ messageId, resultId, errorText: error.message })
+      onError?.({ messageId, errorText: error.message })
     },
   })
 
@@ -167,7 +165,7 @@ export const DisplayBlockRenderer = ({
 
     if (!connectionString) {
       const fallbackMessage = 'Unable to find a database connection to execute this query.'
-      onError?.({ messageId, resultId, errorText: fallbackMessage })
+      onError?.({ messageId, errorText: fallbackMessage })
       return
     }
 
@@ -236,7 +234,7 @@ export const DisplayBlockRenderer = ({
             confirmLabel={executeSqlLoading ? 'Running…' : 'Run Query'}
             isLoading={executeSqlLoading}
             onCancel={async () => {
-              onResults?.({ messageId, resultId, results: 'User skipped running the query' })
+              onResults?.({ messageId, results: 'User skipped running the query' })
             }}
             onConfirm={() => {
               handleExecute(isWriteQuery ? 'mutation' : 'select')

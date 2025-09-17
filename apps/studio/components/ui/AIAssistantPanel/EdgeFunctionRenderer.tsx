@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { PropsWithChildren, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -15,6 +15,7 @@ interface EdgeFunctionRendererProps {
   code: string
   functionName: string
   onDeployed?: (result: { success: true } | { success: false; errorText: string }) => void
+  initialIsDeployed?: boolean
   showConfirmFooter?: boolean
 }
 
@@ -23,17 +24,14 @@ export const EdgeFunctionRenderer = ({
   code,
   functionName,
   onDeployed,
+  initialIsDeployed,
   showConfirmFooter = true,
 }: PropsWithChildren<EdgeFunctionRendererProps>) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
-  const [isDeploying, setIsDeploying] = useState(false)
-  const [isDeployed, setIsDeployed] = useState(false)
-  const [errorText, setErrorText] = useState<string>()
+  const [isDeployed, setIsDeployed] = useState(!!initialIsDeployed)
   const [showReplaceWarning, setShowReplaceWarning] = useState(false)
-  const [hasDecision, setHasDecision] = useState(false)
-  const [hasExistingFunction, setHasExistingFunction] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
   const { data: existingFunction } = useEdgeFunctionQuery(
@@ -41,26 +39,24 @@ export const EdgeFunctionRenderer = ({
     { enabled: !!ref && !!functionName }
   )
 
-  const { mutateAsync: deployFunction } = useEdgeFunctionDeployMutation({
+  const {
+    mutate: deployFunction,
+    error: deployError,
+    isLoading: isDeploying,
+  } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
+      setIsDeployed(true)
       toast.success('Successfully deployed edge function')
+      onDeployed?.({ success: true })
+    },
+    onError: (error) => {
+      const errMsg = error?.message ?? 'Unknown error'
+      const message = `Failed to deploy function: ${errMsg}`
+      toast.error(message)
+      setIsDeployed(false)
+      onDeployed?.({ success: false, errorText: errMsg })
     },
   })
-
-  useEffect(() => {
-    setIsDeploying(false)
-    setIsDeployed(false)
-    setErrorText(undefined)
-    setShowReplaceWarning(false)
-    setHasDecision(false)
-    setHasExistingFunction(false)
-  }, [code, functionName, ref])
-
-  useEffect(() => {
-    if (existingFunction) {
-      setHasExistingFunction(true)
-    }
-  }, [existingFunction])
 
   const functionUrl = useMemo(() => {
     const endpoint = settings?.app_config?.endpoint
@@ -69,7 +65,9 @@ export const EdgeFunctionRenderer = ({
     try {
       const url = new URL(`https://${endpoint}`)
       const restUrlTld = url.hostname.split('.').pop()
-      return restUrlTld ? `https://${ref}.supabase.${restUrlTld}/functions/v1/${functionName}` : undefined
+      return restUrlTld
+        ? `https://${ref}.supabase.${restUrlTld}/functions/v1/${functionName}`
+        : undefined
     } catch (error) {
       return undefined
     }
@@ -88,49 +86,30 @@ export const EdgeFunctionRenderer = ({
   const performDeploy = async () => {
     if (!ref || !functionName || !code) return
 
-    setIsDeploying(true)
-    setErrorText(undefined)
+    deployFunction({
+      projectRef: ref,
+      slug: functionName,
+      metadata: {
+        entrypoint_path: 'index.ts',
+        name: functionName,
+        verify_jwt: true,
+      },
+      files: [{ name: 'index.ts', content: code }],
+    })
 
-    try {
-      await deployFunction({
-        projectRef: ref,
-        slug: functionName,
-        metadata: {
-          entrypoint_path: 'index.ts',
-          name: functionName,
-          verify_jwt: true,
-        },
-        files: [{ name: 'index.ts', content: code }],
-      })
+    sendEvent({
+      action: 'edge_function_deploy_button_clicked',
+      properties: { origin: 'functions_ai_assistant' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
 
-      sendEvent({
-        action: 'edge_function_deploy_button_clicked',
-        properties: { origin: 'functions_ai_assistant' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
-
-      setIsDeployed(true)
-      setHasExistingFunction(true)
-      setHasDecision(true)
-      onDeployed?.({ success: true })
-    } catch (e: any) {
-      const errMsg = e?.message ?? 'Unknown error'
-      const message = `Failed to deploy function: ${errMsg}`
-      toast.error(message)
-      setIsDeployed(false)
-      setErrorText(message)
-      setHasDecision(true)
-      onDeployed?.({ success: false, errorText: errMsg })
-    } finally {
-      setIsDeploying(false)
-      setShowReplaceWarning(false)
-    }
+    setShowReplaceWarning(false)
   }
 
   const handleDeploy = () => {
     if (!code || isDeploying || !ref) return
 
-    if (hasExistingFunction) {
+    if (existingFunction) {
       setShowReplaceWarning(true)
       return
     }
@@ -138,18 +117,16 @@ export const EdgeFunctionRenderer = ({
     void performDeploy()
   }
 
-  const shouldShowConfirmFooter = showConfirmFooter && !hasDecision
-
   return (
     <div className="w-auto overflow-x-hidden my-4">
       <EdgeFunctionBlock
         label={label}
         code={code}
         functionName={functionName}
-        disabled={shouldShowConfirmFooter}
+        disabled={showConfirmFooter}
         isDeploying={isDeploying}
         isDeployed={isDeployed}
-        errorText={errorText}
+        errorText={deployError?.message}
         functionUrl={functionUrl}
         deploymentDetailsUrl={deploymentDetailsUrl}
         downloadCommand={downloadCommand}
@@ -158,7 +135,7 @@ export const EdgeFunctionRenderer = ({
         onConfirmReplace={() => void performDeploy()}
         onDeploy={handleDeploy}
       />
-      {shouldShowConfirmFooter && (
+      {showConfirmFooter && (
         <div className="mx-4">
           <ConfirmFooter
             message="Assistant wants to deploy this EdgeFunction"
@@ -166,7 +143,6 @@ export const EdgeFunctionRenderer = ({
             confirmLabel={isDeploying ? 'Deploying…' : 'Deploy'}
             isLoading={isDeploying}
             onCancel={() => {
-              setHasDecision(true)
               onDeployed?.({ success: false, errorText: 'Skipped' })
             }}
             onConfirm={() => handleDeploy()}

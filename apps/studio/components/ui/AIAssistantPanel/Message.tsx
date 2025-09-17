@@ -41,7 +41,6 @@ interface MessageProps {
   isLoading: boolean
   readOnly?: boolean
   variant?: 'default' | 'warning'
-  onResults: (message: VercelMessage) => void
   addToolResult?: (args: { tool: string; toolCallId: string; output: unknown }) => Promise<void>
   onDelete: (id: string) => void
   onEdit: (id: string) => void
@@ -57,7 +56,6 @@ export const Message = function Message({
   isLoading,
   readOnly,
   variant = 'default',
-  onResults,
   addToolResult,
   onDelete,
   onEdit,
@@ -260,14 +258,8 @@ export const Message = function Message({
                               toolState={state}
                               isLastPart={isLastPart}
                               isLastMessage={isLastMessage}
-                              onResults={(args: {
-                                messageId: string
-                                resultId?: string
-                                results: unknown
-                              }) => {
+                              onResults={(args: { messageId: string; results: unknown }) => {
                                 const results = args.results as any[]
-
-                                console.log('onResults', args)
 
                                 addToolResult?.({
                                   tool: 'execute_sql',
@@ -281,7 +273,6 @@ export const Message = function Message({
                                   toolCallId: String(toolCallId),
                                   output: `Error: ${errorText}`,
                                 })
-                                onResults(message)
                               }}
                             />
                           </div>
@@ -310,28 +301,22 @@ export const Message = function Message({
                         )
                       }
                       if (state === 'input-available' || state === 'output-available') {
+                        const isInitiallyDeployed =
+                          state === 'output-available' && (part as any)?.output?.success === true
                         return (
                           <EdgeFunctionRenderer
                             key={`${id}-tool-${toolCallId}`}
                             label={(input as any).name || 'Edge Function'}
                             code={(input as any).code}
                             functionName={(input as any).name || 'my-function'}
+                            showConfirmFooter={!part.output}
+                            initialIsDeployed={isInitiallyDeployed}
                             onDeployed={async (res) => {
-                              if (res.success) {
-                                await addToolResult?.({
-                                  tool: 'deploy_edge_function',
-                                  toolCallId: String(toolCallId),
-                                  output: 'Deployed successfully',
-                                })
-                                onResults(message)
-                              } else {
-                                await addToolResult?.({
-                                  tool: 'deploy_edge_function',
-                                  toolCallId: String(toolCallId),
-                                  output: res.errorText,
-                                })
-                                onResults(message)
-                              }
+                              await addToolResult?.({
+                                tool: 'deploy_edge_function',
+                                toolCallId: String(toolCallId),
+                                output: res,
+                              })
                             }}
                           />
                         )
