@@ -32,7 +32,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   const hasFunctions = (functions ?? []).length > 0
 
   const secondaryActions = [
-    <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
+    <DocsButton key="docs" href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/functions`} />,
     <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
       <a
         target="_blank"

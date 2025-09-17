@@ -34,7 +34,7 @@ const Hooks: NextPageWithLayout = () => {
   )
 }
 const secondaryActions = [
-  <DocsButton key="docs" href="https://supabase.com/docs/guides/auth/auth-hooks" />,
+  <DocsButton key="docs" href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-hooks`} />,
 ]
 
 Hooks.getLayout = (page) => (

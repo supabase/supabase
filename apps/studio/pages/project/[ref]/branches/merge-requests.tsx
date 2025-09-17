@@ -386,7 +386,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
           Branching Feedback
         </a>
       </Button>
-      <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
+      <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/branching`} />
     </div>
   )
 

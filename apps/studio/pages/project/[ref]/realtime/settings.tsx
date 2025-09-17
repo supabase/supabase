@@ -23,7 +23,7 @@ RealtimePoliciesPage.getLayout = (page) => (
         subtitle="Configure your project's Realtime settings"
         // [Joshen] Scaffolding for now - once docs for this is ready
         primaryActions={
-          <DocsButton href="https://supabase.com/docs/guides/realtime/authorization" />
+          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/realtime/authorization`} />
         }
       >
         {page}

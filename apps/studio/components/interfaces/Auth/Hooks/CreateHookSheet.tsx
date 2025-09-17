@@ -290,7 +290,7 @@ export const CreateHookSheet = ({
               {isCreating ? `Add ${title}` : `Update ${title}`}
             </SheetTitle>
           </div>
-          <DocsButton href={'https://supabase.com/docs/guides/auth/auth-hooks/' + hook.docSlug} />
+          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </SheetHeader>
         <Separator />
         <SheetSection className="overflow-auto flex-grow px-0">

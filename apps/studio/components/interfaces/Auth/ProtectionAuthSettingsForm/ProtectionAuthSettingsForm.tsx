@@ -214,9 +214,9 @@ export const ProtectionAuthSettingsForm = () => {
                           <InlineLink
                             href={
                               field.value === 'hcaptcha'
-                                ? 'https://supabase.com/docs/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=hcaptcha-1'
+                                ? `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=hcaptcha-1`
                                 : field.value === 'turnstile'
-                                  ? 'https://supabase.com/docs/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=turnstile-1'
+                                  ? `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=turnstile-1`
                                   : '/'
                             }
                             className="mt-2 text-xs text-foreground-light hover:text-foreground no-underline"

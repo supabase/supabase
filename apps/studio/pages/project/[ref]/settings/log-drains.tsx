@@ -88,7 +88,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             </ScaffoldDescription>
           </div>
           <div className="flex items-center justify-end gap-2">
-            <DocsButton href="https://supabase.com/docs/guides/platform/log-drains" />
+            <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/log-drains`} />
 
             {!(logDrains?.length === 0) && (
               <Button

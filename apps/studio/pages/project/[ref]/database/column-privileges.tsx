@@ -227,7 +227,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 <p>Grant or revoke privileges on a column based on user role.</p>
               </div>
             </div>
-            <DocsButton href="https://supabase.com/docs/guides/auth/column-level-security" />
+            <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/column-level-security`} />
           </div>
 
           {isEnabled ? (

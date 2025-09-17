@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 async function downloadGraphQLSchema() {
-  const schemaEndpoint = 'https://supabase.com/docs/api/graphql'
+  const schemaEndpoint = `${process.env.NEXT_PUBLIC_DOCS_URL}/api/graphql`
   const outputPath = path.join(__dirname, './schema.graphql')
 
   const schemaQuery = stripIndent`

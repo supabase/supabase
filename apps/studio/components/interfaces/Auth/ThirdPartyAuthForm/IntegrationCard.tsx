@@ -29,7 +29,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           users. You can read more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth"
+            href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth`}
           >
             documentation
           </a>
@@ -44,7 +44,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           read more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth"
+            href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth`}
           >
             documentation
           </a>
@@ -58,7 +58,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           can read more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth/third-party/aws-cognito"
+            href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/third-party/aws-cognito`}
           >
             documentation
           </a>
@@ -73,7 +73,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth/third-party/clerk"
+            href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/third-party/clerk`}
           >
             documentation
           </a>
@@ -88,7 +88,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth/third-party/workos"
+            href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/third-party/workos`}
           >
             documentation
           </a>

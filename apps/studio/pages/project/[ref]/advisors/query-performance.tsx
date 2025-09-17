@@ -49,7 +49,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         actions={
           <div className="flex items-center gap-2">
             <EnableIndexAdvisorButton />
-            <DocsButton href="https://supabase.com/docs/guides/platform/performance#examining-query-performance" />
+            <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/performance#examining-query-performance`} />
             <DatabaseSelector />
           </div>
         }

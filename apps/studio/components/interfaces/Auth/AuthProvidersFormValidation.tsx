@@ -12,7 +12,7 @@ const PROVIDER_EMAIL = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Email',
-  link: 'https://supabase.com/docs/guides/auth/passwords',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/passwords`,
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
       title: 'Enable Email provider',
@@ -95,7 +95,7 @@ const PROVIDER_EMAIL = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -217,7 +217,7 @@ export const PROVIDER_PHONE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Phone',
-  link: 'https://supabase.com/docs/guides/auth/phone-login',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/phone-login`,
   properties: {
     EXTERNAL_PHONE_ENABLED: {
       title: 'Enable Phone provider',
@@ -418,7 +418,7 @@ export const PROVIDER_PHONE = {
   misc: {
     iconKey: 'phone-icon4',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -426,7 +426,7 @@ const EXTERNAL_PROVIDER_APPLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Apple',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-apple',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-apple`,
   properties: {
     EXTERNAL_APPLE_ENABLED: {
       title: 'Enable Sign in with Apple',
@@ -441,7 +441,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     },
     EXTERNAL_APPLE_SECRET: {
       title: 'Secret Key (for OAuth)',
-      description: `Secret key used in the OAuth flow. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
+      description: `Secret key used in the OAuth flow. [Learn more](${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
     },
@@ -527,7 +527,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     iconKey: 'apple-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign in with Apple on the web in the Apple Developer Center.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
     alert: {
       title: `Apple OAuth secret keys expire every 6 months`,
       description: `A new secret should be generated every 6 months, otherwise users on the web will not be able to sign in.`,
@@ -539,7 +539,7 @@ const EXTERNAL_PROVIDER_AZURE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Azure',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-azure',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-azure`,
   properties: {
     EXTERNAL_AZURE_ENABLED: {
       title: 'Azure enabled',
@@ -553,7 +553,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     EXTERNAL_AZURE_SECRET: {
       // [TODO] Change docs
       title: 'Secret Value',
-      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
+      description: `Enter the data from Value, not the Secret ID. [Learn more](${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
       type: 'string',
       isSecret: true,
     },
@@ -588,7 +588,7 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Bitbucket',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-bitbucket',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-bitbucket`,
   properties: {
     EXTERNAL_BITBUCKET_ENABLED: {
       title: 'Bitbucket enabled',
@@ -627,7 +627,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Discord',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-discord?',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-discord?`,
   properties: {
     EXTERNAL_DISCORD_ENABLED: {
       title: 'Discord enabled',
@@ -666,7 +666,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Facebook',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-facebook',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-facebook`,
   properties: {
     EXTERNAL_FACEBOOK_ENABLED: {
       title: 'Facebook enabled',
@@ -705,7 +705,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Figma',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-figma',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-figma`,
   properties: {
     EXTERNAL_FIGMA_ENABLED: {
       title: 'Figma enabled',
@@ -744,7 +744,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitHub',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-github',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-github`,
   properties: {
     EXTERNAL_GITHUB_ENABLED: {
       title: 'GitHub enabled',
@@ -783,7 +783,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitLab',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-gitlab',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-gitlab`,
   properties: {
     EXTERNAL_GITLAB_ENABLED: {
       title: 'GitLab enabled',
@@ -830,7 +830,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Google',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-google',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-google`,
   properties: {
     EXTERNAL_GOOGLE_ENABLED: {
       title: 'Enable Sign in with Google',
@@ -884,7 +884,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     iconKey: 'google-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
+[Learn more](${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
 }
 
@@ -892,7 +892,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Kakao',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-kakao',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-kakao`,
   properties: {
     EXTERNAL_KAKAO_ENABLED: {
       title: 'Kakao enabled',
@@ -934,7 +934,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'KeyCloak',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-keycloak',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-keycloak`,
   properties: {
     EXTERNAL_KEYCLOAK_ENABLED: {
       title: 'Keycloak enabled',
@@ -985,7 +985,7 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   type: 'object',
   key: 'linkedin_oidc',
   title: 'LinkedIn (OIDC)',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-linkedin',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-linkedin`,
   properties: {
     EXTERNAL_LINKEDIN_OIDC_ENABLED: {
       title: 'LinkedIn enabled',
@@ -1024,7 +1024,7 @@ const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Notion',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-notion',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-notion`,
   properties: {
     EXTERNAL_NOTION_ENABLED: {
       title: 'Notion enabled',
@@ -1063,7 +1063,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitch',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-twitch',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-twitch`,
   properties: {
     EXTERNAL_TWITCH_ENABLED: {
       title: 'Twitch enabled',
@@ -1102,7 +1102,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitter',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-twitter',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-twitter`,
   properties: {
     EXTERNAL_TWITTER_ENABLED: {
       title: 'Twitter enabled',
@@ -1141,7 +1141,7 @@ const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack (Deprecated)',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-slack',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-slack`,
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1181,7 +1181,7 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
   type: 'object',
   title: 'Slack (OIDC)',
   key: 'slack_oidc',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-slack',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-slack`,
   properties: {
     EXTERNAL_SLACK_OIDC_ENABLED: {
       title: 'Slack enabled',
@@ -1220,7 +1220,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Spotify',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-spotify',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-spotify`,
   properties: {
     EXTERNAL_SPOTIFY_ENABLED: {
       title: 'Spotify enabled',
@@ -1259,7 +1259,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'WorkOS',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-workos',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-workos`,
   properties: {
     EXTERNAL_WORKOS_ENABLED: {
       title: 'WorkOS enabled',
@@ -1309,7 +1309,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Zoom',
-  link: 'https://supabase.com/docs/guides/auth/social-login/auth-zoom',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/social-login/auth-zoom`,
   properties: {
     EXTERNAL_ZOOM_ENABLED: {
       title: 'Zoom enabled',
@@ -1348,12 +1348,12 @@ const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'SAML 2.0',
-  link: 'https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/enterprise-sso/auth-sso-saml`,
   properties: {
     SAML_ENABLED: {
       title: 'Enable SAML 2.0 Single Sign-on',
       description:
-        'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
+        `You will need to use the [Supabase CLI](${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it`,
       type: 'boolean',
     },
     SAML_EXTERNAL_URL: {
@@ -1385,7 +1385,7 @@ const PROVIDER_WEB3 = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Web3 Wallet',
-  link: 'https://supabase.com/docs/guides/auth/auth-web3',
+  link: `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-web3`,
   properties: {
     EXTERNAL_WEB3_ETHEREUM_ENABLED: {
       title: 'Enable Sign in with Ethereum',

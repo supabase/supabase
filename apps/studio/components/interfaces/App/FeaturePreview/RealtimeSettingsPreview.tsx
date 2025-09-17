@@ -15,7 +15,7 @@ export const RealtimeSettingsPreview = () => {
         Allows you to setup several configurations for Realtime, including configuration channel
         restrictions where you can enable or disable public channels from being able to connect.
         Learn more about how Realtime Authorization works{' '}
-        <InlineLink href="https://supabase.com/docs/guides/realtime/authorization">
+        <InlineLink href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/realtime/authorization`}>
           in our documentation
         </InlineLink>
         .

@@ -15,7 +15,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
       header={
         <div className="flex justify-between items-center">
           <span>Spend Cap</span>
-          <DocsButton href="https://supabase.com/docs/guides/platform/cost-control#spend-cap" />
+          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/cost-control#spend-cap`} />
         </div>
       }
       showCloseButton={false}

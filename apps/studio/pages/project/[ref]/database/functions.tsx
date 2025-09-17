@@ -67,7 +67,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
           <div className="col-span-12">
             <FormHeader
               title="Database Functions"
-              docsUrl="https://supabase.com/docs/guides/database/functions"
+              docsUrl={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/functions`}
             />
             <FunctionsList
               createFunction={createFunction}

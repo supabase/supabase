@@ -269,7 +269,7 @@ const RestoreToNewProject = () => {
             <Link
               target="_blank"
               className="underline"
-              href="https://supabase.com/docs/guides/platform/backups"
+              href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/backups`}
             >
               in our docs
             </Link>

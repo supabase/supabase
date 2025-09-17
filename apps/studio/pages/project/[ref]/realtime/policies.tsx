@@ -24,7 +24,7 @@ RealtimePoliciesPage.getLayout = (page) => (
         title="Policies"
         subtitle="Control access to your realtime channels"
         primaryActions={
-          <DocsButton href="https://supabase.com/docs/guides/realtime/authorization" />
+          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/realtime/authorization`} />
         }
         size="large"
       >

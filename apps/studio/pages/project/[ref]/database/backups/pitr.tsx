@@ -73,7 +73,7 @@ const PITR = () => {
         title="Database backups are not available for OrioleDB"
         description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
       >
-        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+        <DocsButton abbrev={false} className="mt-2" href={process.env.NEXT_PUBLIC_DOCS_URL} />
       </Admonition>
     )
   }

@@ -51,7 +51,7 @@ RateLimitsPage.getLayout = (page) => (
         title="Rate Limits"
         subtitle="Safeguard against bursts of incoming traffic to prevent abuse and maximize stability"
         primaryActions={
-          <DocsButton href="https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention" />
+          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention`} />
         }
       >
         {page}

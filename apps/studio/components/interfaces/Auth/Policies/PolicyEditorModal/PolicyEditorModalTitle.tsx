@@ -61,7 +61,7 @@ const PolicyEditorModalTitle = ({
         )}
         <DocsButton
           className="mt-[-4px]"
-          href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
+          href={`${process.env.NEXT_PUBLIC_DOCS_URL}/learn/auth-deep-dive/auth-policies`}
         />
       </div>
     </div>

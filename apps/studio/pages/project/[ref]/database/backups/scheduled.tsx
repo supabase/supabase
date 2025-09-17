@@ -79,7 +79,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                             terms of the granular recovery that can be performed.{' '}
                             <a
                               className="text-brand transition-colors hover:text-brand-600"
-                              href="https://supabase.com/docs/guides/platform/backups"
+                              href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/backups`}
                             >
                               Learn more
                             </a>

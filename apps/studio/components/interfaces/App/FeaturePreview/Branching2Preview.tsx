@@ -16,7 +16,7 @@ export const Branching2Preview = () => {
       <p className="text-sm text-foreground-light mb-4">
         Create branches, review changes, and merge back into production all through the dashboard.
         Read the below limitations and our{' '}
-        <InlineLink href="https://supabase.com/docs/guides/platform/branching">
+        <InlineLink href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/branching`}>
           branching documentation
         </InlineLink>{' '}
         before opting in.

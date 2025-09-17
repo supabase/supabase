@@ -42,7 +42,7 @@ const SupportPage: NextPageWithLayout = () => {
             <div className="flex items-center gap-x-3">
               <Button asChild type="default" icon={<Wrench />}>
                 <Link
-                  href="https://supabase.com/docs/guides/platform/troubleshooting"
+                  href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/troubleshooting`}
                   target="_blank"
                   rel="noreferrer"
                 >

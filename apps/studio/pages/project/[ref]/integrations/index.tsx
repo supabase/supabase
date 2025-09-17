@@ -50,7 +50,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
           subtitle:
             'Connect to external data sources and services by querying APIs, databases, and files as if they were Postgres tables.',
           secondaryActions: (
-            <DocsButton href="https://supabase.com/docs/guides/database/extensions/wrappers/overview" />
+            <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/extensions/wrappers/overview`} />
           ),
         }
       case 'postgres_extension':

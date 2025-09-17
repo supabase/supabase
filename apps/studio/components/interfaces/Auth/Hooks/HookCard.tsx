@@ -108,7 +108,7 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
           >
             Configure hook
           </ButtonTooltip>
-          <DocsButton href={'https://supabase.com/docs/guides/auth/auth-hooks/' + hook.docSlug} />
+          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </div>
       </div>
       <div className="flex-1">

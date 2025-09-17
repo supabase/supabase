@@ -115,7 +115,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
                 each row before updating or deleting the row.
               </p>
               <div className="mt-3">
-                <DocsButton href="https://supabase.com/docs/guides/database/tables#primary-keys" />
+                <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/tables#primary-keys`} />
               </div>
             </div>
           ),
