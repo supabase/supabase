@@ -543,6 +543,110 @@ function createStorageExplorerState({
       await state.fetchFoldersByPath({ paths })
     },
 
+    // validate and update openedFolders after folder moves
+    validateAndUpdateOpenedFolders: async () => {
+      if (state.openedFolders.length === 0) return
+
+      // Add a small delay to ensure the folder move operation has completed
+      await new Promise((resolve) => setTimeout(resolve, 200))
+
+      try {
+        if (!state.supabaseClient) {
+          console.error('Supabase client not available')
+          return
+        }
+
+        // Check if the current folder structure is still valid by checking if each folder
+        // in the path can still be found in its parent directory
+        let validFolders: StorageItem[] = []
+
+        for (let i = 0; i < state.openedFolders.length; i++) {
+          const currentFolder = state.openedFolders[i]
+          const parentPath = state.openedFolders
+            .slice(0, i)
+            .map((folder) => folder.name)
+            .join('/')
+
+          try {
+            const { data: parentContents, error: parentError } = await (
+              await state.supabaseClient()
+            ).storage
+              .from(state.selectedBucket.id)
+              .list(parentPath, { limit: 1000 })
+
+            if (parentError || !parentContents) {
+              // Error listing parent
+              break
+            }
+
+            // Check if the current folder still exists in its parent
+            const folderExists = parentContents.some((item) => item.name === currentFolder.name)
+
+            if (folderExists) {
+              validFolders.push(currentFolder)
+            } else {
+              // Folder NOT found in parent
+              break
+            }
+          } catch (error) {
+            // Error checking folder
+            break
+          }
+        }
+
+        // If we have valid folders, navigate to that path
+        if (validFolders.length > 0) {
+          const validPaths = validFolders.map((folder) => folder.name)
+
+          // Only navigate if the path has changed
+          const currentPaths = state.openedFolders.map((folder) => folder.name)
+          if (JSON.stringify(validPaths) !== JSON.stringify(currentPaths)) {
+            state.clearSelectedItems()
+            await state.fetchFoldersByPath({ paths: validPaths })
+          } else {
+            // Path is the same, just refresh
+            await state.refetchAllOpenedFolders()
+          }
+        } else {
+          // No valid path found, navigate to root
+          state.openedFolders = []
+          state.columns = [state.selectedBucket.name].map((name) => ({
+            id: name,
+            name,
+            status: STORAGE_ROW_STATUS.READY,
+            items: [],
+            hasMoreItems: false,
+            isLoadingMoreItems: false,
+          }))
+          state.clearSelectedItems()
+          await state.fetchFolderContents({
+            bucketId: state.selectedBucket.id,
+            folderId: state.selectedBucket.id,
+            folderName: state.selectedBucket.name,
+            index: -1,
+          })
+        }
+      } catch (error) {
+        // Fallback to root if validation fails
+        state.openedFolders = []
+        state.columns = [state.selectedBucket.name].map((name) => ({
+          id: name,
+          name,
+          status: STORAGE_ROW_STATUS.READY,
+          items: [],
+          hasMoreItems: false,
+          isLoadingMoreItems: false,
+        }))
+        state.clearSelectedItems()
+        await state.fetchFolderContents({
+          bucketId: state.selectedBucket.id,
+          folderId: state.selectedBucket.id,
+          folderName: state.selectedBucket.name,
+          index: -1,
+        })
+      }
+    },
+
     fetchFoldersByPath: async ({
       paths,
       searchString = '',
@@ -1586,7 +1690,7 @@ function createStorageExplorerState({
       state.clearSelectedItems()
 
       // TODO: invalidate the file preview cache when moving files
-      await state.refetchAllOpenedFolders()
+      await state.validateAndUpdateOpenedFolders()
     },
 
     // New function to handle folder moves by creating new folder and moving contents
@@ -1866,8 +1970,7 @@ function createStorageExplorerState({
         state.removeFolderMoveProgress(sourceFullPath)
 
         try {
-          await state.refetchAllOpenedFolders()
-          console.log('Storage explorer refresh completed')
+          await state.validateAndUpdateOpenedFolders()
         } catch (refreshError) {
           console.error('Failed to refresh storage explorer:', refreshError)
         }
