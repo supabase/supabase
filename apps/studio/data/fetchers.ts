@@ -143,7 +143,7 @@ type HandleErrorOptions = {
 export const handleError = (
   error: unknown,
   options: HandleErrorOptions = {
-    sampleRate: 0.1, // 10%
+    sampleRate: 0.2, // 20%
   }
 ): never => {
   if (options.sampleRate && Math.random() > options.sampleRate) {
