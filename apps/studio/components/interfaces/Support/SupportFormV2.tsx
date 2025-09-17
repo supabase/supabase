@@ -1,6 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { Book, ChevronRight, ExternalLink, Github, Loader2, Mail, Plus, X } from 'lucide-react'
+import {
+  Book,
+  Check,
+  ChevronRight,
+  ChevronsUpDown,
+  ExternalLink,
+  Github,
+  Loader2,
+  Mail,
+  Plus,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -9,6 +20,7 @@ import * as z from 'zod'
 
 import { useDocsSearch, useParams, type DocsSearchResult as Page } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -24,6 +36,8 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -41,6 +55,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { LibrarySuggestions } from './LibrarySuggestions'
 import { PlanExpectationInfoBox } from './PlanExpectationInfoBox'
@@ -51,6 +66,7 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { useRouter } from 'next/router'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -78,6 +94,8 @@ export const SupportFormV2 = ({
     message: urlMessage,
     error,
   } = useParams()
+  const router = useRouter()
+  const dashboardSentryIssueId = router.query.sid as string
 
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -224,6 +242,7 @@ export const SupportFormV2 = ({
         .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
         .join(';'),
       browserInformation: detectBrowser(),
+      ...(dashboardSentryIssueId && { dashboardSentryIssueId }),
     }
 
     if (values.projectRef !== 'no-project') {
@@ -388,31 +407,53 @@ export const SupportFormV2 = ({
             render={({ field }) => (
               <FormItemLayout layout="vertical" label="Which project is affected?">
                 <FormControl_Shadcn_>
-                  <Select_Shadcn_
-                    {...field}
-                    disabled={isLoadingProjects}
-                    defaultValue={field.value}
-                    onValueChange={(val) => {
-                      if (val.length > 0) field.onChange(val)
-                    }}
-                  >
-                    <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select a project" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        {projects?.map((project) => (
-                          <SelectItem_Shadcn_ key={project.ref} value={project.ref as string}>
-                            {project.name}
-                          </SelectItem_Shadcn_>
-                        ))}
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                  <OrganizationProjectSelector
+                    sameWidthAsTrigger
+                    checkPosition="left"
+                    slug={organizationSlug}
+                    selectedRef={field.value}
+                    onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? 'no-project')}
+                    onSelect={(project) => field.onChange(project.ref)}
+                    renderTrigger={({ isLoading, project }) => (
+                      <Button
+                        block
+                        type="default"
+                        role="combobox"
+                        size="small"
+                        className="justify-between"
+                        iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                      >
+                        {isLoading ? (
+                          <ShimmeringLoader className="w-44 py-2" />
+                        ) : field.value === 'no-project' ? (
+                          'No specific project'
+                        ) : (
+                          project?.name ?? 'Unknown project'
+                        )}
+                      </Button>
+                    )}
+                    renderActions={(setOpen) => (
+                      <CommandGroup_Shadcn_>
+                        <CommandItem_Shadcn_
+                          className="w-full gap-x-2"
+                          onSelect={() => {
+                            field.onChange('no-project')
+                            setOpen(false)
+                          }}
+                        >
+                          {field.value === 'no-project' && <Check size={16} />}
+                          <p className={field.value !== 'no-project' ? 'ml-6' : ''}>
+                            No specific project
+                          </p>
+                        </CommandItem_Shadcn_>
+                      </CommandGroup_Shadcn_>
+                    )}
+                  />
                 </FormControl_Shadcn_>
               </FormItemLayout>
             )}
           />
+
           {organizationSlug &&
             subscriptionPlanId !== 'enterprise' &&
             category !== 'Login_issues' && (

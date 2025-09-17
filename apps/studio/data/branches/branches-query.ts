@@ -41,5 +41,5 @@ export const useBranchesQuery = <TData = BranchesData>(
   useQuery<BranchesData, BranchesError, TData>(
     branchKeys.list(projectRef),
     ({ signal }) => getBranches({ projectRef }, signal),
-    { enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: IS_PLATFORM && enabled && Boolean(projectRef), ...options }
   )
