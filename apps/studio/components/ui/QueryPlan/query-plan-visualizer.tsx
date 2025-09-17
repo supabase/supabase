@@ -161,7 +161,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 target="_blank"
                 rel="noreferrer"
               >
-                Learn how to read EXPLAIN
+                Learn about query plans
               </Link>
             </Button>
           )}

@@ -105,7 +105,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
   return (
     <>
       <div className="flex items-center">
-        <p className="text-sm">Execution plan</p>
+        <p className="text-sm">Query plan</p>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button_Shadcn_ asChild size="icon" variant="link">
@@ -119,7 +119,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
               </Link>
             </Button_Shadcn_>
           </TooltipTrigger>
-          <TooltipContent>Learn how to read EXPLAIN</TooltipContent>
+          <TooltipContent>What is a query plan?</TooltipContent>
         </Tooltip>
       </div>
       {explainError && (
