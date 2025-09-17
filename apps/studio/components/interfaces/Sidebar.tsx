@@ -51,7 +51,7 @@ export const ICON_STROKE_WIDTH = 1.5
 export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
 export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 
-const SidebarMotion = motion(SidebarPrimitive) as FC<
+const SidebarMotion = motion.create(SidebarPrimitive) as FC<
   ComponentProps<typeof SidebarPrimitive> & {
     transition?: MotionProps['transition']
   }
