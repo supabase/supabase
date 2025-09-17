@@ -3,7 +3,7 @@ import { differenceInDays } from 'date-fns'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 
 import CopyButton from 'components/ui/CopyButton'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -25,7 +25,7 @@ export const StorageCredItem = ({
   access_key: string
   onDeleteClick: (id: string) => void
 }) => {
-  const { can: canRemoveAccessKey } = useAsyncCheckProjectPermissions(
+  const { can: canRemoveAccessKey } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
   )

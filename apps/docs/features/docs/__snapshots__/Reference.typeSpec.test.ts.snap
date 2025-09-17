@@ -16313,7 +16313,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           },
                           "isOptional": true,
                           "comment": {
-                            "shortText": "Optional statement to include in the Sign in with Solana message. Must not include new line characters. Most wallets like Phantom **require specifying a statement!**"
+                            "shortText": "Optional statement to include in the Sign in with Ethereum message. Must not include new line characters. Most wallets like Phantom **require specifying a statement!**"
                           }
                         },
                         {
@@ -16324,7 +16324,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           },
                           "isOptional": true,
                           "comment": {
-                            "shortText": "Wallet interface to use. If not specified will default to \`window.solana\`."
+                            "shortText": "Wallet interface to use. If not specified will default to \`window.ethereum\`."
                           }
                         }
                       ]
@@ -16376,7 +16376,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             "name": "Hex"
                           },
                           "comment": {
-                            "shortText": "Ed25519 signature of the message."
+                            "shortText": "Ethereum curve (secp256k1) signature of the message."
                           }
                         }
                       ]

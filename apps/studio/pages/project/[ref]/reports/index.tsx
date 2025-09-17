@@ -9,7 +9,7 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { Loading } from 'components/ui/Loading'
 import { useContentQuery } from 'data/content/content-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
@@ -36,7 +36,7 @@ export const UserReportPage: NextPageWithLayout = () => {
     }
   )
 
-  const { can: canCreateReport } = useAsyncCheckProjectPermissions(
+  const { can: canCreateReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
     {

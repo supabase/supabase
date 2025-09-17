@@ -16,7 +16,7 @@ import { useOrganizationCustomerProfileQuery } from 'data/organizations/organiza
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
 import {
@@ -31,8 +31,8 @@ export const BillingCustomerData = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const { can: canUpdateBillingCustomerData } = useAsyncCheckProjectPermissions(
+    useAsyncCheckPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
+  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )

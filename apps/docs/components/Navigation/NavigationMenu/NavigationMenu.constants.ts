@@ -699,7 +699,7 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Web3 (Sign in with Solana)',
+          name: 'Web3 (Ethereum or Solana)',
           url: '/guides/auth/auth-web3',
           enabled: allAuthProvidersEnabled,
         },
@@ -1659,8 +1659,8 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime',
     },
     {
-      name: 'Concepts',
-      url: '/guides/realtime/concepts',
+      name: 'Getting Started',
+      url: '/guides/realtime/getting_started',
     },
     {
       name: 'Usage',
@@ -1713,6 +1713,7 @@ export const realtime: NavMenuConstant = {
           enabled: billingEnabled,
         },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
+        { name: 'Concepts', url: '/guides/realtime/concepts' },
         { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],

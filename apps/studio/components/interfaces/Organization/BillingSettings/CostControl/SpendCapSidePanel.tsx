@@ -9,7 +9,7 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import { pricing } from 'shared-data/pricing'
@@ -43,7 +43,7 @@ const SpendCapSidePanel = () => {
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const { can: canUpdateSpendCap } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateSpendCap } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

@@ -793,7 +793,7 @@ functions:
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
-      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSMSProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -845,8 +845,8 @@ functions:
     title: 'signInWithOAuth()'
     $ref: '@supabase/auth-js.GoTrueClient.signInWithOAuth'
     notes: |
-      - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](/docs/guides/auth#configure-third-party-providers).
+      - This method is used for signing in using [Social Login (OAuth) providers](/docs/guides/auth#configure-third-party-providers).
+      - It works by redirecting your application to the provider's authorization screen, before bringing back the user to your app.
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -871,7 +871,7 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls). It does not redirect the user immediately after invoking this method.
+          - When the OAuth provider successfully authenticates the user, they are redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls). It does not redirect the user immediately after invoking this method.
           - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```js
@@ -924,6 +924,10 @@ functions:
   - id: sign-in-with-id-token
     title: 'signInWithIdToken'
     $ref: '@supabase/auth-js.GoTrueClient.signInWithIdToken'
+    notes: |
+      - Use an ID token to sign in.
+      - Especially useful when implementing sign in using native platform dialogs in mobile or desktop apps using Sign in with Apple or Sign in with Google on iOS and Android.
+      - You can also use Google's [One Tap](https://developers.google.com/identity/gsi/web/guides/display-google-one-tap) and [Automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) via this API.
     examples:
       - id: sign-in-with-id-token
         name: 'Sign In using ID Token'
@@ -1033,12 +1037,109 @@ functions:
               window.location.href = data.url
             }
           ```
+  - id: sign-in-with-web3
+    title: 'signInWithWeb3()'
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithWeb3'
+    notes: |
+      - Uses a Web3 (Ethereum, Solana) wallet to sign a user in.
+      - Read up on the [potential for abuse](/docs/guides/auth/auth-web3#potential-for-abuse) before using it.
+    examples:
+      - id: sign-in-with-solana-window
+        name: Sign in with Solana or Ethereum (Window API)
+        isSpotlight: true
+        code: |
+          ```js
+            // uses window.ethereum for the wallet
+            const { data, error } = await supabase.auth.signInWithWeb3({
+              chain: 'ethereum',
+              statement: 'I accept the Terms of Service at https://example.com/tos'
+            })
+
+            // uses window.solana for the wallet
+            const { data, error } = await supabase.auth.signInWithWeb3({
+              chain: 'solana',
+              statement: 'I accept the Terms of Service at https://example.com/tos'
+            })
+          ```
+      - id: sign-in-with-ethereum-raw
+        name: Sign in with Ethereum (Message and Signature)
+        isSpotlight: true
+        code: |
+          ```js
+            const { data, error } = await supabase.auth.signInWithWeb3({
+              chain: 'ethereum',
+              message: '<sign in with ethereum message>',
+              signature: '<hex of the ethereum signature over the message>',
+            })
+          ```
+      - id: sign-in-with-solana-brave
+        name: Sign in with Solana (Brave)
+        isSpotlight: false
+        code: |
+          ```js
+            const { data, error } = await supabase.auth.signInWithWeb3({
+              chain: 'solana',
+              statement: 'I accept the Terms of Service at https://example.com/tos',
+              wallet: window.braveSolana
+            })
+          ```
+      - id: sign-in-with-solana-wallet-adapter
+        name: Sign in with Solana (Wallet Adapter)
+        isSpotlight: false
+        code: |
+          ```jsx
+            function SignInButton() {
+            const wallet = useWallet()
+
+            return (
+              <>
+                {wallet.connected ? (
+                  <button
+                    onClick={() => {
+                      supabase.auth.signInWithWeb3({
+                        chain: 'solana',
+                        statement: 'I accept the Terms of Service at https://example.com/tos',
+                        wallet,
+                      })
+                    }}
+                  >
+                    Sign in with Solana
+                  </button>
+                ) : (
+                  <WalletMultiButton />
+                )}
+              </>
+            )
+          }
+
+          function App() {
+            const endpoint = clusterApiUrl('devnet')
+            const wallets = useMemo(() => [], [])
+
+            return (
+              <ConnectionProvider endpoint={endpoint}>
+                <WalletProvider wallets={wallets}>
+                  <WalletModalProvider>
+                    <SignInButton />
+                  </WalletModalProvider>
+                </WalletProvider>
+              </ConnectionProvider>
+            )
+          }
+          ```
   - id: get-claims
     title: 'getClaims()'
     $ref: '@supabase/auth-js.GoTrueClient.getClaims'
+    notes: |
+      - Parses the user's [access token](/docs/guides/auth/sessions#access-token-jwt-claims) as a [JSON Web Token (JWT)](/docs/guides/auth/jwts) and returns its components if valid and not expired.
+      - If your project is using asymmetric JWT signing keys, then the verification is done locally usually without a network request using the [WebCrypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API).
+      - A network request is sent to your project's JWT signing key discovery endpoint `https://project-id.supabase.co/auth/v1/.well-known/jwks.json`, which is cached locally. If your environment is ephemeral, such as a Lambda function that is destroyed after every request, a network request will be sent for each new invocation. Supabase provides a network-edge cache providing fast responses for these situations.
+      - If the user's access token is about to expire when calling this function, the user's session will first be refreshed before validating the JWT.
+      - If your project is using a symmetric secret to sign the JWT, it always sends a request similar to `getUser()` to validate the JWT at the server before returning the decoded token. This is also used if the WebCrypto API is not available in the environment. Make sure you polyfill it in such situations.
+      - The returned claims can be customized per project using the [Custom Access Token Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook).
     examples:
       - id: get-claims
-        name: Get user object
+        name: Get JWT claims, header and signature
         code: |
           ```js
           const { data, error } = await supabase.auth.getClaims()
@@ -1059,7 +1160,7 @@ functions:
                 "exp": 1715769600,
                 "iat": 1715766000,
                 "is_anonymous": false,
-                "iss": "https://api.supabase.com/auth/v1",
+                "iss": "https://project-id.supabase.co/auth/v1",
                 "phone": "+13334445555",
                 "role": "authenticated",
                 "session_id": "11111111-1111-1111-1111-111111111111",
@@ -1069,7 +1170,7 @@ functions:
               "header": {
                 "alg": "RS256",
                 "typ": "JWT",
-                "kid": "abcdefgh"
+                "kid": "11111111-1111-1111-1111-111111111111"
               },
               "signature": [/** Uint8Array */],
             },
@@ -1081,15 +1182,29 @@ functions:
     $ref: '@supabase/auth-js.GoTrueClient.signOut'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
-      - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well.
+      - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well. Customize this behavior by passing a scope parameter.
       - Since Supabase Auth uses JWTs for authentication, the access token JWT will be valid until it's expired. When the user signs out, Supabase revokes the refresh token and deletes the JWT from the client-side. This does not revoke the JWT and it will still be valid until it expires.
     examples:
       - id: sign-out
-        name: Sign out
+        name: Sign out (all sessions)
         isSpotlight: true
         code: |
           ```js
           const { error } = await supabase.auth.signOut()
+          ```
+      - id: sign-out-current-session
+        name: Sign out (current session)
+        isSpotlight: false
+        code: |
+          ```js
+          const { error } = await supabase.auth.signOut('local')
+          ```
+      - id: sign-out-other-sessions
+        name: Sign out (other sessions)
+        isSpotlight: false
+        code: |
+          ```js
+          const { error } = await supabase.auth.signOut('others')
           ```
   - id: verify-otp
     title: 'verifyOtp()'
@@ -1218,7 +1333,7 @@ functions:
           }
           ```
       - id: verify-sms-one-time-password(otp)
-        name: Verify Sms One-Time Password (OTP)
+        name: Verify SMS One-Time Password (OTP)
         isSpotlight: true
         code: |
           ```js
@@ -1235,10 +1350,13 @@ functions:
     title: 'getSession()'
     $ref: '@supabase/auth-js.GoTrueClient.getSession'
     notes: |
-      - This method retrieves the current local session (i.e local storage).
-      - The session contains a signed JWT and unencoded session data.
-      - Since the unencoded session data is retrieved from the local storage medium, **do not** rely on it as a source of trusted data on the server. It could be tampered with by the sender. If you need verified, trustworthy user data, call [`getUser`](/docs/reference/javascript/auth-getuser) instead.
-      - If the session has an expired access token, this method will use the refresh token to get a new session.
+      - Since the introduction of [asymmetric JWT signing keys](/docs/guides/auth/signing-keys), this method is considered low-level and we encourage you to use `getClaims()` or `getUser()` instead.
+      - Retrieves the current [user session](/docs/guides/auth/sessions) from the storage medium (local storage, cookies).
+      - The session contains an access token (signed JWT), a refresh token and the user object.
+      - If the session's access token is expired or is about to expire, this method will use the refresh token to refresh the session.
+      - When using in a browser, or you've called `startAutoRefresh()` in your environment (React Native, etc.) this function always returns a valid access token without refreshing the session itself, as this is done in the background. This function returns very fast.
+      - **IMPORTANT SECURITY NOTICE:** If using an insecure storage medium, such as cookies or request headers, the user object returned by this function **must not be trusted**. Always verify the JWT using `getClaims()` or your own JWT verification library to securely establish the user's identity and access. You can also use `getUser()` to fetch the user object directly from the Auth server for this purpose.
+      - When using in a browser, this function is synchronized across all tabs using the [LockManager](https://developer.mozilla.org/en-US/docs/Web/API/LockManager) API. In other environments make sure you've defined a proper `lock` property, if necessary, to make sure there are no race conditions while the session is being refreshed.
     examples:
       - id: get-the-session-data
         name: Get the session data
@@ -3075,6 +3193,16 @@ functions:
           const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { phone_confirm: true }
+          )
+          ```
+      - id: ban-a-user
+        name: Ban a user for 100 years
+        isSpotlight: false
+        code: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { ban_duration: '100y' }
           )
           ```
   - id: mfa-list-factors-admin

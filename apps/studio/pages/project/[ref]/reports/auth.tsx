@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 
-import { ReportChart } from 'components/interfaces/Reports/ReportChart'
+import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
@@ -18,9 +18,10 @@ import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Re
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { getAuthReportAttributes } from 'data/reports/auth-charts'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
+import { createAuthReportConfig } from 'data/reports/v2/auth.config'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -41,6 +42,7 @@ export default AuthReport
 
 const AuthUsage = () => {
   const { ref } = useParams()
+  const chartSyncId = `auth-report`
 
   const {
     selectedDateRange,
@@ -71,17 +73,19 @@ const AuthUsage = () => {
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const AUTH_REPORT_ATTRIBUTES = getAuthReportAttributes()
+  const authReportConfig = createAuthReportConfig({
+    projectRef: ref || '',
+    startDate: selectedDateRange?.period_start?.date,
+    endDate: selectedDateRange?.period_end?.date,
+    interval: selectedDateRange?.interval,
+    filters: { status_code: null },
+  })
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
 
     setIsRefreshing(true)
-    AUTH_REPORT_ATTRIBUTES.forEach((attr) => {
-      attr.attributes.forEach((subAttr) => {
-        queryClient.invalidateQueries(['auth-logs-report', 'auth-metrics'])
-      })
-    })
+
     refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
@@ -100,6 +104,7 @@ const AuthUsage = () => {
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={onRefreshReport}
             />
+            <ReportSettings chartId={chartSyncId} />
             <div className="flex items-center gap-3">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
@@ -130,18 +135,21 @@ const AuthUsage = () => {
           </>
         }
       >
-        {selectedDateRange &&
-          AUTH_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr, i) => (
-            <ReportChart
-              key={`${attr.id}-${i}`}
-              chart={attr}
-              interval={selectedDateRange.interval}
-              startDate={selectedDateRange?.period_start?.date}
-              endDate={selectedDateRange?.period_end?.date}
-              updateDateRange={updateDateRange}
-              isLoading={isRefreshing}
-            />
-          ))}
+        {authReportConfig.map((metric, i) => (
+          <ReportChartV2
+            key={`${metric.id}`}
+            report={metric}
+            projectRef={ref!}
+            interval={selectedDateRange.interval}
+            startDate={selectedDateRange?.period_start?.date}
+            endDate={selectedDateRange?.period_end?.date}
+            updateDateRange={updateDateRange}
+            syncId={chartSyncId}
+            filters={{
+              status_code: null,
+            }}
+          />
+        ))}
         <div>
           <div className="mb-4">
             <h5 className="text-foreground mb-2">Auth API Gateway</h5>

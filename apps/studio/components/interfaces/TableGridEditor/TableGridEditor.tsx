@@ -8,11 +8,13 @@ import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { useLoadTableEditorStateFromLocalStorageIntoUrl } from 'components/grid/SupabaseGrid.utils'
 import {
   Entity,
+  isForeignTable,
   isMaterializedView,
   isTableLike,
   isView,
+  TableLike,
 } from 'data/table-editor/table-editor-types'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -46,11 +48,11 @@ export const TableGridEditor = ({
 
   const [{ view: selectedView = 'data' }] = useUrlState()
 
-  const { can: canEditTables } = useAsyncCheckProjectPermissions(
+  const { can: canEditTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
-  const { can: canEditColumns } = useAsyncCheckProjectPermissions(
+  const { can: canEditColumns } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'columns'
   )
@@ -147,6 +149,7 @@ export const TableGridEditor = ({
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
   const isTableSelected = isTableLike(selectedTable)
+  const isForeignTableSelected = isForeignTable(selectedTable)
 
   const canEditViaTableEditor = isTableSelected && !isSchemaLocked
   const editable = !isReadOnly && canEditViaTableEditor
@@ -188,11 +191,13 @@ export const TableGridEditor = ({
 
         <SidePanelEditor
           editable={editable}
-          selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
+          selectedTable={
+            isTableSelected || isForeignTableSelected ? (selectedTable as TableLike) : undefined
+          }
           onTableCreated={onTableCreated}
         />
         <DeleteConfirmationDialogs
-          selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
+          selectedTable={isTableSelected ? selectedTable : undefined}
           onTableDeleted={onTableDeleted}
         />
       </TableEditorTableStateContextProvider>
