@@ -168,7 +168,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         const formattedValue =
           !!value && typeof value === 'number' && !isNaN(value) && isFinite(value)
             ? isTime
-              ? `${value.toFixed(0)}ms`
+              ? `${value.toFixed(0).toLocaleString()}ms`
               : value.toLocaleString()
             : ''
 
@@ -179,7 +179,11 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 <p
                   className={cn((value / 1000).toFixed(2) === '0.00' && 'text-foreground-lighter')}
                 >
-                  {(value / 1000).toFixed(2) + 's'}
+                  {(value / 1000).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  s
                 </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
@@ -207,7 +211,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             <div className="w-full flex flex-col justify-center text-xs">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p className={cn(value.toFixed(0) === '0' && 'text-foreground-lighter')}>
-                  {value.toFixed(0)}ms
+                  {Math.round(value).toLocaleString()}ms
                 </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
@@ -244,7 +248,11 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                     cacheHitRateToNumber(value).toFixed(2) === '0.00' && 'text-foreground-lighter'
                   )}
                 >
-                  {cacheHitRateToNumber(value).toFixed(2)}%
+                  {cacheHitRateToNumber(value).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  %
                 </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
