@@ -149,7 +149,7 @@ const ReportsMenu = () => {
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/advisors/query-performance${preservedQueryParams}`,
+          url: `/project/${ref}/advisors/query-performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
         ...(postgrestReportEnabled
