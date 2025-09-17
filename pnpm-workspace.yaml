@@ -17,3 +17,5 @@ catalog:
   'vite': '^6.2.7'
 
 minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - '@supabase/mcp-server-supabase'
