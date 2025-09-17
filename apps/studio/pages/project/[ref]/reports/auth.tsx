@@ -62,6 +62,7 @@ const AuthUsage = () => {
     addFilter,
     removeFilters,
     isLoadingData,
+    sql,
   } = useSharedAPIReport({
     filterBy: 'auth',
     start: selectedDateRange?.period_start?.date,
@@ -161,6 +162,10 @@ const AuthUsage = () => {
             error={error}
             isLoading={isLoading}
             isRefetching={isRefetching}
+            sql={sql}
+            filterBy={'auth'}
+            start={selectedDateRange?.period_start?.date}
+            end={selectedDateRange?.period_end?.date}
           />
         </div>
       </ReportStickyNav>
