@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from 'data/sql/execute-sql-query'
 import type { ExplainPlanRow } from 'components/ui/QueryPlan/types'
+import { executeSql } from 'data/sql/execute-sql-query'
 
 const QUERY_KEY = ['query-performance', 'explain-plan'] as const
 
@@ -14,9 +14,10 @@ export const getExplainValidationError = ({
 }: {
   projectRef?: string | null
   sql: string
-}): { title: string; message?: string } | null => {
+}): { id: string; title: string; message?: string } | null => {
   if (!projectRef || !sql) {
     return {
+      id: 'missing-required-data',
       title: 'Missing required data',
       message: 'Project reference and SQL query are required.',
     }
@@ -24,6 +25,7 @@ export const getExplainValidationError = ({
 
   if (!SELECT_ONLY_SAFE_STRICT_REGEX.test(sql)) {
     return {
+      id: 'unsupported-query-type',
       title: 'Unsupported query type',
       message: 'Only SELECT queries are supported for EXPLAIN here.',
     }
@@ -31,6 +33,7 @@ export const getExplainValidationError = ({
 
   if (/\$\d+/.test(sql)) {
     return {
+      id: 'explain-not-run-for-parameterized-query',
       title: 'EXPLAIN not run for parameterized query',
       message: "We didn't run EXPLAIN because this query contains parameters (e.g. $1).",
     }

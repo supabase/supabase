@@ -54,7 +54,12 @@ export const QueryPlan = ({ query }: { query: string }) => {
     cleanedSql,
   })
 
+  const isUnsupportedQueryType =
+    validationError?.id === 'unsupported-query-type' ||
+    validationError?.id === 'explain-not-run-for-parameterized-query'
+
   const explainError = useMemo(() => {
+    if (isUnsupportedQueryType) return null
     if (validationError) return validationError
     if (!queryError) return null
 
@@ -67,7 +72,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
       title: 'Failed to run EXPLAIN',
       message: message ?? 'An unexpected error occurred.',
     }
-  }, [queryError, validationError])
+  }, [isUnsupportedQueryType, queryError, validationError])
 
   const explainJsonString = useMemo(() => {
     if (!rawExplainResult || rawExplainResult.length === 0) return null
@@ -81,6 +86,10 @@ export const QueryPlan = ({ query }: { query: string }) => {
       return null
     }
   }, [rawExplainResult])
+
+  if (isUnsupportedQueryType) {
+    return null
+  }
 
   return (
     <>
