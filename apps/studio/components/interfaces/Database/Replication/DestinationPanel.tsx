@@ -20,8 +20,8 @@ import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
-  AlertDescription_Shadcn_,
   Alert_Shadcn_,
+  AlertDescription_Shadcn_,
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
@@ -103,12 +103,10 @@ export const DestinationPanel = ({
     data: publications,
     isLoading: loadingPublications,
     refetch: refetchPublications,
-  } = useReplicationPublicationsQuery(
-    {
-      projectRef,
-      sourceId,
-    }
-  )
+  } = useReplicationPublicationsQuery({
+    projectRef,
+    sourceId,
+  })
 
   const { data: destinationData } = useReplicationDestinationByIdQuery({
     projectRef,
@@ -148,7 +146,9 @@ export const DestinationPanel = ({
   )
   const publicationName = form.watch('publicationName')
   const isSelectedPublicationMissing =
-    Boolean(publicationName) && !loadingPublications && !publicationOptions.includes(publicationName)
+    Boolean(publicationName) &&
+    !loadingPublications &&
+    !publicationOptions.includes(publicationName)
   const isSubmitDisabled = isSaving || isSelectedPublicationMissing
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
@@ -320,8 +320,9 @@ export const DestinationPanel = ({
                               <WarningIcon />
                               <AlertDescription_Shadcn_>
                                 The publication{' '}
-                                <strong className="text-foreground">{publicationName}</strong>{' '}
-                                was not found, it may have been renamed or deleted, please select another one.
+                                <strong className="text-foreground">{publicationName}</strong> was
+                                not found, it may have been renamed or deleted, please select
+                                another one.
                               </AlertDescription_Shadcn_>
                             </Alert_Shadcn_>
                           )}
@@ -480,7 +481,12 @@ export const DestinationPanel = ({
               <Button disabled={isSaving} type="default" onClick={onClose}>
                 Cancel
               </Button>
-              <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
+              <Button
+                disabled={isSubmitDisabled}
+                loading={isSaving}
+                form={formId}
+                htmlType="submit"
+              >
                 {editMode
                   ? existingDestination?.enabled
                     ? 'Apply and restart'
