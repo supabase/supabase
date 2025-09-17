@@ -5,8 +5,8 @@ import {
   SupabasePlatform,
 } from '@supabase/mcp-server-supabase'
 import { stripIndent } from 'common-tags'
-import { getDatabaseOperations } from 'lib/ai/local-mcp'
-import { commaSeparatedStringIntoArray, zBooleanString } from 'lib/api/apiHelpers'
+import { commaSeparatedStringIntoArray, constructHeaders, zBooleanString } from 'lib/api/apiHelpers'
+import { getDatabaseOperations } from 'lib/api/local/mcp'
 import { DEFAULT_PROJECT } from 'lib/constants/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -49,9 +49,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const { read_only: isReadOnly, features } = data
+  const headers = constructHeaders(req.headers)
 
   const platform: SupabasePlatform = {
-    database: getDatabaseOperations(req),
+    database: getDatabaseOperations({ headers }),
   }
 
   try {
