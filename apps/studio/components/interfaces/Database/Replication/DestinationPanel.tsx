@@ -99,10 +99,16 @@ export const DestinationPanel = ({
 
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
 
-  const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
-    projectRef,
-    sourceId,
-  })
+  const {
+    data: publications,
+    isLoading: loadingPublications,
+    refetch: refetchPublications,
+  } = useReplicationPublicationsQuery(
+    {
+      projectRef,
+      sourceId,
+    }
+  )
 
   const { data: destinationData } = useReplicationDestinationByIdQuery({
     projectRef,
@@ -250,6 +256,12 @@ export const DestinationPanel = ({
       form.reset(defaultValues)
     }
   }, [visible, defaultValues, form])
+
+  useEffect(() => {
+    if (visible && projectRef && sourceId) {
+      refetchPublications()
+    }
+  }, [visible, projectRef, sourceId, refetchPublications])
 
   return (
     <>
