@@ -11,7 +11,7 @@ export type BranchVariables = {
 }
 
 export async function getBranch({ branchRef }: BranchVariables, signal?: AbortSignal) {
-  if (!branchRef) throw new Error('id is required')
+  if (!branchRef) throw new Error('branchRef is required')
 
   const { data, error } = await get(`/v1/branches/{branch_id_or_ref}`, {
     params: { path: { branch_id_or_ref: branchRef } },
