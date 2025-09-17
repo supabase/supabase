@@ -31,7 +31,7 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
     : false
 
   // Get Sentry issue ID from error if available
-  const sentryIssueId = (error as any)?.sentryId || (error as any)?.eventId || ''
+  const sentryIssueId = (!!error && typeof error === 'object' && (error as any).sentryId) ?? ''
 
   const handleClearStorage = () => {
     try {
