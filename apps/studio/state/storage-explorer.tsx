@@ -1552,10 +1552,9 @@ function createStorageExplorerState({
       if (numberOfFilesMovedFail === state.selectedItemsToMove.length) {
         toast.error('Failed to move files')
       } else {
+        const movedFiles = state.selectedItemsToMove.length - numberOfFilesMovedFail
         toast(
-          `Successfully moved ${
-            state.selectedItemsToMove.length - numberOfFilesMovedFail
-          } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
+          `Successfully moved ${movedFiles} file${movedFiles > 1 ? 's' : ''} to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
         )
       }
 
@@ -1661,10 +1660,9 @@ function createStorageExplorerState({
       if (numberOfFilesMovedFail === items.length) {
         toast.error('Failed to move items')
       } else {
+        const movedFiles = items.length - numberOfFilesMovedFail
         toast(
-          `Successfully moved ${
-            items.length - numberOfFilesMovedFail
-          } items to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
+          `Successfully moved ${movedFiles} item${movedFiles > 1 ? 's' : ''} to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
         )
       }
 
@@ -1782,7 +1780,7 @@ function createStorageExplorerState({
         const allItemsToMove = await getAllFilesRecursively(sourceFullPath)
         const filesToMove = allItemsToMove.filter((item) => !item.isFolder)
 
-        // Update progress tracking with total count and show calculation complete
+        // Update progress tracking with total count
         const initialProgressData = state.folderMoveProgress.get(sourceFullPath)
         if (initialProgressData) {
           state.setFolderMoveProgress(sourceFullPath, {
@@ -1790,8 +1788,8 @@ function createStorageExplorerState({
             total: filesToMove.length,
           })
 
-          // Update toast to show calculation complete and move starting
-          toast.loading(
+          // Update the existing toast to show calculation complete and move starting
+          toast(
             <FolderMoveProgressToast
               current={0}
               total={filesToMove.length}
@@ -1826,7 +1824,7 @@ function createStorageExplorerState({
               state.setFolderMoveProgress(sourceFullPath, newProgress)
 
               // Update the toast with new progress
-              toast.loading(
+              toast(
                 <FolderMoveProgressToast
                   current={movedCount}
                   total={filesToMove.length}
