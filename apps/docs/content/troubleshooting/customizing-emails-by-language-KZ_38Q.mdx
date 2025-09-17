@@ -29,16 +29,21 @@ The above example creates a user entry that includes information about their nam
 
 It can be accessed in a project's [Email Templates](/dashboard/project/_/auth/templates). Below is an example:
 
-![image](/docs/img/troubleshooting/3eeb2435-dd1c-41bc-9557-44cabff38f59.png)
+```html
+<h2>Hello, {{ .Data.first_name }} {{ .Data.last_name }}!</h2>
+
+<p>Follow this link to confirm your account:</p>
+<p><a href="{{ .ConfirmationURL }}">Confirm your account</a></p>
+```
 
 If you need to update a user's meta-data, you can do so with the [`updateUser`](/docs/reference/javascript/auth-updateuser?example=update-the-users-metadata) function.
 
 The meta-data can be used to store a users language preferences. You could then use "if statements" in the email template to set the response for a specific language:
 
 ```html
-{{if eq .Data.langauge "en" }}
+{{if eq .Data.language "en" }}
 <h1>Welcome!</h1>
-{{ else if eq .Data.langauge "pl" }}
+{{ else if eq .Data.language "pl" }}
 <h1>Witamy!</h1>
 {{ else }}
 <h1>chuS'ugh, tera' je (Klingon)</h1>
