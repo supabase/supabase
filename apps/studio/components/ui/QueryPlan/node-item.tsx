@@ -5,20 +5,20 @@ import { DEFAULT_NODE_HEIGHT_CONSTANTS } from './constants'
 
 type NodeItemProps = {
   title?: string
-  heightValue?: number
+  height?: number
   className?: string
 }
 
 export const NodeItem = ({
   children,
   title,
-  heightValue = DEFAULT_NODE_HEIGHT_CONSTANTS.ITEM_H,
+  height = DEFAULT_NODE_HEIGHT_CONSTANTS.ITEM_H,
   className,
 }: PropsWithChildren<NodeItemProps>) => {
   return (
     <li
       title={title}
-      style={{ height: `${heightValue}px` }}
+      style={{ height: `${height}px` }}
       className={cn(
         'text-[8px] leading-5 relative px-2 flex flex-row items-center justify-between',
         'bg-surface-100',
