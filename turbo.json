@@ -116,6 +116,7 @@
         "ANALYZE",
         "CMS_API_KEY",
         "CMS_PREVIEW_SECRET",
+        "CMS_SITE_ORIGIN",
         "NEXT_PUBLIC_MISC_USE_URL",
         "NEXT_PUBLIC_MISC_USE_ANON_KEY",
         "NEXT_PUBLIC_STUDIO_URL",

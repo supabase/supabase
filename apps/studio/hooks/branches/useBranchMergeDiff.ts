@@ -4,7 +4,6 @@ import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useEdgeFunctionsDiff, type EdgeFunctionsDiffResult } from './useEdgeFunctionsDiff'
 
 interface UseBranchMergeDiffProps {
-  branchId?: string
   currentBranchRef?: string
   parentProjectRef?: string
   currentBranchConnectionString?: string
@@ -46,7 +45,6 @@ export interface BranchMergeDiffResult {
 }
 
 export const useBranchMergeDiff = ({
-  branchId,
   currentBranchRef,
   parentProjectRef,
   currentBranchConnectionString,
@@ -62,11 +60,11 @@ export const useBranchMergeDiff = ({
     refetch: refetchDatabaseDiff,
   } = useBranchDiffQuery(
     {
-      branchId: branchId || '',
+      branchRef: currentBranchRef || '',
       projectRef: parentProjectRef || '',
     },
     {
-      enabled: !!branchId && !!parentProjectRef,
+      enabled: !!currentBranchRef && !!parentProjectRef,
       refetchOnMount: 'always',
       refetchOnWindowFocus: false,
       staleTime: 0,

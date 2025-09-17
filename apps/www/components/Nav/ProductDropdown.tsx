@@ -15,7 +15,7 @@ import CustomersData from 'data/CustomerStories'
 import MainProductsData from 'data/MainProducts'
 import ProductModulesData from 'data/ProductModules'
 
-const ProductDropdown = () => {
+export const ProductDropdown = () => {
   const isTablet = useBreakpoint(1279)
 
   return (
@@ -182,5 +182,3 @@ const ProductDropdown = () => {
     </div>
   )
 }
-
-export default ProductDropdown

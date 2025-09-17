@@ -19,7 +19,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -179,10 +179,7 @@ export const FileExplorerHeader = ({
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
-  const { can: canUpdateStorage } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)

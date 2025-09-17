@@ -5,10 +5,6 @@ import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
-import {
-  QUERY_PERFORMANCE_PRESET_MAP,
-  QUERY_PERFORMANCE_REPORT_TYPES,
-} from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
@@ -25,24 +21,22 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
-  const [{ preset: urlPreset, search: searchQuery, roles }] = useQueryStates({
+  const [{ search: searchQuery, roles }] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
-    preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
   })
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
-
-  const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
+  const queryMetrics = hooks.queryMetrics()
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
     orderBy: sortConfig || undefined,
-    preset,
+    preset: 'unified',
     roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
   })
@@ -60,7 +54,11 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </div>
         }
       />
-      <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
+      <QueryPerformance
+        queryHitRate={queryHitRate}
+        queryPerformanceQuery={queryPerformanceQuery}
+        queryMetrics={queryMetrics}
+      />
     </div>
   )
 }

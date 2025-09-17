@@ -7,7 +7,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useClientSecretCreateMutation } from 'data/oauth-secrets/client-secret-create-mutation'
 import { CreatedSecret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
 import { SecretRow } from './SecretRow'
 
@@ -18,10 +18,7 @@ interface Props {
 export const OAuthSecrets = ({ selectedApp }: Props) => {
   const { slug } = useParams()
   const [createdSecret, setCreatedSecret] = useState<CreatedSecret>()
-  const { can: canManageSecrets } = useAsyncCheckProjectPermissions(
-    PermissionAction.UPDATE,
-    'oauth_apps'
-  )
+  const { can: canManageSecrets } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
 
   const { id: appId } = selectedApp ?? {}
 
