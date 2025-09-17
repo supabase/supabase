@@ -6,11 +6,7 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from '../renderers/ApiRenderers'
-import {
-  SharedAPIReportFilterBy,
-  SharedAPIReportKey,
-  useSharedAPIReport,
-} from './SharedAPIReport.constants'
+import { SharedAPIReportKey } from './SharedAPIReport.constants'
 
 type SharedAPIReportWidgetsProps = {
   data: any

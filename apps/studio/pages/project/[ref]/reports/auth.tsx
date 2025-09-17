@@ -163,9 +163,6 @@ const AuthUsage = () => {
             isLoading={isLoading}
             isRefetching={isRefetching}
             sql={sql}
-            filterBy={'auth'}
-            start={selectedDateRange?.period_start?.date}
-            end={selectedDateRange?.period_end?.date}
           />
         </div>
       </ReportStickyNav>
