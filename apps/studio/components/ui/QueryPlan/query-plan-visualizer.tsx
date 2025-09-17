@@ -242,14 +242,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   return (
     <>
       {expandedPortal}
-      <div
-        ref={containerRef}
-        className={cn(
-          'w-full h-full flex flex-col',
-          className,
-          isExpanded && 'invisible pointer-events-none'
-        )}
-      >
+      <div ref={containerRef} className={cn('w-full h-full flex flex-col', className)}>
         {renderVisualizer(isExpanded)}
       </div>
     </>
