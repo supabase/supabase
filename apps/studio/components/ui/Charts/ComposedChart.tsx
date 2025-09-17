@@ -116,7 +116,7 @@ export function ComposedChart({
 
   useEffect(() => {
     updateStackedChartColors(isDarkMode ?? false)
-  }, [resolvedTheme, isDarkMode])
+  }, [isDarkMode])
 
   const { Container } = useChartSize(size)
 
