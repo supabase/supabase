@@ -508,7 +508,6 @@ export const createAuthReportConfig = ({
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
       const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
-
       return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
     },
   },
