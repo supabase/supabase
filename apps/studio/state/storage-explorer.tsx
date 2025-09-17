@@ -602,7 +602,7 @@ function createStorageExplorerState({
             projectRef: state.projectRef,
             connectionString: state.connectionString,
             bucketId: state.selectedBucket.id,
-            prefix: folder.name,
+            prefix: folder.path,
           })
         } else {
           await state.deleteFiles({ files: files as any[], isDeleteFolder })
