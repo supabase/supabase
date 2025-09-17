@@ -20,6 +20,8 @@ import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
@@ -39,6 +41,7 @@ import {
   SheetSection,
   SheetTitle,
   TextArea_Shadcn_,
+  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import NewPublicationPanel from './NewPublicationPanel'
@@ -133,10 +136,22 @@ export const DestinationPanel = ({
     defaultValues,
   })
   const isSaving = creatingDestinationPipeline || updatingDestinationPipeline || startingPipeline
+  const publicationOptions = useMemo(
+    () => publications?.map((pub) => pub.name) ?? [],
+    [publications]
+  )
+  const publicationName = form.watch('publicationName')
+  const isSelectedPublicationMissing =
+    Boolean(publicationName) && !loadingPublications && !publicationOptions.includes(publicationName)
+  const isSubmitDisabled = isSaving || isSelectedPublicationMissing
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!sourceId) return console.error('Source id is required')
+    if (isSelectedPublicationMissing) {
+      toast.error('Please select another publication before continuing')
+      return
+    }
 
     try {
       if (editMode && existingDestination) {
@@ -282,12 +297,22 @@ export const DestinationPanel = ({
                         >
                           <FormControl_Shadcn_>
                             <PublicationsComboBox
-                              publications={publications?.map((pub) => pub.name) || []}
+                              publications={publicationOptions}
                               loading={loadingPublications}
                               field={field}
                               onNewPublicationClick={() => setPublicationPanelVisible(true)}
                             />
                           </FormControl_Shadcn_>
+                          {isSelectedPublicationMissing && (
+                            <Alert_Shadcn_ variant="warning" className="mt-2">
+                              <WarningIcon />
+                              <AlertDescription_Shadcn_>
+                                The publication{' '}
+                                <strong className="text-foreground">{publicationName}</strong>{' '}
+                                was not found, it may have been renamed or deleted, please select another one.
+                              </AlertDescription_Shadcn_>
+                            </Alert_Shadcn_>
+                          )}
                         </FormItemLayout>
                       )}
                     />
@@ -443,7 +468,7 @@ export const DestinationPanel = ({
               <Button disabled={isSaving} type="default" onClick={onClose}>
                 Cancel
               </Button>
-              <Button loading={isSaving} form={formId} htmlType="submit">
+              <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
                 {editMode
                   ? existingDestination?.enabled
                     ? 'Apply and restart'
