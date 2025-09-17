@@ -12,7 +12,6 @@ export async function getPermissions(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/permissions', { signal })
   if (error) {
     handleError(error, {
-      alwaysCapture: true,
       sentryContext: {
         tags: {
           permissionsQuery: true,

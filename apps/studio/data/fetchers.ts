@@ -140,20 +140,8 @@ type HandleErrorOptions = {
   sampleRate?: number
 }
 
-export const handleError = (
-  error: unknown,
-  options: HandleErrorOptions = {
-    sampleRate: 0.2, // 20%
-  }
-): never => {
-  if (options.sampleRate && Math.random() > options.sampleRate) {
-    return
-  }
-
+export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   if (error && typeof error === 'object') {
-    if (options.alwaysCapture) {
-      Sentry.captureException(error, options.sentryContext)
-    }
     const errorMessage =
       'msg' in error && typeof error.msg === 'string'
         ? error.msg
@@ -167,6 +155,12 @@ export const handleError = (
     const retryAfter =
       'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
 
+    const shouldCapture = Math.random() < (options?.sampleRate ?? 0.2) // 20% sample rate
+
+    if (shouldCapture) {
+      Sentry.captureException(error, options.sentryContext)
+    }
+
     if (errorMessage) {
       throw new ResponseError(errorMessage, errorCode, requestId, retryAfter)
     }
@@ -175,10 +169,6 @@ export const handleError = (
   if (error !== null && typeof error === 'object' && 'stack' in error) {
     console.error(error.stack)
   }
-
-  // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
-  // add handling for it.
-  Sentry.captureException(error, options.sentryContext)
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.
