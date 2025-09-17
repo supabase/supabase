@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { DOCS_URL } from 'lib/constants'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -25,7 +26,7 @@ const PageLayout: NextPageWithLayout = () => {
       <ProductEmptyState
         title="Storage"
         infoButtonLabel="About storage"
-        infoButtonUrl={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/storage`}
+        infoButtonUrl={`${DOCS_URL}/guides/storage`}
       >
         <p className="text-foreground-light text-sm">
           Create buckets to store and serve any type of digital content.

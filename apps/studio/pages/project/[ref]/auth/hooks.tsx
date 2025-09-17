@@ -3,6 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -34,7 +35,7 @@ const Hooks: NextPageWithLayout = () => {
   )
 }
 const secondaryActions = [
-  <DocsButton key="docs" href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-hooks`} />,
+  <DocsButton key="docs" href={`${DOCS_URL}/guides/auth/auth-hooks`} />,
 ]
 
 Hooks.getLayout = (page) => (

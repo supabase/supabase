@@ -15,6 +15,7 @@ import { BranchSelector } from 'components/interfaces/BranchManagement/BranchSel
 import { PullRequestsEmptyState } from 'components/interfaces/BranchManagement/EmptyStates'
 import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -386,7 +387,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
           Branching Feedback
         </a>
       </Button>
-      <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/branching`} />
+      <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
     </div>
   )
 

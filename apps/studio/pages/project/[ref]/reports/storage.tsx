@@ -25,6 +25,7 @@ import {
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { DOCS_URL } from 'lib/constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useStorageReport } from 'data/reports/storage-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
@@ -166,7 +167,7 @@ export const StorageReport: NextPageWithLayout = () => {
                 hits is better.{' '}
                 <span className="flex items-center gap-1 text-foreground-lighter">
                   <Link
-                    href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/storage/cdn/fundamentals`}
+                    href={`${DOCS_URL}/guides/storage/cdn/fundamentals`}
                     target="_blank"
                   >
                     Read More

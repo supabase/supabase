@@ -9,6 +9,7 @@ import { boolean, number, object, string } from 'yup'
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -214,9 +215,9 @@ export const ProtectionAuthSettingsForm = () => {
                           <InlineLink
                             href={
                               field.value === 'hcaptcha'
-                                ? `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=hcaptcha-1`
+                                ? `${DOCS_URL}/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=hcaptcha-1`
                                 : field.value === 'turnstile'
-                                  ? `${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=turnstile-1`
+                                  ? `${DOCS_URL}/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=turnstile-1`
                                   : '/'
                             }
                             className="mt-2 text-xs text-foreground-light hover:text-foreground no-underline"

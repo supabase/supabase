@@ -6,6 +6,7 @@ import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseB
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -73,7 +74,7 @@ const PITR = () => {
         title="Database backups are not available for OrioleDB"
         description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
       >
-        <DocsButton abbrev={false} className="mt-2" href={process.env.NEXT_PUBLIC_DOCS_URL} />
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
       </Admonition>
     )
   }

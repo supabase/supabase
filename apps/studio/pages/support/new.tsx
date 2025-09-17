@@ -8,6 +8,7 @@ import Success from 'components/interfaces/Support/Success'
 import { SupportFormV2 } from 'components/interfaces/Support/SupportFormV2'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import CopyButton from 'components/ui/CopyButton'
 import InformationBox from 'components/ui/InformationBox'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
@@ -42,7 +43,7 @@ const SupportPage: NextPageWithLayout = () => {
             <div className="flex items-center gap-x-3">
               <Button asChild type="default" icon={<Wrench />}>
                 <Link
-                  href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/troubleshooting`}
+                  href={`${DOCS_URL}/guides/platform/troubleshooting`}
                   target="_blank"
                   rel="noreferrer"
                 >

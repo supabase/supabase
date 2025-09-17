@@ -1,4 +1,5 @@
 import { ExternalLink } from 'lucide-react'
+import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 
 import { useParams } from 'common'
@@ -53,7 +54,7 @@ export const AuthProvidersForm = () => {
                   to more than an hour. It is recommended to set this value to less than an hour.
                 </p>
                 <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                  <Link href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/going-into-prod#security`}>
+                  <Link href={`${DOCS_URL}/guides/platform/going-into-prod#security`}>
                     View security recommendations
                   </Link>
                 </Button>

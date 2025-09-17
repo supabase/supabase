@@ -11,6 +11,7 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useDeleteThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-delete-mutation'
 import {
@@ -73,14 +74,14 @@ export const ThirdPartyAuthForm = () => {
             <br />
             Billing is based on the number of monthly active users (MAUs) requesting your API
             throughout the billing period. Refer to our{' '}
-            <InlineLink href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}>
+            <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}>
               billing docs
             </InlineLink>{' '}
             for more information.
           </ScaffoldSectionDescription>
         </div>
         <div className="flex items-center gap-2 ">
-          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/third-party/overview`} />
+          <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
           {integrations.length !== 0 && (
             <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
           )}

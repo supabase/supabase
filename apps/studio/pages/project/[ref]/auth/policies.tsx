@@ -10,6 +10,7 @@ import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEdi
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -240,7 +241,7 @@ AuthPoliciesPage.getLayout = (page) => (
         title="Policies"
         subtitle="Manage Row Level Security policies for your tables"
         secondaryActions={
-          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+          <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
         }
         size="large"
       >

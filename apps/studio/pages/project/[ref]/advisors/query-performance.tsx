@@ -11,6 +11,7 @@ import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -49,7 +50,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         actions={
           <div className="flex items-center gap-2">
             <EnableIndexAdvisorButton />
-            <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/performance#examining-query-performance`} />
+            <DocsButton href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`} />
             <DatabaseSelector />
           </div>
         }

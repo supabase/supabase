@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import { RateLimits } from 'components/interfaces/Auth/RateLimits/RateLimits'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -51,7 +52,7 @@ RateLimitsPage.getLayout = (page) => (
         title="Rate Limits"
         subtitle="Safeguard against bursts of incoming traffic to prevent abuse and maximize stability"
         primaryActions={
-          <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention`} />
+          <DocsButton href={`${DOCS_URL}/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention`} />
         }
       >
         {page}

@@ -13,6 +13,7 @@ import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement
 import { Markdown } from 'components/interfaces/Markdown'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -269,7 +270,7 @@ const RestoreToNewProject = () => {
             <Link
               target="_blank"
               className="underline"
-              href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/backups`}
+              href={`${DOCS_URL}/guides/platform/backups`}
             >
               in our docs
             </Link>

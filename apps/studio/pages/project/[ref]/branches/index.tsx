@@ -9,6 +9,7 @@ import { useParams } from 'common'
 import { Overview } from 'components/interfaces/BranchManagement/Overview'
 import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -223,7 +224,7 @@ BranchesPage.getLayout = (page) => {
             Branching Feedback
           </a>
         </Button>
-        <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/branching`} />
+        <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
       </div>
     )
 

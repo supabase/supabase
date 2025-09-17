@@ -1,6 +1,7 @@
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface RAMWarningsProps {
@@ -22,7 +23,7 @@ const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => 
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
           <Button asChild type="default">
-            <Link href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/troubleshooting/exhaust-ram`}>
+            <Link href={`${DOCS_URL}/guides/troubleshooting/exhaust-ram`}>
               Learn more
             </Link>
           </Button>
@@ -48,7 +49,7 @@ const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => 
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
           <Button asChild type="default">
-            <Link href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>
+            <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>
               Learn more
             </Link>
           </Button>

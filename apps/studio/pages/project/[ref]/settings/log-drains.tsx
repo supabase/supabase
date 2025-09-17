@@ -8,6 +8,7 @@ import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { DOCS_URL } from 'lib/constants'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -88,7 +89,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             </ScaffoldDescription>
           </div>
           <div className="flex items-center justify-end gap-2">
-            <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/log-drains`} />
+            <DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />
 
             {!(logDrains?.length === 0) && (
               <Button

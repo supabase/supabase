@@ -7,6 +7,7 @@ import { SupaRow } from 'components/grid/types'
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { isTableLike } from 'data/table-editor/table-editor-types'
+import { DOCS_URL } from 'lib/constants'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
@@ -115,7 +116,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
                 each row before updating or deleting the row.
               </p>
               <div className="mt-3">
-                <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/tables#primary-keys`} />
+                <DocsButton href={`${DOCS_URL}/guides/database/tables#primary-keys`} />
               </div>
             </div>
           ),

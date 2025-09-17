@@ -10,6 +10,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -28,14 +29,14 @@ const IndexesPage: NextPageWithLayout = () => {
         <ScaffoldSectionDetail className="flex items-center lg:justify-end gap-2 flex-wrap">
           <DocsButton
             className="no-underline"
-            href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/query-optimization`}
+            href={`${DOCS_URL}/guides/database/query-optimization`}
           />
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
               rel="noreferrer"
               className="no-underline"
-              href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/extensions/index_advisor`}
+              href={`${DOCS_URL}/guides/database/extensions/index_advisor`}
             >
               Index Advisor
             </a>

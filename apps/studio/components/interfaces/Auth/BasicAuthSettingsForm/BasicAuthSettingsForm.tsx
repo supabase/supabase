@@ -10,6 +10,7 @@ import { boolean, object, string } from 'yup'
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -186,7 +187,7 @@ export const BasicAuthSettingsForm = () => {
                             Enable{' '}
                             <InlineLink
                               className="text-foreground-light hover:text-foreground"
-                              href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-identity-linking#manual-linking-beta`}
+                              href={`${DOCS_URL}/guides/auth/auth-identity-linking#manual-linking-beta`}
                             >
                               manual linking APIs
                             </InlineLink>{' '}
@@ -219,7 +220,7 @@ export const BasicAuthSettingsForm = () => {
                           Enable{' '}
                           <InlineLink
                             className="text-foreground-light hover:text-foreground"
-                            href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-anonymous`}
+                            href={`${DOCS_URL}/guides/auth/auth-anonymous`}
                           >
                             anonymous sign-ins
                           </InlineLink>{' '}
@@ -263,7 +264,7 @@ export const BasicAuthSettingsForm = () => {
                           to ensure that access to your data is restricted where required.
                         </p>
                         <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                          <Link href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
+                          <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
                             View access control docs
                           </Link>
                         </Button>

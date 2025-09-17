@@ -9,6 +9,7 @@ import {
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { DOCS_URL } from 'lib/constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -50,7 +51,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
           subtitle:
             'Connect to external data sources and services by querying APIs, databases, and files as if they were Postgres tables.',
           secondaryActions: (
-            <DocsButton href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/database/extensions/wrappers/overview`} />
+            <DocsButton href={`${DOCS_URL}/guides/database/extensions/wrappers/overview`} />
           ),
         }
       case 'postgres_extension':

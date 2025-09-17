@@ -6,6 +6,7 @@ import { BackupsList } from 'components/interfaces/Database'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DOCS_URL } from 'lib/constants'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -79,7 +80,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                             terms of the granular recovery that can be performed.{' '}
                             <a
                               className="text-brand transition-colors hover:text-brand-600"
-                              href={`${process.env.NEXT_PUBLIC_DOCS_URL}/guides/platform/backups`}
+                              href={`${DOCS_URL}/guides/platform/backups`}
                             >
                               Learn more
                             </a>
