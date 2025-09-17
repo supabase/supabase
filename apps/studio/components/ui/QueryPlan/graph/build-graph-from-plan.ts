@@ -1,6 +1,7 @@
 import type { Edge, Node } from 'reactflow'
-import { NODE_TYPE } from '../constants'
+
 import type { RawPlan, PlanRoot, PlanNodeData, Agg } from '../types'
+import { NODE_TYPE } from '../constants'
 import { toArray } from '../utils/formats'
 
 const zeroAgg = (): Agg => ({
@@ -18,11 +19,8 @@ const zeroAgg = (): Agg => ({
   tempWritten: 0,
 })
 
-// Helpers: computation and mapping utilities to keep addPlan concise
-const computeLoops = (plan: RawPlan): number => plan['Actual Loops'] ?? 1
-
 const computeInclusiveBasics = (plan: RawPlan) => {
-  const loops = computeLoops(plan)
+  const loops = plan['Actual Loops'] ?? 1
   const nodeTimeIncl = (plan['Actual Total Time'] ?? 0) * loops
   const nodeCostIncl = plan['Total Cost'] ?? 0
   const actualRowsPerLoop = plan['Actual Rows'] ?? 0
@@ -165,14 +163,11 @@ const createPlanNodeData = (
     raw: plan,
   }
 
-  // Never executed flag - only if we know it's EXPLAIN ANALYZE
-  if (typeof opts?.executionTime === 'number') {
-    if ((plan['Actual Loops'] ?? undefined) === 0) {
-      data.neverExecuted = true
-    }
+  const isAnalyzeRun = opts?.executionTime !== undefined
+  if (isAnalyzeRun && (plan['Actual Loops'] ?? undefined) === 0) {
+    data.neverExecuted = true
   }
 
-  // Propagate inherited subplan name for descendants
   if (subName && subName !== plan['Subplan Name']) {
     data.subplanName = subName
   }
@@ -201,15 +196,12 @@ export const buildGraphFromPlan = (
   ): Agg => {
     const id = parentId ? `${parentId}-${index}` : 'root'
     const label = plan['Node Type'] ?? 'Node'
-    // Compute current subplan context for this node and descendants
     const subName = plan['Subplan Name'] ?? currentSubplanName
 
-    // If this node is a subplan root, record it
     if (plan['Subplan Name']) {
       subplanRoots.push({ name: plan['Subplan Name'], id })
     }
 
-    // Recurse first to get children aggregates for exclusive computation
     const children: RawPlan[] = plan['Plans'] ?? []
     let childAgg: Agg = zeroAgg()
     children.forEach((child, i) => {
@@ -232,17 +224,14 @@ export const buildGraphFromPlan = (
       childAgg.tempWritten += agg.tempWritten
     })
 
-    // Inclusive values and buffers
     const inclusiveBasics = computeInclusiveBasics(plan)
     const buffers = extractBuffers(plan)
 
-    // Estimation factor/direction
     const est = computeEstimation(plan, inclusiveBasics.actualRowsTotal)
 
     // Exclusive (self) = node inclusive - sum(children inclusive)
     const exclusives = computeExclusives({ ...inclusiveBasics, ...buffers }, childAgg)
 
-    // Build PlanNodeData and push node
     const data = createPlanNodeData(
       plan,
       label,
@@ -255,7 +244,6 @@ export const buildGraphFromPlan = (
     )
     nodes.push({ id, type: NODE_TYPE, data, position: { x: 0, y: 0 } })
 
-    // Return this node's inclusive totals so that the parent can compute exclusives
     return {
       timeIncl: inclusiveBasics.nodeTimeIncl,
       costIncl: inclusiveBasics.nodeCostIncl,

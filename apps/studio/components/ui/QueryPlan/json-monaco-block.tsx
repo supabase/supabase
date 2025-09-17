@@ -10,11 +10,8 @@ type JsonMonacoBlockProps = {
   className?: string
   wrapperClassName?: string
   hideCopy?: boolean
-  // Fixed height in px
   height?: number
-  // Show line numbers. Defaults to false
   lineNumbers?: 'on' | 'off'
-  // Font size in px. Defaults to 11 to match details panel text scale
   fontSize?: number
 }
 
