@@ -104,7 +104,7 @@ Let's say you have a table called `profiles` in the public schema and you want t
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -425,12 +425,12 @@ $$;
 create policy "rls_test_select"
 on test_table
 to authenticated
-using ( private.has_good_role() );
+using ( (select private.has_good_role()) );
 ```
 
 <Admonition type="caution">
 
-Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](https://supabase.com/dashboard/project/_/settings/api)`.
+Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](/dashboard/project/_/settings/api)`.
 
 </Admonition>
 

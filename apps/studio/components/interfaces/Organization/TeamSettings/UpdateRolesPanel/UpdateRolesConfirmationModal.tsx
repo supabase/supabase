@@ -14,7 +14,7 @@ import {
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   ProjectRoleConfiguration,
@@ -38,9 +38,10 @@ export const UpdateRolesConfirmationModal = ({
 }: UpdateRolesConfirmationModal) => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
-  const organization = useSelectedOrganization()
-  const { data: projects } = useProjectsQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { data: allRoles } = useOrganizationRolesV2Query({ slug: organization?.slug })
+  const { data } = useProjectsQuery()
+  const projects = data?.projects ?? []
 
   // [Joshen] Separate saving state instead of using RQ due to several successive steps
   const [saving, setSaving] = useState(false)
@@ -75,7 +76,22 @@ export const UpdateRolesConfirmationModal = ({
       .map((id) => {
         return [...org_scoped_roles, ...project_scoped_roles].find((r) => r.id === id)
       })
+      .map((x) => {
+        // [Joshen] This is merely a patch to handle a issue on the BE whereby for a project-scoped member,
+        // if one of the projects that the member is deleted, the roles isn't cleaned up on the BE
+        // Hence adding an FE patch here for dashboard to self-remediate by omitting any project IDs from the role
+        // which no longer exists in the organization projects list
+        if (!!x?.project_ids) {
+          return {
+            ...x,
+            project_ids: x.project_ids.filter((id) => orgProjects.some((p) => id === p.id)),
+          }
+        } else {
+          return x
+        }
+      })
       .filter(Boolean) as OrganizationRole[]
+
     const isChangeWithinOrgScope =
       projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0].ref === undefined
 
@@ -90,10 +106,11 @@ export const UpdateRolesConfirmationModal = ({
         })
         toast.success(`Successfully updated role for ${member.username}`)
         onClose(true)
-        return
       } catch (error: any) {
+        toast.error(`Failed to update role: ${error.message}`)
+      } finally {
         setSaving(false)
-        return toast.error(`Failed to update role: ${error.message}`)
+        return
       }
     }
 
@@ -130,8 +147,10 @@ export const UpdateRolesConfirmationModal = ({
       toast.success(`Successfully updated role for ${member.username}`)
       onClose(true)
     } catch (error: any) {
+      toast.error(`Failed to update role: ${error.message}`)
+    } finally {
       setSaving(false)
-      return toast.error(`Failed to update role: ${error.message}`)
+      return
     }
   }
 

@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useMemo, useState, useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import {
   LogsTableName,
@@ -22,8 +22,8 @@ import {
   genDefaultQuery,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
-import { useLogsUrlState } from './useLogsUrlState'
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
+import { useLogsUrlState } from './useLogsUrlState'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
 interface LogsPreviewHook {
@@ -83,12 +83,11 @@ function useLogsPreview({
   const params: LogsEndpointParams = useMemo(() => {
     const currentSql = genDefaultQuery(table, mergedFilters, limit)
     return {
-      project: projectRef,
       iso_timestamp_start: timestampStart,
       iso_timestamp_end: timestampEnd,
       sql: currentSql,
     }
-  }, [projectRef, timestampStart, timestampEnd, table, mergedFilters, limit])
+  }, [timestampStart, timestampEnd, table, mergedFilters, limit])
 
   const queryKey = useMemo(() => ['projects', projectRef, 'logs', params], [projectRef, params])
 
@@ -177,7 +176,6 @@ function useLogsPreview({
         params: {
           path: { ref: projectRef },
           query: {
-            project: projectRef,
             sql: countQuerySql,
             iso_timestamp_start: latestRefresh,
             iso_timestamp_end: timestampEnd,
@@ -228,7 +226,6 @@ function useLogsPreview({
           query: {
             iso_timestamp_start: timestampStart,
             iso_timestamp_end: timestampEnd,
-            project: projectRef,
             sql: chartQuery,
           },
         },

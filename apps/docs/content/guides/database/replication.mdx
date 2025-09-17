@@ -59,7 +59,7 @@ Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. T
 
 When using logical replication, Postgres is then configured to keep WAL files around for longer than it needs them. If the files are removed too quickly, then your `replication slot` will become inactive and, if the database receives a large number of changes in a short time, then the `replication slot` can become lost as it was not able to keep up.
 
-In order to mitigate this, Postgres has many options and settings that can be [tweaked](/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
+In order to mitigate this, Postgres has many options and settings that can be [tweaked](/docs/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
 
 | Setting                                                                                  | Description                                            | User-facing | Default |
 | ---------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------- | ------- |

@@ -3,42 +3,81 @@
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
+import Script from 'next/script'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
-import { useTelemetryCookie } from './hooks'
+import { useParams, useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
+import { posthogClient } from './posthog-client'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
+
+// Reexports GoogleTagManager with the right API key set
+export const TelemetryTagManager = () => {
+  const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
+
+  if (!isGTMEnabled) {
+    return
+  }
+
+  return (
+    <Script
+      id="consent"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://ss.supabase.com/4icgbaujh.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','60a389s=aWQ9R1RNLVdDVlJMTU43&page=2');`,
+      }}
+    />
+  )
+}
 
 //---
 // PAGE TELEMETRY
 //---
-
 export function handlePageTelemetry(
   API_URL: string,
   pathname?: string,
   featureFlags?: {
     [key: string]: unknown
   },
+  slug?: string,
+  ref?: string,
   telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2']
 ) {
-  return post(
-    `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
-    telemetryDataOverride !== undefined
-      ? { feature_flags: featureFlags, ...telemetryDataOverride }
-      : {
-          ...getSharedTelemetryData(pathname),
-          feature_flags: featureFlags,
-        },
-    { headers: { Version: '2' } }
-  )
+  // Send to PostHog client-side (only in browser)
+  if (typeof window !== 'undefined') {
+    const pageData = getSharedTelemetryData(pathname)
+
+    // Align frontend and backend session IDs for correlation
+    if (pageData.session_id) {
+      document.cookie = `session_id=${pageData.session_id}; path=/; SameSite=Lax`
+    }
+
+    posthogClient.capturePageView({
+      $current_url: pageData.page_url,
+      $pathname: pageData.pathname,
+      $host: new URL(pageData.page_url).hostname,
+      $groups: {
+        ...(slug ? { organization: slug } : {}),
+        ...(ref ? { project: ref } : {}),
+      },
+      page_title: pageData.page_title,
+      ...(pageData.session_id && { $session_id: pageData.session_id }),
+      ...pageData.ph,
+      ...Object.fromEntries(
+        Object.entries(featureFlags || {}).map(([k, v]) => [`$feature/${k}`, v])
+      ),
+    })
+  }
+
+  return Promise.resolve()
 }
 
 export function handlePageLeaveTelemetry(
@@ -46,31 +85,46 @@ export function handlePageLeaveTelemetry(
   pathname: string,
   featureFlags?: {
     [key: string]: unknown
-  }
+  },
+  slug?: string,
+  ref?: string
 ) {
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page-leave`, {
-    body: {
-      pathname,
-      page_url: isBrowser ? window.location.href : '',
-      page_title: isBrowser ? document?.title : '',
-      feature_flags: featureFlags,
-    },
-  })
+  // Send to PostHog client-side (only in browser)
+  if (typeof window !== 'undefined') {
+    const pageData = getSharedTelemetryData(pathname)
+    posthogClient.capturePageLeave({
+      $current_url: pageData.page_url,
+      $pathname: pageData.pathname,
+      page_title: pageData.page_title,
+      ...(pageData.session_id && { $session_id: pageData.session_id }),
+    })
+  }
+
+  return Promise.resolve()
 }
 
 export const PageTelemetry = ({
   API_URL,
   hasAcceptedConsent,
   enabled = true,
+  organizationSlug,
+  projectRef,
 }: {
   API_URL: string
   hasAcceptedConsent: boolean
   enabled?: boolean
+  organizationSlug?: string
+  projectRef?: string
 }) => {
   const router = useRouter()
 
   const pagesPathname = router?.pathname
   const appPathname = usePathname()
+
+  // Get from props or try to extract from URL params
+  const params = useParams()
+  const slug = organizationSlug || params.slug
+  const ref = projectRef || params.ref
 
   const featureFlags = useFeatureFlags()
 
@@ -86,21 +140,43 @@ export const PageTelemetry = ({
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current).catch((e) => {
+    return handlePageTelemetry(
+      API_URL,
+      pathnameRef.current,
+      featureFlagsRef.current,
+      slug,
+      ref
+    ).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
-  }, [API_URL, enabled, hasAcceptedConsent])
+  }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const sendPageLeaveTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current).catch((e) => {
+    if (!pathnameRef.current) return Promise.resolve()
+
+    return handlePageLeaveTelemetry(
+      API_URL,
+      pathnameRef.current,
+      featureFlagsRef.current,
+      slug,
+      ref
+    ).catch((e) => {
       console.error('Problem sending telemetry page-leave:', e)
     })
-  }, [API_URL, enabled, hasAcceptedConsent])
+  }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   // Handle initial page telemetry event
   const hasSentInitialPageTelemetryRef = useRef(false)
+
+  // Initialize PostHog client when consent is accepted
+  useEffect(() => {
+    if (hasAcceptedConsent && IS_PLATFORM) {
+      posthogClient.init(true)
+    }
+  }, [hasAcceptedConsent, IS_PLATFORM])
+
   useEffect(() => {
     // Send page telemetry on first page load
     // Waiting for router ready before sending page_view
@@ -117,19 +193,26 @@ export const PageTelemetry = ({
         try {
           const encodedData = telemetryCookie.split('=')[1]
           const telemetryData = JSON.parse(decodeURIComponent(encodedData))
-          handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, telemetryData)
+          handlePageTelemetry(
+            API_URL,
+            pathnameRef.current,
+            featureFlagsRef.current,
+            slug,
+            ref,
+            telemetryData
+          )
           // remove the telemetry cookie
           document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
         } catch (error) {
           console.error('Invalid telemetry data:', error)
         }
       } else {
-        handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current)
+        handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
       }
 
       hasSentInitialPageTelemetryRef.current = true
     }
-  }, [router?.isReady, hasAcceptedConsent, featureFlags.hasLoaded])
+  }, [router?.isReady, hasAcceptedConsent, featureFlags.hasLoaded, slug, ref])
 
   useEffect(() => {
     // For pages router
@@ -225,9 +308,13 @@ export function useTelemetryIdentify(API_URL: string) {
 
   useEffect(() => {
     if (user?.id) {
+      // Send to backend
       sendTelemetryIdentify(API_URL, {
         user_id: user.id,
       })
+
+      // Also identify in PostHog client-side
+      posthogClient.identify(user.id)
     }
   }, [API_URL, user?.id])
 }

@@ -1,18 +1,12 @@
 import { Lightbulb } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 
 import { formatSql } from 'lib/formatSql'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  CodeBlock,
-  cn,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
-  QUERY_PERFORMANCE_REPORTS,
+  QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
 
@@ -22,14 +16,18 @@ interface QueryDetailProps {
   onClickViewSuggestion: () => void
 }
 
-export const QueryDetail = ({
-  reportType,
-  selectedRow,
-  onClickViewSuggestion,
-}: QueryDetailProps) => {
+// Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
+const SqlMonacoBlock = dynamic(
+  () => import('./SqlMonacoBlock').then(({ SqlMonacoBlock }) => SqlMonacoBlock),
+  {
+    ssr: false,
+  }
+)
+
+export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
-  const report = QUERY_PERFORMANCE_REPORTS[reportType]
+  const report = QUERY_PERFORMANCE_COLUMNS
   const [query, setQuery] = useState(selectedRow?.['query'])
 
   useEffect(() => {
@@ -43,16 +41,7 @@ export const QueryDetail = ({
     <QueryPanelContainer>
       <QueryPanelSection>
         <p className="text-sm">Query pattern</p>
-        <CodeBlock
-          hideLineNumbers
-          value={query}
-          language="sql"
-          className={cn(
-            'max-w-full max-h-[310px]',
-            '!py-3 !px-3.5 prose dark:prose-dark transition',
-            '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
-          )}
-        />
+        <SqlMonacoBlock value={query} height={310} lineNumbers="off" wrapperClassName="pl-3" />
         {isLinterWarning && (
           <Alert_Shadcn_
             variant="default"
@@ -76,10 +65,17 @@ export const QueryDetail = ({
         {report
           .filter((x) => x.id !== 'query')
           .map((x) => {
+            const rawValue = selectedRow?.[x.id]
             const isTime = x.name.includes('time')
+
             const formattedValue = isTime
-              ? `${selectedRow?.[x.id].toFixed(2)}ms`
-              : String(selectedRow?.[x.id])
+              ? typeof rawValue === 'number' && !isNaN(rawValue) && isFinite(rawValue)
+                ? `${rawValue.toFixed(2)}ms`
+                : 'N/A'
+              : rawValue != null
+                ? String(rawValue)
+                : 'N/A'
+
             return (
               <div key={x.id} className="flex gap-x-2">
                 <p className="text-foreground-lighter text-sm w-32">{x.name}</p>

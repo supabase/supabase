@@ -8,6 +8,7 @@ import { useBackupDownloadMutation } from 'data/database/backup-download-mutatio
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useStorageArchiveCreateMutation } from 'data/storage/storage-archive-create-mutation'
 import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Database, Storage } from 'icons'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -21,11 +22,10 @@ import {
   DropdownMenuTrigger,
   WarningIcon,
 } from 'ui'
-import { useProjectContext } from '../ProjectContext'
 
 export const PauseDisabledState = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [toastId, setToastId] = useState<string | number>()
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 

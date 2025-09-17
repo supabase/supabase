@@ -1,0 +1,237 @@
+schema {
+  query: RootQueryType
+}
+
+"""
+A document containing content from the Supabase docs. This is a guide, which might describe a concept, or explain the steps for using or implementing a feature.
+"""
+type Guide implements SearchResult {
+  """The title of the document"""
+  title: String
+
+  """The URL of the document"""
+  href: String
+
+  """
+  The full content of the document, including all subsections (both those matching and not matching any query string) and possibly more content
+  """
+  content: String
+
+  """
+  The subsections of the document. If the document is returned from a search match, only matching content chunks are returned. For the full content of the original document, use the content field in the parent Guide.
+  """
+  subsections: SubsectionCollection
+}
+
+"""Document that matches a search query"""
+interface SearchResult {
+  """The title of the matching result"""
+  title: String
+
+  """The URL of the matching result"""
+  href: String
+
+  """The full content of the matching result"""
+  content: String
+}
+
+"""
+A collection of content chunks from a larger document in the Supabase docs.
+"""
+type SubsectionCollection {
+  """A list of edges containing nodes in this collection"""
+  edges: [SubsectionEdge!]!
+
+  """The nodes in this collection, directly accessible"""
+  nodes: [Subsection!]!
+
+  """The total count of items available in this collection"""
+  totalCount: Int!
+}
+
+"""An edge in a collection of Subsections"""
+type SubsectionEdge {
+  """The Subsection at the end of the edge"""
+  node: Subsection!
+}
+
+"""A content chunk taken from a larger document in the Supabase docs"""
+type Subsection {
+  """The title of the subsection"""
+  title: String
+
+  """The URL of the subsection"""
+  href: String
+
+  """The content of the subsection"""
+  content: String
+}
+
+"""
+A reference document containing a description of a Supabase CLI command
+"""
+type CLICommandReference implements SearchResult {
+  """The title of the document"""
+  title: String
+
+  """The URL of the document"""
+  href: String
+
+  """The content of the reference document, as text"""
+  content: String
+}
+
+"""
+A reference document containing a description of a function from a Supabase client library
+"""
+type ClientLibraryFunctionReference implements SearchResult {
+  """The title of the document"""
+  title: String
+
+  """The URL of the document"""
+  href: String
+
+  """The content of the reference document, as text"""
+  content: String
+
+  """The programming language for which the function is written"""
+  language: Language!
+
+  """The name of the function or method"""
+  methodName: String
+}
+
+enum Language {
+  JAVASCRIPT
+  SWIFT
+  DART
+  CSHARP
+  KOTLIN
+  PYTHON
+}
+
+"""A document describing how to troubleshoot an issue when using Supabase"""
+type TroubleshootingGuide implements SearchResult {
+  """The title of the troubleshooting guide"""
+  title: String
+
+  """The URL of the troubleshooting guide"""
+  href: String
+
+  """The full content of the troubleshooting guide"""
+  content: String
+}
+
+type RootQueryType {
+  """Get the GraphQL schema for this endpoint"""
+  schema: String!
+
+  """Search the Supabase docs for content matching a query string"""
+  searchDocs(query: String!, limit: Int): SearchResultCollection
+
+  """Get the details of an error code returned from a Supabase service"""
+  error(code: String!, service: Service!): Error
+
+  """Get error codes that can potentially be returned by Supabase services"""
+  errors(
+    """Returns the first n elements from the list"""
+    first: Int
+
+    """Returns elements that come after the specified cursor"""
+    after: String
+
+    """Returns the last n elements from the list"""
+    last: Int
+
+    """Returns elements that come before the specified cursor"""
+    before: String
+
+    """Filter errors by a specific Supabase service"""
+    service: Service
+
+    """Filter errors by a specific error code"""
+    code: String
+  ): ErrorCollection
+}
+
+"""A collection of search results containing content from Supabase docs"""
+type SearchResultCollection {
+  """A list of edges containing nodes in this collection"""
+  edges: [SearchResultEdge!]!
+
+  """The nodes in this collection, directly accessible"""
+  nodes: [SearchResult!]!
+
+  """The total count of items available in this collection"""
+  totalCount: Int!
+}
+
+"""An edge in a collection of SearchResults"""
+type SearchResultEdge {
+  """The SearchResult at the end of the edge"""
+  node: SearchResult!
+}
+
+"""An error returned by a Supabase service"""
+type Error {
+  """
+  The unique code identifying the error. The code is stable, and can be used for string matching during error handling.
+  """
+  code: String!
+
+  """The Supabase service that returns this error."""
+  service: Service!
+
+  """The HTTP status code returned with this error."""
+  httpStatusCode: Int
+
+  """
+  A human-readable message describing the error. The message is not stable, and should not be used for string matching during error handling. Use the code instead.
+  """
+  message: String
+}
+
+enum Service {
+  AUTH
+  REALTIME
+  STORAGE
+}
+
+"""A collection of Errors"""
+type ErrorCollection {
+  """A list of edges containing nodes in this collection"""
+  edges: [ErrorEdge!]!
+
+  """The nodes in this collection, directly accessible"""
+  nodes: [Error!]!
+
+  """Pagination information"""
+  pageInfo: PageInfo!
+
+  """The total count of items available in this collection"""
+  totalCount: Int!
+}
+
+"""An edge in a collection of Errors"""
+type ErrorEdge {
+  """The Error at the end of the edge"""
+  node: Error!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Pagination information for a collection"""
+type PageInfo {
+  """Whether there are more items after the current page"""
+  hasNextPage: Boolean!
+
+  """Whether there are more items before the current page"""
+  hasPreviousPage: Boolean!
+
+  """Cursor pointing to the start of the current page"""
+  startCursor: String
+
+  """Cursor pointing to the end of the current page"""
+  endCursor: String
+}

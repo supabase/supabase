@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { Lock, Unlock } from 'lucide-react'
+import { Lock, Table } from 'lucide-react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Badge } from 'ui'
+import { AiIconAnimation, Badge, CardTitle } from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: {
@@ -26,7 +26,7 @@ interface PolicyTableRowHeaderProps {
   onSelectCreatePolicy: () => void
 }
 
-const PolicyTableRowHeader = ({
+export const PolicyTableRowHeader = ({
   table,
   isLocked,
   onSelectToggleRLS = noop,
@@ -35,8 +35,14 @@ const PolicyTableRowHeader = ({
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
 
-  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
-  const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canCreatePolicies } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'policies'
+  )
+  const { can: canToggleRLS } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
@@ -48,28 +54,19 @@ const PolicyTableRowHeader = ({
         <EditorTablePageLink
           projectRef={ref}
           id={String(table.id)}
-          className="flex items-center gap-x-2"
+          className="flex items-center gap-x-3"
         >
-          {table.rls_enabled ? (
-            <div className="flex items-center gap-x-1 text-xs">
-              <Lock size={14} strokeWidth={2} className="text-brand" />
-            </div>
-          ) : (
-            <div className="flex items-center gap-x-1 text-xs">
-              <Unlock size={14} strokeWidth={2} className="text-warning-600" />
-            </div>
-          )}
-          <h4 className="m-0">{table.name}</h4>
+          <Table strokeWidth={1.5} size={16} className="text-foreground-muted" />
+          <CardTitle className="m-0 normal-case">{table.name}</CardTitle>
+          {!table.rls_enabled && <Badge variant="warning">RLS Disabled</Badge>}
         </EditorTablePageLink>
-        <div className="flex items-center gap-x-2">
-          {isTableLocked && (
-            <Badge>
-              <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
-                <Lock size={12} /> Locked
-              </span>
-            </Badge>
-          )}
-        </div>
+        {isTableLocked && (
+          <Badge>
+            <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
+              <Lock size={12} /> Locked
+            </span>
+          </Badge>
+        )}
       </div>
       {!isTableLocked && (
         <div className="flex-1">
@@ -137,5 +134,3 @@ const PolicyTableRowHeader = ({
     </div>
   )
 }
-
-export default PolicyTableRowHeader

@@ -1,12 +1,9 @@
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { FC, PropsWithChildren, useMemo } from 'react'
 import { ResponsiveContainer } from 'recharts'
 
 import { DateTimeFormats } from './Charts.constants'
 import type { CommonChartProps, StackedChartProps } from './Charts.types'
-
-dayjs.extend(utc)
 
 /**
  * Auto formats a number to a default precision if it is a float
@@ -36,6 +33,9 @@ export const isFloat = (num: number) => String(num).includes('.')
  * precisionFormatter(123.123, 2)   // "123.12"
  */
 export const precisionFormatter = (num: number, precision: number): string => {
+  if (precision === 0) {
+    return String(Math.round(num))
+  }
   if (isFloat(num)) {
     const [head, tail] = String(num).split('.')
     return Number(head).toLocaleString() + '.' + tail.slice(0, precision)

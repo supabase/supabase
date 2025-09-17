@@ -64,6 +64,16 @@ export class NoDataError<Details extends ObjectOrNever = never> extends ApiError
   }
 }
 
+export class FileNotFoundError<Details extends ObjectOrNever = never> extends Error {
+  constructor(
+    message: string,
+    error: Error,
+    public details?: Details
+  ) {
+    super(`FileNotFound: ${message}`, { cause: error })
+  }
+}
+
 export class MultiError<ErrorType = unknown, Details extends ObjectOrNever = never> extends Error {
   constructor(
     message: string,
@@ -79,7 +89,7 @@ export class MultiError<ErrorType = unknown, Details extends ObjectOrNever = nev
 
   appendError(message: string, error: ErrorType): this {
     this.message = `${this.message}\n\t${message}`
-    ;((this.cause ?? (this.cause = [])) as Array<ErrorType>).push(error)
+    ;((this.cause ??= []) as Array<ErrorType>).push(error)
     return this
   }
 }
@@ -101,7 +111,10 @@ export class CollectionQueryError extends Error {
   ): CollectionQueryError {
     const fetchFailedFor =
       countError && dataError ? 'count and collection' : countError ? 'count' : 'collection'
-    return new CollectionQueryError(`Failed to fetch ${fetchFailedFor}`, {
+    let message = `Failed to fetch ${fetchFailedFor}`
+    if (countError) message += `: CountError: ${countError.message}`
+    if (dataError) message += `: CollectionError: ${dataError.message}`
+    return new CollectionQueryError(message, {
       count: countError,
       data: dataError,
     })

@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -14,19 +15,16 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
 import {
   Button,
-  CriticalIcon,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
-  WarningIcon,
   cn,
 } from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -42,7 +40,9 @@ export const NotificationsPopoverV2 = () => {
   // so opting to simplify and implement it here for now
   const rowHeights = useRef<{ [key: number]: number }>({})
 
-  const { data: projects } = useProjectsQuery({ enabled: open })
+  const { data: projectsData } = useProjectsQuery({ enabled: open })
+  const projects = projectsData?.projects ?? []
+
   const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
     data,
@@ -103,41 +103,33 @@ export const NotificationsPopoverV2 = () => {
               text: 'Notifications',
             },
           }}
-          type={hasNewNotifications ? 'outline' : 'text'}
-          className={cn(
-            'rounded-none h-[30px] w-[32px]',
-            // !hasCritical || !hasWarning || !hasNewNotifications ? 'w-[26px]' : '',
-            'group',
-            hasNewNotifications ? 'rounded-full px-1.5' : 'px-1',
-            hasCritical
-              ? 'border-destructive-500 hover:border-destructive-600 hover:bg-destructive-300'
-              : hasWarning
-                ? 'border-warning-500 hover:border-warning-600 hover:bg-warning-300'
-                : ''
-          )}
+          type="text"
+          className={cn('rounded-none h-[30px] w-[32px] group relative')}
           icon={
-            hasCritical ? (
-              <CriticalIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
-            ) : hasWarning ? (
-              <WarningIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
-            ) : hasNewNotifications ? (
-              <div
+            <div className="relative">
+              <InboxIcon
+                size={18}
+                strokeWidth={1.5}
                 className={cn(
-                  'transition-all -mr-3 group-hover:-mr-1',
-                  'z-10 h-4 flex items-center justify-center rounded-full bg-black dark:bg-white',
-                  (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4'
+                  '!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground'
                 )}
-              >
-                <p className="text-xs text-background-alternative">{summary?.unread_count}</p>
-              </div>
-            ) : null
-          }
-          iconRight={
-            <InboxIcon
-              size={18}
-              strokeWidth={1.5}
-              className="!h-[18px] !w-[18px] transition group-hover:text-foreground text-foreground-light"
-            />
+              />
+              {hasCritical && (
+                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                  <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent border-b-destructive" />
+                </div>
+              )}
+              {hasWarning && !hasCritical && (
+                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-warning" />
+                </div>
+              )}
+              {!!hasNewNotifications && !hasCritical && !hasWarning && (
+                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-brand" />
+                </div>
+              )}
+            </div>
           }
         />
       </PopoverTrigger_Shadcn_>

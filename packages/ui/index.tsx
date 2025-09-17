@@ -38,6 +38,7 @@ export { Heading } from './src/components/CustomHTMLElements'
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
+export * from './src/components/AnimatedCounter'
 export * from './src/lib/utils'
 
 // DATA ENTRY
@@ -204,6 +205,7 @@ export * from './src/components/shadcn/ui/hover-card'
 export * from './src/components/shadcn/ui/aspect-ratio'
 
 export * from './src/components/shadcn/ui/table'
+export * from './src/components/ShadowScrollArea'
 
 export {
   Collapsible as Collapsible_Shadcn_,
@@ -223,6 +225,7 @@ export {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
+  TooltipPortal,
 } from './src/components/shadcn/ui/tooltip'
 
 export {

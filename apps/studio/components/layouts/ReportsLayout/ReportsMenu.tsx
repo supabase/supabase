@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
+import { Plus, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
@@ -24,12 +24,38 @@ const ReportsMenu = () => {
   const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
-  const storageEnabled = useIsFeatureEnabled('project_storage:all')
+  const authEnabled = useFlag('authreportv2')
+  const edgeFnEnabled = useFlag('edgefunctionreport')
+  const realtimeEnabled = useFlag('realtimeReport')
+  const storageReportEnabled = useFlag('storagereport')
+  const postgrestReportEnabled = useFlag('postgrestreport')
 
-  const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  // b/c fly doesn't support storage
+  const storageSupported = useIsFeatureEnabled('project_storage:all')
+  const storageEnabled = storageReportEnabled && storageSupported
+
+  const { can: canCreateCustomReport } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'report', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
+
+  // Preserve date range query parameters when navigating
+  const preservedQueryParams = useMemo(() => {
+    const { its, ite, isHelper, helperText } = router.query
+    const params = new URLSearchParams()
+
+    if (its && typeof its === 'string') params.set('its', its)
+    if (ite && typeof ite === 'string') params.set('ite', ite)
+    if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
+    if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
+
+    const queryString = params.toString()
+    return queryString ? `?${queryString}` : ''
+  }, [router.query])
 
   const { data: content, isLoading } = useContentQuery({
     projectRef: ref,
@@ -77,7 +103,7 @@ const ReportsMenu = () => {
       name: r.name,
       description: r.description || '',
       key: r.id || idx + '-report',
-      url: `/project/${ref}/reports/${r.id}`,
+      url: `/project/${ref}/reports/${r.id}${preservedQueryParams}`,
       hasDropdownActions: true,
       report: r,
     }))
@@ -93,25 +119,67 @@ const ReportsMenu = () => {
       key: 'builtin-reports',
       items: [
         {
-          name: 'API',
+          name: 'API Gateway',
           key: 'api-overview',
-          url: `/project/${ref}/reports/api-overview`,
+          url: `/project/${ref}/reports/api-overview${preservedQueryParams}`,
         },
+        ...(authEnabled
+          ? [
+              {
+                name: 'Auth',
+                key: 'auth',
+                url: `/project/${ref}/reports/auth${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        {
+          name: 'Database',
+          key: 'database',
+          url: `/project/${ref}/reports/database${preservedQueryParams}`,
+        },
+        ...(edgeFnEnabled
+          ? [
+              {
+                name: 'Edge Functions',
+                key: 'edge-functions',
+                url: `/project/${ref}/reports/edge-functions${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/advisors/query-performance`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+        },
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'PostgREST',
+                key: 'postgrest',
+                url: `/project/${ref}/reports/postgrest${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        ...(realtimeEnabled
+          ? [
+              {
+                name: 'Realtime',
+                key: 'realtime',
+                url: `/project/${ref}/reports/realtime${preservedQueryParams}`,
+              },
+            ]
+          : []),
+
         ...(storageEnabled
           ? [
               {
                 name: 'Storage',
                 key: 'storage',
-                url: `/project/${ref}/reports/storage`,
+                url: `/project/${ref}/reports/storage${preservedQueryParams}`,
               },
             ]
           : []),
-
-        {
-          name: 'Database',
-          key: 'database',
-          url: `/project/${ref}/reports/database`,
-        },
       ],
     },
   ]
@@ -188,8 +256,14 @@ const ReportsMenu = () => {
                             : 'hover:bg-surface-200'
                         )}
                       >
-                        <Link href={subItem.url} className="flex-grow h-7 flex items-center pl-3">
-                          {subItem.name}
+                        <Link
+                          href={subItem.url}
+                          className="flex-grow h-7 flex justify-between items-center pl-3"
+                        >
+                          <span>{subItem.name}</span>
+                          {subItem.rightIcon && (
+                            <span className="shrink-0">{subItem.rightIcon}</span>
+                          )}
                         </Link>
                       </li>
                     ))}

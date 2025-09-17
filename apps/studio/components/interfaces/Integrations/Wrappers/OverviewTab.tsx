@@ -3,10 +3,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -24,10 +24,14 @@ import { WrapperTable } from './WrapperTable'
 
 export const WrapperOverviewTab = () => {
   const { id } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
-  const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+
+  const { can: canCreateWrapper } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'wrappers'
+  )
 
   const { data } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -48,6 +52,8 @@ export const WrapperOverviewTab = () => {
   // but still doesnt meet the minimum extension version, then DB upgrade is required
   const databaseNeedsUpgrading =
     wrappersExtension?.installed_version === wrappersExtension?.default_version
+
+  const CreateWrapperSheetComponent = wrapperMeta.createComponent || CreateWrapperSheet
 
   return (
     <IntegrationOverviewTab
@@ -113,9 +119,10 @@ export const WrapperOverviewTab = () => {
         <WrapperTable />
       </div>
       <Separator />
+
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
         <SheetContent size="lg" tabIndex={undefined}>
-          <CreateWrapperSheet
+          <CreateWrapperSheetComponent
             wrapperMeta={wrapperMeta}
             onClose={() => {
               setCreateWrapperShown(false)

@@ -1,32 +1,29 @@
-import Table from 'components/to-be-cleaned/Table'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Toggle } from 'ui'
+import { Switch, TableCell, TableRow } from 'ui'
 
 export interface PublicationSkeletonProps {
   index?: number
 }
 
-const PublicationSkeleton = ({ index }: PublicationSkeletonProps) => {
+export const PublicationSkeleton = ({ index }: PublicationSkeletonProps) => {
   return (
-    <Table.tr className="border-t">
-      <Table.td className="px-4 py-3" style={{ width: '25%' }}>
+    <TableRow>
+      <TableCell style={{ width: '35%' }}>
         <ShimmeringLoader className="h-4 w-24 my-0.5 p-0" delayIndex={index} />
-      </Table.td>
-      <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
+      </TableCell>
+      <TableCell className="hidden lg:table-cell" style={{ width: '15%' }}>
         <ShimmeringLoader className="h-4 w-14 my-0.5 p-0" delayIndex={index} />
-      </Table.td>
+      </TableCell>
       {Array.from({ length: 4 }).map((_, i) => (
-        <Table.td key={i}>
-          <Toggle size="tiny" checked={false} disabled={true} />
-        </Table.td>
+        <TableCell key={i}>
+          <Switch size="small" checked={false} disabled={true} />
+        </TableCell>
       ))}
-      <Table.td className="px-4 py-3 pr-2">
+      <TableCell className="px-4 py-3 pr-2">
         <div className="flex justify-end">
           <ShimmeringLoader className="h-6 w-12 p-0" delayIndex={index} />
         </div>
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }
-
-export default PublicationSkeleton

@@ -256,6 +256,25 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
                     >
                       {message.content}
                     </ReactMarkdown>
+                    {message.sources && message.sources.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-border-muted">
+                        <p className="text-sm text-foreground-muted mb-2">Sources:</p>
+                        <ul className="space-y-1">
+                          {message.sources.map((source, idx) => (
+                            <li key={idx}>
+                              <a
+                                href={source.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-brand hover:underline"
+                              >
+                                {source.url}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </Fragment>
               )

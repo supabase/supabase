@@ -3,11 +3,9 @@ import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { useDebounce } from 'use-debounce'
 
-import { useCompletion } from 'ai/react'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
 import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
-import { constructHeaders } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -35,7 +33,7 @@ interface CronJobScheduleSectionProps {
 }
 
 export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobScheduleSectionProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [inputValue, setInputValue] = useState('')
   const [debouncedValue] = useDebounce(inputValue, 750)
@@ -50,25 +48,13 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
     { name: 'Every Monday at 2 AM', expression: '0 2 * * 1' },
   ] as const
 
-  const {
-    complete: generateCronSyntax,
-    isLoading: isGeneratingCron,
-    stop,
-  } = useCompletion({
-    api: `${BASE_PATH}/api/ai/sql/cron`,
-    onResponse: async (response) => {
-      if (response.ok) {
-        // remove quotes from the cron expression
-        const expression = (await response.text()).trim().replace(/^"|"$/g, '')
-        form.setValue('schedule', expression, {
-          shouldValidate: true,
-          shouldDirty: true,
-          shouldTouch: true,
-        })
-      }
-    },
-    onError: (error) => {
-      console.error('Error generating cron:', error)
+  const { mutate: generateCronSyntax, isLoading: isGeneratingCron } = useSqlCronGenerateMutation({
+    onSuccess: (expression) => {
+      form.setValue('schedule', expression, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      })
     },
   })
 
@@ -79,12 +65,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
 
   useEffect(() => {
     if (useNaturalLanguage && debouncedValue) {
-      constructHeaders().then((headers) =>
-        generateCronSyntax(debouncedValue, {
-          headers: { Authorization: headers.get('Authorization') ?? '' },
-        })
-      )
-      return () => stop()
+      generateCronSyntax({ prompt: debouncedValue })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue, useNaturalLanguage])

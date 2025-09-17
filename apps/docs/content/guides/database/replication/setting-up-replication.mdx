@@ -15,9 +15,9 @@ To set up replication, the following is recommended:
 To create a replication slot, you will need to use the `postgres` user and follow the instructions in our [guide](/docs/guides/database/postgres/setup-replication-external).
 
 <Admonition type="note">
-  If you are running Postgres 17 or higher, you can create a new user and grant them replication
-  permissions with the `postgres` user. For versions below 17, you will need to use the `postgres`
-  user.
+
+If you are running Postgres 17 or higher, you can create a new user and grant them replication permissions with the `postgres` user. For versions below 17, you will need to use the `postgres` user.
+
 </Admonition>
 
 If you are replicating to an external system and using any of the tools below, check their documentation first and we have added additional information where the setup with Supabase can vary.
@@ -68,7 +68,7 @@ Materialize has the following [documentation](https://materialize.com/docs/sql/c
 
 You can follow those steps with the following modifications:
 
-1. Follow the steps in our [guide](/guides/database/postgres/setup-replication-external) to create a publication slot
+1. Follow the steps in our [guide](/docs/guides/database/postgres/setup-replication-external) to create a publication slot
 
 </TabPanel>
 

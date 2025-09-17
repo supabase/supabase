@@ -274,7 +274,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
 
-  const needsApiQuery = variable === 'anonKey' || variable === 'url'
+  const needsApiQuery = variable === 'publishableKey' || variable === 'url'
   const needsSupavisorQuery = variable === 'sessionPooler'
 
   const {
@@ -303,7 +303,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     switch (variable) {
       case 'url':
         return !apiData.app_config?.endpoint
-      case 'anonKey':
+      case 'publishableKey':
         return !apiData.service_api_keys?.some((key) => key.tags === 'anon')
     }
   }
@@ -336,7 +336,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
       case 'url':
         variableValue = `https://${apiData?.app_config?.endpoint}`
         break
-      case 'anonKey':
+      case 'publishableKey':
         variableValue = apiData?.service_api_keys?.find((key) => key.tags === 'anon')?.api_key || ''
         break
       case 'sessionPooler':

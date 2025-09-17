@@ -4,8 +4,7 @@ import Link from 'next/link'
 import { useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
-import Footer from 'components/grid/components/footer/Footer'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Footer } from 'components/grid/components/footer/Footer'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
@@ -16,6 +15,7 @@ import {
   isView,
   isViewLike,
 } from 'data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
 import { Button } from 'ui'
@@ -24,12 +24,12 @@ export interface TableDefinitionProps {
   entity?: Entity
 }
 
-const TableDefinition = ({ entity }: TableDefinitionProps) => {
+export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
   const { resolvedTheme } = useTheme()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const viewResult = useViewDefinitionQuery(
     {
@@ -132,5 +132,3 @@ const TableDefinition = ({ entity }: TableDefinitionProps) => {
     </>
   )
 }
-
-export default TableDefinition

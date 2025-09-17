@@ -6,12 +6,12 @@ import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TabsUpdateCallout } from 'components/interfaces/App/FeaturePreview/TableEditorTabs'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -27,7 +27,6 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
 
@@ -36,8 +35,8 @@ export function NewTab() {
   const { ref } = useParams()
   const editor = useEditorType()
   const { profile } = useProfile()
-  const org = useSelectedOrganization()
-  const { project } = useProjectContext()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
   const snap = useTableEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -47,10 +46,14 @@ export function NewTab() {
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const tableEditorActions = [
     {
@@ -114,7 +117,6 @@ export function NewTab() {
   return (
     <div className="bg-surface-100 h-full overflow-y-auto py-12">
       <div className="mx-auto max-w-2xl flex flex-col gap-10 px-10">
-        <TabsUpdateCallout />
         <div className="grid grid-cols-2 gap-4">
           {actions.map((item, i) => (
             <ActionCard key={`action-card-${i}`} {...item} />

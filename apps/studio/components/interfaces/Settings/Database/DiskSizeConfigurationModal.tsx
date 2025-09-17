@@ -7,10 +7,10 @@ import { toast } from 'sonner'
 import { number, object } from 'yup'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -36,10 +36,10 @@ const DiskSizeConfigurationModal = ({
   hideModal,
 }: DiskSizeConfigurationProps) => {
   const { ref: projectRef } = useParams()
-  const { project, isLoading: isLoadingProject } = useProjectContext()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
   const { lastDatabaseResizeAt } = project ?? {}
 
-  const organization = useSelectedOrganization()
   const { data: projectSubscriptionData, isLoading: isLoadingSubscription } =
     useOrgSubscriptionQuery({ orgSlug: organization?.slug }, { enabled: visible })
 

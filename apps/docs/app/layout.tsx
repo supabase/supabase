@@ -11,6 +11,7 @@ import { genFaviconData } from 'common/MetaFavicons/app-router'
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
+import { TelemetryTagManager } from 'common'
 
 const metadata: Metadata = {
   applicationName: 'Supabase Docs',
@@ -47,6 +48,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body>
+        <TelemetryTagManager />
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>
         </GlobalProviders>

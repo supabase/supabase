@@ -6,7 +6,7 @@ import type {
   RootQueryTypeErrorsArgs,
   Service,
 } from '~/__generated__/graphql'
-import { ApiError, convertUnknownToApiError } from '~/app/api/utils'
+import { ApiError, convertUnknownToApiError, extractMessageFromAnyError } from '~/app/api/utils'
 import { Result } from '~/features/helpers.fn'
 import {
   createCollectionType,
@@ -77,7 +77,13 @@ async function resolveErrors(
               code: args[0].code ?? undefined,
             },
           })
-          return result.mapError((error) => new ApiError('Failed to resolve error codes', error))
+          return result.mapError(
+            (error) =>
+              new ApiError(
+                `Failed to resolve error codes: ${extractMessageFromAnyError(error)}`,
+                error
+              )
+          )
         }
         return await GraphQLCollectionBuilder.create<
           ErrorModel,

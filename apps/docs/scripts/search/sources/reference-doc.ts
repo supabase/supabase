@@ -8,10 +8,10 @@ import type {
   IFunctionDefinition,
   ISpec,
 } from '../../../components/reference/Reference.types.js'
+import { getApiEndpointById } from '../../../features/docs/Reference.generated.singleton.js'
 import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec.js'
 import { flattenSections } from '../../../lib/helpers.js'
 import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers.js'
-import type { Json } from '../../helpers.mdx.js'
 import { BaseLoader, BaseSource } from './base.js'
 
 export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
@@ -23,7 +23,7 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
   constructor(
     source: string,
     path: string,
-    public meta: Json,
+    public meta: Record<string, unknown>,
     public specFilePath: string,
     public sectionsFilePath: string
   ) {
@@ -39,30 +39,35 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
 
     const specSections = this.getSpecSections(specContents)
 
-    const sections = flattenedRefSections
-      .map((refSection) => {
-        const specSection = this.matchSpecSection(specSections, refSection.id)
+    const sections = (
+      await Promise.all(
+        flattenedRefSections.map(async (refSection) => {
+          const specSection = await this.matchSpecSection(specSections, refSection.id)
 
-        if (!specSection) {
-          return
-        }
+          if (!specSection) {
+            return
+          }
 
-        return this.sourceConstructor(
-          this.source,
-          `${this.path}/${refSection.slug}`,
-          refSection,
-          specSection,
-          this.enhanceMeta(specSection)
-        )
-      })
-      .filter((item): item is ReferenceSource<SpecSection> => item !== undefined)
+          return this.sourceConstructor(
+            this.source,
+            `${this.path}/${refSection.slug}`,
+            refSection,
+            specSection,
+            this.enhanceMeta(specSection)
+          )
+        })
+      )
+    ).filter((item): item is ReferenceSource<SpecSection> => item !== undefined)
 
     return sections as BaseSource[]
   }
 
   abstract getSpecSections(specContents: string): SpecSection[]
-  abstract matchSpecSection(specSections: SpecSection[], id: string): SpecSection | undefined
-  enhanceMeta(section: SpecSection): Json {
+  abstract matchSpecSection(
+    specSections: SpecSection[],
+    id: string
+  ): SpecSection | undefined | Promise<SpecSection | undefined>
+  enhanceMeta(_section: SpecSection): Record<string, unknown> {
     return this.meta
   }
 }
@@ -75,12 +80,12 @@ export abstract class ReferenceSource<SpecSection> extends BaseSource {
     path: string,
     public refSection: ICommonSection,
     public specSection: SpecSection,
-    public meta: Json
+    public meta: Record<string, unknown>
   ) {
     super(source, path)
   }
 
-  process() {
+  async process() {
     const checksum = createHash('sha256')
       .update(JSON.stringify(this.refSection) + JSON.stringify(this.specSection))
       .digest('base64')
@@ -115,11 +120,11 @@ export abstract class ReferenceSource<SpecSection> extends BaseSource {
   abstract extractSubtitle(): string
 }
 
-export class OpenApiReferenceLoader extends ReferenceLoader<enrichedOperation> {
+export class OpenApiReferenceLoader extends ReferenceLoader<Partial<enrichedOperation>> {
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {
@@ -136,39 +141,108 @@ export class OpenApiReferenceLoader extends ReferenceLoader<enrichedOperation> {
 
     return generatedSpec.operations
   }
-  matchSpecSection(operations: enrichedOperation[], id: string): enrichedOperation | undefined {
-    return operations.find((operation) => operation.operationId === id)
+  async matchSpecSection(
+    _operations: enrichedOperation[],
+    id: string
+  ): Promise<Partial<enrichedOperation> | undefined> {
+    const apiEndpoint = await getApiEndpointById(id)
+    if (!apiEndpoint) return undefined
+
+    const enrichedOp: Partial<enrichedOperation> = {
+      operationId: apiEndpoint.id,
+      operation: apiEndpoint.method,
+      path: apiEndpoint.path,
+      summary: apiEndpoint.summary,
+      description: apiEndpoint.description,
+      deprecated: apiEndpoint.deprecated,
+      parameters: apiEndpoint.parameters as any,
+      requestBody: apiEndpoint.requestBody as any,
+      responses: apiEndpoint.responses as any,
+    }
+
+    return enrichedOp
   }
 }
 
-export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
+export class OpenApiReferenceSource extends ReferenceSource<Partial<enrichedOperation>> {
   formatSection(specOperation: enrichedOperation, _: ICommonItem) {
-    const { summary, description, operation, path, tags } = specOperation
+    const { summary, description, operation, path, tags, parameters, responses, operationId } =
+      specOperation
     return JSON.stringify({
       summary,
       description,
       operation,
       path,
       tags,
+      parameters,
+      responses,
+      operationId,
     })
   }
 
   extractSubtitle() {
-    return `${this.meta.title}: ${this.specSection.description}`
+    return `${this.meta.title}: ${this.specSection.description || this.specSection.operationId || ''}`
   }
 
   extractTitle() {
     return (
       this.specSection.summary ||
-      (typeof this.meta.title === 'string' ? this.meta.title : this.specSection.operation)
+      (typeof this.meta.title === 'string' ? this.meta.title : this.specSection.operation) ||
+      ''
     )
   }
 
   extractIndexedContent(): string {
-    const { summary, description, operation, tags } = this.specSection
-    return `# ${this.meta.title ?? ''}\n\n${summary ?? ''}\n\n${description ?? ''}\n\n${operation ?? ''}\n\n${
-      tags?.join(', ') ?? ''
-    }`
+    const { summary, description, operation, tags, path, parameters, responses } = this.specSection
+
+    const sections: string[] = []
+
+    // Title
+    sections.push(`# ${this.meta.title ?? ''}`)
+
+    // Summary
+    if (summary) {
+      sections.push(summary)
+    }
+
+    // Description
+    if (description) {
+      sections.push(`Description: ${description}`)
+    }
+
+    // Path and Method
+    if (path) {
+      sections.push(`Path: ${operation?.toUpperCase() || 'GET'} ${path}`)
+    }
+
+    // Parameters
+    if (parameters && parameters.length > 0) {
+      const paramList = parameters
+        .map((param: any) => {
+          const required = param.required ? 'required' : 'optional'
+          return `- ${param.name} (${param.schema?.type || 'string'}, ${required}): ${param.description || ''}`
+        })
+        .join('\n')
+      sections.push(`Parameters:\n${paramList}`)
+    }
+
+    // Response Types
+    if (responses) {
+      const responseList = Object.entries(responses)
+        .map(([code, response]: [string, any]) => {
+          const desc = response.description || 'No description'
+          return `- ${code}: ${desc}`
+        })
+        .join('\n')
+      sections.push(`Responses:\n${responseList}`)
+    }
+
+    // Tags
+    if (tags && tags.length > 0) {
+      sections.push(`Tags: ${tags.join(', ')}`)
+    }
+
+    return sections.filter(Boolean).join('\n\n')
   }
 }
 
@@ -176,7 +250,7 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {
@@ -197,7 +271,7 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
     return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
   }
 
-  enhanceMeta(section: IFunctionDefinition): Json {
+  enhanceMeta(section: IFunctionDefinition): Record<string, unknown> {
     return { ...this.meta, slug: section.id, methodName: section.title }
   }
 }
@@ -236,7 +310,7 @@ export class CliReferenceLoader extends ReferenceLoader<CliCommand> {
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {

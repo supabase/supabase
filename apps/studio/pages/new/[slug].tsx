@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -23,6 +23,7 @@ import {
   PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { smartRegionToExactRegion } from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
@@ -38,6 +39,7 @@ import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
@@ -46,19 +48,21 @@ import {
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  DEFAULT_PROVIDER,
   FLY_REGIONS_DEFAULT,
+  MANAGED_BY,
   PROJECT_STATUS,
   PROVIDERS,
+  useDefaultProvider,
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
@@ -90,18 +94,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-const sizes: DesiredInstanceSize[] = [
-  'micro',
-  'small',
-  'medium',
-  'large',
-  'xlarge',
-  '2xlarge',
-  '4xlarge',
-  '8xlarge',
-  '12xlarge',
-  '16xlarge',
-]
+const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -111,6 +104,7 @@ const FormSchema = z.object({
   }),
   projectName: z
     .string()
+    .trim()
     .min(1, 'Please enter a project name.') // Required field check
     .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
     .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
@@ -139,15 +133,29 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
-  const currentOrg = useSelectedOrganization()
+  const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
 
+  const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
+
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+
+  // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
+  if (slug === 'last-visited-org') {
+    if (lastVisitedOrganization) {
+      router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
+    } else {
+      router.replace(`/new/_`, undefined, { shallow: true })
+    }
+  }
+
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -156,7 +164,10 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: isFreePlan }
   )
 
-  const { data: approvedOAuthApps } = useAuthorizedAppsQuery({ slug }, { enabled: !isFreePlan })
+  const { data: approvedOAuthApps } = useAuthorizedAppsQuery(
+    { slug },
+    { enabled: !isFreePlan && slug !== '_' }
+  )
 
   const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
 
@@ -207,23 +218,20 @@ const Wizard: NextPageWithLayout = () => {
     components['schemas']['ProjectInfo'][] | undefined
   >(undefined)
 
-  useEffect(() => {
-    // Only set once to ensure compute credits dont change while project is being created
-    if (allProjectsFromApi && !allProjects) {
-      setAllProjects(allProjectsFromApi)
-    }
-  }, [allProjectsFromApi, allProjects, setAllProjects])
-
   const organizationProjects =
     allProjects?.filter(
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+
+  const defaultProvider = useDefaultProvider()
+
+  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+      cloudProvider: PROVIDERS[defaultProvider].id,
     },
     {
+      enabled: !smartRegionEnabled,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
@@ -232,7 +240,27 @@ const Wizard: NextPageWithLayout = () => {
     }
   )
 
-  const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { data: availableRegionsData, error: availableRegionsError } =
+    useOrganizationAvailableRegionsQuery(
+      {
+        slug: slug,
+        cloudProvider: PROVIDERS[defaultProvider].id,
+      },
+      {
+        enabled: smartRegionEnabled,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchInterval: false,
+        refetchOnReconnect: false,
+      }
+    )
+
+  const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
+  const defaultRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : _defaultRegion
+
+  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
   const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
@@ -281,7 +309,7 @@ const Wizard: NextPageWithLayout = () => {
       organization: slug,
       projectName: projectName || '',
       postgresVersion: '',
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+      cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
       dbRegion: defaultRegion || undefined,
@@ -294,14 +322,15 @@ const Wizard: NextPageWithLayout = () => {
   })
 
   const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
+  const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {
       cloudProvider: cloudProvider as CloudProvider,
-      dbRegion,
+      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion,
       organizationSlug: organization,
     },
-    { enabled: currentOrg != null && !isManagedByVercel }
+    { enabled: currentOrg !== null && !isManagedByVercel }
   )
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
@@ -366,12 +395,16 @@ const Wizard: NextPageWithLayout = () => {
     const { postgresEngine, releaseChannel } =
       extractPostgresVersionDetails(postgresVersionSelection)
 
+    const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+    const selectedRegion = smartRegionEnabled
+      ? smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
+      : undefined
+
     const data: ProjectCreateVariables = {
-      cloudProvider: cloudProvider,
-      organizationId: currentOrg.id,
+      dbPass,
+      cloudProvider,
+      organizationSlug: currentOrg.slug,
       name: projectName,
-      dbPass: dbPass,
-      dbRegion: dbRegion,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
@@ -380,6 +413,7 @@ const Wizard: NextPageWithLayout = () => {
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
     }
 
     if (postgresVersion) {
@@ -396,6 +430,13 @@ const Wizard: NextPageWithLayout = () => {
 
     createProject(data)
   }
+
+  useEffect(() => {
+    // Only set once to ensure compute credits dont change while project is being created
+    if (allProjectsFromApi && !allProjects) {
+      setAllProjects(allProjectsFromApi.projects)
+    }
+  }, [allProjectsFromApi, allProjects, setAllProjects])
 
   useEffect(() => {
     // Handle no org: redirect to new org route
@@ -418,10 +459,10 @@ const Wizard: NextPageWithLayout = () => {
   }, [defaultRegion])
 
   useEffect(() => {
-    if (defaultRegionError) {
-      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
+    if (regionError) {
+      form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
     }
-  }, [defaultRegionError])
+  }, [regionError])
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
@@ -453,7 +494,7 @@ const Wizard: NextPageWithLayout = () => {
                   canCreateProject &&
                   additionalMonthlySpend > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span>Additional Costs</span>
+                      <span>Additional costs</span>
                       <div className="text-brand flex gap-1 items-center font-mono font-medium">
                         <span>${additionalMonthlySpend}/m</span>
                         <InfoTooltip side="top" className="max-w-[450px] p-0">
@@ -623,7 +664,9 @@ const Wizard: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isAdmin && !orgNotFound && <NotOrganizationOwnerWarning slug={slug} />}
+                  {isOrganizationsSuccess && !isAdmin && !orgNotFound && (
+                    <NotOrganizationOwnerWarning slug={slug} />
+                  )}
                   {orgNotFound && <OrgNotFound slug={slug} />}
                 </Panel.Content>
 
@@ -669,15 +712,20 @@ const Wizard: NextPageWithLayout = () => {
                                 </FormControl_Shadcn_>
                                 <SelectContent_Shadcn_>
                                   <SelectGroup_Shadcn_>
-                                    {Object.values(PROVIDERS).map((providerObj) => {
-                                      const label = providerObj['name']
-                                      const value = providerObj['id']
-                                      return (
-                                        <SelectItem_Shadcn_ key={value} value={value}>
-                                          {label}
-                                        </SelectItem_Shadcn_>
+                                    {Object.values(PROVIDERS)
+                                      .filter(
+                                        (provider) =>
+                                          validCloudProviders?.includes(provider.id) ?? true
                                       )
-                                    })}
+                                      .map((providerObj) => {
+                                        const label = providerObj['name']
+                                        const value = providerObj['id']
+                                        return (
+                                          <SelectItem_Shadcn_ key={value} value={value}>
+                                            {label}
+                                          </SelectItem_Shadcn_>
+                                        )
+                                      })}
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
@@ -697,7 +745,7 @@ const Wizard: NextPageWithLayout = () => {
                               layout="horizontal"
                               label={
                                 <div className="flex flex-col gap-y-4">
-                                  <span>Compute Size</span>
+                                  <span>Compute size</span>
 
                                   <div className="flex flex-col gap-y-2">
                                     <Link
@@ -706,7 +754,7 @@ const Wizard: NextPageWithLayout = () => {
                                       href="https://supabase.com/docs/guides/platform/compute-add-ons"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute Add-Ons</p>
+                                        <p className="text-sm m-0">Compute add-ons</p>
                                         <ExternalLink size={16} strokeWidth={1.5} />
                                       </div>
                                     </Link>
@@ -716,7 +764,7 @@ const Wizard: NextPageWithLayout = () => {
                                       href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute Billing</p>
+                                        <p className="text-sm m-0">Compute billing</p>
                                         <ExternalLink size={16} strokeWidth={1.5} />
                                       </div>
                                     </Link>
@@ -768,7 +816,7 @@ const Wizard: NextPageWithLayout = () => {
                                                   CPU
                                                 </span>
                                                 <p
-                                                  className="text-xs text-muted instance-details"
+                                                  className="text-xs text-foreground-light instance-details"
                                                   translate="no"
                                                 >
                                                   ${instanceSizeSpecs[option].priceHourly}/hour (~$
@@ -779,6 +827,15 @@ const Wizard: NextPageWithLayout = () => {
                                           </SelectItem_Shadcn_>
                                         )
                                       })}
+                                    <SelectItem_Shadcn_
+                                      key={'disabled'}
+                                      value={'disabled'}
+                                      disabled
+                                    >
+                                      <div className="flex items-center justify-center w-full">
+                                        <span>Larger instance sizes available after creation</span>
+                                      </div>
+                                    </SelectItem_Shadcn_>
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
@@ -798,7 +855,7 @@ const Wizard: NextPageWithLayout = () => {
 
                           return (
                             <FormItemLayout
-                              label="Database Password"
+                              label="Database password"
                               layout="horizontal"
                               description={
                                 <>
@@ -879,7 +936,7 @@ const Wizard: NextPageWithLayout = () => {
                             <FormItemLayout
                               label="Custom Postgres version"
                               layout="horizontal"
-                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
+                              description="Specify a custom version of Postgres (defaults to the latest). This is only applicable for local/staging projects."
                             >
                               <FormControl_Shadcn_>
                                 <Input_Shadcn_
@@ -895,7 +952,9 @@ const Wizard: NextPageWithLayout = () => {
                     )}
 
                     <SecurityOptions form={form} />
-                    {!!availableOrioleVersion && <AdvancedConfiguration form={form} />}
+                    {showAdvancedConfig && !!availableOrioleVersion && (
+                      <AdvancedConfiguration form={form} />
+                    )}
                   </>
                 )}
 
@@ -912,7 +971,7 @@ const Wizard: NextPageWithLayout = () => {
                 ) : isManagedByVercel ? (
                   <Panel.Content>
                     <PartnerManagedResource
-                      partner="vercel-marketplace"
+                      managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
                       resource="Projects"
                       cta={{
                         installationId: currentOrg?.partner_id,
@@ -951,8 +1010,8 @@ const Wizard: NextPageWithLayout = () => {
           size="large"
           loading={false}
           visible={isComputeCostsConfirmationModalVisible}
-          title={<>Confirm compute costs</>}
-          confirmLabel="Confirm"
+          title="Confirm compute costs"
+          confirmLabel="I understand"
           onCancel={() => setIsComputeCostsConfirmationModalVisible(false)}
           onConfirm={async () => {
             const values = form.getValues()
@@ -965,9 +1024,9 @@ const Wizard: NextPageWithLayout = () => {
             <p>
               Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
               monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
-              clicking "Confirm", you agree to the additional costs.{' '}
+              clicking "I understand", you agree to the additional costs.{' '}
               <Link
-                href="/docs/guides/platform/manage-your-usage/compute"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                 target="_blank"
                 className="underline"
               >

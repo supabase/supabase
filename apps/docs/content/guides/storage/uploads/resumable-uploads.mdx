@@ -14,6 +14,14 @@ The resumable upload method is recommended when:
 
 Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the [`tus-js-client`](https://github.com/tus/tus-js-client) library, or other client-side libraries like [Uppy](https://uppy.io/docs/tus/) that support the TUS protocol.
 
+<Admonition type="note">
+
+For optimal performance when uploading large files you should always use the direct storage hostname. This provides several performance enhancements that will greatly improve performance when uploading large files.
+
+Instead of `https://project-id.supabase.co` use `https://project-id.storage.supabase.co`
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
@@ -35,7 +43,8 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
 
         return new Promise((resolve, reject) => {
             var upload = new tus.Upload(file, {
-                endpoint: `https://${projectId}.supabase.co/storage/v1/upload/resumable`,
+                // Supabase TUS endpoint (with direct storage hostname)
+                endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
                 retryDelays: [0, 3000, 5000, 10000, 20000],
                 headers: {
                     authorization: `Bearer ${session.access_token}`,
@@ -48,6 +57,9 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
                     objectName: fileName,
                     contentType: 'image/png',
                     cacheControl: 3600,
+                    metadata: JSON.stringify({ // custom metadata passed to the user_metadata column
+                       yourCustomMetadata: true,
+                    }),
                 },
                 chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB (for now) do not change it
                 onError: function (error) {
@@ -125,7 +137,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
         // Initialize Uppy instance only once
         const [uppy] = useState(() => new Uppy());
         // Initialize Supabase client with project URL and anon key
-        const supabase = createClient(projectURL, anonKey);
+        const supabase = createClient(`https://${projectId}.supabase.co`, anonKey);
 
         useEffect(() => {
             const initializeUppy = async () => {
@@ -135,7 +147,8 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
             } = await supabase.auth.getSession();
 
             uppy.use(Tus, {
-                    endpoint: `${projectURL}/storage/v1/upload/resumable`, // Supabase TUS endpoint
+                    // Supabase TUS endpoint (with direct storage hostname)
+                    endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
                     retryDelays: [0, 3000, 5000, 10000, 20000], // Retry delays for resumable uploads
                     headers: {
                         authorization: `Bearer ${session?.access_token}`, // User session access token
@@ -149,6 +162,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
                         "objectName",
                         "contentType",
                         "cacheControl",
+                        "metadata",
                     ], // Metadata fields allowed for the upload
                     onError: (error) => console.error("Upload error:", error), // Error handling for uploads
                 }).on("file-added", (file) => {
@@ -158,6 +172,9 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
                         bucketName, // Bucket specified by the user of the hook
                         objectName: file.name, // Use file name as object name
                         contentType: file.type, // Set content type based on file MIME type
+                        metadata: JSON.stringify({ // custom metadata passed to the user_metadata column
+                            yourCustomMetadata: true,
+                        }),
                     };
                 });
             };
@@ -173,6 +190,8 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
     ```
 
   </TabPanel>
+
+<$Show if="sdk:kotlin">
 
   <TabPanel id="kotlin" label="Kotlin">
 
@@ -205,6 +224,9 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
     ```
 
   </TabPanel>
+  </$Show>
+
+<$Show if="sdk:python">
 
   <TabPanel id="py" label="Python">
 
@@ -252,6 +274,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
 
 ### Upload URL

@@ -166,7 +166,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   We work together, <br className="md:hidden" />
                   wherever we are
                 </h2>
-                <p className="text-foreground-light mt-4 text-sm md:text-base md:w-full">
+                <p className="text-foreground-light mt-4 text-sm md:text-lg md:w-full">
                   Working in a globally distributed team is rewarding but has its challenges. We are
                   across many different timezones, so we use tools like Notion, Slack, and Discord
                   to stay connected to our team, and our community.
@@ -187,19 +187,20 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">
                       What is Supabase
                     </h2>
-                    <p className="text-foreground-light text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
+                    <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
                       Supabase is the Postgres development platform, built by developers for
                       developers. Supabase adds auth, realtime, storage, restful APIs, and edge
-                      functions to Postgres without a single line of code. Supabase was born-remote.
-                      Having a globally distributed, open source company is our secret weapon to
-                      hiring top-tier talent.
+                    </p>
+                    <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
+                      Supabase was born-remote. Having a globally distributed, open source company
+                      is our secret weapon to hiring top-tier talent.
                     </p>
                   </div>
                   <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
                     <div className="relative w-full aspect-[148/125]">
                       <Image
-                        src="/images/career/1.jpg"
-                        alt="team photo"
+                        src="/images/career/team.jpg"
+                        alt="supabase team"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
                         placeholder="blur"
@@ -213,8 +214,8 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     <div className="w-full md:w-5/6 rounded-md mt-6">
                       <div className="relative w-full aspect-[29/22]">
                         <Image
-                          src="/images/career/2.jpg"
-                          alt="team photo"
+                          src="/images/career/founders.jpg"
+                          alt="supabase founders"
                           fill
                           sizes="(min-width: 767px) 45vw, 100vw"
                           placeholder="blur"
@@ -274,8 +275,8 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   <div className="w-full rounded-md mt-6">
                     <div className="relative w-full aspect-[16/9]">
                       <Image
-                        src="/images/career/6.jpg"
-                        alt="team photo"
+                        src="/images/career/supateam.jpg"
+                        alt="supabase company"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
                         placeholder="blur"
@@ -291,7 +292,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
 
             <SectionContainer>
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">Human powered</h2>
-              <p className="text-foreground-lighter text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
+              <p className="text-foreground-light text-sm lg:text-lg pt-3 sm:w-3/5 lg:max-w-md">
                 As a completely remote and asynchronous team, we focus on these five traits to keep
                 our team effective:
               </p>
@@ -312,9 +313,9 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <SectionContainer className="!pb-0">
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1px]">
-                  1,000 + Contributors building Supabase
+                  1,000+ Contributors building Supabase
                 </h2>
-                <p className="text-foreground-light text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
+                <p className="text-foreground-light text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                   We're building a community of communities, bringing together developers from many
                   different backgrounds, as well as new developers looking to get involved with open
                   source. We love celebrating everyone who contributes their time to the Supabase
@@ -386,53 +387,13 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                 return (
                   <div className="h-full flex items-start space-x-6 w-full" key={i}>
                     <div className="h-fit text-sm lg:text-base">
-                      <h3 className="text-sm">{benefits.title}</h3>
+                      <h3 className="text-base">{benefits.title}</h3>
                       <ReactMarkdown className="prose pt-1 text-sm">{benefits.text}</ReactMarkdown>
                     </div>
                   </div>
                 )
               })}
             </div>
-          </div>
-        </SectionContainer>
-
-        <SectionContainer>
-          <div className="md:text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">How we hire</h2>
-            <p className="text-sm lg:text-base text-foreground-light pt-3">
-              The entire process is fully remote and all communication happens over email or via
-              video chat in Google Meet. The calls are all 1:1 and usually take between 20-45
-              minutes. We know you are interviewing us too, so please ask questions. We are happy to
-              answer.
-            </p>
-          </div>
-          <div className="mt-16 md:ml-36 lg:flex lg:items-start lg:w-fit lg:mx-auto">
-            {career.hiring.map((hiring, i) => {
-              return (
-                <div
-                  key={i + 1}
-                  className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
-                >
-                  <div className="lg:flex items-center">
-                    <div className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
-                      {i + 1}
-                    </div>
-                    <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-500 lg:pr-6"></div>
-                  </div>
-                  <div className="lg:mt-6">
-                    <h3 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
-                      {hiring.title}
-                    </h3>
-                    <p className="text-foreground-light text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
-                      {hiring.text}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-            <h3 className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-xl w-[44px] lg:min-w-[40px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
-              <Check />
-            </h3>
           </div>
         </SectionContainer>
 

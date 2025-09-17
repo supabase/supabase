@@ -5,6 +5,7 @@ on:
     branches: ['master']
     paths:
       - 'apps/docs/**/*.ts*'
+      - 'apps/docs/spec/**/*.json'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -14,9 +15,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  CI: true
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - uses: actions/checkout@v4
@@ -42,4 +46,10 @@ jobs:
         run: pnpm i
 
       - name: Run tests
-        run: pnpm run test:docs
+        run: |
+          touch .env
+          # Needed to prevent local Supabase startup from erroring, due to
+          # GitHub Auth being enabled in config
+          echo "GITHUB_CLIENT_ID=dummy-id" >> .env
+          echo "GITHUB_SECRET=dummy-secret" >> .env
+          pnpm run test:docs

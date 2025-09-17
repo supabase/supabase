@@ -22,7 +22,6 @@ export interface LogSelectionProps {
   onClose: () => void
   queryType?: QueryType
   projectRef: string
-  collectionName?: string
   isLoading: boolean
   error?: string | object
 }
@@ -41,12 +40,11 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
     if (!log) return <LogDetailEmptyState />
 
     switch (queryType) {
-      // case 'warehouse':
-      //   return <WarehouseSelectionRenderer log={log} />
       case 'api':
         const status = log?.metadata?.[0]?.response?.[0]?.status_code
         const method = log?.metadata?.[0]?.request?.[0]?.method
         const path = log?.metadata?.[0]?.request?.[0]?.path
+        const search = log?.metadata?.[0]?.request?.[0]?.search
         const user_agent = log?.metadata?.[0]?.request?.[0]?.headers[0].user_agent
         const error_code = log?.metadata?.[0]?.response?.[0]?.headers?.[0]?.x_sb_error_code
         const apikey = jwtAPIKey(log?.metadata) ?? apiKey(log?.metadata)
@@ -59,6 +57,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
           status,
           method,
           path,
+          search,
           user_agent,
           timestamp,
           event_message,

@@ -1,15 +1,12 @@
-@tailwind base;
 @tailwind components;
-@tailwind utilities;
 
-@import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
 
 :root {
-  --chart-1: hsl(var(--brand-default));
+  --chart-1: var(--brand-default);
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
@@ -30,7 +27,7 @@
 .deep-dark,
 [data-theme='dark'],
 .dark {
-  --chart-1: hsl(var(--brand-default));
+  --chart-1: var(--brand-default);
   --chart-2: 160 60% 45%;
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
@@ -47,21 +44,6 @@
   --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
-@layer utilities {
-  .btn-primary {
-    @apply inline-block rounded border border-green-500 bg-green-500 py-1 px-3 text-sm;
-    color: #fff !important;
-    font-weight: 600;
-    line-height: 20px;
-    text-align: center;
-  }
-
-  .btn-primary-hover {
-    @apply bg-green-600;
-    cursor: pointer;
-  }
-}
-
 html,
 body,
 #__next,
@@ -71,6 +53,7 @@ body,
   @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
 * {
@@ -159,14 +142,6 @@ input.is-invalid {
   @apply border border-red-700;
   @apply focus:ring-red-500;
   @apply placeholder:text-red-600;
-}
-
-input[type='submit'] {
-  @apply btn-primary;
-}
-
-input[type='submit']:hover {
-  @apply btn-primary-hover;
 }
 
 input::placeholder {

@@ -9,11 +9,17 @@ enum MessageStatus {
   Complete = 'complete',
 }
 
+interface SourceLink {
+  path: string
+  url: string
+}
+
 interface Message {
   role: MessageRole
   content: string
   status: MessageStatus
   idempotencyKey?: number
+  sources?: SourceLink[]
 }
 
 interface NewMessageAction {
@@ -38,7 +44,17 @@ interface ResetAction {
   type: 'reset'
 }
 
-type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction | ResetAction
+interface FinalizeWithSourcesAction {
+  type: 'finalize-with-sources'
+  index: number
+}
+
+type MessageAction =
+  | NewMessageAction
+  | UpdateMessageAction
+  | AppendContentAction
+  | ResetAction
+  | FinalizeWithSourcesAction
 
 export { MessageRole, MessageStatus }
-export type { Message, MessageAction }
+export type { Message, MessageAction, SourceLink }

@@ -7,13 +7,13 @@ import { BranchesData } from './branches-query'
 import { branchKeys } from './keys'
 
 export type BranchDeleteVariables = {
-  id: string
+  branchRef: string
   projectRef: string
 }
 
-export async function deleteBranch({ id }: Pick<BranchDeleteVariables, 'id'>) {
-  const { data, error } = await del('/v1/branches/{branch_id}', {
-    params: { path: { branch_id: id } },
+export async function deleteBranch({ branchRef }: Pick<BranchDeleteVariables, 'branchRef'>) {
+  const { data, error } = await del('/v1/branches/{branch_id_or_ref}', {
+    params: { path: { branch_id_or_ref: branchRef } },
   })
 
   if (error) handleError(error)
@@ -35,7 +35,7 @@ export const useBranchDeleteMutation = ({
     (vars) => deleteBranch(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+        const { branchRef, projectRef } = variables
         setTimeout(() => {
           queryClient.invalidateQueries(branchKeys.list(projectRef))
         }, 5000)
@@ -44,7 +44,7 @@ export const useBranchDeleteMutation = ({
           branchKeys.list(projectRef)
         )
         if (branches) {
-          const updatedBranches = branches.filter((branch) => branch.id !== variables.id)
+          const updatedBranches = branches.filter((branch) => branch.project_ref !== branchRef)
           queryClient.setQueryData(branchKeys.list(projectRef), updatedBranches)
         }
 

@@ -6,17 +6,41 @@ description: "Apply network restrictions for your project's database."
 
 <Admonition type="note">
 
-If you can't find the Network Restrictions section at the bottom of your [Database Settings](/dashboard/project/_/settings/database), update your version of Postgres in the [Infrastructure Settings](/dashboard/project/_/settings/infrastructure).
+If you can't find the Network Restrictions section at the bottom of your [Database Settings](/dashboard/project/_/database/settings), update your version of Postgres in the [Infrastructure Settings](/dashboard/project/_/settings/infrastructure).
 
 </Admonition>
 
 Each Supabase project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and its pooler ("your database"). These restrictions are enforced before traffic reaches your database. If a connection is not restricted by IP, it still needs to authenticate successfully with valid database credentials.
 
-If direct connections to your database [resolve to a IPv6 address](https://supabase.com/dashboard/project/_/settings/database), you need to add both IPv4 and IPv6 CIDRs to the list of allowed CIDRs. Network Restrictions will be applied to all database connection routes, whether pooled or direct. You will need to add both the IPv4 and IPv6 networks you want to allow. There are two exceptions: If you have been granted an extension on the IPv6 migration OR if you have purchased the [IPv4 add-on](https://supabase.com/dashboard/project/_/settings/addons), you need only add IPv4 CIDRs.
+If direct connections to your database [resolve to a IPv6 address](/dashboard/project/_/database/settings), you need to add both IPv4 and IPv6 CIDRs to the list of allowed CIDRs. Network Restrictions will be applied to all database connection routes, whether pooled or direct. You will need to add both the IPv4 and IPv6 networks you want to allow. There are two exceptions: If you have been granted an extension on the IPv6 migration OR if you have purchased the [IPv4 add-on](/dashboard/project/_/settings/addons), you need only add IPv4 CIDRs.
 
 ## To get started via the Dashboard:
 
-Network restrictions can be configured in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) page. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
+Network restrictions can be configured in the [Database Settings](/dashboard/project/_/database/settings) page. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
+
+## To get started via the Management API:
+
+You can also manage network restrictions using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get current network restrictions
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/network-restrictions" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+# Update network restrictions
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/network-restrictions/apply" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "db_allowed_cidrs": [
+      "192.168.0.1/24",
+    ]
+  }'
+```
 
 ## To get started via the CLI:
 
@@ -74,5 +98,5 @@ Restrictions applied successfully: true
 
 ## Limitations
 
-- The current iteration of Network Restrictions applies to connections to Postgres and the database pooler; it doesn't currently apply to APIs offered over HTTPS (e.g., PostgREST, Storage, and Auth). This includes using Supabase client libraries like [supabase-js](https://supabase.com/docs/reference/javascript).
-- If network restrictions are enabled, direct access to your database from Edge Functions will always be blocked. Using the Supabase client library [supabase-js](https://supabase.com/docs/reference/javascript) is recommended to connect to a database with network restrictions from Edge Functions.
+- The current iteration of Network Restrictions applies to connections to Postgres and the database pooler; it doesn't currently apply to APIs offered over HTTPS (e.g., PostgREST, Storage, and Auth). This includes using Supabase client libraries like [supabase-js](/docs/reference/javascript).
+- If network restrictions are enabled, direct access to your database from Edge Functions will always be blocked. Using the Supabase client library [supabase-js](/docs/reference/javascript) is recommended to connect to a database with network restrictions from Edge Functions.
