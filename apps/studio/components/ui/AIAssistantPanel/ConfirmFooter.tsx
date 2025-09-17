@@ -19,9 +19,9 @@ export const ConfirmFooter = ({
   onConfirm,
 }: PropsWithChildren<ConfirmFooterProps>) => {
   return (
-    <div className="rounded-b-lg border border-t-0 text-xs text-foreground p-2 pl-4 flex items-center justify-between gap-3  bg-gradient-to-r from-background-surface-75 to-background-muted shadow-inset">
-      <div className="flex-1">{message}</div>
-      <div className="flex items-center gap-2">
+    <div className="relative border border-t-0 overflow-hidden rounded-b-lg text-xs bg-border shadow-inset flex items-center justify-between gap-3 bg-gradient-to-r from-background-surface-75 to-background-surface-200 text-foreground py-2 pr-2 pl-4">
+      <div className="flex-1 relative z-10">{message}</div>
+      <div className="flex items-center gap-2 relative z-10">
         <Button size="tiny" type="outline" onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>

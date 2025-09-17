@@ -1,9 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { DragEvent, PropsWithChildren, useEffect, useState } from 'react'
+import { DragEvent, PropsWithChildren, useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -12,8 +14,6 @@ import { useProfile } from 'lib/profile'
 import { ConfirmFooter } from './ConfirmFooter'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
 import { identifyQueryType } from './AIAssistant.utils'
-import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 
 interface DisplayBlockRendererProps {
   messageId: string
@@ -26,24 +26,30 @@ interface DisplayBlockRendererProps {
     xAxis?: string
     yAxis?: string
   }
-  results?: unknown
-  onResults: (args: { messageId: string; resultId?: string; results: unknown }) => void
+  initialResults?: unknown
+  onResults?: (args: { messageId: string; resultId?: string; results: unknown }) => void
   onError?: (args: { messageId: string; resultId?: string; errorText: string }) => void
   toolState?: 'input-streaming' | 'input-available' | 'output-available' | 'output-error'
   isLastPart?: boolean
   isLastMessage?: boolean
+  showConfirmFooter?: boolean
+  onChartConfigChange?: (chartConfig: ChartConfig) => void
+  onQueryRun?: (queryType: 'select' | 'mutation') => void
 }
 
 export const DisplayBlockRenderer = ({
   messageId,
   toolCallId,
   initialArgs,
-  results,
+  initialResults,
   onResults,
   onError,
   toolState,
   isLastPart = false,
   isLastMessage = false,
+  showConfirmFooter = true,
+  onChartConfigChange,
+  onQueryRun,
 }: PropsWithChildren<DisplayBlockRendererProps>) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -68,29 +74,76 @@ export const DisplayBlockRenderer = ({
   }))
 
   const resultId = toolCallId
-  const displayData = Array.isArray(results) ? results : undefined
+  const [rows, setRows] = useState<any[] | undefined>(
+    Array.isArray(initialResults) ? initialResults : undefined
+  )
   const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
   const label = initialArgs.label || 'SQL Results'
-  const isWriteQuery = initialArgs.isWriteQuery || false
+  const [isWriteQuery, setIsWriteQuery] = useState<boolean>(initialArgs.isWriteQuery || false)
   const sqlQuery = initialArgs.sql
-  const [isRunning, setIsRunning] = useState(false)
 
   const { database: primaryDatabase } = usePrimaryDatabase({ projectRef: ref })
+
   const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
   const postgresConnectionString = primaryDatabase?.connectionString
 
-  const { mutate: execute } = useExecuteSqlMutation({
+  const lastQueryType = useRef<'select' | 'mutation'>('select')
+
+  useEffect(() => {
+    const initialConfig: ChartConfig = {
+      ...DEFAULT_CHART_CONFIG,
+      view: initialArgs.view === 'chart' ? 'chart' : 'table',
+      xKey: initialArgs.xAxis ?? '',
+      yKey: initialArgs.yAxis ?? '',
+    }
+    setChartConfig(initialConfig)
+    onChartConfigChange?.(initialConfig)
+    setIsWriteQuery(initialArgs.isWriteQuery || false)
+    setRows(Array.isArray(initialResults) ? initialResults : undefined)
+    lastQueryType.current = initialArgs.isWriteQuery ? 'mutation' : 'select'
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toolCallId])
+
+  useEffect(() => {
+    const normalized = Array.isArray(initialResults) ? initialResults : undefined
+    if (!normalized || normalized === rows) return
+    setRows(normalized)
+  }, [initialResults, rows])
+
+  const {
+    mutate: executeSql,
+    error: executeSqlError,
+    isLoading: executeSqlLoading,
+  } = useExecuteSqlMutation({
     onSuccess: (data) => {
-      onResults({ messageId, resultId, results: data.result })
-      setIsRunning(false)
+      setRows(Array.isArray(data.result) ? data.result : undefined)
+      setIsWriteQuery(lastQueryType.current === 'mutation' || initialArgs.isWriteQuery || false)
+      onResults?.({
+        messageId,
+        resultId,
+        results: Array.isArray(data.result) ? data.result : undefined,
+      })
     },
     onError: (error) => {
+      const lowerMessage = error.message.toLowerCase()
+      const isReadOnlyError =
+        lowerMessage.includes('read-only transaction') ||
+        lowerMessage.includes('permission denied') ||
+        lowerMessage.includes('must be owner')
+
+      if (lastQueryType.current === 'select' && isReadOnlyError) {
+        setIsWriteQuery(true)
+      }
+
       onError?.({ messageId, resultId, errorText: error.message })
-      setIsRunning(false)
     },
   })
 
   const handleRunQuery = (queryType: 'select' | 'mutation') => {
+    if (!sqlQuery) return
+
+    onQueryRun?.(queryType)
+
     sendEvent({
       action: 'assistant_suggestion_run_query_clicked',
       properties: {
@@ -104,12 +157,30 @@ export const DisplayBlockRenderer = ({
     })
   }
 
+  const runQuery = (queryType: 'select' | 'mutation') => {
+    if (!ref || !sqlQuery) return
+
+    const connectionString =
+      queryType === 'mutation'
+        ? postgresConnectionString
+        : readOnlyConnectionString ?? postgresConnectionString
+
+    if (!connectionString) {
+      const fallbackMessage = 'Unable to find a database connection to execute this query.'
+      onError?.({ messageId, resultId, errorText: fallbackMessage })
+      return
+    }
+
+    lastQueryType.current = queryType
+    if (queryType === 'mutation') {
+      setIsWriteQuery(true)
+    }
+    executeSql({ projectRef: ref, connectionString, sql: sqlQuery })
+  }
+
   const handleExecute = (queryType: 'select' | 'mutation') => {
     handleRunQuery(queryType)
-    if (ref && postgresConnectionString) {
-      setIsRunning(true)
-      execute({ projectRef: ref, connectionString: postgresConnectionString, sql: sqlQuery })
-    }
+    runQuery(queryType)
   }
 
   const handleUpdateChartConfig = ({
@@ -117,7 +188,11 @@ export const DisplayBlockRenderer = ({
   }: {
     chartConfig: Partial<ChartConfig>
   }) => {
-    setChartConfig((prev) => ({ ...prev, ...updatedValues }))
+    setChartConfig((prev) => {
+      const next = { ...prev, ...updatedValues }
+      onChartConfigChange?.(next)
+      return next
+    })
   }
 
   const handleDragStart = (e: DragEvent<Element>) => {
@@ -127,44 +202,41 @@ export const DisplayBlockRenderer = ({
     )
   }
 
-  const resolvedHasDecision = !!results
+  const resolvedHasDecision = initialResults !== undefined || rows !== undefined
   const shouldShowConfirmFooter =
-    !resolvedHasDecision && toolState === 'input-available' && isLastPart && isLastMessage
+    showConfirmFooter &&
+    !resolvedHasDecision &&
+    toolState === 'input-available' &&
+    isLastPart &&
+    isLastMessage
 
   return (
     <div className="display-block w-auto overflow-x-hidden">
-      <QueryBlock
-        label={label}
-        isWriteQuery={isWriteQuery}
-        sql={sqlQuery}
-        initialResults={displayData}
-        chartConfig={chartConfig}
-        onResults={(results) => {
-          onResults({ messageId, resultId, results })
-          setIsRunning(false)
-        }}
-        onRunQuery={handleRunQuery}
-        onUpdateChartConfig={handleUpdateChartConfig}
-        onError={(errorText) => {
-          onError?.({ messageId, resultId, errorText })
-          setIsRunning(false)
-        }}
-        draggable={isDraggableToReports}
-        onDragStart={handleDragStart}
-        disabled={!resolvedHasDecision || isRunning}
-        isExternallyExecuting={isRunning}
-      />
-
+      <div className="relative z-10">
+        <QueryBlock
+          label={label}
+          isWriteQuery={isWriteQuery}
+          sql={sqlQuery}
+          results={rows}
+          errorText={executeSqlError?.message}
+          chartConfig={chartConfig}
+          onExecute={handleExecute}
+          onUpdateChartConfig={handleUpdateChartConfig}
+          draggable={isDraggableToReports}
+          onDragStart={handleDragStart}
+          disabled={shouldShowConfirmFooter}
+          isExecuting={executeSqlLoading}
+        />
+      </div>
       {shouldShowConfirmFooter && (
         <div className="mx-4">
           <ConfirmFooter
             message="Assistant wants to run this query"
             cancelLabel="Skip"
-            confirmLabel={isRunning ? 'Running…' : 'Run Query'}
-            isLoading={isRunning}
+            confirmLabel={executeSqlLoading ? 'Running…' : 'Run Query'}
+            isLoading={executeSqlLoading}
             onCancel={async () => {
-              setIsRunning(false)
-              onResults({ messageId, resultId, results: 'User skipped running the query' })
+              onResults?.({ messageId, resultId, results: 'User skipped running the query' })
             }}
             onConfirm={() => {
               handleExecute(isWriteQuery ? 'mutation' : 'select')

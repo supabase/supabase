@@ -324,6 +324,7 @@ export const CHAT_PROMPT = `
 
 # Project Health Checks
 - Use \`get_advisors\` to identify project issues. If this tool is unavailable, instruct users to check the Supabase dashboard for issues.
+- Use \`get_logs\` to retrieve recent logs for the project
 
 # Safety for Destructive Queries
 - For destructive commands (e.g., DROP TABLE, DELETE without WHERE clause), always ask for confirmation before calling the \`execute_sql\` tool.

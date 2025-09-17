@@ -339,15 +339,19 @@ export const createAiAssistantState = (): AiAssistantState => {
       const chat = state.activeChat
       if (!chat) return
 
-      const existingMessages = chat.messages
-      const messagesToAdd = Array.isArray(message)
-        ? message.filter(
-            (msg) =>
-              !existingMessages.some((existing: AssistantMessageType) => existing.id === msg.id)
-          )
-        : !existingMessages.some((existing: AssistantMessageType) => existing.id === message.id)
-          ? [message]
-          : []
+      const incomingMessages = Array.isArray(message) ? message : [message]
+
+      const messagesToAdd: AssistantMessageType[] = []
+
+      incomingMessages.forEach((msg) => {
+        const index = chat.messages.findIndex((existing) => existing.id === msg.id)
+
+        if (index !== -1) {
+          state.updateMessage(msg)
+        } else {
+          messagesToAdd.push(msg as AssistantMessageType)
+        }
+      })
 
       if (messagesToAdd.length > 0) {
         chat.messages.push(...messagesToAdd)
@@ -361,7 +365,6 @@ export const createAiAssistantState = (): AiAssistantState => {
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        // Replace entire message instance to capture latest tool parts/results
         chat.messages[messageIndex] = updatedMessage as AssistantMessageType
         chat.updatedAt = new Date()
       }

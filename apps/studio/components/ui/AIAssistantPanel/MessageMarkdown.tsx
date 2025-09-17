@@ -1,24 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import {
-  DragEvent,
-  memo,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react'
+import { memo, ReactNode, useEffect, useMemo, useRef } from 'react'
 
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import Link from 'next/link'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   cn,
@@ -33,13 +20,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { DebouncedComponent } from '../DebouncedComponent'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
-import { QueryBlock } from '../QueryBlock/QueryBlock'
+import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { AssistantSnippetProps } from './AIAssistant.types'
-import { identifyQueryType } from './AIAssistant.utils'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
-import { MessageContext } from './Message'
 import { defaultUrlTransform } from './Message.utils'
 import { Loader2 } from 'lucide-react'
 
@@ -126,27 +110,16 @@ Hyperlink.displayName = 'Hyperlink'
 export const MarkdownPre = ({
   children,
   id,
-  onResults,
+  isLoading,
+  readOnly,
 }: {
   children: any
   id: string
-  onResults: ({
-    messageId,
-    resultId,
-    results,
-  }: {
-    messageId: string
-    resultId?: string
-    results: any[]
-  }) => void
+  isLoading: boolean
+  readOnly?: boolean
 }) => {
   const router = useRouter()
   const { profile } = useProfile()
-  const { isLoading, readOnly } = useContext(MessageContext)
-  const { mutate: sendEvent } = useSendEventMutation()
-  const snap = useAiAssistantStateSnapshot()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
 
   const { can: canCreateSQLSnippet } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
@@ -183,12 +156,11 @@ export const MarkdownPre = ({
   const snippetId = snippetProps.id
   const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
   const isChart = snippetProps.isChart === 'true'
-  const results = snap.getCachedSQLResults({ messageId: id, snippetId })
-
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
   const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const toolCallId = String(snippetId ?? id)
 
   useEffect(() => {
     chartConfig.current = {
@@ -199,29 +171,6 @@ export const MarkdownPre = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snippetProps])
-
-  const onResultsReturned = useCallback(
-    (results: any[]) => {
-      onResults({ messageId: id, resultId: snippetProps.id, results })
-    },
-    [onResults, snippetProps.id]
-  )
-
-  const onRunQuery = async (queryType: 'select' | 'mutation') => {
-    sendEvent({
-      action: 'assistant_suggestion_run_query_clicked',
-      properties: {
-        queryType,
-        ...(queryType === 'mutation'
-          ? { category: identifyQueryType(cleanContent) ?? 'unknown' }
-          : {}),
-      },
-      groups: {
-        project: project?.ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
-  }
 
   return (
     <div className="w-auto overflow-x-hidden not-prose my-4 ">
@@ -235,42 +184,29 @@ export const MarkdownPre = ({
       ) : language === 'sql' ? (
         readOnly ? (
           <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
+        ) : isLoading ? (
+          <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Writing SQL...
+          </div>
         ) : (
-          <DebouncedComponent
-            delay={isLoading ? 500 : 0}
-            value={cleanContent}
-            fallback={
-              <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Writing SQL...
-              </div>
-            }
-          >
-            <QueryBlock
-              label={title}
-              sql={cleanContent}
-              chartConfig={{
-                type: 'bar',
-                cumulative: false,
-                xKey: xAxis ?? '',
-                yKey: yAxis ?? '',
-                view: isChart ? 'chart' : 'table',
-              }}
-              initialResults={results}
-              onRunQuery={onRunQuery}
-              onResults={onResultsReturned}
-              onUpdateChartConfig={({ chartConfig: config }) => {
-                chartConfig.current = { ...chartConfig.current, ...config }
-              }}
-              draggable={isDraggableToReports}
-              onDragStart={(e: DragEvent<Element>) => {
-                e.dataTransfer.setData(
-                  'application/json',
-                  JSON.stringify({ label: title, sql: cleanContent, config: chartConfig.current })
-                )
-              }}
-            />
-          </DebouncedComponent>
+          <DisplayBlockRenderer
+            messageId={id}
+            toolCallId={toolCallId}
+            initialArgs={{
+              sql: cleanContent,
+              label: title,
+              isWriteQuery: false,
+              view: isChart ? 'chart' : 'table',
+              xAxis: xAxis ?? '',
+              yAxis: yAxis ?? '',
+            }}
+            onError={() => {}}
+            showConfirmFooter={false}
+            onChartConfigChange={(config) => {
+              chartConfig.current = { ...config }
+            }}
+          />
         )
       ) : (
         <CodeBlock

@@ -106,6 +106,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const updateMessage = useCallback(
+    (updatedMessage: MessageType) => {
+      snap.updateMessage(updatedMessage)
+    },
+    [snap]
+  )
+
   // Handle completion of the assistant's response
   const handleChatFinish = useCallback(
     ({ message }: { message: MessageType }) => {
@@ -113,15 +120,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         snap.saveMessage([lastUserMessageRef.current, message])
         lastUserMessageRef.current = null
       } else {
-        const existingMessage = snap.activeChat?.messages.find((m) => m.id === message.id)
-        if (existingMessage) {
-          snap.updateMessage(message)
-        } else {
-          snap.saveMessage(message)
-        }
+        updateMessage(message)
       }
     },
-    [snap]
+    [snap, updateMessage]
   )
 
   // TODO(refactor): This useChat hook should be moved down into each chat session.
@@ -219,13 +221,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
-
-  const updateMessage = useCallback(
-    (updatedMessage: MessageType) => {
-      snap.updateMessage(updatedMessage)
-    },
-    [snap]
-  )
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -422,7 +417,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             aiOptInLevel={aiOptInLevel}
           />
 
-          {hasMessages && (
+          {hasMessages ? (
             <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
               {error && (
@@ -466,6 +461,17 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 />
               )}
             </ConversationContent>
+          ) : (
+            <AIOnboarding
+              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
+              suggestions={
+                snap.suggestions as
+                  | { title?: string; prompts?: { label: string; description: string }[] }
+                  | undefined
+              }
+              onValueChange={(val) => setValue(val)}
+              onFocusInput={() => inputRef.current?.focus()}
+            />
           )}
 
           <ConversationScrollButton />
@@ -536,19 +542,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   }
                 />
               }
-            />
-          )}
-
-          {isShowingOnboarding && (
-            <AIOnboarding
-              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
-              suggestions={
-                snap.suggestions as
-                  | { title?: string; prompts?: { label: string; description: string }[] }
-                  | undefined
-              }
-              onValueChange={(val) => setValue(val)}
-              onFocusInput={() => inputRef.current?.focus()}
             />
           )}
 

@@ -109,6 +109,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     // Filter out tool calls with UI-specific states that the AI SDK doesn't understand
     // These states are used for UI rendering but shouldn't be sent to the model
     if (msg && msg.role === 'assistant' && msg.parts) {
+      console.log('msg.parts', msg.parts)
       const cleanedParts = msg.parts
         .filter((part: any) => {
           // Filter out tool calls with invalid states for AI SDK
@@ -119,9 +120,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           return true
         })
         .map((part: any) => {
-          // If opt in level is schema_and_log_and_data, replace part output with permission message
-          if (aiOptInLevel !== 'schema_and_log_and_data' && part.output) {
-            return { ...part, output: 'Result not shared due to permission level' }
+          // If opt in level is not schema_and_log_and_data, replace execute_sql tool output with permission message
+          if (
+            aiOptInLevel !== 'schema_and_log_and_data' &&
+            part.type === 'tool-execute_sql' &&
+            part.output
+          ) {
+            return {
+              ...part,
+              output: 'The query was executed but the result is not shared due to permission level',
+            }
           }
           return part
         })
