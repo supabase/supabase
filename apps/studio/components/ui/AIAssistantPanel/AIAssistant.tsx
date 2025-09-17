@@ -312,7 +312,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   const hasMessages = chatMessages.length > 0
-  const isShowingOnboarding = !hasMessages && isApiKeySet
 
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
@@ -404,18 +403,17 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       ]}
     >
       <div className={cn('flex flex-col h-full', className)}>
-        <Conversation className={cn('flex-1')}>
-          <AIAssistantHeader
-            isChatLoading={isChatLoading}
-            onNewChat={snap.newChat}
-            onCloseAssistant={snap.closeAssistant}
-            showMetadataWarning={showMetadataWarning}
-            updatedOptInSinceMCP={updatedOptInSinceMCP}
-            isHipaaProjectDisallowed={isHipaaProjectDisallowed as boolean}
-            aiOptInLevel={aiOptInLevel}
-          />
-
-          {hasMessages ? (
+        <AIAssistantHeader
+          isChatLoading={isChatLoading}
+          onNewChat={snap.newChat}
+          onCloseAssistant={snap.closeAssistant}
+          showMetadataWarning={showMetadataWarning}
+          updatedOptInSinceMCP={updatedOptInSinceMCP}
+          isHipaaProjectDisallowed={isHipaaProjectDisallowed as boolean}
+          aiOptInLevel={aiOptInLevel}
+        />
+        {hasMessages ? (
+          <Conversation className={cn('flex-1')}>
             <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
               {error && (
@@ -459,21 +457,20 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 />
               )}
             </ConversationContent>
-          ) : (
-            <AIOnboarding
-              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
-              suggestions={
-                snap.suggestions as
-                  | { title?: string; prompts?: { label: string; description: string }[] }
-                  | undefined
-              }
-              onValueChange={(val) => setValue(val)}
-              onFocusInput={() => inputRef.current?.focus()}
-            />
-          )}
-
-          <ConversationScrollButton />
-        </Conversation>
+            <ConversationScrollButton />
+          </Conversation>
+        ) : (
+          <AIOnboarding
+            sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
+            suggestions={
+              snap.suggestions as
+                | { title?: string; prompts?: { label: string; description: string }[] }
+                | undefined
+            }
+            onValueChange={(val) => setValue(val)}
+            onFocusInput={() => inputRef.current?.focus()}
+          />
+        )}
 
         <AnimatePresence>
           {editingMessageId && (
