@@ -171,14 +171,10 @@ export function useAsyncCheckPermissions(
     }
   }
 
-  const can = doPermissionsCheck(
-    allPermissions,
-    action,
-    resource,
-    data,
-    _organizationSlug,
-    _projectRef
-  )
+  const can =
+    isPermissionsSuccess && allPermissions
+      ? doPermissionsCheck(allPermissions, action, resource, data, _organizationSlug, _projectRef)
+      : false
 
   return {
     isLoading: isPermissionsLoading,
