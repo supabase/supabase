@@ -508,7 +508,6 @@ export const createAuthReportConfig = ({
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
       const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
-      console.log('sign up latency', { sql, rawData, transformedData })
 
       return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
     },
