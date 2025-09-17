@@ -1,9 +1,8 @@
 'use client'
 
 import type { HTMLAttributes, PropsWithChildren } from 'react'
-import { useContext, useEffect, useRef, useState, useMemo } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { debounce } from 'lodash-es'
 import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 import {
@@ -37,11 +36,6 @@ export function ReferenceSectionWrapper({
   HTMLAttributes<HTMLElement>) {
   const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
 
-  const debouncedReplaceState = useMemo(
-    () => debounce(safeHistoryReplaceState, 500), 
-    []
-  )
-
   const { ref } = useInView({
     threshold: 0,
     rootMargin: '-10% 0% -50% 0%',
@@ -51,7 +45,7 @@ export function ReferenceSectionWrapper({
         initialScrollHappened &&
         window.scrollY > 0 /* Don't update on first navigation to introduction */
       ) {
-        debouncedReplaceState(link)
+        safeHistoryReplaceState(link)
       }
     },
   })

@@ -1,48 +1,21 @@
-const createHistoryRateLimiter = () => {
-  const calls: number[] = []
-  const MAX_CALLS = 50 
-  const TIME_WINDOW = 10000 
-  let lastUrl = '' 
+import { debounce } from 'lodash-es'
 
-  return {
-    canCall: (url: string): boolean => {
-      const now = Date.now()
-      
-      while (calls.length > 0 && calls[0] < now - TIME_WINDOW) {
-        calls.shift()
-      }
-      
-      if (url === lastUrl) {
-        return false
-      }
-      
-      return calls.length < MAX_CALLS
-    },
-    recordCall: (url: string): void => {
-      calls.push(Date.now())
-      lastUrl = url
-    }
+let lastUrl = ''
+
+const debouncedHistoryReplaceState = debounce((url: string) => {
+  if (typeof window === 'undefined') return
+
+  if (url === lastUrl) return
+
+  try {
+    window.history.replaceState(null, '', url)
+    lastUrl = url
+  } catch (error) {
+    console.warn('Failed to call history.replaceState:', error)
   }
-}
+}, 120)
 
-const historyRateLimiter = createHistoryRateLimiter()
-
-export const safeHistoryReplaceState = (url: string): boolean => {
-  if (typeof window === 'undefined') return false
-  
+export const safeHistoryReplaceState = (url: string): void => {
   const normalizedUrl = url.toString()
-  
-  if (historyRateLimiter.canCall(normalizedUrl)) {
-    try {
-      window.history.replaceState(null, '', normalizedUrl)
-      historyRateLimiter.recordCall(normalizedUrl)
-      return true
-    } catch (error) {
-      // If we hit the browser limit, let log the error here but we're not crashing
-      console.warn('Failed to call history.replaceState:', error)
-      return false
-    }
-  }
-  
-  return false
+  debouncedHistoryReplaceState(normalizedUrl)
 }
