@@ -211,7 +211,7 @@ export const QueryBlock = ({
 
       {showSql && (
         <div
-          className={cn('h-full w-full max-h-full min-h-32 overflow-y-auto', {
+          className={cn('shrink-0 grow-1 w-full h-full overflow-y-auto max-h-[min(300px, 100%)]', {
             'border-b': results !== undefined,
           })}
         >

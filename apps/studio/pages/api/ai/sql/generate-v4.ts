@@ -21,6 +21,7 @@ import {
   RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
+import { renderingToolOutputParser } from 'lib/ai/tools/rendering-tools'
 
 export const maxDuration = 120
 
@@ -97,22 +98,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
-  // Results property is used to cache results client-side after queries are run
-  // Tool results will still be included in history sent to model
+  // Only returns last 7 messages
+  // Filters out tools with invalid states
+  // Filters out tool outputs based on opt-in level using renderingToolOutputParser
   const messages = (rawMessages || []).slice(-7).map((msg: any) => {
     if (msg && msg.role === 'assistant' && 'results' in msg) {
       const cleanedMsg = { ...msg }
       delete cleanedMsg.results
       return cleanedMsg
     }
-    // Filter out tool calls with UI-specific states that the AI SDK doesn't understand
-    // These states are used for UI rendering but shouldn't be sent to the model
     if (msg && msg.role === 'assistant' && msg.parts) {
       console.log('msg.parts', msg.parts)
       const cleanedParts = msg.parts
         .filter((part: any) => {
-          // Filter out tool calls with invalid states for AI SDK
           if (part.type.startsWith('tool-')) {
             const invalidStates = ['input-streaming', 'input-available', 'output-error']
             return !invalidStates.includes(part.state)
@@ -120,15 +118,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           return true
         })
         .map((part: any) => {
-          // If opt in level is not schema_and_log_and_data, replace execute_sql tool output with permission message
-          if (
-            aiOptInLevel !== 'schema_and_log_and_data' &&
-            part.type === 'tool-execute_sql' &&
-            part.output
-          ) {
-            return {
-              ...part,
-              output: 'The query was executed but the result is not shared due to permission level',
+          if (part.type?.startsWith('tool-') && part.output) {
+            const toolName = part.type.split('-')[1]
+            if (renderingToolOutputParser[toolName as keyof typeof renderingToolOutputParser]) {
+              return {
+                ...part,
+                output: renderingToolOutputParser[
+                  toolName as keyof typeof renderingToolOutputParser
+                ](part.output, aiOptInLevel),
+              }
             }
           }
           return part
