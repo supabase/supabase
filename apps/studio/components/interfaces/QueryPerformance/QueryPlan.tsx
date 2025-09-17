@@ -1,9 +1,20 @@
 import { type PropsWithChildren, useMemo } from 'react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  WarningIcon,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  Button_Shadcn_,
+} from 'ui'
+import { HelpCircle } from 'lucide-react'
 import { removeCommentsFromSql } from 'lib/helpers'
 import { useExplainPlanQuery } from './hooks/useExplainPlanQuery'
 
@@ -93,7 +104,24 @@ export const QueryPlan = ({ query }: { query: string }) => {
 
   return (
     <>
-      <p className="text-sm">Execution plan</p>
+      <div className="flex items-center">
+        <p className="text-sm">Execution plan</p>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button_Shadcn_ asChild size="icon" variant="link">
+              <Link
+                href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Learn how to read EXPLAIN"
+              >
+                <HelpCircle size={14} strokeWidth={1.5} className="text-foreground-light" />
+              </Link>
+            </Button_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent>Learn how to read EXPLAIN</TooltipContent>
+        </Tooltip>
+      </div>
       {explainError && (
         <WarningMessage title={explainError.title || 'Failed to run EXPLAIN'}>
           {explainError.message}

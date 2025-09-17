@@ -1,7 +1,8 @@
+import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import ReactFlow, { Background, BackgroundVariant, type ReactFlowInstance } from 'reactflow'
-import { Maximize2, Minimize2 } from 'lucide-react'
+import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 
 import type { PlanNodeData } from './types'
@@ -147,6 +148,23 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             jitTotalTime={meta?.jitTotalTime}
             className={cn(isExpanded ? 'p-2' : 'text-[10px]')}
           />
+          {isExpanded && (
+            <Button
+              asChild
+              type="default"
+              size="tiny"
+              icon={<ExternalLink />}
+              className="ml-auto h-[28px] text-foreground-light"
+            >
+              <Link
+                href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Learn how to read EXPLAIN
+              </Link>
+            </Button>
+          )}
         </div>
 
         {selectedNode && (
@@ -211,7 +229,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           }
           onClick={toggleExpanded}
           aria-label={isExpanded ? 'Exit expanded view' : 'Enter expanded view'}
-          className="absolute top-2 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border bg-foreground-muted/20 hover:bg-foreground-muted/30"
+          className="absolute top-3 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border bg-foreground-muted/20 hover:bg-foreground-muted/30"
         />
       </div>
     </>
