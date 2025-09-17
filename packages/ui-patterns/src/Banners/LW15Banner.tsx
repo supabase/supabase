@@ -53,11 +53,11 @@ export function LW15Banner() {
       <div className="relative z-10 flex items-center justify-center">
         <div className="w-full flex gap-5 md:gap-10 items-center md:justify-center text-sm">
           <p className="flex gap-1.5 items-center font-mono uppercase tracking-widest text-sm">
-            {announcement.text}
+            {announcement.title}
           </p>
-          <p className="text-sm hidden sm:block">{announcement.launch}</p>
+          <p className="text-sm hidden sm:block">{announcement.desc}</p>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
-            <Link href={announcement.link}>{announcement.cta}</Link>
+            <Link href={announcement.link}>{announcement.button}</Link>
           </Button>
         </div>
       </div>
