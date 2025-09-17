@@ -159,8 +159,8 @@ export function useAsyncCheckPermissions(
 
   const can = useMemo(() => {
     if (!IS_PLATFORM) return true
-    if (!isLoggedIn) return undefined
-    if (!isPermissionsSuccess || !allPermissions) return undefined
+    if (!isLoggedIn) return false
+    if (!isPermissionsSuccess || !allPermissions) return false
 
     return doPermissionsCheck(
       allPermissions,
