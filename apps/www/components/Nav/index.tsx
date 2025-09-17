@@ -7,7 +7,7 @@ import { useWindowSize } from 'react-use'
 
 import { useIsLoggedIn, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns'
+import { AnnouncementBanner, AuthenticatedDropdownMenu } from 'ui-patterns'
 
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import GitHubButton from './GitHubButton'
@@ -88,6 +88,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      <AnnouncementBanner />
       <div
         className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}

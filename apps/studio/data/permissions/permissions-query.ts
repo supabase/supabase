@@ -11,11 +11,18 @@ export type PermissionsResponse = Permission[]
 export async function getPermissions(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/permissions', { signal })
   if (error) {
+    const statusCode = (!!error && typeof error === 'object' && (error as any).code) || 'unknown'
+
+    // This is to avoid sending 4XX errors
+    // But we still want to capture errors without a status code or 5XXs
+    // since those may require investigation if they spike
+    const sendError = statusCode >= 500 || statusCode === 'unknown'
     handleError(error, {
-      alwaysCapture: true,
+      alwaysCapture: sendError,
       sentryContext: {
         tags: {
           permissionsQuery: true,
+          statusCode,
         },
         contexts: {
           rawError: error,

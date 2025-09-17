@@ -76,5 +76,7 @@
   "sdk:dart": true,
   "sdk:kotlin": true,
   "sdk:python": true,
-  "sdk:swift": true
+  "sdk:swift": true,
+
+  "search:fullIndex": true
 }
