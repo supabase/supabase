@@ -18,7 +18,6 @@ export async function getPermissions(signal?: AbortSignal) {
     // since those may require investigation if they spike
     const sendError = statusCode >= 500 || statusCode === 'unknown'
     handleError(error, {
-      alwaysCapture: sendError,
       sentryContext: {
         tags: {
           permissionsQuery: true,
