@@ -21,6 +21,7 @@ import {
   RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
+import { renderingToolOutputParser } from 'lib/ai/tools/rendering-tools'
 
 export const maxDuration = 120
 
@@ -107,13 +108,29 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return cleanedMsg
     }
     if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts.filter((part: any) => {
-        if (part.type.startsWith('tool-')) {
-          const invalidStates = ['input-streaming', 'input-available', 'output-error']
-          return !invalidStates.includes(part.state)
-        }
-        return true
-      })
+      console.log('msg.parts', msg.parts)
+      const cleanedParts = msg.parts
+        .filter((part: any) => {
+          if (part.type.startsWith('tool-')) {
+            const invalidStates = ['input-streaming', 'input-available', 'output-error']
+            return !invalidStates.includes(part.state)
+          }
+          return true
+        })
+        .map((part: any) => {
+          if (part.type?.startsWith('tool-') && part.output) {
+            const toolName = part.type.split('-')[1]
+            if (renderingToolOutputParser[toolName as keyof typeof renderingToolOutputParser]) {
+              return {
+                ...part,
+                output: renderingToolOutputParser[
+                  toolName as keyof typeof renderingToolOutputParser
+                ](part.output, aiOptInLevel),
+              }
+            }
+          }
+          return part
+        })
       return { ...msg, parts: cleanedParts }
     }
     return msg

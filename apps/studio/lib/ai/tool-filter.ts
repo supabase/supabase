@@ -28,8 +28,8 @@ export const toolSetValidationSchema = z.record(
     'get_logs',
 
     // Local tools
-    'display_query',
-    'display_edge_function',
+    'execute_sql',
+    'deploy_edge_function',
     'rename_chat',
     'list_policies',
 
@@ -88,8 +88,8 @@ type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
  */
 export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   // UI tools - always available
-  display_query: TOOL_CATEGORIES.UI,
-  display_edge_function: TOOL_CATEGORIES.UI,
+  execute_sql: TOOL_CATEGORIES.UI,
+  deploy_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
 

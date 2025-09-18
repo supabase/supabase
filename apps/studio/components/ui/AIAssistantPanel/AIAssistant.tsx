@@ -37,7 +37,7 @@ import {
   ConversationContent,
   ConversationScrollButton,
 } from './elements/Conversation'
-import { MemoizedMessage } from './Message'
+import { Message } from './Message'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
@@ -107,16 +107,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const updateMessage = useCallback(
-    ({
-      messageId,
-      resultId,
-      results,
-    }: {
-      messageId: string
-      resultId?: string
-      results: any[]
-    }) => {
-      snap.updateMessage({ id: messageId, resultId, results })
+    (updatedMessage: MessageType) => {
+      snap.updateMessage(updatedMessage)
     },
     [snap]
   )
@@ -128,10 +120,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         snap.saveMessage([lastUserMessageRef.current, message])
         lastUserMessageRef.current = null
       } else {
-        snap.saveMessage(message)
+        updateMessage(message)
       }
     },
-    [snap]
+    [snap, updateMessage]
   )
 
   // TODO(refactor): This useChat hook should be moved down into each chat session.
@@ -289,29 +281,33 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         const isAfterEditedMessage = editingMessageId
           ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
           : false
+        const isLastMessage = index === chatMessages.length - 1
 
         return (
-          <MemoizedMessage
+          <Message
+            id={message.id}
             key={message.id}
             message={message}
-            status={chatStatus}
-            onResults={updateMessage}
+            isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
+            readOnly={message.role === 'user'}
+            addToolResult={addToolResult}
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
             isBeingEdited={isBeingEdited}
             onCancelEdit={cancelEdit}
+            isLastMessage={isLastMessage}
           />
         )
       }),
     [
       chatMessages,
-      updateMessage,
       deleteMessageFromHere,
       editMessage,
       cancelEdit,
       editingMessageId,
       chatStatus,
+      addToolResult,
     ]
   )
 
