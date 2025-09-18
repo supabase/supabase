@@ -63,50 +63,21 @@ export function SelectBanner() {
             {cta}
             {/* Crosshairs */}
             <div className="absolute pointer-events-none inset-0 z-10">
-              {/* Top-left crosshair */}
-              <div className="absolute top-0 left-0">
+              {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((position) => (
                 <div
-                  className="absolute -left-px -top-[3px] w-px h-[5px]"
-                  style={{ backgroundColor: 'hsl(var(--brand-600))' }}
-                />
-                <div
-                  className="absolute -left-[3px] -top-px w-[5px] h-px"
-                  style={{ backgroundColor: 'hsl(var(--brand-600))' }}
-                />
-              </div>
-              {/* Top-right crosshair */}
-              <div className="absolute top-0 right-0">
-                <div
-                  className="absolute -right-px -top-[3px] w-px h-[5px]"
-                  style={{ backgroundColor: 'hsl(var(--brand-600))' }}
-                />
-                <div
-                  className="absolute -right-[3px] -top-px w-[5px] h-px"
-                  style={{ backgroundColor: 'hsl(var(--brand-600))' }}
-                />
-              </div>
-              {/* Bottom-left crosshair */}
-              <div className="absolute bottom-0 left-0">
-                <div
-                  className="absolute -left-px -bottom-[3px] w-px h-[5px]"
-                  style={{ backgroundColor: 'hsl(var(--brand-600))' }}
-                />
-                <div
-                  className="absolute -left-[3px] -bottom-px w-[5px] h-px"
-                  style={{ backgroundColor: 'hsl(var(--brand-600))' }}
-                />
-              </div>
-              {/* Bottom-right crosshair */}
-              <div className="absolute bottom-0 right-0">
-                <div
-                  className="absolute -right-px -bottom-[3px] w-px h-[5px]"
-                  style={{ backgroundColor: 'hsl(var(--brand-600))' }}
-                />
-                <div
-                  className="absolute -right-[3px] -bottom-px w-[5px] h-px"
-                  style={{ backgroundColor: 'hsl(var(--brand-600))' }}
-                />
-              </div>
+                  key={position}
+                  className={`absolute ${position === 'top-left' ? 'top-0 left-0' : position === 'top-right' ? 'top-0 right-0' : position === 'bottom-left' ? 'bottom-0 left-0' : 'bottom-0 right-0'}`}
+                >
+                  <div
+                    className={`absolute ${position.includes('left') ? '-left-px' : '-right-px'} ${position.includes('top') ? '-top-[3px]' : '-bottom-[3px]'} w-px h-[5px]`}
+                    style={{ backgroundColor: 'hsl(var(--brand-600))' }}
+                  />
+                  <div
+                    className={`absolute ${position.includes('left') ? '-left-[3px]' : '-right-[3px]'} ${position.includes('top') ? '-top-px' : '-bottom-px'} w-[5px] h-px`}
+                    style={{ backgroundColor: 'hsl(var(--brand-600))' }}
+                  />
+                </div>
+              ))}
             </div>
           </Link>
         </div>
