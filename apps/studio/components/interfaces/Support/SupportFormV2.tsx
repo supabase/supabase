@@ -107,7 +107,7 @@ export const SupportFormV2 = ({
     .object({
       organizationSlug: z.string().min(1, 'Please select an organization'),
       projectRef: z.string().min(1, 'Please select a project'),
-      category: z.string(),
+      category: z.string().min(1, 'Please select an issue type'),
       severity: z.string(),
       library: z.string(),
       subject: z.string().min(1, 'Please add a subject heading'),
@@ -128,7 +128,7 @@ export const SupportFormV2 = ({
   const defaultValues = {
     organizationSlug: '',
     projectRef: 'no-project',
-    category: CATEGORY_OPTIONS[0].value,
+    category: '',
     severity: 'Low',
     library: '',
     subject: '',
@@ -475,7 +475,7 @@ export const SupportFormV2 = ({
             name="category"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout layout="vertical" label="What areas are you having problems with?">
+              <FormItemLayout layout="vertical" label="What are you having issues with?">
                 <FormControl_Shadcn_>
                   <Select_Shadcn_
                     {...field}
@@ -483,8 +483,10 @@ export const SupportFormV2 = ({
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_>
-                        {CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label}
+                      <SelectValue_Shadcn_ placeholder="Select an issue">
+                        {field.value
+                          ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
+                          : null}
                       </SelectValue_Shadcn_>
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
@@ -648,7 +650,7 @@ export const SupportFormV2 = ({
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Please select a library" />
+                      <SelectValue_Shadcn_ placeholder="Select a library" />
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
