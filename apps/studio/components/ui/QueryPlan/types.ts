@@ -159,6 +159,16 @@ export type PlanNodeData = {
   sortMethod?: string
   sortSpaceUsed?: number
   sortSpaceType?: string
+  // Performance hints
+  slowHint?: {
+    severity: 'warn' | 'alert'
+    selfTimeMs: number
+    selfTimeShare: number
+  }
+  estimateHint?: {
+    severity: 'warn' | 'alert'
+    factor: number
+  }
   // Raw JSON for detail panel
   raw?: RawPlan
   // Subplan/CTE context

@@ -21,6 +21,7 @@ import {
   localTooltip,
   tempTooltip,
   removedPercentValue,
+  buildHints,
 } from './utils/node-display'
 import { formatMs, formatNumber } from './utils/formats'
 
@@ -271,6 +272,7 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const vis = useContext(MetricsVisibilityContext)
   const heat = useContext(HeatmapContext)
   const headerLines = computeHeaderLines(data)
+  const hints = buildHints(data)
 
   return (
     <div
@@ -280,22 +282,25 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
       <Handle type="target" position={Position.Top} className={HIDDEN_NODE_CONNECTOR} />
       <header
         style={{ height: `${DEFAULT_NODE_HEIGHT_CONSTANTS.HEADER_H}px` }}
-        className="text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between"
+        className="text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center"
       >
         <div className="flex gap-x-1 items-center">
           <Workflow strokeWidth={1} size={12} className="text-light" />
           {data.label}
         </div>
-        {data.neverExecuted && (
-          <Badge
-            variant="destructive"
-            size="small"
-            title="Never executed (loops=0)"
-            className="h-[15px] px-1 py-[1px] text-[0.55rem]"
-          >
-            Never executed
-          </Badge>
-        )}
+        <div className="flex items-center gap-x-1 ml-auto">
+          {hints}
+          {data.neverExecuted && (
+            <Badge
+              variant="destructive"
+              size="small"
+              title="Never executed (loops=0)"
+              className="h-[15px] px-1 py-[1px] text-[0.55rem]"
+            >
+              Never executed
+            </Badge>
+          )}
+        </div>
       </header>
       {heat.mode !== 'none' && <Heatmap data={data} />}
       {headerLines.length > 0 && (

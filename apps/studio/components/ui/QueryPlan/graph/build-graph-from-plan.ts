@@ -3,6 +3,7 @@ import type { Edge, Node } from 'reactflow'
 import type { RawPlan, PlanRoot, PlanNodeData, Agg } from '../types'
 import { NODE_TYPE } from '../constants'
 import { toArray } from '../utils/formats'
+import { percentile } from './utils'
 
 const zeroAgg = (): Agg => ({
   timeIncl: 0,
@@ -175,6 +176,65 @@ const createPlanNodeData = (
   return data
 }
 
+const annotateNodesWithHints = (
+  nodes: Node<PlanNodeData>[],
+  opts?: { executionTime?: number }
+): void => {
+  const fallbackTotalTime = nodes.reduce((sum, node) => sum + (node.data.exclusiveTimeMs ?? 0), 0)
+  const execTime = opts?.executionTime && opts.executionTime > 0 ? opts.executionTime : undefined
+  const totalSelfTime = execTime && execTime > 0 ? execTime : fallbackTotalTime
+
+  const selfTimeValues = nodes
+    .map((node) => node.data.exclusiveTimeMs ?? 0)
+    .filter((value) => value > 0)
+
+  const p90SelfTime = percentile(selfTimeValues, 0.9)
+  const p95SelfTime = percentile(selfTimeValues, 0.95)
+
+  nodes.forEach((node) => {
+    const data = node.data
+
+    const selfTime = data.exclusiveTimeMs ?? 0
+    if (selfTime > 0 && totalSelfTime > 0) {
+      const share = selfTime / totalSelfTime
+      let severity: 'warn' | 'alert' | undefined
+
+      if (share >= 0.5 || (p95SelfTime > 0 && selfTime >= p95SelfTime)) {
+        severity = 'alert'
+      } else if (share >= 0.3 || (p90SelfTime > 0 && selfTime >= p90SelfTime)) {
+        severity = 'warn'
+      }
+
+      if (severity) {
+        data.slowHint = {
+          severity,
+          selfTimeMs: selfTime,
+          selfTimeShare: share,
+        }
+      }
+    }
+
+    const factor = data.estFactor
+    if (factor !== undefined && factor > 0) {
+      const magnitude = factor >= 1 ? factor : 1 / factor
+      let severity: 'warn' | 'alert' | undefined
+
+      if (magnitude >= 16) {
+        severity = 'alert'
+      } else if (magnitude >= 4) {
+        severity = 'warn'
+      }
+
+      if (severity) {
+        data.estimateHint = {
+          severity,
+          factor,
+        }
+      }
+    }
+  })
+}
+
 export const buildGraphFromPlan = (
   planJson: PlanRoot,
   opts?: { executionTime?: number }
@@ -261,6 +321,7 @@ export const buildGraphFromPlan = (
   }
 
   addPlan(planJson.Plan)
+  annotateNodesWithHints(nodes, opts)
 
   return { nodes, edges, subplanRoots }
 }

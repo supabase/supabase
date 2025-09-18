@@ -1,9 +1,11 @@
 import { type ReactNode } from 'react'
+import { Timer, BarChart3 } from 'lucide-react'
 import { capitalize } from 'lodash'
 
 import type { PlanNodeData } from '../types'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { MetricsVisibility, HeatmapMode } from '../contexts'
-import { formatKeys, stripParens, blocksToBytes } from './formats'
+import { formatKeys, stripParens, blocksToBytes, formatMs, formatNumber } from './formats'
 import { DEFAULT_NODE_HEIGHT_CONSTANTS, type NodeHeightConstants } from '../constants'
 
 /**
@@ -256,4 +258,84 @@ export function estimateNodeHeight(
     bodyRows * constants.ITEM_H +
     constants.PADDING
   )
+}
+
+/**
+ * Builds the header hint badges/tooltips for a plan node.
+ */
+export const buildHints = (data: PlanNodeData): JSX.Element[] => {
+  const hints: JSX.Element[] = []
+
+  if (data.slowHint) {
+    const share = Math.round(data.slowHint.selfTimeShare * 100)
+    const slowTime = formatMs(data.slowHint.selfTimeMs) ?? data.slowHint.selfTimeMs.toFixed(2)
+
+    hints.push(
+      <Tooltip key="slow">
+        <TooltipTrigger className="flex">
+          <Badge
+            size="small"
+            variant={data.slowHint.severity === 'alert' ? 'destructive' : 'warning'}
+            aria-label="Slow node"
+            className="p-0.5 rounded"
+          >
+            <Timer size={10} strokeWidth={1.5} />
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="space-y-1 max-w-[220px]">
+          <p className="font-medium text-xs">Slow node</p>
+          <p className="text-[11px]">
+            Self time {slowTime} ms ({share}% of total execution time).
+          </p>
+          <p className="text-[11px] text-foreground-light">
+            Consider reducing rows earlier or adding an index to speed this step up.
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  if (data.estimateHint) {
+    const magnitude =
+      data.estimateHint.factor >= 1 ? data.estimateHint.factor : 1 / data.estimateHint.factor
+
+    const actualRows =
+      data.estActualTotalRows !== undefined
+        ? formatNumber(data.estActualTotalRows) ?? data.estActualTotalRows
+        : undefined
+    const planRows =
+      data.planRows !== undefined ? formatNumber(data.planRows) ?? data.planRows : undefined
+
+    hints.push(
+      <Tooltip key="estimate">
+        <TooltipTrigger className="flex">
+          <Badge
+            size="small"
+            variant={data.estimateHint.severity === 'alert' ? 'destructive' : 'warning'}
+            aria-label="Row estimate is inaccurate"
+            className="p-0.5 rounded"
+          >
+            <BarChart3 size={10} strokeWidth={1.5} />
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="space-y-1 max-w-[220px]">
+          <p className="font-medium text-xs">Row estimate is inaccurate</p>
+          <p className="text-[11px]">
+            {planRows !== undefined && actualRows !== undefined ? (
+              <>
+                Estimated {planRows} rows but saw {actualRows} (~{magnitude.toFixed(2)}×).
+              </>
+            ) : (
+              <>Estimation factor {magnitude.toFixed(2)}×.</>
+            )}
+          </p>
+          <p className="text-[11px] text-foreground-light">
+            Run ANALYZE or add more selective filters to improve planner estimates.
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return hints
 }
