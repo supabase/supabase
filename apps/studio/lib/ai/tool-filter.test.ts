@@ -8,7 +8,6 @@ import {
   filterToolsByOptInLevel,
   createPrivacyMessageTool,
   toolSetValidationSchema,
-  transformToolResult,
 } from './tool-filter'
 
 describe('TOOL_CATEGORY_MAP', () => {
@@ -234,56 +233,6 @@ describe('createPrivacyMessageTool', () => {
 
     const result = await privacyTool.execute({}, {})
     expect(result.status).toContain("You don't have permission to use this tool")
-  })
-})
-
-describe('transformToolResult', () => {
-  it('should wrap a tool with a result transformation function', async () => {
-    const originalResult = { data: 'original' }
-
-    const mockTool = {
-      description: 'Test tool',
-      execute: vitest.fn().mockResolvedValue(originalResult),
-    } as unknown as Tool<any, typeof originalResult>
-
-    const transformFn = vitest.fn((result: typeof originalResult) => ({
-      data: `${result.data} - transformed`,
-    }))
-
-    const transformedTool = transformToolResult(mockTool, transformFn)
-
-    // Tool properties should be preserved
-    expect(transformedTool.description).toBe(mockTool.description)
-
-    // Execute the transformed tool
-    const args = { key: 'value' }
-    const options = {} as any
-
-    if (!transformedTool.execute) {
-      throw new Error('Transformed tool does not have an execute function')
-    }
-
-    const result = await transformedTool.execute(args, options)
-
-    // Original tool should have been called with the same arguments
-    expect(mockTool.execute).toHaveBeenCalledWith(args, options)
-
-    // Transform function should have been called with the original result
-    expect(transformFn).toHaveBeenCalledWith(originalResult)
-
-    // Final result should be the transformed value
-    expect(result).toEqual({ data: 'original - transformed' })
-  })
-
-  it('should throw an error if tool is null', () => {
-    expect(() => transformToolResult(null as any, () => ({}))).toThrow('Tool is required')
-  })
-
-  it('should throw an error if tool does not have an execute function', () => {
-    const invalidTool = { name: 'invalid' } as any
-    expect(() => transformToolResult(invalidTool, () => ({}))).toThrow(
-      'Tool does not have an execute function'
-    )
   })
 })
 
