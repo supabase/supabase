@@ -4,7 +4,7 @@ export const TablePickerSkeleton = () => {
       {[1, 2, 3].map((index) => (
         <div
           key={index}
-          className="relative overflow-hidden rounded-xl border border-default bg-surface-100 animate-pulse"
+          className="relative overflow-hidden rounded-xl border border-default bg-surface-100 animate-pulse h-[240px] flex flex-col"
         >
           <div className="relative overflow-hidden bg-surface-200/50 px-4 py-3 border-b border-default">
             <div className="flex items-center gap-2">

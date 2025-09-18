@@ -50,7 +50,7 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
     >
       <div
         className={cn(
-          'relative overflow-hidden rounded-xl border bg-surface-100 transition-all duration-300',
+          'relative overflow-hidden rounded-xl border bg-surface-100 transition-all duration-300 h-[240px] flex flex-col',
           isActive
             ? 'border-brand shadow-xl scale-[1.02]'
             : 'border-default hover:border-foreground/20 hover:shadow-lg hover:scale-[1.01]',
@@ -58,8 +58,8 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
         )}
       >
         {/* Header */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-surface-200 to-surface-100 px-4 py-3 border-b border-default">
-          <div className="flex items-center justify-between">
+        <div className="relative overflow-hidden bg-gradient-to-r from-surface-200 to-surface-100 px-4 py-3 border-b border-default flex-shrink-0">
+          <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <Database size={14} className="text-foreground-light" />
               <h4 className="font-mono text-sm font-medium text-foreground">
@@ -72,10 +72,15 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
               </span>
             )}
           </div>
+          {table.rationale && (
+            <p className="text-[10px] text-foreground-lighter line-clamp-1">
+              {table.rationale}
+            </p>
+          )}
         </div>
 
         {/* Fields */}
-        <div className="p-4 space-y-2">
+        <div className="flex-1 p-4 space-y-2 overflow-hidden">
           {displayFields.map((field, idx) => (
             <div
               key={field.name}
@@ -112,12 +117,6 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
         )}
       </div>
 
-      {/* Description */}
-      {table.rationale && (
-        <p className="mt-3 px-1 text-xs text-foreground-light line-clamp-2 group-hover:text-foreground-default transition-colors">
-          {table.rationale}
-        </p>
-      )}
     </button>
   )
 }

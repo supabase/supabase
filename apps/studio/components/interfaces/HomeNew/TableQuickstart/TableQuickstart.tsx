@@ -26,26 +26,27 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
 
   return (
     <div className="w-full">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header Section */}
-        <div className="space-y-2">
-          <h2 className="text-2xl font-medium text-foreground">
-            What kind of app are you building?
-          </h2>
-          {variant === 'ai' && (
-            <div className="flex items-center gap-2">
-              <AiIconAnimation size={16} className="text-brand" />
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-surface-100 border border-default rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
+          {/* Header Section */}
+          <div className="space-y-2 mb-8">
+            <h2 className="text-2xl font-medium text-foreground">
+              What kind of app are you building?
+            </h2>
+            {variant === 'ai' && (
+              <div className="flex items-center gap-2">
+                <AiIconAnimation size={16} className="text-brand" />
+                <p className="text-sm text-foreground-light">
+                  Describe your idea and we'll generate the tables
+                </p>
+              </div>
+            )}
+            {variant === 'templates' && (
               <p className="text-sm text-foreground-light">
-                Describe your idea and we'll generate the tables
+                Start with a pre-built schema for common app types
               </p>
-            </div>
-          )}
-          {variant === 'templates' && (
-            <p className="text-sm text-foreground-light">
-              Start with a pre-built schema for common app types
-            </p>
-          )}
-        </div>
+            )}
+          </div>
 
         {/* Content Section with Smooth Height Transitions */}
         <div className={cn(
@@ -158,6 +159,7 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
               )}
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>
