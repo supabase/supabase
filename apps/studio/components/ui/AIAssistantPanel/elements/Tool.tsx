@@ -1,7 +1,4 @@
-import { BrainIcon, ChevronDownIcon, Loader2 } from 'lucide-react'
-import type { ComponentProps } from 'react'
-import { memo } from 'react'
-import ReactMarkdown from 'react-markdown'
+/* no react imports to avoid type resolution issues here */
 
 import {
   cn,
@@ -10,48 +7,46 @@ import {
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
 
-type ReasoningProps = Omit<ComponentProps<typeof Collapsible>, 'children'> & {
-  isStreaming?: boolean
-  children: string
-  showReasoning?: boolean
+type ToolProps = {
+  className?: string
+  label: string | JSX.Element
+  icon?: JSX.Element
+  children?: any
 }
 
-export const Reasoning = memo(
-  ({ className, isStreaming, showReasoning, children, ...props }: ReasoningProps) => (
-    <Collapsible
-      className={cn('not-prose border rounded-md border-muted', className)}
-      defaultOpen={false}
-      disabled={!showReasoning}
-      {...props}
+export function Tool({ className, label, icon, children }: ToolProps) {
+  const isCollapsible = !!children
+
+  return (
+    <div
+      className={cn(
+        'tool-item text-foreground-lighter flex items-center gap-2 py-2',
+        '[&:not(.tool-item+.tool-item)]:mt-4 [&:not(:has(+.tool-item))]:mb-4',
+        '[&:has(+.tool-item)]:border-b [&:has(+.tool-item)]:border-b-muted',
+        'first:!mt-0 last:mb-0',
+        className
+      )}
     >
-      <CollapsibleTrigger
-        className={cn(
-          'flex items-center gap-2 text-foreground-lighter heading-meta px-3 py-2 w-full'
-        )}
-      >
-        {isStreaming ? (
-          <>
-            <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />
-            <p>Thinking...</p>
-          </>
-        ) : (
-          <>
-            <BrainIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />
-            <p>Reasoned</p>
-          </>
-        )}
-        {showReasoning && (
-          <ChevronDownIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />
-        )}
-      </CollapsibleTrigger>
+      <Collapsible>
+        <CollapsibleTrigger className={cn('flex items-center gap-2 w-full text-left')}>
+          {icon}
+          {typeof label === 'string' ? (
+            <span className="text-foreground-lighter">{label}</span>
+          ) : (
+            label
+          )}
+        </CollapsibleTrigger>
 
-      <CollapsibleContent
-        className={cn('p-5 pt-2 text-xs leading-normal', 'max-h-64 overflow-y-auto')}
-      >
-        <ReactMarkdown>{children}</ReactMarkdown>
-      </CollapsibleContent>
-    </Collapsible>
+        {isCollapsible && (
+          <CollapsibleContent
+            className={cn('pl-6 py-2 text-xs leading-normal', 'max-h-64 overflow-y-auto')}
+          >
+            {children}
+          </CollapsibleContent>
+        )}
+      </Collapsible>
+    </div>
   )
-)
+}
 
-Reasoning.displayName = 'Reasoning'
+Tool.displayName = 'Tool'
