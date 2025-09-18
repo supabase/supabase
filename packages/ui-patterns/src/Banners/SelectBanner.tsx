@@ -1,3 +1,4 @@
+import React from 'react'
 import Link from 'next/link'
 
 export function SelectBanner() {
@@ -17,12 +18,13 @@ export function SelectBanner() {
   return (
     <div
       className="dark relative w-full flex items-center group justify-center text-foreground-contrast bg-black border-b border-muted transition-colors overflow-hidden"
-      style={{
-        '--line-color': 'hsl(var(--border-muted))',
-        '--line-width': '1px',
-        '--offset-from-top': '64px',
-        '--line-spacing': '12px', // Match -3 utility spacing used elsewhere
-        backgroundImage: `
+      style={
+        {
+          '--line-color': 'hsl(var(--border-muted))',
+          '--line-width': '1px',
+          '--offset-from-top': '64px',
+          '--line-spacing': '12px', // Match -3 utility spacing used elsewhere
+          backgroundImage: `
           /* Top horizontal line: offset from middle line by line spacing */
           linear-gradient(to bottom, transparent 0, transparent calc(var(--offset-from-top) - var(--line-spacing)), var(--line-color) calc(var(--offset-from-top) - var(--line-spacing)), var(--line-color) calc(var(--offset-from-top) - var(--line-spacing) + var(--line-width)), transparent calc(var(--offset-from-top) - var(--line-spacing) + var(--line-width))),
           /* Middle horizontal line */
@@ -30,9 +32,10 @@ export function SelectBanner() {
           /* Bottom horizontal line: offset from middle line by line spacing */
           linear-gradient(to bottom, transparent 0, transparent calc(var(--offset-from-top) + var(--line-spacing)), var(--line-color) calc(var(--offset-from-top) + var(--line-spacing)), var(--line-color) calc(var(--offset-from-top) + var(--line-spacing) + var(--line-width)), transparent calc(var(--offset-from-top) + var(--line-spacing) + var(--line-width)))
         `,
-        backgroundSize: '100% 100%',
-        backgroundRepeat: 'no-repeat',
-      }}
+          backgroundSize: '100% 100%',
+          backgroundRepeat: 'no-repeat',
+        } as React.CSSProperties
+      }
     >
       <div className="relative z-10 flex gap-5 items-stretch justify-center px-3 border-l border-muted">
         <div className={`${baseStyles} -px-3`}>
