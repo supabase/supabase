@@ -2,9 +2,9 @@
 // import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
 // import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
-// import { z } from 'zod/v4'
+import { z } from 'zod/v4'
 //
-// import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM } from 'common'
 // import { executeSql } from 'data/sql/execute-sql'
 // import { getModel } from 'lib/ai/model'
 // import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
@@ -20,16 +20,16 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
 // import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 //
-// const requestBodySchema = z.object({
-//   messages: z.array(z.any()),
-//   projectRef: z.string(),
-//   connectionString: z.string(),
-//   schema: z.string().optional(),
-//   table: z.string().optional(),
-//   chatName: z.string().optional(),
-//   orgSlug: z.string().optional(),
-// })
-//
+const requestBodySchema = z.object({
+  messages: z.array(z.any()),
+  projectRef: z.string(),
+  connectionString: z.string(),
+  schema: z.string().optional(),
+  table: z.string().optional(),
+  chatName: z.string().optional(),
+  orgSlug: z.string().optional(),
+})
+
 export const maxDuration = 120
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -45,23 +45,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const authorization = req.headers.authorization
+  const accessToken = authorization?.replace('Bearer ', '')
+
+  if (IS_PLATFORM && !accessToken) {
+    return res.status(401).json({ error: 'Authorization token is required' })
+  }
+
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  const { data, error: parseError } = requestBodySchema.safeParse(body)
+
+  if (parseError) {
+    return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
+  }
+
+  const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
+
   return res.status(200).json({ ok: true })
-  //   const authorization = req.headers.authorization
-  //   const accessToken = authorization?.replace('Bearer ', '')
-  //
-  //   if (IS_PLATFORM && !accessToken) {
-  //     return res.status(401).json({ error: 'Authorization token is required' })
-  //   }
-  //
-  //   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
-  //   const { data, error: parseError } = requestBodySchema.safeParse(body)
-  //
-  //   if (parseError) {
-  //     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
-  //   }
-  //
-  //   const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
-  //
   //   // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
   //   // Results property is used to cache results client-side after queries are run
   //   // Tool results will still be included in history sent to model
