@@ -264,25 +264,29 @@ export const ServiceStatus = () => {
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type="outline"
-          className="text-base h-auto px-2"
-          iconRight={<ChevronDown size={14} strokeWidth={1.5} />}
-          icon={
-            isLoadingChecks || anyComingUp || isMigrationLoading ? (
-              <Loader2 className="animate-spin ml-1" size={12} strokeWidth={1.5} />
-            ) : (
-              <div
-                className={cn(
-                  'w-2 h-2 rounded-full ml-1.5',
-                  allServicesOperational ? 'bg-brand' : 'bg-warning'
-                )}
-              />
-            )
-          }
-        >
-          {overallStatusLabel}
-        </Button>
+        <button className="group flex items-center gap-4 p-0 text-base flex items-center justify-start">
+          <div className="w-16 h-16 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
+            <div className="grid grid-cols-3 gap-1">
+              {services.map((service, index) => (
+                <div
+                  key={`${service.name}-${index}`}
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full',
+                    service.isLoading || service.status === 'COMING_UP'
+                      ? 'bg-foreground-lighter animate-pulse'
+                      : service.isHealthy
+                        ? 'bg-brand'
+                        : 'bg-warning'
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="heading-meta text-foreground-light">Healthy</div>
+            {overallStatusLabel}
+          </div>
+        </button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="start">
         {services.map((service) => (

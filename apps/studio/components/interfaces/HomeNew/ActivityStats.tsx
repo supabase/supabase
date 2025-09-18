@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { GitBranch } from 'lucide-react'
+import { GitBranch, Database, Archive } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
@@ -55,74 +55,91 @@ export const ActivityStats = () => {
 
   return (
     <div className="@container">
-      <div className="grid grid-cols-2 xl:flex xl:gap-10 gap-4 flex-wrap">
-        <div className="block">
-          <p className="heading-meta text-foreground-light mb-1">Status</p>
-          <ServiceStatus />
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-wrap">
+        <ServiceStatus />
 
-        <Link className="block" href={`/project/${ref}/database/migrations`}>
-          <h4 className="heading-meta text-foreground-light mb-1">Last migration</h4>
-
-          <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
-            {isLoadingMigrations ? (
-              <Skeleton className="h-6 w-24" />
-            ) : latestMigration ? (
-              <TimestampInfo
-                className="text-base"
-                label={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()}
-                utcTimestamp={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').toISOString()}
-              />
-            ) : (
-              <p className="text-foreground-lighter">No migrations</p>
-            )}
-          </div>
-        </Link>
-
-        <Link className="block" href={`/project/${ref}/database/backups/scheduled`}>
-          <h4 className="heading-meta text-foreground-light mb-1">Last backup</h4>
-
-          <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
-            {isLoadingBackups ? (
-              <Skeleton className="h-6 w-24" />
-            ) : backupsData?.pitr_enabled ? (
-              <p>PITR enabled</p>
-            ) : latestBackup ? (
-              <TimestampInfo
-                className="text-base"
-                label={dayjs(latestBackup.inserted_at).fromNow()}
-                utcTimestamp={latestBackup.inserted_at}
-              />
-            ) : (
-              <p className="text-foreground-lighter">No backups</p>
-            )}
-          </div>
-        </Link>
-
-        <Link className="block" href={`/project/${ref}/branches`}>
-          <h4 className="heading-meta text-foreground-light mb-1">
-            {isDefaultProject ? 'Recent branch' : 'Branch Created'}
-          </h4>
-
-          <div className="text-foreground truncate h-[34px] flex items-center capitalize-sentence">
-            {isLoadingBranches ? (
-              <Skeleton className="h-6 w-24" />
-            ) : isDefaultProject ? (
-              <div className="flex items-center gap-2">
-                <GitBranch size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                <p className={cn('truncate', !latestNonDefaultBranch && 'text-foreground-lighter')}>
-                  {latestNonDefaultBranch?.name ?? 'No branches'}
-                </p>
+        <Link className="group block" href={`/project/${ref}/database/migrations`}>
+          <div className="flex items-center gap-4 p-0 text-base justify-start">
+            <div className="w-16 h-16 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
+              <Database size={18} strokeWidth={1.5} className="text-foreground" />
+            </div>
+            <div>
+              <div className="heading-meta text-foreground-light">Last migration</div>
+              <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
+                {isLoadingMigrations ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : latestMigration ? (
+                  <TimestampInfo
+                    className="text-base"
+                    label={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()}
+                    utcTimestamp={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').toISOString()}
+                  />
+                ) : (
+                  <p className="text-foreground-lighter">No migrations</p>
+                )}
               </div>
-            ) : currentBranch?.created_at ? (
-              <TimestampInfo
-                className="text-base"
-                label={dayjs(currentBranch.created_at).fromNow()}
-                utcTimestamp={currentBranch.created_at}
-              />
-            ) : (
-              <p className="text-foreground-lighter">Unknown</p>
-            )}
+            </div>
+          </div>
+        </Link>
+
+        <Link className="group block" href={`/project/${ref}/database/backups/scheduled`}>
+          <div className="flex items-center gap-4 p-0 text-base justify-start">
+            <div className="w-16 h-16 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
+              <Archive size={18} strokeWidth={1.5} className="text-foreground" />
+            </div>
+            <div>
+              <div className="heading-meta text-foreground-light">Last backup</div>
+              <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
+                {isLoadingBackups ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : backupsData?.pitr_enabled ? (
+                  <p>PITR enabled</p>
+                ) : latestBackup ? (
+                  <TimestampInfo
+                    className="text-base"
+                    label={dayjs(latestBackup.inserted_at).fromNow()}
+                    utcTimestamp={latestBackup.inserted_at}
+                  />
+                ) : (
+                  <p className="text-foreground-lighter">No backups</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        <Link className="group block" href={`/project/${ref}/branches`}>
+          <div className="flex items-center gap-4 p-0 text-base justify-start">
+            <div className="w-16 h-16 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
+              <GitBranch size={18} strokeWidth={1.5} className="text-foreground" />
+            </div>
+            <div>
+              <div className="heading-meta text-foreground-light">
+                {isDefaultProject ? 'Recent branch' : 'Branch Created'}
+              </div>
+              <div className="text-foreground truncate h-[34px] flex items-center capitalize-sentence">
+                {isLoadingBranches ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : isDefaultProject ? (
+                  <p
+                    className={cn(
+                      'truncate',
+                      !latestNonDefaultBranch && 'text-foreground-lighter truncate'
+                    )}
+                  >
+                    {latestNonDefaultBranch?.name ?? 'No branches'}
+                  </p>
+                ) : currentBranch?.created_at ? (
+                  <TimestampInfo
+                    className="text-base"
+                    label={dayjs(currentBranch.created_at).fromNow()}
+                    utcTimestamp={currentBranch.created_at}
+                  />
+                ) : (
+                  <p className="text-foreground-lighter">Unknown</p>
+                )}
+              </div>
+            </div>
           </div>
         </Link>
       </div>
