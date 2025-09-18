@@ -98,15 +98,16 @@ export const HeaderBanner = ({
           </span>
         </div>
         {link && (
-          <button
+          <Link
+            href={link}
             className={cn(
               'lg:block hidden',
               'text-foreground-lighter text-sm z-[1] m-0',
               type === 'danger' ? 'text-destructive' : 'text-warning'
             )}
           >
-            <Link href={link}>View Details</Link>
-          </button>
+            View Details
+          </Link>
         )}
       </div>
     </motion.div>
