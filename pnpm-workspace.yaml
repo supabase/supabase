@@ -5,9 +5,9 @@ packages:
 
 catalog:
   '@types/node': ^22.0.0
-  '@supabase/auth-js': 2.72.0-rc.11
-  '@supabase/supabase-js': ^2.47.14
-  '@supabase/realtime-js': ^2.11.3
+  '@supabase/auth-js': 2.71.2-canary.0
+  '@supabase/supabase-js': 2.71.2-canary.0
+  '@supabase/realtime-js': 2.71.2-canary.0
   next: ^15.5.2
   'react': '^18.3.0'
   'react-dom': '^18.3.0'
@@ -15,5 +15,3 @@ catalog:
   '@types/react-dom': '^18.3.0'
   'valtio': '^1.12.0'
   'vite': '^6.2.7'
-
-minimumReleaseAge: 10080
