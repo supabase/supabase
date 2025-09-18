@@ -114,6 +114,8 @@
       "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
+        "CF_ACCESS_CLIENT_ID",
+        "CF_ACCESS_CLIENT_SECRET",
         "CMS_API_KEY",
         "CMS_PREVIEW_SECRET",
         "CMS_SITE_ORIGIN",

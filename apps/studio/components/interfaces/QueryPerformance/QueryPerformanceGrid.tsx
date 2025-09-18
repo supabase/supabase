@@ -145,7 +145,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           const fillWidth = Math.min(percentage, 100)
 
           return (
-            <div className="w-full flex flex-col justify-center text-xs">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               <div
                 className={`absolute inset-0 bg-foreground transition-all duration-200 z-0`}
                 style={{
@@ -168,18 +168,22 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         const formattedValue =
           !!value && typeof value === 'number' && !isNaN(value) && isFinite(value)
             ? isTime
-              ? `${value.toFixed(0)}ms`
+              ? `${value.toFixed(0).toLocaleString()}ms`
               : value.toLocaleString()
             : ''
 
         if (col.id === 'total_time') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p
                   className={cn((value / 1000).toFixed(2) === '0.00' && 'text-foreground-lighter')}
                 >
-                  {(value / 1000).toFixed(2) + 's'}
+                  {(value / 1000).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  s
                 </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
@@ -190,7 +194,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'calls') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p className={cn(value === 0 && 'text-foreground-lighter')}>
                   {value.toLocaleString()}
@@ -204,10 +208,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'max_time' || col.id === 'mean_time' || col.id === 'min_time') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p className={cn(value.toFixed(0) === '0' && 'text-foreground-lighter')}>
-                  {value.toFixed(0)}ms
+                  {Math.round(value).toLocaleString()}ms
                 </p>
               ) : (
                 <p className="text-muted">&ndash;</p>
@@ -218,7 +222,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'rows_read') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p className={cn(value === 0 && 'text-foreground-lighter')}>
                   {value.toLocaleString()}
@@ -237,14 +241,18 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'cache_hit_rate') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {typeof value === 'string' ? (
                 <p
                   className={cn(
                     cacheHitRateToNumber(value).toFixed(2) === '0.00' && 'text-foreground-lighter'
                   )}
                 >
-                  {cacheHitRateToNumber(value).toFixed(2)}%
+                  {cacheHitRateToNumber(value).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  %
                 </p>
               ) : (
                 <p className="text-muted">&ndash;</p>

@@ -21,6 +21,7 @@ import {
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
   Button,
+  DialogSectionSeparator,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -30,7 +31,6 @@ import {
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Separator,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -40,6 +40,7 @@ import {
   SheetTitle,
   TextArea_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import NewPublicationPanel from './NewPublicationPanel'
 import PublicationsComboBox from './PublicationsComboBox'
@@ -96,10 +97,12 @@ export const DestinationPanel = ({
 
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
 
-  const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
-    projectRef,
-    sourceId,
-  })
+  const {
+    data: publications = [],
+    isLoading: isLoadingPublications,
+    isSuccess: isSuccessPublications,
+    refetch: refetchPublications,
+  } = useReplicationPublicationsQuery({ projectRef, sourceId })
 
   const { data: destinationData } = useReplicationDestinationByIdQuery({
     projectRef,
@@ -132,11 +135,21 @@ export const DestinationPanel = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
+  const publicationName = form.watch('publicationName')
   const isSaving = creatingDestinationPipeline || updatingDestinationPipeline || startingPipeline
+
+  const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
+  const isSelectedPublicationMissing =
+    isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
+
+  const isSubmitDisabled = isSaving || isSelectedPublicationMissing
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!sourceId) return console.error('Source id is required')
+    if (isSelectedPublicationMissing) {
+      return toast.error('Please select another publication before continuing')
+    }
 
     try {
       if (editMode && existingDestination) {
@@ -236,6 +249,12 @@ export const DestinationPanel = ({
     }
   }, [visible, defaultValues, form])
 
+  useEffect(() => {
+    if (visible && projectRef && sourceId) {
+      refetchPublications()
+    }
+  }, [visible, projectRef, sourceId, refetchPublications])
+
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
@@ -247,59 +266,72 @@ export const DestinationPanel = ({
                 {editMode ? null : 'Send data to a new destination'}
               </SheetDescription>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-auto px-0 pb-0">
+
+            <SheetSection className="flex-grow overflow-auto px-0 py-0">
               <Form_Shadcn_ {...form}>
                 <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-                  <div className="px-5 pb-4">
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          className="mb-8"
-                          label="Name"
-                          layout="vertical"
-                          description="A name you will use to identify this destination"
-                        >
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Name" />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        className="p-5"
+                        label="Name"
+                        layout="vertical"
+                        description="A name you will use to identify this destination"
+                      >
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_ {...field} placeholder="Name" />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
 
-                    <h3 className="mb-4">What data to send</h3>
+                  <DialogSectionSeparator />
 
+                  <div className="p-5">
+                    <p className="text-sm text-foreground-light mb-4">What data to send</p>
                     <FormField_Shadcn_
                       control={form.control}
                       name="publicationName"
                       render={({ field }) => (
                         <FormItemLayout
-                          className="mb-4"
                           label="Publication"
                           layout="vertical"
                           description="A publication is a collection of tables that you want to replicate "
                         >
                           <FormControl_Shadcn_>
                             <PublicationsComboBox
-                              publications={publications?.map((pub) => pub.name) || []}
-                              loading={loadingPublications}
+                              publications={publicationNames}
+                              loading={isLoadingPublications}
                               field={field}
                               onNewPublicationClick={() => setPublicationPanelVisible(true)}
                             />
                           </FormControl_Shadcn_>
+                          {isSelectedPublicationMissing && (
+                            <Admonition type="warning" className="mt-2 mb-0">
+                              <p className="!leading-normal">
+                                The publication{' '}
+                                <strong className="text-foreground">{publicationName}</strong> was
+                                not found, it may have been renamed or deleted, please select
+                                another one.
+                              </p>
+                            </Admonition>
+                          )}
                         </FormItemLayout>
                       )}
                     />
+                  </div>
 
-                    <h3 className="mb-4 mt-8">Where to send that data</h3>
+                  <DialogSectionSeparator />
 
+                  <div className="p-5 flex flex-col gap-y-4">
+                    <p className="text-sm text-foreground-light">Where to send that data</p>
                     <FormField_Shadcn_
                       name="type"
                       control={form.control}
                       render={({ field }) => (
                         <FormItemLayout
-                          className="mb-4"
                           label="Type"
                           layout="vertical"
                           description="The type of destination to send the data to"
@@ -323,7 +355,6 @@ export const DestinationPanel = ({
                       name="projectId"
                       render={({ field }) => (
                         <FormItemLayout
-                          className="mb-4"
                           label="Project ID"
                           layout="vertical"
                           description="Which BigQuery project to send data to"
@@ -339,11 +370,7 @@ export const DestinationPanel = ({
                       control={form.control}
                       name="datasetId"
                       render={({ field }) => (
-                        <FormItemLayout
-                          className="mb-4"
-                          label="Project's Dataset ID"
-                          layout="vertical"
-                        >
+                        <FormItemLayout label="Project's Dataset ID" layout="vertical">
                           <FormControl_Shadcn_>
                             <Input_Shadcn_ {...field} placeholder="Dataset ID" />
                           </FormControl_Shadcn_>
@@ -373,7 +400,7 @@ export const DestinationPanel = ({
                     />
                   </div>
 
-                  <Separator />
+                  <DialogSectionSeparator />
 
                   <div className="px-5">
                     <Accordion_Shadcn_ type="single" collapsible>
@@ -443,7 +470,12 @@ export const DestinationPanel = ({
               <Button disabled={isSaving} type="default" onClick={onClose}>
                 Cancel
               </Button>
-              <Button loading={isSaving} form={formId} htmlType="submit">
+              <Button
+                disabled={isSubmitDisabled}
+                loading={isSaving}
+                form={formId}
+                htmlType="submit"
+              >
                 {editMode
                   ? existingDestination?.enabled
                     ? 'Apply and restart'
