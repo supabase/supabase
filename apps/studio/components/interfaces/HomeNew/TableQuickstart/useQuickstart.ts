@@ -79,6 +79,8 @@ export const useQuickstart = () => {
   const handleAiGenerate = useCallback(async (prompt: string) => {
     setIsGenerating(true)
     setError(null)
+    setCurrentStep('preview') // Show preview immediately to display skeleton
+    setCandidates([]) // Clear any previous candidates
 
     try {
       const headers = await constructHeaders()

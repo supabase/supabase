@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { AiIconAnimation, cn } from 'ui'
-import { Sparkles } from 'lucide-react'
 
 interface AiPromptInputProps {
   onGenerate: (prompt: string) => void
@@ -19,26 +18,22 @@ export const AiPromptInput = ({ onGenerate, isLoading = false }: AiPromptInputPr
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
       <div
         className={cn(
           'relative group bg-surface-100 rounded-lg border transition-all duration-200',
           isFocused ? 'border-foreground/30 shadow-lg' : 'border-default hover:border-foreground/20',
-          isLoading && 'animate-pulse'
+          isLoading && 'opacity-80'
         )}
       >
         <div className="flex items-center px-4 py-3 gap-3">
           <div className="flex-shrink-0">
-            {isLoading ? (
-              <AiIconAnimation size={20} loading={true} className="text-brand" />
-            ) : (
-              <Sparkles size={20} className="text-foreground-light group-hover:text-brand transition-colors" />
-            )}
+            <AiIconAnimation size={20} loading={isLoading} className="text-brand" />
           </div>
 
           <input
             type="text"
-            placeholder="Describe the tables you want to create..."
+            placeholder="What kind of app are you building?"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onFocus={() => setIsFocused(true)}
@@ -52,7 +47,7 @@ export const AiPromptInput = ({ onGenerate, isLoading = false }: AiPromptInputPr
             disabled={!prompt.trim() || isLoading}
             className={cn(
               'flex items-center gap-2 px-4 py-1.5 rounded-md font-medium text-xs transition-all',
-              'bg-foreground text-background-default hover:bg-foreground/90',
+              'bg-brand text-white hover:bg-brand-600',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-surface-100'
             )}
@@ -60,12 +55,6 @@ export const AiPromptInput = ({ onGenerate, isLoading = false }: AiPromptInputPr
             {isLoading ? 'Generating...' : 'Generate'}
           </button>
         </div>
-
-        {!isLoading && (
-          <div className="absolute -bottom-6 left-4 text-[11px] text-foreground-lighter">
-            Try: "project management tool" or "e-commerce platform"
-          </div>
-        )}
       </div>
     </form>
   )
