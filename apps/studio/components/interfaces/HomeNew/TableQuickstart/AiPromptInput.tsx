@@ -39,7 +39,7 @@ export const AiPromptInput = ({ onGenerate, isLoading = false }: AiPromptInputPr
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             disabled={isLoading}
-            className="flex-1 bg-transparent border-0 outline-0 ring-0 placeholder:text-foreground-lighter text-foreground-default focus:outline-none"
+            className="flex-1 bg-transparent border-0 outline-0 ring-0 placeholder:text-foreground-lighter text-foreground-default focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
           />
 
           <button
