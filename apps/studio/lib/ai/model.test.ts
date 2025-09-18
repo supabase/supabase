@@ -4,7 +4,7 @@ import * as bedrockModule from './bedrock'
 import { getModel, ModelErrorMessage } from './model'
 
 vi.mock('@ai-sdk/openai', () => ({
-  openai: { chat: vi.fn(() => 'openai-model') },
+  openai: vi.fn(() => 'openai-model'),
 }))
 
 vi.mock('./bedrock', async () => ({
