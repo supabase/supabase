@@ -23,6 +23,7 @@ import { useHeatmapMax } from './hooks/use-heatmap-max'
 import { DetailsPanel } from './details-panel'
 import { usePlanGraph } from './hooks/use-plan-graph'
 import { useDagreLayout } from './hooks/use-dagre-layout'
+import { MetricsSidebar } from './metrics-sidebar'
 
 export const QueryPlanVisualizer = ({ json, className }: { json: string; className?: string }) => {
   const { nodes, edges, meta } = usePlanGraph(json)
@@ -119,118 +120,129 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           isExpanded ? 'border-t' : 'border rounded-md'
         )}
       >
-        {meta?.errorMessage && (
-          <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
-            <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
-              <div className="font-semibold text-red-600">{meta.errorMessage}</div>
-              {meta.errorDetail && (
-                <div className="mt-1 whitespace-pre-wrap text-foreground-lighter">
-                  {meta.errorDetail}
+        <div className="flex h-full">
+          <MetricsSidebar
+            nodes={layout.nodes}
+            edges={layout.edges}
+            meta={meta}
+            selectedNode={selectedNode}
+            onSelect={(node) => setSelectedNode(node)}
+          />
+          <div className="relative flex-1">
+            {meta?.errorMessage && (
+              <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
+                <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
+                  <div className="font-semibold text-red-600">{meta.errorMessage}</div>
+                  {meta.errorDetail && (
+                    <div className="mt-1 whitespace-pre-wrap text-foreground-lighter">
+                      {meta.errorDetail}
+                    </div>
+                  )}
                 </div>
+              </div>
+            )}
+            <div className="absolute z-10 top-2 left-2 right-2 flex items-center justify-start pr-8 gap-x-2">
+              {isExpanded && (
+                <ControlsOverlay
+                  metricsVisibility={metricsVisibility}
+                  setMetricsVisibility={setMetricsVisibility}
+                  heatmapMode={heatmapMode}
+                  setHeatmapMode={setHeatmapMode}
+                  variant="overlay"
+                  portal={false}
+                />
+              )}
+              <MetaOverlay
+                planningTime={meta?.planningTime}
+                executionTime={meta?.executionTime}
+                jitTotalTime={meta?.jitTotalTime}
+                className={cn(isExpanded ? 'p-2' : 'text-[10px]')}
+              />
+              {isExpanded && (
+                <Button
+                  asChild
+                  type="default"
+                  size="tiny"
+                  icon={<ExternalLink />}
+                  className="ml-auto h-[28px] text-foreground-light"
+                >
+                  <Link
+                    href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Learn about query plans
+                  </Link>
+                </Button>
               )}
             </div>
-          </div>
-        )}
-        <div className="absolute z-10 top-2 left-2 right-2 flex items-center justify-start pr-8 gap-x-2">
-          {isExpanded && (
-            <ControlsOverlay
-              metricsVisibility={metricsVisibility}
-              setMetricsVisibility={setMetricsVisibility}
-              heatmapMode={heatmapMode}
-              setHeatmapMode={setHeatmapMode}
-              variant="overlay"
-              portal={false}
-            />
-          )}
-          <MetaOverlay
-            planningTime={meta?.planningTime}
-            executionTime={meta?.executionTime}
-            jitTotalTime={meta?.jitTotalTime}
-            className={cn(isExpanded ? 'p-2' : 'text-[10px]')}
-          />
-          {isExpanded && (
+
+            {selectedNode && (
+              <DetailsPanel
+                selectedNode={selectedNode}
+                setSelectedNode={setSelectedNode}
+                isFullscreen={isExpanded}
+              />
+            )}
+            <MetricsVisibilityContext.Provider value={metricsVisibility}>
+              <HeatmapContext.Provider
+                value={{
+                  mode: heatmapMode,
+                  maxTime: heatMax.maxTime,
+                  maxRows: heatMax.maxRows,
+                  maxCost: heatMax.maxCost,
+                }}
+              >
+                <ReactFlow
+                  className="rounded-md"
+                  defaultNodes={[]}
+                  defaultEdges={[]}
+                  nodesConnectable={false}
+                  defaultEdgeOptions={{
+                    type: 'smoothstep',
+                    animated: true,
+                    deletable: false,
+                    style: {
+                      stroke: 'hsl(var(--border-stronger))',
+                      strokeWidth: 1,
+                    },
+                  }}
+                  fitView
+                  nodeTypes={nodeTypes}
+                  nodes={layout.nodes}
+                  edges={layout.edges}
+                  minZoom={0.8}
+                  maxZoom={1.8}
+                  proOptions={{ hideAttribution: true }}
+                  onNodeClick={(_event, node) => setSelectedNode(node.data)}
+                  onPaneClick={() => setSelectedNode(null)}
+                  onInit={(instance) => setRfInstance(instance)}
+                >
+                  <Background
+                    gap={16}
+                    className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                    variant={BackgroundVariant.Dots}
+                    color="inherit"
+                  />
+                </ReactFlow>
+              </HeatmapContext.Provider>
+            </MetricsVisibilityContext.Provider>
             <Button
-              asChild
               type="default"
               size="tiny"
-              icon={<ExternalLink />}
-              className="ml-auto h-[28px] text-foreground-light"
-            >
-              <Link
-                href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Learn about query plans
-              </Link>
-            </Button>
-          )}
+              icon={
+                isExpanded ? (
+                  <Minimize2 size={14} className="text-foreground" />
+                ) : (
+                  <Maximize2 size={14} className="text-foreground" />
+                )
+              }
+              onClick={toggleExpanded}
+              aria-label={isExpanded ? 'Exit expanded view' : 'Enter expanded view'}
+              className="absolute top-3 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border bg-foreground-muted/20 hover:bg-foreground-muted/30"
+            />
+          </div>
         </div>
-
-        {selectedNode && (
-          <DetailsPanel
-            selectedNode={selectedNode}
-            setSelectedNode={setSelectedNode}
-            isFullscreen={isExpanded}
-          />
-        )}
-        <MetricsVisibilityContext.Provider value={metricsVisibility}>
-          <HeatmapContext.Provider
-            value={{
-              mode: heatmapMode,
-              maxTime: heatMax.maxTime,
-              maxRows: heatMax.maxRows,
-              maxCost: heatMax.maxCost,
-            }}
-          >
-            <ReactFlow
-              className="rounded-md"
-              defaultNodes={[]}
-              defaultEdges={[]}
-              nodesConnectable={false}
-              defaultEdgeOptions={{
-                type: 'smoothstep',
-                animated: true,
-                deletable: false,
-                style: {
-                  stroke: 'hsl(var(--border-stronger))',
-                  strokeWidth: 1,
-                },
-              }}
-              fitView
-              nodeTypes={nodeTypes}
-              nodes={layout.nodes}
-              edges={layout.edges}
-              minZoom={0.8}
-              maxZoom={1.8}
-              proOptions={{ hideAttribution: true }}
-              onNodeClick={(_event, node) => setSelectedNode(node.data)}
-              onPaneClick={() => setSelectedNode(null)}
-              onInit={(instance) => setRfInstance(instance)}
-            >
-              <Background
-                gap={16}
-                className="[&>*]:stroke-foreground-muted opacity-[25%]"
-                variant={BackgroundVariant.Dots}
-                color="inherit"
-              />
-            </ReactFlow>
-          </HeatmapContext.Provider>
-        </MetricsVisibilityContext.Provider>
-        <Button
-          type="default"
-          size="tiny"
-          icon={
-            isExpanded ? (
-              <Minimize2 size={14} className="text-foreground" />
-            ) : (
-              <Maximize2 size={14} className="text-foreground" />
-            )
-          }
-          onClick={toggleExpanded}
-          aria-label={isExpanded ? 'Exit expanded view' : 'Enter expanded view'}
-          className="absolute top-3 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border bg-foreground-muted/20 hover:bg-foreground-muted/30"
-        />
       </div>
     </>
   )
