@@ -6,13 +6,13 @@ import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchPushVariables = {
-  id: string
+  branchRef: string
   projectRef: string
 }
 
-export async function pushBranch({ id }: Pick<BranchPushVariables, 'id'>) {
-  const { data, error } = await post('/v1/branches/{branch_id}/push', {
-    params: { path: { branch_id: id } },
+export async function pushBranch({ branchRef }: Pick<BranchPushVariables, 'branchRef'>) {
+  const { data, error } = await post('/v1/branches/{branch_id_or_ref}/push', {
+    params: { path: { branch_id_or_ref: branchRef } },
     body: {},
   })
 

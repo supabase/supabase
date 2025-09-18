@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --turbopack --port 3003",
-    "build": "pnpm run content:build && pnpm run build:registry && next build",
+    "build": "pnpm run content:build && pnpm run build:registry && next build --turbopack",
     "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "start": "next start",
     "lint": "next lint",

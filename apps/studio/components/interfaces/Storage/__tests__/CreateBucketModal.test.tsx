@@ -13,7 +13,7 @@ describe(`CreateBucketModal`, () => {
   beforeEach(() => {
     vi.mock(`hooks/misc/useCheckPermissions`, () => ({
       useCheckPermissions: vi.fn(),
-      useAsyncCheckProjectPermissions: vi.fn().mockImplementation(() => ({ can: true })),
+      useAsyncCheckPermissions: vi.fn().mockImplementation(() => ({ can: true })),
     }))
     // useParams
     routerMock.setCurrentUrl(`/project/default/storage/buckets`)

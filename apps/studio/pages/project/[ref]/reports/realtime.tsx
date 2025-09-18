@@ -72,6 +72,7 @@ const RealtimeUsage = () => {
     addFilter,
     removeFilters,
     isLoadingData,
+    sql,
   } = useSharedAPIReport({
     filterBy: 'realtime',
     start: selectedDateRange?.period_start?.date,
@@ -209,6 +210,7 @@ const RealtimeUsage = () => {
             isLoading={isLoading}
             isRefetching={isRefetching}
             hiddenReports={['networkTraffic']}
+            sql={sql}
           />
         </div>
       </ReportStickyNav>

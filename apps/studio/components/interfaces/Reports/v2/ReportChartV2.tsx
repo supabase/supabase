@@ -58,7 +58,7 @@ export const ReportChartV2 = ({
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
     {
-      enabled: Boolean(projectRef && canFetch),
+      enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
       staleTime: 0,
     }
@@ -68,10 +68,11 @@ export const ReportChartV2 = ({
   const dynamicAttributes = queryResult?.attributes || []
 
   /**
-   * Infra monitoring data returns 'period_start', but logs return 'timestamp'
+   * Depending on the source the timestamp key could be 'timestamp' or 'period_start'
    */
   const firstItem = chartData[0]
   const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
+
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
     chartData,
     timestampKey,
@@ -83,9 +84,6 @@ export const ReportChartV2 = ({
     interval
   )
 
-  const finalChartData =
-    filledChartData && filledChartData.length > 0 && !isFillError ? filledChartData : chartData
-
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
 
   if (!isAvailable) {
@@ -93,6 +91,8 @@ export const ReportChartV2 = ({
   }
 
   const isErrorState = error && !isLoadingChart
+
+  if (report.hide) return null
 
   return (
     <Card id={report.id} className={cn('relative w-full overflow-hidden scroll-mt-16', className)}>
@@ -112,10 +112,11 @@ export const ReportChartV2 = ({
           <div className="w-full relative">
             <ComposedChart
               attributes={dynamicAttributes}
-              data={finalChartData}
+              data={filledChartData}
               format={report.format ?? undefined}
               xAxisKey={report.xAxisKey ?? 'timestamp'}
               yAxisKey={report.yAxisKey ?? dynamicAttributes[0]?.attribute}
+              hideHighlightedValue={report.hideHighlightedValue}
               highlightedValue={0}
               title={report.label}
               customDateFormat={undefined}

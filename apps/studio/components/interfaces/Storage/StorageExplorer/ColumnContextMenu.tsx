@@ -3,7 +3,7 @@ import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ChevronRight, ChevronsDown, ChevronsUp, Clipboard, Eye, FolderPlus } from 'lucide-react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
@@ -28,10 +28,7 @@ export const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
     addNewFolderPlaceholder,
   } = useStorageExplorerStateSnapshot()
 
-  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const onSelectCreateFolder = (columnIndex = -1) => {
     addNewFolderPlaceholder(columnIndex)
