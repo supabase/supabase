@@ -4,8 +4,8 @@ import { toast } from 'sonner'
 import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
 import type { ResponseError } from 'types'
+import { castOrganizationResponseToOrganization } from './fetchers'
 import { organizationKeys } from './keys'
-import { castOrganizationResponseToOrganization } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'
 
 export type OrganizationCreateVariables = {

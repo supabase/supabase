@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { OrganizationBase } from 'data/organizations/organizations-query'
+import { OrganizationBase } from 'data/organizations/fetchers'
 import { PlanId } from 'data/subscriptions/types'
 import jsonLogic from 'json-logic-js'
 import { ManagedBy } from 'lib/constants/infrastructure'

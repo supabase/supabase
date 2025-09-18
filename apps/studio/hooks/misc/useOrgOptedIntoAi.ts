@@ -1,36 +1,10 @@
-import { z } from 'zod'
-
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-
-export const aiOptInLevelSchema = z.enum([
-  'disabled',
-  'schema',
-  'schema_and_log',
-  'schema_and_log_and_data',
-])
-
-export type AiOptInLevel = z.infer<typeof aiOptInLevelSchema>
-
-export const getAiOptInLevel = (tags: string[] | undefined): AiOptInLevel => {
-  const hasSql = tags?.includes(OPT_IN_TAGS.AI_SQL)
-  const hasData = tags?.includes(OPT_IN_TAGS.AI_DATA)
-  const hasLog = tags?.includes(OPT_IN_TAGS.AI_LOG)
-
-  if (hasData) {
-    return 'schema_and_log_and_data'
-  } else if (hasLog) {
-    return 'schema_and_log'
-  } else if (hasSql) {
-    return 'schema'
-  } else {
-    return 'disabled'
-  }
-}
+import { IS_PLATFORM } from 'lib/constants'
+import { AiOptInLevel, getAiOptInLevel } from './aiOptInLevel'
 
 /**
  * Determines if the organization has opted into *any* level of AI features (schema or schema_and_log or schema_and_log_and_data).

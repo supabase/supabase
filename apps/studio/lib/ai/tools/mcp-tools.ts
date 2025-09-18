@@ -1,4 +1,4 @@
-import { AiOptInLevel } from '../org-ai-details'
+import { AiOptInLevel } from 'hooks/misc/aiOptInLevel'
 import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
 

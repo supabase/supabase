@@ -1,13 +1,11 @@
 import { ToolSet } from 'ai'
 
 import { IS_PLATFORM } from 'common'
-import { AiOptInLevel } from '../org-ai-details'
+import { AiOptInLevel } from 'hooks/misc/aiOptInLevel'
 import { filterToolsByOptInLevel } from '../tool-filter'
+import { getFallbackTools } from './fallback-tools'
 import { getMcpTools } from './mcp-tools'
 import { getRenderingTools } from './rendering-tools'
-
-import { getFallbackTools } from './fallback-tools'
-
 import { getSchemaTools } from './schema-tools'
 
 export const getTools = async ({

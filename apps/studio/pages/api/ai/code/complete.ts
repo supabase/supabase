@@ -3,7 +3,7 @@ import { generateText, ModelMessage, stepCountIs } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { AiOptInLevel } from 'hooks/misc/aiOptInLevel'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {

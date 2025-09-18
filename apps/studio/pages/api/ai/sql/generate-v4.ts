@@ -6,8 +6,9 @@ import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql'
+import { AiOptInLevel } from 'hooks/misc/aiOptInLevel'
 import { getModel } from 'lib/ai/model'
-import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,

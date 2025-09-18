@@ -1,6 +1,6 @@
 import { Tool, ToolSet } from 'ai'
+import { AiOptInLevel } from 'hooks/misc/aiOptInLevel'
 import { z } from 'zod'
-import { AiOptInLevel } from './org-ai-details'
 
 // Add the DatabaseExtension type import
 export type DatabaseExtension = {
