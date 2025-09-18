@@ -156,7 +156,7 @@ const navCommands = [
     name: 'Go to Supabase UI Library',
     route: 'https://supabase.com/ui',
     icon: () => <ArrowRight />,
-  }
+  },
 ] satisfies Array<ICommand & { enabled?: boolean }>
 
 const filteredNavCommands = navCommands.filter((command) => command.enabled !== false)

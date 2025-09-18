@@ -239,7 +239,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'ui',
             href: 'https://supabase.com/ui' as `/${string}`,
             level: 'ui',
-          }
+          },
         ],
         [
           { label: 'Data API' },

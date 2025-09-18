@@ -192,8 +192,8 @@ const additionalResources = [
     description: 'A collection of pre-built Supabase components to speed up your project.',
     icon: 'ui',
     href: 'https://supabase.com/ui',
-    external: true
-  }
+    external: true,
+  },
 ]
 
 const HomePage = () => (
