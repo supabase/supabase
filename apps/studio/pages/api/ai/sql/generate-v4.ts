@@ -8,6 +8,8 @@ import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql'
 // import { getModel } from 'lib/ai/model'
 // import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { getModel } from 'lib/ai/model'
+import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,
@@ -16,9 +18,7 @@ import {
   RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
-// import { getTools } from 'lib/ai/tools'
-import { getModel } from 'lib/ai/model'
-import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
@@ -184,16 +184,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
 
-    return res.status(200).json({ ping: 'pong' })
+    // Get tools
+    const tools = await getTools({
+      projectRef,
+      connectionString,
+      authorization,
+      aiOptInLevel,
+      accessToken,
+    })
 
-    //   // Get tools
-    //   const tools = await getTools({
-    //     projectRef,
-    //     connectionString,
-    //     authorization,
-    //     aiOptInLevel,
-    //     accessToken,
-    //   })
+    return res.status(200).json({ ping: 'pong' })
 
     //   const result = streamText({
     //     model,
