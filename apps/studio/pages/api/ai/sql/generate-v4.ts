@@ -1,6 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
-// import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
-// import { source } from 'common-tags'
+import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
+import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
 //
@@ -8,14 +8,14 @@ import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql'
 import { getModel } from 'lib/ai/model'
 import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
-// import {
-//   CHAT_PROMPT,
-//   EDGE_FUNCTION_PROMPT,
-//   GENERAL_PROMPT,
-//   PG_BEST_PRACTICES,
-//   RLS_PROMPT,
-//   SECURITY_PROMPT,
-// } from 'lib/ai/prompts'
+import {
+  CHAT_PROMPT,
+  EDGE_FUNCTION_PROMPT,
+  GENERAL_PROMPT,
+  PG_BEST_PRACTICES,
+  RLS_PROMPT,
+  SECURITY_PROMPT,
+} from 'lib/ai/prompts'
 // import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
@@ -148,33 +148,33 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         ? `The available database schema names are: ${JSON.stringify(schemas)}`
         : "You don't have access to any schemas."
 
+    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
+    const system = source`
+          ${GENERAL_PROMPT}
+          ${CHAT_PROMPT}
+          ${PG_BEST_PRACTICES}
+          ${RLS_PROMPT}
+          ${EDGE_FUNCTION_PROMPT}
+          ${SECURITY_PROMPT}
+        `
+
+    // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
+    // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
+    const coreMessages: ModelMessage[] = [
+      {
+        role: 'system',
+        content: system,
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
+      },
+      {
+        role: 'assistant',
+        // Add any dynamic context here
+        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
+      },
+      ...convertToModelMessages(messages),
+    ]
+
     return res.status(200).json({ ok: 'true' })
-    //     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
-    //     const system = source`
-    //       ${GENERAL_PROMPT}
-    //       ${CHAT_PROMPT}
-    //       ${PG_BEST_PRACTICES}
-    //       ${RLS_PROMPT}
-    //       ${EDGE_FUNCTION_PROMPT}
-    //       ${SECURITY_PROMPT}
-    //     `
-    //
-    //     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
-    //     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-    //     const coreMessages: ModelMessage[] = [
-    //       {
-    //         role: 'system',
-    //         content: system,
-    //         ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
-    //       },
-    //       {
-    //         role: 'assistant',
-    //         // Add any dynamic context here
-    //         content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
-    //       },
-    //       ...convertToModelMessages(messages),
-    //     ]
-    //
     //     const abortController = new AbortController()
     //     req.on('close', () => abortController.abort())
     //     req.on('aborted', () => abortController.abort())
