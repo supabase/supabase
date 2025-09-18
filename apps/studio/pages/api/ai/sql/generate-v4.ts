@@ -6,7 +6,7 @@ import { z } from 'zod/v4'
 //
 import { IS_PLATFORM } from 'common'
 // import { executeSql } from 'data/sql/execute-sql'
-// import { getModel } from 'lib/ai/model'
+import { getModel } from 'lib/ai/model'
 import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 // import {
 //   CHAT_PROMPT,
@@ -87,41 +87,42 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
   }
-  //
-  //   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
-  //     try {
-  //       // Get organizations and compute opt in level server-side
-  //       const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
-  //         orgSlug,
-  //         authorization,
-  //         projectRef,
-  //       })
-  //
-  //       aiOptInLevel = orgAIOptInLevel
-  //       isLimited = orgAILimited
-  //     } catch (error) {
-  //       return res
-  //         .status(400)
-  //         .json({ error: 'There was an error fetching your organization details' })
-  //     }
-  //   }
-  //
-  //   const {
-  //     model,
-  //     error: modelError,
-  //     promptProviderOptions,
-  //     providerOptions,
-  //   } = await getModel({
-  //     provider: 'openai',
-  //     model: 'gpt-5',
-  //     routingKey: projectRef,
-  //     isLimited,
-  //   })
-  //
-  //   if (modelError) {
-  //     return res.status(500).json({ error: modelError.message })
-  //   }
-  //
+
+  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+    try {
+      // Get organizations and compute opt in level server-side
+      const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
+        orgSlug,
+        authorization,
+        projectRef,
+      })
+
+      aiOptInLevel = orgAIOptInLevel
+      isLimited = orgAILimited
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ error: 'There was an error fetching your organization details' })
+    }
+  }
+
+  const {
+    model,
+    error: modelError,
+    promptProviderOptions,
+    providerOptions,
+  } = await getModel({
+    provider: 'openai',
+    model: 'gpt-5',
+    routingKey: projectRef,
+    isLimited,
+  })
+
+  if (modelError) {
+    return res.status(500).json({ error: modelError.message })
+  }
+
+  return res.status(200).json({ ok: 'true' })
   //   try {
   //     // Get a list of all schemas to add to context
   //     const pgMetaSchemasList = pgMeta.schemas.list()
