@@ -7,7 +7,7 @@ export function SelectBanner() {
   const descExtended = 'Guillermo Rauch, Dylan Field, and more'
   const cta = 'Save your seat'
 
-  const baseStyles = 'flex flex-col justify-center border-l border-muted py-8'
+  const baseStyles = 'flex flex-col justify-center border-l border-muted py-8 '
   const styles = baseStyles + 'pr-8 text-xs font-mono uppercase tracking-wide text-white/50'
 
   return (
@@ -37,23 +37,28 @@ export function SelectBanner() {
             href={selectSiteUrl}
             className="transition-opacity hover:opacity-80"
           >
-            <img src="/images/select/supabase-select.svg" alt="Supabase Select" className="w-36" />
+            <img
+              src="/images/select/supabase-select.svg"
+              alt="Supabase Select"
+              className="w-36 -translate-y-[3px]"
+            />
           </Link>
         </div>
-        {desc.map((item, index) => (
-          <div key={index} className={`${styles} hidden sm:flex`}>
-            <p>{item}</p>
-          </div>
-        ))}
-        <div className={`${styles} hidden xl:flex`}>
+        <div className={`${styles} hidden md:flex`}>
+          <p>{desc[0]}</p>
+        </div>
+        <div className={`${styles} hidden sm:flex`}>
+          <p>{desc[1]}</p>
+        </div>
+        <div className={`${styles} hidden lg:flex`}>
           <p>{descExtended}</p>
         </div>
 
-        <div className="flex flex-col justify-center -px-4 border-r border-muted relative after:absolute after:top-0 after:left-full after:w-screen after:h-full after:bg-black after:-z-10">
+        <div className="flex flex-col justify-center -px-4 border-x border-muted relative after:absolute after:top-0 after:left-full after:w-screen after:h-full after:bg-black after:-z-10">
           <Link
             target="_blank"
             href={selectSiteUrl}
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-11 px-8 relative bg-accent-1-foreground/20 border border-dashed border-accent-1-foreground/30 text-sm font-medium hover:bg-accent-1-foreground/80 hover:border-accent-1-foreground/60 transition-all duration-300 text-white"
+            className="bg-brand/50 inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-11 px-8 relative bg-accent-1-foreground/20 border border-dashed border-accent-1-foreground/30 text-sm font-medium hover:bg-accent-1-foreground/80 hover:border-accent-1-foreground/60 transition-all duration-300 text-white"
           >
             {cta}
           </Link>
