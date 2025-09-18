@@ -1,6 +1,8 @@
 import { BASE_PATH } from 'lib/constants'
 import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 
+export const USER_CONTEXT_MENU_ID = 'user-context-menu'
+
 export const PANEL_PADDING = 'px-5 py-5'
 
 // [Joshen] Temporary fix as bulk delete will fire n requests since Auth + API do not have a bulk delete endpoint yet

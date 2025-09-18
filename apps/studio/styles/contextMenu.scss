@@ -1,10 +1,12 @@
 .react-contexify {
   @apply border border-default;
   background-color: hsl(var(--background-surface-100)) !important;
+  padding: 0 !important;
 
   .react-contexify__item {
+    @apply m-1;
     .react-contexify__item__content {
-      @apply text-foreground-light text-sm;
+      @apply px-2 text-foreground-light text-sm;
     }
     .react-contexify__submenu {
       @apply bg-surface-100 border;

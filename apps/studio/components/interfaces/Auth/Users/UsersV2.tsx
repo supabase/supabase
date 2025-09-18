@@ -31,6 +31,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isAtBottom } from 'lib/helpers'
+import { useContextMenu } from 'react-contexify'
+import { createPortal } from 'react-dom'
 import {
   Button,
   cn,
@@ -60,6 +62,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
+import { UserContextMenu } from './UserContextMenu'
 import { UserPanel } from './UserPanel'
 import {
   ColumnConfiguration,
@@ -79,6 +82,7 @@ export const UsersV2 = () => {
   const { data: project } = useSelectedProjectQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
+  const { show: showContextMenu } = useContextMenu()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const {
@@ -269,7 +273,7 @@ export const UsersV2 = () => {
         users: users ?? [],
         visibleColumns: selectedColumns,
         setSortByValue,
-        onSelectDeleteUser: setSelectedUserToDelete,
+        showContextMenu,
       })
       setColumns(columns)
       if (columns.length < USERS_TABLE_COLUMNS.length) {
@@ -418,7 +422,7 @@ export const UsersV2 = () => {
                       users: users ?? [],
                       visibleColumns: value,
                       setSortByValue,
-                      onSelectDeleteUser: setSelectedUserToDelete,
+                      showContextMenu,
                     })
 
                     setSelectedColumns(value)
@@ -648,6 +652,9 @@ export const UsersV2 = () => {
           )}
         </div>
       </div>
+
+      {typeof window !== 'undefined' &&
+        createPortal(<UserContextMenu onDeleteUser={setSelectedUserToDelete} />, document.body)}
 
       <ConfirmationModal
         visible={showDeleteModal}
