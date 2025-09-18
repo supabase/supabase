@@ -17,7 +17,7 @@ import { IS_PLATFORM } from 'common'
 //   SECURITY_PROMPT,
 // } from 'lib/ai/prompts'
 // import { getTools } from 'lib/ai/tools'
-import { AiOptInLevel } from 'lib/ai/org-ai-details'
+import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 import apiWrapper from 'lib/api/apiWrapper'
 // import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
@@ -93,25 +93,25 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     aiOptInLevel = 'schema'
   }
 
+  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+    try {
+      // Get organizations and compute opt in level server-side
+      const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
+        orgSlug,
+        authorization,
+        projectRef,
+      })
+
+      aiOptInLevel = orgAIOptInLevel
+      isLimited = orgAILimited
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ error: 'There was an error fetching your organization details' })
+    }
+  }
+
   return res.status(200).json({ ping: 'pong' })
-
-  // if (IS_PLATFORM && orgSlug && authorization && projectRef) {
-  //   try {
-  //     // Get organizations and compute opt in level server-side
-  //     const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
-  //       orgSlug,
-  //       authorization,
-  //       projectRef,
-  //     })
-
-  //     aiOptInLevel = orgAIOptInLevel
-  //     isLimited = orgAILimited
-  //   } catch (error) {
-  //     return res
-  //       .status(400)
-  //       .json({ error: 'There was an error fetching your organization details' })
-  //   }
-  // }
 
   // const {
   //   model,
