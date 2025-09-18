@@ -333,8 +333,12 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
   }
 
   if (data.costHint) {
-    const share =
-      data.costHint.selfCostShare !== undefined
+    const totalShare =
+      data.costHint.totalCostShare !== undefined
+        ? Math.round((data.costHint.totalCostShare ?? 0) * 100)
+        : undefined
+    const selfShare =
+      totalShare === undefined && data.costHint.selfCostShare !== undefined
         ? Math.round((data.costHint.selfCostShare ?? 0) * 100)
         : undefined
 
@@ -353,8 +357,12 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
         <TooltipContent side="top" className="space-y-1 max-w-[220px] pb-2">
           <p className="font-medium text-xs">Cost is high</p>
           <p className="text-[11px]">
-            Estimated cost {data.costHint.selfCost.toFixed(2)}
-            {share !== undefined ? ` (~${share}% of total plan cost).` : '.'}
+            Estimated cost {(data.totalCost ?? data.costHint.selfCost ?? 0).toFixed(2)}
+            {totalShare !== undefined
+              ? ` (~${totalShare}% of total plan cost).`
+              : selfShare !== undefined
+                ? ` (~${selfShare}% of leaf cost).`
+                : '.'}
           </p>
           <p className="text-[11px] text-foreground-light">
             Reduce scanned rows or improve indexes so the planner considers cheaper strategies.

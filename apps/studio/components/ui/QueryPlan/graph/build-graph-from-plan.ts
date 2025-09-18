@@ -176,6 +176,7 @@ const createPlanNodeData = (
   return data
 }
 
+const MIN_SELF_TIME_MS = 1
 const annotateNodesWithHints = (
   nodes: Node<PlanNodeData>[],
   opts?: { executionTime?: number }
@@ -196,17 +197,24 @@ const annotateNodesWithHints = (
   const p90Cost = percentile(costValues, 0.9)
   const p95Cost = percentile(costValues, 0.95)
 
+  const rootNode = nodes.find((node) => node.id === 'root')
+  const rootTotalCost = rootNode?.data.totalCost ?? 0
+
   nodes.forEach((node) => {
     const data = node.data
 
     const selfTime = data.exclusiveTimeMs ?? 0
-    if (selfTime > 0 && totalSelfTime > 0) {
+    if (selfTime >= MIN_SELF_TIME_MS && totalSelfTime > 0) {
       const share = selfTime / totalSelfTime
       let severity: 'warn' | 'alert' | undefined
 
-      if (share >= 0.5 || (p95SelfTime > 0 && selfTime >= p95SelfTime)) {
+      if (share >= 0.75) {
         severity = 'alert'
-      } else if (share >= 0.3 || (p90SelfTime > 0 && selfTime >= p90SelfTime)) {
+      } else if (share >= 0.35) {
+        severity = 'warn'
+      } else if (p95SelfTime >= MIN_SELF_TIME_MS && selfTime >= p95SelfTime) {
+        severity = 'alert'
+      } else if (p90SelfTime >= MIN_SELF_TIME_MS && selfTime >= p90SelfTime) {
         severity = 'warn'
       }
 
@@ -219,21 +227,50 @@ const annotateNodesWithHints = (
       }
     }
 
+    const totalCost = data.totalCost ?? 0
     const selfCost = data.exclusiveCost ?? 0
-    if (selfCost > 0) {
-      let severity: 'warn' | 'alert' | undefined
-      if (p95Cost > 0 && selfCost >= p95Cost) {
-        severity = 'alert'
-      } else if (p90Cost > 0 && selfCost >= p90Cost) {
-        severity = 'warn'
+    let costSeverity: 'warn' | 'alert' | undefined
+    let totalCostShare: number | undefined
+    let selfCostShare: number | undefined
+
+    if (node.id === 'root' && rootTotalCost > 0 && totalCost > 0) {
+      const share = totalCost / rootTotalCost
+      if (share >= 0.6) {
+        costSeverity = 'alert'
+      } else if (share >= 0.25) {
+        costSeverity = 'warn'
+      }
+      if (costSeverity) {
+        totalCostShare = share
+      }
+    }
+
+    if (!costSeverity && selfCost > 0) {
+      if (totalSelfCost > 0) {
+        const share = selfCost / totalSelfCost
+        selfCostShare = share
+        if (share >= 0.5) {
+          costSeverity = 'alert'
+        } else if (share >= 0.25) {
+          costSeverity = 'warn'
+        }
       }
 
-      if (severity) {
-        data.costHint = {
-          severity,
-          selfCost,
-          selfCostShare: totalSelfCost > 0 ? selfCost / totalSelfCost : undefined,
+      if (!costSeverity) {
+        if (p95Cost > 0 && selfCost >= p95Cost) {
+          costSeverity = 'alert'
+        } else if (p90Cost > 0 && selfCost >= p90Cost) {
+          costSeverity = 'warn'
         }
+      }
+    }
+
+    if (costSeverity) {
+      data.costHint = {
+        severity: costSeverity,
+        selfCost,
+        selfCostShare,
+        totalCostShare,
       }
     }
   })
