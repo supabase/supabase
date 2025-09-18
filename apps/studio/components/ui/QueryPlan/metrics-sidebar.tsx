@@ -368,7 +368,7 @@ export const MetricsSidebar = ({
         </div>
         <span className="text-[11px] text-foreground-light">{rows.length} nodes</span>
       </div>
-      <div className="flex gap-2 px-3 py-2 flex-wrap border-b border-border">
+      <div className="flex gap-2 px-3 py-2 border-b border-border justify-between">
         {METRIC_OPTIONS.map((option) => (
           <Button
             key={option.key}
