@@ -9,6 +9,7 @@ const {
   billingAll: billingEnabled,
   docsCompliance: complianceEnabled,
   'docsSelf-hosting': selfHostingEnabled,
+  integrationsPartners: integrationsEnabled,
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
   sdkKotlin: sdkKotlinEnabled,
@@ -19,6 +20,7 @@ const {
   'billing:all',
   'docs:compliance',
   'docs:self-hosting',
+  'integrations:partners',
   'sdk:csharp',
   'sdk:dart',
   'sdk:kotlin',
@@ -128,6 +130,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             hasLightIcon: true,
             href: '/guides/integrations' as `/${string}`,
             level: 'integrations',
+            enabled: integrationsEnabled,
           },
         ],
       ],
@@ -2626,6 +2629,7 @@ export const integrations: NavMenuConstant = {
   title: 'Integrations',
   icon: 'integrations',
   url: '/guides/integrations',
+  enabled: integrationsEnabled,
   items: [
     {
       name: 'Overview',
