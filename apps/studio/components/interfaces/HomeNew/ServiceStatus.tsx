@@ -1,9 +1,9 @@
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
+import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
@@ -12,15 +12,7 @@ import {
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  Button,
-  InfoIcon,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
-} from 'ui'
-import { SingleStat } from 'components/ui/SingleStat'
+import { InfoIcon, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 
 /**
  * [Joshen] JFYI before we go live with this, we need to revisit the migrations section
@@ -86,7 +78,6 @@ const StatusIcon = ({
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [open, setOpen] = useState(false)
 
   const {
     projectAuthAll: authEnabled,
@@ -263,10 +254,9 @@ export const ServiceStatus = () => {
         : 'Healthy'
 
   return (
-    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover_Shadcn_>
+      <PopoverTrigger_Shadcn_>
         <SingleStat
-          onClick={() => setOpen(!open)}
           icon={
             <div className="grid grid-cols-3 gap-1">
               {services.map((service, index) => (

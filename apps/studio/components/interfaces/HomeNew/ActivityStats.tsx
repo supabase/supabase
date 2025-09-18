@@ -1,14 +1,14 @@
 import dayjs from 'dayjs'
-import { GitBranch, Database, Archive } from 'lucide-react'
+import { Archive, Database, GitBranch } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { useParams } from 'common'
+import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn, Skeleton } from 'ui'
-import { SingleStat } from 'components/ui/SingleStat'
 import { TimestampInfo } from 'ui-patterns'
 import { ServiceStatus } from './ServiceStatus'
 
