@@ -17,3 +17,6 @@ catalog:
   'vite': '^6.2.7'
 
 minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+- "ai"
+- "@ai-sdk/*"
