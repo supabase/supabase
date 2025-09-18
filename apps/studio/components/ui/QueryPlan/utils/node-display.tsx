@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Timer, BarChart3, BadgeDollarSign, ExternalLink } from 'lucide-react'
+import { Timer, BadgeDollarSign, ExternalLink } from 'lucide-react'
 import { capitalize } from 'lodash'
 
 import type { PlanNodeData } from '../types'
@@ -274,13 +274,6 @@ const SLOW_HELP_LINKS = [
   },
 ]
 
-const ESTIMATE_HELP_LINKS = [
-  {
-    label: 'Inspect your database',
-    href: 'https://supabase.com/docs/guides/database/inspect',
-  },
-]
-
 const COST_HELP_LINKS = [
   {
     label: 'Examine query performance',
@@ -334,50 +327,6 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             Consider narrowing the rows earlier in the plan or adding an index to reduce work.
           </p>
           {renderHelpLinks(SLOW_HELP_LINKS)}
-        </TooltipContent>
-      </Tooltip>
-    )
-  }
-
-  if (data.estimateHint) {
-    const magnitude =
-      data.estimateHint.factor >= 1 ? data.estimateHint.factor : 1 / data.estimateHint.factor
-
-    const actualRows =
-      data.estActualTotalRows !== undefined
-        ? formatNumber(data.estActualTotalRows) ?? data.estActualTotalRows
-        : undefined
-    const planRows =
-      data.planRows !== undefined ? formatNumber(data.planRows) ?? data.planRows : undefined
-
-    hints.push(
-      <Tooltip key="estimate">
-        <TooltipTrigger className="flex">
-          <Badge
-            size="small"
-            variant={data.estimateHint.severity === 'alert' ? 'destructive' : 'warning'}
-            aria-label="Row estimate is inaccurate"
-            className="p-0.5 rounded"
-          >
-            <BarChart3 size={10} strokeWidth={1.5} />
-          </Badge>
-        </TooltipTrigger>
-        <TooltipContent side="top" className="space-y-1 max-w-[220px] pb-2">
-          <p className="font-medium text-xs">Row estimate is inaccurate</p>
-          <p className="text-[11px]">
-            {planRows !== undefined && actualRows !== undefined ? (
-              <>
-                Estimated {planRows} rows but saw {actualRows} (~{magnitude.toFixed(2)}×).
-              </>
-            ) : (
-              <>Estimation factor {magnitude.toFixed(2)}×.</>
-            )}
-          </p>
-          <p className="text-[11px] text-foreground-light">
-            Refresh statistics or improve filters/indexes so the planner can better predict row
-            counts.
-          </p>
-          {renderHelpLinks(ESTIMATE_HELP_LINKS)}
         </TooltipContent>
       </Tooltip>
     )

@@ -165,10 +165,6 @@ export type PlanNodeData = {
     selfTimeMs: number
     selfTimeShare: number
   }
-  estimateHint?: {
-    severity: 'warn' | 'alert'
-    factor: number
-  }
   costHint?: {
     severity: 'warn' | 'alert'
     selfCost: number

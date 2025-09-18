@@ -219,25 +219,6 @@ const annotateNodesWithHints = (
       }
     }
 
-    const factor = data.estFactor
-    if (factor !== undefined && factor > 0) {
-      const magnitude = factor >= 1 ? factor : 1 / factor
-      let severity: 'warn' | 'alert' | undefined
-
-      if (magnitude >= 16) {
-        severity = 'alert'
-      } else if (magnitude >= 4) {
-        severity = 'warn'
-      }
-
-      if (severity) {
-        data.estimateHint = {
-          severity,
-          factor,
-        }
-      }
-    }
-
     const selfCost = data.exclusiveCost ?? 0
     if (selfCost > 0) {
       let severity: 'warn' | 'alert' | undefined
