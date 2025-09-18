@@ -134,9 +134,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [snap]
   )
 
-  // TODO(refactor): This useChat hook should be moved down into each chat session.
-  // That way we won't have to disable switching chats while the chat is loading,
-  // and don't run the risk of messages getting mixed up between chats.
   // Sanitize messages to remove Valtio proxy wrappers that can't be cloned
   const sanitizedMessages = useMemo(() => {
     if (!snap.activeChat?.messages) return undefined
@@ -148,6 +145,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     })
   }, [snap.activeChat?.messages])
 
+  // TODO(refactor): This useChat hook should be moved down into each chat session.
+  // That way we won't have to disable switching chats while the chat is loading,
+  // and don't run the risk of messages getting mixed up between chats.
   const {
     messages: chatMessages,
     status: chatStatus,
