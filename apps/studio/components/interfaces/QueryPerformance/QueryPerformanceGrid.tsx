@@ -145,7 +145,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           const fillWidth = Math.min(percentage, 100)
 
           return (
-            <div className="w-full flex flex-col justify-center text-xs tabular-nums">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums">
               <div
                 className={`absolute inset-0 bg-foreground transition-all duration-200 z-0`}
                 style={{
