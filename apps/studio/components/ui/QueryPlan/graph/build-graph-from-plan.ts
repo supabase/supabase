@@ -191,6 +191,11 @@ const annotateNodesWithHints = (
   const p90SelfTime = percentile(selfTimeValues, 0.9)
   const p95SelfTime = percentile(selfTimeValues, 0.95)
 
+  const costValues = nodes.map((node) => node.data.exclusiveCost ?? 0).filter((value) => value > 0)
+  const totalSelfCost = costValues.reduce((sum, value) => sum + value, 0)
+  const p90Cost = percentile(costValues, 0.9)
+  const p95Cost = percentile(costValues, 0.95)
+
   nodes.forEach((node) => {
     const data = node.data
 
@@ -229,6 +234,24 @@ const annotateNodesWithHints = (
         data.estimateHint = {
           severity,
           factor,
+        }
+      }
+    }
+
+    const selfCost = data.exclusiveCost ?? 0
+    if (selfCost > 0) {
+      let severity: 'warn' | 'alert' | undefined
+      if (p95Cost > 0 && selfCost >= p95Cost) {
+        severity = 'alert'
+      } else if (p90Cost > 0 && selfCost >= p90Cost) {
+        severity = 'warn'
+      }
+
+      if (severity) {
+        data.costHint = {
+          severity,
+          selfCost,
+          selfCostShare: totalSelfCost > 0 ? selfCost / totalSelfCost : undefined,
         }
       }
     }

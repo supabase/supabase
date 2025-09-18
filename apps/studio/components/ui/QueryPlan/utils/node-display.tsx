@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Timer, BarChart3 } from 'lucide-react'
+import { Timer, BarChart3, BadgeDollarSign, ExternalLink } from 'lucide-react'
 import { capitalize } from 'lodash'
 
 import type { PlanNodeData } from '../types'
@@ -263,6 +263,49 @@ export function estimateNodeHeight(
 /**
  * Builds the header hint badges/tooltips for a plan node.
  */
+const SLOW_HELP_LINKS = [
+  {
+    label: 'Examine query performance',
+    href: 'https://supabase.com/docs/guides/platform/performance#examining-query-performance',
+  },
+  {
+    label: 'Managing Indexes',
+    href: 'https://supabase.com/docs/guides/database/postgres/indexes',
+  },
+]
+
+const ESTIMATE_HELP_LINKS = [
+  {
+    label: 'Inspect your database',
+    href: 'https://supabase.com/docs/guides/database/inspect',
+  },
+]
+
+const COST_HELP_LINKS = [
+  {
+    label: 'Examine query performance',
+    href: 'https://supabase.com/docs/guides/platform/performance#examining-query-performance',
+  },
+]
+
+const renderHelpLinks = (links: { label: string; href: string }[]) => (
+  <ul className="flex flex-col gap-1 pt-1 text-[11px]">
+    {links.map((link) => (
+      <li key={link.href}>
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-x-1 underline underline-offset-2 text-foreground-light hover:text-foreground"
+        >
+          <span>{link.label}</span>
+          <ExternalLink size={10} strokeWidth={1.5} />
+        </a>
+      </li>
+    ))}
+  </ul>
+)
+
 export const buildHints = (data: PlanNodeData): JSX.Element[] => {
   const hints: JSX.Element[] = []
 
@@ -282,14 +325,15 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             <Timer size={10} strokeWidth={1.5} />
           </Badge>
         </TooltipTrigger>
-        <TooltipContent side="top" className="space-y-1 max-w-[220px]">
+        <TooltipContent side="top" className="space-y-1 max-w-[220px] pb-2">
           <p className="font-medium text-xs">Slow node</p>
           <p className="text-[11px]">
             Self time {slowTime} ms ({share}% of total execution time).
           </p>
           <p className="text-[11px] text-foreground-light">
-            Consider reducing rows earlier or adding an index to speed this step up.
+            Consider narrowing the rows earlier in the plan or adding an index to reduce work.
           </p>
+          {renderHelpLinks(SLOW_HELP_LINKS)}
         </TooltipContent>
       </Tooltip>
     )
@@ -318,7 +362,7 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             <BarChart3 size={10} strokeWidth={1.5} />
           </Badge>
         </TooltipTrigger>
-        <TooltipContent side="top" className="space-y-1 max-w-[220px]">
+        <TooltipContent side="top" className="space-y-1 max-w-[220px] pb-2">
           <p className="font-medium text-xs">Row estimate is inaccurate</p>
           <p className="text-[11px]">
             {planRows !== undefined && actualRows !== undefined ? (
@@ -330,8 +374,43 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             )}
           </p>
           <p className="text-[11px] text-foreground-light">
-            Run ANALYZE or add more selective filters to improve planner estimates.
+            Refresh statistics or improve filters/indexes so the planner can better predict row
+            counts.
           </p>
+          {renderHelpLinks(ESTIMATE_HELP_LINKS)}
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  if (data.costHint) {
+    const share =
+      data.costHint.selfCostShare !== undefined
+        ? Math.round((data.costHint.selfCostShare ?? 0) * 100)
+        : undefined
+
+    hints.push(
+      <Tooltip key="cost">
+        <TooltipTrigger className="flex">
+          <Badge
+            size="small"
+            variant={data.costHint.severity === 'alert' ? 'destructive' : 'warning'}
+            aria-label="Cost is high"
+            className="p-0.5 rounded"
+          >
+            <BadgeDollarSign size={10} strokeWidth={1.5} />
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="space-y-1 max-w-[220px] pb-2">
+          <p className="font-medium text-xs">Cost is high</p>
+          <p className="text-[11px]">
+            Estimated cost {data.costHint.selfCost.toFixed(2)}
+            {share !== undefined ? ` (~${share}% of total plan cost).` : '.'}
+          </p>
+          <p className="text-[11px] text-foreground-light">
+            Reduce scanned rows or improve indexes so the planner considers cheaper strategies.
+          </p>
+          {renderHelpLinks(COST_HELP_LINKS)}
         </TooltipContent>
       </Tooltip>
     )
