@@ -1,13 +1,11 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage } from 'ai'
+import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql'
-// import { getModel } from 'lib/ai/model'
-// import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getModel } from 'lib/ai/model'
 import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
@@ -193,35 +191,33 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    return res.status(200).json({ ping: 'pong' })
+    const result = streamText({
+      model,
+      stopWhen: stepCountIs(5),
+      messages: coreMessages,
+      ...(providerOptions && { providerOptions }),
+      tools,
+      abortSignal: abortController.signal,
+    })
 
-    //   const result = streamText({
-    //     model,
-    //     stopWhen: stepCountIs(5),
-    //     messages: coreMessages,
-    //     ...(providerOptions && { providerOptions }),
-    //     tools,
-    //     abortSignal: abortController.signal,
-    //   })
+    result.pipeUIMessageStreamToResponse(res, {
+      sendReasoning: true,
+      onError: (error) => {
+        if (error == null) {
+          return 'unknown error'
+        }
 
-    //   result.pipeUIMessageStreamToResponse(res, {
-    //     sendReasoning: true,
-    //     onError: (error) => {
-    //       if (error == null) {
-    //         return 'unknown error'
-    //       }
+        if (typeof error === 'string') {
+          return error
+        }
 
-    //       if (typeof error === 'string') {
-    //         return error
-    //       }
+        if (error instanceof Error) {
+          return error.message
+        }
 
-    //       if (error instanceof Error) {
-    //         return error.message
-    //       }
-
-    //       return JSON.stringify(error)
-    //     },
-    //   })
+        return JSON.stringify(error)
+      },
+    })
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
