@@ -1,4 +1,5 @@
 import { cn } from 'ui'
+import { Database, Key, Hash, Calendar, Type, Binary } from 'lucide-react'
 import type { TableField, TableSuggestion } from './types'
 
 interface TablePreviewCardProps {
@@ -8,62 +9,115 @@ interface TablePreviewCardProps {
   disabled?: boolean
 }
 
+const getFieldIcon = (field: TableField) => {
+  if (field.isPrimary) return <Key size={10} className="text-brand" />
+  if (field.isForeign) return <Hash size={10} className="text-warning" />
+
+  switch (field.type) {
+    case 'timestamp':
+    case 'timestamptz':
+    case 'date':
+    case 'time':
+      return <Calendar size={10} className="text-foreground-lighter" />
+    case 'text':
+    case 'varchar':
+      return <Type size={10} className="text-foreground-lighter" />
+    case 'uuid':
+    case 'int2':
+    case 'int4':
+    case 'int8':
+    case 'bigint':
+      return <Binary size={10} className="text-foreground-lighter" />
+    default:
+      return <Database size={10} className="text-foreground-lighter" />
+  }
+}
+
 export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePreviewCardProps) => {
-  const displayFields = table.fields.slice(0, 5)
+  const displayFields = table.fields.slice(0, 6)
+  const remainingCount = table.fields.length - displayFields.length
 
   return (
-    <div
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
       className={cn(
-        'relative cursor-pointer transition-all duration-200 hover:scale-[1.02] h-full flex flex-col',
-        isActive && 'scale-[1.02]',
+        'group relative w-full text-left transition-all duration-300',
+        'focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-background',
         disabled && 'opacity-50 cursor-not-allowed'
       )}
-      onClick={disabled ? undefined : onClick}
     >
       <div
         className={cn(
-          'w-full h-[180px] bg-surface-100 border-2 rounded-lg overflow-hidden flex flex-col',
-          isActive ? 'border-primary shadow-lg' : 'border-default hover:border-primary/50'
+          'relative overflow-hidden rounded-xl border bg-surface-100 transition-all duration-300',
+          isActive
+            ? 'border-brand shadow-xl scale-[1.02]'
+            : 'border-default hover:border-foreground/20 hover:shadow-lg hover:scale-[1.01]',
+          !disabled && 'cursor-pointer'
         )}
       >
-        <div className="bg-surface-200 px-3 py-2 border-b-2 border-default flex-shrink-0">
-          <h4 className="font-mono font-semibold text-xs">{table.tableName}</h4>
+        {/* Header */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-surface-200 to-surface-100 px-4 py-3 border-b border-default">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Database size={14} className="text-foreground-light" />
+              <h4 className="font-mono text-sm font-medium text-foreground">
+                {table.tableName}
+              </h4>
+            </div>
+            {table.source === 'ai' && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand/10 text-brand font-medium">
+                AI
+              </span>
+            )}
+          </div>
         </div>
 
-        <div className="relative flex-1 overflow-hidden">
-          <div className="px-3 py-2 space-y-1.5">
-            {displayFields.map((field, idx) => (
-              <div
-                key={field.name}
-                className={cn(
-                  'flex items-center justify-between text-[10px] font-mono gap-2',
-                  idx >= 3 && 'opacity-60',
-                  idx >= 4 && 'opacity-30'
-                )}
-              >
-                <span className="text-foreground truncate">{field.name}</span>
-                <span className="text-foreground-light text-[9px] truncate">{field.type}</span>
-              </div>
-            ))}
-          </div>
+        {/* Fields */}
+        <div className="p-4 space-y-2">
+          {displayFields.map((field, idx) => (
+            <div
+              key={field.name}
+              className={cn(
+                'flex items-center gap-2 text-xs transition-opacity duration-200',
+                idx >= 4 && 'opacity-60'
+              )}
+            >
+              <span className="flex-shrink-0">
+                {getFieldIcon(field)}
+              </span>
+              <span className="flex-1 font-mono text-foreground truncate">
+                {field.name}
+              </span>
+              <span className="text-[10px] font-mono text-foreground-lighter">
+                {field.type}
+              </span>
+            </div>
+          ))}
 
-          {/* Gradient fade for remaining fields */}
-          {table.fields.length > 5 && (
-            <>
-              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-surface-100 to-transparent pointer-events-none" />
-              <div className="absolute bottom-0 left-0 right-0 text-center pb-2 text-[10px] text-foreground-light">
-                +{table.fields.length - 5} more fields
-              </div>
-            </>
+          {remainingCount > 0 && (
+            <div className="pt-2 text-[11px] text-foreground-lighter text-center">
+              +{remainingCount} more {remainingCount === 1 ? 'field' : 'fields'}
+            </div>
           )}
         </div>
-      </div>
 
-      <div className="h-[50px] mt-2 px-1">
-        {table.rationale && (
-          <p className="text-xs text-muted-foreground line-clamp-2">{table.rationale}</p>
+        {/* Active indicator */}
+        {isActive && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 bg-brand/5" />
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-brand" />
+          </div>
         )}
       </div>
-    </div>
+
+      {/* Description */}
+      {table.rationale && (
+        <p className="mt-3 px-1 text-xs text-foreground-light line-clamp-2 group-hover:text-foreground-default transition-colors">
+          {table.rationale}
+        </p>
+      )}
+    </button>
   )
 }
