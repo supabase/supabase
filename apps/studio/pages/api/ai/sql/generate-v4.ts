@@ -45,7 +45,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  return res.status(200)
+  return res.status(200).json({ ok: true })
   //   const authorization = req.headers.authorization
   //   const accessToken = authorization?.replace('Bearer ', '')
   //
