@@ -19,6 +19,7 @@ import {
   GENERAL_PROMPT,
   PG_BEST_PRACTICES,
   RLS_PROMPT,
+  REALTIME_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
 import { renderingToolOutputParser } from 'lib/ai/tools/rendering-tools'
@@ -185,6 +186,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ${PG_BEST_PRACTICES}
       ${RLS_PROMPT}
       ${EDGE_FUNCTION_PROMPT}
+      ${REALTIME_PROMPT}
       ${SECURITY_PROMPT}
     `
 

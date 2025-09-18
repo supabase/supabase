@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
+import { ChevronDown, ChevronRight, ListTree, Lock, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -9,9 +9,8 @@ import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import {
   Entity,
@@ -28,9 +27,15 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
+  AiIconAnimation,
   Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -40,7 +45,6 @@ import {
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
@@ -79,7 +83,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     },
   })
 
-  const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
 
@@ -95,25 +98,18 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     (policy) => policy.schema === table.schema && policy.table === table.name
   )
 
-  const { data: publications } = useDatabasePublicationsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const realtimePublication = (publications ?? []).find(
-    (publication) => publication.name === 'supabase_realtime'
+  const { data: triggersData } = useDatabaseTriggersQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: isTable,
+    }
   )
-  const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = realtimeEnabledTables.some((t: any) => t.id === table?.id)
-
-  const { mutate: updatePublications, isLoading: isTogglingRealtime } =
-    useDatabasePublicationUpdateMutation({
-      onSuccess: () => {
-        setShowEnableRealtime(false)
-      },
-      onError: (error) => {
-        toast.error(`Failed to toggle realtime for ${table.name}: ${error.message}`)
-      },
-    })
+  const tableTriggersCount = (triggersData ?? []).filter(
+    (trigger) => trigger.schema === table.schema && trigger.table === table.name
+  ).length
 
   const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -145,25 +141,32 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     )
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const aiSnap = useAiAssistantStateSnapshot()
 
-  const toggleRealtime = async () => {
-    if (!project) return console.error('Project is required')
-    if (!realtimePublication) return console.error('Unable to find realtime publication')
+  const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
-    const exists = realtimeEnabledTables.some((x: any) => x.id == table.id)
-    const tables = !exists
-      ? [`${table.schema}.${table.name}`].concat(
-          realtimeEnabledTables.map((t: any) => `${t.schema}.${t.name}`)
-        )
-      : realtimeEnabledTables
-          .filter((x: any) => x.id != table.id)
-          .map((x: any) => `${x.schema}.${x.name}`)
-
+  const handleManageTriggersClick = () => {
     sendEvent({
-      action: 'realtime_toggle_table_clicked',
+      action: 'table_triggers_manage_clicked',
       properties: {
-        newState: exists ? 'disabled' : 'enabled',
         origin: 'tableGridHeader',
+        table: table.name,
+        schema: table.schema,
+      },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+  }
+
+  const handleCreateTriggerWithAssistant = () => {
+    sendEvent({
+      action: 'table_triggers_assistant_clicked',
+      properties: {
+        origin: 'tableGridHeader',
+        table: table.name,
+        schema: table.schema,
       },
       groups: {
         project: project?.ref ?? 'Unknown',
@@ -171,11 +174,28 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       },
     })
 
-    updatePublications({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: realtimePublication.id,
-      tables,
+    aiSnap.newChat({
+      name: `Create trigger for ${table.schema}.${table.name}`,
+      open: true,
+      initialInput: `Help me broadcast changes from the ${table.schema}.${table.name} table using Supabase Realtime. Ask how I want to filter events in the topic name, then walk me through the required policies and trigger SQL step by step.`,
+      suggestions: {
+        title: 'Need inspiration? Try one of these prompts:',
+        prompts: [
+          {
+            label: 'Broadcast all row changes',
+            description: 'Emit INSERT, UPDATE, and DELETE events for every change on this table.',
+          },
+          {
+            label: 'Per-record topics',
+            description:
+              'Create topics scoped to the record ID so clients subscribe to a single row.',
+          },
+          {
+            label: 'Filter by tenant',
+            description: 'Only broadcast events for a given tenant id embedded in the topic name.',
+          },
+        ],
+      },
     })
   }
 
@@ -446,28 +466,49 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
           {isTable && realtimeEnabled && (
-            <ButtonTooltip
-              type="default"
-              size="tiny"
-              icon={
-                <MousePointer2
-                  strokeWidth={1.5}
-                  className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
-                />
-              }
-              onClick={() => setShowEnableRealtime(true)}
-              className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: isRealtimeEnabled
-                    ? 'Click to disable realtime for this table'
-                    : 'Click to enable realtime for this table',
-                },
-              }}
-            >
-              {!isRealtimeEnabled && 'Enable Realtime'}
-            </ButtonTooltip>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type={'default'}
+                  size="tiny"
+                  className="group"
+                  iconRight={<ChevronDown strokeWidth={1.5} size={14} />}
+                  icon={
+                    <div
+                      className={cn(
+                        'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                        tableTriggersCount > 9 ? 'px-1' : 'w-[16px]'
+                      )}
+                    >
+                      <span className="text-[11px] text-foreground font-mono text-center">
+                        {tableTriggersCount}
+                      </span>
+                    </div>
+                  }
+                >
+                  {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={manageTriggersHref}
+                    onClick={handleManageTriggersClick}
+                    className="flex items-center gap-2"
+                  >
+                    <ListTree size={14} />
+                    <span>Manage triggers</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center gap-2"
+                  onSelect={() => handleCreateTriggerWithAssistant()}
+                >
+                  <AiIconAnimation size={16} />
+                  <span>Create with Assistant</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           {doesHaveAutoGeneratedAPIDocs && <APIDocsButton section={['entities', table.name]} />}
@@ -475,32 +516,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           <RefreshButton tableId={table.id} isRefetching={isRefetching} />
         </div>
       )}
-      <ConfirmationModal
-        visible={showEnableRealtime}
-        loading={isTogglingRealtime}
-        title={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for ${table.name}`}
-        confirmLabel={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime`}
-        confirmLabelLoading={`${isRealtimeEnabled ? 'Disabling' : 'Enabling'} realtime`}
-        onCancel={() => setShowEnableRealtime(false)}
-        onConfirm={() => toggleRealtime()}
-      >
-        <div className="space-y-2">
-          <p className="text-sm">
-            Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will{' '}
-            {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
-          </p>
-          {!isRealtimeEnabled && (
-            <p className="text-sm">
-              You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/publications`} className="text-brand">
-                database publications
-              </Link>{' '}
-              settings.
-            </p>
-          )}
-        </div>
-      </ConfirmationModal>
-
       <ViewEntityAutofixSecurityModal
         table={table}
         isAutofixViewSecurityModalOpen={isAutofixViewSecurityModalOpen}
