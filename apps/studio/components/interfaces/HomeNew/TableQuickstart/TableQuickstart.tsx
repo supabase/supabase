@@ -28,20 +28,30 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
     <div className="w-full">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header Section */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           <h2 className="text-2xl font-medium text-foreground">
-            What would you like to build today?
+            What kind of app are you building?
           </h2>
-          <div className="flex items-center gap-2">
-            <AiIconAnimation size={16} className="text-brand" />
+          {variant === 'ai' && (
+            <div className="flex items-center gap-2">
+              <AiIconAnimation size={16} className="text-brand" />
+              <p className="text-sm text-foreground-light">
+                Describe your idea and we'll generate the tables
+              </p>
+            </div>
+          )}
+          {variant === 'templates' && (
             <p className="text-sm text-foreground-light">
-              Kickstart your database with AI
+              Start with a pre-built schema for common app types
             </p>
-          </div>
+          )}
         </div>
 
-        {/* Content Section with Transitions */}
-        <div className="min-h-[400px]">
+        {/* Content Section with Smooth Height Transitions */}
+        <div className={cn(
+          'transition-all duration-500 ease-in-out',
+          currentStep === 'input' ? 'min-h-0' : 'min-h-[400px]'
+        )}>
           {/* Step 1: Input Form */}
           <div
             className={cn(
@@ -61,15 +71,15 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
                         <div className="w-full border-t border-default"></div>
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-foreground-lighter">Or try these</span>
+                        <span className="bg-background px-2 text-foreground-lighter">Quick ideas</span>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2 justify-center">
                       {[
-                        'Todo app with user accounts',
-                        'Blog with comments',
-                        'E-commerce store',
-                        'SaaS dashboard',
+                        'Social media platform',
+                        'Project management tool',
+                        'E-commerce marketplace',
+                        'Content management system',
                       ].map((example) => (
                         <button
                           key={example}
@@ -98,8 +108,8 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
           {/* Step 2: Table Selection */}
           <div
             className={cn(
-              'transition-all duration-500',
-              currentStep === 'preview' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 hidden'
+              'transition-all duration-500 transform',
+              currentStep === 'preview' ? 'opacity-100 scale-100' : 'opacity-0 scale-95 hidden'
             )}
           >
             <div className="space-y-6">
@@ -128,15 +138,17 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
               </div>
 
               {/* Table Cards */}
-              {isGenerating ? (
+              {isGenerating && currentStep === 'preview' ? (
                 <TablePickerSkeleton />
-              ) : candidates.length > 0 ? (
-                <TablePicker
-                  tables={candidates}
-                  onSelectTable={handleSelectTable}
-                  loading={loading}
-                />
-              ) : null}
+              ) : (
+                candidates.length > 0 && (
+                  <TablePicker
+                    tables={candidates}
+                    onSelectTable={handleSelectTable}
+                    loading={loading}
+                  />
+                )
+              )}
 
               {/* Error State */}
               {error && (
