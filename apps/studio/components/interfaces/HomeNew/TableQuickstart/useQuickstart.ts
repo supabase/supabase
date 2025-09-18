@@ -90,7 +90,6 @@ export const useQuickstart = () => {
         credentials: 'include',
         body: JSON.stringify({
           prompt,
-          projectType: 'general',
         }),
       })
 

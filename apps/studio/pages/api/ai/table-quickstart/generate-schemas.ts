@@ -73,7 +73,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: modelError.message })
   }
 
-  const { prompt, projectType = 'general' } = req.body
+  const { prompt } = req.body
 
   if (!prompt) {
     return res.status(400).json({ error: 'Prompt is required' })
@@ -96,8 +96,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       Be concise and practical.`,
       prompt: `Generate a database schema for: ${prompt}
-
-      Project type context: ${projectType}
 
       Create a practical, production-ready schema with related tables that would be needed for this application.`,
     })
