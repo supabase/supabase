@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react'
-import { cn, AiIconAnimation } from 'ui'
+import { cn } from 'ui'
 import { TemplateSelector } from './TemplateSelector'
 import { AiPromptInput } from './AiPromptInput'
 import { TablePicker } from './TablePicker'
@@ -34,12 +34,9 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
               What kind of app are you building?
             </h2>
             {variant === 'ai' && (
-              <div className="flex items-center gap-2">
-                <AiIconAnimation size={16} className="text-brand" />
-                <p className="text-sm text-foreground-light">
-                  Describe your idea and we'll generate the tables
-                </p>
-              </div>
+              <p className="text-sm text-foreground-light">
+                Describe your idea and we'll generate the tables
+              </p>
             )}
             {variant === 'templates' && (
               <p className="text-sm text-foreground-light">
@@ -50,8 +47,7 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
 
         {/* Content Section with Smooth Height Transitions */}
         <div className={cn(
-          'transition-all duration-500 ease-in-out',
-          currentStep === 'input' ? 'min-h-0' : 'min-h-[400px]'
+          'transition-all duration-500 ease-in-out'
         )}>
           {/* Step 1: Input Form */}
           <div
@@ -116,24 +112,30 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
             <div className="space-y-6">
               {/* Back Button and Context */}
               <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  disabled={loading}
-                  className={cn(
-                    'inline-flex items-center gap-2 text-sm text-foreground-light',
-                    'hover:text-foreground transition-colors',
-                    'disabled:opacity-50 disabled:cursor-not-allowed'
-                  )}
-                >
-                  <ArrowLeft size={14} />
-                  <span>Back to {variant === 'ai' ? 'prompt' : 'templates'}</span>
-                </button>
+                {!isGenerating && (
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    disabled={loading}
+                    className={cn(
+                      'inline-flex items-center gap-2 text-sm text-foreground-light',
+                      'hover:text-foreground transition-colors',
+                      'disabled:opacity-50 disabled:cursor-not-allowed'
+                    )}
+                  >
+                    <ArrowLeft size={14} />
+                    <span>Back to {variant === 'ai' ? 'prompt' : 'templates'}</span>
+                  </button>
+                )}
 
-                {variant === 'ai' && userInput && (
+                {userInput && (
                   <div className="p-3 bg-surface-100 rounded-lg border border-default">
-                    <p className="text-xs text-foreground-lighter mb-1">Generated tables for:</p>
-                    <p className="text-sm text-foreground font-medium">"{userInput}"</p>
+                    <p className="text-xs text-foreground-lighter mb-1">
+                      {isGenerating ? 'Generating tables for:' : 'Generated tables for:'}
+                    </p>
+                    <p className="text-sm text-foreground font-medium">
+                      {variant === 'templates' ? userInput : `"${userInput}"`}
+                    </p>
                   </div>
                 )}
               </div>

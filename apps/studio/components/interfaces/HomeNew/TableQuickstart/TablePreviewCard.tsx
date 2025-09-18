@@ -24,12 +24,12 @@ const getFieldIcon = (field: TableField) => {
     case 'date':
     case 'time':
     case 'timez':
-      return <Calendar size={10} className="text-blue-500" />
+      return <Calendar size={10} className="text-blue-800" />
     case 'text':
     case 'varchar':
-      return <Type size={10} className="text-green-500" />
+      return <Type size={10} className="text-green-700" />
     case 'uuid':
-      return <FileText size={10} className="text-purple-500" />
+      return <FileText size={10} className="text-purple-800" />
     case 'int2':
     case 'int4':
     case 'int8':
@@ -37,14 +37,14 @@ const getFieldIcon = (field: TableField) => {
     case 'float4':
     case 'float8':
     case 'numeric':
-      return <Binary size={10} className="text-orange-500" />
+      return <Binary size={10} className="text-orange-800" />
     case 'bool':
-      return <ToggleLeft size={10} className="text-cyan-500" />
+      return <ToggleLeft size={10} className="text-cyan-800" />
     case 'json':
     case 'jsonb':
-      return <Braces size={10} className="text-indigo-500" />
+      return <Braces size={10} className="text-indigo-800" />
     case 'bytea':
-      return <Binary size={10} className="text-gray-500" />
+      return <Binary size={10} className="text-gray-800" />
     default:
       return <Database size={10} className="text-foreground-lighter" />
   }
@@ -76,18 +76,11 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
       >
         {/* Header */}
         <div className="relative overflow-hidden bg-gradient-to-r from-surface-200 to-surface-100 px-4 py-3 border-b border-default flex-shrink-0">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <Database size={14} className="text-foreground-light" />
-              <h4 className="font-mono text-sm font-medium text-foreground">
-                {table.tableName}
-              </h4>
-            </div>
-            {table.source === 'ai' && (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand/10 text-brand font-medium">
-                AI
-              </span>
-            )}
+          <div className="flex items-center gap-2 mb-1">
+            <Database size={14} className="text-foreground-light" />
+            <h4 className="font-mono text-sm font-medium text-foreground">
+              {table.tableName}
+            </h4>
           </div>
           {table.rationale && (
             <p className="text-xs text-foreground-lighter line-clamp-1">
@@ -119,7 +112,7 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
           ))}
 
           {remainingCount > 0 && (
-            <div className="absolute bottom-2 left-0 right-0 text-[11px] text-foreground-lighter text-center bg-surface-100">
+            <div className="absolute bottom-0 left-0 right-0 py-2 text-[11px] text-foreground-lighter text-center bg-gradient-to-t from-surface-100 via-surface-100 to-transparent">
               +{remainingCount} more {remainingCount === 1 ? 'field' : 'fields'}
             </div>
           )}

@@ -79,6 +79,7 @@ export const useQuickstart = () => {
   const handleAiGenerate = useCallback(async (prompt: string) => {
     setIsGenerating(true)
     setError(null)
+    setUserInput(prompt) // Set the user input immediately
     setCurrentStep('preview') // Show preview immediately to display skeleton
     setCandidates([]) // Clear any previous candidates
 
