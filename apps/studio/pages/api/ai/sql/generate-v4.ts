@@ -6,13 +6,8 @@ import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { getTools } from 'lib/ai/tools'
-import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-
+import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,
@@ -21,6 +16,9 @@ import {
   RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
+import { getTools } from 'lib/ai/tools'
+import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
 const requestBodySchema = z.object({
   messages: z.array(z.any()),

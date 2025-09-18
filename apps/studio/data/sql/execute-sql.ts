@@ -1,12 +1,23 @@
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
 import { MB } from 'lib/constants'
-import {
-  ROLE_IMPERSONATION_NO_RESULTS,
-  ROLE_IMPERSONATION_SQL_LINE_COUNT,
-} from 'lib/role-impersonation'
 import { ResponseError } from 'types'
-import { ExecuteSqlVariables } from './execute-sql-query'
+
+// [Joshen] If this works, we'll need to clean up
+const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
+const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
+
+type ExecuteSqlVariables = {
+  projectRef?: string
+  connectionString?: string | null
+  sql: string
+  queryKey?: any
+  handleError?: (error: ResponseError) => { result: any }
+  isRoleImpersonationEnabled?: boolean
+  isStatementTimeoutDisabled?: boolean
+  autoLimit?: number
+  contextualInvalidation?: boolean
+}
 
 export async function executeSql<T = any>(
   {
@@ -70,7 +81,7 @@ export async function executeSql<T = any>(
         query: {
           key:
             queryKey
-              ?.filter((seg) => typeof seg === 'string' || typeof seg === 'number')
+              ?.filter((seg: any) => typeof seg === 'string' || typeof seg === 'number')
               .join('-') ?? '',
         },
       },
