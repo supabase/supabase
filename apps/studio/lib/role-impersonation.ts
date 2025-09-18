@@ -1,6 +1,7 @@
 import type { User } from 'data/auth/users-infinite-query'
 import { RoleImpersonationState as ValtioRoleImpersonationState } from 'state/role-impersonation-state'
 import { uuidv4 } from './helpers'
+import { ROLE_IMPERSONATION_NO_RESULTS } from './role-impersonation.constants'
 
 type PostgrestImpersonationRole =
   | {
@@ -108,8 +109,6 @@ set_config('request.headers', '{"accept": "*/*"}', true);
 }
 
 // Includes getPostgrestRoleImpersonationSql() and wrapWithRoleImpersonation()
-export const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
-export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
 
 function getCustomRoleImpersonationSql(roleName: string) {
   return /* SQL */ `

@@ -10,7 +10,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
-import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import { DatabaseFunction } from 'data/database-functions/fetchers'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 

@@ -9,10 +9,8 @@ import { Button, SidePanel } from 'ui'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import SqlEditor from 'components/ui/SqlEditor'
-import {
-  useDatabaseFunctionsQuery,
-  type DatabaseFunction,
-} from 'data/database-functions/database-functions-query'
+import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
+import { type DatabaseFunction } from 'data/database-functions/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ChevronDown, HelpCircle, Terminal } from 'lucide-react'
 

@@ -11,11 +11,8 @@ import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
-import {
-  ROLE_IMPERSONATION_NO_RESULTS,
-  RoleImpersonationState,
-  wrapWithRoleImpersonation,
-} from 'lib/role-impersonation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { ROLE_IMPERSONATION_NO_RESULTS } from 'lib/role-impersonation.constants'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { executeSql } from '../sql/execute-sql'
 import { ExecuteSqlError } from '../sql/execute-sql-query'

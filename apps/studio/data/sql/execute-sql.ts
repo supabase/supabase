@@ -1,11 +1,14 @@
+// [Joshen] These are being placed separately as they're also being used in the API
+// which we should avoid mixing client side and server side logic (main problem was importing of react query)
+
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
 import { MB } from 'lib/constants'
+import {
+  ROLE_IMPERSONATION_NO_RESULTS,
+  ROLE_IMPERSONATION_SQL_LINE_COUNT,
+} from 'lib/role-impersonation.constants'
 import { ResponseError } from 'types'
-
-// [Joshen] If this works, we'll need to clean up
-const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
-const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
 
 type ExecuteSqlVariables = {
   projectRef?: string

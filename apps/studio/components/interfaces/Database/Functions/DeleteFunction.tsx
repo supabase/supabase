@@ -1,7 +1,7 @@
 import { toast } from 'sonner'
 
 import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
-import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import { DatabaseFunction } from 'data/database-functions/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 

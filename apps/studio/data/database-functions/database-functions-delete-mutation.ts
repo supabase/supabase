@@ -6,7 +6,7 @@ import pgMeta from '@supabase/pg-meta'
 import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql'
 import type { ResponseError } from 'types'
-import { DatabaseFunction } from './database-functions-query'
+import { DatabaseFunction } from './fetchers'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string

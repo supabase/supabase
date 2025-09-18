@@ -1,6 +1,7 @@
 import { tool } from 'ai'
-import { getDatabasePolicies } from 'data/database-policies/fetchers'
 import { z } from 'zod'
+
+import { getDatabasePolicies } from 'data/database-policies/fetchers'
 
 export const getSchemaTools = ({
   projectRef,
