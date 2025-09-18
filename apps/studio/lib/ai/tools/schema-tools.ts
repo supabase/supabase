@@ -1,12 +1,6 @@
-// @ts-nocheck
-
 import { tool } from 'ai'
-// import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
+import { getDatabasePolicies } from 'data/database-policies/fetchers'
 import { z } from 'zod'
-
-const getDatabasePolicies = async (val: any, val2: any, val3: any) => {
-  return { data: [] }
-}
 
 export const getSchemaTools = ({
   projectRef,

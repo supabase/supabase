@@ -1,47 +1,10 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
+import { DatabasePoliciesVariables, getDatabasePolicies } from './fetchers'
 import { databasePoliciesKeys } from './keys'
-
-export type DatabasePoliciesVariables = {
-  projectRef?: string
-  connectionString?: string | null
-  schema?: string
-}
-
-export async function getDatabasePolicies(
-  { projectRef, connectionString, schema }: DatabasePoliciesVariables,
-  signal?: AbortSignal,
-  headersInit?: HeadersInit
-) {
-  if (!projectRef) throw new Error('projectRef is required')
-
-  let headers = new Headers(headersInit)
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/policies', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
-      query: {
-        included_schemas: schema || '',
-        excluded_schemas: '',
-      },
-    },
-    headers,
-    signal,
-  })
-
-  if (error) handleError(error)
-  return data
-}
 
 export type DatabasePoliciesData = Awaited<ReturnType<typeof getDatabasePolicies>>
 export type DatabasePoliciesError = ResponseError
