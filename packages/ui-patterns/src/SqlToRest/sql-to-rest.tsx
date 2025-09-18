@@ -15,17 +15,11 @@ import {
   renderHttp,
   renderSupabaseJs,
 } from '@supabase/sql-to-rest'
+import { useIsomorphicLayoutEffect } from 'common'
 import { ChevronUp, GitPullRequest } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { useTheme } from 'next-themes'
-import {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
@@ -49,7 +43,7 @@ export default function SqlToRest({
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme?.includes('dark') ?? true
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (monaco) {
       const lightMode = getTheme(false)
       const darkMode = getTheme(true)

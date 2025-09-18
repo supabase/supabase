@@ -1,9 +1,10 @@
 'use client'
 
-import { useLayoutEffect, useRef } from 'react'
+import { useIsomorphicLayoutEffect } from 'common'
+import { useRef } from 'react'
 import { useSnapshot } from 'valtio'
 import { useCommandContext } from '../../internal/Context'
-import { type DialogSize, type ITouchHandlers } from '../../internal/state/viewState.types'
+import { type DialogSize } from '../../internal/state/viewState.types'
 
 const useCommandMenuInitiated = () => {
   const { viewState } = useCommandContext()
@@ -41,7 +42,7 @@ const useSetCommandMenuSize = (newSize: DialogSize) => {
 
   const originalSize = useRef(size)
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     setSize(newSize)
     return () => setSize(originalSize.current)
   }, [setSize])
@@ -64,10 +65,10 @@ const useCommandMenuTouchGestures = () => {
 export {
   useCommandMenuInitiated,
   useCommandMenuOpen,
-  useSetCommandMenuOpen,
-  useToggleCommandMenu,
   useCommandMenuSize,
+  useCommandMenuTouchGestures,
+  useSetCommandMenuOpen,
   useSetCommandMenuSize,
   useSetupCommandMenuTouchEvents,
-  useCommandMenuTouchGestures,
+  useToggleCommandMenu,
 }

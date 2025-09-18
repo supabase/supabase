@@ -74,9 +74,9 @@
     "neverBuiltDependencies": ["libpg-query"]
   },
   "engines": {
-    "pnpm": ">=9",
+    "pnpm": ">=10.16",
     "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@9.15.5"
+  "packageManager": "pnpm@10.16.1"
 }

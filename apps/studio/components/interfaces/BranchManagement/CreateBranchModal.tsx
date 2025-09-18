@@ -253,6 +253,7 @@ export const CreateBranchModal = () => {
         onOpenAutoFocus={(e) => {
           if (promptProPlanUpgrade) e.preventDefault()
         }}
+        aria-describedby={undefined}
       >
         <DialogHeader padding="small">
           <DialogTitle>Create a new preview branch</DialogTitle>

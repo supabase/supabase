@@ -6,7 +6,6 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
@@ -16,7 +15,9 @@ const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
-  useAutoProjectsPrefetch()
+  // [Joshen] Temporarily hiding as its adding noise to server logs
+  // Needs updating anyway to use the new infinite query
+  // useAutoProjectsPrefetch()
 
   return (
     <ScaffoldContainer className="flex-grow flex">

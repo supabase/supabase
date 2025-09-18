@@ -31,7 +31,7 @@
     "preinstall": "npx only-allow pnpm",
     "presync": "pnpm run codegen:graphql",
     "pretest": "pnpm run codegen:examples",
-    "pretypecheck": "pnpm run codegen:graphql",
+    "pretypecheck": "pnpm run codegen:graphql && next typegen",
     "start": "next start",
     "sync": "tsx --conditions=react-server ./resources/rootSync.ts",
     "test": "pnpm supabase start && pnpm run test:local && pnpm supabase stop",
