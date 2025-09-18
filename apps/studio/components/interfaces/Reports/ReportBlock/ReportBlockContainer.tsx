@@ -3,6 +3,7 @@ import { DragEvent, PropsWithChildren, ReactNode } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface ReportBlockContainerProps {
+  icon?: ReactNode
   label: string
   badge?: ReactNode
   actions: ReactNode
@@ -14,6 +15,7 @@ interface ReportBlockContainerProps {
 }
 
 export const ReportBlockContainer = ({
+  icon,
   label,
   badge,
   actions,
@@ -47,6 +49,8 @@ export const ReportBlockContainer = ({
               <div className="absolute left-3 top-2.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">
                 <GripHorizontal size={16} strokeWidth={1.5} />
               </div>
+            ) : icon ? (
+              icon
             ) : (
               <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
