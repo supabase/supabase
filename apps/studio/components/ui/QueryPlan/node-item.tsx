@@ -1,34 +1,52 @@
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 
-import { cn } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { DEFAULT_NODE_HEIGHT_CONSTANTS } from './constants'
 
 type NodeItemProps = {
-  title?: string
+  tooltip?: ReactNode
   height?: number
   className?: string
 }
 
 export const NodeItem = ({
   children,
-  title,
+  tooltip,
   height = DEFAULT_NODE_HEIGHT_CONSTANTS.ITEM_H,
   className,
 }: PropsWithChildren<NodeItemProps>) => {
-  return (
+  // const tooltipContent: ReactNode | undefined =
+  //   typeof tooltip === 'string' ? (
+  //     <span className="block whitespace-pre-line">{tooltip}</span>
+  //   ) : (
+  //     tooltip
+  //   )
+
+  const item = (
     <li
-      title={title}
       style={{ height: `${height}px` }}
       className={cn(
         'text-[8px] leading-5 relative px-2 flex flex-row items-center justify-between',
         'bg-surface-100',
         'border-t',
         'border-t-[0.5px]',
-        'hover:bg-scale-500 transition-[background-color] cursor-default',
+        'hover:bg-scale-500 transition-[background-color]',
+        tooltip ? 'cursor-help' : 'cursor-default',
         className
       )}
     >
       {children}
     </li>
+  )
+
+  if (!tooltip) return item
+
+  return (
+    <Tooltip delayDuration={150}>
+      <TooltipTrigger asChild>{item}</TooltipTrigger>
+      <TooltipContent side="right" align="start" className="max-w-[240px] text-[10px] leading-4">
+        {tooltip}
+      </TooltipContent>
+    </Tooltip>
   )
 }

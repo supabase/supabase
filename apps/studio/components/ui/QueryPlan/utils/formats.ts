@@ -52,3 +52,9 @@ export const formatMs = (value?: number) => {
 
   return value.toLocaleString(undefined, options)
 }
+
+export const formatOrDash = (value?: number) => {
+  if (value === undefined) return '-'
+
+  return formatNumber(value) ?? `${value}`
+}
