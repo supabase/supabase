@@ -1,11 +1,11 @@
-// import pgMeta from '@supabase/pg-meta'
+import pgMeta from '@supabase/pg-meta'
 // import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
 // import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
 //
 import { IS_PLATFORM } from 'common'
-// import { executeSql } from 'data/sql/execute-sql'
+import { executeSql } from 'data/sql/execute-sql'
 import { getModel } from 'lib/ai/model'
 import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 // import {
@@ -18,8 +18,8 @@ import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 // } from 'lib/ai/prompts'
 // import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
-// import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-//
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+
 const requestBodySchema = z.object({
   messages: z.array(z.any()),
   projectRef: z.string(),
@@ -122,106 +122,106 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: modelError.message })
   }
 
-  return res.status(200).json({ ok: 'true' })
-  //   try {
-  //     // Get a list of all schemas to add to context
-  //     const pgMetaSchemasList = pgMeta.schemas.list()
-  //
-  //     const { result: schemas } =
-  //       aiOptInLevel !== 'disabled'
-  //         ? await executeSql(
-  //             {
-  //               projectRef,
-  //               connectionString,
-  //               sql: pgMetaSchemasList.sql,
-  //             },
-  //             undefined,
-  //             {
-  //               'Content-Type': 'application/json',
-  //               ...(authorization && { Authorization: authorization }),
-  //             },
-  //             IS_PLATFORM ? undefined : queryPgMetaSelfHosted
-  //           )
-  //         : { result: [] }
-  //
-  //     const schemasString =
-  //       schemas?.length > 0
-  //         ? `The available database schema names are: ${JSON.stringify(schemas)}`
-  //         : "You don't have access to any schemas."
-  //
-  //     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
-  //     const system = source`
-  //       ${GENERAL_PROMPT}
-  //       ${CHAT_PROMPT}
-  //       ${PG_BEST_PRACTICES}
-  //       ${RLS_PROMPT}
-  //       ${EDGE_FUNCTION_PROMPT}
-  //       ${SECURITY_PROMPT}
-  //     `
-  //
-  //     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
-  //     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-  //     const coreMessages: ModelMessage[] = [
-  //       {
-  //         role: 'system',
-  //         content: system,
-  //         ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
-  //       },
-  //       {
-  //         role: 'assistant',
-  //         // Add any dynamic context here
-  //         content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
-  //       },
-  //       ...convertToModelMessages(messages),
-  //     ]
-  //
-  //     const abortController = new AbortController()
-  //     req.on('close', () => abortController.abort())
-  //     req.on('aborted', () => abortController.abort())
-  //
-  //     // Get tools
-  //     const tools = await getTools({
-  //       projectRef,
-  //       connectionString,
-  //       authorization,
-  //       aiOptInLevel,
-  //       accessToken,
-  //     })
-  //
-  //     const result = streamText({
-  //       model,
-  //       stopWhen: stepCountIs(5),
-  //       messages: coreMessages,
-  //       ...(providerOptions && { providerOptions }),
-  //       tools,
-  //       abortSignal: abortController.signal,
-  //     })
-  //
-  //     result.pipeUIMessageStreamToResponse(res, {
-  //       sendReasoning: true,
-  //       onError: (error) => {
-  //         if (error == null) {
-  //           return 'unknown error'
-  //         }
-  //
-  //         if (typeof error === 'string') {
-  //           return error
-  //         }
-  //
-  //         if (error instanceof Error) {
-  //           return error.message
-  //         }
-  //
-  //         return JSON.stringify(error)
-  //       },
-  //     })
-  //   } catch (error) {
-  //     console.error('Error in handlePost:', error)
-  //     if (error instanceof Error) {
-  //       return res.status(500).json({ message: error.message })
-  //     }
-  //     return res.status(500).json({ message: 'An unexpected error occurred.' })
-  //   }
+  try {
+    // Get a list of all schemas to add to context
+    const pgMetaSchemasList = pgMeta.schemas.list()
+
+    const { result: schemas } =
+      aiOptInLevel !== 'disabled'
+        ? await executeSql(
+            {
+              projectRef,
+              connectionString,
+              sql: pgMetaSchemasList.sql,
+            },
+            undefined,
+            {
+              'Content-Type': 'application/json',
+              ...(authorization && { Authorization: authorization }),
+            },
+            IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+          )
+        : { result: [] }
+
+    const schemasString =
+      schemas?.length > 0
+        ? `The available database schema names are: ${JSON.stringify(schemas)}`
+        : "You don't have access to any schemas."
+
+    return res.status(200).json({ ok: 'true' })
+    //     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
+    //     const system = source`
+    //       ${GENERAL_PROMPT}
+    //       ${CHAT_PROMPT}
+    //       ${PG_BEST_PRACTICES}
+    //       ${RLS_PROMPT}
+    //       ${EDGE_FUNCTION_PROMPT}
+    //       ${SECURITY_PROMPT}
+    //     `
+    //
+    //     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
+    //     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
+    //     const coreMessages: ModelMessage[] = [
+    //       {
+    //         role: 'system',
+    //         content: system,
+    //         ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
+    //       },
+    //       {
+    //         role: 'assistant',
+    //         // Add any dynamic context here
+    //         content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
+    //       },
+    //       ...convertToModelMessages(messages),
+    //     ]
+    //
+    //     const abortController = new AbortController()
+    //     req.on('close', () => abortController.abort())
+    //     req.on('aborted', () => abortController.abort())
+    //
+    //     // Get tools
+    //     const tools = await getTools({
+    //       projectRef,
+    //       connectionString,
+    //       authorization,
+    //       aiOptInLevel,
+    //       accessToken,
+    //     })
+    //
+    //     const result = streamText({
+    //       model,
+    //       stopWhen: stepCountIs(5),
+    //       messages: coreMessages,
+    //       ...(providerOptions && { providerOptions }),
+    //       tools,
+    //       abortSignal: abortController.signal,
+    //     })
+    //
+    //     result.pipeUIMessageStreamToResponse(res, {
+    //       sendReasoning: true,
+    //       onError: (error) => {
+    //         if (error == null) {
+    //           return 'unknown error'
+    //         }
+    //
+    //         if (typeof error === 'string') {
+    //           return error
+    //         }
+    //
+    //         if (error instanceof Error) {
+    //           return error.message
+    //         }
+    //
+    //         return JSON.stringify(error)
+    //       },
+    //     })
+  } catch (error) {
+    console.error('Error in handlePost:', error)
+    // if (error instanceof Error) {
+    //   return res.status(500).json({ message: error.message })
+    // }
+    return res.status(500).json({ message: 'An unexpected error occurred.' })
+  }
 }
 
 const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
