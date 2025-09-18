@@ -194,6 +194,7 @@
     "jsdom-testing-mocks": "^1.13.1",
     "msw": "^2.3.0",
     "next-router-mock": "^0.9.13",
+    "node-mocks-http": "^1.17.2",
     "postcss": "^8.5.3",
     "prettier": "3.2.4",
     "raw-loader": "^4.0.2",
