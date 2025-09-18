@@ -68,7 +68,7 @@ describe('getModel', () => {
 
     expect(model).toEqual('openai-model')
     // Default openai model in registry is gpt-5-mini
-    expect(openai.chat).toHaveBeenCalledWith('gpt-5-mini')
+    expect(openai).toHaveBeenCalledWith('gpt-5-mini')
     expect(promptProviderOptions).toBeUndefined()
   })
 
@@ -94,6 +94,6 @@ describe('getModel', () => {
 
     expect(error).toBeUndefined()
     expect(model).toEqual('openai-model')
-    expect(openai.chat).toHaveBeenCalledWith('gpt-5')
+    expect(openai).toHaveBeenCalledWith('gpt-5')
   })
 })
