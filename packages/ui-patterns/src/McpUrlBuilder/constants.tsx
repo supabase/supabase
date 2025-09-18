@@ -84,7 +84,7 @@ export const MCP_CLIENTS: McpClient[] = [
     },
     generateDeepLink: (_config) => {
       const config = _config as VSCodeMcpConfig
-      const mcpConfig = { id: 'supabase', ...config.mcpServers.supabase }
+      const mcpConfig = { name: 'supabase', ...config.mcpServers.supabase }
 
       return `vscode:mcp/install?${encodeURIComponent(JSON.stringify(mcpConfig))}`
     },
