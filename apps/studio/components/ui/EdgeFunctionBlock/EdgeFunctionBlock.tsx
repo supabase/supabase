@@ -168,7 +168,12 @@ export const EdgeFunctionBlock = ({
                 )}{' '}
                 is now live at:
               </p>
-              <CodeBlock language="bash" hideLineNumbers value={resolvedFunctionUrl} className="text-xs p-2" />
+              <CodeBlock
+                language="bash"
+                hideLineNumbers
+                value={resolvedFunctionUrl}
+                className="text-xs p-2"
+              />
               <p className="text-foreground-light mt-4 mb-2">
                 To download and work on this function locally, use the CLI command:
               </p>
