@@ -95,9 +95,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     (policy) => policy.schema === table.schema && policy.table === table.name
   )
 
-  // Use the new comprehensive realtime status hook
-  const { isRealtimeEnabled, hasTriggerRealtime, realtimeTriggers, realtimeType } =
-    useRealtimeStatus(table)
+  // Check realtime status via triggers
+  const { isRealtimeEnabled } = useRealtimeStatus(table)
 
   const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -401,11 +400,10 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               type="default"
               size="tiny"
               icon={
-                isRealtimeEnabled ? (
-                  <MousePointer2 strokeWidth={1.5} className="text-brand" />
-                ) : (
-                  <MousePointer2 strokeWidth={1.5} className="text-foreground-muted" />
-                )
+                <MousePointer2
+                  strokeWidth={1.5}
+                  className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
+                />
               }
               onClick={() => setShowRealtimeSettingsSheet(true)}
               className={cn(
