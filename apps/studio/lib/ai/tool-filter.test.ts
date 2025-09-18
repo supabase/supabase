@@ -62,7 +62,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).not.toContain('list_edge_functions')
     expect(tools).not.toContain('list_branches')
     expect(tools).not.toContain('get_logs')
-    expect(tools).not.toContain('execute_sql')
+    expect(tools).not.toContain('get_advisors')
   })
 
   it('should return UI and schema tools for schema opt-in level', () => {
@@ -78,7 +78,6 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('search_docs')
     expect(tools).not.toContain('get_advisors')
     expect(tools).not.toContain('get_logs')
-    expect(tools).not.toContain('execute_sql')
   })
 
   it('should return UI, schema and log tools for schema_and_log opt-in level', () => {
@@ -94,7 +93,6 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
     expect(tools).toContain('get_logs')
-    expect(tools).not.toContain('execute_sql')
   })
 
   it('should return all tools for schema_and_log_and_data opt-in level', () => {
@@ -110,7 +108,6 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
     expect(tools).toContain('get_logs')
-    expect(tools).not.toContain('execute_sql')
   })
 })
 
@@ -173,8 +170,8 @@ describe('filterToolsByOptInLevel', () => {
   it('should always allow UI tools regardless of opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'disabled')
 
-    expect(tools).toHaveProperty('display_query')
-    expect(tools).toHaveProperty('display_edge_function')
+    expect(tools).toHaveProperty('execute_sql')
+    expect(tools).toHaveProperty('deploy_edge_function')
     expect(tools).toHaveProperty('rename_chat')
 
     // UI tools should not be stubbed, but managed tools should be
@@ -240,7 +237,7 @@ describe('toolSetValidationSchema', () => {
   it('should accept subset of known tools', () => {
     const validSubset = {
       list_tables: { inputSchema: z.object({}), execute: vitest.fn() },
-      display_query: { inputSchema: z.object({}), execute: vitest.fn() },
+      execute_sql: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const result = toolSetValidationSchema.safeParse(validSubset)
@@ -276,9 +273,10 @@ describe('toolSetValidationSchema', () => {
       list_policies: { inputSchema: z.object({}), execute: vitest.fn() },
       search_docs: { inputSchema: z.object({}), execute: vitest.fn() },
       get_advisors: { inputSchema: z.object({}), execute: vitest.fn() },
-      display_query: { inputSchema: z.object({}), execute: vitest.fn() },
-      display_edge_function: { inputSchema: z.object({}), execute: vitest.fn() },
+      execute_sql: { inputSchema: z.object({}), execute: vitest.fn() },
+      deploy_edge_function: { inputSchema: z.object({}), execute: vitest.fn() },
       rename_chat: { inputSchema: z.object({}), execute: vitest.fn() },
+      get_logs: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const validationResult = toolSetValidationSchema.safeParse(allExpectedTools)
