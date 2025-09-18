@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 type SingleStatProps = {
   icon: ReactNode
@@ -17,7 +17,7 @@ export const SingleStat = ({ icon, label, value, className, href, onClick }: Sin
         {icon}
       </div>
       <div>
-        <div className="heading-meta text-foreground-light">{label}</div>
+        <div className="text-left heading-meta text-foreground-light">{label}</div>
         <div className="text-foreground truncate h-[34px] flex items-center capitalize-sentence">
           {value}
         </div>

@@ -268,13 +268,13 @@ export const ServiceStatus = () => {
                       ? 'bg-foreground-lighter animate-pulse'
                       : service.isHealthy
                         ? 'bg-brand'
-                        : 'bg-warning'
+                        : 'bg-selection'
                   )}
                 />
               ))}
             </div>
           }
-          label={<span>Healthy</span>}
+          label={<span>Health</span>}
           value={<span>{overallStatusLabel}</span>}
         />
       </PopoverTrigger_Shadcn_>
