@@ -431,14 +431,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[46px]">
                 <TabsTrigger_Shadcn_
                   value="details"
-                  className="px-0 pb-0 text-xs data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
                 {showIndexSuggestions && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
-                    className="px-0 pb-0 text-xs data-[state=active]:bg-transparent !shadow-none"
+                    className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
                   >
                     Indexes
                   </TabsTrigger_Shadcn_>
