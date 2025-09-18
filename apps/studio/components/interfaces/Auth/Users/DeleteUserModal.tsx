@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { User } from 'data/auth/users-infinite-query'
-import { cleanPointerEventsNoneOnBody, timeout } from 'lib/helpers'
+import { timeout } from 'lib/helpers'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteUserModalProps {
@@ -44,13 +44,8 @@ export const DeleteUserModal = ({
       title="Confirm to delete user"
       loading={isDeleting}
       confirmLabel="Delete"
-      onCancel={() => {
-        onClose()
-        cleanPointerEventsNoneOnBody()
-      }}
-      onConfirm={() => {
-        handleDeleteUser()
-      }}
+      onCancel={() => onClose()}
+      onConfirm={() => handleDeleteUser()}
       alert={{
         title: 'Deleting a user is irreversible',
         description:
