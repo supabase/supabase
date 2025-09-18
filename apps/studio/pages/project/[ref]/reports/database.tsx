@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
-import { ReportChart } from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -34,7 +33,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -42,6 +41,7 @@ import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { ReportChartUpsell } from 'components/interfaces/Reports/v2/ReportChartUpsell'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -107,7 +107,7 @@ const DatabaseUsage = () => {
   })
   const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {
@@ -307,13 +307,13 @@ const DatabaseUsage = () => {
                     }
                   />
                 ) : (
-                  <ReportChart
-                    key={`${chart.id}-${i}`}
-                    chart={chart}
-                    interval={selectedDateRange.interval}
-                    startDate={selectedDateRange?.period_start?.date}
-                    endDate={selectedDateRange?.period_end?.date}
-                    updateDateRange={updateDateRange}
+                  <ReportChartUpsell
+                    key={chart.id}
+                    report={{
+                      label: chart.label,
+                      availableIn: chart.availableIn ?? [],
+                    }}
+                    orgSlug={org?.slug ?? ''}
                   />
                 )
               ))}

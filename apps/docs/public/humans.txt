@@ -50,6 +50,7 @@ Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
 Fabrizio Fenoglio
+Fady A
 Felipe Stival
 Francesco Sansalvadore
 Greg Kress
@@ -138,6 +139,7 @@ Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
+Yuliya Marinova
 Yuri Santana
 ____________
 

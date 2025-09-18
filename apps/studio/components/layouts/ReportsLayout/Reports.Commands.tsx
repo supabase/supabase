@@ -41,7 +41,7 @@ export function useReportsGotoCommands(options?: CommandOptions) {
           {
             id: 'nav-reports-query-performance',
             name: 'Query Performance Reports',
-            route: `/project/${ref}/reports/query-performance`,
+            route: `/project/${ref}/advisors/query-performance`,
             defaultHidden: true,
           },
         ]

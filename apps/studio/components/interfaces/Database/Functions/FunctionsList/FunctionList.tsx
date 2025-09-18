@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
@@ -15,8 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TableRow,
   TableCell,
+  TableRow,
 } from 'ui'
 
 interface FunctionListProps {
@@ -51,7 +51,7 @@ const FunctionList = ({
     (func) => func.name.toLocaleLowerCase()
   )
   const projectRef = selectedProject?.ref
-  const { can: canUpdateFunctions } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
