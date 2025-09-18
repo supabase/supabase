@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
+import { executeSql } from './execute-sql'
+import { ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better

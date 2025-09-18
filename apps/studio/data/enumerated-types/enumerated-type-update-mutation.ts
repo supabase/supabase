@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import type { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'

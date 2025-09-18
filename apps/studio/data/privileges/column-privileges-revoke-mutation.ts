@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import type { components } from 'data/api'
-import type { ResponseError } from 'types'
 import pgMeta from '@supabase/pg-meta'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import type { components } from 'data/api'
+import { executeSql } from 'data/sql/execute-sql'
+import { toast } from 'sonner'
+import type { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
 
 export type ColumnPrivilegesRevoke = components['schemas']['RevokeColumnPrivilegesBody']

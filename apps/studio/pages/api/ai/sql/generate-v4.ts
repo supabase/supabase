@@ -5,7 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
@@ -21,6 +21,16 @@ import {
   RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
+
+const requestBodySchema = z.object({
+  messages: z.array(z.any()),
+  projectRef: z.string(),
+  connectionString: z.string(),
+  schema: z.string().optional(),
+  table: z.string().optional(),
+  chatName: z.string().optional(),
+  orgSlug: z.string().optional(),
+})
 
 export const maxDuration = 120
 
@@ -39,21 +49,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
-
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-export default wrapper
-
-const requestBodySchema = z.object({
-  messages: z.array(z.any()),
-  projectRef: z.string(),
-  connectionString: z.string(),
-  schema: z.string().optional(),
-  table: z.string().optional(),
-  chatName: z.string().optional(),
-  orgSlug: z.string().optional(),
-})
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const authorization = req.headers.authorization
@@ -233,3 +228,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ message: 'An unexpected error occurred.' })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper

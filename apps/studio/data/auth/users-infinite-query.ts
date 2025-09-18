@@ -1,7 +1,8 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
-import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
+import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { authKeys } from './keys'

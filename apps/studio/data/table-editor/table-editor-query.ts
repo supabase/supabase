@@ -1,6 +1,7 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { executeSql } from '../sql/execute-sql'
+import { ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableEditorKeys } from './keys'
 import { getTableEditorSql } from './table-editor-query-sql'
 import { Entity } from './table-editor-types'

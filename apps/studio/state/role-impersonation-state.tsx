@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useCallback, useContext, useEffect } 
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import useLatest from 'hooks/misc/useLatest'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getPostgrestClaims, ImpersonationRole } from 'lib/role-impersonation'

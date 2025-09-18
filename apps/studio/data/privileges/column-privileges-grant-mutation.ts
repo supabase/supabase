@@ -1,10 +1,10 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import type { components } from 'data/api'
+import { executeSql } from 'data/sql/execute-sql'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
-import pgMeta from '@supabase/pg-meta'
-import { executeSql } from 'data/sql/execute-sql-query'
 
 export type ColumnPrivilegesGrant = components['schemas']['GrantColumnPrivilegesBody']
 

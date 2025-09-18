@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import type { Filter } from 'components/grid/types'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import { Entity } from 'data/table-editor/table-editor-types'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
