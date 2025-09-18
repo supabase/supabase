@@ -20,6 +20,7 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { SingleStat } from 'components/ui/SingleStat'
 
 /**
  * [Joshen] JFYI before we go live with this, we need to revisit the migrations section
@@ -264,8 +265,9 @@ export const ServiceStatus = () => {
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <button className="group flex items-center gap-4 p-0 text-base flex items-center justify-start">
-          <div className="w-16 h-16 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
+        <SingleStat
+          onClick={() => setOpen(!open)}
+          icon={
             <div className="grid grid-cols-3 gap-1">
               {services.map((service, index) => (
                 <div
@@ -281,12 +283,10 @@ export const ServiceStatus = () => {
                 />
               ))}
             </div>
-          </div>
-          <div>
-            <div className="heading-meta text-foreground-light">Healthy</div>
-            {overallStatusLabel}
-          </div>
-        </button>
+          }
+          label={<span>Healthy</span>}
+          value={<span>{overallStatusLabel}</span>}
+        />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="start">
         {services.map((service) => (
