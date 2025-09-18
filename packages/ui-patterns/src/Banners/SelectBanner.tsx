@@ -49,7 +49,7 @@ export function SelectBanner() {
           <p>{descExtended}</p>
         </div>
 
-        <div className="-px-4 border-r border-muted">
+        <div className="flex flex-col justify-center -px-4 border-r border-muted relative after:absolute after:top-0 after:left-full after:w-screen after:h-full after:bg-black after:-z-10">
           <Link
             target="_blank"
             href={selectSiteUrl}
