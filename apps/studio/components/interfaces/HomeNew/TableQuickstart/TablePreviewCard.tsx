@@ -1,5 +1,5 @@
 import { cn } from 'ui'
-import { Database, Key, Hash, Calendar, Type, Binary } from 'lucide-react'
+import { Database, Key, Hash, Calendar, Type, Binary, ToggleLeft, Braces, FileText } from 'lucide-react'
 import type { TableField, TableSuggestion } from './types'
 
 interface TablePreviewCardProps {
@@ -10,31 +10,48 @@ interface TablePreviewCardProps {
 }
 
 const getFieldIcon = (field: TableField) => {
-  if (field.isPrimary) return <Key size={10} className="text-brand" />
-  if (field.isForeign) return <Hash size={10} className="text-warning" />
+  // Always show primary key icon for 'id' fields or explicitly marked primary keys
+  if (field.isPrimary || field.name === 'id') {
+    return <Key size={10} className="text-brand" />
+  }
+  if (field.isForeign || field.name.endsWith('_id')) {
+    return <Hash size={10} className="text-warning" />
+  }
 
   switch (field.type) {
     case 'timestamp':
     case 'timestamptz':
     case 'date':
     case 'time':
-      return <Calendar size={10} className="text-foreground-lighter" />
+    case 'timez':
+      return <Calendar size={10} className="text-blue-500" />
     case 'text':
     case 'varchar':
-      return <Type size={10} className="text-foreground-lighter" />
+      return <Type size={10} className="text-green-500" />
     case 'uuid':
+      return <FileText size={10} className="text-purple-500" />
     case 'int2':
     case 'int4':
     case 'int8':
     case 'bigint':
-      return <Binary size={10} className="text-foreground-lighter" />
+    case 'float4':
+    case 'float8':
+    case 'numeric':
+      return <Binary size={10} className="text-orange-500" />
+    case 'bool':
+      return <ToggleLeft size={10} className="text-cyan-500" />
+    case 'json':
+    case 'jsonb':
+      return <Braces size={10} className="text-indigo-500" />
+    case 'bytea':
+      return <Binary size={10} className="text-gray-500" />
     default:
       return <Database size={10} className="text-foreground-lighter" />
   }
 }
 
 export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePreviewCardProps) => {
-  const displayFields = table.fields.slice(0, 6)
+  const displayFields = table.fields.slice(0, 7)
   const remainingCount = table.fields.length - displayFields.length
 
   return (
@@ -43,7 +60,7 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'group relative w-full text-left transition-all duration-300',
+        'group relative w-full text-left transition-all duration-300 rounded-xl',
         'focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-background',
         disabled && 'opacity-50 cursor-not-allowed'
       )}
@@ -73,20 +90,20 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
             )}
           </div>
           {table.rationale && (
-            <p className="text-[10px] text-foreground-lighter line-clamp-1">
+            <p className="text-xs text-foreground-lighter line-clamp-1">
               {table.rationale}
             </p>
           )}
         </div>
 
         {/* Fields */}
-        <div className="flex-1 p-4 space-y-2 overflow-hidden">
+        <div className="flex-1 p-4 space-y-1.5 overflow-hidden relative">
           {displayFields.map((field, idx) => (
             <div
               key={field.name}
               className={cn(
                 'flex items-center gap-2 text-xs transition-opacity duration-200',
-                idx >= 4 && 'opacity-60'
+                idx >= 6 && 'opacity-50'
               )}
             >
               <span className="flex-shrink-0">
@@ -102,7 +119,7 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
           ))}
 
           {remainingCount > 0 && (
-            <div className="pt-2 text-[11px] text-foreground-lighter text-center">
+            <div className="absolute bottom-2 left-0 right-0 text-[11px] text-foreground-lighter text-center bg-surface-100">
               +{remainingCount} more {remainingCount === 1 ? 'field' : 'fields'}
             </div>
           )}
