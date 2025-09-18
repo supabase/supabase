@@ -66,7 +66,7 @@ const ColumnType = ({
   description,
   showRecommendation = false,
   onOptionSelect = noop,
-  error
+  error,
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
   const availableTypes = POSTGRES_DATA_TYPES.concat(
