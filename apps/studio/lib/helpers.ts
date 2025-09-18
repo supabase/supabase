@@ -339,7 +339,7 @@ export const formatCurrency = (amount: number | undefined | null): string | null
  *
  * Timeout is made configurable as I've observed it requires a higher timeout sometimes (e.g when closing the cron job sheet)
  */
-export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 200) => {
+export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 300) => {
   if (typeof window !== 'undefined') {
     setTimeout(() => {
       if (document.body.style.pointerEvents === 'none') {

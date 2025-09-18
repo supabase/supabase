@@ -681,13 +681,13 @@ export const UsersV2 = () => {
         visible={!!selectedUserToDelete}
         selectedUser={selectedUserToDelete}
         onClose={() => {
-          cleanPointerEventsNoneOnBody()
           setSelectedUserToDelete(undefined)
+          cleanPointerEventsNoneOnBody()
         }}
         onDeleteSuccess={() => {
           if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
           setSelectedUserToDelete(undefined)
-          cleanPointerEventsNoneOnBody()
+          cleanPointerEventsNoneOnBody(500)
         }}
       />
 
