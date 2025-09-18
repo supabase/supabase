@@ -6,6 +6,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import RealtimeLayout from 'components/layouts/RealtimeLayout/RealtimeLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 
 const RealtimePoliciesPage: NextPageWithLayout = () => {
   return (
@@ -24,7 +25,7 @@ RealtimePoliciesPage.getLayout = (page) => (
         title="Policies"
         subtitle="Control access to your realtime channels"
         primaryActions={
-          <DocsButton href="https://supabase.com/docs/guides/realtime/authorization" />
+          <DocsButton href={`${DOCS_URL}/guides/realtime/authorization`} />
         }
         size="large"
       >

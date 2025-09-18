@@ -17,6 +17,7 @@ import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePic
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { DOCS_URL } from 'lib/constants'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
@@ -432,7 +433,7 @@ const DatabaseUsage = () => {
 
                     <Button asChild type="default" icon={<ExternalLink />}>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/database-size#disk-space-usage"
+                        href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
                         target="_blank"
                         rel="noreferrer"
                       >
