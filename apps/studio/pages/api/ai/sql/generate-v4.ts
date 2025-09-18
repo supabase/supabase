@@ -7,7 +7,7 @@ import { z } from 'zod/v4'
 import { IS_PLATFORM } from 'common'
 // import { executeSql } from 'data/sql/execute-sql'
 // import { getModel } from 'lib/ai/model'
-// import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 // import {
 //   CHAT_PROMPT,
 //   EDGE_FUNCTION_PROMPT,
@@ -61,33 +61,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
 
-  return res.status(200).json({ ok: true })
-  //   // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
-  //   // Results property is used to cache results client-side after queries are run
-  //   // Tool results will still be included in history sent to model
-  //   const messages = (rawMessages || []).slice(-7).map((msg: any) => {
-  //     if (msg && msg.role === 'assistant' && 'results' in msg) {
-  //       const cleanedMsg = { ...msg }
-  //       delete cleanedMsg.results
-  //       return cleanedMsg
-  //     }
-  //     // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
-  //     // this happens when a user stops the assistant response while the tool is being called
-  //     if (msg && msg.role === 'assistant' && msg.parts) {
-  //       const cleanedParts = msg.parts.filter((part: any) => {
-  //         return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
-  //       })
-  //       return { ...msg, parts: cleanedParts }
-  //     }
-  //     return msg
-  //   })
-  //
-  //   let aiOptInLevel: AiOptInLevel = 'disabled'
-  //   let isLimited = false
-  //
-  //   if (!IS_PLATFORM) {
-  //     aiOptInLevel = 'schema'
-  //   }
+  // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
+  // Results property is used to cache results client-side after queries are run
+  // Tool results will still be included in history sent to model
+  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
+    if (msg && msg.role === 'assistant' && 'results' in msg) {
+      const cleanedMsg = { ...msg }
+      delete cleanedMsg.results
+      return cleanedMsg
+    }
+    // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
+    // this happens when a user stops the assistant response while the tool is being called
+    if (msg && msg.role === 'assistant' && msg.parts) {
+      const cleanedParts = msg.parts.filter((part: any) => {
+        return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
+      })
+      return { ...msg, parts: cleanedParts }
+    }
+    return msg
+  })
+
+  let aiOptInLevel: AiOptInLevel = 'disabled'
+  let isLimited = false
+
+  if (!IS_PLATFORM) {
+    aiOptInLevel = 'schema'
+  }
   //
   //   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
   //     try {
