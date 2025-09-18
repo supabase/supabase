@@ -4,7 +4,7 @@ import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM } from 'common/constants'
 import { executeSql } from 'data/sql/execute-sql'
 import { getModel } from 'lib/ai/model'
 import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
