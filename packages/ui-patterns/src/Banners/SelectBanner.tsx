@@ -12,11 +12,11 @@ export function SelectBanner() {
   const baseStyles = 'flex flex-col justify-center border-l border-muted py-8 '
   const textBlockStyles =
     baseStyles +
-    'pr-8 text-xs font-mono uppercase leading-none tracking-wide text-white/50 [&_p]:mt-[2px]'
+    'pr-8 text-xs font-mono uppercase leading-none tracking-wide text-white/50 [&_p]:mt-[4px]'
 
   return (
     <div
-      className="relative w-full flex items-center group justify-center text-foreground-contrast dark:text-white bg-black border-b border-muted transition-colors overflow-hidden"
+      className="dark relative w-full flex items-center group justify-center text-foreground-contrast bg-black border-b border-muted transition-colors overflow-hidden"
       style={{
         '--line-color': 'hsl(var(--border-muted))',
         '--line-width': '1px',
