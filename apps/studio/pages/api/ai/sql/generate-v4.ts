@@ -1,11 +1,11 @@
-// import pgMeta from '@supabase/pg-meta'
+import pgMeta from '@supabase/pg-meta'
 // import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
 // import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
-// import { executeSql } from 'data/sql/execute-sql'
+import { executeSql } from 'data/sql/execute-sql'
 // import { getModel } from 'lib/ai/model'
 // import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 // import {
@@ -20,7 +20,7 @@ import { IS_PLATFORM } from 'common'
 import { getModel } from 'lib/ai/model'
 import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 import apiWrapper from 'lib/api/apiWrapper'
-// import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
 const requestBodySchema = z.object({
   messages: z.array(z.any()),
@@ -129,26 +129,27 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    return res.status(200).json({ ping: 'pong' })
-    //   // Get a list of all schemas to add to context
-    //   const pgMetaSchemasList = pgMeta.schemas.list()
+    // Get a list of all schemas to add to context
+    const pgMetaSchemasList = pgMeta.schemas.list()
 
-    //   const { result: schemas } =
-    //     aiOptInLevel !== 'disabled'
-    //       ? await executeSql(
-    //           {
-    //             projectRef,
-    //             connectionString,
-    //             sql: pgMetaSchemasList.sql,
-    //           },
-    //           undefined,
-    //           {
-    //             'Content-Type': 'application/json',
-    //             ...(authorization && { Authorization: authorization }),
-    //           },
-    //           IS_PLATFORM ? undefined : queryPgMetaSelfHosted
-    //         )
-    //       : { result: [] }
+    const { result: schemas } =
+      aiOptInLevel !== 'disabled'
+        ? await executeSql(
+            {
+              projectRef,
+              connectionString,
+              sql: pgMetaSchemasList.sql,
+            },
+            undefined,
+            {
+              'Content-Type': 'application/json',
+              ...(authorization && { Authorization: authorization }),
+            },
+            IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+          )
+        : { result: [] }
+
+    return res.status(200).json({ ping: 'pong' })
 
     //   const schemasString =
     //     schemas?.length > 0
