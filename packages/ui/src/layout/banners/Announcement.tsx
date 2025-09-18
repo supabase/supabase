@@ -9,8 +9,8 @@ import { X } from 'lucide-react'
 
 export interface AnnouncementProps {
   show: boolean
-  title: string
-  launchDate: string | null
+  text: string
+  launchDate: string
   link: string
   badge?: string
 }
