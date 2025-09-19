@@ -41,11 +41,12 @@ const convertAISchemaToTableSuggestions = (schema: AIGeneratedSchema): TableSugg
       nullable: column.isNullable ?? undefined,
       unique: column.isUnique ?? undefined,
       default: column.defaultValue ?? undefined,
-      description: column.isPrimary || column.name === 'id'
-        ? 'Primary key'
-        : column.isForeign && column.references
-          ? `References ${column.references}`
-          : undefined,
+      description:
+        column.isPrimary || column.name === 'id'
+          ? 'Primary key'
+          : column.isForeign && column.references
+            ? `References ${column.references}`
+            : undefined,
       // Ensure 'id' fields are always marked as primary
       isPrimary: column.name === 'id' ? true : column.isPrimary ?? undefined,
       isForeign: column.isForeign ?? undefined,

@@ -57,12 +57,10 @@ export const useQuickstartData = ({
             const isPrimaryKey = field.isPrimary === true || field.name === 'id'
 
             const looksLikeIdentity =
-              field.name === 'id' &&
-              field.type.toLowerCase().includes('int') &&
-              !field.default
+              field.name === 'id' && field.type.toLowerCase().includes('int') && !field.default
 
             // Don't set default value for primary keys
-            const defaultValue = isPrimaryKey ? null : (field.default ? String(field.default) : null)
+            const defaultValue = isPrimaryKey ? null : field.default ? String(field.default) : null
 
             return {
               id: `column-${index}`,
