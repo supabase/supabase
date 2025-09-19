@@ -251,10 +251,10 @@ export const TableTemplateSelector = ({ variant, onSelectTemplate, onDismiss, di
             <DropdownMenuSeparator />
             <div className="px-2 py-1.5 text-xs text-foreground-light">Quick ideas</div>
             {[
-              'Social media platform',
-              'E-commerce marketplace',
-              'Project management tool',
-              'Content management system',
+              'Recipe sharing app',
+              'Event ticketing system',
+              'Fitness tracker',
+              'Learning management platform',
             ].map((example) => (
               <DropdownMenuItem
                 key={example}
