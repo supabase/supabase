@@ -45,7 +45,7 @@ export const useQuickstartData = ({
 
     if (quickstartSnap.selectedTableData) {
       try {
-        const { tableName, fields } = quickstartSnap.selectedTableData
+        const { tableName, fields, rationale } = quickstartSnap.selectedTableData
 
         if (!tableName || !Array.isArray(fields) || fields.length === 0) {
           throw new Error('Invalid quickstart data structure')
@@ -53,20 +53,24 @@ export const useQuickstartData = ({
 
         const columns: TableField['columns'] = fields.map(
           (field: QuickstartTableField, index: number) => {
-            const looksLikePrimaryKey =
-              field.name === 'id' &&
-              (field.type === 'uuid' || field.type.toLowerCase().includes('int'))
+            // Check if field is marked as primary or if it's an id field
+            const isPrimaryKey = field.isPrimary === true || field.name === 'id'
+
+            const looksLikeIdentity =
+              field.name === 'id' && field.type.toLowerCase().includes('int') && !field.default
+
+            // Don't set default value for primary keys
+            const defaultValue = isPrimaryKey ? null : field.default ? String(field.default) : null
 
             return {
               id: `column-${index}`,
               name: field.name,
               format: field.type,
-              defaultValue: field.default ? String(field.default) : null,
+              defaultValue: defaultValue,
               isNullable: field.nullable !== false,
               isUnique: field.unique ?? false,
-              isIdentity:
-                looksLikePrimaryKey && field.type.toLowerCase().includes('int') && !field.default,
-              isPrimaryKey: looksLikePrimaryKey,
+              isIdentity: looksLikeIdentity,
+              isPrimaryKey: isPrimaryKey,
               comment: field.description || '',
               isNewColumn: true,
               table: tableName,
@@ -82,7 +86,7 @@ export const useQuickstartData = ({
           id: 0,
           name: tableName,
           schema: QUICKSTART_DEFAULT_SCHEMA,
-          comment: '',
+          comment: rationale || '',
           columns: columns,
           isRLSEnabled: false,
           isRealtimeEnabled: false,
