@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import pgMeta from '@supabase/pg-meta'
+import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { executeSql } from 'data/sql/execute-sql'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 
 export type DatabaseTriggerCreateVariables = {
   projectRef: string

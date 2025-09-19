@@ -1,6 +1,6 @@
 import { UseInfiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import dayjs from 'dayjs'
 import { DATE_FORMAT } from 'lib/constants'
 import { last } from 'lodash'

@@ -3,16 +3,11 @@ import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'a
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-
+//
 import { IS_PLATFORM } from 'common'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { executeSql } from 'data/sql/execute-sql'
 import { getModel } from 'lib/ai/model'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { getTools } from 'lib/ai/tools'
-import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-
+import { AiOptInLevel, getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,
@@ -21,12 +16,21 @@ import {
   RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
+// import { getTools } from 'lib/ai/tools'
+import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+
+const requestBodySchema = z.object({
+  messages: z.array(z.any()),
+  projectRef: z.string(),
+  connectionString: z.string(),
+  schema: z.string().optional(),
+  table: z.string().optional(),
+  chatName: z.string().optional(),
+  orgSlug: z.string().optional(),
+})
 
 export const maxDuration = 120
-
-export const config = {
-  api: { bodyParser: true },
-}
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -39,21 +43,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
-
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-export default wrapper
-
-const requestBodySchema = z.object({
-  messages: z.array(z.any()),
-  projectRef: z.string(),
-  connectionString: z.string(),
-  schema: z.string().optional(),
-  table: z.string().optional(),
-  chatName: z.string().optional(),
-  orgSlug: z.string().optional(),
-})
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const authorization = req.headers.authorization
@@ -161,13 +150,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
-      ${GENERAL_PROMPT}
-      ${CHAT_PROMPT}
-      ${PG_BEST_PRACTICES}
-      ${RLS_PROMPT}
-      ${EDGE_FUNCTION_PROMPT}
-      ${SECURITY_PROMPT}
-    `
+          ${GENERAL_PROMPT}
+          ${CHAT_PROMPT}
+          ${PG_BEST_PRACTICES}
+          ${RLS_PROMPT}
+          ${EDGE_FUNCTION_PROMPT}
+          ${SECURITY_PROMPT}
+        `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
@@ -185,51 +174,57 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...convertToModelMessages(messages),
     ]
 
-    const abortController = new AbortController()
-    req.on('close', () => abortController.abort())
-    req.on('aborted', () => abortController.abort())
-
-    // Get tools
-    const tools = await getTools({
-      projectRef,
-      connectionString,
-      authorization,
-      aiOptInLevel,
-      accessToken,
-    })
-
-    const result = streamText({
-      model,
-      stopWhen: stepCountIs(5),
-      messages: coreMessages,
-      ...(providerOptions && { providerOptions }),
-      tools,
-      abortSignal: abortController.signal,
-    })
-
-    result.pipeUIMessageStreamToResponse(res, {
-      sendReasoning: true,
-      onError: (error) => {
-        if (error == null) {
-          return 'unknown error'
-        }
-
-        if (typeof error === 'string') {
-          return error
-        }
-
-        if (error instanceof Error) {
-          return error.message
-        }
-
-        return JSON.stringify(error)
-      },
-    })
+    return res.status(200).json({ ok: 'true' })
+    //     const abortController = new AbortController()
+    //     req.on('close', () => abortController.abort())
+    //     req.on('aborted', () => abortController.abort())
+    //
+    //     // Get tools
+    //     const tools = await getTools({
+    //       projectRef,
+    //       connectionString,
+    //       authorization,
+    //       aiOptInLevel,
+    //       accessToken,
+    //     })
+    //
+    //     const result = streamText({
+    //       model,
+    //       stopWhen: stepCountIs(5),
+    //       messages: coreMessages,
+    //       ...(providerOptions && { providerOptions }),
+    //       tools,
+    //       abortSignal: abortController.signal,
+    //     })
+    //
+    //     result.pipeUIMessageStreamToResponse(res, {
+    //       sendReasoning: true,
+    //       onError: (error) => {
+    //         if (error == null) {
+    //           return 'unknown error'
+    //         }
+    //
+    //         if (typeof error === 'string') {
+    //           return error
+    //         }
+    //
+    //         if (error instanceof Error) {
+    //           return error.message
+    //         }
+    //
+    //         return JSON.stringify(error)
+    //       },
+    //     })
   } catch (error) {
     console.error('Error in handlePost:', error)
-    if (error instanceof Error) {
-      return res.status(500).json({ message: error.message })
-    }
+    // if (error instanceof Error) {
+    //   return res.status(500).json({ message: error.message })
+    // }
     return res.status(500).json({ message: 'An unexpected error occurred.' })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper

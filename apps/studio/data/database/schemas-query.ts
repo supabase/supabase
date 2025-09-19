@@ -2,7 +2,8 @@ import pgMeta from '@supabase/pg-meta'
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
+import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { databaseKeys } from './keys'
 
 export type SchemasVariables = {

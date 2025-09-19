@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import pgMeta from '@supabase/pg-meta'
 import { databaseKeys } from 'data/database/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import type { ResponseError } from 'types'
 import type { DatabaseFunction } from './database-functions-query'
 

@@ -7,7 +7,7 @@ import { IS_PLATFORM } from 'common'
 import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
 export const getFallbackTools = ({

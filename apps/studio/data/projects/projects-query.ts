@@ -50,11 +50,11 @@ export const useProjectsQuery = <TData = ProjectsData>({
   )
 }
 
-export function prefetchProjects(client: QueryClient) {
+function prefetchProjects(client: QueryClient) {
   return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal }))
 }
 
-export function useProjectsPrefetch() {
+function useProjectsPrefetch() {
   const client = useQueryClient()
 
   return useCallback(() => {

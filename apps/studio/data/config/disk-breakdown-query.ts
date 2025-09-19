@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { executeSql } from 'data/sql/execute-sql'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DiskBreakdownVariables = {
   projectRef?: string

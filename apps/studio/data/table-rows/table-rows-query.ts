@@ -17,7 +17,8 @@ import {
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
+import { executeSql } from '../sql/execute-sql'
+import { ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { THRESHOLD_COUNT } from './table-rows-count-query'
 import { formatFilterValue } from './utils'

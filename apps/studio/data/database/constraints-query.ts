@@ -1,5 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { executeSql } from '../sql/execute-sql'
+import { ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
 
 type GetTableConstraintsVariables = {

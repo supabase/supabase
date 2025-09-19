@@ -3,8 +3,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { lintKeys } from 'data/lint/keys'
+import { executeSql } from 'data/sql/execute-sql'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'

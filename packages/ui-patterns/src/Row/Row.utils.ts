@@ -1,9 +1,10 @@
-import { useLayoutEffect, useState } from 'react'
+import { useIsomorphicLayoutEffect } from 'common'
+import { useState } from 'react'
 
 export const useMeasuredWidth = <T extends HTMLElement>(ref: React.RefObject<T>) => {
   const [measuredWidth, setMeasuredWidth] = useState<number | null>(null)
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const element = ref.current
     if (!element) return
 

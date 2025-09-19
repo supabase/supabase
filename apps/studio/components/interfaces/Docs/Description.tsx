@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'

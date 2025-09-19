@@ -2,7 +2,7 @@ import { toast } from 'sonner'
 
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 
 /**
  * Gets the required extensions for index advisor

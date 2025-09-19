@@ -55,7 +55,7 @@
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
     "supports-color": "^8.0.0",
-    "turbo": "2.3.3",
+    "turbo": "2.5.6",
     "typescript": "~5.5.0"
   },
   "repository": {
@@ -67,7 +67,7 @@
       "@supabase/supabase-js>@supabase/auth-js": "catalog:",
       "@tanstack/directive-functions-plugin>vite": "catalog:",
       "@tanstack/react-start-plugin>vite": "catalog:",
-      "esbuild": "^0.25.2",
+      "esbuild": "^0.25.9",
       "@redocly/respect-core>form-data": "^4.0.4",
       "tmp": "^0.2.4"
     },

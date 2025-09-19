@@ -1,6 +1,7 @@
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 
-import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
+import { type ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from 'data/table-rows/table-rows-count-query'
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'

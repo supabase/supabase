@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import { ResponseError } from 'types'
 import { CronJob } from './database-cron-jobs-infinite-query'
 import { databaseCronJobsKeys } from './keys'

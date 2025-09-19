@@ -1,10 +1,9 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import pgMeta from '@supabase/pg-meta'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { executeSql } from 'data/sql/execute-sql'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
-import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DatabaseTriggerDeleteVariables = {
   trigger: {

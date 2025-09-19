@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { viewKeys } from 'data/views/keys'
