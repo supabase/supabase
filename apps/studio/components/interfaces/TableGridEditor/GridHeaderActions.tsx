@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, ChevronRight, ListTree, Lock, PlusCircle, Unlock } from 'lucide-react'
+import { ChevronsUpDown, ListTree, Lock, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -32,10 +32,12 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   AiIconAnimation,
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -44,6 +46,8 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
+import { useRouter } from 'next/router'
+import { sortBy } from 'lodash'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
@@ -57,6 +61,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const router = useRouter()
 
   const [showWarning, setShowWarning] = useQueryState(
     'showWarning',
@@ -85,6 +90,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
+  const [triggersPopoverOpen, setTriggersPopoverOpen] = useState(false)
 
   const snap = useTableEditorTableStateSnapshot()
   const showHeaderActions = snap.selectedRows.size === 0
@@ -107,9 +113,17 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       enabled: isTable,
     }
   )
-  const tableTriggersCount = (triggersData ?? []).filter(
-    (trigger) => trigger.schema === table.schema && trigger.table === table.name
-  ).length
+  const tableTriggers = useMemo(
+    () =>
+      sortBy(
+        (triggersData ?? []).filter(
+          (trigger) => trigger.schema === table.schema && trigger.table === table.name
+        ),
+        (trigger) => (trigger.name || '').toLowerCase()
+      ),
+    [triggersData, table.schema, table.name]
+  )
+  const tableTriggersCount = tableTriggers.length
 
   const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -145,54 +159,36 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
   const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
-  const handleManageTriggersClick = () => {
-    sendEvent({
-      action: 'table_triggers_manage_clicked',
-      properties: {
-        origin: 'tableGridHeader',
-        table: table.name,
-        schema: table.schema,
-      },
-      groups: {
-        project: project?.ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+  const handleManageTriggersClick = (triggerName?: string) => {
+    setTriggersPopoverOpen(false)
+    router.push(manageTriggersHref)
   }
 
   const handleCreateTriggerWithAssistant = () => {
-    sendEvent({
-      action: 'table_triggers_assistant_clicked',
-      properties: {
-        origin: 'tableGridHeader',
-        table: table.name,
-        schema: table.schema,
-      },
-      groups: {
-        project: project?.ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    setTriggersPopoverOpen(false)
 
     aiSnap.newChat({
       name: `Create trigger for ${table.schema}.${table.name}`,
       open: true,
-      initialInput: `Help me broadcast changes from the ${table.schema}.${table.name} table using Supabase Realtime. Ask how I want to filter events in the topic name, then walk me through the required policies and trigger SQL step by step.`,
+      initialInput: `Help me create a trigger for the ${table.schema}.${table.name} table.`,
       suggestions: {
         title: 'Need inspiration? Try one of these prompts:',
         prompts: [
           {
-            label: 'Broadcast all row changes',
-            description: 'Emit INSERT, UPDATE, and DELETE events for every change on this table.',
+            label: 'Enable Realtime broadcasts',
+            description: `Keep my client query in sync with the ${table.schema}.${table.name} table.`,
           },
           {
-            label: 'Per-record topics',
-            description:
-              'Create topics scoped to the record ID so clients subscribe to a single row.',
+            label: 'Audit log trigger',
+            description: 'Log all changes to an audit table for compliance and tracking.',
           },
           {
-            label: 'Filter by tenant',
-            description: 'Only broadcast events for a given tenant id embedded in the topic name.',
+            label: 'Automatic timestamps',
+            description: 'Update created_at and updated_at fields automatically on row changes.',
+          },
+          {
+            label: 'Data validation',
+            description: 'Validate data before insert/update operations and prevent invalid data.',
           },
         ],
       },
@@ -463,16 +459,15 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             </Popover_Shadcn_>
           )}
 
-          <RoleImpersonationPopover serviceRoleLabel="postgres" />
-
           {isTable && realtimeEnabled && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            <Popover_Shadcn_ open={triggersPopoverOpen} onOpenChange={setTriggersPopoverOpen}>
+              <PopoverTrigger_Shadcn_ asChild>
                 <Button
                   type={'default'}
                   size="tiny"
+                  role="combobox"
                   className="group"
-                  iconRight={<ChevronDown strokeWidth={1.5} size={14} />}
+                  iconRight={<ChevronsUpDown className="ml-1 h-4 w-4 text-foreground-muted" />}
                   icon={
                     <div
                       className={cn(
@@ -488,28 +483,78 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 >
                   {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={manageTriggersHref}
-                    onClick={handleManageTriggersClick}
-                    className="flex items-center gap-2"
-                  >
-                    <ListTree size={14} />
-                    <span>Manage triggers</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="flex items-center gap-2"
-                  onSelect={() => handleCreateTriggerWithAssistant()}
-                >
-                  <AiIconAnimation size={16} />
-                  <span>Create with Assistant</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ portal side="bottom" align="end" className="w-80 p-0">
+                <div className="flex max-h-80 flex-col">
+                  <Command_Shadcn_ className="max-h-64">
+                    <CommandInput_Shadcn_ placeholder="Search triggers" />
+                    <CommandList_Shadcn_ className="max-h-64 overflow-y-auto">
+                      <CommandEmpty_Shadcn_>
+                        <div className="p-3 text-center">
+                          <h4 className="text-sm font-medium text-foreground mb-2">
+                            No triggers found
+                          </h4>
+                          <p className="text-sm text-foreground-light">
+                            Use triggers to automatically execute functions when data changes,
+                            enable realtime subscriptions, or edge functions.
+                          </p>
+                        </div>
+                      </CommandEmpty_Shadcn_>
+                      {tableTriggersCount > 0 && (
+                        <CommandGroup_Shadcn_ heading="Triggers">
+                          {tableTriggers.map((trigger) => {
+                            const events = (trigger.events ?? []).join(', ')
+                            const orientation = trigger.orientation
+                              ? trigger.orientation.toLowerCase()
+                              : undefined
+                            const metadata = [events || null, orientation || null]
+                              .filter(Boolean)
+                              .join(' · ')
+
+                            return (
+                              <CommandItem_Shadcn_
+                                key={trigger.id}
+                                value={`${trigger.name} ${trigger.function_name}`}
+                                onSelect={() => handleManageTriggersClick(trigger.name)}
+                                className="items-start gap-1 py-2"
+                              >
+                                <div className="flex w-full flex-col">
+                                  <div className="flex items-center justify-between gap-2 text-sm font-medium text-foreground">
+                                    <span className="truncate">{trigger.name}</span>
+                                    <span className="text-xs text-foreground-muted">
+                                      {trigger.enabled_mode !== 'DISABLED' ? 'Enabled' : 'Disabled'}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-foreground-light">
+                                    {metadata || 'No events configured'}
+                                  </div>
+                                  <div className="text-xs text-foreground-lighter truncate">
+                                    {trigger.function_schema}.{trigger.function_name}
+                                  </div>
+                                </div>
+                              </CommandItem_Shadcn_>
+                            )
+                          })}
+                        </CommandGroup_Shadcn_>
+                      )}
+                    </CommandList_Shadcn_>
+                  </Command_Shadcn_>
+                  <div className="border-t p-3">
+                    <Button
+                      type="default"
+                      className="w-full"
+                      icon={<AiIconAnimation size={16} />}
+                      onClick={handleCreateTriggerWithAssistant}
+                    >
+                      Create with Assistant
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           )}
+
+          <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
           {doesHaveAutoGeneratedAPIDocs && <APIDocsButton section={['entities', table.name]} />}
 
