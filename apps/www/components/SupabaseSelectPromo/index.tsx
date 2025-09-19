@@ -30,8 +30,8 @@ const SupabaseSelectPromo = () => {
         ))}
       </header>
       <div className="flex flex-col">
-        <h3 className="text-2xl text-lighter">{mainText[0]}</h3>
-        <p className="text-2xl text-white">{mainText[1]}</p>
+        <h3 className="text-2xl text-light">{mainText[0]}</h3>
+        <p className="text-2xl text">{mainText[1]}</p>
       </div>
 
       <Button asChild type="primary" size="large">
