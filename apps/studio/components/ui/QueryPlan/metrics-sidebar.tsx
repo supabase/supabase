@@ -269,7 +269,7 @@ const renderTimeMetric: MetricRenderer = (data, stats) => {
       />
     ),
     tooltip: (
-      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-lighter">
+      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
         <li>
           <span className="font-medium">Time spent in this step only:</span>{' '}
           <span className="text-foreground">
@@ -333,7 +333,7 @@ const renderCostMetric: MetricRenderer = (data, stats) => {
   return {
     visual: <MetricBar percent={percent} />,
     tooltip: (
-      <ul className="-space-y-0.5 text-foreground-lighter">
+      <ul className="-space-y-0.5 text-foreground-light">
         <li>
           <span className="font-medium">Planner cost for this step:</span>{' '}
           <span className="text-foreground">{exclusiveCost.toFixed(2)}</span>
@@ -369,7 +369,7 @@ const renderBuffersMetric: MetricRenderer = (data, stats) => {
       />
     ),
     tooltip: (
-      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-lighter">
+      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
         <li>
           <span className="font-medium">Shared cache (global):</span>{' '}
           <span className="text-foreground">{formatNumber(breakdown.shared) ?? '0'} blocks</span>{' '}
@@ -414,7 +414,7 @@ const renderIOMetric: MetricRenderer = (data, stats) => {
   return {
     visual: <BufferBar sharedPercent={readPercent} tempPercent={writePercent} localPercent={0} />,
     tooltip: (
-      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-lighter">
+      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
         <li>
           <span className="font-medium">Reading from storage:</span>{' '}
           <span className="text-foreground">{formatMs(read) ?? '0'} ms</span>

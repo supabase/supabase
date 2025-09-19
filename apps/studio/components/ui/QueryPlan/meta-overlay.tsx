@@ -54,7 +54,9 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-x-1">
-                  <span className="text-foreground-lighter leading-tight">{metric.label}:</span>
+                  <span className="text-foreground-light leading-tight font-medium">
+                    {metric.label}:
+                  </span>
                   <span>{formatMs(metric.value)} ms</span>
                 </div>
               </TooltipTrigger>
