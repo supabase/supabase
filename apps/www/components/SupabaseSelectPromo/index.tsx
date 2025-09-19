@@ -1,4 +1,4 @@
-// import React from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -9,14 +9,8 @@ import './styles.css'
 const SupabaseSelectPromo = () => {
   const monoStyle = 'text-sm font-mono uppercase leading-none tracking-wide text-white/50'
   const gridUnit = 24
-  const gridUnitTailwind = gridUnit / 4
-
   const logoWidth = 320
-  const logoWidthTailwind = logoWidth / 4 // 80px
   const speakerImgWidth = gridUnit * 12 // 288px
-
-  const speakerImgWidthTailwind = speakerImgWidth / 4
-
   const gridWidth = gridUnit * 26 // 624px
   const selectSiteUrl = 'https://select.supabase.com/'
   const headerText = ['Our first user conference', 'Oct 3 2025', '@ YC Offices, SF']
@@ -52,7 +46,8 @@ const SupabaseSelectPromo = () => {
     >
       {/* Main centered content */}
       <div
-        className={`border-x border-muted m:py-18 container relative mx-auto py-16 md:py-24 lg:py-24 before:absolute before:left-0 before:top-0 before:w-px before:h-full before:bg-muted before:-left-[${gridUnit}px]`}
+        className="border-x border-muted m:py-18 container relative mx-auto py-16 md:py-24 lg:py-24 before:absolute before:top-0 before:w-px before:h-full before:bg-muted before-left-negative"
+        style={{ '--before-left': `-${gridUnit}px` } as React.CSSProperties}
       >
         {/* Header */}
         <header className="flex flex-row border-y border-muted">
@@ -71,7 +66,8 @@ const SupabaseSelectPromo = () => {
           <Image
             src={`/images/supabase-select/speakers/${speakers[0].slug}.jpg`}
             alt={speakers[0].name}
-            className={`w-[${speakerImgWidthTailwind - 1}px] absolute top-0 -right-[0.5px] hidden md:block z-10`}
+            className="absolute top-0 -right-[0.5px] hidden lg:block z-10"
+            style={{ width: `${speakerImgWidth - 1}px` }}
             width={speakerImgWidth - 1}
             height={speakerImgWidth - 1}
           />
@@ -86,14 +82,16 @@ const SupabaseSelectPromo = () => {
               <Image
                 src="/images/supabase-select/logo.svg"
                 alt="Supabase Select"
-                className={`w-[${logoWidth}px] transform translate-y-3`}
+                className="transform translate-y-3"
+                style={{ width: `${logoWidth}px` }}
                 width={logoWidth}
                 height={logoWidth}
               />
             </Link>
             {/* Speaker name */}
             <p
-              className={`${monoStyle} mr-[${speakerImgWidth}px] pr-1 hidden lg:inline-block text-right`}
+              className={`${monoStyle} pr-1 hidden lg:inline-block text-right`}
+              style={{ marginRight: `${speakerImgWidth}px` }}
             >
               {speakers[0].name}, {speakers[0].title}
             </p>
@@ -102,8 +100,10 @@ const SupabaseSelectPromo = () => {
           <div className="relative h-[288px] border-b border-muted flex flex-col justify-between">
             {/* Grid background */}
             <div
-              className={`hidden xl:block absolute -top-[1px] -right-[1px] w-[${gridWidth}px] h-[${gridWidth}px] border-r border-b border-muted`}
+              className="hidden lg:block absolute -top-[1px] -right-[1px] border-r border-b border-muted"
               style={{
+                width: `${gridWidth}px`,
+                height: `${gridWidth}px`,
                 backgroundImage: `
                 linear-gradient(to right, hsl(var(--border-muted)) 1px, transparent 1px),
                 linear-gradient(to bottom, hsl(var(--border-muted)) 1px, transparent 1px)
