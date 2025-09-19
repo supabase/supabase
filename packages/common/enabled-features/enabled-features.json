@@ -38,8 +38,9 @@
 
   "feedback:docs": true,
 
-  "integrations:vercel": true,
+  "integrations:partners": true,
   "integrations:show_stripe_wrapper": true,
+  "integrations:vercel": true,
 
   "logs:templates": true,
   "logs:collections": true,
