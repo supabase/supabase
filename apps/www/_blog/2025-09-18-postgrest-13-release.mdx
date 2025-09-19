@@ -86,11 +86,9 @@ This also works with `rpc()`, given that it modifies rows and returns the affect
 For observability, you can now verify the response body size in bytes in the `Content-Length` header.
 
 ```bash
-
 HTTP/1.1 200 OK
 Content-Length: 104
 Content-Location: /items
-```
 
 This helps in cases where you want to know which requests consume the most traffic to avoid exceeding egress limits.
 
