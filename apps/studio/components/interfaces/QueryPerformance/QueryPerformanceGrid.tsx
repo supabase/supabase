@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ChevronDown, TextSearch, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -18,6 +18,7 @@ import {
   Tabs_Shadcn_,
   cn,
   CodeBlock,
+  SheetTitle,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -41,6 +42,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const gridRef = useRef<DataGridHandle>(null)
   const { sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
+  const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
@@ -365,77 +367,84 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
   return (
     <div className="relative flex flex-grow bg-alternative min-h-0">
-      <DataGrid
-        ref={gridRef}
-        style={{ height: '100%' }}
-        className={cn('flex-1 flex-grow h-full')}
-        rowHeight={44}
-        headerRowHeight={36}
-        columns={columns}
-        rows={reportData}
-        rowClass={(_, idx) => {
-          const isSelected = idx === selectedRow
-          return [
-            `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-            `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
-            '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-            '[&>.rdg-cell.column-prop_total_time]:relative',
-          ].join(' ')
-        }}
-        renderers={{
-          renderRow(idx, props) {
-            return (
-              <Row
-                {...props}
-                key={`qp-row-${props.rowIdx}`}
-                onClick={() => {
-                  if (typeof idx === 'number' && idx >= 0) {
-                    setSelectedRow(idx)
-                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+      <div ref={dataGridContainerRef} className="flex-1">
+        <DataGrid
+          ref={gridRef}
+          style={{ height: '100%' }}
+          className={cn('flex-1 flex-grow h-full')}
+          rowHeight={44}
+          headerRowHeight={36}
+          columns={columns}
+          rows={reportData}
+          rowClass={(_, idx) => {
+            const isSelected = idx === selectedRow
+            return [
+              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell.column-prop_total_time]:relative',
+            ].join(' ')
+          }}
+          renderers={{
+            renderRow(idx, props) {
+              return (
+                <Row
+                  {...props}
+                  key={`qp-row-${props.rowIdx}`}
+                  onClick={(event) => {
+                    event.stopPropagation()
 
-                    const rowQuery = reportData[idx]?.query ?? ''
-                    if (!rowQuery.trim().toLowerCase().startsWith('select')) {
-                      setView('details')
+                    if (typeof idx === 'number' && idx >= 0) {
+                      setSelectedRow(idx)
+                      gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+
+                      const rowQuery = reportData[idx]?.query ?? ''
+                      if (!rowQuery.trim().toLowerCase().startsWith('select')) {
+                        setView('details')
+                      }
                     }
-                  }
-                }}
-              />
-            )
-          },
-          noRowsFallback: isLoading ? (
-            <div className="absolute top-14 px-6 w-full">
-              <GenericSkeletonLoader />
-            </div>
-          ) : (
-            <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-              <TextSearch className="text-foreground-muted" strokeWidth={1} />
-              <div className="text-center">
-                <p className="text-foreground">No queries detected</p>
-                <p className="text-foreground-light">
-                  There are no actively running queries that match the criteria
-                </p>
+                  }}
+                />
+              )
+            },
+            noRowsFallback: isLoading ? (
+              <div className="absolute top-14 px-6 w-full">
+                <GenericSkeletonLoader />
               </div>
-            </div>
-          ),
-        }}
-      />
+            ) : (
+              <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+                <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                <div className="text-center">
+                  <p className="text-foreground">No queries detected</p>
+                  <p className="text-foreground-light">
+                    There are no actively running queries that match the criteria
+                  </p>
+                </div>
+              </div>
+            ),
+          }}
+        />
+      </div>
 
       <Sheet
         open={selectedRow !== undefined}
         onOpenChange={(open) => {
-          // Only close the sheet if open is false AND we're not just changing content
-          // This prevents closing when clicking outside
           if (!open) {
             setSelectedRow(undefined)
           }
         }}
         modal={false}
       >
+        <SheetTitle className="sr-only">Query details</SheetTitle>
         <SheetContent
           side="right"
           className="flex flex-col h-full bg-studio border-l !w-[580px]"
           hasOverlay={false}
-          // onPointerDownOutside={(event) => event.preventDefault()}
+          onInteractOutside={(event) => {
+            if (dataGridContainerRef.current?.contains(event.target as Node)) {
+              event.preventDefault()
+            }
+          }}
         >
           <Tabs_Shadcn_
             value={view}
