@@ -77,18 +77,13 @@ export const FilterPopoverPrimitive = ({
     const formattedFilters = localFilters.map((f) => {
       const column = snap.table.columns.find((c) => c.name === f.column)
       if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
+      // For `ilike` and `like` operator, must wrap the value with `%`.
+      if (['~~*', '~~'].includes(f?.operator)) return { ...f, value: `%${f.value}%` }
       else return f
     })
 
-    const appliedFilters = formattedFilters.map((filterObj) => {
-      // For `ilike` operator, must wrap the value with `%`.
-      if (filterObj?.operator === '~~*') return { ...filterObj, value: `%${filterObj.value}%` }
-
-      return filterObj
-    })
-
     setLocalFilters(formattedFilters)
-    onApplyFilters(appliedFilters)
+    onApplyFilters(formattedFilters)
   }
 
   function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
