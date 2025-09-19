@@ -22,6 +22,7 @@ export const OrganizationInvite = () => {
     {
       retry: false,
       refetchOnWindowFocus: false,
+      enabled: !!profile,
     }
   )
   const hasError =
