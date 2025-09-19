@@ -35,13 +35,10 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const activeItemRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null)
   const hasSubItems = props.subItem.items && props.subItem.items.length > 0
 
-  // Callback ref for better React compatibility
   const setActiveItemRef = React.useCallback((element: HTMLButtonElement | HTMLAnchorElement | null) => {
-    // Store ref for potential future use
     if (activeItemRef.current !== element) {
       (activeItemRef as React.MutableRefObject<HTMLButtonElement | HTMLAnchorElement | null>).current = element
     }
-    // Scroll to active item when ref is set
     if (activeItem && element) {
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
