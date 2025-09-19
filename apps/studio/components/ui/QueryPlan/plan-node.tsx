@@ -330,14 +330,14 @@ export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
 
   return (
     <div
+      style={{ width: `${DEFAULT_NODE_WIDTH}px` }}
       className={cn(
         'border overflow-hidden rounded-[4px] shadow-sm bg-background transition-all',
         selected
-          ? 'border-brand ring-2 ring-brand ring-offset-2 ring-offset-background shadow-lg'
+          ? 'border-brand-500/70 ring ring-brand-500/60 ring-offset-[3px] ring-offset-background'
           : 'border-border',
         isNeverExecuted && 'border-dashed opacity-70'
       )}
-      style={{ width: DEFAULT_NODE_WIDTH }}
     >
       <Handle type="target" position={Position.Top} className={HIDDEN_NODE_CONNECTOR} />
       <header
