@@ -113,7 +113,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(object)
   } catch (error) {
-    console.error('Error generating schemas:', error)
 
     if (error instanceof Error) {
       if (error.message.includes('context_length') || error.message.includes('too long')) {

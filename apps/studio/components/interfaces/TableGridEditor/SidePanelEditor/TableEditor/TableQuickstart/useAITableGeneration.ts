@@ -47,7 +47,6 @@ const convertAISchemaToTableSuggestions = (schema: AIGeneratedSchema): TableSugg
           : column.isForeign && column.references
             ? `References ${column.references}`
             : undefined,
-      // Ensure 'id' fields are always marked as primary
       isPrimary: column.name === 'id' ? true : column.isPrimary ?? undefined,
       isForeign: column.isForeign ?? undefined,
       references: column.references ?? undefined,
@@ -63,7 +62,6 @@ export const useAITableGeneration = () => {
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
@@ -73,12 +71,10 @@ export const useAITableGeneration = () => {
   }, [])
 
   const generateTables = useCallback(async (prompt: string): Promise<TableSuggestion[]> => {
-    // Cancel any pending request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
 
-    // Validate prompt length
     if (prompt.length > 500) {
       const error = 'Description is too long. Please keep it under 500 characters.'
       toast.error(error)
@@ -121,12 +117,10 @@ export const useAITableGeneration = () => {
       return tables
     } catch (e) {
       if (e instanceof Error && e.name === 'AbortError') {
-        // Request was cancelled, don't show error
         return []
       }
 
       const errorMessage = e instanceof Error ? e.message : 'Failed to generate schemas'
-      console.error('AI generation failed:', e)
       setError(errorMessage)
 
       toast.error('Unable to generate tables', {

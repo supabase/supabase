@@ -25,7 +25,6 @@ interface TableTemplateSelectorProps {
   disabled?: boolean
 }
 
-// Extracted template item component for performance
 const TemplateItem = memo(({
   template,
   isSelected,
@@ -62,7 +61,6 @@ const TemplateItem = memo(({
 ))
 TemplateItem.displayName = 'TemplateItem'
 
-// Extracted category selector for template variant
 const CategorySelector = memo(({
   onSelectCategory,
   onDismiss,
@@ -134,7 +132,6 @@ export const TableTemplateSelector = ({
   onDismiss,
   disabled
 }: TableTemplateSelectorProps) => {
-  // Simplified state management
   const [viewState, setViewState] = useState<{
     mode: 'initial' | 'ai-input' | 'ai-results' | 'category-selected'
     selectedCategory: string | null
@@ -151,14 +148,12 @@ export const TableTemplateSelector = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const { generateTables, isGenerating } = useAITableGeneration()
 
-  // Focus management
   useEffect(() => {
     if (viewState.mode === 'ai-input' && inputRef.current) {
       inputRef.current.focus()
     }
   }, [viewState.mode])
 
-  // Memoized template conversion
   const convertToTableField = useCallback((table: TableSuggestion): Partial<TableField> => {
     const columns: ColumnField[] = table.fields.map((field, index) => {
       const isPrimaryKey = field.isPrimary === true || field.name === 'id'
@@ -221,7 +216,6 @@ export const TableTemplateSelector = ({
     setAiPrompt('')
   }, [])
 
-  // Template variant
   if (variant === QuickstartVariant.TEMPLATES) {
     if (viewState.selectedCategory && viewState.mode !== 'initial') {
       const templates = tableTemplates[viewState.selectedCategory] || []
@@ -266,7 +260,6 @@ export const TableTemplateSelector = ({
     )
   }
 
-  // AI variant
   if (viewState.mode === 'ai-input') {
     return (
       <div className="space-y-2">
@@ -345,7 +338,6 @@ export const TableTemplateSelector = ({
     )
   }
 
-  // Initial state - AI variant
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -394,7 +386,6 @@ export const TableTemplateSelector = ({
               onClick={async () => {
                 setAiPrompt(example)
                 setViewState(prev => ({ ...prev, mode: 'ai-input' }))
-                // Auto-generate after setting the prompt
                 setTimeout(() => handleGenerateTables(), 100)
               }}
             >

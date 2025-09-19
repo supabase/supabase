@@ -97,7 +97,6 @@ export const TableEditor = ({
     | false
     | undefined
 
-  // Check if user has tables and if quickstart is dismissed
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -308,7 +307,6 @@ export const TableEditor = ({
           <TableTemplateSelector
             variant={tableQuickstartVariant}
             onSelectTemplate={(template) => {
-              // Update all fields at once to avoid closure issues
               const updates: Partial<TableField> = {}
               if (template.name) updates.name = template.name
               if (template.comment) updates.comment = template.comment
