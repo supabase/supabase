@@ -124,7 +124,7 @@ To do this now, you should use the new `Max Affected` instead.
 
 ### JWT `kid` validation
 
-PostgREST now validates the JWT `kid` claim. If your JWT contains a `kid`, it will try to match the `kid` of one of the keys in the configured JSON Web Key Set. Check the [official docs](https://docs.postgrest.org/en/v13/references/auth.html#jwk-kid-validation) for more details.
+PostgREST now validates the JWT `kid` claim. If your JWT contains a Key ID (`kid`), it will try to match this with one of the `kid`'s in the configured JSON Web Key Set. Check the [official docs](https://docs.postgrest.org/en/v13/references/auth.html#jwk-kid-validation) for more details.
 
 If you use Supabase Auth or the CLI to create JSON Web Keys, you shouldn’t worry about this change. For users that integrate with other Auth systems, check that both your JWT and JWKS follow the above rules.
 
