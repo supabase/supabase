@@ -67,15 +67,19 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  // Generate unique request ID for tracing
+  const requestId = `table-gen-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+
   const { model, error: modelError } = await getModel({
     provider: 'openai',
-    model: 'gpt-4o-mini',
+    model: 'gpt-5-mini',
     routingKey: 'table-quickstart',
     isLimited: false,
   })
 
-  if (modelError) {
-    return res.status(500).json({ error: modelError.message })
+  if (modelError || !model) {
+    console.error(`[${requestId}] Model initialization failed:`, modelError)
+    return res.status(500).json({ error: 'AI service temporarily unavailable' })
   }
 
   const { prompt } = req.body
