@@ -88,6 +88,7 @@ typings/
 .env.staging
 .env.production
 
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 
@@ -123,6 +124,7 @@ typings/
 **/supabase/.temp
 
 apps/new-docs/*
+apps/*/next-env.d.ts
 
 # UI tokens
 packages/ui/tokens/**/*.json
