@@ -120,7 +120,7 @@ const { data, error } = await supabase
 
 But this never gave an error, it only did the equivalent of a `UPDATE .. LIMIT` SQL statement. It also required adding a PK in the `order` method, which was a confusing interface.
 
-To do this now, you should use the new Max Affected instead.
+To do this now, you should use the new `Max Affected` instead.
 
 ### JWT kid validation
 
