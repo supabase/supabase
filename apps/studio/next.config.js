@@ -35,6 +35,11 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
+    // Enable additional optimizations for better performance
+    optimizePackageImports: ['lodash', '@supabase/supabase-js', 'react-use'],
+    turbotrace: {
+      logLevel: 'error',
+    },
   },
   async rewrites() {
     return [
@@ -507,7 +512,7 @@ const nextConfig = {
     },
   },
   // Both configs for turbopack and webpack need to exist (and sync) because Nextjs still uses webpack for production building
-  webpack(config) {
+  webpack(config, { dev, isServer }) {
     config.module?.rules
       .find((rule) => rule.oneOf)
       .oneOf.forEach((rule) => {
@@ -523,6 +528,44 @@ const nextConfig = {
       test: /\.md$/,
       type: 'asset/source',
     })
+
+    // Performance optimizations
+    if (!dev && !isServer) {
+      // Enable optimizations for production client builds
+      config.optimization = {
+        ...config.optimization,
+        sideEffects: false,
+        usedExports: true,
+        splitChunks: {
+          ...config.optimization.splitChunks,
+          chunks: 'all',
+          cacheGroups: {
+            ...config.optimization.splitChunks?.cacheGroups,
+            lodash: {
+              test: /[\\/]node_modules[\\/]lodash[\\/]/,
+              name: 'lodash',
+              chunks: 'all',
+              priority: 10,
+            },
+            supabase: {
+              test: /[\\/]node_modules[\\/]@supabase[\\/]/,
+              name: 'supabase',
+              chunks: 'all',
+              priority: 10,
+            },
+          },
+        },
+      }
+
+      // Add React optimizations
+      if (config.resolve.alias) {
+        config.resolve.alias = {
+          ...config.resolve.alias,
+          'react-dom$': 'react-dom/profiling',
+          'scheduler/tracing': 'scheduler/tracing-profiling',
+        }
+      }
+    }
 
     return config
   },
