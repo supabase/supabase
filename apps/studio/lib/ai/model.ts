@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai'
-import { LanguageModel } from 'ai'
+import { LanguageModelV2 } from 'ai'
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 import {
   BedrockModel,
@@ -15,7 +15,7 @@ type PromptProviderOptions = Record<string, any>
 type ProviderOptions = Record<string, any>
 
 type ModelSuccess = {
-  model: LanguageModel
+  model: LanguageModelV2
   promptProviderOptions?: PromptProviderOptions
   providerOptions?: ProviderOptions
   error?: never
@@ -100,7 +100,7 @@ export async function getModel({
       return { error: new Error('OPENAI_API_KEY not available') }
     }
     return {
-      model: openai.chat(chosenModelId as OpenAIModel),
+      model: openai(chosenModelId as OpenAIModel),
       promptProviderOptions: models[chosenModelId as OpenAIModel]?.promptProviderOptions,
       providerOptions: providerRegistry.providerOptions,
     }

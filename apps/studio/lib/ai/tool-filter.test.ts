@@ -13,7 +13,7 @@ import {
 
 describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
-    expect(TOOL_CATEGORY_MAP['display_query']).toBe(TOOL_CATEGORIES.UI)
+    expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
   })
 })
@@ -23,8 +23,8 @@ describe('tool allowance by opt-in level', () => {
   function getAllowedTools(optInLevel: string) {
     const mockTools: ToolSet = {
       // UI tools
-      display_query: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-      display_edge_function: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+      execute_sql: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+      deploy_edge_function: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       rename_chat: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Schema tools
@@ -54,8 +54,8 @@ describe('tool allowance by opt-in level', () => {
 
   it('should return only UI tools for disabled opt-in level', () => {
     const tools = getAllowedTools('disabled')
-    expect(tools).toContain('display_query')
-    expect(tools).toContain('display_edge_function')
+    expect(tools).toContain('execute_sql')
+    expect(tools).toContain('deploy_edge_function')
     expect(tools).toContain('rename_chat')
     expect(tools).toContain('search_docs')
     expect(tools).not.toContain('list_tables')
@@ -68,8 +68,8 @@ describe('tool allowance by opt-in level', () => {
 
   it('should return UI and schema tools for schema opt-in level', () => {
     const tools = getAllowedTools('schema')
-    expect(tools).toContain('display_query')
-    expect(tools).toContain('display_edge_function')
+    expect(tools).toContain('execute_sql')
+    expect(tools).toContain('deploy_edge_function')
     expect(tools).toContain('rename_chat')
     expect(tools).toContain('list_tables')
     expect(tools).toContain('list_extensions')
@@ -84,8 +84,8 @@ describe('tool allowance by opt-in level', () => {
 
   it('should return UI, schema and log tools for schema_and_log opt-in level', () => {
     const tools = getAllowedTools('schema_and_log')
-    expect(tools).toContain('display_query')
-    expect(tools).toContain('display_edge_function')
+    expect(tools).toContain('execute_sql')
+    expect(tools).toContain('deploy_edge_function')
     expect(tools).toContain('rename_chat')
     expect(tools).toContain('list_tables')
     expect(tools).toContain('list_extensions')
@@ -98,10 +98,10 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).not.toContain('execute_sql')
   })
 
-  it('should return all tools for schema_and_log_and_data opt-in level (excluding execute_sql)', () => {
+  it('should return all tools for schema_and_log_and_data opt-in level', () => {
     const tools = getAllowedTools('schema_and_log_and_data')
-    expect(tools).toContain('display_query')
-    expect(tools).toContain('display_edge_function')
+    expect(tools).toContain('execute_sql')
+    expect(tools).toContain('deploy_edge_function')
     expect(tools).toContain('rename_chat')
     expect(tools).toContain('list_tables')
     expect(tools).toContain('list_extensions')
@@ -118,8 +118,8 @@ describe('tool allowance by opt-in level', () => {
 describe('filterToolsByOptInLevel', () => {
   const mockTools: ToolSet = {
     // UI tools - should return non-privacy responses
-    display_query: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-    display_edge_function: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+    execute_sql: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+    deploy_edge_function: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     rename_chat: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Schema tools
     list_tables: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
