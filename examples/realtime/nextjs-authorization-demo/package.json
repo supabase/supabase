@@ -11,7 +11,7 @@
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.9.0",
     "@supabase/ssr": "latest",
-    "@supabase/supabase-js": "2.44.0",
+    "@supabase/supabase-js": "2.71.2-canary.3",
     "autoprefixer": "10.4.17",
     "geist": "^1.2.1",
     "next": "latest",

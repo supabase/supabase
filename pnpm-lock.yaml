@@ -1441,10 +1441,10 @@ importers:
         version: 1.6.0
       '@supabase/ssr':
         specifier: ^0.6.1
-        version: 0.6.1(@supabase/supabase-js@2.49.3)
+        version: 0.6.1(@supabase/supabase-js@2.71.2-canary.3)
       '@supabase/supabase-js':
-        specifier: ^2.49.1
-        version: 2.49.3
+        specifier: 2.71.2-canary.3
+        version: 2.71.2-canary.3
       '@tanstack/react-router':
         specifier: ^1.114.27
         version: 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1554,7 +1554,7 @@ importers:
         specifier: ^10
         version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
-        specifier: 'catalog:'
+        specifier: 2.71.2-canary.3
         version: 2.71.2-canary.3
       '@vercel/og':
         specifier: ^0.6.2
@@ -8044,9 +8044,6 @@ packages:
   '@supabase/auth-js@2.71.2-canary.3':
     resolution: {integrity: sha512-hdBAJNV02VFU3gNv+aJH3H22Y+Dh7ivsZmxtavxG+dsrBkBn5rnQlh3B9dkwvjnXX86JLnO9UlCPpBK5MoVkzQ==}
 
-  '@supabase/functions-js@2.4.4':
-    resolution: {integrity: sha512-WL2p6r4AXNGwop7iwvul2BvOtuJ1YQy8EbOd0dhG1oN1q8el/BIRSFCFnWAMM/vJJlHWLi4ad22sKbKr9mvjoA==}
-
   '@supabase/functions-js@2.71.2-canary.3':
     resolution: {integrity: sha512-Ceu8EGwroQUHGTAUp5iJ2zeSIDLqVhyVIeqGvwz+ZtqGQDeGSvYzPeWHY9qEp5l9mc0HUkfETSmPHYaW+rdOTg==}
 
@@ -8071,9 +8068,6 @@ packages:
   '@supabase/postgrest-js@2.71.2-canary.3':
     resolution: {integrity: sha512-g09oFurM4uaByKuc5+TblomZkZbzmmLXO/Rn/JSy1/TbRohxQN7dCEtixdbSoIssk0clBZsmqZozS5eu6i3NAQ==}
 
-  '@supabase/realtime-js@2.11.2':
-    resolution: {integrity: sha512-u/XeuL2Y0QEhXSoIPZZwR6wMXgB+RQbJzG9VErA3VghVt7uRfSVsjeqd7m5GhX3JR6dM/WRmLbVR8URpDWG4+w==}
-
   '@supabase/realtime-js@2.71.2-canary.3':
     resolution: {integrity: sha512-tetkMqKxgpkMxCTjaMrgP5Z6JkkYlp49k/IIaPlkMsjjmjzc32+RQsPJmsXrHQ62Q4Y3NqyBVPujKVs4Onw1pA==}
 
@@ -8087,9 +8081,6 @@ packages:
     resolution: {integrity: sha512-QtQgEMvaDzr77Mk3vZ3jWg2/y+D8tExYF7vcJT+wQ8ysuvOeGGjYbZlvj5bHYsj/SpC0bihcisnwPrM4Gp5G4g==}
     peerDependencies:
       '@supabase/supabase-js': ^2.43.4
-
-  '@supabase/storage-js@2.7.1':
-    resolution: {integrity: sha512-asYHcyDR1fKqrMpytAS1zjyEfvxuOIp1CIXX7ji4lHHcJKqyk+sLl/Vxgm4sN6u8zvuUtae9e4kDxQP2qrwWBA==}
 
   '@supabase/storage-js@2.71.2-canary.3':
     resolution: {integrity: sha512-4FRJPRHwNBOz6a/Ta/fKfvwrgGoBzScE2VL9JrmKfqJ496SCKzXG34F4Loz8QrxSJ3Lm+BHHDiD9kp4LrIcStw==}
@@ -8183,9 +8174,6 @@ packages:
   '@supabase/supa-mdx-lint@0.3.1':
     resolution: {integrity: sha512-TNbBLSofM6jQg3JwzO4lttd59dScTTzW4p504/OWcgRWghQLRNfxXRJJtdui83gBMLWpgeUZqvgtfYIwS1Flzw==}
     hasBin: true
-
-  '@supabase/supabase-js@2.49.3':
-    resolution: {integrity: sha512-42imTuAm9VEQGlXT0O6zrSwNnsIblU1eieqrAWj8HSmFaYkxepk/IuUVw1M5hKelk0ZYlqDKNwRErI1rF1EL4w==}
 
   '@supabase/supabase-js@2.71.2-canary.3':
     resolution: {integrity: sha512-LRFUOyThgCf+njp8v0d5cKjxCUGPa5Ft3iEVgbsTzlf6nsvj6MLaBUGEhavlHp4G7RGOj0qEsO/uqI0nnMB/vA==}
@@ -26096,10 +26084,6 @@ snapshots:
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
-  '@supabase/functions-js@2.4.4':
-    dependencies:
-      '@supabase/node-fetch': 2.6.15
-
   '@supabase/functions-js@2.71.2-canary.3':
     dependencies:
       '@supabase/node-fetch': 2.6.15
@@ -26151,16 +26135,6 @@ snapshots:
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
-  '@supabase/realtime-js@2.11.2':
-    dependencies:
-      '@supabase/node-fetch': 2.6.15
-      '@types/phoenix': 1.6.6
-      '@types/ws': 8.18.1
-      ws: 8.18.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   '@supabase/realtime-js@2.71.2-canary.3':
     dependencies:
       '@supabase/node-fetch': 2.6.15
@@ -26182,14 +26156,10 @@ snapshots:
       - encoding
       - supports-color
 
-  '@supabase/ssr@0.6.1(@supabase/supabase-js@2.49.3)':
+  '@supabase/ssr@0.6.1(@supabase/supabase-js@2.71.2-canary.3)':
     dependencies:
-      '@supabase/supabase-js': 2.49.3
+      '@supabase/supabase-js': 2.71.2-canary.3
       cookie: 1.0.2
-
-  '@supabase/storage-js@2.7.1':
-    dependencies:
-      '@supabase/node-fetch': 2.6.15
 
   '@supabase/storage-js@2.71.2-canary.3':
     dependencies:
@@ -26258,18 +26228,6 @@ snapshots:
       '@supabase/supa-mdx-lint-win32-i686': 0.3.1
       '@supabase/supa-mdx-lint-win32-x64': 0.3.1
       node-pty: 1.0.0
-
-  '@supabase/supabase-js@2.49.3':
-    dependencies:
-      '@supabase/auth-js': 2.71.2-canary.3
-      '@supabase/functions-js': 2.4.4
-      '@supabase/node-fetch': 2.6.15
-      '@supabase/postgrest-js': 1.19.2
-      '@supabase/realtime-js': 2.11.2
-      '@supabase/storage-js': 2.7.1
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
 
   '@supabase/supabase-js@2.71.2-canary.3':
     dependencies:
