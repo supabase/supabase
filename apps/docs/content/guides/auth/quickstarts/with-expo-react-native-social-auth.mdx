@@ -1315,11 +1315,11 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
           const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials);
 
           if (error) {
-            console.error('Error signing in with Apple:', error);
+            console.error('Error signing in with Google:', error);
           }
 
           if (data) {
-            console.log('Apple sign in successful:', data);
+            console.log('Google sign in successful:', data);
           }
         }
       }

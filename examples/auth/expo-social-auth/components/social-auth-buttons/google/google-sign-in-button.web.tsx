@@ -23,11 +23,11 @@ export default function GoogleSignInButton() {
       const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials)
 
       if (error) {
-        console.error('Error signing in with Apple:', error)
+        console.error('Error signing in with Google:', error)
       }
 
       if (data) {
-        console.log('Apple sign in successful:', data)
+        console.log('Google sign in successful:', data)
       }
     }
   }
