@@ -72,15 +72,15 @@ const STATIC_EDGES = [
   { id: 'e1-4', source: '1', target: '4', type: 'smoothstep', animated: true },
 ]
 
-export const ReplicationComingSoon = () => {
+export const ReplicationComingSoon = ({ projectRef }: { projectRef: string }) => {
   return (
     <ReactFlowProvider>
-      <ReplicationStaticMockup />
+      <ReplicationStaticMockup projectRef={projectRef} />
     </ReactFlowProvider>
   )
 }
 
-const ReplicationStaticMockup = () => {
+const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
   const nodes = useMemo(() => STATIC_NODES, [])
   const edges = useMemo(() => STATIC_EDGES, [])
 
@@ -94,7 +94,7 @@ const ReplicationStaticMockup = () => {
       primary: PrimaryNode,
       replica: ReplicaNode,
       blank: BlankNode,
-      cta: CTANode,
+      cta: () => CTANode({ projectRef }),
     }),
     []
   )
@@ -208,7 +208,7 @@ const BlankNode = () => {
   )
 }
 
-const CTANode = ({ ref }: { ref: string }) => {
+const CTANode = ({ projectRef }: { projectRef: string }) => {
   return (
     <Card className="w-[500px] p-6">
       <CardContent>
@@ -227,7 +227,7 @@ const CTANode = ({ ref }: { ref: string }) => {
             </Link>
           </Button>
           <Button asChild type="default" iconRight={<ArrowRight size={16} strokeWidth={1.5} />}>
-            <Link href={`/project/${ref}/settings/infrastructure?createReplica=true`}>
+            <Link href={`/project/${projectRef}/settings/infrastructure?createReplica=true`}>
               Create a read replica
             </Link>
           </Button>
