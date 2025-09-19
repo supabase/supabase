@@ -1,3 +1,5 @@
+import { type SafeParseReturnType, z } from 'zod'
+
 const extractDataFromSafetyMessage = (text: string): string | null => {
   const openingTags = [...text.matchAll(/<untrusted-data-[a-z0-9-]+>/gi)]
   if (openingTags.length < 2) return null
@@ -71,4 +73,48 @@ export function defaultUrlTransform(value: string) {
   }
 
   return ''
+}
+
+const chartArgsSchema = z
+  .object({
+    view: z.enum(['table', 'chart']).optional(),
+    xKey: z.string().optional(),
+    xAxis: z.string().optional(),
+    yKey: z.string().optional(),
+    yAxis: z.string().optional(),
+  })
+  .passthrough()
+
+const chartArgsFieldSchema = z.preprocess((value) => {
+  if (!value || typeof value !== 'object') return undefined
+  if (Array.isArray(value)) return value[0]
+  return value
+}, chartArgsSchema.optional())
+
+const executeSqlChartResultSchema = z
+  .object({
+    sql: z.string().optional(),
+    label: z.string().optional(),
+    isWriteQuery: z.boolean().optional(),
+    chartConfig: chartArgsFieldSchema,
+    config: chartArgsFieldSchema,
+  })
+  .passthrough()
+  .transform(({ sql, label, chartConfig, config }) => {
+    const chartArgs = chartConfig ?? config
+
+    return {
+      sql: sql ?? '',
+      label,
+      isWriteQuery,
+      view: chartArgs?.view,
+      xAxis: chartArgs?.xKey ?? chartArgs?.xAxis,
+      yAxis: chartArgs?.yKey ?? chartArgs?.yAxis,
+    }
+  })
+
+export function parseExecuteSqlChartResult(
+  input: unknown
+): SafeParseReturnType<unknown, z.infer<typeof executeSqlChartResultSchema>> {
+  return executeSqlChartResultSchema.safeParse(input)
 }
