@@ -178,12 +178,14 @@ async function prepareSections(
             return
           }
 
-          if (existingPage && debug) {
-            console.log(
-              !shouldRefresh
-                ? `[${path}] Docs have changed, removing old page sections and their embeddings`
-                : `[${path}] Refresh flag set, removing old page sections and their embeddings`
-            )
+          if (existingPage) {
+            if (debug) {
+              console.log(
+                !shouldRefresh
+                  ? `[${path}] Docs have changed, removing old page sections and their embeddings`
+                  : `[${path}] Refresh flag set, removing old page sections and their embeddings`
+              )
+            }
 
             const { error: deletePageSectionError } = await supabaseClient
               .from(pageSectionTable)
@@ -254,24 +256,20 @@ async function processAndInsertEmbeddings(
   allSections: PageSectionForEmbedding[],
   pageInfoMap: Map<number, PageInfo>
 ): Promise<ProcessingResult> {
-  if (allSections.length === 0) {
-    return {
-      successfulPages: new Set(),
-      failedPages: new Set(),
-      totalSectionsProcessed: 0,
-      totalSectionsInserted: 0,
-    }
-  }
-
-  console.log(`Processing ${allSections.length} sections with embeddings + insertion`)
-
-  const embeddingBatches = createBatches(allSections, CONFIG.OPENAI_BATCH_SIZE)
   const result: ProcessingResult = {
     successfulPages: new Set(),
     failedPages: new Set(),
     totalSectionsProcessed: 0,
     totalSectionsInserted: 0,
   }
+
+  if (allSections.length === 0) {
+    return result
+  }
+
+  console.log(`Processing ${allSections.length} sections with embeddings + insertion`)
+
+  const embeddingBatches = createBatches(allSections, CONFIG.OPENAI_BATCH_SIZE)
 
   // Track sections inserted per page
   const pageSectionsInserted = new Map<number, number>()

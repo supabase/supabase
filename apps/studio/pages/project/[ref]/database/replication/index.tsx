@@ -41,7 +41,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
               </div>
             </ScaffoldSection>
           </ScaffoldContainer>
-          <ReplicationComingSoon />
+          <ReplicationComingSoon projectRef={ref || '_'} />
         </>
       )}
     </>
