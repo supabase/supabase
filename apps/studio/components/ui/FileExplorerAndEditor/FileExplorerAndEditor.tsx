@@ -49,8 +49,10 @@ const getLanguageFromFileName = (fileName: string): string => {
       return 'css'
     case 'md':
       return 'markdown'
+    case 'csv':
+      return 'csv'
     default:
-      return 'typescript' // Default to typescript
+      return 'plaintext' // Default to plaintext
   }
 }
 
@@ -197,13 +199,17 @@ const FileExplorerAndEditor = ({
                         icon={<File size={14} className="text-foreground-light shrink-0" />}
                         isEditing={Boolean(element.metadata?.isEditing)}
                         onEditSubmit={(value) => {
-                          if (originalId !== null) handleFileNameChange(originalId, value)
+                          if (originalId !== null) {
+                            handleFileNameChange(originalId, value)
+                          }
                         }}
                         onClick={() => {
                           if (originalId !== null) handleFileSelect(originalId)
                         }}
                         onDoubleClick={() => {
-                          if (originalId !== null) handleStartRename(originalId)
+                          if (originalId !== null) {
+                            handleStartRename(originalId)
+                          }
                         }}
                       />
                     </div>
@@ -226,7 +232,9 @@ const FileExplorerAndEditor = ({
                         <ContextMenuItem_Shadcn_
                           className="gap-x-2"
                           onSelect={() => {
-                            if (originalId !== null) handleFileDelete(originalId)
+                            if (originalId !== null) {
+                              handleFileDelete(originalId)
+                            }
                           }}
                           onFocusCapture={(e) => e.stopPropagation()}
                         >
