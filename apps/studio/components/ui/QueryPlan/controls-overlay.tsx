@@ -43,9 +43,7 @@ export const ControlsOverlay = ({
     <div
       className={cn(
         'text-xs',
-        variant === 'overlay'
-          ? 'px-2 py-1 bg-foreground-muted/20 backdrop-blur-sm border rounded-md'
-          : null,
+        variant === 'overlay' ? 'px-2 py-1 bg-alternative border rounded-md' : null,
         className
       )}
     >

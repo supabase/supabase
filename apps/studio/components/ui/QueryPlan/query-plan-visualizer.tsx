@@ -255,7 +255,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               }
               onClick={toggleExpanded}
               aria-label={isExpanded ? 'Exit expanded view' : 'Enter expanded view'}
-              className="absolute top-3 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border bg-foreground-muted/20 hover:bg-foreground-muted/30"
+              className="absolute top-3 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border"
             />
           </div>
         </div>

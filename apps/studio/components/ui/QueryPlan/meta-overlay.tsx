@@ -19,12 +19,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
   if (jitTotalTime !== undefined) metrics.push({ label: 'jit', value: jitTotalTime })
 
   return (
-    <div
-      className={cn(
-        'text-xs px-2 py-1 rounded-md border bg-foreground-muted/20 backdrop-blur-sm',
-        className
-      )}
-    >
+    <div className={cn('text-xs px-2 py-1 rounded-md border bg-alternative h-[36px]', className)}>
       <ul className="flex items-center gap-x-2">
         {metrics.map((metric) => (
           <li key={metric.label} className="flex items-baseline gap-x-1">
