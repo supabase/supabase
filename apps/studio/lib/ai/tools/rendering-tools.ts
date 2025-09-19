@@ -1,48 +1,42 @@
 import { tool } from 'ai'
+import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { z } from 'zod'
 
+export const renderingToolOutputParser = {
+  execute_sql: (output: any, optInLevel: AiOptInLevel) => {
+    if (optInLevel !== 'schema_and_log_and_data') {
+      if (Array.isArray(output)) {
+        return 'The query was executed but the result is not shared due to permission level'
+      }
+      return output
+    }
+    return output
+  },
+  deploy_edge_function: (output: any, optInLevel: AiOptInLevel) => {
+    return output
+  },
+}
+
 export const getRenderingTools = () => ({
-  display_query: tool({
-    description:
-      'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
+  execute_sql: tool({
+    description: 'Asks the user to execute a SQL statement and return the results',
     inputSchema: z.object({
-      manualToolCallId: z
-        .string()
-        .optional()
-        .describe('The manual ID from the corresponding execute_sql result (for SELECT queries).'),
-      sql: z.string().describe('The SQL query.'),
-      label: z
-        .string()
+      sql: z.string().describe('The SQL statement to execute.'),
+      label: z.string().describe('A short 2-4 word label for the SQL statement.'),
+      isWriteQuery: z
+        .boolean()
         .describe(
-          'The title or label for this query block (e.g., "Users Over Time", "Create Users Table").'
+          'Whether the SQL statement performs a write operation of any kind instead of a read operation'
         ),
-      view: z
-        .enum(['table', 'chart'])
-        .optional()
-        .describe(
-          'Display mode for SELECT results: table or chart. Required if manualToolCallId is provided.'
-        ),
-      xAxis: z.string().optional().describe('Key for the x-axis (required if view is chart).'),
-      yAxis: z.string().optional().describe('Key for the y-axis (required if view is chart).'),
     }),
-    execute: async (args) => {
-      const statusMessage = args.manualToolCallId
-        ? 'Tool call sent to client for rendering SELECT results.'
-        : 'Tool call sent to client for rendering write/DDL query.'
-      return { status: statusMessage }
-    },
   }),
-  display_edge_function: tool({
-    description: 'Renders the code for a Supabase Edge Function for the user to deploy manually.',
+  deploy_edge_function: tool({
+    description:
+      'Ask the user to deploy a Supabase Edge Function from provided code on the client. Client will confirm before deploying and return the result',
     inputSchema: z.object({
-      name: z
-        .string()
-        .describe('The URL-friendly name of the Edge Function (e.g., "my-function").'),
+      name: z.string().describe('The URL-friendly name/slug of the Edge Function.'),
       code: z.string().describe('The TypeScript code for the Edge Function.'),
     }),
-    execute: async () => {
-      return { status: 'Tool call sent to client for rendering.' }
-    },
   }),
   rename_chat: tool({
     description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
