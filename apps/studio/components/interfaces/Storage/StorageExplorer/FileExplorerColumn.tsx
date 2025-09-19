@@ -2,8 +2,8 @@ import { Transition } from '@headlessui/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get, noop, sum } from 'lodash'
 import { Upload } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { useContextMenu } from 'react-contexify'
+import { DragEvent, useEffect, useRef, useState } from 'react'
+import { TriggerEvent, useContextMenu } from 'react-contexify'
 import { useDrop } from 'react-dnd'
 import { toast } from 'sonner'
 
@@ -67,7 +67,7 @@ export interface FileExplorerColumnProps {
   fullWidth?: boolean
   selectedItems: StorageItemWithColumn[]
   itemSearchString: string
-  onFilesUpload: (event: any, index: number) => void
+  onFilesUpload: (event: DragEvent<HTMLDivElement>, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
   onColumnLoadMore: (index: number, column: StorageColumn) => void
@@ -87,6 +87,7 @@ export const FileExplorerColumn = ({
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const fileExplorerColumnRef = useRef<any>(null)
 
+  const { show } = useContextMenu()
   const snap = useStorageExplorerStateSnapshot()
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
@@ -111,7 +112,7 @@ export const FileExplorerColumn = ({
   // Drop target for column background
   const [dropProps, drop] = useDrop({
     accept: 'storage-item',
-    canDrop: (draggedItem: any, monitor: any) => {
+    canDrop: (draggedItem, monitor) => {
       // Only allow drops when we're actually hovering over the column background
       // This prevents interference with folder item drops
       const isOverColumnBackground = monitor.isOver({ shallow: true })
@@ -210,7 +211,7 @@ export const FileExplorerColumn = ({
 
       return true
     },
-    drop: (draggedItem: any, monitor: any) => {
+    drop: (draggedItem: any) => {
       if (canUpdateStorage) {
         const targetDirectory = getColumnPath()
 
@@ -248,8 +249,7 @@ export const FileExplorerColumn = ({
   const isEmpty =
     column.items.filter((item) => item.status !== STORAGE_ROW_STATUS.LOADING).length === 0
 
-  const { show } = useContextMenu()
-  const displayMenu = (event: any) => {
+  const displayMenu = (event: TriggerEvent) => {
     show(event, {
       id: CONTEXT_MENU_KEYS.STORAGE_COLUMN,
       props: { index },
@@ -257,7 +257,7 @@ export const FileExplorerColumn = ({
   }
 
   // Handle external file drag over for uploads (separate from react-dnd)
-  const onDragOver = (event: any) => {
+  const onDragOver = (event: DragEvent<HTMLDivElement>) => {
     if (event) {
       event.stopPropagation()
       event.preventDefault()
@@ -266,7 +266,7 @@ export const FileExplorerColumn = ({
       // Check if this is an external file drag by looking for file types in dataTransfer
       const hasFiles =
         event.dataTransfer.items &&
-        Array.from(event.dataTransfer.items).some((item: any) => item.kind === 'file')
+        Array.from(event.dataTransfer.items).some((item) => item.kind === 'file')
       const hasInternalType = event.dataTransfer.types.includes('storage-item')
 
       // Only show overlay for external file drags (has files but no internal storage-item type)
@@ -277,7 +277,7 @@ export const FileExplorerColumn = ({
   }
 
   // Handle external file drops for uploads (separate from react-dnd)
-  const handleExternalFileDrop = (event: any) => {
+  const handleExternalFileDrop = (event: DragEvent<HTMLDivElement>) => {
     // Reset drag state
     setIsDraggedOver(false)
 

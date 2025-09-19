@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { useEffect, useRef } from 'react'
+import { DragEvent, useEffect, useRef } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
@@ -17,7 +17,7 @@ export interface FileExplorerProps {
   columns: StorageColumn[]
   selectedItems: StorageItemWithColumn[]
   itemSearchString: string
-  onFilesUpload: (event: any, index: number) => void
+  onFilesUpload: (event: DragEvent<HTMLDivElement>, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
   onColumnLoadMore: (index: number, column: StorageColumn) => void
