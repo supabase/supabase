@@ -88,6 +88,20 @@ export const ECOMMERCE_TABLES: TableSuggestion[] = [
     rationale: 'Customer orders and transactions',
     source: 'template',
   },
+  {
+    tableName: 'order_items',
+    fields: [
+      { name: 'id', type: 'uuid', nullable: false, default: 'gen_random_uuid()' },
+      { name: 'order_id', type: 'uuid', nullable: false, description: 'References orders.id' },
+      { name: 'product_id', type: 'uuid', nullable: false, description: 'References products.id' },
+      { name: 'quantity', type: 'int4', nullable: false },
+      { name: 'unit_price', type: 'numeric', nullable: false },
+      { name: 'subtotal', type: 'numeric', nullable: false },
+      { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
+    ],
+    rationale: 'Individual items within each order',
+    source: 'template',
+  },
 ]
 
 export const BLOG_TABLES: TableSuggestion[] = [
@@ -115,6 +129,20 @@ export const BLOG_TABLES: TableSuggestion[] = [
       { name: 'description', type: 'text', nullable: true },
     ],
     rationale: 'Article categories for organization',
+    source: 'template',
+  },
+  {
+    tableName: 'comments',
+    fields: [
+      { name: 'id', type: 'uuid', nullable: false, default: 'gen_random_uuid()' },
+      { name: 'article_id', type: 'uuid', nullable: false, description: 'References articles.id' },
+      { name: 'author_name', type: 'varchar', nullable: false },
+      { name: 'author_email', type: 'varchar', nullable: false },
+      { name: 'content', type: 'text', nullable: false },
+      { name: 'approved', type: 'bool', nullable: false, default: 'false' },
+      { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
+    ],
+    rationale: 'Reader comments on blog articles',
     source: 'template',
   },
 ]
@@ -147,6 +175,19 @@ export const PROJECT_MGMT_TABLES: TableSuggestion[] = [
     rationale: 'Tasks within projects',
     source: 'template',
   },
+  {
+    tableName: 'team_members',
+    fields: [
+      { name: 'id', type: 'uuid', nullable: false, default: 'gen_random_uuid()' },
+      { name: 'project_id', type: 'uuid', nullable: false, description: 'References projects.id' },
+      { name: 'user_id', type: 'uuid', nullable: false, description: 'References auth.users.id' },
+      { name: 'role', type: 'varchar', nullable: false, default: "'member'" },
+      { name: 'permissions', type: 'jsonb', nullable: true },
+      { name: 'joined_at', type: 'timestamptz', nullable: false, default: 'now()' },
+    ],
+    rationale: 'Team members assigned to projects',
+    source: 'template',
+  },
 ]
 
 export const ANALYTICS_TABLES: TableSuggestion[] = [
@@ -173,6 +214,21 @@ export const ANALYTICS_TABLES: TableSuggestion[] = [
       { name: 'recorded_at', type: 'timestamptz', nullable: false, default: 'now()' },
     ],
     rationale: 'Aggregated metrics and KPIs',
+    source: 'template',
+  },
+  {
+    tableName: 'sessions',
+    fields: [
+      { name: 'id', type: 'varchar', nullable: false },
+      { name: 'user_id', type: 'uuid', nullable: true },
+      { name: 'device_info', type: 'jsonb', nullable: true },
+      { name: 'ip_address', type: 'inet', nullable: true },
+      { name: 'user_agent', type: 'text', nullable: true },
+      { name: 'started_at', type: 'timestamptz', nullable: false, default: 'now()' },
+      { name: 'ended_at', type: 'timestamptz', nullable: true },
+      { name: 'page_views', type: 'int4', nullable: false, default: '0' },
+    ],
+    rationale: 'User sessions for tracking engagement',
     source: 'template',
   },
 ]
