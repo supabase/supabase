@@ -48,6 +48,19 @@ execute function "supabase_functions"."http_request"(
 
 We currently support HTTP webhooks. These can be sent as `POST` or `GET` requests with a JSON payload.
 
+<Admonition type="note">
+
+**Authorization Headers in Studio UI**
+
+When creating or editing webhooks through the Supabase Studio UI, headers named `Authorization` are automatically managed and hidden from the interface for security reasons. This behavior ensures that:
+
+- For Edge Functions with JWT verification enabled: Authorization headers are automatically added with the appropriate service role token
+- For regular HTTP requests or Edge Functions without JWT verification: Authorization headers are automatically removed
+
+If you manually add an Authorization header through the UI, it may not appear in the headers list after saving, but it will still be applied to webhook requests when appropriate. You can reference the filtering logic in the [Studio source code](https://github.com/supabase/supabase/blob/main/apps/studio/components/interfaces/Database/Hooks/FormContents.tsx#L104).
+
+</Admonition>
+
 ## Payload
 
 The payload is automatically generated from the underlying table record:

@@ -125,7 +125,18 @@ const HTTPRequestFields = ({
       </FormSection>
       <SidePanel.Separator />
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">HTTP Headers</FormSectionLabel>}
+        header={
+          <FormSectionLabel 
+            className="lg:!col-span-4"
+            description={
+              <p className="text-sm text-foreground-light">
+                Authorization headers are automatically managed: added for Edge Functions with JWT verification, removed otherwise.
+              </p>
+            }
+          >
+            HTTP Headers
+          </FormSectionLabel>
+        }
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <div className="space-y-2">
