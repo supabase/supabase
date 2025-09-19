@@ -1423,6 +1423,158 @@ export interface DpaPdfOpenedEvent {
 }
 
 /**
+ * User selected a workflow in the Getting Started section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedWorkflowSelectedEvent {
+  action: 'home_getting_started_workflow_selected'
+  properties: {
+    /**
+     * The workflow selected by the user
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * Whether this is switching from another workflow
+     */
+    is_switch: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a step in the Getting Started section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedStepClickedEvent {
+  action: 'home_getting_started_step_clicked'
+  properties: {
+    /**
+     * The workflow type (code or no-code)
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * The step number (1-based index)
+     */
+    step_number: number
+    /**
+     * The title of the step
+     */
+    step_title: string
+    /**
+     * The action type of the button clicked
+     */
+    action_type: 'primary' | 'ai_assist' | 'external_link'
+    /**
+     * Whether the step was already completed
+     */
+    was_completed: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the Getting Started section in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedDismissedEvent {
+  action: 'home_getting_started_dismissed'
+  properties: {
+    /**
+     * The current workflow when dismissed
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * Number of steps completed when dismissed
+     */
+    steps_completed: number
+    /**
+     * Total number of steps in the workflow
+     */
+    total_steps: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User reordered sections in HomeV2 using drag and drop.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeSectionReorderedEvent {
+  action: 'home_section_reordered'
+  properties: {
+    /**
+     * The section that was moved
+     */
+    section_moved: string
+    /**
+     * The old position of the section (0-based index)
+     */
+    old_position: number
+    /**
+     * The new position of the section (0-based index)
+     */
+    new_position: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on an activity stat in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeActivityStatClickedEvent {
+  action: 'home_activity_stat_clicked'
+  properties: {
+    /**
+     * The type of activity stat clicked
+     */
+    stat_type: 'migrations' | 'backups' | 'branches' | 'tables' | 'functions' | 'replicas'
+    /**
+     * The current value of the stat
+     */
+    stat_value: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User toggled the visibility of a section in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeSectionVisibilityToggledEvent {
+  action: 'home_section_visibility_toggled'
+  properties: {
+    /**
+     * The section that was toggled
+     */
+    section_name: string
+    /**
+     * The new visibility state
+     */
+    is_visible: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Request DPA button to open the confirmation modal.
  *
  * @group Events
@@ -1555,6 +1707,12 @@ export type TelemetryEvent =
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
   | DpaPdfOpenedEvent
+  | HomeGettingStartedWorkflowSelectedEvent
+  | HomeGettingStartedStepClickedEvent
+  | HomeGettingStartedDismissedEvent
+  | HomeSectionReorderedEvent
+  | HomeActivityStatClickedEvent
+  | HomeSectionVisibilityToggledEvent
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent

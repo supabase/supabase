@@ -1,6 +1,8 @@
 import { useParams } from 'common'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { GettingStarted } from './GettingStarted'
 import {
   Code,
@@ -60,13 +62,16 @@ export function GettingStartedSection({
   onChange: (v: GettingStartedState) => void
 }) {
   const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
   const router = useRouter()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   // Local state for framework selector preview
   const [selectedFramework, setSelectedFramework] = useState<string>(FRAMEWORKS[0]?.key ?? 'nextjs')
   const workflow: 'no-code' | 'code' | null = value === 'code' || value === 'no-code' ? value : null
+  const [previousWorkflow, setPreviousWorkflow] = useState<'no-code' | 'code' | null>(null)
 
   const { data: tablesData } = useTablesQuery({
     projectRef: project?.ref,
@@ -471,7 +476,24 @@ export function GettingStartedSection({
           <ToggleGroup
             type="single"
             value={workflow ?? undefined}
-            onValueChange={(v) => v && onChange(v as 'no-code' | 'code')}
+            onValueChange={(v) => {
+              if (v) {
+                const newWorkflow = v as 'no-code' | 'code'
+                setPreviousWorkflow(workflow)
+                onChange(newWorkflow)
+                sendEvent({
+                  action: 'home_getting_started_workflow_selected',
+                  properties: {
+                    workflow: newWorkflow === 'no-code' ? 'no_code' : 'code',
+                    is_switch: previousWorkflow !== null
+                  },
+                  groups: {
+                    project: project?.ref || '',
+                    organization: organization?.slug || ''
+                  }
+                })
+              }
+            }}
           >
             <ToggleGroupItem
               value="no-code"
@@ -488,7 +510,25 @@ export function GettingStartedSection({
               <Code size={16} strokeWidth={1.5} className="text-foreground" />
             </ToggleGroupItem>
           </ToggleGroup>
-          <Button size="tiny" type="outline" onClick={() => onChange('hidden')}>
+          <Button size="tiny" type="outline" onClick={() => {
+            onChange('hidden')
+            if (workflow) {
+              const completedSteps = (workflow === 'code' ? codeSteps : noCodeSteps).filter(step => step.status === 'complete').length
+              const totalSteps = (workflow === 'code' ? codeSteps : noCodeSteps).length
+              sendEvent({
+                action: 'home_getting_started_dismissed',
+                properties: {
+                  workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                  steps_completed: completedSteps,
+                  total_steps: totalSteps
+                },
+                groups: {
+                  project: project?.ref || '',
+                  organization: organization?.slug || ''
+                }
+              })
+            }
+          }}>
             Dismiss
           </Button>
         </div>
@@ -524,7 +564,21 @@ export function GettingStartedSection({
               <Button
                 size="medium"
                 type="outline"
-                onClick={() => onChange('no-code')}
+                onClick={() => {
+                  setPreviousWorkflow(workflow)
+                  onChange('no-code')
+                  sendEvent({
+                    action: 'home_getting_started_workflow_selected',
+                    properties: {
+                      workflow: 'no_code',
+                      is_switch: previousWorkflow !== null
+                    },
+                    groups: {
+                      project: project?.ref || '',
+                      organization: organization?.slug || ''
+                    }
+                  })
+                }}
                 className="block gap-2 h-auto p-4 md:p-8 max-w-80 text-left justify-start bg-background "
               >
                 <Table2 size={20} strokeWidth={1.5} className="text-brand" />
@@ -538,7 +592,21 @@ export function GettingStartedSection({
               <Button
                 size="medium"
                 type="outline"
-                onClick={() => onChange('code')}
+                onClick={() => {
+                  setPreviousWorkflow(workflow)
+                  onChange('code')
+                  sendEvent({
+                    action: 'home_getting_started_workflow_selected',
+                    properties: {
+                      workflow: 'code',
+                      is_switch: previousWorkflow !== null
+                    },
+                    groups: {
+                      project: project?.ref || '',
+                      organization: organization?.slug || ''
+                    }
+                  })
+                }}
                 className="bg-background block gap-2 h-auto p-4 md:p-8 max-w-80 text-left justify-start"
               >
                 <Code size={20} strokeWidth={1.5} className="text-brand" />
@@ -553,7 +621,27 @@ export function GettingStartedSection({
           </CardContent>
         </Card>
       ) : (
-        <GettingStarted steps={steps} />
+        <GettingStarted
+          steps={steps}
+          onStepClick={(stepIndex, stepTitle, actionType, wasCompleted) => {
+            if (workflow) {
+              sendEvent({
+                action: 'home_getting_started_step_clicked',
+                properties: {
+                  workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                  step_number: stepIndex + 1,
+                  step_title: stepTitle,
+                  action_type: actionType,
+                  was_completed: wasCompleted
+                },
+                groups: {
+                  project: project?.ref || '',
+                  organization: organization?.slug || ''
+                }
+              })
+            }
+          }}
+        />
       )}
     </section>
   )

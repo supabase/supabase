@@ -5,9 +5,10 @@ import { GettingStartedStep } from './GettingStartedSection'
 
 export interface GettingStartedProps {
   steps: GettingStartedStep[]
+  onStepClick: (stepIndex: number, stepTitle: string, actionType: 'primary' | 'ai_assist' | 'external_link', wasCompleted: boolean) => void
 }
 
-export function GettingStarted({ steps }: GettingStartedProps) {
+export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
   return (
     <Row columns={[3, 2, 1]} className="items-stretch">
       {steps.map((step, index) => (
@@ -34,6 +35,24 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                 if (action.component) {
                   return <div key={`${step.key}-action-${i}`}>{action.component}</div>
                 }
+
+                // Determine action type for tracking
+                const getActionType = (action: any): 'primary' | 'ai_assist' | 'external_link' => {
+                  // Check if it's an AI assist action (has AiIconAnimation or "Do it for me"/"Generate" labels)
+                  if (action.label?.toLowerCase().includes('do it for me') ||
+                      action.label?.toLowerCase().includes('generate') ||
+                      action.label?.toLowerCase().includes('create policies for me')) {
+                    return 'ai_assist'
+                  }
+                  // Check if it's an external link (href that doesn't start with /project/)
+                  if (action.href && !action.href.startsWith('/project/')) {
+                    return 'external_link'
+                  }
+                  return 'primary'
+                }
+
+                const actionType = getActionType(action)
+
                 if (action.href) {
                   return (
                     <Button
@@ -43,7 +62,14 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                       icon={action.icon}
                       className="text-foreground-light hover:text-foreground"
                     >
-                      <Link href={action.href}>{action.label}</Link>
+                      <Link
+                        href={action.href}
+                        onClick={() => {
+                          onStepClick(index, step.title, actionType, step.status === 'complete')
+                        }}
+                      >
+                        {action.label}
+                      </Link>
                     </Button>
                   )
                 }
@@ -52,7 +78,10 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                     key={`${step.key}-action-${i}`}
                     type={action.variant ?? 'default'}
                     icon={action.icon}
-                    onClick={action.onClick}
+                    onClick={() => {
+                      action.onClick?.()
+                      onStepClick(index, step.title, actionType, step.status === 'complete')
+                    }}
                     className="text-foreground-light hover:text-foreground"
                   >
                     {action.label}

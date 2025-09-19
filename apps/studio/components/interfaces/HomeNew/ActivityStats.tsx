@@ -62,6 +62,11 @@ export const ActivityStats = () => {
           href={`/project/${ref}/database/migrations`}
           icon={<Database size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last migration</span>}
+          trackingAction="home_activity_stat_clicked"
+          trackingProperties={{
+            stat_type: 'migrations',
+            stat_value: migrationsData?.length ?? 0,
+          }}
           value={
             isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
@@ -81,6 +86,11 @@ export const ActivityStats = () => {
           href={`/project/${ref}/database/backups/scheduled`}
           icon={<Archive size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last backup</span>}
+          trackingAction="home_activity_stat_clicked"
+          trackingProperties={{
+            stat_type: 'backups',
+            stat_value: backupsData?.backups?.length ?? 0,
+          }}
           value={
             isLoadingBackups ? (
               <Skeleton className="h-6 w-24" />
@@ -102,6 +112,11 @@ export const ActivityStats = () => {
           href={`/project/${ref}/branches`}
           icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
+          trackingAction="home_activity_stat_clicked"
+          trackingProperties={{
+            stat_type: 'branches',
+            stat_value: branchesData?.length ?? 0,
+          }}
           value={
             isLoadingBranches ? (
               <Skeleton className="h-6 w-24" />

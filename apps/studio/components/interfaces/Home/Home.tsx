@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { ClientLibrary } from 'components/interfaces/Home'
 import { AdvisorWidget } from 'components/interfaces/Home/AdvisorWidget'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
@@ -48,6 +49,7 @@ export const Home = () => {
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { ref, enableBranching } = useParams()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { projectHomepageExampleProjects, projectHomepageClientLibraries: clientLibraries } =
     useCustomContent(['project_homepage:example_projects', 'project_homepage:client_libraries'])
@@ -153,6 +155,19 @@ export const Home = () => {
                     <Link
                       href={`/project/${ref}/editor`}
                       className="transition text-foreground-light hover:text-foreground text-sm"
+                      onClick={() => {
+                        sendEvent({
+                          action: 'home_activity_stat_clicked',
+                          properties: {
+                            stat_type: 'tables',
+                            stat_value: tablesCount,
+                          },
+                          groups: {
+                            project: project?.ref ?? '',
+                            organization: organization?.slug ?? '',
+                          },
+                        })
+                      }}
                     >
                       Tables
                     </Link>
@@ -169,6 +184,19 @@ export const Home = () => {
                       <Link
                         href={`/project/${ref}/functions`}
                         className="transition text-foreground-light hover:text-foreground text-sm"
+                        onClick={() => {
+                          sendEvent({
+                            action: 'home_activity_stat_clicked',
+                            properties: {
+                              stat_type: 'functions',
+                              stat_value: functionsCount,
+                            },
+                            groups: {
+                              project: project?.ref ?? '',
+                              organization: organization?.slug ?? '',
+                            },
+                          })
+                        }}
                       >
                         Functions
                       </Link>
@@ -185,6 +213,19 @@ export const Home = () => {
                       <Link
                         href={`/project/${ref}/settings/infrastructure`}
                         className="transition text-foreground-light hover:text-foreground text-sm"
+                        onClick={() => {
+                          sendEvent({
+                            action: 'home_activity_stat_clicked',
+                            properties: {
+                              stat_type: 'replicas',
+                              stat_value: replicasCount,
+                            },
+                            groups: {
+                              project: project?.ref ?? '',
+                              organization: organization?.slug ?? '',
+                            },
+                          })
+                        }}
                       >
                         Replicas
                       </Link>
