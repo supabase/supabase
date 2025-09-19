@@ -43,31 +43,6 @@ export const toolSetValidationSchema = z.record(
 )
 
 /**
- * Transforms the result of a tool execution to a new output.
- */
-export function transformToolResult<OriginalResult, NewResult>(
-  tool: Tool<any, OriginalResult>,
-  execute: (result: OriginalResult) => NewResult
-): Tool<any, NewResult> {
-  if (!tool) {
-    throw new Error('Tool is required')
-  }
-
-  if (!tool.execute) {
-    throw new Error('Tool does not have an execute function')
-  }
-
-  // Intercept the tool to add a custom execute function
-  return {
-    ...tool,
-    execute: async (args: any, options: any) => {
-      const result = await tool.execute!(args, options)
-      return execute(result)
-    },
-  } as unknown as Tool<any, NewResult>
-}
-
-/**
  * Tool categories based on the data they access
  */
 export const TOOL_CATEGORIES = {
