@@ -16,13 +16,6 @@ export const FEATURE_PREVIEWS = [
     isPlatformOnly: true,
   },
   {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
-    name: 'Realtime settings',
-    discussionsUrl: undefined,
-    isNew: true,
-    isPlatformOnly: true,
-  },
-  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
     name: 'Disable Advisor rules',
     discussionsUrl: undefined,
