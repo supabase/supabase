@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { AnalyticsInterval } from 'data/analytics/constants'
@@ -8,7 +8,7 @@ import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Card, CardContent, cn } from 'ui'
+import { Badge, Card, CardContent, cn } from 'ui'
 import { ReportChartUpsell } from './ReportChartUpsell'
 export interface ReportChartV2Props {
   report: ReportConfig
@@ -109,7 +109,7 @@ export const ReportChartV2 = ({
             Error loading chart data
           </p>
         ) : (
-          <div className="w-full">
+          <div className="w-full relative">
             <ComposedChart
               attributes={dynamicAttributes}
               data={filledChartData}
@@ -133,6 +133,7 @@ export const ReportChartV2 = ({
               titleTooltip={report.titleTooltip}
               syncId={syncId}
               sql={queryResult?.query}
+              showNewBadge={report.showNewBadge}
             />
           </div>
         )}

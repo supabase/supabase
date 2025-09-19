@@ -15,6 +15,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { formatBytes } from 'lib/helpers'
 import { numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
+import { Badge } from 'ui'
 
 export interface ChartHeaderProps {
   title?: string
@@ -41,6 +42,7 @@ export interface ChartHeaderProps {
   isNetworkChart?: boolean
   attributes?: any[]
   sql?: string
+  showNewBadge?: boolean
 }
 
 export const ChartHeader = ({
@@ -68,10 +70,9 @@ export const ChartHeader = ({
   isNetworkChart = false,
   attributes,
   sql,
+  showNewBadge,
 }: ChartHeaderProps) => {
-  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
-    syncId || 'default'
-  )
+  const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
   const { ref } = useParams()
@@ -97,6 +98,7 @@ export const ChartHeader = ({
   useEffect(() => {
     if (syncId && hoveredIndex !== null && isHovered && data && xAxisKey && yAxisKey) {
       const activeDataPoint = data[hoveredIndex]
+
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
         // that should be included in the total (excluding reference lines, max values, etc.)
@@ -120,7 +122,7 @@ export const ChartHeader = ({
                 attributes.some((attr) => attr.attribute === key && attr.enabled !== false)
               )
             })
-            .reduce((sum, [_, value]) => sum + (value as number), 0)
+            .reduce((sum, [_, value]) => sum + Number(value), 0)
 
           newValue = totalValue
         }
@@ -211,7 +213,10 @@ export const ChartHeader = ({
   return (
     <div className="flex-grow flex justify-between items-start min-h-16">
       <div className="flex flex-col">
-        {title && chartTitle}
+        <div className="flex items-center gap-2">
+          {title && chartTitle}
+          {showNewBadge && <Badge variant="success">New</Badge>}
+        </div>
         <div className="h-4">
           {hasHighlightedValue && highlighted}
           {label}
