@@ -107,6 +107,14 @@
     "author_image_url": "https://github.com/laurenceisla.png"
   },
   {
+    "author_id": "avallete",
+    "author": "Andrew Valleteau",
+    "username": "avallete",
+    "position": "Engineering",
+    "author_url": "https://github.com/avallete",
+    "author_image_url": "https://github.com/avallete.png"
+  },
+  {
     "author_id": "supabase",
     "author": "Supabase",
     "position": "",

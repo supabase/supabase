@@ -1,0 +1,145 @@
+---
+title: PostgREST 13
+description: New features and changes in PostgREST version 13.
+author: steve_chavez,laurenceisla,avallete
+image: 2025-09-18-postgrest-13-release/cover-postgrest-13.png
+thumb: 2025-09-18-postgrest-13-release/cover-postgrest-13.png
+categories:
+  - postgres
+tags:
+  - postgres
+  - postgrest
+  - release-notes
+date: '2025-09-18'
+---
+
+PostgREST 13 is out! It comes with API and Observabilty improvements. In this post, we'll see what's new.
+
+## Spread To-Many relationships
+
+This new feature allows you to represent one-to-many and many-to-many relationships as flat JSON arrays.
+
+For example, if you have database similar to IMDB and you’d like to represent it as a hierarchical JSON structure for your frontend, like so:
+
+```json
+[
+  {
+    "title": "The Shawshank Redemption",
+    "actors": [ "Tim Robbins", "Morgan Freeman" ],
+    "genres": [ "Drama" ]
+  },
+  {
+    "title": "The Godfather",
+    "actors": [ "Marlon Brando", "Al Pacino" ],
+    "genres": [ "Drama", "Crime" ]
+  },
+  {
+    "title": "The Dark Knight",
+    "actors": [ "Christian Bale", "Heath Ledger" ],
+    "genres": [ "Drama", "Crime", "Action" ]
+  }
+]
+```
+
+You can now do it this way:
+
+```js
+const { data, error } = await supabase
+  .from('titles')
+  .select(`
+    title:primary_title,
+    ...people(actors:primary_name),
+    ...genres(genres:name)
+  `)
+```
+
+The above `...people` is “spreading” the many-to-many relationship between `titles` and `people`, forming a flat array only consisting of the `primary_name` column. This flat array is then renamed to `actors`. We do a similar process for `genres` , which also forms a many-to-many relationship with `people`.
+
+You can see the data model used for this example on this [gist](https://gist.github.com/steve-chavez/93f7ae04b4323e1952710af7129b32cf). There are more details about this feature on the [official docs](https://docs.postgrest.org/en/v13/references/api/resource_embedding.html#spread-to-many-relationships).
+
+## Automatic tsvector convertion
+
+Previously you could only use the full text search operator on `tsvector` columns, now you can do it on `text` columns too:
+
+```js
+const {data, error} = await supabase
+  .from("titles")
+  .textSearch("primary_name", `'god' & 'father'`);
+```
+
+This works because `text` columns will be automatically converted with `to_tsvector`.
+
+## Max Affected
+
+You can now limit to the amount of rows affected by an `update` or `delete` operation with `maxAffected`:
+
+```js
+const { data, error } = await supabase
+    .from('people')
+    .update({ primary_name: 'Marlon Brando Jr.' })
+    .eq('nconst', 'nm0000008')
+    .maxAffected(1)
+```
+
+If the rows affected by the operation surpass the limit in `maxAffected`, an error will be thrown.
+
+This also works with `rpc()`, given that it modifies rows and returns the affected rows. More on details on the [official docs](https://docs.postgrest.org/en/v13/references/api/preferences.html#max-affected).
+
+## Content-Length header
+
+For observability, you can now verify the response body size in bytes in the `Content-Length` header.
+
+```bash
+
+HTTP/1.1 200 OK
+Content-Length: 104
+Content-Location: /items
+```
+
+This helps in cases where you want to know which requests consume the most traffic to avoid exceeding egress limits.
+
+## Proxy-Status header
+
+The PostgREST error code is now present in the `Proxy-Status` header.
+
+```bash
+HTTP/1.1 406 Not Acceptable
+Proxy-Status: PostgREST; error=PGRST116
+```
+
+You can check this header and the Content-Length one the Supabase Logs Explorer.
+
+## Breaking Changes
+
+### Limited Update/Delete
+
+Previously on v12, you could limit the updated or deleted affected rows with a combination of the `limit()` and `order()` methods.
+
+```js
+const { data, error } = await supabase
+    .from('people')
+    .update({ primary_name: 'Marlon Brando Jr.' })
+    .eq('primary_name', 'Marlon Brando')
+    .limit(1)
+    .order('nconst')
+```
+
+But this never gave an error, it only did the equivalent of a `UPDATE .. LIMIT` SQL statement. It also required adding a PK in the `order` method, which was a confusing interface.
+
+To do this now, you should use the new Max Affected instead.
+
+### JWT kid validation
+
+PostgREST now validates the JWT `kid` claim. If your JWT contains a `kid`, it will try to match the `kid` of one of the keys in the configured JSON Web Key Set. Check the [official docs](https://docs.postgrest.org/en/v13/references/auth.html#jwk-kid-validation) for more details.
+
+If you use Supabase Auth or the CLI to create JSON Web Keys, you shouldn’t worry about this change. For users that integrate with other Auth systems, check that both your JWT and JWKS follow the above rules.
+
+### Schema validation in PostgREST search path
+
+The schemas inside `db-schemas` and `db-extra-search-path` are now validated. This means you cannot put a nonexistent schema there, if you do PostgREST will faill with an error message.
+
+## Try it out
+
+PostgREST v13 is now available for all new projects on the Supabase platform, old projects can upgrade to get this new version.
+
+You can look at the full changelog on the [release notes](https://github.com/PostgREST/postgrest/releases/tag/v13.0.0).
