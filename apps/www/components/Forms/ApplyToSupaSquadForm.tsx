@@ -1,6 +1,5 @@
 import { FC, useEffect, useState, memo } from 'react'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
-import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -16,7 +15,7 @@ import {
   TextArea_Shadcn_,
   FormDescription_Shadcn_,
 } from 'ui'
-import { Alert, AlertTitle, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
+import { Alert, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +31,10 @@ import {
   MultiSelectorItem,
 } from 'ui-patterns/multi-select'
 import { CountrySelector } from '../Supasquad/CountrySelector'
+import {
+  supaSquadApplicationSchema,
+  SupaSquadApplication,
+} from '~/data/open-source/contributing/supasquad.utils'
 
 interface FormItem_Shadcn_ {
   type: 'text' | 'textarea'
@@ -108,31 +111,6 @@ const languagesSpoken: string[] = [
   'Other',
 ]
 
-const applicationSchema = z.object({
-  first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Please enter a valid email address'),
-  tracks: z
-    .array(
-      z.object({
-        heading: z.string(),
-        description: z.string(),
-      })
-    )
-    .min(1, 'Select at least 1 track'),
-  areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
-  why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.string().optional(),
-  languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
-  skills: z.string().optional(),
-  city: z.string().min(1, 'Specify your city'),
-  country: z.string().min(1, 'Specify your country'),
-  github: z.string().optional(),
-  twitter: z.string().optional(),
-})
-
-type ApplicationFormData = z.infer<typeof applicationSchema>
-
 const headerContent = {
   title: 'Apply to join SupaSquad',
   description:
@@ -150,9 +128,9 @@ const FormContent = memo(function FormContent({
   handleCancel,
   isSubmitting,
 }: {
-  form: ReturnType<typeof useForm<ApplicationFormData>>
+  form: ReturnType<typeof useForm<SupaSquadApplication>>
   errors: { [key: string]: string }
-  onSubmit: (data: ApplicationFormData) => Promise<void>
+  onSubmit: (data: SupaSquadApplication) => Promise<void>
   honeypot: string
   setHoneypot: React.Dispatch<React.SetStateAction<string>>
   isMobile: boolean
@@ -236,26 +214,6 @@ const FormContent = memo(function FormContent({
 
           <div className="space-y-8">
             <h3 className="h3 text-foreground">Interests and skills</h3>
-            <FormField_Shadcn_
-              control={form.control}
-              name="why_you_want_to_join"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-1">
-                  <FormLabel_Shadcn_ className="text-foreground">
-                    Why do you want to join the program? *
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    What do you have to contribute? What would you like to get out of it?
-                  </FormDescription_Shadcn_>
-                  <FormControl_Shadcn_>
-                    <div className="relative">
-                      <TextArea_Shadcn_ autoComplete="off" {...field} />
-                    </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
-              )}
-            />
 
             <FormField_Shadcn_
               control={form.control}
@@ -306,6 +264,60 @@ const FormContent = memo(function FormContent({
                     </div>
                   </FormControl_Shadcn_>
 
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="why_you_want_to_join"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="space-y-1">
+                  <FormLabel_Shadcn_ className="text-foreground">
+                    Why do you want to join the program? *
+                  </FormLabel_Shadcn_>
+                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                    What do you have to contribute? What would you like to get out of it?
+                  </FormDescription_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <div className="relative">
+                      <TextArea_Shadcn_
+                        autoComplete="off"
+                        rows={3}
+                        className="bg-foreground/[.026]"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="contributions"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="space-y-1">
+                  <FormLabel_Shadcn_ className="text-foreground">
+                    Share some of your recent contributions
+                  </FormLabel_Shadcn_>
+                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                    Any relevant links to show your current engagement with the Supabase community.
+                  </FormDescription_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <div className="relative">
+                      <TextArea_Shadcn_
+                        autoComplete="off"
+                        rows={3}
+                        className="bg-foreground/[.026]"
+                        placeholder="PR links, posts/replies on Discord/Reddit/X, Luma links of meetups
+                    you have organized, etc."
+                        {...field}
+                      />
+                    </div>
+                  </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
               )}
@@ -389,7 +401,6 @@ const FormContent = memo(function FormContent({
                     <FormLabel_Shadcn_ className="text-foreground">Country *</FormLabel_Shadcn_>
                     <FormControl_Shadcn_>
                       <div className="relative mt-1">
-                        {/* <Input_Shadcn_ type="text" placeholder="Country" {...field} /> */}
                         <CountrySelector value={field.value || ''} onValueChange={field.onChange} />
                       </div>
                     </FormControl_Shadcn_>
@@ -487,6 +498,22 @@ const FormContent = memo(function FormContent({
             <div className="space-y-3">
               <FormField_Shadcn_
                 control={form.control}
+                name="discord"
+                render={({ field }) => (
+                  <FormItem_Shadcn_>
+                    <FormLabel_Shadcn_ className="text-foreground">Discord</FormLabel_Shadcn_>
+                    <FormControl_Shadcn_>
+                      <div className="relative mt-1">
+                        <Input_Shadcn_ type="text" placeholder="#username" {...field} />
+                      </div>
+                    </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
+                )}
+              />
+
+              <FormField_Shadcn_
+                control={form.control}
                 name="github"
                 render={({ field }) => (
                   <FormItem_Shadcn_>
@@ -570,14 +597,15 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [startTime, setStartTime] = useState<number>(0)
 
-  const form = useForm<ApplicationFormData>({
-    resolver: zodResolver(applicationSchema),
+  const form = useForm<SupaSquadApplication>({
+    resolver: zodResolver(supaSquadApplicationSchema),
     defaultValues: {
       first_name: '',
       last_name: '',
       email: '',
       tracks: [],
       areas_of_interest: [],
+      contributions: '',
       skills: '',
       why_you_want_to_join: '',
       city: '',
@@ -586,6 +614,7 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
       languages_spoken: [],
       github: '',
       twitter: '',
+      discord: '',
     },
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -603,7 +632,7 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
     setErrors({})
   }
 
-  const onSubmit = async (data: ApplicationFormData) => {
+  const onSubmit = async (data: SupaSquadApplication) => {
     const currentTime = Date.now()
     const timeElapsed = (currentTime - startTime) / 1000
 

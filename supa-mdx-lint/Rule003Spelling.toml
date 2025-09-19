@@ -69,6 +69,7 @@ allow_list = [
     "[Ll]iveness",
     "[Mm]atryoshka",
     "[Mm]essageBird",
+    "MetaMask",
     "[Mm]icroservices?",
     "[Mm]iddlewares?",
     "[Mm]onorepos?",

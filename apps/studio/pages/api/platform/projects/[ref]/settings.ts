@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { components } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'lib/constants/api'
 
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
   protocol?: string

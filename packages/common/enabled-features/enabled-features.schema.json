@@ -102,6 +102,10 @@
       "type": "boolean",
       "description": "Enable the sign in with email/password provider"
     },
+    "dashboard_auth:show_testimonial": {
+      "type": "boolean",
+      "description": "Enable the testimonial on the sign in/up page"
+    },
 
     "database:replication": {
       "type": "boolean",
@@ -126,13 +130,17 @@
       "description": "Enable feedback submission for docs site"
     },
 
-    "integrations:vercel": {
+    "integrations:partners": {
       "type": "boolean",
-      "description": "Enable the vercel integration section in the organization and project settings pages"
+      "description": "Show all third-party-managed integrations"
     },
     "integrations:show_stripe_wrapper": {
       "type": "boolean",
       "description": "Show the Stripe wrapper under project integrations"
+    },
+    "integrations:vercel": {
+      "type": "boolean",
+      "description": "Enable the vercel integration section in the organization and project settings pages"
     },
 
     "logs:templates": {
@@ -142,6 +150,11 @@
     "logs:collections": {
       "type": "boolean",
       "description": "Enable the logs collections page"
+    },
+
+    "organization:show_sso_settings": {
+      "type": "boolean",
+      "description": "Show the SSO settings tab in the organization settings page"
     },
 
     "profile:show_email": {
@@ -169,6 +182,18 @@
       "type": "boolean",
       "description": "Show the dart example in the project connection settings"
     },
+    "project_connection:show_app_frameworks": {
+      "type": "boolean",
+      "description": "Show the app frameworks tab in the connect modal"
+    },
+    "project_connection:show_mobile_frameworks": {
+      "type": "boolean",
+      "description": "Show the mobile frameworks tab in the connect modal"
+    },
+    "project_connection:show_orms": {
+      "type": "boolean",
+      "description": "Show the orms tab in the connect modal"
+    },
 
     "project_creation:show_advanced_config": {
       "type": "boolean",
@@ -183,14 +208,14 @@
       "type": "boolean",
       "description": "Show the example projects in the project homepage"
     },
-    "project_homepage:show_all_client_libraries": {
-      "type": "boolean",
-      "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
-    },
 
     "project_addons:dedicated_ipv4_address": {
       "type": "boolean",
       "description": "Show the dedicated IPv4 address addon"
+    },
+    "project_addons:show_compute_price": {
+      "type": "boolean",
+      "description": "Show the compute price in the compute and disk page"
     },
 
     "project_settings:custom_domains": {
@@ -234,6 +259,11 @@
     "sdk:swift": {
       "type": "boolean",
       "description": "Enable the Swift SDK"
+    },
+
+    "search:fullIndex": {
+      "type": "boolean",
+      "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
     }
   },
   "required": [
@@ -265,31 +295,37 @@
     "docs:compliance",
     "docs:self-hosting",
     "feedback:docs",
-    "integrations:vercel",
+    "integrations:partners",
     "integrations:show_stripe_wrapper",
+    "integrations:vercel",
     "profile:show_email",
     "profile:show_information",
     "profile:show_analytics_and_marketing",
     "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
+    "organization:show_sso_settings",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
-    "project_homepage:show_all_client_libraries",
     "project_addons:dedicated_ipv4_address",
+    "project_addons:show_compute_price",
     "project_settings:custom_domains",
     "project_settings:show_disable_legacy_api_keys",
     "project_settings:legacy_jwt_keys",
     "project_settings:log_drains",
     "project_connection:javascript_example",
     "project_connection:dart_example",
+    "project_connection:show_app_frameworks",
+    "project_connection:show_mobile_frameworks",
+    "project_connection:show_orms",
     "reports:all",
     "sdk:csharp",
     "sdk:dart",
     "sdk:kotlin",
     "sdk:python",
-    "sdk:swift"
+    "sdk:swift",
+    "search:fullIndex"
   ],
   "additionalProperties": false
 }

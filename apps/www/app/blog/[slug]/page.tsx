@@ -28,7 +28,7 @@ async function getCMSPostFromAPI(
     const fetchOptions = isDraft
       ? {
           // For draft mode: always fresh data, no caching
-          cache: 'no-store' as const,
+          // cache: 'no-store' as const,
           next: { revalidate: 0 },
         }
       : {
