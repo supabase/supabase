@@ -1,7 +1,12 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import ReactFlow, { Background, BackgroundVariant, type ReactFlowInstance } from 'reactflow'
+import ReactFlow, {
+  Background,
+  BackgroundVariant,
+  type Node,
+  type ReactFlowInstance,
+} from 'reactflow'
 import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 
@@ -9,7 +14,7 @@ import type { PlanNodeData } from './types'
 import { Button, cn } from 'ui'
 import { MetaOverlay } from './meta-overlay'
 import { ControlsOverlay } from './controls-overlay'
-import { NODE_TYPE } from './constants'
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, NODE_TYPE } from './constants'
 import {
   MetricsVisibilityContext,
   HeatmapContext,
@@ -36,6 +41,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   const heatMax = useHeatmapMax(nodes)
 
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -45,6 +51,61 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   useEffect(() => {
     requestAnimationFrame(() => rfInstance?.fitView())
   }, [isExpanded, rfInstance])
+
+  const centerNodeInView = useCallback(
+    (nodeId: string) => {
+      if (!rfInstance) return
+
+      const node = rfInstance.getNode(nodeId)
+      if (!node) return
+
+      const position = node.positionAbsolute ?? node.position
+      const nodeWidth = node.width ?? DEFAULT_NODE_WIDTH
+      const nodeHeight = node.height ?? DEFAULT_NODE_HEIGHT
+      const centerX = position.x + nodeWidth / 2
+      const centerY = position.y + nodeHeight / 2
+
+      const currentZoom = rfInstance.getZoom()
+      const targetZoom = currentZoom < 1 ? 1 : currentZoom
+
+      rfInstance.setCenter(centerX, centerY, {
+        zoom: targetZoom,
+        duration: 400,
+      })
+    },
+    [rfInstance]
+  )
+
+  const handleSelectNode = useCallback(
+    (node: Node<PlanNodeData>) => {
+      setSelectedNode(node.data)
+      setSelectedNodeId(node.id)
+
+      requestAnimationFrame(() => centerNodeInView(node.id))
+    },
+    [centerNodeInView]
+  )
+
+  useEffect(() => {
+    if (!selectedNodeId) return
+
+    const match = layout.nodes.find((node) => node.id === selectedNodeId)
+    if (match) {
+      setSelectedNode(match.data)
+    } else {
+      setSelectedNode(null)
+      setSelectedNodeId(null)
+    }
+  }, [layout.nodes, selectedNodeId])
+
+  const nodesWithSelection = useMemo(
+    () =>
+      layout.nodes.map((node) => ({
+        ...node,
+        selected: node.id === selectedNodeId,
+      })),
+    [layout.nodes, selectedNodeId]
+  )
 
   const updateOverlayRect = useCallback(() => {
     const host = containerRef.current?.closest('[data-query-performance-body]')
@@ -126,8 +187,8 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               nodes={layout.nodes}
               edges={layout.edges}
               meta={meta}
-              selectedNode={selectedNode}
-              onSelect={(node) => setSelectedNode(node)}
+              selectedNodeId={selectedNodeId}
+              onSelect={handleSelectNode}
             />
           )}
           <div className="relative flex-1">
@@ -211,13 +272,16 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                   }}
                   fitView
                   nodeTypes={nodeTypes}
-                  nodes={layout.nodes}
+                  nodes={nodesWithSelection}
                   edges={layout.edges}
                   minZoom={0.8}
                   maxZoom={1.8}
                   proOptions={{ hideAttribution: true }}
-                  onNodeClick={(_event, node) => setSelectedNode(node.data)}
-                  onPaneClick={() => setSelectedNode(null)}
+                  onNodeClick={(_event, node) => handleSelectNode(node)}
+                  onPaneClick={() => {
+                    setSelectedNode(null)
+                    setSelectedNodeId(null)
+                  }}
                   onInit={(instance) => setRfInstance(instance)}
                 >
                   <Background

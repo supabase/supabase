@@ -1,9 +1,9 @@
 import { type ReactNode, useContext } from 'react'
-import { Handle, Position } from 'reactflow'
+import { Handle, Position, type NodeProps } from 'reactflow'
 import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
-import { Badge } from 'ui'
+import { Badge, cn } from 'ui'
 import { NodeItem } from './node-item'
 import { Heatmap } from './heatmap'
 import { HeatmapContext, MetricsVisibilityContext, type MetricsVisibility } from './contexts'
@@ -321,7 +321,7 @@ Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
   ]
 }
 
-export const PlanNode = ({ data }: { data: PlanNodeData }) => {
+export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
   const vis = useContext(MetricsVisibilityContext)
   const heat = useContext(HeatmapContext)
   const headerLines = computeHeaderLines(data)
@@ -329,7 +329,12 @@ export const PlanNode = ({ data }: { data: PlanNodeData }) => {
 
   return (
     <div
-      className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
+      className={cn(
+        'border-[0.5px] overflow-hidden rounded-[4px] shadow-sm bg-background transition-all',
+        selected
+          ? 'border-brand ring-2 ring-brand ring-offset-2 ring-offset-background shadow-lg'
+          : 'border-border/60'
+      )}
       style={{ width: DEFAULT_NODE_WIDTH }}
     >
       <Handle type="target" position={Position.Top} className={HIDDEN_NODE_CONNECTOR} />

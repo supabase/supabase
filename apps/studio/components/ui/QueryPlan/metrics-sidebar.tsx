@@ -21,8 +21,8 @@ type MetricsSidebarProps = {
   nodes: Node<PlanNodeData>[]
   edges: Edge[]
   meta?: PlanMeta
-  selectedNode?: PlanNodeData | null
-  onSelect?: (node: PlanNodeData) => void
+  selectedNodeId?: string | null
+  onSelect?: (node: Node<PlanNodeData>) => void
 }
 
 type MetricStats = {
@@ -359,7 +359,7 @@ export const MetricsSidebar = ({
   nodes,
   edges,
   meta,
-  selectedNode,
+  selectedNodeId,
   onSelect,
 }: MetricsSidebarProps) => {
   const [activeMetric, setActiveMetric] = useState<SidebarMetricKey>('time')
@@ -396,7 +396,7 @@ export const MetricsSidebar = ({
           {rows.map((row) => {
             const { node, branchTrail, isLast } = row
             const data = node.data
-            const isActive = selectedNode && selectedNode === data
+            const isActive = selectedNodeId === node.id
             const visual = renderMetricCellForMode(data, stats, activeMetric, 'visual')
             const tooltip = renderMetricCellForMode(data, stats, activeMetric, 'tooltip')
             const hasTooltip = tooltip !== null && tooltip !== undefined && tooltip !== ''
@@ -405,7 +405,7 @@ export const MetricsSidebar = ({
               <button
                 type="button"
                 className="w-full py-0 px-1 text-xs"
-                onClick={() => onSelect?.(data)}
+                onClick={() => onSelect?.(node)}
               >
                 <div className="flex items-center gap-x-1 h-[16px]">
                   <TreeGuide branchTrail={branchTrail} isLast={isLast} />
