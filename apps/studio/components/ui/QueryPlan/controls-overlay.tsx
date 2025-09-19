@@ -119,9 +119,10 @@ export const ControlsOverlay = ({
                   ? 'default'
                   : 'dashed'
               }
-              className="px-1"
               icon={<Filter />}
-            />
+            >
+              Filters
+            </Button>
           </PopoverTrigger_Shadcn_>
           <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={portal}>
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">

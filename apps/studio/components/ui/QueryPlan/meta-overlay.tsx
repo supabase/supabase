@@ -48,7 +48,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
     <div
       className={cn('text-xs px-2 py-1 rounded-md border bg-alternative min-h-[36px]', className)}
     >
-      <ul className="flex gap-x-4">
+      <ul className="flex items-center gap-x-4">
         {metrics.map((metric) => (
           <li key={metric.label} className="cursor-help">
             <Tooltip>

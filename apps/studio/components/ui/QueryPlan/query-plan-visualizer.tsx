@@ -7,7 +7,7 @@ import ReactFlow, {
   type Node,
   type ReactFlowInstance,
 } from 'reactflow'
-import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
+import { BookOpen, Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 
 import type { PlanNodeData } from './types'
@@ -162,29 +162,29 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 </div>
               </div>
             )}
-            <div className="absolute z-10 top-2 left-2 right-2 flex items-center justify-start pr-8 gap-x-2">
-              {isExpanded && (
+            {isExpanded ? (
+              <div className="flex h-[41px] w-full items-center gap-x-3 border-b border-border px-3 bg-sidebar">
                 <ControlsOverlay
                   metricsVisibility={metricsVisibility}
                   setMetricsVisibility={setMetricsVisibility}
                   heatmapMode={heatmapMode}
                   setHeatmapMode={setHeatmapMode}
-                  variant="overlay"
+                  variant="toolbar"
                   portal={false}
+                  className="shrink-0"
                 />
-              )}
-              <MetaOverlay
-                planningTime={meta?.planningTime}
-                executionTime={meta?.executionTime}
-                jitTotalTime={meta?.jitTotalTime}
-                className={cn(isExpanded ? 'p-2' : 'text-[10px]')}
-              />
-              {isExpanded && (
+                <div className="h-[20px] w-px border-r border-control" />
+                <MetaOverlay
+                  planningTime={meta?.planningTime}
+                  executionTime={meta?.executionTime}
+                  jitTotalTime={meta?.jitTotalTime}
+                  className="flex-1 border-0 bg-transparent px-0 py-0 text-xs h-full flex"
+                />
                 <Button
                   asChild
                   type="default"
                   size="tiny"
-                  icon={<ExternalLink />}
+                  icon={<BookOpen />}
                   className="ml-auto h-[28px] text-foreground-light"
                 >
                   <Link
@@ -195,8 +195,17 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                     Learn about query plans
                   </Link>
                 </Button>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="absolute z-10 top-2 left-2 right-2 flex items-center justify-start pr-8 gap-x-2">
+                <MetaOverlay
+                  planningTime={meta?.planningTime}
+                  executionTime={meta?.executionTime}
+                  jitTotalTime={meta?.jitTotalTime}
+                  className="text-[10px]"
+                />
+              </div>
+            )}
 
             <MetricsVisibilityContext.Provider value={metricsVisibility}>
               <HeatmapContext.Provider
@@ -255,7 +264,10 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               }
               onClick={toggleExpanded}
               aria-label={isExpanded ? 'Exit expanded view' : 'Enter expanded view'}
-              className="absolute top-3 right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border"
+              className={cn(
+                'absolute right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border',
+                isExpanded ? 'top-12 right-3' : 'top-2 right-2'
+              )}
             />
           </div>
         </div>

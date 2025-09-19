@@ -458,7 +458,7 @@ export const MetricsSidebar = ({
 
   return (
     <aside className="hidden lg:flex w-72 flex-col border-r border-border bg-sidebar">
-      <div className="flex items-center justify-between px-3 py-2 border-b">
+      <div className="h-[41px] flex items-center justify-between px-3 py-2 border-b">
         <div className="flex items-center gap-2 text-xs font-medium text-foreground">
           <Layers size={14} />
           <span>Metrics</span>
