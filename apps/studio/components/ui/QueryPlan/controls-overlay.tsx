@@ -1,5 +1,6 @@
 import { type SetStateAction, useState } from 'react'
 import { Filter, ChevronsUpDown, Check } from 'lucide-react'
+import { capitalize } from 'lodash'
 
 import { type MetricsVisibility, type HeatmapMode, defaultMetricsVisibility } from './contexts'
 import { HEATMAP_ITEMS } from './constants'
@@ -67,12 +68,11 @@ export const ControlsOverlay = ({
                 {heatmapMode === 'none' ? (
                   <div className="w-full flex gap-1">
                     <p className="text-foreground-lighter">Choose a heatmap…</p>
-                    <p className="text-foreground">{heatmapMode}</p>
                   </div>
                 ) : (
                   <div className="w-full flex gap-1">
                     <p className="text-foreground-lighter">Heatmap</p>
-                    <p className="text-foreground">{heatmapMode}</p>
+                    <p className="text-foreground">{capitalize(heatmapMode)}</p>
                   </div>
                 )}
               </Button>
@@ -96,7 +96,7 @@ export const ControlsOverlay = ({
                           setHeatmapPopoverOpen(false)
                         }}
                       >
-                        <span>{heatmapItem}</span>
+                        <span>{capitalize(heatmapItem)}</span>
                         {heatmapMode === heatmapItem && (
                           <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
@@ -139,7 +139,7 @@ export const ControlsOverlay = ({
                         }
                       />
                       <Label_Shadcn_ htmlFor={item} className="text-xs">
-                        {item}
+                        {capitalize(item)}
                       </Label_Shadcn_>
                     </div>
                     <Button
