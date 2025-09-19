@@ -12,7 +12,6 @@ import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -95,7 +94,6 @@ export const ProjectUsageSection = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: project } = useSelectedProjectQuery()
   const { mutate: sendEvent } = useSendEventMutation()
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
@@ -228,7 +226,7 @@ export const ProjectUsageSection = () => {
 
     router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
 
-    if (project?.ref && organization?.slug) {
+    if (projectRef && organization?.slug) {
       sendEvent({
         action: 'home_project_usage_chart_clicked',
         properties: {
@@ -236,7 +234,7 @@ export const ProjectUsageSection = () => {
           timestamp: datum.timestamp,
         },
         groups: {
-          project: project.ref,
+          project: projectRef,
           organization: organization.slug,
         },
       })
@@ -368,7 +366,7 @@ export const ProjectUsageSection = () => {
                         <Link
                           href={s.href}
                           onClick={() => {
-                            if (project?.ref && organization?.slug) {
+                            if (projectRef && organization?.slug) {
                               sendEvent({
                                 action: 'home_project_usage_service_clicked',
                                 properties: {
@@ -377,7 +375,7 @@ export const ProjectUsageSection = () => {
                                   error_count: s.err || 0,
                                 },
                                 groups: {
-                                  project: project.ref,
+                                  project: projectRef,
                                   organization: organization.slug,
                                 },
                               })
