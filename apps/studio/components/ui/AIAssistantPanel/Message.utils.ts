@@ -100,7 +100,7 @@ const executeSqlChartResultSchema = z
     config: chartArgsFieldSchema,
   })
   .passthrough()
-  .transform(({ sql, label, chartConfig, config }) => {
+  .transform(({ sql, label, isWriteQuery, chartConfig, config }) => {
     const chartArgs = chartConfig ?? config
 
     return {
@@ -118,3 +118,32 @@ export function parseExecuteSqlChartResult(
 ): SafeParseReturnType<unknown, z.infer<typeof executeSqlChartResultSchema>> {
   return executeSqlChartResultSchema.safeParse(input)
 }
+
+export const deployEdgeFunctionInputSchema = z
+  .object({
+    code: z.string().min(1),
+    name: z.string().trim().optional(),
+    slug: z.string().trim().optional(),
+    functionName: z.string().trim().optional(),
+    label: z.string().optional(),
+  })
+  .passthrough()
+  .transform((data) => {
+    const rawName = data.functionName ?? data.name ?? data.slug
+    const trimmedName = rawName?.trim()
+    const functionName = trimmedName && trimmedName.length > 0 ? trimmedName : 'my-function'
+
+    const rawLabel = data.label ?? rawName
+    const trimmedLabel = rawLabel?.trim()
+    const label = trimmedLabel && trimmedLabel.length > 0 ? trimmedLabel : 'Edge Function'
+
+    return {
+      code: data.code,
+      functionName,
+      label,
+    }
+  })
+
+export const deployEdgeFunctionOutputSchema = z
+  .object({ success: z.boolean().optional() })
+  .passthrough()

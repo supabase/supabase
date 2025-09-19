@@ -1,7 +1,7 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { type DynamicToolUIPart, type ToolUIPart, type ReasoningUIPart } from 'ai'
+import { type DynamicToolUIPart, type ToolUIPart, type ReasoningUIPart, type TextUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2, Pencil, Trash2 } from 'lucide-react'
-import { type FunctionComponent, PropsWithChildren, useMemo, useState } from 'react'
+import { PropsWithChildren, useMemo, useState, createContext, useContext } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
@@ -23,7 +23,11 @@ import {
   OrderedList,
 } from './MessageMarkdown'
 import { useProfileNameAndPicture } from './Message.hooks'
-import { parseExecuteSqlChartResult } from './Message.utils'
+import {
+  deployEdgeFunctionInputSchema,
+  deployEdgeFunctionOutputSchema,
+  parseExecuteSqlChartResult,
+} from './Message.utils'
 
 function MessageDisplayProfileImage() {
   const { username, avatarUrl } = useProfileNameAndPicture()
@@ -35,7 +39,6 @@ function MessageDisplayProfileImage() {
     />
   )
 }
-MessageDisplay.ProfileImage = MessageDisplayProfileImage
 
 const baseMarkdownComponents: Partial<Components> = {
   ol: OrderedList,
@@ -93,7 +96,6 @@ function MessageDisplayMarkdown({
     </ReactMarkdown>
   )
 }
-MessageDisplay.Markdown = MessageDisplayMarkdown
 
 function MessageDisplayContainer({
   children,
@@ -109,12 +111,37 @@ function MessageDisplayContainer({
     </div>
   )
 }
-MessageDisplay.Container = MessageDisplayContainer
 
-function MessageMainArea({ children, className }: PropsWithChildren<{ className?: string }>) {
+function MessageDisplayMainArea({
+  children,
+  className,
+}: PropsWithChildren<{ className?: string }>) {
   return <div className={cn('flex gap-4 w-auto overflow-hidden group', className)}>{children}</div>
 }
-MessageDisplay.MainArea = MessageMainArea
+
+function MessageDisplayContent({ message }: { message: VercelMessage }) {
+  const { id, isLoading, readOnly } = useMessageInfoContext()
+
+  const messageParts = message.parts
+  const content =
+    ('content' in message && typeof message.content === 'string' && message.content.trim()) ||
+    undefined
+
+  return (
+    <div className="flex-1 min-w-0">
+      {messageParts?.length > 0
+        ? messageParts.map((part: NonNullable<VercelMessage['parts'][number]>, idx) => {
+            const isLastPart = idx === messageParts.length - 1
+            return <MessagePartSwitcher part={part} isLastPart={isLastPart} />
+          })
+        : content && (
+            <MessageDisplayTextMessage id={id} isLoading={isLoading} readOnly={readOnly}>
+              {content}
+            </MessageDisplayTextMessage>
+          )}
+    </div>
+  )
+}
 
 function MessageDisplayTextMessage({
   id,
@@ -123,19 +150,47 @@ function MessageDisplayTextMessage({
   children,
 }: PropsWithChildren<{ id: string; isLoading: boolean; readOnly?: boolean }>) {
   return (
-    <MessageDisplay.Markdown
+    <MessageDisplayMarkdown
       id={id}
       isLoading={isLoading}
       readOnly={readOnly}
       className="prose prose-sm max-w-none break-words"
     >
       {children}
+    </MessageDisplayMarkdown>
+  )
+}
+
+const MessageDisplay = {
+  Container: MessageDisplayContainer,
+  Content: MessageDisplayContent,
+  MainArea: MessageDisplayMainArea,
+  Markdown: MessageDisplayMarkdown,
+  ProfileImage: MessageDisplayProfileImage,
+}
+
+type AddToolResult = (args: { tool: string; toolCallId: string; output: unknown }) => Promise<void>
+
+function MessagePartText({ textPart }: { textPart: TextUIPart }) {
+  const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
+
+  return (
+    <MessageDisplay.Markdown
+      id={id}
+      isLoading={isLoading}
+      readOnly={readOnly}
+      className={cn(
+        'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+        isUserMessage && 'text-foreground [&>p]:font-medium',
+        state === 'editing' && 'animate-pulse'
+      )}
+    >
+      {textPart.text}
     </MessageDisplay.Markdown>
   )
 }
-MessageDisplay.TextMessage = MessageDisplayTextMessage
 
-function ToolDisplayDynamic({ toolPart }: { toolPart: DynamicToolUIPart }) {
+function MessagePartDynamicTool({ toolPart }: { toolPart: DynamicToolUIPart }) {
   return (
     <Tool
       icon={
@@ -155,7 +210,7 @@ function ToolDisplayDynamic({ toolPart }: { toolPart: DynamicToolUIPart }) {
   )
 }
 
-function ToolDisplayBasicTool({ toolPart }: { toolPart: ToolUIPart }) {
+function MessagePartTool({ toolPart }: { toolPart: ToolUIPart }) {
   return (
     <Tool
       icon={
@@ -175,7 +230,7 @@ function ToolDisplayBasicTool({ toolPart }: { toolPart: ToolUIPart }) {
   )
 }
 
-function ToolDisplayReasoning({ reasoningPart }: { reasoningPart: ReasoningUIPart }) {
+function MessagePartReasoning({ reasoningPart }: { reasoningPart: ReasoningUIPart }) {
   return (
     <Tool
       icon={
@@ -205,27 +260,16 @@ function ToolDisplayExecuteSqlFailure() {
   return <div className="text-xs text-danger">Failed to execute SQL.</div>
 }
 
-function ToolDisplayExecuteSql({
-  id,
+function MessagePartExecuteSql({
   toolPart,
   isLastPart,
-  isLastMessage,
-  addToolResult,
 }: {
-  id: string
   toolPart: ToolUIPart
   isLastPart?: boolean
-  isLastMessage?: boolean
-  addToolResult?: ({
-    tool,
-    toolCallId,
-    output,
-  }: {
-    tool: string
-    toolCallId: string
-    output: unknown
-  }) => void
 }) {
+  const { id, isLastMessage } = useMessageInfoContext()
+  const { addToolResult } = useMessageActionsContext()
+
   const { toolCallId, state, input, output } = toolPart
 
   if (state === 'input-streaming') {
@@ -281,190 +325,152 @@ function ToolDisplayExecuteSql({
   return null
 }
 
-const ToolDisplay = {
-  Dynamic: ToolDisplayDynamic,
-  BasicTool: ToolDisplayBasicTool,
-  Reasoning: ToolDisplayReasoning,
-  ExecuteSql: ToolDisplayExecuteSql,
-} as const
+const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set(['input-available', 'output-available'])
 
-interface MessageProps {
-  id: string
-  message: VercelMessage
-  isLoading: boolean
-  readOnly?: boolean
-  variant?: 'default' | 'warning'
-  addToolResult?: (args: { tool: string; toolCallId: string; output: unknown }) => Promise<void>
-  onDelete: (id: string) => void
-  onEdit: (id: string) => void
-  isAfterEditedMessage: boolean
-  isBeingEdited: boolean
-  onCancelEdit: () => void
-  isLastMessage?: boolean
-}
+function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
+  const { toolCallId, state, input, output } = toolPart
+  const { addToolResult } = useMessageActionsContext()
 
-function MessageDisplay({
-  id,
-  message,
-  isLoading,
-  readOnly,
-  variant = 'default',
-  addToolResult,
-  onDelete,
-  onEdit,
-  isAfterEditedMessage = false,
-  isBeingEdited = false,
-  onCancelEdit,
-  isLastMessage = false,
-}: PropsWithChildren<MessageProps>) {
-  // For backwards compatibility: some stored messages may have a 'content' property
-  const { role, parts } = message
-  const hasContent = (msg: VercelMessage): msg is VercelMessage & { content: string } =>
-    'content' in msg && typeof msg.content === 'string'
-  const content = hasContent(message) ? message.content : undefined
-  const isUser = role === 'user'
+  if (state === 'input-streaming') {
+    return (
+      <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        Writing Edge Function...
+      </div>
+    )
+  }
 
-  const shouldUsePartsRendering = parts && parts.length > 0
+  if (state === 'output-error') {
+    return <div className="text-xs text-danger">Failed to deploy Edge Function.</div>
+  }
 
-  const hasTextContent = content && content.trim().length > 0
+  if (!TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT.has(state)) return null
+
+  const parsedInput = deployEdgeFunctionInputSchema.safeParse(input)
+  if (!parsedInput.success) return null
+
+  const parsedOutput = deployEdgeFunctionOutputSchema.safeParse(output)
+  const isInitiallyDeployed =
+    state === 'output-available' && parsedOutput.success && parsedOutput.data.success === true
 
   return (
-    <MessageDisplayContainer
-      className={cn(
-        isUser ? 'text-foreground mt-6' : '',
-        variant === 'warning' && 'bg-warning-200',
-        isAfterEditedMessage && 'opacity-50 cursor-pointer transition-opacity'
-      )}
-      onClick={isAfterEditedMessage ? onCancelEdit : undefined}
-    >
-      <MessageMainArea>
-        {isUser && <MessageDisplayProfileImage />}
-
-        <div className="flex-1 min-w-0">
-          {shouldUsePartsRendering
-            ? (() => {
-                return parts.map(
-                  (part: NonNullable<VercelMessage['parts']>[number], index: number) => {
-                    const isLastPart = index === parts.length - 1
-                    switch (part.type) {
-                      case 'dynamic-tool': {
-                        return (
-                          <ToolDisplay.Dynamic
-                            key={`${id}-tool-${part.toolCallId}`}
-                            toolPart={part}
-                          />
-                        )
-                      }
-                      case 'tool-list_policies':
-                      case 'tool-search_docs': {
-                        return (
-                          <ToolDisplay.BasicTool
-                            key={`${id}-tool-${part.toolCallId}`}
-                            toolPart={part}
-                          />
-                        )
-                      }
-                      case 'reasoning':
-                        return (
-                          <ToolDisplay.Reasoning
-                            key={`${message.id}-${index}}`}
-                            reasoningPart={part}
-                          />
-                        )
-                      case 'text':
-                        return (
-                          <MessageDisplay.Markdown
-                            key={`${id}-part-${index}`}
-                            id={id}
-                            isLoading={isLoading}
-                            readOnly={readOnly}
-                            className={cn(
-                              'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
-                              isUser && 'text-foreground [&>p]:font-medium',
-                              isBeingEdited && 'animate-pulse'
-                            )}
-                          >
-                            {part.text}
-                          </MessageDisplay.Markdown>
-                        )
-
-                      case 'tool-execute_sql': {
-                        return (
-                          <ToolDisplay.ExecuteSql
-                            key={`${id}-tool-execute_sql`}
-                            id={id}
-                            toolPart={part}
-                            isLastPart={isLastPart}
-                            isLastMessage={isLastMessage}
-                            addToolResult={addToolResult}
-                          />
-                        )
-                      }
-                      case 'tool-deploy_edge_function': {
-                        const { toolCallId, state, input } = part
-                        if (state === 'input-streaming') {
-                          return (
-                            <div
-                              key={`${id}-tool-loading-execute_sql`}
-                              className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2"
-                            >
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              Writing Edge Function...
-                            </div>
-                          )
-                        }
-                        if (state === 'input-available' || state === 'output-available') {
-                          const isInitiallyDeployed =
-                            state === 'output-available' && (part as any)?.output?.success === true
-                          return (
-                            <EdgeFunctionRenderer
-                              key={`${id}-tool-${toolCallId}`}
-                              label={(input as any).name || 'Edge Function'}
-                              code={(input as any).code}
-                              functionName={(input as any).name || 'my-function'}
-                              showConfirmFooter={!part.output}
-                              initialIsDeployed={isInitiallyDeployed}
-                              onDeployed={async (res) => {
-                                await addToolResult?.({
-                                  tool: 'deploy_edge_function',
-                                  toolCallId: String(toolCallId),
-                                  output: res,
-                                })
-                              }}
-                            />
-                          )
-                        }
-                        if (state === 'output-error') {
-                          return (
-                            <div key={`${id}-tool-${toolCallId}`} className="text-xs text-danger">
-                              Failed to deploy Edge Function.
-                            </div>
-                          )
-                        }
-                        return null
-                      }
-
-                      case 'source-url':
-                      case 'source-document':
-                      case 'file':
-                      default:
-                        return null
-                    }
-                  }
-                )
-              })()
-            : hasTextContent && (
-                <MessageDisplay.TextMessage id={id} isLoading={isLoading} readOnly={readOnly}>
-                  {content}
-                </MessageDisplay.TextMessage>
-              )}
-        </div>
-      </MessageMainArea>
-    </MessageDisplayContainer>
+    <EdgeFunctionRenderer
+      label={parsedInput.data.label}
+      code={parsedInput.data.code}
+      functionName={parsedInput.data.functionName}
+      showConfirmFooter={!output}
+      initialIsDeployed={isInitiallyDeployed}
+      onDeployed={(result) => {
+        addToolResult?.({
+          tool: 'deploy_edge_function',
+          toolCallId: String(toolCallId),
+          output: result,
+        })
+      }}
+    />
   )
 }
 
-function MessageTools({ children }: PropsWithChildren<{}>) {
+const MessagePart = {
+  Text: MessagePartText,
+  Dynamic: MessagePartDynamicTool,
+  Tool: MessagePartTool,
+  Reasoning: MessagePartReasoning,
+  ExecuteSql: MessagePartExecuteSql,
+  DeployEdgeFunction: MessagePartDeployEdgeFunction,
+} as const
+
+function MessagePartSwitcher({
+  part,
+  isLastPart,
+}: {
+  part: NonNullable<VercelMessage['parts']>[number]
+  isLastPart?: boolean
+}) {
+  switch (part.type) {
+    case 'dynamic-tool': {
+      return <MessagePart.Dynamic toolPart={part} />
+    }
+    case 'tool-list_policies':
+    case 'tool-search_docs': {
+      return <MessagePart.Tool toolPart={part} />
+    }
+    case 'reasoning':
+      return <MessagePart.Reasoning reasoningPart={part} />
+    case 'text':
+      return <MessagePart.Text textPart={part} />
+
+    case 'tool-execute_sql': {
+      return <MessagePart.ExecuteSql toolPart={part} isLastPart={isLastPart} />
+    }
+    case 'tool-deploy_edge_function': {
+      return <MessagePart.DeployEdgeFunction toolPart={part} />
+    }
+
+    case 'source-url':
+    case 'source-document':
+    case 'file':
+    default:
+      return null
+  }
+}
+
+interface MessageInfo {
+  id: string
+
+  variant?: 'default' | 'warning'
+
+  isLoading: boolean
+  readOnly?: boolean
+
+  isUserMessage?: boolean
+  isLastMessage?: boolean
+
+  state: 'idle' | 'editing' | 'predecessor-editing'
+}
+
+interface MessageActions {
+  addToolResult?: AddToolResult
+
+  onDelete: (id: string) => void
+  onEdit: (id: string) => void
+  onCancelEdit: () => void
+}
+
+const MessageInfoContext = createContext<MessageInfo | null>(null)
+const MessageActionsContext = createContext<MessageActions | null>(null)
+
+function useMessageInfoContext() {
+  const ctx = useContext(MessageInfoContext)
+  if (!ctx) {
+    throw Error('useMessageInfoContext must be used within a MessageProvider')
+  }
+  return ctx
+}
+
+function useMessageActionsContext() {
+  const ctx = useContext(MessageActionsContext)
+  if (!ctx) {
+    throw Error('useMessageActionsContext must be used within a MessageProvider')
+  }
+  return ctx
+}
+
+function MessageProvider({
+  messageInfo,
+  messageActions,
+  children,
+}: PropsWithChildren<{ messageInfo: MessageInfo; messageActions: MessageActions }>) {
+  return (
+    <MessageInfoContext.Provider value={messageInfo}>
+      <MessageActionsContext.Provider value={messageActions}>
+        {children}
+      </MessageActionsContext.Provider>
+    </MessageInfoContext.Provider>
+  )
+}
+
+function MessageActions({ children }: PropsWithChildren<{}>) {
   return (
     <div className="flex items-center gap-4 mt-2 mb-1">
       <span className="h-0.5 w-5 bg-muted" />
@@ -490,7 +496,7 @@ function MessageToolsEdit({ onClick, tooltip }: { onClick: () => void; tooltip: 
     />
   )
 }
-MessageTools.Edit = MessageToolsEdit
+MessageActions.Edit = MessageToolsEdit
 
 function MessageToolsDelete({ onClick }: { onClick: () => void }) {
   return (
@@ -505,52 +511,58 @@ function MessageToolsDelete({ onClick }: { onClick: () => void }) {
     />
   )
 }
-MessageTools.Delete = MessageToolsDelete
+MessageActions.Delete = MessageToolsDelete
 
-interface UserMessageStateShared {
-  status: string
-  onDelete: () => void
+function AssistantMessage({ message }: { message: VercelMessage }) {
+  const { variant, state } = useMessageInfoContext()
+  const { onCancelEdit } = useMessageActionsContext()
+
+  return (
+    <MessageDisplay.Container
+      className={cn(
+        variant === 'warning' && 'bg-warning-200',
+        state === 'predecessor-editing' && 'opacity-50 transition-opacity cursor-pointer'
+      )}
+      onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
+    >
+      <MessageDisplay.MainArea>
+        <MessageDisplay.Content message={message} />
+      </MessageDisplay.MainArea>
+    </MessageDisplay.Container>
+  )
 }
 
-interface UserMessageStateIdle extends UserMessageStateShared {
-  status: 'idle'
-  onEdit: () => void
-}
-
-interface UserMessageStateEditing extends UserMessageStateShared {
-  status: 'editing'
-  onCancelEdit: () => void
-}
-
-interface UserMessageStatePredecessorEditing extends UserMessageStateShared {
-  status: 'predecessor-editing'
-  onCancelEdit: () => void
-}
-
-type UserMessageState =
-  | UserMessageStateIdle
-  | UserMessageStateEditing
-  | UserMessageStatePredecessorEditing
-
-function UserMessage(state: UserMessageState) {
+function UserMessage({ message }: { message: VercelMessage }) {
+  const { id, variant, state } = useMessageInfoContext()
+  const { onCancelEdit, onEdit, onDelete } = useMessageActionsContext()
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
 
   return (
     <>
-      <MessageDisplay.Container>
-        <MessageDisplay.MainArea></MessageDisplay.MainArea>
-        <MessageTools>
-          <MessageTools.Edit
-            onClick={state.status === 'idle' ? state.onEdit : state.onCancelEdit}
-            tooltip={state.status === 'idle' ? 'Edit message' : 'Cancel editing'}
+      <MessageDisplay.Container
+        className={cn(
+          'mt-6 text-foreground',
+          variant === 'warning' && 'bg-warning-200',
+          state === 'predecessor-editing' && 'opacity-50 transition-opacity cursor-pointer'
+        )}
+        onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
+      >
+        <MessageDisplay.MainArea>
+          <MessageDisplay.ProfileImage />
+          <MessageDisplay.Content message={message} />
+        </MessageDisplay.MainArea>
+        <MessageActions>
+          <MessageActions.Edit
+            onClick={state === 'idle' ? () => onEdit(id) : onCancelEdit}
+            tooltip={state === 'idle' ? 'Edit message' : 'Cancel editing'}
           />
-          <MessageTools.Delete onClick={() => setShowDeleteConfirmModal(true)} />
-        </MessageTools>
+          <MessageActions.Delete onClick={() => setShowDeleteConfirmModal(true)} />
+        </MessageActions>
       </MessageDisplay.Container>
       <DeleteMessageConfirmModal
         visible={showDeleteConfirmModal}
         onConfirm={() => {
-          state.onDelete()
+          onDelete(id)
           setShowDeleteConfirmModal(false)
           toast.success('Message deleted successfully')
         }}
@@ -560,10 +572,49 @@ function UserMessage(state: UserMessageState) {
   )
 }
 
-export function Message(props: PropsWithChildren<MessageProps>) {
-  const { role } = props.message
-  const isUser = role === 'user'
+interface MessageProps {
+  id: string
+  message: VercelMessage
+  isLoading: boolean
+  readOnly?: boolean
+  variant?: 'default' | 'warning'
+  addToolResult?: AddToolResult
+  onDelete: (id: string) => void
+  onEdit: (id: string) => void
+  isAfterEditedMessage: boolean
+  isBeingEdited: boolean
+  onCancelEdit: () => void
+  isLastMessage?: boolean
+}
 
-  if (isUser) return <MessageDisplay {...props} />
-  return <MessageDisplay {...props} />
+export function Message(props: MessageProps) {
+  const message = props.message
+  const { role } = message
+  const isUserMessage = role === 'user'
+
+  const messageInfo = {
+    id: props.id,
+    isLoading: props.isLoading,
+    readOnly: props.readOnly,
+    variant: props.variant,
+    state: props.isBeingEdited
+      ? 'editing'
+      : props.isAfterEditedMessage
+        ? 'predecessor-editing'
+        : 'idle',
+    isLastMessage: props.isLastMessage,
+  } satisfies MessageInfo
+
+  const messageActions = {
+    addToolResult: props.addToolResult,
+    onDelete: props.onDelete,
+    onEdit: props.onEdit,
+    onCancelEdit: props.onCancelEdit,
+  }
+
+  return (
+    <MessageProvider messageInfo={messageInfo} messageActions={messageActions}>
+      {isUserMessage ? <UserMessage message={message} /> : <AssistantMessage message={message} />}
+    </MessageProvider>
+  )
 }
