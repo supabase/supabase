@@ -1,10 +1,11 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2, LogsIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import { ComposedChart } from './ComposedChart'
+import type { ChartHighlightAction } from './ChartHighlightActions'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
@@ -231,6 +232,22 @@ const ComposedChartHandler = ({
           : (firstData.data[firstData.data.length - 1] as any)?.[firstAttr.attribute]
   }, [highlightedValue, attributes, attributeQueries])
 
+  const highlightActions: ChartHighlightAction[] = useMemo(() => {
+    return [
+      {
+        id: 'open-logs',
+        label: 'Open in Postgres Logs',
+        icon: <LogsIcon size={12} />,
+        onSelect: ({ start, end, clear }) => {
+          const projectRef = ref as string
+          if (!projectRef) return
+          const url = `/project/${projectRef}/logs/postgres-logs?its=${start}&ite=${end}`
+          router.push(url)
+        },
+      },
+    ]
+  }, [ref])
+
   if (loading) {
     return (
       <Panel
@@ -288,6 +305,7 @@ const ComposedChartHandler = ({
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
           syncId={syncId}
+          highlightActions={highlightActions}
           {...otherProps}
         />
       </Panel.Content>
