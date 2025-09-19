@@ -13,7 +13,7 @@ export function SelectBanner() {
 
   return (
     <div
-      className="dark relative w-full flex items-center group justify-center text-foreground-contrast bg-black border-b border-muted transition-colors overflow-hidden"
+      className="dark relative w-full flex items-center group justify-center bg-black border-b border-muted transition-colors overflow-hidden"
       style={
         {
           '--line-color': 'hsl(var(--border-muted))',

@@ -9,7 +9,6 @@ import { Button, cn } from 'ui'
 
 import { useFlag } from 'common'
 import DefaultLayout from '~/components/Layouts/Default'
-import { DecorativeProgressBar } from '~/components/SurveyResults/DecorativeProgressBar'
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
