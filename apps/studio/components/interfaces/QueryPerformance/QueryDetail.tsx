@@ -90,7 +90,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
 
               const formattedValue = isTime
                 ? typeof rawValue === 'number' && !isNaN(rawValue) && isFinite(rawValue)
-                  ? `${rawValue.toFixed(2)}ms`
+                  ? `${Math.round(rawValue).toLocaleString()}ms`
                   : 'n/a'
                 : rawValue != null
                   ? String(rawValue)
@@ -151,6 +151,35 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
                         className={cn('tabular-nums', rawValue === 0 && 'text-foreground-lighter')}
                       >
                         {rawValue.toLocaleString()}
+                      </p>
+                    ) : (
+                      <p className="text-muted">&ndash;</p>
+                    )}
+                  </li>
+                )
+              }
+
+              const cacheHitRateToNumber = (value: number | string) => {
+                if (typeof value === 'number') return value
+                return parseFloat(value.toString().replace('%', '')) || 0
+              }
+
+              if (x.id === 'cache_hit_rate') {
+                return (
+                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                    <p className="text-foreground-light">{x.name}</p>
+                    {typeof rawValue === 'string' ? (
+                      <p
+                        className={cn(
+                          cacheHitRateToNumber(rawValue).toFixed(2) === '0.00' &&
+                            'text-foreground-lighter'
+                        )}
+                      >
+                        {cacheHitRateToNumber(rawValue).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                        %
                       </p>
                     ) : (
                       <p className="text-muted">&ndash;</p>
