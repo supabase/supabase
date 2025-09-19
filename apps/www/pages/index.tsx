@@ -7,7 +7,6 @@ import Logos from '~/components/logos'
 const Products = dynamic(() => import('~/components/Products/index'))
 const HeroFrameworks = dynamic(() => import('~/components/Hero/HeroFrameworks'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
-const SupabaseSelectPromo = dynamic(() => import('components/SupabaseSelectPromo'))
 const BuiltWithSupabase = dynamic(() => import('components/BuiltWithSupabase'))
 const DashboardFeatures = dynamic(() => import('~/components/DashboardFeatures'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
@@ -23,7 +22,6 @@ const Index = () => {
       <Products {...content.productsSection} />
       <HeroFrameworks />
       <CustomerStories />
-      <SupabaseSelectPromo />
       <BuiltWithSupabase />
       <DashboardFeatures {...content.dashboardFeatures} />
       <TwitterSocialSection {...content.twitterSocialSection} />

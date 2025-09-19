@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import { Button } from 'ui'
+import { DecorativeProgressBar } from '~/components/SurveyResults/DecorativeProgressBar'
 // import SectionContainer from '~/components/Layouts/SectionContainer'
 import './styles.css'
 
@@ -118,6 +119,14 @@ const SupabaseSelectPromo = () => {
                   backgroundSize: `${gridUnit}px ${gridUnit}px`,
                 }}
               />
+              <div
+                className="hidden xl:block absolute top-0 right-0 h-full"
+                style={{
+                  width: `${gridWidth}px`,
+                }}
+              >
+                <DecorativeProgressBar align="end" />
+              </div>
               {/* Main text */}
               <div className="flex flex-col pt-16 text-balance relative">
                 <h3 className="text-2xl text-light pb-2 max-w-md">{mainText[0]}</h3>
