@@ -5,9 +5,9 @@ packages:
 
 catalog:
   '@types/node': ^22.0.0
-  '@supabase/auth-js': 2.71.2-canary.2
-  '@supabase/supabase-js': 2.71.2-canary.2
-  '@supabase/realtime-js': 2.71.2-canary.2
+  '@supabase/auth-js': 2.71.2-canary.3
+  '@supabase/supabase-js': 2.71.2-canary.3
+  '@supabase/realtime-js': 2.71.2-canary.3
   next: ^15.5.2
   'react': '^18.3.0'
   'react-dom': '^18.3.0'
