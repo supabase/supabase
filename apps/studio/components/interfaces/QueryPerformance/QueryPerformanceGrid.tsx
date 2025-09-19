@@ -438,7 +438,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         <SheetTitle className="sr-only">Query details</SheetTitle>
         <SheetContent
           side="right"
-          className="flex flex-col h-full bg-studio border-l !w-[580px]"
+          className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
           hasOverlay={false}
           onInteractOutside={(event) => {
             if (dataGridContainerRef.current?.contains(event.target as Node)) {
