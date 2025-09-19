@@ -142,7 +142,7 @@
     "uuid": "^9.0.1",
     "valtio": "catalog:",
     "yup": "^1.4.0",
-    "zod": "^3.25.76",
+    "zod": "catalog:",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
