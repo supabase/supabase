@@ -25,7 +25,7 @@
         "name": "next"
       }
     ],
-    "skipDefaultLibCheck": true
+    "noErrorTruncation": true
   },
   "include": [
     "next-env.d.ts",
