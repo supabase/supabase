@@ -45,7 +45,7 @@
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
     "unist-util-visit": "^5.0.0",
-    "zod": "^3.25.76"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@shikijs/compat": "^1.1.7",

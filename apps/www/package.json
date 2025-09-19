@@ -99,7 +99,7 @@
     "react-hook-form": "^7.45.0",
     "tsconfig": "workspace:*",
     "uuid": "^9.0.1",
-    "zod": "^3.25.76"
+    "zod": "catalog:"
   },
   "license": "MIT"
 }
