@@ -163,7 +163,18 @@ export const createTableEditorTableState = ({
 
 export type TableEditorTableState = ReturnType<typeof createTableEditorTableState>
 
-export const TableEditorTableStateContext = createContext<TableEditorTableState>(proxy({} as any))
+const DEFAULT_STATE_CONFIG = {
+  projectRef: '',
+  table: undefined as any,
+  editable: undefined,
+  onAddColumn: () => {},
+  onExpandJSONEditor: () => {},
+  onExpandTextEditor: () => {},
+}
+
+export const TableEditorTableStateContext = createContext<TableEditorTableState>(
+  createTableEditorTableState(DEFAULT_STATE_CONFIG)
+)
 
 type TableEditorTableStateContextProviderProps = Omit<
   Parameters<typeof createTableEditorTableState>[0],
