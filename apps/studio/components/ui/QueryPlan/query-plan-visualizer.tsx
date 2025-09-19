@@ -121,13 +121,15 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         )}
       >
         <div className="flex h-full">
-          <MetricsSidebar
-            nodes={layout.nodes}
-            edges={layout.edges}
-            meta={meta}
-            selectedNode={selectedNode}
-            onSelect={(node) => setSelectedNode(node)}
-          />
+          {isExpanded && (
+            <MetricsSidebar
+              nodes={layout.nodes}
+              edges={layout.edges}
+              meta={meta}
+              selectedNode={selectedNode}
+              onSelect={(node) => setSelectedNode(node)}
+            />
+          )}
           <div className="relative flex-1">
             {meta?.errorMessage && (
               <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
