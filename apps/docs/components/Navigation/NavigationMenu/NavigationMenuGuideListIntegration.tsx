@@ -2,4 +2,4 @@ export { default as NavigationMenuGuideListOld } from './NavigationMenuGuideList
 export { default as NavigationMenuGuideListNew } from './NavigationMenuGuideListRecursive'
 
 export type { MenuItem } from './RecursiveNavigation'
-export { transformNavMenuToMenuItems, createSampleMenuData } from './navigationDataTransform'
+export { transformNavMenuToMenuItems } from './navigationDataTransform'

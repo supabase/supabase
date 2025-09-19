@@ -8,13 +8,12 @@ import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { cn } from 'ui'
-import MenuIconPicker from './MenuIconPicker'
 
 interface MenuItem {
   title: string
   icon?: string
   url?: string
-  type?: 'link' | 'category' | 'section'
+  type?: 'link' | 'category'
   enabled?: boolean
   children?: MenuItem[]
 }
@@ -30,9 +29,26 @@ interface RecursiveNavigationProps {
   className?: string
 }
 
-const RecursiveNavItem: React.FC<RecursiveNavItemProps> = ({ item, depth = 0, path = '' }) => {
-  const pathname = usePathname()
+// Constants for consistent sizing
+const ICON_SIZE = 16
+
+// Icon component to avoid duplication
+const NavIcon = React.memo(({ icon, title }: { icon: string; title: string }) => {
   const { resolvedTheme } = useTheme()
+  return (
+    <Image
+      alt={title}
+      src={`${icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+      width={ICON_SIZE}
+      height={ICON_SIZE}
+    />
+  )
+})
+
+NavIcon.displayName = 'NavIcon'
+
+const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, path = '' }) => {
+  const pathname = usePathname()
 
   const itemPath = path ? `${path}.${item.title}` : item.title
   const isActive = item.url === pathname
@@ -55,14 +71,7 @@ const RecursiveNavItem: React.FC<RecursiveNavItemProps> = ({ item, depth = 0, pa
             )}
           >
             <div className="flex items-center gap-2">
-              {item.icon && (
-                <Image
-                  alt={item.title}
-                  src={`${item.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
-                  width={16}
-                  height={16}
-                />
-              )}
+              {item.icon && <NavIcon icon={item.icon} title={item.title} />}
               <span className={cn(depth === 0 && 'font-medium', 'text-left')}>{item.title}</span>
             </div>
             <ChevronRight
@@ -75,7 +84,7 @@ const RecursiveNavItem: React.FC<RecursiveNavItemProps> = ({ item, depth = 0, pa
             <div className="pt-1 pb-2 pl-4 space-y-1 border-l border-border ml-2">
               {item.children?.map((child, index) => (
                 <RecursiveNavItem
-                  key={`${child.title}-${index}`}
+                  key={child.url || `${child.title}-${index}`}
                   item={child}
                   depth={depth + 1}
                   path={itemPath}
@@ -98,24 +107,19 @@ const RecursiveNavItem: React.FC<RecursiveNavItemProps> = ({ item, depth = 0, pa
         isActive ? 'bg-surface-200 text-brand-link font-medium' : 'text-foreground-light'
       )}
     >
-      {item.icon && (
-        <Image
-          alt={item.title}
-          src={`${item.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
-          width={16}
-          height={16}
-        />
-      )}
+      {item.icon && <NavIcon icon={item.icon} title={item.title} />}
       <span>{item.title}</span>
     </Link>
   )
-}
+})
+
+RecursiveNavItem.displayName = 'RecursiveNavItem'
 
 const RecursiveNavigation: React.FC<RecursiveNavigationProps> = ({ items, className }) => {
   return (
     <nav className={cn('w-full space-y-1', className)}>
       {items.map((item, index) => (
-        <RecursiveNavItem key={`${item.title}-${index}`} item={item} />
+        <RecursiveNavItem key={item.url || `${item.title}-${index}`} item={item} />
       ))}
     </nav>
   )
