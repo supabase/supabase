@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { HomeActivityStatClickedEvent } from 'common/telemetry-constants'
 
 type SingleStatProps = {
   icon: ReactNode
@@ -41,15 +40,14 @@ export const SingleStat = ({
       project?.ref &&
       organization?.slug
     ) {
-      const event: HomeActivityStatClickedEvent = {
+      sendEvent({
         action: 'home_activity_stat_clicked',
         properties: trackingProperties,
         groups: {
           project: project.ref,
           organization: organization.slug,
         },
-      }
-      sendEvent(event)
+      })
     }
   }
   const content = (
@@ -78,15 +76,14 @@ export const SingleStat = ({
             project?.ref &&
             organization?.slug
           ) {
-            const event: HomeActivityStatClickedEvent = {
+            sendEvent({
               action: 'home_activity_stat_clicked',
               properties: trackingProperties,
               groups: {
                 project: project.ref,
                 organization: organization.slug,
               },
-            }
-            sendEvent(event)
+            })
           }
         }}
       >
