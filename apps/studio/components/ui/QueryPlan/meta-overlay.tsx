@@ -1,5 +1,11 @@
-import { cn } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { formatMs } from './utils/formats'
+
+type Metric = {
+  label: string
+  value: number
+  description: string
+}
 
 type Props = {
   planningTime?: number
@@ -13,18 +19,49 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
     return null
   }
 
-  const metrics: { label: string; value: number }[] = []
-  if (planningTime !== undefined) metrics.push({ label: 'planning', value: planningTime })
-  if (executionTime !== undefined) metrics.push({ label: 'exec', value: executionTime })
-  if (jitTotalTime !== undefined) metrics.push({ label: 'jit', value: jitTotalTime })
+  const metrics: Metric[] = []
+  if (planningTime !== undefined) {
+    metrics.push({
+      label: 'Plan time',
+      value: planningTime,
+      description:
+        'How long PostgreSQL spent preparing the query plan before any rows were processed.',
+    })
+  }
+  if (executionTime !== undefined) {
+    metrics.push({
+      label: 'Run time',
+      value: executionTime,
+      description: 'Time PostgreSQL needed to execute the plan and produce results.',
+    })
+  }
+  if (jitTotalTime !== undefined) {
+    metrics.push({
+      label: 'Instant compile',
+      value: jitTotalTime,
+      description:
+        'Time spent compiling parts of the plan immediately before running (also known as just-in-time compilation).',
+    })
+  }
 
   return (
-    <div className={cn('text-xs px-2 py-1 rounded-md border bg-alternative h-[36px]', className)}>
-      <ul className="flex items-center gap-x-2">
+    <div
+      className={cn('text-xs px-2 py-1 rounded-md border bg-alternative min-h-[36px]', className)}
+    >
+      <ul className="flex gap-x-4">
         {metrics.map((metric) => (
-          <li key={metric.label} className="flex items-baseline gap-x-1">
-            <span className="text-foreground-lighter">{metric.label}:</span>
-            <span>{formatMs(metric.value)} ms</span>
+          <li key={metric.label} className="cursor-help">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-x-1">
+                  <span className="text-foreground-lighter leading-tight">{metric.label}:</span>
+                  <span>{formatMs(metric.value)} ms</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[240px] whitespace-normal">
+                {metric.description}
+              </TooltipContent>
+            </Tooltip>
           </li>
         ))}
       </ul>
