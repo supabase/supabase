@@ -115,6 +115,10 @@
       "type": "boolean",
       "description": "Enable the database roles page"
     },
+    "docs:auth": {
+      "type": "boolean",
+      "description": "Enable auth docs"
+    },
     "docs:contribution": {
       "type": "boolean",
       "description": "Enable documentation on contribution"
@@ -147,7 +151,7 @@
       "type": "boolean",
       "description": "Enable pgtap started documentation"
     },
-    "production_checklist": {
+    "docs:production_checklist": {
       "type": "boolean",
       "description": "Enable production checklist"
     },
@@ -322,8 +326,17 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
+    "docs:auth",
     "docs:compliance",
+    "docs:contribution",
+    "docs:framework_quickstarts",
+    "docs:full_getting_started",
+    "docs:full_platform",
+    "docs:mobile_tutorials",
+    "docs:pgtap",
+    "docs:production_checklist",
     "docs:self-hosting",
+    "docs:web_apps",
     "feedback:docs",
     "integrations:partners",
     "integrations:show_stripe_wrapper",

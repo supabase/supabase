@@ -7,13 +7,14 @@ import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Naviga
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
   billingAll: billingEnabled,
+  docsAuth: authEnabled,
   docsCompliance: complianceEnabled,
   docsContribution: contributionEnabled,
   'docsSelf-hosting': selfHostingEnabled,
   docsFrameworkQuickstarts: frameworkQuickstartsEnabled,
   docsFullPlatform: fullPlatformEnabled,
   docsMobileTutorials: mobileTutorialsEnabled,
-  docsPgTap: pgTapEnabled,
+  docsPgtap: pgTapEnabled,
   docsProductionChecklist: productionChecklistEnabled,
   docsWebApps: webAppsEnabled,
   integrationsPartners: integrationsEnabled,
@@ -25,6 +26,7 @@ const {
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
+  'docs:auth',
   'docs:contribution',
   'docs:compliance',
   'docs:self-hosting',
@@ -34,7 +36,6 @@ const {
   'docs:pgtap',
   'docs:production_checklist',
   'docs:web_apps',
-  'docs:full_getting_started',
   'integrations:partners',
   'sdk:csharp',
   'sdk:dart',
@@ -71,6 +72,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'auth',
             href: '/guides/auth' as `/${string}`,
             level: 'auth',
+            enabled: authEnabled,
           },
           {
             label: 'Storage',
@@ -311,53 +313,44 @@ export const gettingstarted: NavMenuConstant = {
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
-      // Will show when there's a child
       name: 'Framework Quickstarts',
+      enabled: frameworkQuickstartsEnabled,
       items: [
         {
           name: 'Next.js',
           url: '/guides/getting-started/quickstarts/nextjs',
-          enabled: frameworkQuickstartsEnabled,
         },
         {
           name: 'React',
           url: '/guides/getting-started/quickstarts/reactjs',
-          enabled: frameworkQuickstartsEnabled,
         },
         {
           name: 'Nuxt',
           url: '/guides/getting-started/quickstarts/nuxtjs',
-          enabled: frameworkQuickstartsEnabled,
         },
         {
           name: 'Vue',
           url: '/guides/getting-started/quickstarts/vue',
-          enabled: frameworkQuickstartsEnabled,
         },
         {
           name: 'Hono',
           url: '/guides/getting-started/quickstarts/hono',
-          enabled: frameworkQuickstartsEnabled,
         },
         {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
-          enabled: sdkDartEnabled,
         },
         {
           name: 'iOS SwiftUI',
           url: '/guides/getting-started/quickstarts/ios-swiftui',
-          enabled: sdkSwiftEnabled,
         },
         {
           name: 'Android Kotlin',
           url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
-          enabled: sdkKotlinEnabled,
         },
         {
           name: 'SvelteKit',
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
-          enabled: frameworkQuickstartsEnabled,
         },
         {
           name: 'Laravel PHP',
@@ -373,77 +366,66 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'SolidJS',
           url: '/guides/getting-started/quickstarts/solidjs',
-          enabled: frameworkQuickstartsEnabled,
         },
         {
           name: 'RedwoodJS',
           url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
-          enabled: frameworkQuickstartsEnabled,
         },
         {
           name: 'refine',
           url: '/guides/getting-started/quickstarts/refine',
-          enabled: frameworkQuickstartsEnabled,
         },
       ],
     },
     {
       name: 'Web app demos',
+      enabled: webAppsEnabled,
       items: [
         {
           name: 'Next.js',
           url: '/guides/getting-started/tutorials/with-nextjs' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'React',
           url: '/guides/getting-started/tutorials/with-react' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'Vue 3',
           url: '/guides/getting-started/tutorials/with-vue-3' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'Nuxt 3',
           url: '/guides/getting-started/tutorials/with-nuxt-3' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'Angular',
           url: '/guides/getting-started/tutorials/with-angular' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'RedwoodJS',
           url: '/guides/getting-started/tutorials/with-redwoodjs' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'SolidJS',
           url: '/guides/getting-started/tutorials/with-solidjs' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'Svelte',
           url: '/guides/getting-started/tutorials/with-svelte' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'SvelteKit',
           url: '/guides/getting-started/tutorials/with-sveltekit' as `/${string}`,
-          enabled: webAppsEnabled,
         },
         {
           name: 'refine',
           url: '/guides/getting-started/tutorials/with-refine' as `/${string}`,
-          enabled: webAppsEnabled,
         },
       ],
     },
     {
       name: 'Mobile tutorials',
+      enabled: mobileTutorialsEnabled,
       items: [
         {
           name: 'Flutter',
@@ -454,7 +436,6 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Expo React Native',
           url: '/guides/getting-started/tutorials/with-expo-react-native' as `/${string}`,
-          enabled: mobileTutorialsEnabled,
         },
         {
           name: 'Android Kotlin',
@@ -465,17 +446,14 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Ionic React',
           url: '/guides/getting-started/tutorials/with-ionic-react' as `/${string}`,
-          enabled: mobileTutorialsEnabled,
         },
         {
           name: 'Ionic Vue',
           url: '/guides/getting-started/tutorials/with-ionic-vue' as `/${string}`,
-          enabled: mobileTutorialsEnabled,
         },
         {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular' as `/${string}`,
-          enabled: mobileTutorialsEnabled,
         },
         {
           name: 'Swift',
@@ -660,6 +638,7 @@ export const PhoneLoginsItems = [
 export const auth: NavMenuConstant = {
   icon: 'auth',
   title: 'Auth',
+  enabled: authEnabled,
   items: [
     {
       name: 'Overview',
@@ -2177,6 +2156,7 @@ export const contributing: NavMenuConstant = {
   icon: 'contributing',
   title: 'Contributing',
   url: '/contributing',
+  enabled: contributionEnabled,
   items: [{ name: 'Overview', url: '/contributing' }],
 }
 
@@ -2688,7 +2668,11 @@ export const deployment: NavMenuConstant = {
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
-        { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        {
+          name: 'Production checklist',
+          url: '/guides/deployment/going-into-prod',
+          enabled: productionChecklistEnabled,
+        },
         { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
       ],
     },

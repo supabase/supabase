@@ -256,7 +256,7 @@ const HomePage = () => (
             })}
         </div>
       </div>
-      {isFeatureEnabled('docs:full_getting_started') === true && (
+      {isFeatureEnabled('docs:full_getting_started') && (
         <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
           <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
             <h2 id="migrate-to-supabase" className="group scroll-mt-24">
@@ -313,7 +313,7 @@ const HomePage = () => (
           })}
         </ul>
       </div>
-      {isFeatureEnabled('docs:full_getting_started') === true && (
+      {isFeatureEnabled('docs:full_getting_started') && (
         <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12">
           <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
             <div className="md:max-w-xs 2xl:max-w-none">
