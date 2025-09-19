@@ -132,7 +132,7 @@ export function GettingStarted({ steps }: GettingStartedProps) {
           <div className="relative w-full flex-1 min-h-[100px] shrink-0 overflow-hidden">
             {activeStep.image ? (
               <Image
-                className="w-full"
+                className="w-full select-none"
                 src={activeStep.image}
                 fill
                 objectFit="cover"
@@ -144,12 +144,12 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                 <img
                   src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
                   alt="Supabase Grafana"
-                  className="w-full h-full object-cover object-right hidden dark:block"
+                  className="w-full h-full object-cover object-right hidden dark:block user-select-none"
                 />
                 <img
                   src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
                   alt="Supabase Grafana"
-                  className="w-full h-full object-cover object-right dark:hidden"
+                  className="w-full h-full object-cover object-right dark:hidden user-select-none"
                 />
               </div>
             )}
