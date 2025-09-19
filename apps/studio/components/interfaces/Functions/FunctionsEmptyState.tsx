@@ -1,6 +1,7 @@
 import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useMemo } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -8,6 +9,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
@@ -38,6 +40,16 @@ export const FunctionsEmptyState = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
+
+  const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
+  const templates = useMemo(() => {
+    if (showStripeExample) {
+      return EDGE_FUNCTION_TEMPLATES
+    }
+
+    // Filter out Stripe template
+    return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
+  }, [showStripeExample])
 
   return (
     <>
@@ -157,7 +169,7 @@ export const FunctionsEmptyState = () => {
         Start with a template
       </ScaffoldSectionTitle>
       <ResourceList>
-        {EDGE_FUNCTION_TEMPLATES.map((template) => (
+        {templates.map((template) => (
           <ResourceItem
             key={template.name}
             media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
@@ -181,6 +193,16 @@ export const FunctionsEmptyState = () => {
 }
 
 export const FunctionsEmptyStateLocal = () => {
+  const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
+  const templates = useMemo(() => {
+    if (showStripeExample) {
+      return EDGE_FUNCTION_TEMPLATES
+    }
+
+    // Filter out Stripe template
+    return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
+  }, [showStripeExample])
+
   return (
     <>
       <div className="flex flex-col gap-y-4">
@@ -295,7 +317,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
 
         <ScaffoldSectionTitle className="text-xl mt-12">Explore our templates</ScaffoldSectionTitle>
         <ResourceList>
-          {EDGE_FUNCTION_TEMPLATES.map((template) => (
+          {templates.map((template) => (
             <Dialog>
               <DialogTrigger asChild>
                 <ResourceItem
