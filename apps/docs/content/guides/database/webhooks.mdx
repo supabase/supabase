@@ -57,7 +57,7 @@ When creating or editing webhooks through the Supabase Studio UI, headers named 
 - For Edge Functions with JWT verification enabled: Authorization headers are automatically added with the appropriate service role token
 - For regular HTTP requests or Edge Functions without JWT verification: Authorization headers are automatically removed
 
-If you manually add an Authorization header through the UI, it may not appear in the headers list after saving, but it will still be applied to webhook requests when appropriate. You can reference the filtering logic in the [Studio source code](https://github.com/supabase/supabase/blob/031c5644e7d6d3068206e7ce4ab6905f1634af20/apps/studio/components/interfaces/Database/Hooks/FormContents.tsx#L104).
+If you manually add an Authorization header through the UI, it may not appear in the headers list after saving, but it will still be applied to webhook requests when appropriate. You can reference the filtering logic in the [Studio source code](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/Database/Hooks/FormContents.tsx#L104).
 
 </Admonition>
 
