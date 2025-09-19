@@ -15,7 +15,11 @@ const ColumnSchema = z.object({
   references: z.string().optional().nullable().describe('Table.column this foreign key references'),
   isNullable: z.boolean().optional().nullable().describe('Whether the column can be null'),
   defaultValue: z.string().optional().nullable().describe('Default value or expression'),
-  isUnique: z.boolean().optional().nullable().describe('Whether the column has a unique constraint'),
+  isUnique: z
+    .boolean()
+    .optional()
+    .nullable()
+    .describe('Whether the column has a unique constraint'),
 })
 
 const TableSchema = z.object({

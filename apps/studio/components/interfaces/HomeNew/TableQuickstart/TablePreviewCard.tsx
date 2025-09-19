@@ -1,5 +1,15 @@
 import { cn } from 'ui'
-import { Database, Key, Hash, Calendar, Type, Binary, ToggleLeft, Braces, FileText } from 'lucide-react'
+import {
+  Database,
+  Key,
+  Hash,
+  Calendar,
+  Type,
+  Binary,
+  ToggleLeft,
+  Braces,
+  FileText,
+} from 'lucide-react'
 import type { TableField, TableSuggestion } from './types'
 
 interface TablePreviewCardProps {
@@ -78,14 +88,10 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
         <div className="relative overflow-hidden bg-gradient-to-r from-surface-200 to-surface-100 px-4 py-3 border-b border-default flex-shrink-0">
           <div className="flex items-center gap-2 mb-1">
             <Database size={14} className="text-foreground-light" />
-            <h4 className="font-mono text-sm font-medium text-foreground">
-              {table.tableName}
-            </h4>
+            <h4 className="font-mono text-sm font-medium text-foreground">{table.tableName}</h4>
           </div>
           {table.rationale && (
-            <p className="text-xs text-foreground-lighter line-clamp-1">
-              {table.rationale}
-            </p>
+            <p className="text-xs text-foreground-lighter line-clamp-1">{table.rationale}</p>
           )}
         </div>
 
@@ -99,15 +105,9 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
                 idx >= 6 && 'opacity-50'
               )}
             >
-              <span className="flex-shrink-0">
-                {getFieldIcon(field)}
-              </span>
-              <span className="flex-1 font-mono text-foreground truncate">
-                {field.name}
-              </span>
-              <span className="text-[10px] font-mono text-foreground-lighter">
-                {field.type}
-              </span>
+              <span className="flex-shrink-0">{getFieldIcon(field)}</span>
+              <span className="flex-1 font-mono text-foreground truncate">{field.name}</span>
+              <span className="text-[10px] font-mono text-foreground-lighter">{field.type}</span>
             </div>
           ))}
 
@@ -126,7 +126,6 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
           </div>
         )}
       </div>
-
     </button>
   )
 }

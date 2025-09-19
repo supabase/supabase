@@ -18,9 +18,9 @@ const iconComponents = {
 const templateDescriptions: Record<string, string> = {
   'Social Media': 'User profiles, posts, comments, and social interactions',
   'E-commerce': 'Products, orders, inventory, and customer management',
-  'Blog': 'Articles, categories, authors, and content management',
+  Blog: 'Articles, categories, authors, and content management',
   'Todo List': 'Tasks, projects, assignments, and productivity tracking',
-  'Analytics': 'Events, sessions, metrics, and data tracking',
+  Analytics: 'Events, sessions, metrics, and data tracking',
 }
 
 export const TemplateSelector = ({ onSelect }: TemplateSelectorProps) => {
@@ -50,12 +50,8 @@ export const TemplateSelector = ({ onSelect }: TemplateSelectorProps) => {
                   <IconComponent className="w-5 h-5 text-foreground-light group-hover:text-brand transition-colors" />
                 </div>
                 <div className="flex-1 space-y-1">
-                  <h3 className="text-sm font-medium text-foreground">
-                    {template.name}
-                  </h3>
-                  <p className="text-xs text-foreground-light line-clamp-2">
-                    {description}
-                  </p>
+                  <h3 className="text-sm font-medium text-foreground">{template.name}</h3>
+                  <p className="text-xs text-foreground-light line-clamp-2">{description}</p>
                 </div>
               </div>
             </button>

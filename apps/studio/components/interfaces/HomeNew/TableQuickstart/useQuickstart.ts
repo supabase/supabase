@@ -9,24 +9,24 @@ import { useQuickstartStore } from './quickstartStore'
 
 const mapColumnType = (type: string): TableField['type'] => {
   const typeMap: Record<string, TableField['type']> = {
-    'bigint': 'int8',
-    'integer': 'int4',
-    'smallint': 'int2',
-    'boolean': 'bool',
-    'text': 'text',
-    'varchar': 'varchar',
-    'uuid': 'uuid',
-    'timestamp': 'timestamp',
-    'timestamptz': 'timestamptz',
+    bigint: 'int8',
+    integer: 'int4',
+    smallint: 'int2',
+    boolean: 'bool',
+    text: 'text',
+    varchar: 'varchar',
+    uuid: 'uuid',
+    timestamp: 'timestamp',
+    timestamptz: 'timestamptz',
     'timestamp with time zone': 'timestamptz',
-    'date': 'date',
-    'time': 'time',
-    'json': 'json',
-    'jsonb': 'jsonb',
-    'numeric': 'numeric',
-    'real': 'float4',
+    date: 'date',
+    time: 'time',
+    json: 'json',
+    jsonb: 'jsonb',
+    numeric: 'numeric',
+    real: 'float4',
     'double precision': 'float8',
-    'bytea': 'bytea',
+    bytea: 'bytea',
   }
 
   return typeMap[type.toLowerCase()] || 'text'
@@ -41,7 +41,11 @@ const convertAISchemaToTableSuggestions = (schema: AIGeneratedSchema): TableSugg
       nullable: column.isNullable ?? undefined,
       unique: column.isUnique ?? undefined,
       default: column.defaultValue ?? undefined,
-      description: column.isPrimary ? 'Primary key' : column.isForeign && column.references ? `References ${column.references}` : undefined,
+      description: column.isPrimary
+        ? 'Primary key'
+        : column.isForeign && column.references
+          ? `References ${column.references}`
+          : undefined,
       isPrimary: column.isPrimary ?? undefined,
       isForeign: column.isForeign ?? undefined,
       references: column.references ?? undefined,
@@ -66,60 +70,60 @@ export const useQuickstart = () => {
   const [userInput, setUserInput] = useState<string>('')
   const [isGenerating, setIsGenerating] = useState(false)
 
-  const onTablesReady = useCallback(
-    (tables: TableSuggestion[], input: string) => {
-      setCandidates(tables)
-      setUserInput(input)
-      setCurrentStep('preview')
-      setIsGenerating(false)
-    },
-    []
-  )
+  const onTablesReady = useCallback((tables: TableSuggestion[], input: string) => {
+    setCandidates(tables)
+    setUserInput(input)
+    setCurrentStep('preview')
+    setIsGenerating(false)
+  }, [])
 
-  const handleAiGenerate = useCallback(async (prompt: string) => {
-    setIsGenerating(true)
-    setError(null)
-    setUserInput(prompt) // Set the user input immediately
-    setCurrentStep('preview') // Show preview immediately to display skeleton
-    setCandidates([]) // Clear any previous candidates
+  const handleAiGenerate = useCallback(
+    async (prompt: string) => {
+      setIsGenerating(true)
+      setError(null)
+      setUserInput(prompt) // Set the user input immediately
+      setCurrentStep('preview') // Show preview immediately to display skeleton
+      setCandidates([]) // Clear any previous candidates
 
-    try {
-      const headers = await constructHeaders()
-      headers.set('Content-Type', 'application/json')
+      try {
+        const headers = await constructHeaders()
+        headers.set('Content-Type', 'application/json')
 
-      const response = await fetch(`${BASE_PATH}/api/ai/table-quickstart/generate-schemas`, {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify({
-          prompt,
-        }),
-      })
+        const response = await fetch(`${BASE_PATH}/api/ai/table-quickstart/generate-schemas`, {
+          method: 'POST',
+          headers,
+          credentials: 'include',
+          body: JSON.stringify({
+            prompt,
+          }),
+        })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to generate schemas')
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to generate schemas')
+        }
+
+        const data: AIGeneratedSchema = await response.json()
+        const tables = convertAISchemaToTableSuggestions(data)
+
+        onTablesReady(tables, prompt)
+      } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : 'Failed to generate schemas'
+        console.error('AI generation failed:', e)
+
+        // Show error toast and return to input form
+        toast.error('Unable to generate tables. Please try again with a different description.', {
+          description: errorMessage,
+          duration: 5000,
+        })
+
+        setError(errorMessage)
+        setIsGenerating(false)
+        setCurrentStep('input') // Return to input form
       }
-
-      const data: AIGeneratedSchema = await response.json()
-      const tables = convertAISchemaToTableSuggestions(data)
-
-      onTablesReady(tables, prompt)
-    } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'Failed to generate schemas'
-      console.error('AI generation failed:', e)
-
-      // Show error toast and return to input form
-      toast.error('Unable to generate tables. Please try again with a different description.', {
-        description: errorMessage,
-        duration: 5000,
-      })
-
-      setError(errorMessage)
-      setIsGenerating(false)
-      setCurrentStep('input') // Return to input form
-    }
-  }, [onTablesReady])
+    },
+    [onTablesReady]
+  )
 
   const handleSelectTable = useCallback(
     async (table: TableSuggestion) => {

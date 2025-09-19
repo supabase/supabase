@@ -45,123 +45,123 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
             )}
           </div>
 
-        {/* Content Section with Smooth Height Transitions */}
-        <div className={cn(
-          'transition-all duration-500 ease-in-out'
-        )}>
-          {/* Step 1: Input Form */}
-          <div
-            className={cn(
-              'transition-all duration-500',
-              currentStep === 'input' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 hidden'
-            )}
-          >
-            {variant === 'ai' && (
-              <div className="space-y-8">
-                <AiPromptInput onGenerate={handleAiGenerate} isLoading={isGenerating} />
-
-                {/* Example Templates */}
-                {!isGenerating && (
-                  <div className="space-y-4">
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-default"></div>
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-foreground-lighter">Quick ideas</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      {[
-                        'Social media platform',
-                        'Project management tool',
-                        'E-commerce marketplace',
-                        'Content management system',
-                      ].map((example) => (
-                        <button
-                          key={example}
-                          onClick={() => handleAiGenerate(example)}
-                          disabled={isGenerating}
-                          className={cn(
-                            'px-3 py-1.5 text-xs rounded-md border transition-all',
-                            'bg-surface-100 border-default hover:border-foreground/20',
-                            'hover:bg-surface-200 disabled:opacity-50 disabled:cursor-not-allowed'
-                          )}
-                        >
-                          {example}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {variant === 'templates' && (
-              <TemplateSelector onSelect={onTablesReady} />
-            )}
-          </div>
-
-          {/* Step 2: Table Selection */}
-          <div
-            className={cn(
-              'transition-all duration-500 transform',
-              currentStep === 'preview' ? 'opacity-100 scale-100' : 'opacity-0 scale-95 hidden'
-            )}
-          >
-            <div className="space-y-6">
-              {/* Back Button and Context */}
-              <div className="space-y-3">
-                {!isGenerating && (
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    disabled={loading}
-                    className={cn(
-                      'inline-flex items-center gap-2 text-sm text-foreground-light',
-                      'hover:text-foreground transition-colors',
-                      'disabled:opacity-50 disabled:cursor-not-allowed'
-                    )}
-                  >
-                    <ArrowLeft size={14} />
-                    <span>Back to {variant === 'ai' ? 'prompt' : 'templates'}</span>
-                  </button>
-                )}
-
-                {userInput && (
-                  <div className="p-3 bg-surface-100 rounded-lg border border-default">
-                    <p className="text-xs text-foreground-lighter mb-1">
-                      {isGenerating ? 'Generating tables for:' : 'Generated tables for:'}
-                    </p>
-                    <p className="text-sm text-foreground font-medium">
-                      {variant === 'templates' ? userInput : `"${userInput}"`}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Table Cards */}
-              {isGenerating && currentStep === 'preview' ? (
-                <TablePickerSkeleton />
-              ) : (
-                candidates.length > 0 && (
-                  <TablePicker
-                    tables={candidates}
-                    onSelectTable={handleSelectTable}
-                    loading={loading}
-                  />
-                )
+          {/* Content Section with Smooth Height Transitions */}
+          <div className={cn('transition-all duration-500 ease-in-out')}>
+            {/* Step 1: Input Form */}
+            <div
+              className={cn(
+                'transition-all duration-500',
+                currentStep === 'input'
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-4 hidden'
               )}
+            >
+              {variant === 'ai' && (
+                <div className="space-y-8">
+                  <AiPromptInput onGenerate={handleAiGenerate} isLoading={isGenerating} />
 
-              {/* Error State */}
-              {error && (
-                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                  <p className="text-sm text-destructive">{error}</p>
+                  {/* Example Templates */}
+                  {!isGenerating && (
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-default"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-foreground-lighter">
+                            Quick ideas
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {[
+                          'Social media platform',
+                          'Project management tool',
+                          'E-commerce marketplace',
+                          'Content management system',
+                        ].map((example) => (
+                          <button
+                            key={example}
+                            onClick={() => handleAiGenerate(example)}
+                            disabled={isGenerating}
+                            className={cn(
+                              'px-3 py-1.5 text-xs rounded-md border transition-all',
+                              'bg-surface-100 border-default hover:border-foreground/20',
+                              'hover:bg-surface-200 disabled:opacity-50 disabled:cursor-not-allowed'
+                            )}
+                          >
+                            {example}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
+
+              {variant === 'templates' && <TemplateSelector onSelect={onTablesReady} />}
+            </div>
+
+            {/* Step 2: Table Selection */}
+            <div
+              className={cn(
+                'transition-all duration-500 transform',
+                currentStep === 'preview' ? 'opacity-100 scale-100' : 'opacity-0 scale-95 hidden'
+              )}
+            >
+              <div className="space-y-6">
+                {/* Back Button and Context */}
+                <div className="space-y-3">
+                  {!isGenerating && (
+                    <button
+                      type="button"
+                      onClick={handleBack}
+                      disabled={loading}
+                      className={cn(
+                        'inline-flex items-center gap-2 text-sm text-foreground-light',
+                        'hover:text-foreground transition-colors',
+                        'disabled:opacity-50 disabled:cursor-not-allowed'
+                      )}
+                    >
+                      <ArrowLeft size={14} />
+                      <span>Back to {variant === 'ai' ? 'prompt' : 'templates'}</span>
+                    </button>
+                  )}
+
+                  {userInput && (
+                    <div className="p-3 bg-surface-100 rounded-lg border border-default">
+                      <p className="text-xs text-foreground-lighter mb-1">
+                        {isGenerating ? 'Generating tables for:' : 'Generated tables for:'}
+                      </p>
+                      <p className="text-sm text-foreground font-medium">
+                        {variant === 'templates' ? userInput : `"${userInput}"`}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Table Cards */}
+                {isGenerating && currentStep === 'preview' ? (
+                  <TablePickerSkeleton />
+                ) : (
+                  candidates.length > 0 && (
+                    <TablePicker
+                      tables={candidates}
+                      onSelectTable={handleSelectTable}
+                      loading={loading}
+                    />
+                  )
+                )}
+
+                {/* Error State */}
+                {error && (
+                  <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <p className="text-sm text-destructive">{error}</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
