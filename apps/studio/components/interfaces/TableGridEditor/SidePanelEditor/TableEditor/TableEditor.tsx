@@ -134,8 +134,6 @@ export const TableEditor = ({
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
 
-  const quickstartTableFields = null
-
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -235,11 +233,10 @@ export const TableEditor = ({
       setImportContent(undefined)
       setIsDuplicateRows(false)
       if (isNewRecord) {
-        if (quickstartTableFields) {
-          setTableFields(quickstartTableFields)
-          setFkRelations([])
-        } else {
+        // Only set default fields if tableFields doesn't exist yet
+        if (!tableFields) {
           setTableFields(generateTableField())
+          setFkRelations([])
         }
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
@@ -251,7 +248,7 @@ export const TableEditor = ({
         setTableFields(tableFields)
       }
     }
-  }, [visible, quickstartTableFields])
+  }, [visible])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
@@ -285,7 +282,7 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        {isNewRecord && !isDuplicating && tableQuickstartVariant && tableQuickstartVariant !== 'control' && tableQuickstartVariant !== false && (
+        {isNewRecord && !isDuplicating && tableQuickstartVariant && tableQuickstartVariant !== 'control' && (
           <TableTemplateSelector
             variant={tableQuickstartVariant}
             onSelectTemplate={(template) => {

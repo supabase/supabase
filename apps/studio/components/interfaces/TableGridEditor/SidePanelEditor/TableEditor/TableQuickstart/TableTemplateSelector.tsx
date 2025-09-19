@@ -40,22 +40,6 @@ export const TableTemplateSelector = ({ variant, onSelectTemplate, disabled }: T
     }
   }, [showAIInput])
 
-  const handleGenerateTables = useCallback(async () => {
-    if (!aiPrompt.trim() || isGenerating) return
-
-    try {
-      const tables = await generateTables(aiPrompt)
-      setGeneratedTables(tables)
-      setSelectedTableIndex(0)
-      if (tables.length > 0) {
-        applyTemplate(tables[0])
-      }
-    } catch (error) {
-      setShowAIInput(false)
-      setIsOpen(false)
-    }
-  }, [aiPrompt, generateTables, isGenerating])
-
   const applyTemplate = useCallback((table: TableSuggestion) => {
     const columns: ColumnField[] = table.fields.map((field, index) => {
       const isPrimaryKey = field.isPrimary === true || field.name === 'id'
@@ -89,6 +73,22 @@ export const TableTemplateSelector = ({ variant, onSelectTemplate, disabled }: T
 
     setSelectedTemplate(table)
   }, [onSelectTemplate])
+
+  const handleGenerateTables = useCallback(async () => {
+    if (!aiPrompt.trim() || isGenerating) return
+
+    try {
+      const tables = await generateTables(aiPrompt)
+      setGeneratedTables(tables)
+      setSelectedTableIndex(0)
+      if (tables.length > 0) {
+        applyTemplate(tables[0])
+      }
+    } catch (error) {
+      setShowAIInput(false)
+      setIsOpen(false)
+    }
+  }, [aiPrompt, generateTables, isGenerating, applyTemplate])
 
   const handleQuickTemplate = useCallback((example: string) => {
     setAiPrompt(example)
