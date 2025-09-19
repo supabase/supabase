@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, RefreshCw } from 'lucide-react'
+import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
@@ -22,6 +22,8 @@ import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
 import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
+import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
+import { useRouter } from 'next/router'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -91,6 +93,29 @@ const AuthUsage = () => {
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
+  const router = useRouter()
+
+  const highlightActions: ChartHighlightAction[] = [
+    {
+      id: 'api-gateway-logs',
+      label: 'Open in API Gateway Logs',
+      icon: <LogsIcon size={12} />,
+      onSelect: ({ start, end, clear }) => {
+        const url = `/project/${ref}/logs/edge-logs?its=${start}&ite=${end}&f={"product":{"auth":true}}`
+        router.push(url)
+      },
+    },
+    {
+      id: 'auth-logs',
+      label: 'Open in Auth Logs',
+      icon: <LogsIcon size={12} />,
+      onSelect: ({ start, end, clear }) => {
+        const url = `/project/${ref}/logs/auth-logs?its=${start}&ite=${end}`
+        router.push(url)
+      },
+    },
+  ]
+
   return (
     <>
       <ReportHeader title="Auth" showDatabaseSelector={false} />
@@ -149,6 +174,7 @@ const AuthUsage = () => {
             filters={{
               status_code: null,
             }}
+            highlightActions={highlightActions}
           />
         ))}
         <div>
