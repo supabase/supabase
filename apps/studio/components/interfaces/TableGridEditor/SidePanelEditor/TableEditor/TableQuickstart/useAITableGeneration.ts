@@ -1,11 +1,12 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { BASE_PATH } from 'lib/constants'
 import { constructHeaders } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { TableSuggestion, TableField, AIGeneratedSchema } from './types'
+import { TableSource } from './types'
+import type { TableSuggestion, PostgresType, AIGeneratedSchema } from './types'
 
-const mapColumnType = (type: string): TableField['type'] => {
-  const typeMap: Record<string, TableField['type']> = {
+const mapColumnType = (type: string): PostgresType => {
+  const typeMap: Record<string, PostgresType> = {
     bigint: 'int8',
     integer: 'int4',
     smallint: 'int2',
@@ -18,6 +19,8 @@ const mapColumnType = (type: string): TableField['type'] => {
     'timestamp with time zone': 'timestamptz',
     date: 'date',
     time: 'time',
+    timetz: 'timetz',
+    'time with time zone': 'timetz',
     json: 'json',
     jsonb: 'jsonb',
     numeric: 'numeric',
@@ -50,7 +53,7 @@ const convertAISchemaToTableSuggestions = (schema: AIGeneratedSchema): TableSugg
       references: column.references ?? undefined,
     })),
     rationale: table.description,
-    source: 'ai' as const,
+    source: TableSource.AI,
     relationships: table.relationships ?? undefined,
   }))
 }
@@ -58,8 +61,33 @@ const convertAISchemaToTableSuggestions = (schema: AIGeneratedSchema): TableSugg
 export const useAITableGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
 
   const generateTables = useCallback(async (prompt: string): Promise<TableSuggestion[]> => {
+    // Cancel any pending request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Validate prompt length
+    if (prompt.length > 500) {
+      const error = 'Description is too long. Please keep it under 500 characters.'
+      toast.error(error)
+      return []
+    }
+
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
     setIsGenerating(true)
     setError(null)
 
@@ -72,30 +100,44 @@ export const useAITableGeneration = () => {
         headers,
         credentials: 'include',
         body: JSON.stringify({ prompt }),
+        signal: abortController.signal,
       })
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to generate schemas')
+        const errorMessage = errorData.error || 'Failed to generate schemas'
+        setError(errorMessage)
+        toast.error('Unable to generate tables', {
+          description: errorMessage,
+          duration: 5000,
+        })
+        return []
       }
 
       const data: AIGeneratedSchema = await response.json()
       const tables = convertAISchemaToTableSuggestions(data)
 
-      setIsGenerating(false)
+      setError(null)
       return tables
     } catch (e) {
+      if (e instanceof Error && e.name === 'AbortError') {
+        // Request was cancelled, don't show error
+        return []
+      }
+
       const errorMessage = e instanceof Error ? e.message : 'Failed to generate schemas'
       console.error('AI generation failed:', e)
+      setError(errorMessage)
 
-      toast.error('Unable to generate tables. Please try again with a different description.', {
+      toast.error('Unable to generate tables', {
         description: errorMessage,
         duration: 5000,
       })
 
-      setError(errorMessage)
+      return []
+    } finally {
       setIsGenerating(false)
-      throw e
+      abortControllerRef.current = null
     }
   }, [])
 

@@ -1,25 +1,26 @@
+export type PostgresType =
+  | 'text'
+  | 'varchar'
+  | 'uuid'
+  | 'int2'
+  | 'int4'
+  | 'int8'
+  | 'float4'
+  | 'float8'
+  | 'numeric'
+  | 'bool'
+  | 'json'
+  | 'jsonb'
+  | 'date'
+  | 'time'
+  | 'timestamp'
+  | 'timestamptz'
+  | 'timetz'
+  | 'bytea'
+
 export type TableField = {
   name: string
-  type:
-    | 'text'
-    | 'varchar'
-    | 'uuid'
-    | 'int2'
-    | 'int4'
-    | 'int8'
-    | 'float4'
-    | 'float8'
-    | 'numeric'
-    | 'bool'
-    | 'json'
-    | 'jsonb'
-    | 'date'
-    | 'time'
-    | 'timestamp'
-    | 'timestamptz'
-    | 'timez'
-    | 'bytea'
-    | 'bigint'
+  type: PostgresType
   nullable?: boolean
   unique?: boolean
   default?: string // Must be string for table editor compatibility
@@ -35,11 +36,22 @@ export type TableRelationship = {
   type: 'one-to-one' | 'one-to-many' | 'many-to-many' | 'many-to-one'
 }
 
+export enum TableSource {
+  AI = 'ai',
+  TEMPLATE = 'template',
+}
+
+export enum QuickstartVariant {
+  CONTROL = 'control',
+  AI = 'ai',
+  TEMPLATES = 'templates',
+}
+
 export type TableSuggestion = {
   tableName: string
   fields: TableField[]
   rationale?: string
-  source: 'ai' | 'template'
+  source: TableSource
   relationships?: TableRelationship[]
 }
 
@@ -60,12 +72,4 @@ export type AIGeneratedSchema = {
     relationships?: TableRelationship[]
   }>
   summary: string
-}
-
-export type TableTemplate = {
-  id: string
-  name: string
-  iconName: string
-  category: string
-  tables: TableSuggestion[]
 }

@@ -1,4 +1,4 @@
-import type { TableSuggestion } from './types'
+import { TableSuggestion, TableSource } from './types'
 
 export const tableTemplates: Record<string, TableSuggestion[]> = {
   'Social Network': [
@@ -17,7 +17,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'User profiles for social networking',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'posts',
@@ -32,7 +32,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Social media posts and updates',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'follows',
@@ -43,7 +43,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'User follow relationships',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
   ],
   'E-commerce': [
@@ -66,7 +66,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Product catalog with inventory management',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'orders',
@@ -84,7 +84,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Order management and tracking',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'cart_items',
@@ -96,7 +96,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'added_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Shopping cart functionality',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
   ],
   'Blog': [
@@ -116,7 +116,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Blog articles with publishing workflow',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'categories',
@@ -129,7 +129,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Article categories and tags',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'comments',
@@ -143,7 +143,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Blog comments with moderation',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
   ],
   'To-Do List': [
@@ -162,7 +162,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Individual tasks with priority and due dates',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'lists',
@@ -177,7 +177,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Task lists for organization',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'subtasks',
@@ -190,7 +190,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Subtasks for breaking down larger tasks',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
   ],
   'Analytics': [
@@ -207,7 +207,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Event tracking for analytics',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'page_views',
@@ -221,7 +221,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Page view tracking',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
     {
       tableName: 'metrics',
@@ -235,7 +235,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'Custom metrics and KPI tracking',
-      source: 'template' as const,
+      source: TableSource.TEMPLATE,
     },
   ],
 }

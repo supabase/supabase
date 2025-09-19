@@ -69,7 +69,7 @@ export default wrapper
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { model, error: modelError } = await getModel({
     provider: 'openai',
-    model: 'gpt-5-mini',
+    model: 'gpt-4o-mini',
     routingKey: 'table-quickstart',
     isLimited: false,
   })
@@ -84,6 +84,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Prompt is required' })
   }
 
+  if (typeof prompt !== 'string' || prompt.length > 500) {
+    return res.status(400).json({ error: 'Prompt must be a string under 500 characters' })
+  }
+
   try {
     const { object } = await generateObject({
       model,
@@ -91,13 +95,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       system: `You are a Supabase PostgreSQL schema designer. Generate exactly 2-3 core tables based on the user's description.
 
       Rules:
-      - Use "id bigint" as primary key (or "id uuid" for UUID keys)
+      - Use "id uuid" as primary key with type: 'uuid'
       - ALWAYS mark the "id" field with isPrimary: true
-      - Do NOT set defaultValue for primary key fields
-      - Use 'text' not 'varchar', 'timestamptz' not 'date'
-      - Use snake_case naming
-      - Add created_at, updated_at timestamps with defaultValue: 'now()'
-      - Reference auth.users(id) for user relations
+      - Set defaultValue: 'gen_random_uuid()' for UUID primary keys
+      - Use 'text' for string data, 'timestamptz' for timestamps
+      - Use snake_case naming consistently
+      - Add created_at, updated_at timestamps with type: 'timestamptz' and defaultValue: 'now()'
+      - Reference auth.users(id) for user relations when appropriate
       - Keep descriptions brief (one sentence)
       - Focus on the most essential tables only
 

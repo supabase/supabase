@@ -1,49 +1,16 @@
-import { TableTemplate } from './types'
-import {
-  SOCIAL_MEDIA_TABLES,
-  ECOMMERCE_TABLES,
-  BLOG_TABLES,
-  PROJECT_MGMT_TABLES,
-  ANALYTICS_TABLES,
-} from './mockData'
+export const STORAGE_KEYS = {
+  TABLE_QUICKSTART_DISMISSED: 'tableQuickstartDismissed',
+} as const
 
-export const QUICKSTART_DEFAULT_SCHEMA = 'public'
+export const LIMITS = {
+  MAX_PROMPT_LENGTH: 500,
+  MAX_TABLES_TO_GENERATE: 3,
+  MIN_TABLES_TO_GENERATE: 2,
+} as const
 
-// Table templates configuration
-export const APP_TEMPLATES: TableTemplate[] = [
-  {
-    id: 'social-app',
-    name: 'Social Media',
-    iconName: 'User',
-    category: 'social',
-    tables: SOCIAL_MEDIA_TABLES,
-  },
-  {
-    id: 'ecommerce-app',
-    name: 'E-commerce',
-    iconName: 'Storage',
-    category: 'commerce',
-    tables: ECOMMERCE_TABLES,
-  },
-  {
-    id: 'blog-app',
-    name: 'Blog',
-    iconName: 'ApiDocs',
-    category: 'content',
-    tables: BLOG_TABLES,
-  },
-  {
-    id: 'project-app',
-    name: 'Todo List',
-    iconName: 'Logs',
-    category: 'productivity',
-    tables: PROJECT_MGMT_TABLES,
-  },
-  {
-    id: 'analytics-app',
-    name: 'Analytics',
-    iconName: 'Realtime',
-    category: 'productivity',
-    tables: ANALYTICS_TABLES,
-  },
-]
+export const AI_QUICK_IDEAS = [
+  'Recipe sharing app',
+  'Event ticketing system',
+  'Fitness tracker',
+  'Learning management platform',
+] as const

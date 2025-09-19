@@ -46,6 +46,8 @@ import {
   validateFields,
 } from './TableEditor.utils'
 import { TableTemplateSelector } from './TableQuickstart'
+import { QuickstartVariant } from './TableQuickstart/types'
+import { STORAGE_KEYS } from './TableQuickstart/constants'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -91,9 +93,7 @@ export const TableEditor = ({
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
   const tableQuickstartVariant = usePHFlag('tableQuickstart') as
-    | 'control'
-    | 'ai'
-    | 'templates'
+    | QuickstartVariant
     | false
     | undefined
 
@@ -106,7 +106,7 @@ export const TableEditor = ({
   const hasTables = publicTables.length > 0
   const [quickstartDismissed, setQuickstartDismissed] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('tableQuickstartDismissed') === 'true'
+      return localStorage.getItem(STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED) === 'true'
     }
     return false
   })
@@ -114,7 +114,7 @@ export const TableEditor = ({
   const handleQuickstartDismiss = useCallback(() => {
     setQuickstartDismissed(true)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('tableQuickstartDismissed', 'true')
+      localStorage.setItem(STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED, 'true')
     }
   }, [])
 
@@ -304,7 +304,7 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        {isNewRecord && !isDuplicating && tableQuickstartVariant && tableQuickstartVariant !== 'control' && !hasTables && !quickstartDismissed && (
+        {isNewRecord && !isDuplicating && tableQuickstartVariant && tableQuickstartVariant !== QuickstartVariant.CONTROL && !hasTables && !quickstartDismissed && (
           <TableTemplateSelector
             variant={tableQuickstartVariant}
             onSelectTemplate={(template) => {
