@@ -14,17 +14,6 @@ import { getGridColumns } from 'components/grid/utils/gridColumns'
 import { Entity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from './table-editor'
 
-const DEFAULT_STATE = {
-  editable: undefined,
-  _originalTableRef: undefined,
-  table: { name: '', schema: '' },
-  gridColumns: [],
-  allRowsSelected: false,
-  selectedCellPosition: undefined,
-  updateTable: () => {},
-  setEditable: () => {},
-}
-
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
@@ -202,6 +191,8 @@ export const TableEditorTableStateContextProvider = ({
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const [state, setState] = useState(createTableEditorTableState(DEFAULT_STATE_CONFIG))
+
+  console.log('TableEditorTableStateContextProvider', { table })
 
   useEffect(() => {
     const isReady = !!table && !!projectRef
