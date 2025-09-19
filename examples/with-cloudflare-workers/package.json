@@ -10,6 +10,6 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
-    "@supabase/supabase-js": "2.71.2-canary.3"
+    "@supabase/supabase-js": "2.71.2-canary.4"
   }
 }

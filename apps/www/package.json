@@ -33,7 +33,7 @@
     "@octokit/rest": "^21.0.0",
     "@radix-ui/react-dialog": "^1.0.5",
     "@sentry/nextjs": "^10",
-    "@supabase/supabase-js": "2.71.2-canary.3",
+    "@supabase/supabase-js": "2.71.2-canary.4",
     "@vercel/og": "^0.6.2",
     "ai-commands": "workspace:*",
     "animejs": "^4.0.2",
