@@ -33,7 +33,38 @@ export const NewProjectPanel = () => {
             </div>
           </div>
 
-          <CreateTableCTA paramRef={ref ?? ''} />
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 flex flex-col justify-center space-y-8 lg:col-span-7">
+              <div className="space-y-2">
+                <h2>Get started by building out your database</h2>
+                <p className="text-base text-foreground-light">
+                  Start building your app by creating tables and inserting data. Our Table Editor
+                  makes Postgres as easy to use as a spreadsheet, but there's also our SQL Editor if
+                  you need something more.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
+                  <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
+                </Button>
+                <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
+                  <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
+                </Button>
+                <Button asChild type="default" icon={<ExternalLink />}>
+                  <Link
+                    href="https://supabase.com/docs/guides/database"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About Database
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            <div className="col-span-12 lg:col-span-5">
+              <GetStartedHero />
+            </div>
+          </div>
 
           {authEnabled && edgeFunctionsEnabled && storageEnabled && (
             <div className="flex h-full flex-col justify-between space-y-6">
@@ -226,39 +257,6 @@ export const NewProjectPanel = () => {
       </div>
       <div className="col-span-12 lg:col-span-8">
         <APIKeys />
-      </div>
-    </div>
-  )
-}
-
-const CreateTableCTA = ({ paramRef }: { paramRef: string }) => {
-  return (
-    <div className="grid grid-cols-12 gap-4">
-      <div className="col-span-12 flex flex-col justify-center space-y-8 lg:col-span-7">
-        <div className="space-y-2">
-          <h2>Get started by building out your database</h2>
-          <p className="text-base text-foreground-light">
-            Start building your app by creating tables and inserting data. Our Table Editor makes
-            Postgres as easy to use as a spreadsheet, but there's also our SQL Editor if you need
-            something more.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
-            <EditorIndexPageLink projectRef={paramRef}>Table Editor</EditorIndexPageLink>
-          </Button>
-          <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
-            <Link href={`/project/${paramRef}/sql/new`}>SQL Editor</Link>
-          </Button>
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link href="https://supabase.com/docs/guides/database" target="_blank" rel="noreferrer">
-              About Database
-            </Link>
-          </Button>
-        </div>
-      </div>
-      <div className="col-span-12 lg:col-span-5">
-        <GetStartedHero />
       </div>
     </div>
   )
