@@ -5,7 +5,12 @@ import { GettingStartedStep } from './GettingStartedSection'
 
 export interface GettingStartedProps {
   steps: GettingStartedStep[]
-  onStepClick: (stepIndex: number, stepTitle: string, actionType: 'primary' | 'ai_assist' | 'external_link', wasCompleted: boolean) => void
+  onStepClick: (
+    stepIndex: number,
+    stepTitle: string,
+    actionType: 'primary' | 'ai_assist' | 'external_link',
+    wasCompleted: boolean
+  ) => void
 }
 
 export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
@@ -39,9 +44,11 @@ export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
                 // Determine action type for tracking
                 const getActionType = (action: any): 'primary' | 'ai_assist' | 'external_link' => {
                   // Check if it's an AI assist action (has AiIconAnimation or "Do it for me"/"Generate" labels)
-                  if (action.label?.toLowerCase().includes('do it for me') ||
-                      action.label?.toLowerCase().includes('generate') ||
-                      action.label?.toLowerCase().includes('create policies for me')) {
+                  if (
+                    action.label?.toLowerCase().includes('do it for me') ||
+                    action.label?.toLowerCase().includes('generate') ||
+                    action.label?.toLowerCase().includes('create policies for me')
+                  ) {
                     return 'ai_assist'
                   }
                   // Check if it's an external link (href that doesn't start with /project/)
