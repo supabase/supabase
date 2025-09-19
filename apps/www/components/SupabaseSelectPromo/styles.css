@@ -6,7 +6,3 @@
   font-style: normal;
   font-display: swap;
 }
-
-.before-left-negative::before {
-  left: var(--before-left, -24px);
-}

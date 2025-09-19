@@ -46,82 +46,90 @@ const SupabaseSelectPromo = () => {
     >
       {/* Main centered content */}
       <div
-        className="border-x border-muted m:py-18 container relative mx-auto py-16 md:py-24 lg:py-24 before:absolute before:top-0 before:w-px before:h-full before:bg-muted before-left-negative"
-        style={{ '--before-left': `-${gridUnit}px` } as React.CSSProperties}
+        className="container relative mx-auto px-6 lg:px-16 xl:px-20"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, hsl(var(--border-muted)) 1px, transparent 1px)',
+          backgroundPosition: '56px 0',
+          backgroundRepeat: 'repeat-y',
+          backgroundSize: '1px 100%',
+        }}
       >
-        {/* Header */}
-        <header className="flex flex-row border-y border-muted">
-          {Object.entries(headerText).map(([index, value]: [string, string]) => (
-            <p
-              key={index}
-              className={`${monoStyle} pr-8 border-r border-muted pt-8 last:pr-0 last:border-r-0`}
-            >
-              {value}
-            </p>
-          ))}
-        </header>
-        {/* Main text, CTA, and images */}
-        <div className="relative">
-          {/* Speaker image */}
-          <Image
-            src={`/images/supabase-select/speakers/${speakers[0].slug}.jpg`}
-            alt={speakers[0].name}
-            className="absolute top-0 -right-[0.5px] hidden lg:block z-10"
-            style={{ width: `${speakerImgWidth - 1}px` }}
-            width={speakerImgWidth - 1}
-            height={speakerImgWidth - 1}
-          />
-          {/* Logo and speaker name */}
-          <div className="h-24 border-b border-muted flex flex-row justify-between items-end">
-            {/* Logo */}
-            <Link
-              target="_blank"
-              href={selectSiteUrl}
-              className="inline-block transition-opacity hover:opacity-80"
-            >
-              <Image
-                src="/images/supabase-select/logo.svg"
-                alt="Supabase Select"
-                className="transform translate-y-3"
-                style={{ width: `${logoWidth}px` }}
-                width={logoWidth}
-                height={logoWidth}
-              />
-            </Link>
-            {/* Speaker name */}
-            <p
-              className={`${monoStyle} pr-1 hidden lg:inline-block text-right`}
-              style={{ marginRight: `${speakerImgWidth}px` }}
-            >
-              {speakers[0].name}, {speakers[0].title}
-            </p>
-          </div>
+        <div className="w-full border-x border-muted py-16 md:py-24 lg:py-24">
+          {/* Header */}
+          <header className="flex flex-row border-y border-muted">
+            {Object.entries(headerText).map(([index, value]: [string, string]) => (
+              <p
+                key={index}
+                className={`${monoStyle} pr-8 border-r border-muted pt-8 last:pr-0 last:border-r-0`}
+              >
+                {value}
+              </p>
+            ))}
+          </header>
+          {/* Main text, CTA, and images */}
+          <div className="relative">
+            {/* Speaker image */}
+            <Image
+              src={`/images/supabase-select/speakers/${speakers[0].slug}.jpg`}
+              alt={speakers[0].name}
+              className="absolute top-0 -right-[0.5px] hidden lg:block z-10"
+              style={{ width: `${speakerImgWidth - 1}px` }}
+              width={speakerImgWidth - 1}
+              height={speakerImgWidth - 1}
+            />
+            {/* Logo and speaker name */}
+            <div className="h-24 border-b border-muted flex flex-row justify-between items-end">
+              {/* Logo */}
+              <Link
+                target="_blank"
+                href={selectSiteUrl}
+                className="inline-block transition-opacity hover:opacity-80"
+              >
+                <Image
+                  src="/images/supabase-select/logo.svg"
+                  alt="Supabase Select"
+                  className="transform translate-y-3"
+                  style={{ width: `${logoWidth}px` }}
+                  width={logoWidth}
+                  height={logoWidth}
+                />
+              </Link>
+              {/* Speaker name */}
+              <p
+                className={`${monoStyle} pr-1 hidden lg:inline-block text-right`}
+                style={{ marginRight: `${speakerImgWidth}px` }}
+              >
+                {speakers[0].name}, {speakers[0].title}
+              </p>
+            </div>
 
-          <div className="relative h-[288px] border-b border-muted flex flex-col justify-between">
-            {/* Grid background */}
-            <div
-              className="hidden lg:block absolute -top-[1px] -right-[1px] border-r border-b border-muted"
-              style={{
-                width: `${gridWidth}px`,
-                height: `${gridWidth}px`,
-                backgroundImage: `
+            <div className="relative h-[288px] border-b border-muted flex flex-col justify-between">
+              {/* Grid background */}
+              <div
+                className="hidden lg:block absolute -top-[1px] -right-[1px] border-r border-b border-muted"
+                style={{
+                  width: `${gridWidth}px`,
+                  height: `${gridWidth}px`,
+                  backgroundImage: `
                 linear-gradient(to right, hsl(var(--border-muted)) 1px, transparent 1px),
                 linear-gradient(to bottom, hsl(var(--border-muted)) 1px, transparent 1px)
               `,
-                backgroundSize: `${gridUnit}px ${gridUnit}px`,
-              }}
-            />
-            {/* Main text */}
-            <div className="flex flex-col pt-16 text-balance relative">
-              <h3 className="text-2xl text-light pb-2 max-w-md">{mainText[0]}</h3>
-              <p className="text-2xl text max-w-md">{mainText[1]}</p>
+                  backgroundSize: `${gridUnit}px ${gridUnit}px`,
+                }}
+              />
+              {/* Main text */}
+              <div className="flex flex-col pt-16 text-balance relative">
+                <h3 className="text-2xl text-light pb-2 max-w-md">{mainText[0]}</h3>
+                <p className="text-2xl text max-w-md">{mainText[1]}</p>
+              </div>
+              {/* CTA */}
+              <Button asChild type="primary" size="large" className="w-fit">
+                <Link target="_blank" href={selectSiteUrl}>
+                  Apply now
+                </Link>
+              </Button>
             </div>
-            {/* CTA */}
-            <Button asChild type="primary" size="large" className="w-fit">
-              <Link target="_blank" href={selectSiteUrl}>
-                Apply now
-              </Link>
-            </Button>
           </div>
         </div>
       </div>
