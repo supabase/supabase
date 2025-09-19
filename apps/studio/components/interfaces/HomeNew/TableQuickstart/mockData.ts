@@ -222,7 +222,7 @@ export const ANALYTICS_TABLES: TableSuggestion[] = [
       { name: 'id', type: 'varchar', nullable: false },
       { name: 'user_id', type: 'uuid', nullable: true },
       { name: 'device_info', type: 'jsonb', nullable: true },
-      { name: 'ip_address', type: 'inet', nullable: true },
+      { name: 'ip_address', type: 'varchar', nullable: true },
       { name: 'user_agent', type: 'text', nullable: true },
       { name: 'started_at', type: 'timestamptz', nullable: false, default: 'now()' },
       { name: 'ended_at', type: 'timestamptz', nullable: true },
