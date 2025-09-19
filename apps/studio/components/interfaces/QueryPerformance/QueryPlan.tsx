@@ -114,6 +114,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Learn how to read EXPLAIN"
+                className="h-auto"
               >
                 <HelpCircle size={14} strokeWidth={1.5} className="text-foreground-light" />
               </Link>
@@ -122,6 +123,9 @@ export const QueryPlan = ({ query }: { query: string }) => {
           <TooltipContent>What is a query plan?</TooltipContent>
         </Tooltip>
       </div>
+      <p className="text-xs text-foreground-light mb-2">
+        Visualize how Postgres executes your SQL so you can pinpoint costly steps faster.
+      </p>
       {explainError && (
         <WarningMessage title={explainError.title || 'Failed to run EXPLAIN'}>
           {explainError.message}
