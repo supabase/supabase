@@ -3,7 +3,7 @@ import { Handle, Position, type NodeProps } from 'reactflow'
 import { Workflow, ArrowBigUp, ArrowBigDown, TimerOff } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
-import { Badge, cn } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { NodeItem } from './node-item'
 import { Heatmap } from './heatmap'
 import { HeatmapContext, MetricsVisibilityContext, type MetricsVisibility } from './contexts'
@@ -326,14 +326,17 @@ export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
   const heat = useContext(HeatmapContext)
   const headerLines = computeHeaderLines(data)
   const hints = buildHints(data)
+  // const isNeverExecuted = !!data.neverExecuted
+  const isNeverExecuted = Math.random() < 0.5
 
   return (
     <div
       className={cn(
-        'border-[0.5px] overflow-hidden rounded-[4px] shadow-sm bg-background transition-all',
+        'border overflow-hidden rounded-[4px] shadow-sm bg-background transition-all',
         selected
           ? 'border-brand ring-2 ring-brand ring-offset-2 ring-offset-background shadow-lg'
-          : 'border-border/60'
+          : 'border-border',
+        isNeverExecuted && 'border-dashed opacity-70'
       )}
       style={{ width: DEFAULT_NODE_WIDTH }}
     >
@@ -342,23 +345,34 @@ export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
         style={{ height: `${DEFAULT_NODE_HEIGHT_CONSTANTS.HEADER_H}px` }}
         className="text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center"
       >
-        <div className="flex gap-x-1 items-center">
-          <Workflow strokeWidth={1} size={12} className="text-light" />
-          {data.label}
+        <div className="flex gap-x-1 items-center min-w-0">
+          <Workflow strokeWidth={1} size={12} className="text-light flex-shrink-0" />
+          <span className="truncate">{data.label}</span>
         </div>
-        <div className="flex items-center gap-x-1 ml-auto">
+        <div className="flex items-center gap-x-1 ml-auto flex-shrink-0">
           {hints}
-          {/* {data.neverExecuted && ( */}
-          <Badge
-            variant="outline"
-            size="small"
-            title="Never executed (loops=0)"
-            className="h-[15px] px-2 py-[1px] text-[0.55rem] gap-[4px]"
-          >
-            <TimerOff size={10} strokeWidth={1} />
-            Skipped
-          </Badge>
-          {/* )} */}
+          {isNeverExecuted && (
+            <Tooltip>
+              <TooltipTrigger className="flex">
+                <Badge
+                  variant="outline"
+                  size="small"
+                  className="p-0.5 rounded"
+                  aria-label="Postgres skipped this step when running the query."
+                >
+                  <TimerOff size={10} strokeWidth={1} />
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                align="center"
+                className="max-w-[220px] text-[11px] leading-4"
+              >
+                <p>Postgres skipped this step when running the query.</p>
+                <p className="text-muted-foreground">Loops observed: 0</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </header>
       {heat.mode !== 'none' && <Heatmap data={data} />}
