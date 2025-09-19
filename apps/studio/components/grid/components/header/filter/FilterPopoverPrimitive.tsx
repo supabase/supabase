@@ -79,8 +79,16 @@ export const FilterPopoverPrimitive = ({
       if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
       else return f
     })
+
+    const appliedFilters = formattedFilters.map((filterObj) => {
+      // For `ilike` operator, must wrap the value with `%`.
+      if (filterObj?.operator === '~~*') return { ...filterObj, value: `%${filterObj.value}%` }
+
+      return filterObj
+    })
+
     setLocalFilters(formattedFilters)
-    onApplyFilters(formattedFilters)
+    onApplyFilters(appliedFilters)
   }
 
   function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
