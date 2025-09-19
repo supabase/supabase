@@ -6,6 +6,7 @@ import { cn, Button, Card, CardContent, CardHeader, CardTitle, Badge } from 'ui'
 
 import { GettingStartedStep } from './GettingStartedSection'
 import Image from 'next/image'
+import { BASE_PATH } from 'lib/constants'
 
 export interface GettingStartedProps {
   steps: GettingStartedStep[]
@@ -69,27 +70,31 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                     )}
                   >
                     <div className="flex items-center gap-3 text-sm w-full">
-                      <span className="text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md">
-                        {index + 1}
+                      <span
+                        className={cn(
+                          'text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md'
+                        )}
+                      >
+                        {isComplete ? (
+                          <Check size={16} strokeWidth={1.5} className="text-brand" />
+                        ) : (
+                          index + 1
+                        )}
                       </span>
                       <span
                         className={cn(
                           'flex-1 block truncate',
-                          isActive ? 'text-foreground' : 'group-hover:text-foreground'
+                          isActive ? 'text-foreground' : 'group-hover:text-foreground',
+                          isComplete && 'line-through'
                         )}
                       >
                         {step.title}
                       </span>
-
-                      {isComplete ? (
-                        <Check size={16} strokeWidth={1.5} className="text-brand" />
-                      ) : (
-                        <ChevronRight
-                          size={16}
-                          strokeWidth={1.5}
-                          className="text-foreground-lighter"
-                        />
-                      )}
+                      <ChevronRight
+                        size={16}
+                        strokeWidth={1.5}
+                        className="text-foreground-lighter"
+                      />
                     </div>
                   </Button>
                 </li>
@@ -98,7 +103,7 @@ export function GettingStarted({ steps }: GettingStartedProps) {
           </ol>
         </aside>
 
-        <CardContent className="flex flex-1 flex-col gap-0 p-0 h-[400px] overflow-y-auto">
+        <CardContent className="flex flex-1 flex-col gap-0 p-0 min-h-[300px] overflow-y-auto">
           <div className="flex items-center justify-between gap-2 border-b px-2 py-2 lg:hidden">
             <span className="text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md">
               {activeStepIndex + 1}
@@ -124,17 +129,32 @@ export function GettingStarted({ steps }: GettingStartedProps) {
               </Button>
             </div>
           </div>
-          {activeStep.image && (
-            <div className="relative w-full flex-1">
+          <div className="relative w-full flex-1 h-[200px] shrink-0">
+            {activeStep.image ? (
               <Image
                 className="w-full"
                 src={activeStep.image}
                 fill
                 objectFit="cover"
+                objectPosition="bottom"
                 alt={activeStep.title}
               />
-            </div>
-          )}
+            ) : (
+              <div className="absolute inset-0">
+                <img
+                  src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
+                  alt="Supabase Grafana"
+                  className="w-full h-full object-cover object-right hidden dark:block"
+                />
+                <img
+                  src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
+                  alt="Supabase Grafana"
+                  className="w-full h-full object-cover object-right dark:hidden"
+                />
+              </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background-surface-100 to-transparent" />
+          </div>
           <div className="p-6">
             <div className="flex flex-row items-center justify-between mb-1">
               <h3>{activeStep.title}</h3>
@@ -172,7 +192,6 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                     type={action.variant ?? 'default'}
                     icon={action.icon}
                     onClick={action.onClick}
-                    className="text-foreground-light hover:text-foreground"
                   >
                     {action.label}
                   </Button>

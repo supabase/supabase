@@ -124,18 +124,8 @@ export function GettingStartedSection({
       },
       {
         label: 'Connect',
-        variant: 'default',
+        variant: 'primary',
         onClick: openConnect,
-      },
-      {
-        label: 'Ask Assistant',
-        variant: 'outline',
-        icon: <AiIconAnimation size={14} />,
-        onClick: () =>
-          openAiChat(
-            'Help me connect my app',
-            `Search the Supabase docs for the ${selectedFrameworkMeta?.label ?? selectedFramework} guide and walk me through connecting my app step by step.`
-          ),
       },
     ],
     [openConnect, openAiChat, selectedFramework, selectedFrameworkMeta?.label]
@@ -166,6 +156,7 @@ export function GettingStartedSection({
         status: tablesCount > 0 ? 'complete' : 'incomplete',
         title: 'Design your database schema',
         icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
+        image: '/img/getting-started/declarative-schemas.png',
         description:
           'Next, create a schema file that defines the structure of your database, either following our declarative schema guide or asking the AI assistant to generate one for you.',
         actions: [
@@ -331,9 +322,9 @@ export function GettingStartedSection({
       {
         key: 'design-db',
         status: tablesCount > 0 ? 'complete' : 'incomplete',
-        image: '/img/integrations/covers/cron-cover.webp',
         title: 'Create your first table',
         icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
+        image: '/img/getting-started/sample.png',
         description:
           "To kick off your new project, let's start by creating your very first database table using either the table editor or the AI assistant to shape the structure for you.",
         actions: [
@@ -353,7 +344,6 @@ export function GettingStartedSection({
       {
         key: 'add-data',
         status: 'incomplete',
-        image: '/img/integrations/covers/queues-cover.png',
         title: 'Add sample data',
         icon: <Table strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
@@ -418,7 +408,7 @@ export function GettingStartedSection({
         title: 'Connect your application',
         icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "Your project is ready; use the framework selector to preview starter code and launch the Connect flow to wire up your app.",
+          'Your project is ready; use the framework selector to preview starter code and launch the Connect flow to wire up your app.',
         actions: connectActions,
       },
       {
@@ -503,16 +493,20 @@ export function GettingStartedSection({
             <ToggleGroupItem
               value="no-code"
               aria-label="No-code workflow"
-              className="w-[26px] h-[26px] p-0"
+              size="sm"
+              className="text-xs gap-2 h-auto"
             >
-              <Table2 size={16} strokeWidth={1.5} className="text-foreground" />
+              <Table2 size={16} strokeWidth={1.5} />
+              Code
             </ToggleGroupItem>
             <ToggleGroupItem
               value="code"
+              size="sm"
               aria-label="Code workflow"
-              className="w-[26px] h-[26px] p-0"
+              className="text-xs gap-2 h-auto"
             >
-              <Code size={16} strokeWidth={1.5} className="text-foreground" />
+              <Code size={16} strokeWidth={1.5} />
+              No-code
             </ToggleGroupItem>
           </ToggleGroup>
           <Button size="tiny" type="outline" onClick={() => onChange('hidden')}>

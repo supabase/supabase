@@ -274,7 +274,7 @@ export const ServiceStatus = () => {
               ))}
             </div>
           }
-          label={<span>Health</span>}
+          label={<span>Status</span>}
           value={<span>{overallStatusLabel}</span>}
         />
       </PopoverTrigger_Shadcn_>

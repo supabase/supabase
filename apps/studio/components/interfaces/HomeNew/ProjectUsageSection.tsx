@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Archive, ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
+import { Archive, Code, Database, Key, Zap, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -19,14 +19,15 @@ import {
   CardHeader,
   CardTitle,
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuTrigger,
+  TooltipTrigger,
   Loading,
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
+  cn,
 } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -268,17 +269,20 @@ export const ProjectUsageSection = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-row justify-between items-center gap-x-2">
-        <div className="flex items-center gap-6">
-          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-6">
+          <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{totalRequests.toLocaleString()}</span>
             <span>Total Requests</span>
-            <span className={`${totalDeltaClass}`}>{formatDelta(totalRequestsChangePct)}</span>
+            <span className={cn('text-sm', totalDeltaClass)}>
+              {formatDelta(totalRequestsChangePct)}
+            </span>
           </div>
-          <span className="text-foreground-muted">/</span>
-          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+          <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{errorRate.toFixed(1)}%</span>
             <span>Error Rate</span>
-            <span className={`${errorDeltaClass}`}>{formatDelta(errorRateChangePct)}</span>
+            <span className={cn('text-sm', errorDeltaClass)}>
+              {formatDelta(errorRateChangePct)}
+            </span>
           </div>
         </div>
         <DropdownMenu>
