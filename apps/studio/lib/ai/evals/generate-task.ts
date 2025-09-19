@@ -83,9 +83,16 @@ export async function generateTask(input: string, opts: GenerateTaskOptions = {}
     .map((step) => {
       const toolResults = step.toolResults
         ?.filter((tr) =>
-          ['display_edge_function', 'display_query', 'list_policies', 'list_tables'].includes(
-            tr.toolName
-          )
+          [
+            'deploy_edge_function',
+            'execute_sql',
+            'list_policies',
+            'list_tables',
+            'list_edge_functions',
+            'list_extensions',
+            'get_logs',
+            'get_advisors',
+          ].includes(tr.toolName)
         )
         .map((result) => JSON.stringify({ tool: result.toolName, input: result.input }))
         .join('\n')
