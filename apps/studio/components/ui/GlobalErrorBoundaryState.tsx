@@ -29,6 +29,9 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
   const isRemoveChildError = checkIsError
     ? errorMessage.includes("Failed to execute 'removeChild' on 'Node'")
     : false
+  const isInsertBeforeError = checkIsError
+    ? errorMessage.includes("Failed to execute 'insertBefore' on 'Node'")
+    : false
 
   // Get Sentry issue ID from error if available
   const sentryIssueId = (!!error && typeof error === 'object' && (error as any).sentryId) ?? ''
@@ -69,7 +72,7 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
           </p>
           <p className="text-foreground-light text-sm">{errorMessage}</p>
         </div>
-        {isRemoveChildError ? (
+        {isRemoveChildError || isInsertBeforeError ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
@@ -77,14 +80,28 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               You may try to avoid using Google translate or disable certain browser extensions to
-              avoid running into the <code className="text-xs">'removeChild' on 'Node'</code> error.
+              avoid running into the{' '}
+              <code className="text-xs">
+                {isRemoveChildError
+                  ? `'removeChild' on 'Node'`
+                  : isInsertBeforeError
+                    ? `'insertBefore' on 'Node'`
+                    : ''}
+              </code>{' '}
+              error.
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-3">
               <Button asChild type="default" icon={<ExternalLink />}>
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  href="https://github.com/facebook/react/issues/17256"
+                  href={
+                    isRemoveChildError
+                      ? 'https://github.com/facebook/react/issues/17256'
+                      : isInsertBeforeError
+                        ? 'https://github.com/facebook/react/issues/24865'
+                        : '/'
+                  }
                 >
                   More information
                 </a>
