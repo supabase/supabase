@@ -110,8 +110,15 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
           <span>Back to menu</span>
         </Link>
         <div className="flex items-center gap-3 my-3">
+
+          {/* the below commentd code gives nullish error
           <img
             src={`${BASE_PATH}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+            className="w-5 rounded"
+          /> */}
+
+          <img
+            src={`${BASE_PATH}${menu.icon ?? `/img/icons/menu/${id}.svg`}`}
             className="w-5 rounded"
           />
 

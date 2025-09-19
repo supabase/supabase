@@ -6,6 +6,7 @@ import Link from 'next/link'
 import React, { useEffect, useRef } from 'react'
 
 import MenuIconPicker from './MenuIconPicker'
+import { ChevronDown } from 'lucide-react'
 
 const HeaderLink = React.memo(function HeaderLink(props: {
   title: string
@@ -88,7 +89,12 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                 height={15}
               />
             )}
-            {props.subItem.name}
+            <span className="flex items-center justify-between w-full">
+              {props.subItem.name}
+              {props.subItem.items && props.subItem.items.length > 0 && (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </span>
           </LinkContainer>
         </li>
 
@@ -98,7 +104,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               .filter((subItem) => subItem.enabled !== false)
               .map((subSubItem) => {
                 return (
-                  <li key={props.subItem.name}>
+                  // this key was throwing an error of non-unique that's why I included the subItem.url
+                  <li key={`${props.subItem.name}-${subSubItem.url}`}>
                     <Link
                       href={`${subSubItem.url}`}
                       className={[
