@@ -421,7 +421,11 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       />
 
       <Sheet open={selectedRow !== undefined} onOpenChange={() => setSelectedRow(undefined)}>
-        <SheetContent side="right" className="flex flex-col h-full bg-studio border-l !w-[580px]">
+        <SheetContent
+          side="right"
+          className="flex flex-col h-full bg-studio border-l !w-[580px]"
+          hasOverlay={false}
+        >
           <Tabs_Shadcn_
             value={view}
             className="flex flex-col h-full"
