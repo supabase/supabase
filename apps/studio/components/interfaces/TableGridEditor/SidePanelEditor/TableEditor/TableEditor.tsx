@@ -303,20 +303,25 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        {isNewRecord && !isDuplicating && tableQuickstartVariant && tableQuickstartVariant !== QuickstartVariant.CONTROL && !hasTables && !quickstartDismissed && (
-          <TableTemplateSelector
-            variant={tableQuickstartVariant}
-            onSelectTemplate={(template) => {
-              const updates: Partial<TableField> = {}
-              if (template.name) updates.name = template.name
-              if (template.comment) updates.comment = template.comment
-              if (template.columns) updates.columns = template.columns
-              onUpdateField(updates)
-            }}
-            onDismiss={handleQuickstartDismiss}
-            disabled={false}
-          />
-        )}
+        {isNewRecord &&
+          !isDuplicating &&
+          tableQuickstartVariant &&
+          tableQuickstartVariant !== QuickstartVariant.CONTROL &&
+          !hasTables &&
+          !quickstartDismissed && (
+            <TableTemplateSelector
+              variant={tableQuickstartVariant}
+              onSelectTemplate={(template) => {
+                const updates: Partial<TableField> = {}
+                if (template.name) updates.name = template.name
+                if (template.comment) updates.comment = template.comment
+                if (template.columns) updates.columns = template.columns
+                onUpdateField(updates)
+              }}
+              onDismiss={handleQuickstartDismiss}
+              disabled={false}
+            />
+          )}
         <Input
           data-testid="table-name-input"
           label="Name"

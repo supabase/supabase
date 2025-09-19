@@ -9,12 +9,12 @@ export function isPrimaryKeyField(field: TableField): boolean {
 }
 
 export function isIdentityField(field: TableField): boolean {
-  return field.name === 'id' &&
-    field.type.toLowerCase().includes('int') &&
-    !field.default
+  return field.name === 'id' && field.type.toLowerCase().includes('int') && !field.default
 }
 
-export function convertTableSuggestionToTableField(table: TableSuggestion): Partial<EditorTableField> {
+export function convertTableSuggestionToTableField(
+  table: TableSuggestion
+): Partial<EditorTableField> {
   const columns: ColumnField[] = table.fields.map((field, index) => {
     const isPrimaryKey = isPrimaryKeyField(field)
     const isIdentity = isIdentityField(field)
@@ -44,11 +44,4 @@ export function convertTableSuggestionToTableField(table: TableSuggestion): Part
     comment: table.rationale || '',
     columns,
   }
-}
-
-export function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message
-  }
-  return 'An unknown error occurred'
 }

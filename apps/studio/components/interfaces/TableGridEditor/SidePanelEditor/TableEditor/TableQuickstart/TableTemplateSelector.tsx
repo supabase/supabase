@@ -44,49 +44,47 @@ const initialViewState: ViewState = {
 }
 
 // Template item component
-const TemplateItem = memo(({
-  template,
-  isSelected,
-  onClick
-}: {
-  template: TableSuggestion
-  isSelected: boolean
-  onClick: () => void
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={cn(
-      "text-left p-3 rounded-md border transition-all w-full",
-      isSelected
-        ? "border-foreground bg-surface-200"
-        : "border-default hover:border-foreground-muted hover:bg-surface-100"
-    )}
-    aria-selected={isSelected}
-    aria-label={`Select ${template.tableName} table template`}
-  >
-    <div className="flex items-start justify-between">
-      <div className="flex-1">
-        <div className="text-sm font-medium">{template.tableName}</div>
-        {template.rationale && (
-          <div className="text-xs text-foreground-light mt-1">{template.rationale}</div>
-        )}
+const TemplateItem = memo(
+  ({
+    template,
+    isSelected,
+    onClick,
+  }: {
+    template: TableSuggestion
+    isSelected: boolean
+    onClick: () => void
+  }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'text-left p-3 rounded-md border transition-all w-full',
+        isSelected
+          ? 'border-foreground bg-surface-200'
+          : 'border-default hover:border-foreground-muted hover:bg-surface-100'
+      )}
+      data-selected={isSelected}
+      aria-label={`Select ${template.tableName} table template`}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="text-sm font-medium">{template.tableName}</div>
+          {template.rationale && (
+            <div className="text-xs text-foreground-light mt-1">{template.rationale}</div>
+          )}
+        </div>
+        <div className="flex items-center gap-1 text-xs text-foreground-muted ml-3">
+          <Columns3 size={12} aria-hidden="true" />
+          <span>{template.fields.length}</span>
+        </div>
       </div>
-      <div className="flex items-center gap-1 text-xs text-foreground-muted ml-3">
-        <Columns3 size={12} aria-hidden="true" />
-        <span>{template.fields.length}</span>
-      </div>
-    </div>
-  </button>
-))
+    </button>
+  )
+)
 TemplateItem.displayName = 'TemplateItem'
 
 // Header with dismiss button
-const SelectorHeader = memo(({
-  onDismiss
-}: {
-  onDismiss?: () => void
-}) => (
+const SelectorHeader = memo(({ onDismiss }: { onDismiss?: () => void }) => (
   <div className="flex items-center justify-between">
     <label className="text-sm text-foreground-light">Start from template (optional)</label>
     {onDismiss && (
@@ -109,7 +107,7 @@ export const TableTemplateSelector = ({
   variant,
   onSelectTemplate,
   onDismiss,
-  disabled
+  disabled,
 }: TableTemplateSelectorProps) => {
   const [viewState, setViewState] = useState<ViewState>(initialViewState)
   const [aiPrompt, setAiPrompt] = useState('')
@@ -136,20 +134,23 @@ export const TableTemplateSelector = ({
   // Update error state when API error changes
   useEffect(() => {
     if (apiError) {
-      setViewState(prev => ({ ...prev, error: apiError }))
+      setViewState((prev) => ({ ...prev, error: apiError }))
     }
   }, [apiError])
 
-  const handleSelectTemplate = useCallback((template: TableSuggestion) => {
-    const tableField = convertTableSuggestionToTableField(template)
-    onSelectTemplate(tableField)
-    setViewState(prev => ({ ...prev, selectedTemplate: template }))
-  }, [onSelectTemplate])
+  const handleSelectTemplate = useCallback(
+    (template: TableSuggestion) => {
+      const tableField = convertTableSuggestionToTableField(template)
+      onSelectTemplate(tableField)
+      setViewState((prev) => ({ ...prev, selectedTemplate: template }))
+    },
+    [onSelectTemplate]
+  )
 
   const handleGenerateTables = useCallback(async () => {
     if (!aiPrompt.trim() || isGenerating) return
 
-    setViewState(prev => ({ ...prev, isLoading: true, error: null }))
+    setViewState((prev) => ({ ...prev, isLoading: true, error: null }))
 
     try {
       const tables = await generateTables(aiPrompt)
@@ -165,14 +166,14 @@ export const TableTemplateSelector = ({
         })
         handleSelectTemplate(tables[0])
       } else {
-        setViewState(prev => ({
+        setViewState((prev) => ({
           ...prev,
           error: 'No tables generated. Please try a different description.',
           isLoading: false,
         }))
       }
     } catch (error) {
-      setViewState(prev => ({
+      setViewState((prev) => ({
         ...prev,
         error: 'Failed to generate tables. Please try again.',
         isLoading: false,
@@ -180,21 +181,24 @@ export const TableTemplateSelector = ({
     }
   }, [aiPrompt, generateTables, isGenerating, handleSelectTemplate])
 
-  const handleQuickIdea = useCallback((idea: string) => {
-    setAiPrompt(idea)
-    setViewState(prev => ({ ...prev, mode: ViewMode.AI_INPUT }))
+  const handleQuickIdea = useCallback(
+    (idea: string) => {
+      setAiPrompt(idea)
+      setViewState((prev) => ({ ...prev, mode: ViewMode.AI_INPUT }))
 
-    // Clean up any existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
+      // Clean up any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
 
-    // Auto-generate after setting the prompt
-    timeoutRef.current = setTimeout(() => {
-      handleGenerateTables()
-      timeoutRef.current = null
-    }, 100)
-  }, [handleGenerateTables])
+      // Auto-generate after setting the prompt
+      timeoutRef.current = setTimeout(() => {
+        handleGenerateTables()
+        timeoutRef.current = null
+      }, 100)
+    },
+    [handleGenerateTables]
+  )
 
   const handleReset = useCallback(() => {
     setViewState(initialViewState)
@@ -206,7 +210,11 @@ export const TableTemplateSelector = ({
   }, [])
 
   // Template variant - category selected
-  if (variant === QuickstartVariant.TEMPLATES && viewState.mode === ViewMode.CATEGORY_SELECTED && viewState.selectedCategory) {
+  if (
+    variant === QuickstartVariant.TEMPLATES &&
+    viewState.mode === ViewMode.CATEGORY_SELECTED &&
+    viewState.selectedCategory
+  ) {
     const templates = tableTemplates[viewState.selectedCategory] ?? []
 
     if (templates.length === 0) {
@@ -221,7 +229,9 @@ export const TableTemplateSelector = ({
           >
             Back
           </Button>
-          <p className="text-sm text-foreground-lighter">No templates available for this category.</p>
+          <p className="text-sm text-foreground-lighter">
+            No templates available for this category.
+          </p>
         </div>
       )
     }
@@ -282,10 +292,10 @@ export const TableTemplateSelector = ({
               <DropdownMenuItem
                 key={category}
                 onClick={() => {
-                  setViewState(prev => ({
+                  setViewState((prev) => ({
                     ...prev,
                     mode: ViewMode.CATEGORY_SELECTED,
-                    selectedCategory: category
+                    selectedCategory: category,
                   }))
                 }}
               >
@@ -355,7 +365,11 @@ export const TableTemplateSelector = ({
   }
 
   // AI variant - results
-  if (variant === QuickstartVariant.AI && viewState.mode === ViewMode.AI_RESULTS && viewState.generatedTables.length > 0) {
+  if (
+    variant === QuickstartVariant.AI &&
+    viewState.mode === ViewMode.AI_RESULTS &&
+    viewState.generatedTables.length > 0
+  ) {
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between">
@@ -407,7 +421,7 @@ export const TableTemplateSelector = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-[320px]">
             <DropdownMenuItem
-              onClick={() => setViewState(prev => ({ ...prev, mode: ViewMode.AI_INPUT }))}
+              onClick={() => setViewState((prev) => ({ ...prev, mode: ViewMode.AI_INPUT }))}
             >
               <Wand2 size={14} className="mr-2" aria-hidden="true" />
               Generate with AI...
@@ -415,10 +429,7 @@ export const TableTemplateSelector = ({
             <DropdownMenuSeparator />
             <div className="px-2 py-1.5 text-xs text-foreground-light">Quick ideas</div>
             {AI_QUICK_IDEAS.map((example) => (
-              <DropdownMenuItem
-                key={example}
-                onClick={() => handleQuickIdea(example)}
-              >
+              <DropdownMenuItem key={example} onClick={() => handleQuickIdea(example)}>
                 {example}
               </DropdownMenuItem>
             ))}

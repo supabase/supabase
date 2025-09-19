@@ -5,8 +5,21 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'profiles',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
-        { name: 'user_id', type: 'uuid', nullable: false, unique: true, isForeign: true, references: 'auth.users(id)' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
+        {
+          name: 'user_id',
+          type: 'uuid',
+          nullable: false,
+          unique: true,
+          isForeign: true,
+          references: 'auth.users(id)',
+        },
         { name: 'username', type: 'varchar', nullable: true, unique: true },
         { name: 'display_name', type: 'text', nullable: true },
         { name: 'avatar_url', type: 'text', nullable: true },
@@ -22,8 +35,20 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'posts',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
-        { name: 'author_id', type: 'uuid', nullable: false, isForeign: true, references: 'profiles(id)' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
+        {
+          name: 'author_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'profiles(id)',
+        },
         { name: 'content', type: 'text', nullable: false },
         { name: 'image_url', type: 'text', nullable: true },
         { name: 'likes_count', type: 'int4', nullable: false, default: '0' },
@@ -37,9 +62,27 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'follows',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
-        { name: 'follower_id', type: 'uuid', nullable: false, isForeign: true, references: 'profiles(id)' },
-        { name: 'following_id', type: 'uuid', nullable: false, isForeign: true, references: 'profiles(id)' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
+        {
+          name: 'follower_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'profiles(id)',
+        },
+        {
+          name: 'following_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'profiles(id)',
+        },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
       rationale: 'User follow relationships',
@@ -50,7 +93,13 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'products',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
         { name: 'name', type: 'varchar', nullable: false },
         { name: 'slug', type: 'varchar', nullable: false, unique: true },
         { name: 'description', type: 'text', nullable: true },
@@ -71,9 +120,21 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'orders',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
         { name: 'order_number', type: 'varchar', nullable: false, unique: true },
-        { name: 'customer_id', type: 'uuid', nullable: false, isForeign: true, references: 'profiles(id)' },
+        {
+          name: 'customer_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'profiles(id)',
+        },
         { name: 'status', type: 'varchar', nullable: false, default: "'pending'" },
         { name: 'subtotal', type: 'numeric', nullable: false },
         { name: 'tax', type: 'numeric', nullable: false, default: '0' },
@@ -89,9 +150,27 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'cart_items',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
-        { name: 'user_id', type: 'uuid', nullable: false, isForeign: true, references: 'profiles(id)' },
-        { name: 'product_id', type: 'uuid', nullable: false, isForeign: true, references: 'products(id)' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
+        {
+          name: 'user_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'profiles(id)',
+        },
+        {
+          name: 'product_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'products(id)',
+        },
         { name: 'quantity', type: 'int4', nullable: false, default: '1' },
         { name: 'added_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
@@ -99,17 +178,29 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
       source: TableSource.TEMPLATE,
     },
   ],
-  'Blog': [
+  Blog: [
     {
       tableName: 'articles',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
         { name: 'title', type: 'varchar', nullable: false },
         { name: 'slug', type: 'varchar', nullable: false, unique: true },
         { name: 'content', type: 'text', nullable: true },
         { name: 'excerpt', type: 'text', nullable: true },
         { name: 'cover_image', type: 'text', nullable: true },
-        { name: 'author_id', type: 'uuid', nullable: false, isForeign: true, references: 'profiles(id)' },
+        {
+          name: 'author_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'profiles(id)',
+        },
         { name: 'status', type: 'varchar', nullable: false, default: "'draft'" },
         { name: 'published_at', type: 'timestamptz', nullable: true },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
@@ -121,7 +212,13 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'categories',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
         { name: 'name', type: 'varchar', nullable: false },
         { name: 'slug', type: 'varchar', nullable: false, unique: true },
         { name: 'description', type: 'text', nullable: true },
@@ -134,8 +231,20 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'comments',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
-        { name: 'article_id', type: 'uuid', nullable: false, isForeign: true, references: 'articles(id)' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
+        {
+          name: 'article_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'articles(id)',
+        },
         { name: 'author_name', type: 'varchar', nullable: false },
         { name: 'author_email', type: 'varchar', nullable: false },
         { name: 'content', type: 'text', nullable: false },
@@ -150,13 +259,25 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'tasks',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
         { name: 'title', type: 'varchar', nullable: false },
         { name: 'description', type: 'text', nullable: true },
         { name: 'completed', type: 'bool', nullable: false, default: 'false' },
         { name: 'priority', type: 'varchar', nullable: true, default: "'medium'" },
         { name: 'due_date', type: 'date', nullable: true },
-        { name: 'user_id', type: 'uuid', nullable: false, isForeign: true, references: 'auth.users(id)' },
+        {
+          name: 'user_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'auth.users(id)',
+        },
         { name: 'list_id', type: 'uuid', nullable: true, isForeign: true, references: 'lists(id)' },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
@@ -167,12 +288,24 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'lists',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
         { name: 'name', type: 'varchar', nullable: false },
         { name: 'description', type: 'text', nullable: true },
         { name: 'color', type: 'varchar', nullable: true },
         { name: 'icon', type: 'varchar', nullable: true },
-        { name: 'user_id', type: 'uuid', nullable: false, isForeign: true, references: 'auth.users(id)' },
+        {
+          name: 'user_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'auth.users(id)',
+        },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
@@ -182,8 +315,20 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'subtasks',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
-        { name: 'task_id', type: 'uuid', nullable: false, isForeign: true, references: 'tasks(id)' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
+        {
+          name: 'task_id',
+          type: 'uuid',
+          nullable: false,
+          isForeign: true,
+          references: 'tasks(id)',
+        },
         { name: 'title', type: 'varchar', nullable: false },
         { name: 'completed', type: 'bool', nullable: false, default: 'false' },
         { name: 'position', type: 'int4', nullable: false, default: '0' },
@@ -193,12 +338,24 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
       source: TableSource.TEMPLATE,
     },
   ],
-  'Analytics': [
+  Analytics: [
     {
       tableName: 'events',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
-        { name: 'user_id', type: 'uuid', nullable: true, isForeign: true, references: 'profiles(id)' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
+        {
+          name: 'user_id',
+          type: 'uuid',
+          nullable: true,
+          isForeign: true,
+          references: 'profiles(id)',
+        },
         { name: 'session_id', type: 'varchar', nullable: true },
         { name: 'event_type', type: 'varchar', nullable: false },
         { name: 'properties', type: 'jsonb', nullable: true },
@@ -212,8 +369,20 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'page_views',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
-        { name: 'user_id', type: 'uuid', nullable: true, isForeign: true, references: 'profiles(id)' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
+        {
+          name: 'user_id',
+          type: 'uuid',
+          nullable: true,
+          isForeign: true,
+          references: 'profiles(id)',
+        },
         { name: 'session_id', type: 'varchar', nullable: true },
         { name: 'path', type: 'varchar', nullable: false },
         { name: 'referrer', type: 'text', nullable: true },
@@ -226,7 +395,13 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
     {
       tableName: 'metrics',
       fields: [
-        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
+        {
+          name: 'id',
+          type: 'uuid',
+          nullable: false,
+          isPrimary: true,
+          default: 'gen_random_uuid()',
+        },
         { name: 'metric_name', type: 'varchar', nullable: false },
         { name: 'value', type: 'numeric', nullable: false },
         { name: 'tags', type: 'jsonb', nullable: true },
