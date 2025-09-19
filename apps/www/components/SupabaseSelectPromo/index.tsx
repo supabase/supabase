@@ -3,12 +3,21 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import { Button } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+// import SectionContainer from '~/components/Layouts/SectionContainer'
 import './styles.css'
 
 const SupabaseSelectPromo = () => {
-  const monoStyle = 'text-xs font-mono uppercase leading-none tracking-wide text-white/50'
-  const imgWidth = 320
+  const monoStyle = 'text-sm font-mono uppercase leading-none tracking-wide text-white/50'
+  const gridUnit = 24
+  const gridUnitTailwind = gridUnit / 4
+
+  const logoWidth = 320
+  const logoWidthTailwind = logoWidth / 4 // 80px
+  const speakerImgWidth = gridUnit * 12 // 288px
+
+  const speakerImgWidthTailwind = speakerImgWidth / 4
+
+  const gridWidth = gridUnit * 26 // 624px
   const selectSiteUrl = 'https://select.supabase.com/'
   const headerText = ['Our first user conference', 'Oct 3 2025', '@ YC Offices, SF']
   const mainText = [
@@ -35,14 +44,17 @@ const SupabaseSelectPromo = () => {
 
   return (
     <section
-      className="dark bg-black"
+      className="dark bg-black overflow-hidden"
       style={{
         fontFamily:
           "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
       }}
     >
-      {/* Text contents */}
-      <div className="border-x border-muted m:py-18 container relative mx-auto py-16 md:py-24 lg:py-24 before:absolute before:left-0 before:top-0 before:w-px before:h-full before:bg-muted before:-left-6">
+      {/* Main centered content */}
+      <div
+        className={`border-x border-muted m:py-18 container relative mx-auto py-16 md:py-24 lg:py-24 before:absolute before:left-0 before:top-0 before:w-px before:h-full before:bg-muted before:-left-[${gridUnit}px]`}
+      >
+        {/* Header */}
         <header className="flex flex-row border-y border-muted">
           {Object.entries(headerText).map(([index, value]: [string, string]) => (
             <p
@@ -53,18 +65,19 @@ const SupabaseSelectPromo = () => {
             </p>
           ))}
         </header>
-        {/* Content area */}
+        {/* Main text, CTA, and images */}
         <div className="relative">
           {/* Speaker image */}
           <Image
             src={`/images/supabase-select/speakers/${speakers[0].slug}.jpg`}
             alt={speakers[0].name}
-            className="w-80 absolute top-0 right-0"
-            width={imgWidth}
-            height={imgWidth}
+            className={`w-[${speakerImgWidthTailwind - 1}px] absolute top-0 -right-[0.5px] hidden md:block z-10`}
+            width={speakerImgWidth - 1}
+            height={speakerImgWidth - 1}
           />
           {/* Logo and speaker name */}
-          <div className="pt-8 border-b border-muted flex flex-row justify-between items-baseline">
+          <div className="h-24 border-b border-muted flex flex-row justify-between items-end">
+            {/* Logo */}
             <Link
               target="_blank"
               href={selectSiteUrl}
@@ -73,24 +86,38 @@ const SupabaseSelectPromo = () => {
               <Image
                 src="/images/supabase-select/logo.svg"
                 alt="Supabase Select"
-                className="w-80 transform translate-y-4 pb-1"
-                width={240}
-                height={40}
+                className={`w-[${logoWidth}px] transform translate-y-3`}
+                width={logoWidth}
+                height={logoWidth}
               />
             </Link>
-            <p className={`${monoStyle} mr-[${imgWidth}px] pr-1`}>
+            {/* Speaker name */}
+            <p
+              className={`${monoStyle} mr-[${speakerImgWidth}px] pr-1 hidden lg:inline-block text-right`}
+            >
               {speakers[0].name}, {speakers[0].title}
             </p>
           </div>
 
-          {/* Main text */}
-          <div className="flex flex-col pt-16 text-balance max-w-md">
-            <h3 className="text-2xl text-light pb-2">{mainText[0]}</h3>
-            <p className="text-2xl text">{mainText[1]}</p>
-          </div>
-          {/* CTA */}
-          <div className="border-b border-muted pt-8">
-            <Button asChild type="primary" size="large">
+          <div className="relative h-[288px] border-b border-muted flex flex-col justify-between">
+            {/* Grid background */}
+            <div
+              className={`hidden xl:block absolute -top-[1px] -right-[1px] w-[${gridWidth}px] h-[${gridWidth}px] border-r border-b border-muted`}
+              style={{
+                backgroundImage: `
+                linear-gradient(to right, hsl(var(--border-muted)) 1px, transparent 1px),
+                linear-gradient(to bottom, hsl(var(--border-muted)) 1px, transparent 1px)
+              `,
+                backgroundSize: `${gridUnit}px ${gridUnit}px`,
+              }}
+            />
+            {/* Main text */}
+            <div className="flex flex-col pt-16 text-balance relative">
+              <h3 className="text-2xl text-light pb-2 max-w-md">{mainText[0]}</h3>
+              <p className="text-2xl text max-w-md">{mainText[1]}</p>
+            </div>
+            {/* CTA */}
+            <Button asChild type="primary" size="large" className="w-fit">
               <Link target="_blank" href={selectSiteUrl}>
                 Apply now
               </Link>
