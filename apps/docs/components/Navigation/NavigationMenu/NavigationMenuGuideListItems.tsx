@@ -1,9 +1,10 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
+import { ChevronRight } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 
 import MenuIconPicker from './MenuIconPicker'
 
@@ -31,10 +32,33 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === pathname
-  const activeItemRef = useRef<HTMLLIElement>(null)
+  const activeItemRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null)
+  const hasSubItems = props.subItem.items && props.subItem.items.length > 0
 
-  const LinkContainer = (props) => {
+  // Callback ref for better React compatibility
+  const setActiveItemRef = React.useCallback((element: HTMLButtonElement | HTMLAnchorElement | null) => {
+    // Store ref for potential future use
+    if (activeItemRef.current !== element) {
+      (activeItemRef as React.MutableRefObject<HTMLButtonElement | HTMLAnchorElement | null>).current = element
+    }
+    // Scroll to active item when ref is set
+    if (activeItem && element) {
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 0)
+    }
+  }, [activeItem])
+
+  const LinkContainer = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, any>((props, ref) => {
     const isExternal = props.url.startsWith('https://')
+
+    if (hasSubItems) {
+      return (
+        <Accordion.Trigger className={props.className} ref={ref as React.ForwardedRef<HTMLButtonElement>}>
+          {props.children}
+        </Accordion.Trigger>
+      )
+    }
 
     return (
       <Link
@@ -42,21 +66,15 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
         className={props.className}
         target={isExternal ? '_blank' : undefined}
         rel={isExternal ? 'noopener noreferrer' : undefined}
+        ref={ref as React.ForwardedRef<HTMLAnchorElement>}
       >
         {props.children}
       </Link>
     )
-  }
-
-  useEffect(() => {
-    // scroll to active item
-    if (activeItem && activeItemRef.current) {
-      // this is a hack, but seems a common one on Stackoverflow
-      setTimeout(() => {
-        activeItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-      }, 0)
-    }
   })
+  
+  LinkContainer.displayName = 'LinkContainer'
+
   return (
     <>
       {props.subItemIndex === 0 && (
@@ -67,19 +85,80 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           </span>
         </>
       )}
-      <Accordion.Item key={props.subItem.label} value={props.subItem.url}>
-        <li key={props.subItem.name} ref={activeItem ? activeItemRef : null}>
-          <LinkContainer
-            url={props.subItem.url}
-            className={[
-              'flex items-center gap-2',
-              'cursor-pointer transition text-sm',
-              activeItem
-                ? 'text-brand-link font-medium'
-                : 'hover:text-foreground text-foreground-lighter',
-            ].join(' ')}
-            parent={props.subItem.parent}
-          >
+      {hasSubItems ? (
+        <Accordion.Root collapsible type="single" className="space-y-0.5">
+          <Accordion.Item key={props.subItem.url || props.subItem.name} value={props.subItem.url}>
+            <LinkContainer
+              url={props.subItem.url}
+              className={[
+                'flex items-center gap-2',
+                'cursor-pointer transition text-sm',
+                hasSubItems ? 'justify-between' : '',
+                activeItem
+                  ? 'text-brand-link font-medium'
+                  : 'hover:text-foreground text-foreground-lighter',
+              ].join(' ')}
+              parent={props.subItem.parent}
+              ref={setActiveItemRef}
+            >
+              <div className="flex items-center gap-2">
+                {props.subItem.icon && (
+                  <Image
+                    alt={props.subItem.name}
+                    src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+                    width={15}
+                    height={15}
+                  />
+                )}
+                {props.subItem.name}
+              </div>
+              {hasSubItems && (
+                <ChevronRight
+                  className="transition text-foreground-lighter data-open-parent:rotate-90"
+                  size={14}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+              )}
+            </LinkContainer>
+
+            <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
+              {props.subItem.items
+                .filter((subItem) => subItem.enabled !== false)
+                .map((subSubItem) => {
+                  return (
+                    <li key={subSubItem.url || subSubItem.name}>
+                      <Link
+                        href={`${subSubItem.url}`}
+                        className={[
+                          'cursor-pointer transition text-sm',
+                          subSubItem.url === pathname
+                            ? 'text-brand-link'
+                            : 'hover:text-brand-link text-foreground-lighter',
+                        ].join(' ')}
+                      >
+                        {subSubItem.name}
+                      </Link>
+                    </li>
+                  )
+                })}
+            </Accordion.Content>
+          </Accordion.Item>
+        </Accordion.Root>
+      ) : (
+        <LinkContainer
+          url={props.subItem.url}
+          className={[
+            'flex items-center gap-2',
+            'cursor-pointer transition text-sm',
+            activeItem
+              ? 'text-brand-link font-medium'
+              : 'hover:text-foreground text-foreground-lighter',
+          ].join(' ')}
+          parent={props.subItem.parent}
+          ref={setActiveItemRef}
+        >
+          <div className="flex items-center gap-2">
             {props.subItem.icon && (
               <Image
                 alt={props.subItem.name}
@@ -89,33 +168,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               />
             )}
             {props.subItem.name}
-          </LinkContainer>
-        </li>
-
-        {props.subItem.items && props.subItem.items.length > 0 && (
-          <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-            {props.subItem.items
-              .filter((subItem) => subItem.enabled !== false)
-              .map((subSubItem) => {
-                return (
-                  <li key={props.subItem.name}>
-                    <Link
-                      href={`${subSubItem.url}`}
-                      className={[
-                        'cursor-pointer transition text-sm',
-                        subSubItem.url === pathname
-                          ? 'text-brand-link'
-                          : 'hover:text-brand-link text-foreground-lighter',
-                      ].join(' ')}
-                    >
-                      {subSubItem.name}
-                    </Link>
-                  </li>
-                )
-              })}
-          </Accordion.Content>
-        )}
-      </Accordion.Item>
+          </div>
+        </LinkContainer>
+      )}
     </>
   )
 })
