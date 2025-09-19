@@ -23,8 +23,8 @@ export const AiPromptInput = ({ onGenerate, isLoading = false }: AiPromptInputPr
         className={cn(
           'relative group bg-surface-100 rounded-lg border transition-all duration-200',
           isFocused
-            ? 'border-foreground/30 shadow-lg'
-            : 'border-default hover:border-foreground/20',
+            ? 'border-foreground-muted shadow-lg'
+            : 'border-default hover:border-foreground-muted',
           isLoading && 'opacity-80'
         )}
       >

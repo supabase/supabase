@@ -80,7 +80,7 @@ export const TablePreviewCard = ({ table, isActive, onClick, disabled }: TablePr
           'relative overflow-hidden rounded-xl border bg-surface-100 transition-all duration-300 h-[240px] flex flex-col',
           isActive
             ? 'border-brand shadow-xl scale-[1.02]'
-            : 'border-default hover:border-foreground/20 hover:shadow-lg hover:scale-[1.01]',
+            : 'border-default hover:border-foreground-muted hover:shadow-lg hover:scale-[1.01]',
           !disabled && 'cursor-pointer'
         )}
       >

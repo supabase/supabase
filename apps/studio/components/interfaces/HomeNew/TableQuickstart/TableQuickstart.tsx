@@ -85,7 +85,7 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
                             disabled={isGenerating}
                             className={cn(
                               'px-3 py-1.5 text-xs rounded-md border transition-all',
-                              'bg-surface-100 border-default hover:border-foreground/20',
+                              'bg-surface-100 border-default hover:border-foreground-muted',
                               'hover:bg-surface-200 disabled:opacity-50 disabled:cursor-not-allowed'
                             )}
                           >

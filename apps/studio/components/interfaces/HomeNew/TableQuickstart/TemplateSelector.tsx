@@ -41,7 +41,7 @@ export const TemplateSelector = ({ onSelect }: TemplateSelectorProps) => {
               onClick={() => handleTemplateSelect(template)}
               className={cn(
                 'group relative p-4 rounded-lg border bg-surface-100 text-left transition-all',
-                'border-default hover:border-foreground/20 hover:shadow-md',
+                'border-default hover:border-foreground-muted hover:shadow-md',
                 'focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2'
               )}
             >
