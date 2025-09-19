@@ -6,16 +6,15 @@ import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
 
-import { ProfileImage } from 'components/ui/ProfileImage'
+import { ProfileImage as ProfileImageDisplay } from 'components/ui/ProfileImage'
 import { useProfile } from 'lib/profile'
 import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
-import { getGitHubProfileImgUrl } from 'lib/github'
 import { cn, markdownComponents } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
-
+import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
+import { Tool } from './elements/Tool'
 import {
   Heading3,
   Hyperlink,
@@ -24,7 +23,6 @@ import {
   MarkdownPre,
   OrderedList,
 } from './MessageMarkdown'
-import { Tool } from './elements/Tool'
 
 const baseMarkdownComponents: Partial<Components> = {
   ol: OrderedList,
@@ -50,6 +48,81 @@ interface MessageProps {
   isLastMessage?: boolean
 }
 
+function useProfileNameAndPicture(): {
+  username: string | undefined
+  avatarUrl: string | undefined
+} {
+  const { profile } = useProfile()
+  const username = profile?.username
+
+  const { data: identitiesData } = useProfileIdentitiesQuery()
+  const githubProfileData = identitiesData?.identities?.find(
+    (x) => x.provider === 'github'
+  )?.identity_data
+  const avatarUrl = githubProfileData?.avatar_url
+
+  return { username, avatarUrl }
+}
+
+function ProfileImage() {
+  const { username, avatarUrl } = useProfileNameAndPicture()
+  return (
+    <ProfileImageDisplay
+      alt={username}
+      src={avatarUrl}
+      className="w-5 h-5 shrink-0 rounded-full translate-y-0.5"
+    />
+  )
+}
+
+function MessageMarkdown({
+  id,
+  isLoading,
+  readOnly,
+  className,
+  children,
+}: PropsWithChildren<{
+  id: string
+  isLoading: boolean
+  readOnly?: boolean
+  className?: string
+}>) {
+  const markdownSource = useMemo(() => {
+    if (typeof children === 'string') {
+      return children
+    }
+
+    if (Array.isArray(children)) {
+      return children.filter((child): child is string => typeof child === 'string').join('')
+    }
+
+    return ''
+  }, [children])
+
+  const allMarkdownComponents: Partial<Components> = useMemo(
+    () => ({
+      ...markdownComponents,
+      ...baseMarkdownComponents,
+      pre: ({ children }) => (
+        <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
+          {children}
+        </MarkdownPre>
+      ),
+    }),
+    [id, isLoading, readOnly]
+  )
+
+  return (
+    <ReactMarkdown
+      className={className}
+      remarkPlugins={[remarkGfm]}
+      components={allMarkdownComponents}
+    >
+      {markdownSource}
+    </ReactMarkdown>
+  )
+}
+
 export const Message = function Message({
   id,
   message,
@@ -64,26 +137,7 @@ export const Message = function Message({
   onCancelEdit,
   isLastMessage = false,
 }: PropsWithChildren<MessageProps>) {
-  const { profile } = useProfile()
-  const { data: identitiesData } = useProfileIdentitiesQuery()
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
-  const allMarkdownComponents: Partial<Components> = useMemo(
-    () => ({
-      ...markdownComponents,
-      ...baseMarkdownComponents,
-      pre: ({ children }) => (
-        <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
-          {children}
-        </MarkdownPre>
-      ),
-    }),
-    [id, isLoading, readOnly]
-  )
-
-  if (!message) {
-    console.error(`Message component received undefined message prop for id: ${id}`)
-    return null
-  }
 
   // For backwards compatibility: some stored messages may have a 'content' property
   const { role, parts } = message
@@ -96,15 +150,6 @@ export const Message = function Message({
 
   const hasTextContent = content && content.trim().length > 0
 
-  const isGitHubProfile = !!profile?.auth0_id && profile.auth0_id.startsWith('github')
-  const gitHubUsername = isGitHubProfile
-    ? (identitiesData?.identities ?? []).find((x) => x.provider === 'github')?.identity_data
-        ?.user_name
-    : undefined
-  const profileImageUrl = isGitHubProfile
-    ? getGitHubProfileImgUrl(gitHubUsername as string)
-    : profile?.profileImageUrl
-
   return (
     <div
       className={cn(
@@ -116,13 +161,7 @@ export const Message = function Message({
       onClick={isAfterEditedMessage ? onCancelEdit : undefined}
     >
       <div className="flex gap-4 w-auto overflow-hidden group">
-        {isUser && (
-          <ProfileImage
-            alt={profile?.username}
-            src={profileImageUrl}
-            className="w-5 h-5 shrink-0 rounded-full translate-y-0.5"
-          />
-        )}
+        {isUser && <ProfileImage />}
 
         <div className="flex-1 min-w-0">
           {shouldUsePartsRendering
@@ -202,18 +241,19 @@ export const Message = function Message({
                         )
                       case 'text':
                         return (
-                          <ReactMarkdown
+                          <MessageMarkdown
                             key={`${id}-part-${index}`}
+                            id={id}
+                            isLoading={isLoading}
+                            readOnly={readOnly}
                             className={cn(
                               'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
                               isUser && 'text-foreground [&>p]:font-medium',
                               isBeingEdited && 'animate-pulse'
                             )}
-                            remarkPlugins={[remarkGfm]}
-                            components={allMarkdownComponents}
                           >
                             {part.text}
-                          </ReactMarkdown>
+                          </MessageMarkdown>
                         )
 
                       case 'tool-execute_sql': {
@@ -341,13 +381,14 @@ export const Message = function Message({
                 )
               })()
             : hasTextContent && (
-                <ReactMarkdown
+                <MessageMarkdown
+                  id={id}
+                  isLoading={isLoading}
+                  readOnly={readOnly}
                   className="prose prose-sm max-w-none break-words"
-                  remarkPlugins={[remarkGfm]}
-                  components={allMarkdownComponents}
                 >
                   {content}
-                </ReactMarkdown>
+                </MessageMarkdown>
               )}
         </div>
       </div>
