@@ -123,16 +123,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
 
   const renderVisualizer = (isExpanded: boolean) => (
     <>
-      {!isExpanded && (
-        <ControlsOverlay
-          metricsVisibility={metricsVisibility}
-          setMetricsVisibility={setMetricsVisibility}
-          heatmapMode={heatmapMode}
-          setHeatmapMode={setHeatmapMode}
-          variant="toolbar"
-          className="mb-2"
-        />
-      )}
       <div
         className={cn(
           'relative w-full h-full bg-background',
@@ -185,7 +175,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                   type="default"
                   size="tiny"
                   icon={<BookOpen />}
-                  className="ml-auto h-[28px] text-foreground-light"
+                  className="ml-auto h-[28px]"
                 >
                   <Link
                     href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
@@ -197,12 +187,30 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 </Button>
               </div>
             ) : (
-              <div className="absolute z-10 top-2 left-2 right-2 flex items-center justify-start pr-8 gap-x-2">
+              <div className="absolute top-2.5 left-2.5 right-2.5 z-20 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border bg-sidebar px-2.5 py-1.5 shadow-sm">
+                <ControlsOverlay
+                  metricsVisibility={metricsVisibility}
+                  setMetricsVisibility={setMetricsVisibility}
+                  heatmapMode={heatmapMode}
+                  setHeatmapMode={setHeatmapMode}
+                  variant="toolbar"
+                  className="shrink-0"
+                />
+                <div className="h-5 w-px border-l border-border" />
                 <MetaOverlay
                   planningTime={meta?.planningTime}
                   executionTime={meta?.executionTime}
                   jitTotalTime={meta?.jitTotalTime}
-                  className="text-[10px]"
+                  className="min-h-0 flex-1 border-0 bg-transparent px-0 py-0 text-xs"
+                />
+                <div className="h-5 w-px border-l border-border" />
+                <Button
+                  type="default"
+                  size="tiny"
+                  icon={<Maximize2 size={14} className="text-foreground" />}
+                  onClick={toggleExpanded}
+                  aria-label="Enter expanded view"
+                  className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
                 />
               </div>
             )}
@@ -252,23 +260,16 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 </ReactFlow>
               </HeatmapContext.Provider>
             </MetricsVisibilityContext.Provider>
-            <Button
-              type="default"
-              size="tiny"
-              icon={
-                isExpanded ? (
-                  <Minimize2 size={14} className="text-foreground" />
-                ) : (
-                  <Maximize2 size={14} className="text-foreground" />
-                )
-              }
-              onClick={toggleExpanded}
-              aria-label={isExpanded ? 'Exit expanded view' : 'Enter expanded view'}
-              className={cn(
-                'absolute right-2 z-10 inline-flex items-center justify-center h-7 w-7 rounded-md border',
-                isExpanded ? 'top-12 right-3' : 'top-2 right-2'
-              )}
-            />
+            {isExpanded && (
+              <Button
+                type="default"
+                size="tiny"
+                icon={<Minimize2 size={14} className="text-foreground" />}
+                onClick={toggleExpanded}
+                aria-label="Exit expanded view"
+                className="absolute top-12 right-3 z-10 inline-flex h-7 w-7 items-center justify-center rounded-md border"
+              />
+            )}
           </div>
         </div>
       </div>
