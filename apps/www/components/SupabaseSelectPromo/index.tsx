@@ -4,7 +4,6 @@ import Image from 'next/image'
 
 import { Button } from 'ui'
 import { DecorativeProgressBar } from '~/components/SurveyResults/DecorativeProgressBar'
-// import SectionContainer from '~/components/Layouts/SectionContainer'
 import './styles.css'
 
 const SupabaseSelectPromo = () => {
