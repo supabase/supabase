@@ -23,7 +23,10 @@ import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { Dashboards } from 'types'
@@ -35,6 +38,9 @@ export function CustomReportSection() {
   const endDate = dayjs().toISOString()
   const { ref } = useParams()
   const { profile } = useProfile()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
@@ -185,6 +191,21 @@ export function CustomReportSection() {
           content: newReport,
         },
       })
+
+      if (project?.ref && organization?.slug) {
+        sendEvent({
+          action: 'home_custom_report_block_added',
+          properties: {
+            block_id: snippet.id,
+            block_name: snippet.name,
+            position: 0,
+          },
+          groups: {
+            project: project.ref,
+            organization: organization.slug,
+          },
+        })
+      }
       return
     }
     const current = [...editableReport.layout]
@@ -193,6 +214,21 @@ export function CustomReportSection() {
     const updated = { ...editableReport, layout: current }
     setEditableReport(updated)
     persistReport(updated)
+
+    if (project?.ref && organization?.slug) {
+      sendEvent({
+        action: 'home_custom_report_block_added',
+        properties: {
+          block_id: snippet.id,
+          block_name: snippet.name,
+          position: current.length - 1,
+        },
+        groups: {
+          project: project.ref,
+          organization: organization.slug,
+        },
+      })
+    }
   }
 
   const handleRemoveChart = ({ metric }: { metric: { key: string } }) => {

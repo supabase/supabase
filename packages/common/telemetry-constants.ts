@@ -1501,6 +1501,142 @@ export interface HomeActivityStatClickedEvent {
 }
 
 /**
+ * User clicked the Ask Assistant button in the Advisor section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorAskAssistantClickedEvent {
+  action: 'home_advisor_ask_assistant_clicked'
+  properties: {
+    /**
+     * Number of issues found by the advisor
+     */
+    issues_count: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on an issue card in the Advisor section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorIssueCardClickedEvent {
+  action: 'home_advisor_issue_card_clicked'
+  properties: {
+    /**
+     * Category of the issue (SECURITY or PERFORMANCE)
+     */
+    issue_category: string
+    /**
+     * Name/key of the lint issue
+     */
+    issue_name: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Fix Issue button on an advisor card in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorFixIssueClickedEvent {
+  action: 'home_advisor_fix_issue_clicked'
+  properties: {
+    /**
+     * Category of the issue (SECURITY or PERFORMANCE)
+     */
+    issue_category: string
+    /**
+     * Name/key of the lint issue
+     */
+    issue_name: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a service title in Project Usage section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeProjectUsageServiceClickedEvent {
+  action: 'home_project_usage_service_clicked'
+  properties: {
+    /**
+     * The service that was clicked
+     */
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    /**
+     * Total requests for this service
+     */
+    total_requests: number
+    /**
+     * Number of errors for this service
+     */
+    error_count: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a bar in the usage chart in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeProjectUsageChartClickedEvent {
+  action: 'home_project_usage_chart_clicked'
+  properties: {
+    /**
+     * The service type for this chart
+     */
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    /**
+     * Timestamp of the bar clicked
+     */
+    timestamp: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User added a block to the custom report in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeCustomReportBlockAddedEvent {
+  action: 'home_custom_report_block_added'
+  properties: {
+    /**
+     * ID of the snippet/block added
+     */
+    block_id: string
+    /**
+     * Name of the snippet/block added
+     */
+    block_name: string
+    /**
+     * If position is 0 it is equivalent to 'Add your first chart'.
+     */
+    position: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User dismissed the Getting Started section in HomeV2.
  *
  * @group Events
@@ -1690,6 +1826,12 @@ export type TelemetryEvent =
   | HomeGettingStartedDismissedEvent
   | HomeSectionReorderedEvent
   | HomeActivityStatClickedEvent
+  | HomeAdvisorAskAssistantClickedEvent
+  | HomeAdvisorIssueCardClickedEvent
+  | HomeAdvisorFixIssueClickedEvent
+  | HomeProjectUsageServiceClickedEvent
+  | HomeProjectUsageChartClickedEvent
+  | HomeCustomReportBlockAddedEvent
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
