@@ -1501,7 +1501,7 @@ export interface HomeActivityStatClickedEvent {
 }
 
 /**
- * User clicked the Ask Assistant button in the Advisor section of HomeV2.
+ * User clicked the main Ask Assistant button in the Advisor section of HomeV2.
  *
  * @group Events
  * @source studio
@@ -1536,6 +1536,7 @@ export interface HomeAdvisorIssueCardClickedEvent {
      * Name/key of the lint issue
      */
     issue_name: string
+    issues_count: number
   }
   groups: TelemetryGroups
 }

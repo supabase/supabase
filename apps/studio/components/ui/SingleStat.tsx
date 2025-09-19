@@ -11,7 +11,6 @@ type SingleStatProps = {
   className?: string
   href?: string
   onClick?: () => void
-  trackingAction?: 'home_activity_stat_clicked'
   trackingProperties?: {
     stat_type: 'migrations' | 'backups' | 'branches'
     stat_value: number
@@ -25,21 +24,14 @@ export const SingleStat = ({
   className,
   href,
   onClick,
-  trackingAction,
   trackingProperties,
 }: SingleStatProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
-  const handleClick = () => {
-    if (onClick) onClick()
-    if (
-      trackingAction === 'home_activity_stat_clicked' &&
-      trackingProperties &&
-      project?.ref &&
-      organization?.slug
-    ) {
+  const trackActivityStat = () => {
+    if (trackingProperties && project?.ref && organization?.slug) {
       sendEvent({
         action: 'home_activity_stat_clicked',
         properties: trackingProperties,
@@ -66,38 +58,14 @@ export const SingleStat = ({
 
   if (href) {
     return (
-      <Link
-        className="group block"
-        href={href}
-        onClick={() => {
-          if (
-            trackingAction === 'home_activity_stat_clicked' &&
-            trackingProperties &&
-            project?.ref &&
-            organization?.slug
-          ) {
-            sendEvent({
-              action: 'home_activity_stat_clicked',
-              properties: trackingProperties,
-              groups: {
-                project: project.ref,
-                organization: organization.slug,
-              },
-            })
-          }
-        }}
-      >
+      <Link className="group block" href={href} onClick={trackActivityStat}>
         {content}
       </Link>
     )
   }
 
   if (onClick) {
-    return (
-      <button className="group" onClick={handleClick}>
-        {content}
-      </button>
-    )
+    return <button className="group">{content}</button>
   }
 
   return content

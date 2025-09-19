@@ -83,6 +83,7 @@ export const AdvisorSection = () => {
           properties: {
             issue_category: lint.categories[0] || 'UNKNOWN',
             issue_name: lint.name,
+            issues_count: totalErrors,
           },
           groups: {
             project: project.ref,
