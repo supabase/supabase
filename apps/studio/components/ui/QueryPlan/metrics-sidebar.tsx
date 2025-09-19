@@ -421,7 +421,7 @@ export const MetricsSidebar = ({
               <li
                 key={row.id}
                 className={cn(
-                  'rounded border border-transparent transition-colors',
+                  'rounded border border-transparent transition-colors flex p-1',
                   isActive ? 'border-brand bg-brand/10' : 'hover:border-border'
                 )}
               >
