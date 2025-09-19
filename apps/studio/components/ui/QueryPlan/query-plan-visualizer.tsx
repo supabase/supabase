@@ -279,7 +279,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             >
               <div
                 className={cn(
-                  'flex h-full w-full flex-col overflow-hidden border border-border shadow-2xl md:rounded-lg',
+                  'flex flex-col h-full w-full overflow-hidden border shadow-2xl',
                   className
                 )}
               >
