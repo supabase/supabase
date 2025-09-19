@@ -48,10 +48,10 @@ type MetricRenderResult = {
 type MetricRenderer = (data: PlanNodeData, stats: MetricStats) => MetricRenderResult
 
 const METRIC_OPTIONS: { key: SidebarMetricKey; label: string }[] = [
-  { key: 'time', label: 'time' },
-  { key: 'rows', label: 'rows' },
-  { key: 'cost', label: 'cost' },
-  { key: 'buffers', label: 'buffers' },
+  { key: 'time', label: 'Time' },
+  { key: 'rows', label: 'Rows' },
+  { key: 'cost', label: 'Cost' },
+  { key: 'buffers', label: 'Buffers' },
   { key: 'io', label: 'IO' },
 ]
 
