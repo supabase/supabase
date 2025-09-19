@@ -1,6 +1,6 @@
 import { type ReactNode, useContext } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-import { Workflow, ArrowBigUp, ArrowBigDown } from 'lucide-react'
+import { Workflow, ArrowBigUp, ArrowBigDown, TimerOff } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn } from 'ui'
@@ -348,16 +348,17 @@ export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
         </div>
         <div className="flex items-center gap-x-1 ml-auto">
           {hints}
-          {data.neverExecuted && (
-            <Badge
-              variant="destructive"
-              size="small"
-              title="Never executed (loops=0)"
-              className="h-[15px] px-1 py-[1px] text-[0.55rem]"
-            >
-              Never executed
-            </Badge>
-          )}
+          {/* {data.neverExecuted && ( */}
+          <Badge
+            variant="outline"
+            size="small"
+            title="Never executed (loops=0)"
+            className="h-[15px] px-2 py-[1px] text-[0.55rem] gap-[4px]"
+          >
+            <TimerOff size={10} strokeWidth={1} />
+            Skipped
+          </Badge>
+          {/* )} */}
         </div>
       </header>
       {heat.mode !== 'none' && <Heatmap data={data} />}
