@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Button,
   Command_Shadcn_,
@@ -32,6 +32,10 @@ const PublicationsComboBox = ({
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
   const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    setSelectedPublication(field?.value || '')
+  }, [field?.value])
 
   function handleSearchChange(value: string) {
     setSearchTerm(value)

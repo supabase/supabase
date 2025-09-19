@@ -2127,6 +2127,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/customers/mendableai',
+    destination: '/customers/firecrawl',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
     destination: '/docs/guides/auth/auth-helpers/nextjs',
   },
@@ -2153,12 +2158,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/channels',
-    destination: '/docs/guides/realtime/concepts#channels',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/extensions',
-    destination: '/docs/guides/realtime/concepts',
+    destination: '/docs/guides/realtime/protocol#channels',
   },
   {
     permanent: true,

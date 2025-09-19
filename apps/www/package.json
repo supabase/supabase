@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "clean": "rimraf node_modules",
+    "pretypecheck": "next typegen",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "node scripts/generateStaticContent.mjs",
     "prettier": "prettier --cache --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",

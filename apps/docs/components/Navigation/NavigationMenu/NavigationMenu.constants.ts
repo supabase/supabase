@@ -9,6 +9,7 @@ const {
   billingAll: billingEnabled,
   docsCompliance: complianceEnabled,
   'docsSelf-hosting': selfHostingEnabled,
+  integrationsPartners: integrationsEnabled,
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
   sdkKotlin: sdkKotlinEnabled,
@@ -19,6 +20,7 @@ const {
   'billing:all',
   'docs:compliance',
   'docs:self-hosting',
+  'integrations:partners',
   'sdk:csharp',
   'sdk:dart',
   'sdk:kotlin',
@@ -128,6 +130,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             hasLightIcon: true,
             href: '/guides/integrations' as `/${string}`,
             level: 'integrations',
+            enabled: integrationsEnabled,
           },
         ],
       ],
@@ -699,7 +702,7 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Web3 (Sign in with Solana)',
+          name: 'Web3 (Ethereum or Solana)',
           url: '/guides/auth/auth-web3',
           enabled: allAuthProvidersEnabled,
         },
@@ -793,6 +796,7 @@ export const auth: NavMenuConstant = {
         { name: 'Password Security', url: '/guides/auth/password-security' },
         { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
         { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
+        { name: 'Audit Logs', url: '/guides/auth/audit-logs' },
         {
           name: 'JSON Web Tokens (JWT)',
           url: '/guides/auth/jwts',
@@ -1658,8 +1662,8 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime',
     },
     {
-      name: 'Concepts',
-      url: '/guides/realtime/concepts',
+      name: 'Getting Started',
+      url: '/guides/realtime/getting_started',
     },
     {
       name: 'Usage',
@@ -1712,6 +1716,7 @@ export const realtime: NavMenuConstant = {
           enabled: billingEnabled,
         },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
+        { name: 'Concepts', url: '/guides/realtime/concepts' },
         { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],
@@ -2624,6 +2629,7 @@ export const integrations: NavMenuConstant = {
   title: 'Integrations',
   icon: 'integrations',
   url: '/guides/integrations',
+  enabled: integrationsEnabled,
   items: [
     {
       name: 'Overview',
