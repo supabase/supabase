@@ -62,58 +62,56 @@ export const QueryPerformance = ({
     <>
       <QueryPerformanceMetrics />
 
-      <div className="flex flex-col h-full overflow-y-hidden">
-        <QueryPerformanceFilterBar
-          queryPerformanceQuery={queryPerformanceQuery}
-          onResetReportClick={() => setShowResetgPgStatStatements(true)}
-        />
-        <LoadingLine loading={isLoading || isRefetching} />
+      <QueryPerformanceFilterBar
+        queryPerformanceQuery={queryPerformanceQuery}
+        onResetReportClick={() => setShowResetgPgStatStatements(true)}
+      />
+      <LoadingLine loading={isLoading || isRefetching} />
 
-        <QueryPerformanceGrid queryPerformanceQuery={queryPerformanceQuery} />
+      <QueryPerformanceGrid queryPerformanceQuery={queryPerformanceQuery} />
 
-        <div
-          className={cn('px-6 py-6 flex gap-x-4 border-t relative', {
-            hidden: showBottomSection === false,
-          })}
+      <div
+        className={cn('px-6 py-6 flex gap-x-4 border-t relative', {
+          hidden: showBottomSection === false,
+        })}
+      >
+        <Button
+          className="absolute top-1.5 right-3 px-1.5"
+          type="text"
+          size="tiny"
+          onClick={() => setShowBottomSection(false)}
         >
+          <X size="14" />
+        </Button>
+        <div className="w-[33%] flex flex-col gap-y-1 text-sm">
+          <p>Reset report</p>
+          <p className="text-xs text-foreground-light">
+            Consider resetting the analysis after optimizing any queries
+          </p>
           <Button
-            className="absolute top-1.5 right-3 px-1.5"
-            type="text"
-            size="tiny"
-            onClick={() => setShowBottomSection(false)}
+            type="default"
+            className="!mt-3 w-min"
+            onClick={() => setShowResetgPgStatStatements(true)}
           >
-            <X size="14" />
+            Reset report
           </Button>
-          <div className="w-[33%] flex flex-col gap-y-1 text-sm">
-            <p>Reset report</p>
-            <p className="text-xs text-foreground-light">
-              Consider resetting the analysis after optimizing any queries
-            </p>
-            <Button
-              type="default"
-              className="!mt-3 w-min"
-              onClick={() => setShowResetgPgStatStatements(true)}
-            >
-              Reset report
-            </Button>
-          </div>
+        </div>
 
-          <div className="w-[33%] flex flex-col gap-y-1 text-sm">
-            <p>How is this report generated?</p>
-            <Markdown
-              className="text-xs"
-              content="This report uses the pg_stat_statements table, and pg_stat_statements extension. [Learn more here](https://supabase.com/docs/guides/platform/performance#examining-query-performance)."
-            />
-          </div>
+        <div className="w-[33%] flex flex-col gap-y-1 text-sm">
+          <p>How is this report generated?</p>
+          <Markdown
+            className="text-xs"
+            content="This report uses the pg_stat_statements table, and pg_stat_statements extension. [Learn more here](https://supabase.com/docs/guides/platform/performance#examining-query-performance)."
+          />
+        </div>
 
-          <div className="w-[33%] flex flex-col gap-y-1 text-sm">
-            <p>Inspect your database for potential issues</p>
-            <Markdown
-              className="text-xs"
-              content="The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
+        <div className="w-[33%] flex flex-col gap-y-1 text-sm">
+          <p>Inspect your database for potential issues</p>
+          <Markdown
+            className="text-xs"
+            content="The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
             potential issues. [Learn more here](https://supabase.com/docs/guides/database/inspect)."
-            />
-          </div>
+          />
         </div>
       </div>
 
