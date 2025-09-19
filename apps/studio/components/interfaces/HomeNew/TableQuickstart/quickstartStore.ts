@@ -5,6 +5,7 @@ type QuickstartStore = {
   selectedTableData: {
     tableName: string
     fields: TableSuggestion['fields']
+    rationale?: string
   } | null
   isQuickstartFlow: boolean
   setQuickstartData: (table: TableSuggestion | null) => void
@@ -22,6 +23,7 @@ const quickstartStore = proxy<QuickstartStore>({
       quickstartStore.selectedTableData = {
         tableName: table.tableName,
         fields: table.fields,
+        rationale: table.rationale,
       }
       quickstartStore.isQuickstartFlow = true
     } else {

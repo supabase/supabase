@@ -90,11 +90,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       system: `You are a Supabase PostgreSQL schema designer. Generate exactly 2-3 core tables based on the user's description.
 
       Rules:
-      - Use "id bigint primary key generated always as identity" for PKs
+      - Use "id bigint" as primary key (or "id uuid" for UUID keys)
       - ALWAYS mark the "id" field with isPrimary: true
+      - Do NOT set defaultValue for primary key fields
       - Use 'text' not 'varchar', 'timestamptz' not 'date'
       - Use snake_case naming
-      - Add created_at, updated_at timestamps
+      - Add created_at, updated_at timestamps with defaultValue: 'now()'
       - Reference auth.users(id) for user relations
       - Keep descriptions brief (one sentence)
       - Focus on the most essential tables only

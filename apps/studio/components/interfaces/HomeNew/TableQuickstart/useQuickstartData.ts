@@ -45,7 +45,7 @@ export const useQuickstartData = ({
 
     if (quickstartSnap.selectedTableData) {
       try {
-        const { tableName, fields } = quickstartSnap.selectedTableData
+        const { tableName, fields, rationale } = quickstartSnap.selectedTableData
 
         if (!tableName || !Array.isArray(fields) || fields.length === 0) {
           throw new Error('Invalid quickstart data structure')
@@ -61,11 +61,14 @@ export const useQuickstartData = ({
               field.type.toLowerCase().includes('int') &&
               !field.default
 
+            // Don't set default value for primary keys
+            const defaultValue = isPrimaryKey ? null : (field.default ? String(field.default) : null)
+
             return {
               id: `column-${index}`,
               name: field.name,
               format: field.type,
-              defaultValue: field.default ? String(field.default) : null,
+              defaultValue: defaultValue,
               isNullable: field.nullable !== false,
               isUnique: field.unique ?? false,
               isIdentity: looksLikeIdentity,
@@ -85,7 +88,7 @@ export const useQuickstartData = ({
           id: 0,
           name: tableName,
           schema: QUICKSTART_DEFAULT_SCHEMA,
-          comment: '',
+          comment: rationale || '',
           columns: columns,
           isRLSEnabled: false,
           isRealtimeEnabled: false,
