@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 
 import { useParams } from 'common'
@@ -6,13 +7,14 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentIdQuery } from 'data/content/content-id-query'
+import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Dashboards, SqlSnippets } from 'types'
-import { Button, cn } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
+import { toast } from 'sonner'
 
 interface ReportBlockProps {
   item: Dashboards.Chart
@@ -46,7 +48,7 @@ export const ReportBlock = ({
 
   const isSnippet = item.attribute.startsWith('snippet_')
 
-  const { data, error, isLoading, isError } = useContentIdQuery(
+  const { data, error, isLoading } = useContentIdQuery(
     { projectRef, id: item.id },
     {
       enabled: isSnippet && !!item.id,
@@ -57,6 +59,11 @@ export const ReportBlock = ({
         if (failureCount >= 2) return false
         return true
       },
+      onSuccess: (contentData) => {
+        if (!isSnippet) return
+        const fetchedSql = (contentData?.content as SqlSnippets.Content | undefined)?.sql
+        if (fetchedSql) runQuery('select', fetchedSql)
+      },
     }
   )
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.sql : undefined
@@ -64,82 +71,95 @@ export const ReportBlock = ({
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = error?.message.includes('Content not found')
 
+  const { database: primaryDatabase } = usePrimaryDatabase({ projectRef })
+  const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
+  const postgresConnectionString = primaryDatabase?.connectionString
+
+  const [rows, setRows] = useState<any[] | undefined>(undefined)
+  const [isWriteQuery, setIsWriteQuery] = useState(false)
+  const lastQueryType = useRef<'select' | 'mutation'>('select')
+
+  const {
+    mutate: executeSql,
+    error: executeSqlError,
+    isLoading: executeSqlLoading,
+  } = useExecuteSqlMutation({
+    onSuccess: (data) => {
+      setRows(data.result)
+      setIsWriteQuery(lastQueryType.current === 'mutation')
+    },
+    onError: (mutationError) => {
+      const lowerMessage = mutationError.message.toLowerCase()
+      const isReadOnlyError =
+        lowerMessage.includes('read-only transaction') ||
+        lowerMessage.includes('permission denied') ||
+        lowerMessage.includes('must be owner')
+
+      if (lastQueryType.current === 'select' && isReadOnlyError) {
+        setIsWriteQuery(true)
+      }
+    },
+  })
+
+  const runQuery = useCallback(
+    (queryType: 'select' | 'mutation' = 'select', sqlToRun?: string) => {
+      if (!projectRef || !sqlToRun) return false
+
+      const connectionString =
+        queryType === 'mutation'
+          ? postgresConnectionString
+          : readOnlyConnectionString ?? postgresConnectionString
+
+      if (!connectionString) {
+        toast.error('Unable to establish a database connection for this project.')
+        return false
+      }
+
+      lastQueryType.current = queryType
+      if (queryType === 'mutation') {
+        setIsWriteQuery(true)
+      }
+      executeSql({ projectRef, connectionString, sql: sqlToRun })
+      return true
+    },
+    [projectRef, readOnlyConnectionString, postgresConnectionString, executeSql]
+  )
+
+  useEffect(() => {
+    if (!executeSqlLoading && isRefreshing) {
+      runQuery('select', sql)
+    }
+  }, [isRefreshing, executeSqlLoading, sql, runQuery])
+
   return (
     <>
       {isSnippet ? (
         <QueryBlock
-          runQuery
-          isChart
-          draggable
           id={item.id}
-          isLoading={isLoading}
-          isRefreshing={isRefreshing}
           label={item.label}
           chartConfig={chartConfig}
           sql={sql}
-          maxHeight={232}
-          queryHeight={232}
+          results={rows}
+          initialHideSql={true}
+          errorText={snippetMissing ? 'SQL snippet not found' : executeSqlError?.message}
+          isExecuting={executeSqlLoading}
+          isWriteQuery={isWriteQuery}
           actions={
-            <ButtonTooltip
-              type="text"
-              icon={<X />}
-              className="w-7 h-7"
-              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
-              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
-            />
-          }
-          onUpdateChartConfig={onUpdateChart}
-          noResultPlaceholder={
-            <div
-              className={cn(
-                'flex flex-col gap-y-1 h-full w-full',
-                isLoading ? 'justify-start items-start p-2 gap-y-2' : 'justify-center px-4 gap-y-1'
-              )}
-            >
-              {isLoading ? (
-                <>
-                  <ShimmeringLoader className="w-full" />
-                  <ShimmeringLoader className="w-full w-3/4" />
-                  <ShimmeringLoader className="w-full w-1/2" />
-                </>
-              ) : isError ? (
-                <>
-                  <p className="text-xs text-foreground-light text-center">
-                    {snippetMissing ? 'SQL snippet cannot be found' : 'Error fetching SQL snippet'}
-                  </p>
-                  <p className="text-xs text-foreground-lighter text-center">
-                    {snippetMissing ? 'Please remove this block from your report' : error.message}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs text-foreground-light text-center">
-                    No results returned from query
-                  </p>
-                  <p className="text-xs text-foreground-lighter text-center">
-                    Results from the SQL query can be viewed as a table or chart here
-                  </p>
-                </>
-              )}
-            </div>
-          }
-          readOnlyErrorPlaceholder={
-            <div className="flex flex-col h-full justify-center items-center text-center">
-              <p className="text-xs text-foreground-light">
-                SQL query is not read-only and cannot be rendered
-              </p>
-              <p className="text-xs text-foreground-lighter text-center">
-                Queries that involve any mutation will not be run in reports
-              </p>
-              <Button
-                type="default"
-                className="mt-2"
+            !isLoading && (
+              <ButtonTooltip
+                type="text"
+                icon={<X />}
+                className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
-              >
-                Remove chart
-              </Button>
-            </div>
+                tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+              />
+            )
           }
+          onExecute={(queryType) => {
+            runQuery(queryType, sql)
+          }}
+          onUpdateChartConfig={onUpdateChart}
+          disabled={isLoading || snippetMissing || !sql}
         />
       ) : isDeprecatedChart ? (
         <DeprecatedChartBlock
