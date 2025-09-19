@@ -155,7 +155,7 @@ export function GettingStarted({ steps }: GettingStartedProps) {
             )}
             <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background-surface-100 to-transparent" />
           </div>
-          <div className="p-6">
+          <div className="p-10">
             <div className="flex flex-row items-center gap-4 mb-1">
               <h3>{activeStep.title}</h3>
               <Badge
