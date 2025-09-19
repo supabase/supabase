@@ -144,7 +144,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           const fillWidth = Math.min(percentage, 100)
 
           return (
-            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               <div
                 className={`absolute inset-0 bg-foreground transition-all duration-200 z-0`}
                 style={{
@@ -173,7 +173,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'total_time') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p
                   className={cn((value / 1000).toFixed(2) === '0.00' && 'text-foreground-lighter')}
@@ -193,7 +193,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'calls') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p className={cn(value === 0 && 'text-foreground-lighter')}>
                   {value.toLocaleString()}
@@ -207,7 +207,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'max_time' || col.id === 'mean_time' || col.id === 'min_time') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p className={cn(value.toFixed(0) === '0' && 'text-foreground-lighter')}>
                   {Math.round(value).toLocaleString()}ms
@@ -221,7 +221,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'rows_read') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
                 <p className={cn(value === 0 && 'text-foreground-lighter')}>
                   {value.toLocaleString()}
@@ -240,7 +240,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'cache_hit_rate') {
           return (
-            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums">
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
               {typeof value === 'string' ? (
                 <p
                   className={cn(
