@@ -45,7 +45,6 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
             )}
           </div>
 
-          {/* Content Section with Smooth Height Transitions */}
           <div className={cn('transition-all duration-500 ease-in-out')}>
             {/* Step 1: Input Form */}
             <div
@@ -110,8 +109,8 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
               )}
             >
               <div className="space-y-6">
-                {/* Back Button and Context */}
                 <div className="space-y-3">
+                  {/* Back Button */}
                   {!isGenerating && (
                     <button
                       type="button"
@@ -128,6 +127,7 @@ export const TableQuickstart = ({ variant = 'ai' }: TableQuickstartProps = {}) =
                     </button>
                   )}
 
+                  {/* User Input */}
                   {userInput && (
                     <div className="p-3 bg-surface-100 rounded-lg border border-default">
                       <p className="text-xs text-foreground-lighter mb-1">

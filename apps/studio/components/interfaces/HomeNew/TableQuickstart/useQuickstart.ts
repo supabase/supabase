@@ -82,9 +82,9 @@ export const useQuickstart = () => {
     async (prompt: string) => {
       setIsGenerating(true)
       setError(null)
-      setUserInput(prompt) // Set the user input immediately
-      setCurrentStep('preview') // Show preview immediately to display skeleton
-      setCandidates([]) // Clear any previous candidates
+      setUserInput(prompt)
+      setCurrentStep('preview')
+      setCandidates([])
 
       try {
         const headers = await constructHeaders()
@@ -112,7 +112,6 @@ export const useQuickstart = () => {
         const errorMessage = e instanceof Error ? e.message : 'Failed to generate schemas'
         console.error('AI generation failed:', e)
 
-        // Show error toast and return to input form
         toast.error('Unable to generate tables. Please try again with a different description.', {
           description: errorMessage,
           duration: 5000,
@@ -120,7 +119,7 @@ export const useQuickstart = () => {
 
         setError(errorMessage)
         setIsGenerating(false)
-        setCurrentStep('input') // Return to input form
+        setCurrentStep('input')
       }
     },
     [onTablesReady]
