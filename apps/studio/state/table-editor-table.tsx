@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useRef } from 'react'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { CalculatedColumn } from 'react-data-grid'
 import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
@@ -60,7 +60,7 @@ export const createTableEditorTableState = ({
   const state = proxy({
     /* Table */
     table,
-    originalTable,
+    originalTable: originalTable || { name: undefined, schema: undefined },
 
     /**
      * Used for tracking changes to the table
@@ -201,27 +201,36 @@ export const TableEditorTableStateContextProvider = ({
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
-  const state = useRef(
-    createTableEditorTableState({
-      ...props,
-      projectRef,
-      table,
-      onAddColumn: tableEditorSnap.onAddColumn,
-      onExpandJSONEditor: (column: string, row: SupaRow) => {
-        tableEditorSnap.onExpandJSONEditor({
-          column,
-          row,
-          value: JSON.stringify(row[column]) || '',
-        })
-      },
-      onExpandTextEditor: (column: string, row: SupaRow) => {
-        tableEditorSnap.onExpandTextEditor(column, row)
-      },
-    })
-  ).current
+  const [state, setState] = useState(createTableEditorTableState(DEFAULT_STATE_CONFIG))
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    const isReady = !!table && !!projectRef
+
+    if (isReady) {
+      setState(
+        createTableEditorTableState({
+          ...props,
+          projectRef,
+          table,
+          onAddColumn: tableEditorSnap.onAddColumn,
+          onExpandJSONEditor: (column: string, row: SupaRow) => {
+            tableEditorSnap.onExpandJSONEditor({
+              column,
+              row,
+              value: JSON.stringify(row[column]) || '',
+            })
+          },
+          onExpandTextEditor: (column: string, row: SupaRow) => {
+            tableEditorSnap.onExpandTextEditor(column, row)
+          },
+        })
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, projectRef])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !!state.table) {
       return subscribe(state, () => {
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
@@ -232,7 +241,7 @@ export const TableEditorTableStateContextProvider = ({
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [state])
 
   useEffect(() => {
     // We can use a === check here because react-query is good
