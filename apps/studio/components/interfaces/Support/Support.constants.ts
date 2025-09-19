@@ -3,7 +3,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 export const CATEGORY_OPTIONS = [
   {
     value: SupportCategories.PROBLEM,
-    label: 'Issues with APIs / client libraries',
+    label: 'APIs and client libraries',
     description: "Issues with your project's API and client libraries",
     query: undefined,
   },

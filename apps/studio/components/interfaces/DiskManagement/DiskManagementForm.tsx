@@ -25,7 +25,7 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
@@ -80,7 +80,7 @@ export function DiskManagementForm() {
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'projects', {
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
       resource: {
         project_id: project?.id,
       },
