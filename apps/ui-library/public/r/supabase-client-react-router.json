@@ -12,12 +12,12 @@
   "files": [
     {
       "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\r\nimport { createBrowserClient } from '@supabase/ssr'\r\n\r\nexport function createClient() {\r\n  return createBrowserClient(\r\n    import.meta.env.VITE_SUPABASE_URL!,\r\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\r\n  )\r\n}\r\n",
       "type": "registry:lib"
     },
     {
       "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-      "content": "import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'\n\nexport function createClient(request: Request) {\n  const headers = new Headers()\n\n  const supabase = createServerClient(\n    process.env.VITE_SUPABASE_URL!,\n    process.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return parseCookieHeader(request.headers.get('Cookie') ?? '') as {\n            name: string\n            value: string\n          }[]\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value, options }) =>\n            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))\n          )\n        },\n      },\n    }\n  )\n\n  return { supabase, headers }\n}\n",
+      "content": "import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'\r\n\r\nexport function createClient(request: Request) {\r\n  const headers = new Headers()\r\n\r\n  const supabase = createServerClient(\r\n    process.env.VITE_SUPABASE_URL!,\r\n    process.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\r\n    {\r\n      cookies: {\r\n        getAll() {\r\n          return parseCookieHeader(request.headers.get('Cookie') ?? '') as {\r\n            name: string\r\n            value: string\r\n          }[]\r\n        },\r\n        setAll(cookiesToSet) {\r\n          cookiesToSet.forEach(({ name, value, options }) =>\r\n            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))\r\n          )\r\n        },\r\n      },\r\n    }\r\n  )\r\n\r\n  return { supabase, headers }\r\n}\r\n",
       "type": "registry:lib"
     }
   ],
