@@ -326,8 +326,7 @@ export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
   const heat = useContext(HeatmapContext)
   const headerLines = computeHeaderLines(data)
   const hints = buildHints(data)
-  // const isNeverExecuted = !!data.neverExecuted
-  const isNeverExecuted = Math.random() < 0.5
+  const isNeverExecuted = !!data.neverExecuted
 
   return (
     <div
