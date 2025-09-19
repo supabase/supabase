@@ -233,12 +233,28 @@ export function CustomReportSection() {
 
   const handleRemoveChart = ({ metric }: { metric: { key: string } }) => {
     if (!editableReport) return
+    const removedChart = editableReport.layout.find(
+      (x) => x.attribute === (metric.key as unknown as Dashboards.Chart['attribute'])
+    )
     const nextLayout = editableReport.layout.filter(
       (x) => x.attribute !== (metric.key as unknown as Dashboards.Chart['attribute'])
     )
     const updated = { ...editableReport, layout: nextLayout }
     setEditableReport(updated)
     persistReport(updated)
+
+    if (project?.ref && organization?.slug && removedChart) {
+      sendEvent({
+        action: 'home_custom_report_block_removed',
+        properties: {
+          block_id: String(removedChart.id),
+        },
+        groups: {
+          project: project.ref,
+          organization: organization.slug,
+        },
+      })
+    }
   }
 
   const handleUpdateChart = (

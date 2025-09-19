@@ -1637,6 +1637,24 @@ export interface HomeCustomReportBlockAddedEvent {
 }
 
 /**
+ * User removed a block from the custom report in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeCustomReportBlockRemovedEvent {
+  action: 'home_custom_report_block_removed'
+  properties: {
+    /**
+     * ID of the block removed
+     */
+    block_id: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User dismissed the Getting Started section in HomeV2.
  *
  * @group Events
@@ -1832,6 +1850,7 @@ export type TelemetryEvent =
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
   | HomeCustomReportBlockAddedEvent
+  | HomeCustomReportBlockRemovedEvent
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
