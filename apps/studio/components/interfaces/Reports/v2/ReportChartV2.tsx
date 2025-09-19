@@ -58,7 +58,7 @@ export const ReportChartV2 = ({
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
     {
-      enabled: Boolean(projectRef && canFetch && isAvailable),
+      enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
       staleTime: 0,
     }
@@ -67,9 +67,15 @@ export const ReportChartV2 = ({
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
 
+  /**
+   * Depending on the source the timestamp key could be 'timestamp' or 'period_start'
+   */
+  const firstItem = chartData[0]
+  const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
+
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
     chartData,
-    'timestamp',
+    timestampKey,
     (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
     0,
     startDate,
@@ -78,9 +84,6 @@ export const ReportChartV2 = ({
     interval
   )
 
-  const finalChartData =
-    filledChartData && filledChartData.length > 0 && !isFillError ? filledChartData : chartData
-
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
 
   if (!isAvailable) {
@@ -88,7 +91,8 @@ export const ReportChartV2 = ({
   }
 
   const isErrorState = error && !isLoadingChart
-  const showEmptyState = (!finalChartData || finalChartData.length === 0) && !isLoadingChart
+
+  if (report.hide) return null
 
   return (
     <Card id={report.id} className={cn('relative w-full overflow-hidden scroll-mt-16', className)}>
@@ -100,10 +104,6 @@ export const ReportChartV2 = ({
       >
         {isLoadingChart ? (
           <Loader2 className="size-5 animate-spin text-foreground-light" />
-        ) : showEmptyState ? (
-          <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
-            No data available for the selected time range and filters
-          </p>
         ) : isErrorState ? (
           <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
             Error loading chart data
@@ -112,10 +112,11 @@ export const ReportChartV2 = ({
           <div className="w-full">
             <ComposedChart
               attributes={dynamicAttributes}
-              data={finalChartData}
+              data={filledChartData}
               format={report.format ?? undefined}
               xAxisKey={report.xAxisKey ?? 'timestamp'}
               yAxisKey={report.yAxisKey ?? dynamicAttributes[0]?.attribute}
+              hideHighlightedValue={report.hideHighlightedValue}
               highlightedValue={0}
               title={report.label}
               customDateFormat={undefined}

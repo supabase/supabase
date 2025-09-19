@@ -39,6 +39,7 @@ export const LOCAL_STORAGE_KEYS = {
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
   CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
+  LINTER_SHOW_FOOTER: 'supabase-linter-show-footer',
   // Key to track account deletion requests
   ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
   // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
@@ -110,6 +111,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
+  LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
 ]
 
 export function clearLocalStorage() {

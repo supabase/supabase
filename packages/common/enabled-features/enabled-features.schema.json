@@ -130,13 +130,17 @@
       "description": "Enable feedback submission for docs site"
     },
 
-    "integrations:vercel": {
+    "integrations:partners": {
       "type": "boolean",
-      "description": "Enable the vercel integration section in the organization and project settings pages"
+      "description": "Show all third-party-managed integrations"
     },
     "integrations:show_stripe_wrapper": {
       "type": "boolean",
       "description": "Show the Stripe wrapper under project integrations"
+    },
+    "integrations:vercel": {
+      "type": "boolean",
+      "description": "Enable the vercel integration section in the organization and project settings pages"
     },
 
     "logs:templates": {
@@ -209,6 +213,10 @@
       "type": "boolean",
       "description": "Show the dedicated IPv4 address addon"
     },
+    "project_addons:show_compute_price": {
+      "type": "boolean",
+      "description": "Show the compute price in the compute and disk page"
+    },
 
     "project_settings:custom_domains": {
       "type": "boolean",
@@ -251,6 +259,11 @@
     "sdk:swift": {
       "type": "boolean",
       "description": "Enable the Swift SDK"
+    },
+
+    "search:fullIndex": {
+      "type": "boolean",
+      "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
     }
   },
   "required": [
@@ -282,8 +295,9 @@
     "docs:compliance",
     "docs:self-hosting",
     "feedback:docs",
-    "integrations:vercel",
+    "integrations:partners",
     "integrations:show_stripe_wrapper",
+    "integrations:vercel",
     "profile:show_email",
     "profile:show_information",
     "profile:show_analytics_and_marketing",
@@ -295,6 +309,7 @@
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
     "project_addons:dedicated_ipv4_address",
+    "project_addons:show_compute_price",
     "project_settings:custom_domains",
     "project_settings:show_disable_legacy_api_keys",
     "project_settings:legacy_jwt_keys",
@@ -309,7 +324,8 @@
     "sdk:dart",
     "sdk:kotlin",
     "sdk:python",
-    "sdk:swift"
+    "sdk:swift",
+    "search:fullIndex"
   ],
   "additionalProperties": false
 }
