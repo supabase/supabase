@@ -37,28 +37,40 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
     }
   }, [selectedRow])
 
+  const [isExpanded, setIsExpanded] = useState(false)
+
   return (
     <QueryPanelContainer>
-      <QueryPanelSection>
-        <p className="text-sm">Query pattern</p>
-        <SqlMonacoBlock value={query} height={310} lineNumbers="off" wrapperClassName="pl-3" />
-        {isLinterWarning && (
-          <Alert_Shadcn_
-            variant="default"
-            className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
-          >
-            <Lightbulb />
-            <AlertTitle_Shadcn_>Suggested optimization: Add an index</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Adding an index will help this query execute faster
-            </AlertDescription_Shadcn_>
-            <AlertDescription_Shadcn_>
-              <Button className="mt-3" onClick={() => onClickViewSuggestion()}>
-                View suggestion
-              </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+      <QueryPanelSection
+        className={cn(
+          'overflow-hidden pb-0 relative transition-all duration-300',
+          isExpanded ? 'h-[420px]' : 'h-[190px]'
         )}
+      >
+        <div className="h-full pb-6">
+          <h4 className="mb-2">Query pattern</h4>
+          <SqlMonacoBlock value={query} height={368} lineNumbers="off" wrapperClassName="pl-3" />
+          {isLinterWarning && (
+            <Alert_Shadcn_
+              variant="default"
+              className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
+            >
+              <Lightbulb />
+              <AlertTitle_Shadcn_>Suggested optimization: Add an index</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Adding an index will help this query execute faster
+              </AlertDescription_Shadcn_>
+              <AlertDescription_Shadcn_>
+                <Button className="mt-3" onClick={() => onClickViewSuggestion()}>
+                  View suggestion
+                </Button>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+        </div>
+        <button onClick={() => setIsExpanded(!isExpanded)} className="absolute bottom-0 right-0">
+          Expand
+        </button>
       </QueryPanelSection>
       <div className="border-t" />
       <QueryPanelSection className="gap-y-1">
