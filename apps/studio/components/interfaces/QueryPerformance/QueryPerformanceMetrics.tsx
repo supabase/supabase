@@ -11,7 +11,7 @@ export const QueryPerformanceMetrics = () => {
   const stats = useMemo(() => {
     return [
       {
-        title: queryMetrics?.[0]?.slow_queries === '1' ? 'Slow Query' : 'Slow Queries',
+        title: queryMetrics?.[0]?.slow_queries === 1 ? 'Slow Query' : 'Slow Queries',
         value: queryMetrics?.[0]?.slow_queries || '0',
       },
       {
