@@ -47,12 +47,35 @@ type MetricRenderResult = {
 
 type MetricRenderer = (data: PlanNodeData, stats: MetricStats) => MetricRenderResult
 
-const METRIC_OPTIONS: { key: SidebarMetricKey; label: string }[] = [
-  { key: 'time', label: 'Time' },
-  { key: 'rows', label: 'Rows' },
-  { key: 'cost', label: 'Cost' },
-  { key: 'buffers', label: 'Buffers' },
-  { key: 'io', label: 'IO' },
+const METRIC_OPTIONS: { key: SidebarMetricKey; label: string; description: string }[] = [
+  {
+    key: 'time',
+    label: 'Time',
+    description:
+      'Shows how long each plan step took. The first bar segment is time spent in this step; the second segment adds time from its child steps.',
+  },
+  {
+    key: 'rows',
+    label: 'Rows',
+    description: 'Shows how many rows the step actually produced versus what the planner expected.',
+  },
+  {
+    key: 'cost',
+    label: 'Cost',
+    description:
+      "Shows the planner's cost estimate for each step. Useful for spotting operations the planner thinks are expensive.",
+  },
+  {
+    key: 'buffers',
+    label: 'Buffers',
+    description:
+      'Shows how many data blocks the step touched, split across shared cache, temp spill, and local buffers.',
+  },
+  {
+    key: 'io',
+    label: 'IO',
+    description: 'Shows how much time the step spent waiting on storage reads and writes.',
+  },
 ]
 
 const parsePath = (id: string): number[] => {
@@ -467,15 +490,21 @@ export const MetricsSidebar = ({
       </div>
       <div className="flex gap-2 px-3 py-2 border-b justify-between">
         {METRIC_OPTIONS.map((option) => (
-          <Button
-            key={option.key}
-            type={activeMetric === option.key ? 'default' : 'dashed'}
-            size="tiny"
-            className="px-2 py-1"
-            onClick={() => setActiveMetric(option.key)}
-          >
-            {option.label}
-          </Button>
+          <Tooltip key={option.key}>
+            <TooltipTrigger asChild>
+              <Button
+                type={activeMetric === option.key ? 'default' : 'dashed'}
+                size="tiny"
+                className="px-2 py-1"
+                onClick={() => setActiveMetric(option.key)}
+              >
+                {option.label}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-[220px] text-[11px] leading-relaxed">
+              {option.description}
+            </TooltipContent>
+          </Tooltip>
         ))}
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-2">
