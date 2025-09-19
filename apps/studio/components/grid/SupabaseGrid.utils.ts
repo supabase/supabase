@@ -127,6 +127,8 @@ export function loadTableEditorStateFromLocalStorage(
   tableName: string,
   schema?: string | null
 ): SavedState | undefined {
+  if (typeof window === 'undefined') return undefined
+
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   const jsonStr = localStorage.getItem(storageKey)
   if (!jsonStr) return

@@ -14,6 +14,17 @@ import { getGridColumns } from 'components/grid/utils/gridColumns'
 import { Entity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from './table-editor'
 
+const DEFAULT_STATE = {
+  editable: undefined,
+  _originalTableRef: undefined,
+  table: { name: '', schema: '' },
+  gridColumns: [],
+  allRowsSelected: false,
+  selectedCellPosition: undefined,
+  updateTable: () => {},
+  setEditable: () => {},
+}
+
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
@@ -30,17 +41,9 @@ export const createTableEditorTableState = ({
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void
 }) => {
-  if (!originalTable)
-    return proxy({
-      editable,
-      _originalTableRef: undefined,
-      table: { name: '', schema: '' },
-      gridColumns: [],
-      updateTable: () => {},
-      setEditable: () => {},
-    })
-
-  const table = parseSupaTable(originalTable)
+  const table = !!originalTable
+    ? parseSupaTable(originalTable)
+    : { id: -1, name: '', schema: undefined, columns: [], comment: undefined, estimateRowCount: 0 }
 
   const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
   const gridColumns = getInitialGridColumns(
@@ -63,7 +66,7 @@ export const createTableEditorTableState = ({
      * Used for tracking changes to the table
      * Do not use outside of table-editor-table.tsx
      */
-    _originalTableRef: ref(originalTable),
+    _originalTableRef: ref(originalTable ?? {}),
 
     updateTable: (table: Entity) => {
       const supaTable = parseSupaTable(table)
