@@ -103,7 +103,7 @@ export function GettingStarted({ steps }: GettingStartedProps) {
           </ol>
         </aside>
 
-        <CardContent className="flex flex-1 flex-col gap-0 p-0 min-h-[300px] overflow-y-auto">
+        <CardContent className="flex flex-1 flex-col gap-0 p-0 overflow-y-auto border-b-0">
           <div className="flex items-center justify-between gap-2 border-b px-2 py-2 lg:hidden">
             <span className="text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md">
               {activeStepIndex + 1}
@@ -129,18 +129,18 @@ export function GettingStarted({ steps }: GettingStartedProps) {
               </Button>
             </div>
           </div>
-          <div className="relative w-full flex-1 h-[200px] shrink-0">
+          <div className="relative w-full flex-1 min-h-[100px] shrink-0 overflow-hidden">
             {activeStep.image ? (
               <Image
                 className="w-full"
                 src={activeStep.image}
                 fill
                 objectFit="cover"
-                objectPosition="bottom"
+                objectPosition="top"
                 alt={activeStep.title}
               />
             ) : (
-              <div className="absolute inset-0">
+              <div className="absolute top-0 left-0 right-0 overflow-hidden">
                 <img
                   src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
                   alt="Supabase Grafana"
