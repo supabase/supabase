@@ -122,7 +122,7 @@ But this never gave an error, it only did the equivalent of a `UPDATE .. LIMIT` 
 
 To do this now, you should use the new `Max Affected` instead.
 
-### JWT kid validation
+### JWT `kid` validation
 
 PostgREST now validates the JWT `kid` claim. If your JWT contains a `kid`, it will try to match the `kid` of one of the keys in the configured JSON Web Key Set. Check the [official docs](https://docs.postgrest.org/en/v13/references/auth.html#jwk-kid-validation) for more details.
 
