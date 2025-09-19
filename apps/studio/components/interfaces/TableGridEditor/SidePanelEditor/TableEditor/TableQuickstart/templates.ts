@@ -173,5 +173,19 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
       rationale: 'Page view tracking',
       source: 'template' as const,
     },
+    {
+      tableName: 'metrics',
+      fields: [
+        { name: 'id', type: 'uuid', nullable: false, isPrimary: true, default: 'gen_random_uuid()' },
+        { name: 'metric_name', type: 'varchar', nullable: false },
+        { name: 'value', type: 'numeric', nullable: false },
+        { name: 'tags', type: 'jsonb', nullable: true },
+        { name: 'timestamp', type: 'timestamptz', nullable: false, default: 'now()' },
+        { name: 'aggregation_period', type: 'varchar', nullable: true },
+        { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
+      ],
+      rationale: 'Custom metrics and KPI tracking',
+      source: 'template' as const,
+    },
   ],
 }
