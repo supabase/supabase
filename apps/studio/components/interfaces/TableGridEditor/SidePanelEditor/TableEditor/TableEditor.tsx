@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -16,11 +16,13 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
@@ -43,6 +45,9 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { TableTemplateSelector } from './TableQuickstart'
+import { QuickstartVariant } from './TableQuickstart/types'
+import { STORAGE_KEYS } from './TableQuickstart/constants'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -87,6 +92,30 @@ export const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
+  const tableQuickstartVariant = usePHFlag('tableQuickstart') as
+    | QuickstartVariant
+    | false
+    | undefined
+
+  const { data: tables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const publicTables = (tables ?? []).filter((table) => table.schema === 'public')
+  const hasTables = publicTables.length > 0
+  const [quickstartDismissed, setQuickstartDismissed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED) === 'true'
+    }
+    return false
+  })
+
+  const handleQuickstartDismiss = useCallback(() => {
+    setQuickstartDismissed(true)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED, 'true')
+    }
+  }, [])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -229,9 +258,11 @@ export const TableEditor = ({
       setImportContent(undefined)
       setIsDuplicateRows(false)
       if (isNewRecord) {
-        const tableFields = generateTableField()
-        setTableFields(tableFields)
-        setFkRelations([])
+        // Only set default fields if tableFields doesn't exist yet
+        if (!tableFields) {
+          setTableFields(generateTableField())
+          setFkRelations([])
+        }
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
           table,
@@ -276,6 +307,25 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
+        {isNewRecord &&
+          !isDuplicating &&
+          tableQuickstartVariant &&
+          tableQuickstartVariant !== QuickstartVariant.CONTROL &&
+          !hasTables &&
+          !quickstartDismissed && (
+            <TableTemplateSelector
+              variant={tableQuickstartVariant}
+              onSelectTemplate={(template) => {
+                const updates: Partial<TableField> = {}
+                if (template.name) updates.name = template.name
+                if (template.comment) updates.comment = template.comment
+                if (template.columns) updates.columns = template.columns
+                onUpdateField(updates)
+              }}
+              onDismiss={handleQuickstartDismiss}
+              disabled={false}
+            />
+          )}
         <Input
           data-testid="table-name-input"
           label="Name"
