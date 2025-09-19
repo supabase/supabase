@@ -25,7 +25,6 @@ import {
 } from './contexts'
 import { PlanNode } from './plan-node'
 import { useHeatmapMax } from './hooks/use-heatmap-max'
-// import { DetailsPanel } from './details-panel'
 import { usePlanGraph } from './hooks/use-plan-graph'
 import { useDagreLayout } from './hooks/use-dagre-layout'
 import { MetricsSidebar } from './metrics-sidebar'
@@ -204,13 +203,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               )}
             </div>
 
-            {/* {selectedNode && (
-              <DetailsPanel
-                selectedNode={selectedNode}
-                setSelectedNode={setSelectedNode}
-                isFullscreen={isExpanded}
-              />
-            )} */}
             <MetricsVisibilityContext.Provider value={metricsVisibility}>
               <HeatmapContext.Provider
                 value={{
