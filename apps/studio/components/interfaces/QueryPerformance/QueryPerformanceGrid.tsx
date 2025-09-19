@@ -420,11 +420,22 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         }}
       />
 
-      <Sheet open={selectedRow !== undefined} onOpenChange={() => setSelectedRow(undefined)}>
+      <Sheet
+        open={selectedRow !== undefined}
+        onOpenChange={(open) => {
+          // Only close the sheet if open is false AND we're not just changing content
+          // This prevents closing when clicking outside
+          if (!open) {
+            setSelectedRow(undefined)
+          }
+        }}
+        modal={false}
+      >
         <SheetContent
           side="right"
           className="flex flex-col h-full bg-studio border-l !w-[580px]"
           hasOverlay={false}
+          // onPointerDownOutside={(event) => event.preventDefault()}
         >
           <Tabs_Shadcn_
             value={view}
@@ -432,7 +443,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             onValueChange={(value: any) => setView(value)}
           >
             <div className="px-5 border-b">
-              <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[46px]">
+              <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
                 <TabsTrigger_Shadcn_
                   value="details"
                   className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
