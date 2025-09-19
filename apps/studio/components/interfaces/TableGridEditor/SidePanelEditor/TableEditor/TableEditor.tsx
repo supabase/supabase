@@ -286,9 +286,12 @@ export const TableEditor = ({
           <TableTemplateSelector
             variant={tableQuickstartVariant}
             onSelectTemplate={(template) => {
-              if (template.name) onUpdateField({ name: template.name })
-              if (template.comment) onUpdateField({ comment: template.comment })
-              if (template.columns) onUpdateField({ columns: template.columns })
+              // Update all fields at once to avoid closure issues
+              const updates: Partial<TableField> = {}
+              if (template.name) updates.name = template.name
+              if (template.comment) updates.comment = template.comment
+              if (template.columns) updates.columns = template.columns
+              onUpdateField(updates)
             }}
             disabled={false}
           />
