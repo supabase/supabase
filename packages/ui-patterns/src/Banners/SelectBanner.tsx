@@ -40,7 +40,7 @@ export function SelectBanner() {
             href={selectSiteUrl}
             className="transition-opacity hover:opacity-80"
           >
-            <img src="/images/select/supabase-select.svg" alt="Supabase Select" className="w-36" />
+            <img src="/images/supabase-select/logo.svg" alt="Supabase Select" className="w-36" />
           </Link>
         </div>
         <div className={`${textBlockStyles} hidden md:flex`}>
