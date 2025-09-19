@@ -22,7 +22,7 @@ export const QUERY_PERFORMANCE_COLUMNS = [
   { id: 'min_time', name: 'Min time', description: undefined, minWidth: 100 },
   { id: 'rows_read', name: 'Rows processed', description: undefined, minWidth: 130 },
   { id: 'cache_hit_rate', name: 'Cache hit rate', description: undefined, minWidth: 130 },
-  { id: 'rolname', name: 'Role', description: undefined, minWidth: 160 },
+  { id: 'rolname', name: 'Role', description: undefined, minWidth: 200 },
 ] as const
 
 export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
