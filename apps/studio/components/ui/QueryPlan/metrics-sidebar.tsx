@@ -184,7 +184,7 @@ const computeBufferBreakdown = (data: PlanNodeData): BufferBreakdown => {
 const MetricBar = ({
   percent,
   secondaryPercent = 0,
-  color = 'bg-brand',
+  color = 'bg-foreground',
   secondaryColor = 'bg-foreground-muted',
 }: {
   percent: number
@@ -222,12 +222,9 @@ const BufferBar = ({
 }) => {
   return (
     <div className="flex h-2 w-full overflow-hidden rounded-sm bg-border">
-      <div className="h-full bg-brand/70" style={{ width: `${Math.min(sharedPercent, 100)}%` }} />
-      <div className="h-full bg-warning/70" style={{ width: `${Math.min(tempPercent, 100)}%` }} />
-      <div
-        className="h-full bg-foreground-muted"
-        style={{ width: `${Math.min(localPercent, 100)}%` }}
-      />
+      <div className="h-full bg-foreground" style={{ width: `${Math.min(sharedPercent, 100)}%` }} />
+      <div className="h-full bg-warning" style={{ width: `${Math.min(tempPercent, 100)}%` }} />
+      <div className="h-full bg-info" style={{ width: `${Math.min(localPercent, 100)}%` }} />
     </div>
   )
 }
@@ -267,8 +264,8 @@ const renderTimeMetric: MetricRenderer = (data, stats) => {
       <MetricBar
         percent={totalPercent}
         secondaryPercent={secondaryPercent}
-        color="bg-brand"
-        secondaryColor="bg-brand/30"
+        color="bg-foreground"
+        secondaryColor="bg-foreground-muted"
       />
     ),
     tooltip: (
@@ -311,7 +308,7 @@ const renderRowsMetric: MetricRenderer = (data, stats) => {
     data.planRows !== undefined ? formatNumber(data.planRows) ?? `${data.planRows}` : undefined
 
   return {
-    visual: <MetricBar percent={percent} color="bg-brand" />,
+    visual: <MetricBar percent={percent} />,
     tooltip: (
       <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
         <li>
@@ -334,7 +331,7 @@ const renderCostMetric: MetricRenderer = (data, stats) => {
   const percent = stats.maxExclusiveCost > 0 ? (exclusiveCost / stats.maxExclusiveCost) * 100 : 0
 
   return {
-    visual: <MetricBar percent={percent} color="bg-brand" />,
+    visual: <MetricBar percent={percent} />,
     tooltip: (
       <ul className="-space-y-0.5 text-foreground-light">
         <li>
@@ -510,8 +507,8 @@ export const MetricsSidebar = ({
               <li
                 key={row.id}
                 className={cn(
-                  'rounded border border-transparent transition-colors flex px-1',
-                  isActive ? 'border-brand bg-brand/10' : 'hover:border-border'
+                  'rounded border border-transparent transition-colors flex px-1 hover:border-border hover:bg-surface-100',
+                  isActive && 'border-stronger bg-surface-100'
                 )}
               >
                 {hasTooltip ? (
