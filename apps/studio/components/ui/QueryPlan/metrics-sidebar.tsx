@@ -250,6 +250,17 @@ const renderTimeMetric: MetricRenderer = (data, stats) => {
   const totalPercent = stats.totalTime > 0 ? (exclusive / stats.totalTime) * 100 : 0
   const secondaryPercent = stats.totalTime > 0 ? (inclusive / stats.totalTime) * 100 : 0
   const formattedExclusive = formatMs(exclusive)
+  const loops = data.actualLoops ?? 1
+  const totalPerLoop =
+    data.actualTotalTime !== undefined
+      ? data.actualTotalTime
+      : loops > 0
+        ? exclusive / loops
+        : exclusive
+  const formattedTotalPerLoop = formatMs(totalPerLoop)
+  const totalCombined = totalPerLoop * Math.max(loops, 0)
+  const formattedTotalCombined = loops > 1 ? formatMs(totalCombined) : undefined
+  const formattedLoops = loops > 1 ? formatNumber(loops) ?? `${loops}` : undefined
 
   return {
     visual: (
@@ -260,7 +271,34 @@ const renderTimeMetric: MetricRenderer = (data, stats) => {
         secondaryColor="bg-brand/30"
       />
     ),
-    tooltip: <span>Exclusive {formattedExclusive ? `${formattedExclusive} ms` : '0 ms'}</span>,
+    tooltip: (
+      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
+        <li>
+          <span className="font-medium">Time spent in this step only:</span>{' '}
+          <span className="text-foreground">
+            {formattedExclusive ? `${formattedExclusive} ms` : '0 ms'}
+          </span>
+        </li>
+        <li>
+          <span className="font-medium">Total including child steps:</span>{' '}
+          <span className="text-foreground">
+            {formattedTotalPerLoop ? `${formattedTotalPerLoop} ms` : '0 ms'}
+          </span>
+          {formattedLoops ? (
+            <>
+              {' '}
+              per loop · ran <span className="text-foreground">{formattedLoops} loops</span>
+            </>
+          ) : null}
+        </li>
+        {formattedLoops && formattedTotalCombined ? (
+          <li>
+            <span className="font-medium">All loops combined:</span>{' '}
+            <span className="text-foreground">{formattedTotalCombined} ms</span>
+          </li>
+        ) : null}
+      </ul>
+    ),
   }
 }
 
@@ -268,14 +306,25 @@ const renderRowsMetric: MetricRenderer = (data, stats) => {
   const actualTotalRows =
     data.estActualTotalRows ?? (data.actualRows ?? 0) * (data.actualLoops ?? 1)
   const percent = stats.maxRows > 0 ? (actualTotalRows / stats.maxRows) * 100 : 0
+  const formattedActualRows = formatNumber(actualTotalRows) ?? '0'
+  const formattedPlanRows =
+    data.planRows !== undefined ? formatNumber(data.planRows) ?? `${data.planRows}` : undefined
 
   return {
     visual: <MetricBar percent={percent} color="bg-brand" />,
     tooltip: (
-      <span>
-        Actual {formatNumber(actualTotalRows) ?? '0'}
-        {data.planRows !== undefined ? ` · Est ${formatNumber(data.planRows)}` : ''}
-      </span>
+      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
+        <li>
+          <span className="font-medium">Rows produced by this step:</span>{' '}
+          <span className="text-foreground">{formattedActualRows}</span>
+        </li>
+        {formattedPlanRows ? (
+          <li>
+            <span className="font-medium">Planner expected:</span>{' '}
+            <span className="text-foreground">{formattedPlanRows}</span>
+          </li>
+        ) : null}
+      </ul>
     ),
   }
 }
@@ -286,7 +335,15 @@ const renderCostMetric: MetricRenderer = (data, stats) => {
 
   return {
     visual: <MetricBar percent={percent} color="bg-brand" />,
-    tooltip: <span>Self cost {exclusiveCost.toFixed(2)}</span>,
+    tooltip: (
+      <ul className="-space-y-0.5 text-foreground-light">
+        <li>
+          <span className="font-medium">Planner cost for this step:</span>{' '}
+          <span className="text-foreground">{exclusiveCost.toFixed(2)}</span>
+        </li>
+        <li>* Cost units are planner estimates, not milliseconds.</li>
+      </ul>
+    ),
   }
 }
 
@@ -315,16 +372,28 @@ const renderBuffersMetric: MetricRenderer = (data, stats) => {
       />
     ),
     tooltip: (
-      <div className="space-y-1">
-        <div>
-          Shared {formatNumber(breakdown.shared) ?? '0'} · Temp{' '}
-          {formatNumber(breakdown.temp) ?? '0'} · Local {formatNumber(breakdown.local) ?? '0'}{' '}
-          blocks
-        </div>
-        <div className="text-[10px] text-foreground-light">
-          Total {formatNumber(breakdown.total) ?? '0'} blocks ({blocksToBytes(breakdown.total)})
-        </div>
-      </div>
+      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
+        <li>
+          <span className="font-medium">Shared cache (global):</span>{' '}
+          <span className="text-foreground">{formatNumber(breakdown.shared) ?? '0'} blocks</span>{' '}
+          <span className="text-foreground-light">({blocksToBytes(breakdown.shared)})</span>
+        </li>
+        <li>
+          <span className="font-medium">Temp spill (disk):</span>{' '}
+          <span className="text-foreground">{formatNumber(breakdown.temp) ?? '0'} blocks</span>{' '}
+          <span className="text-foreground-light">({blocksToBytes(breakdown.temp)})</span>
+        </li>
+        <li>
+          <span className="font-medium">Local buffers (per worker):</span>{' '}
+          <span className="text-foreground">{formatNumber(breakdown.local) ?? '0'} blocks</span>{' '}
+          <span className="text-foreground-light">({blocksToBytes(breakdown.local)})</span>
+        </li>
+        <li>
+          <span className="font-medium">This step total:</span>{' '}
+          <span className="text-foreground">{formatNumber(breakdown.total) ?? '0'} blocks</span>{' '}
+          <span className="text-foreground-light">({blocksToBytes(breakdown.total)})</span>
+        </li>
+      </ul>
     ),
   }
 }
@@ -348,9 +417,19 @@ const renderIOMetric: MetricRenderer = (data, stats) => {
   return {
     visual: <BufferBar sharedPercent={readPercent} tempPercent={writePercent} localPercent={0} />,
     tooltip: (
-      <span>
-        Read {formatMs(read) ?? '0'} ms · Write {formatMs(write) ?? '0'} ms
-      </span>
+      <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
+        <li>
+          <span className="font-medium">Reading from storage:</span>{' '}
+          <span className="text-foreground">{formatMs(read) ?? '0'} ms</span>
+        </li>
+        <li>
+          <span className="font-medium">Writing to storage:</span>{' '}
+          <span className="text-foreground">{formatMs(write) ?? '0'} ms</span>
+        </li>
+        <li>
+          <span className="font-medium">Note:</span> Values include every loop for this node
+        </li>
+      </ul>
     ),
   }
 }
