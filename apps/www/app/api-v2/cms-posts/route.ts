@@ -6,10 +6,11 @@ import { generateReadingTime } from '~/lib/helpers'
 // Lightweight runtime for better performance
 export const runtime = 'edge'
 
-// CORS headers for cross-origin requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID ?? '',
+  'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET ?? '',
 }
 
 // Lightweight TOC generation for edge runtime
