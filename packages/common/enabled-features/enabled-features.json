@@ -71,6 +71,8 @@
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
 
+  "quickstarts:hide_nimbus": true,
+
   "reports:all": true,
 
   "sdk:csharp": true,
