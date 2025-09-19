@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -16,6 +16,7 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -95,6 +96,27 @@ export const TableEditor = ({
     | 'templates'
     | false
     | undefined
+
+  // Check if user has tables and if quickstart is dismissed
+  const { data: tables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const publicTables = (tables ?? []).filter((table) => table.schema === 'public')
+  const hasTables = publicTables.length > 0
+  const [quickstartDismissed, setQuickstartDismissed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('tableQuickstartDismissed') === 'true'
+    }
+    return false
+  })
+
+  const handleQuickstartDismiss = useCallback(() => {
+    setQuickstartDismissed(true)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tableQuickstartDismissed', 'true')
+    }
+  }, [])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -282,7 +304,7 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        {isNewRecord && !isDuplicating && tableQuickstartVariant && tableQuickstartVariant !== 'control' && (
+        {isNewRecord && !isDuplicating && tableQuickstartVariant && tableQuickstartVariant !== 'control' && !hasTables && !quickstartDismissed && (
           <TableTemplateSelector
             variant={tableQuickstartVariant}
             onSelectTemplate={(template) => {
@@ -293,6 +315,7 @@ export const TableEditor = ({
               if (template.columns) updates.columns = template.columns
               onUpdateField(updates)
             }}
+            onDismiss={handleQuickstartDismiss}
             disabled={false}
           />
         )}

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Wand2, ChevronDown, ArrowLeft, Database, Columns3 } from 'lucide-react'
+import { Wand2, ChevronDown, ArrowLeft, Database, Columns3, X } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,10 +19,11 @@ import type { TableField } from '../TableEditor.types'
 interface TableTemplateSelectorProps {
   variant: 'ai' | 'templates'
   onSelectTemplate: (tableField: Partial<TableField>) => void
+  onDismiss?: () => void
   disabled?: boolean
 }
 
-export const TableTemplateSelector = ({ variant, onSelectTemplate, disabled }: TableTemplateSelectorProps) => {
+export const TableTemplateSelector = ({ variant, onSelectTemplate, onDismiss, disabled }: TableTemplateSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [showAIInput, setShowAIInput] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
@@ -108,7 +109,20 @@ export const TableTemplateSelector = ({ variant, onSelectTemplate, disabled }: T
   if (variant === 'templates') {
     return (
       <div className="space-y-2">
-        <label className="text-sm text-foreground-light">Start from template (optional)</label>
+        <div className="flex items-center justify-between">
+          <label className="text-sm text-foreground-light">Start from template (optional)</label>
+          {onDismiss && (
+            <Button
+              type="text"
+              size="tiny"
+              icon={<X size={14} />}
+              onClick={onDismiss}
+              className="text-foreground-lighter hover:text-foreground"
+            >
+              Dismiss
+            </Button>
+          )}
+        </div>
 
         {!selectedCategory && !selectedTemplate && (
           <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -193,7 +207,20 @@ export const TableTemplateSelector = ({ variant, onSelectTemplate, disabled }: T
   // AI Variant
   return (
     <div className="space-y-2">
-      <label className="text-sm text-foreground-light">Start from template (optional)</label>
+      <div className="flex items-center justify-between">
+        <label className="text-sm text-foreground-light">Start from template (optional)</label>
+        {onDismiss && (
+          <Button
+            type="text"
+            size="tiny"
+            icon={<X size={14} />}
+            onClick={onDismiss}
+            className="text-foreground-lighter hover:text-foreground"
+          >
+            Dismiss
+          </Button>
+        )}
+      </div>
 
       {!showAIInput && generatedTables.length === 0 && (
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
