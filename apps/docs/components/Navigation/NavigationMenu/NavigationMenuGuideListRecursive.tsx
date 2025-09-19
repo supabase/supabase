@@ -58,10 +58,7 @@ const NavigationMenuGuideListRecursive = ({
           </div>
         </Link>
 
-        <RecursiveNavigation 
-          items={menuItems[0].children || []} 
-          className="space-y-1"
-        />
+        <RecursiveNavigation items={menuItems[0].children || []} className="space-y-1" />
       </div>
     </NavigationMenuGuideListWrapper>
   )
