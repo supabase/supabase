@@ -115,7 +115,14 @@
       "type": "boolean",
       "description": "Enable the database roles page"
     },
-
+    "docs:auth": {
+      "type": "boolean",
+      "description": "Enable auth docs"
+    },
+    "docs:contribution": {
+      "type": "boolean",
+      "description": "Enable documentation on contribution"
+    },
     "docs:compliance": {
       "type": "boolean",
       "description": "Enable documentation on compliance"
@@ -124,7 +131,34 @@
       "type": "boolean",
       "description": "Enable documentation for self-hosting"
     },
-
+    "docs:framework_quickstarts": {
+      "type": "boolean",
+      "description": "Enable framework quickstarts documentation"
+    },
+    "docs:full_getting_started": {
+      "type": "boolean",
+      "description": "Enable full getting started documentation"
+    },
+    "docs:full_platform": {
+      "type": "boolean",
+      "description": "Enable full platform documentation"
+    },
+    "docs:mobile_tutorials": {
+      "type": "boolean",
+      "description": "Enable mobile tutorials getting started documentation"
+    },
+    "docs:pgtap": {
+      "type": "boolean",
+      "description": "Enable pgtap started documentation"
+    },
+    "docs:production_checklist": {
+      "type": "boolean",
+      "description": "Enable production checklist"
+    },
+    "docs:web_apps": {
+      "type": "boolean",
+      "description": "Enable web apps getting started documentation"
+    },
     "feedback:docs": {
       "type": "boolean",
       "description": "Enable feedback submission for docs site"
@@ -292,8 +326,17 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
+    "docs:auth",
     "docs:compliance",
+    "docs:contribution",
+    "docs:framework_quickstarts",
+    "docs:full_getting_started",
+    "docs:full_platform",
+    "docs:mobile_tutorials",
+    "docs:pgtap",
+    "docs:production_checklist",
     "docs:self-hosting",
+    "docs:web_apps",
     "feedback:docs",
     "integrations:partners",
     "integrations:show_stripe_wrapper",
