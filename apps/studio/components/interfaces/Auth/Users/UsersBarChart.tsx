@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -6,8 +7,9 @@ import type { CategoricalChartState } from 'recharts/types/chart/types'
 
 import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import { useParams } from 'common'
+import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useChartData } from 'hooks/useChartData'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
@@ -35,6 +37,7 @@ export const UsersBarChart = ({
   className?: string
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+  const { ref: projectRef } = useParams()
 
   const startDate = useMemo(
     () => timestampStart || dayjs().subtract(7, 'day').toISOString(),
@@ -55,28 +58,54 @@ export const UsersBarChart = ({
     return '1d'
   }, [startDate, endDate])
 
-  const attributes = useMemo(
-    () =>
-      [
-        { attribute: 'TotalSignUps', provider: 'logs', label: 'Sign Ups', enabled: true },
-      ] as MultiAttribute[],
-    []
+  const filters = useMemo(() => ({ status_code: null }), [])
+
+  const signUpsReportConfig = useMemo(() => {
+    if (!projectRef) return undefined
+    const reportConfigs = createAuthReportConfig({
+      projectRef,
+      startDate,
+      endDate,
+      interval,
+      filters,
+    })
+
+    return reportConfigs.find((config) => config.id === 'signups')
+  }, [projectRef, startDate, endDate, interval, filters])
+
+  const canFetch = Boolean(projectRef && signUpsReportConfig)
+
+  const {
+    data: queryResult,
+    isLoading,
+    isFetching,
+  } = useQuery(
+    ['projects', projectRef, 'auth-users', 'signups', { startDate, endDate, interval }],
+    async () => {
+      if (!signUpsReportConfig || !projectRef)
+        return { data: [], attributes: [] as MultiAttribute[] }
+
+      return await signUpsReportConfig.dataProvider(
+        projectRef,
+        startDate,
+        endDate,
+        interval,
+        filters
+      )
+    },
+    {
+      enabled: canFetch,
+      refetchOnWindowFocus: false,
+    }
   )
 
-  const { data, isLoading } = useChartData({
-    attributes: attributes,
-    startDate,
-    endDate,
-    interval,
-    data: undefined,
-    enabled: true,
-  })
-
-  const chartDataArray = Array.isArray(data) ? data : []
+  const chartDataArray = Array.isArray(queryResult?.data) ? queryResult?.data : []
+  const dynamicAttributes = (queryResult?.attributes || []) as MultiAttribute[]
+  const timestampKey = chartDataArray[0]?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
   const { data: filledData, isError: isFillError } = useFillTimeseriesSorted(
     chartDataArray,
-    'period_start',
-    attributes.map((attr) => attr.attribute),
+    timestampKey,
+    dynamicAttributes.map((attr) => attr.attribute),
     0,
     startDate,
     endDate,
@@ -88,10 +117,10 @@ export const UsersBarChart = ({
   const transformedData: UsersBarChartDatum[] = useMemo(
     () =>
       (finalData || []).map((d: any) => ({
-        timestamp: d.period_start,
+        timestamp: d[timestampKey],
         count: d.TotalSignUps ?? d.count ?? 0,
       })),
-    [finalData]
+    [finalData, timestampKey]
   )
 
   const startLabel = useMemo(() => {
@@ -103,24 +132,25 @@ export const UsersBarChart = ({
     return dayjs(transformedData[transformedData?.length - 1]?.['timestamp']).format(DateTimeFormat)
   }, [transformedData, DateTimeFormat])
 
-  const noData = chartDataArray.length === 0
+  const noData = canFetch && chartDataArray.length === 0
+  const showLoader = isLoading || isFetching
 
   return (
     <div data-testid="users-bar-chart" className={cn('flex flex-col gap-y-3', className)}>
-      {isLoading && (
+      {showLoader && (
         <div className="flex items-center justify-center h-[96px]">
           <Loader2 size={18} className="h-24 animate-spin text-border-strong" />
         </div>
       )}
 
-      {noData && !isLoading ? (
+      {noData && !showLoader ? (
         <NoDataPlaceholder
           size="tiny"
           className="border-0 h-[80px] p-0"
           description="User sign-ups over time will appear here once data becomes available"
         />
       ) : (
-        !isLoading && (
+        !showLoader && (
           <ChartContainer
             config={
               {
