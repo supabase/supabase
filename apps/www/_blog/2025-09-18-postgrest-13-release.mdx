@@ -25,18 +25,18 @@ For example, if you have database similar to IMDB and you’d like to represent 
 [
   {
     "title": "The Shawshank Redemption",
-    "actors": [ "Tim Robbins", "Morgan Freeman" ],
-    "genres": [ "Drama" ]
+    "actors": ["Tim Robbins", "Morgan Freeman"],
+    "genres": ["Drama"]
   },
   {
     "title": "The Godfather",
-    "actors": [ "Marlon Brando", "Al Pacino" ],
-    "genres": [ "Drama", "Crime" ]
+    "actors": ["Marlon Brando", "Al Pacino"],
+    "genres": ["Drama", "Crime"]
   },
   {
     "title": "The Dark Knight",
-    "actors": [ "Christian Bale", "Heath Ledger" ],
-    "genres": [ "Drama", "Crime", "Action" ]
+    "actors": ["Christian Bale", "Heath Ledger"],
+    "genres": ["Drama", "Crime", "Action"]
   }
 ]
 ```
@@ -44,9 +44,7 @@ For example, if you have database similar to IMDB and you’d like to represent 
 You can now do it this way:
 
 ```js
-const { data, error } = await supabase
-  .from('titles')
-  .select(`
+const { data, error } = await supabase.from('titles').select(`
     title:primary_title,
     ...people(actors:primary_name),
     ...genres(genres:name)
@@ -62,9 +60,7 @@ You can see the data model used for this example on this [gist](https://gist.git
 Previously you could only use the full text search operator on `tsvector` columns, now you can do it on `text` columns too:
 
 ```js
-const {data, error} = await supabase
-  .from("titles")
-  .textSearch("primary_name", `'god' & 'father'`);
+const { data, error } = await supabase.from('titles').textSearch('primary_name', `'god' & 'father'`)
 ```
 
 This works because `text` columns will be automatically converted with `to_tsvector`.
@@ -75,10 +71,10 @@ You can now limit to the amount of rows affected by an `update` or `delete` oper
 
 ```js
 const { data, error } = await supabase
-    .from('people')
-    .update({ primary_name: 'Marlon Brando Jr.' })
-    .eq('nconst', 'nm0000008')
-    .maxAffected(1)
+  .from('people')
+  .update({ primary_name: 'Marlon Brando Jr.' })
+  .eq('nconst', 'nm0000008')
+  .maxAffected(1)
 ```
 
 If the rows affected by the operation surpass the limit in `maxAffected`, an error will be thrown.
@@ -117,11 +113,11 @@ Previously on v12, you could limit the updated or deleted affected rows with a c
 
 ```js
 const { data, error } = await supabase
-    .from('people')
-    .update({ primary_name: 'Marlon Brando Jr.' })
-    .eq('primary_name', 'Marlon Brando')
-    .limit(1)
-    .order('nconst')
+  .from('people')
+  .update({ primary_name: 'Marlon Brando Jr.' })
+  .eq('primary_name', 'Marlon Brando')
+  .limit(1)
+  .order('nconst')
 ```
 
 But this never gave an error, it only did the equivalent of a `UPDATE .. LIMIT` SQL statement. It also required adding a PK in the `order` method, which was a confusing interface.
