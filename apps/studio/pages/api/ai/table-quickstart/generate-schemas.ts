@@ -91,6 +91,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       Rules:
       - Use "id bigint primary key generated always as identity" for PKs
+      - ALWAYS mark the "id" field with isPrimary: true
       - Use 'text' not 'varchar', 'timestamptz' not 'date'
       - Use snake_case naming
       - Add created_at, updated_at timestamps
