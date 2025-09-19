@@ -9,25 +9,6 @@ import {
 
 export const QUICKSTART_DEFAULT_SCHEMA = 'public'
 
-export const QUICKSTART_VARIANTS = {
-  AI: 'ai',
-  TEMPLATES: 'templates',
-  CONTROL: 'control',
-} as const
-
-export const GETTING_STARTED_WIDGET_COPY = {
-  ai: {
-    title: 'Kickstart your database with AI',
-    description:
-      'Describe your app, and our AI will suggest starter table schemas to get you going. Edit and customize them as you go. No SQL required.',
-  },
-  templates: {
-    title: 'Choose a template',
-    description:
-      'Start with pre-built database schemas for common app types. Fully customizable to fit your needs.',
-  },
-}
-
 // Table templates configuration
 export const APP_TEMPLATES: TableTemplate[] = [
   {
