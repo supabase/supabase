@@ -62,7 +62,7 @@ export const QueryPerformance = ({
     <>
       <QueryPerformanceMetrics />
 
-      <div data-query-performance-body className="flex flex-col h-full overflow-y-hidden">
+      <div className="flex flex-col h-full overflow-y-hidden">
         <QueryPerformanceFilterBar
           queryPerformanceQuery={queryPerformanceQuery}
           onResetReportClick={() => setShowResetgPgStatStatements(true)}

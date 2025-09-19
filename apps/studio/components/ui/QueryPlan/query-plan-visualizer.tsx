@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import ReactFlow, {
   Background,
@@ -43,9 +43,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
-  const containerRef = useRef<HTMLDivElement | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [overlayRect, setOverlayRect] = useState<DOMRect | null>(null)
   const layout = useDagreLayout(nodes, edges, metricsVisibility, heatmapMode)
 
   useEffect(() => {
@@ -107,54 +105,20 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     [layout.nodes, selectedNodeId]
   )
 
-  const updateOverlayRect = useCallback(() => {
-    const host = containerRef.current?.closest('[data-query-performance-body]')
-    const target = host ?? containerRef.current
-    if (!target) return
-
-    setOverlayRect(target.getBoundingClientRect())
-  }, [])
-
   useEffect(() => {
-    if (!isExpanded) {
-      setOverlayRect(null)
+    if (!isExpanded || typeof document === 'undefined') return
 
-      return
-    }
-
-    updateOverlayRect()
-
-    const handleResize = () => updateOverlayRect()
-    window.addEventListener('resize', handleResize)
-
-    return () => window.removeEventListener('resize', handleResize)
-  }, [isExpanded, updateOverlayRect])
-
-  useEffect(() => {
-    if (!isExpanded) return
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsExpanded(false)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = previousOverflow
     }
   }, [isExpanded])
 
   const toggleExpanded = useCallback(() => {
-    setIsExpanded((prev) => {
-      const next = !prev
-      if (!prev) {
-        requestAnimationFrame(() => updateOverlayRect())
-      }
-      return next
-    })
-  }, [updateOverlayRect])
+    setIsExpanded((prev) => !prev)
+  }, [])
 
   const nodeTypes = useMemo(
     () => ({
@@ -178,7 +142,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
       <div
         className={cn(
           'relative w-full h-full bg-background',
-          isExpanded ? 'border-t' : 'border rounded-md'
+          isExpanded ? 'border-none' : 'border rounded-md'
         )}
       >
         <div className="flex h-full">
@@ -314,22 +278,27 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   )
 
   const expandedPortal =
-    isExpanded && overlayRect && typeof document !== 'undefined'
+    isExpanded && typeof document !== 'undefined'
       ? createPortal(
-          <div
-            className="fixed z-50"
-            style={{
-              position: 'fixed',
-              top: overlayRect.top,
-              left: overlayRect.left,
-              width: overlayRect.width,
-              height: overlayRect.height,
-            }}
-          >
+          <div className="fixed inset-0 z-50 flex">
             <div
-              className={cn('w-full h-full flex flex-col bg-background overflow-hidden', className)}
+              className="absolute inset-0 bg-foreground/20 backdrop-blur-sm"
+              aria-hidden="true"
+              onClick={() => setIsExpanded(false)}
+            />
+            <div
+              role="dialog"
+              aria-modal="true"
+              className="relative z-10 flex w-full bg-background"
             >
-              {renderVisualizer(isExpanded)}
+              <div
+                className={cn(
+                  'flex h-full w-full flex-col overflow-hidden border border-border shadow-2xl md:rounded-lg',
+                  className
+                )}
+              >
+                {renderVisualizer(true)}
+              </div>
             </div>
           </div>,
           document.body
@@ -339,8 +308,15 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   return (
     <>
       {expandedPortal}
-      <div ref={containerRef} className={cn('w-full h-full flex flex-col', className)}>
-        {renderVisualizer(isExpanded)}
+      <div
+        className={cn(
+          'w-full h-full flex flex-col',
+          className,
+          isExpanded && 'pointer-events-none select-none opacity-0'
+        )}
+        aria-hidden={isExpanded}
+      >
+        {renderVisualizer(false)}
       </div>
     </>
   )
