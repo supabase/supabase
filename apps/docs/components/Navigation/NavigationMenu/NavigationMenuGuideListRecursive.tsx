@@ -40,7 +40,6 @@ const NavigationMenuGuideListRecursive = ({
     }
   }
 
-  // Transform the legacy data structure to the new recursive format
   const menuItems: MenuItem[] = transformNavMenuToMenuItems([
     {
       label: menu.title,
