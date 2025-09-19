@@ -367,7 +367,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
   return (
     <div className="relative flex flex-grow bg-alternative min-h-0">
-      <div ref={dataGridContainerRef} className="flex-1">
+      <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
