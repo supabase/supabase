@@ -163,12 +163,12 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                   portal={false}
                   className="shrink-0"
                 />
-                <div className="h-[20px] w-px border-r border-control" />
+                <div className="hidden md:block h-[20px] w-px border-r border-control" />
                 <MetaOverlay
                   planningTime={meta?.planningTime}
                   executionTime={meta?.executionTime}
                   jitTotalTime={meta?.jitTotalTime}
-                  className="flex-1 border-0 bg-transparent px-0 py-0 text-xs h-full flex"
+                  className="hidden h-full flex-1 items-center border-0 bg-transparent px-0 py-0 text-xs md:flex"
                 />
                 <Button
                   asChild
@@ -211,6 +211,17 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                   onClick={toggleExpanded}
                   aria-label="Enter expanded view"
                   className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
+                />
+              </div>
+            )}
+
+            {isExpanded && (
+              <div className="absolute top-[46px] left-3 z-20 md:hidden">
+                <MetaOverlay
+                  planningTime={meta?.planningTime}
+                  executionTime={meta?.executionTime}
+                  jitTotalTime={meta?.jitTotalTime}
+                  className="rounded-md bg-transparent border-none border-border px-2 py-1 text-[11px] shadow-sm"
                 />
               </div>
             )}
