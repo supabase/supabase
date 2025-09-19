@@ -10,7 +10,7 @@ import { Button } from 'ui'
 import { APIKeys } from './APIKeys'
 import { GetStartedHero } from './GetStartedHero'
 import { usePHFlag } from 'hooks/ui/useFlag'
-import { TableQuickstart } from 'components/interfaces/HomeNew/TableQuickstart/TableQuickstart'
+import { TableQuickstart } from 'components/interfaces/HomeNew/TableQuickstart'
 
 export const NewProjectPanel = () => {
   const { ref } = useParams()

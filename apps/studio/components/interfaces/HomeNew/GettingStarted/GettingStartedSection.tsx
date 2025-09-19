@@ -30,6 +30,8 @@ import {
   ToggleGroupItem,
 } from 'ui'
 import { BASE_PATH } from 'lib/constants'
+import { usePHFlag } from 'hooks/ui/useFlag'
+import { InlineTableQuickstart } from '../TableQuickstart/inline/InlineTableQuickstart'
 
 export type GettingStartedAction = {
   label: string
@@ -63,6 +65,14 @@ export function GettingStartedSection({
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
   const router = useRouter()
+
+  // Feature flag for table quickstart variant
+  const tableQuickstartVariant = usePHFlag('tableQuickstart') as
+    | 'control'
+    | 'ai'
+    | 'templates'
+    | false // false = flag is disabled
+    | undefined // undefined = flags are loading
 
   // Local state for framework selector preview
   const [selectedFramework, setSelectedFramework] = useState<string>(FRAMEWORKS[0]?.key ?? 'nextjs')
@@ -313,19 +323,37 @@ export function GettingStartedSection({
         icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
           "To kick off your new project, let's start by creating your very first database table using either the table editor or AI Assistant.",
-        actions: [
-          { label: 'Create a table', href: `/project/${ref}/editor`, variant: 'default' },
-          {
-            label: 'Do it for me',
-            variant: 'default',
-            icon: <AiIconAnimation size={14} />,
-            onClick: () =>
-              openAiChat(
-                'Design my database',
-                'I want to design my database schema. Please propose tables, relationships, and SQL to create them for my app. Ask clarifying questions if needed.'
-              ),
-          },
-        ],
+        actions:
+          tableQuickstartVariant === 'control' ||
+          tableQuickstartVariant === false ||
+          tableQuickstartVariant === undefined
+            ? [
+                { label: 'Create a table', href: `/project/${ref}/editor`, variant: 'default' },
+                {
+                  label: 'Do it for me',
+                  variant: 'default',
+                  icon: <AiIconAnimation size={14} />,
+                  onClick: () =>
+                    openAiChat(
+                      'Design my database',
+                      'I want to design my database schema. Please propose tables, relationships, and SQL to create them for my app. Ask clarifying questions if needed.'
+                    ),
+                },
+              ]
+            : [
+                {
+                  label: 'inline-quickstart',
+                  component: (
+                    <InlineTableQuickstart
+                      variant={tableQuickstartVariant}
+                      projectRef={ref ?? ''}
+                      onComplete={() => {
+                        // Optionally refresh tables or update status
+                      }}
+                    />
+                  ),
+                },
+              ],
       },
       {
         key: 'add-data',
@@ -458,7 +486,7 @@ export function GettingStartedSection({
         ],
       },
     ],
-    [tablesCount, ref, openAiChat, connectActions, hasNonDefaultBranch]
+    [tablesCount, ref, openAiChat, connectActions, hasNonDefaultBranch, tableQuickstartVariant]
   )
 
   const steps = workflow === 'code' ? codeSteps : workflow === 'no-code' ? noCodeSteps : []

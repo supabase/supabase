@@ -43,7 +43,7 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import { useQuickstartData } from 'components/interfaces/HomeNew/TableQuickstart/useQuickstartData'
+import { useQuickstartData } from 'components/interfaces/HomeNew/TableQuickstart/legacy/useQuickstartData'
 
 export interface TableEditorProps {
   table?: PostgresTable
