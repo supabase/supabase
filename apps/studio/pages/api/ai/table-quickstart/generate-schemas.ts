@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 
+// See https://vercel.com/docs/functions/configuring-functions/duration
 export const maxDuration = 30
 
 const ColumnSchema = z.object({
