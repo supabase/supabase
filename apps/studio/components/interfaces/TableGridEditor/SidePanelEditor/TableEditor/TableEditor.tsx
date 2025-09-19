@@ -43,7 +43,7 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import { useQuickstartData } from 'components/interfaces/HomeNew/TableQuickstart/useQuickstartData'
+import { TableTemplateSelector } from './TableQuickstart'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -127,7 +127,7 @@ export const TableEditor = ({
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
 
-  const quickstartTableFields = useQuickstartData({ isNewRecord, visible })
+  const quickstartTableFields = null
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
@@ -278,6 +278,16 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
+        {isNewRecord && !isDuplicating && (
+          <TableTemplateSelector
+            onSelectTemplate={(template) => {
+              if (template.name) onUpdateField({ name: template.name })
+              if (template.comment) onUpdateField({ comment: template.comment })
+              if (template.columns) onUpdateField({ columns: template.columns })
+            }}
+            disabled={false}
+          />
+        )}
         <Input
           data-testid="table-name-input"
           label="Name"
