@@ -22,9 +22,9 @@ export const GETTING_STARTED_WIDGET_COPY = {
       'Describe your app, and our AI will suggest starter table schemas to get you going. Edit and customize them as you go. No SQL required.',
   },
   templates: {
-    title: 'Start with a ready-made database',
+    title: 'Choose a template',
     description:
-      'Start from a ready-made list of tables based on common app types to get you started. You can edit them anytime to make them your own.',
+      'Start with pre-built database schemas for common app types. Fully customizable to fit your needs.',
   },
 }
 

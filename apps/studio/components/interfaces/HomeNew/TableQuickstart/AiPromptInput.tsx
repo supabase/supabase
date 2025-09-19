@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AiIconAnimation, Button_Shadcn_, Input_Shadcn_ } from 'ui'
+import { AiIconAnimation, cn } from 'ui'
 
 interface AiPromptInputProps {
   onGenerate: (prompt: string) => void
@@ -8,6 +8,7 @@ interface AiPromptInputProps {
 
 export const AiPromptInput = ({ onGenerate, isLoading = false }: AiPromptInputProps) => {
   const [prompt, setPrompt] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,36 +18,46 @@ export const AiPromptInput = ({ onGenerate, isLoading = false }: AiPromptInputPr
   }
 
   return (
-    <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-3 items-center">
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Input_Shadcn_
-            placeholder="e.g., social media app with posts and comments"
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
+      <div
+        className={cn(
+          'relative group bg-surface-100 rounded-lg border transition-all duration-200',
+          isFocused
+            ? 'border-foreground/30 shadow-lg'
+            : 'border-default hover:border-foreground/20',
+          isLoading && 'opacity-80'
+        )}
+      >
+        <div className="flex items-center px-4 py-3 gap-3">
+          <div className="flex-shrink-0">
+            <AiIconAnimation size={20} loading={isLoading} className="text-brand" />
+          </div>
+
+          <input
+            type="text"
+            placeholder="What kind of app are you building?"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             disabled={isLoading}
-            className="flex-1 items-center h-8"
+            className="flex-1 bg-transparent border-0 outline-0 ring-0 placeholder:text-foreground-lighter text-foreground-default focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
           />
-          <Button_Shadcn_
-            disabled={!prompt.trim() || isLoading}
-            className="sm:w-auto sm:flex-shrink-0 items-center h-8"
-            variant="outline"
+
+          <button
             type="submit"
-          >
-            {isLoading ? (
-              <>
-                <AiIconAnimation size={16} className="mr-2" loading={true} />
-                Generating...
-              </>
-            ) : (
-              <>
-                <AiIconAnimation size={16} className="mr-2" />
-                Generate
-              </>
+            disabled={!prompt.trim() || isLoading}
+            className={cn(
+              'flex items-center gap-2 px-4 py-1.5 rounded-md font-medium text-xs transition-all',
+              'bg-brand text-white hover:bg-brand-600',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-surface-100'
             )}
-          </Button_Shadcn_>
+          >
+            {isLoading ? 'Generating...' : 'Generate'}
+          </button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   )
 }
