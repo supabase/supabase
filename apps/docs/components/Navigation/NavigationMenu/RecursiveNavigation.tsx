@@ -29,10 +29,8 @@ interface RecursiveNavigationProps {
   className?: string
 }
 
-// Constants for consistent sizing
 const ICON_SIZE = 16
 
-// Icon component to avoid duplication
 const NavIcon = React.memo(({ icon, title }: { icon: string; title: string }) => {
   const { resolvedTheme } = useTheme()
   return (
