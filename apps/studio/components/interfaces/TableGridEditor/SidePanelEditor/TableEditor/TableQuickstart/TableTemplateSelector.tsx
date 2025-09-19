@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Wand2, ChevronDown, ArrowLeft, Database } from 'lucide-react'
+import { Wand2, ChevronDown, ArrowLeft, Database, Columns3 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -143,7 +143,7 @@ export const TableTemplateSelector = ({ variant, onSelectTemplate, disabled }: T
           </DropdownMenu>
         )}
 
-        {selectedCategory && !selectedTemplate && (
+        {selectedCategory && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Button
@@ -160,39 +160,29 @@ export const TableTemplateSelector = ({ variant, onSelectTemplate, disabled }: T
               {tableTemplates[selectedCategory].map((template, index) => (
                 <button
                   key={index}
-                  onClick={() => applyTemplate(template)}
-                  className="text-left p-3 rounded-md border border-default hover:border-foreground-muted transition-colors"
+                  onClick={() => {
+                    applyTemplate(template)
+                    setSelectedTemplate(template)
+                  }}
+                  className={cn(
+                    "text-left p-3 rounded-md border transition-all",
+                    selectedTemplate?.tableName === template.tableName
+                      ? "border-foreground bg-surface-200"
+                      : "border-default hover:border-foreground-muted hover:bg-surface-100"
+                  )}
                 >
-                  <div className="text-sm font-medium">{template.tableName}</div>
-                  <div className="text-xs text-foreground-light mt-1">{template.rationale}</div>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">{template.tableName}</div>
+                      <div className="text-xs text-foreground-light mt-1">{template.rationale}</div>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-foreground-muted ml-3">
+                      <Columns3 size={12} />
+                      <span>{template.fields.length}</span>
+                    </div>
+                  </div>
                 </button>
               ))}
-            </div>
-          </div>
-        )}
-
-        {selectedTemplate && (
-          <div className="space-y-2">
-            <Button
-              type="text"
-              size="tiny"
-              icon={<ArrowLeft size={14} />}
-              onClick={handleBack}
-            >
-              Select another template
-            </Button>
-            <div className="rounded-md border border-default bg-surface-100 p-3">
-              <div className="text-sm font-medium text-foreground">
-                {selectedTemplate.tableName}
-              </div>
-              {selectedTemplate.rationale && (
-                <div className="text-xs text-foreground-light mt-1">
-                  {selectedTemplate.rationale}
-                </div>
-              )}
-              <div className="text-xs text-foreground-muted mt-2">
-                {selectedTemplate.fields.length} columns
-              </div>
             </div>
           </div>
         )}
@@ -304,39 +294,38 @@ export const TableTemplateSelector = ({ variant, onSelectTemplate, disabled }: T
             >
               Generate new
             </Button>
-            {generatedTables.length > 1 && (
-              <div className="flex gap-1">
-                {generatedTables.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setSelectedTableIndex(index)
-                      applyTemplate(generatedTables[index])
-                    }}
-                    className={cn(
-                      'w-2 h-2 rounded-full transition-colors',
-                      index === selectedTableIndex
-                        ? 'bg-foreground'
-                        : 'bg-border hover:bg-foreground-muted'
-                    )}
-                    aria-label={`Select table ${index + 1}`}
-                  />
-                ))}
-              </div>
-            )}
+            <span className="text-xs text-foreground-light">AI Generated Tables</span>
           </div>
-          <div className="rounded-md border border-default bg-surface-100 p-3">
-            <div className="text-sm font-medium text-foreground">
-              {generatedTables[selectedTableIndex].tableName}
-            </div>
-            {generatedTables[selectedTableIndex].rationale && (
-              <div className="text-xs text-foreground-light mt-1">
-                {generatedTables[selectedTableIndex].rationale}
-              </div>
-            )}
-            <div className="text-xs text-foreground-muted mt-2">
-              {generatedTables[selectedTableIndex].fields.length} columns generated
-            </div>
+          <div className="grid gap-2">
+            {generatedTables.map((table, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setSelectedTableIndex(index)
+                  applyTemplate(table)
+                  setSelectedTemplate(table)
+                }}
+                className={cn(
+                  "text-left p-3 rounded-md border transition-all",
+                  selectedTableIndex === index
+                    ? "border-foreground bg-surface-200"
+                    : "border-default hover:border-foreground-muted hover:bg-surface-100"
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">{table.tableName}</div>
+                    {table.rationale && (
+                      <div className="text-xs text-foreground-light mt-1">{table.rationale}</div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-foreground-muted ml-3">
+                    <Columns3 size={12} />
+                    <span>{table.fields.length}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       )}
