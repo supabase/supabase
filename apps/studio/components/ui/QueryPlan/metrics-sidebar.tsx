@@ -3,7 +3,7 @@ import type { Edge, Node } from 'reactflow'
 import { Layers } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
-import { Button, Progress, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { formatMs, formatNumber, blocksToBytes } from './utils/formats'
 
 type SidebarMetricKey = 'time' | 'rows' | 'cost' | 'buffers' | 'io'
@@ -187,22 +187,19 @@ const MetricBar = ({
 }) => {
   const primaryWidth = Math.max(Math.min(percent, 100), 0)
   const secondaryWidth = Math.max(Math.min(secondaryPercent, 100 - primaryWidth), 0)
-  const totalWidth = Math.min(primaryWidth + secondaryWidth, 100)
 
   return (
-    <div className="relative h-2 w-full">
-      <Progress
-        value={totalWidth}
-        className="!h-full w-full overflow-hidden !rounded-sm !bg-border"
-        indicatorClassName={cn('duration-300 opacity-80', secondaryColor)}
+    <div className="flex h-2 overflow-hidden rounded-sm bg-border w-full">
+      <div
+        className={cn('h-full transition-[width] duration-300', color)}
+        style={{ width: `${primaryWidth}%` }}
       />
-      <div className="pointer-events-none absolute inset-0">
-        <Progress
-          value={primaryWidth}
-          className="!h-full w-full overflow-hidden !rounded-sm !bg-transparent"
-          indicatorClassName={cn('duration-300', color)}
+      {secondaryWidth > 0 ? (
+        <div
+          className={cn('h-full transition-[width] duration-300 opacity-80', secondaryColor)}
+          style={{ width: `${secondaryWidth}%` }}
         />
-      </div>
+      ) : null}
     </div>
   )
 }
