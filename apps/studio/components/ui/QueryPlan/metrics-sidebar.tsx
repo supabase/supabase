@@ -392,7 +392,7 @@ export const MetricsSidebar = ({
         ))}
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-2">
-        <ul className="flex flex-col">
+        <ul className="flex flex-col gap-y-1">
           {rows.map((row) => {
             const { node, branchTrail, isLast } = row
             const data = node.data
@@ -407,7 +407,7 @@ export const MetricsSidebar = ({
                 className="w-full py-0 px-1 text-xs"
                 onClick={() => onSelect?.(node)}
               >
-                <div className="flex items-center gap-x-1 h-[16px]">
+                <div className="flex items-center gap-x-1 h-[24px]">
                   <TreeGuide branchTrail={branchTrail} isLast={isLast} />
                   <span className="flex-1 min-w-0 font-medium text-[11px] text-left text-foreground">
                     {data.label}
@@ -421,7 +421,7 @@ export const MetricsSidebar = ({
               <li
                 key={row.id}
                 className={cn(
-                  'rounded border border-transparent transition-colors flex p-1',
+                  'rounded border border-transparent transition-colors flex px-1',
                   isActive ? 'border-brand bg-brand/10' : 'hover:border-border'
                 )}
               >
