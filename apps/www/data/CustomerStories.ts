@@ -176,7 +176,7 @@ export const data: CustomerStoryType[] = [
     description:
       'Mobbin helps over 200,000 creators globally search and view the latest design patterns from well-known apps.',
     organization: 'Mobbin',
-    imgUrl: 'images/customers/logos/shotgun.png',
+    imgUrl: 'images/customers/logos/mobbin.png',
     logo: '/images/customers/logos/mobbin.png',
     logo_inverse: '/images/customers/logos/light/mobbin.png',
     url: '/customers/mobbin',
