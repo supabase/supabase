@@ -117,7 +117,7 @@ export const UsersBarChart = ({
         <NoDataPlaceholder
           size="tiny"
           className="border-0 h-[80px] p-0"
-          description="It may take up to 24 hours for data to refresh"
+          description="User sign-ups over time will appear here once data becomes available"
         />
       ) : (
         !isLoading && (
