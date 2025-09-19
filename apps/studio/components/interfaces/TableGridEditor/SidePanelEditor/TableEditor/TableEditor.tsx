@@ -21,6 +21,7 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
@@ -88,6 +89,12 @@ export const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
+  const tableQuickstartVariant = usePHFlag('tableQuickstart') as
+    | 'control'
+    | 'ai'
+    | 'templates'
+    | false
+    | undefined
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -278,8 +285,9 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        {isNewRecord && !isDuplicating && (
+        {isNewRecord && !isDuplicating && tableQuickstartVariant && tableQuickstartVariant !== 'control' && tableQuickstartVariant !== false && (
           <TableTemplateSelector
+            variant={tableQuickstartVariant}
             onSelectTemplate={(template) => {
               if (template.name) onUpdateField({ name: template.name })
               if (template.comment) onUpdateField({ comment: template.comment })
