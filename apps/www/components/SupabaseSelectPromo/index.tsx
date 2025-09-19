@@ -1,3 +1,4 @@
+// import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -41,7 +42,7 @@ const SupabaseSelectPromo = () => {
       }}
     >
       {/* Text contents */}
-      <div className="border-x border-muted m:py-18 container relative mx-auto py-16 md:py-24 lg:py-24">
+      <div className="border-x border-muted m:py-18 container relative mx-auto py-16 md:py-24 lg:py-24 before:absolute before:left-0 before:top-0 before:w-px before:h-full before:bg-muted before:-left-6">
         <header className="flex flex-row border-y border-muted">
           {Object.entries(headerText).map(([index, value]: [string, string]) => (
             <p
