@@ -39,7 +39,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>(defaultHeatmapMeta.mode)
   const heatMax = useHeatmapMax(nodes)
 
-  const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -75,7 +74,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
 
   const handleSelectNode = useCallback(
     (node: Node<PlanNodeData>) => {
-      setSelectedNode(node.data)
       setSelectedNodeId(node.id)
 
       requestAnimationFrame(() => centerNodeInView(node.id))
@@ -87,10 +85,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     if (!selectedNodeId) return
 
     const match = layout.nodes.find((node) => node.id === selectedNodeId)
-    if (match) {
-      setSelectedNode(match.data)
-    } else {
-      setSelectedNode(null)
+    if (!match) {
       setSelectedNodeId(null)
     }
   }, [layout.nodes, selectedNodeId])
@@ -235,7 +230,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                   proOptions={{ hideAttribution: true }}
                   onNodeClick={(_event, node) => handleSelectNode(node)}
                   onPaneClick={() => {
-                    setSelectedNode(null)
                     setSelectedNodeId(null)
                   }}
                   onInit={(instance) => setRfInstance(instance)}
