@@ -24,7 +24,7 @@ type GenerateTaskOptions = {
  * using generateText instead of streamText.
  */
 export async function generateTask(input: string, opts: GenerateTaskOptions = {}) {
-  const { projectRef = 'eval-project', chatName = 'RLS', isLimited = true } = opts
+  const { projectRef = 'eval-project', chatName = 'RLS', isLimited = false } = opts
 
   const {
     model,
@@ -33,7 +33,7 @@ export async function generateTask(input: string, opts: GenerateTaskOptions = {}
     providerOptions,
   } = await getModel({
     provider: 'openai',
-    model: 'gpt-5-mini',
+    model: 'gpt-5',
     routingKey: projectRef,
     isLimited,
   })
@@ -92,6 +92,7 @@ export async function generateTask(input: string, opts: GenerateTaskOptions = {}
             'list_extensions',
             'get_logs',
             'get_advisors',
+            'search_docs',
           ].includes(tr.toolName)
         )
         .map((result) => JSON.stringify({ tool: result.toolName, input: result.input }))

@@ -36,6 +36,32 @@ export function getEvalMockTools(): ToolSet {
   return {
     ...mockedRenderingTools,
 
+    search_docs: tool({
+      description: 'Searches Supabase documentation for the given query (mocked).',
+      inputSchema: z.object({
+        query: z.string(),
+        limit: z.number().optional(),
+      }),
+      execute: async ({ query }: { query: string; limit?: number }) => {
+        return {
+          query,
+          results: [
+            {
+              title: 'Manage project API keys',
+              url: 'https://supabase.com/docs/guides/platform/api-keys',
+              snippet:
+                'Open the Dashboard, navigate to Project Settings > API to view and manage service role and anon keys.',
+            },
+            {
+              title: 'Rotate Supabase API keys',
+              url: 'https://supabase.com/docs/guides/platform/rotate-api-keys',
+              snippet: 'Use the Rotate key button from Project Settings > API to issue new credentials.',
+            },
+          ],
+        }
+      },
+    }),
+
     list_tables: tool({
       description: 'Lists tables and columns for the provided schemas.',
       inputSchema: z.object({
