@@ -57,13 +57,19 @@ You can see the data model used for this example on this [gist](https://gist.git
 
 ## Automatic tsvector convertion
 
-Previously you could only use the full text search operator on `tsvector` columns, now you can do it on `text` columns too:
+Previously you could only use the full text search operator on `tsvector` columns, now you can do it on `text` and `json/jsonb` columns too:
 
 ```js
 const { data, error } = await supabase.from('titles').textSearch('primary_name', `'god' & 'father'`)
 ```
 
-This works because `text` columns will be automatically converted with `to_tsvector`.
+This works because `text` and `json/jsonb` columns will be automatically converted with `to_tsvector`.
+
+To ensure this operation is fast, add an index:
+
+```sql
+create index idx_titles on people using gin (to_tsvector('english', primary_name));
+```
 
 ## Max Affected
 
