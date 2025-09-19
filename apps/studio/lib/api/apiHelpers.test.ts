@@ -1,5 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { constructHeaders, toSnakeCase } from './apiHelpers'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  commaSeparatedStringIntoArray,
+  constructHeaders,
+  toSnakeCase,
+  zBooleanString,
+} from './apiHelpers'
 
 vi.mock('lib/constants', () => ({
   IS_PLATFORM: false,
@@ -127,6 +132,75 @@ describe('apiHelpers', () => {
       expect(toSnakeCase('test')).toBe('test')
       expect(toSnakeCase(123)).toBe(123)
       expect(toSnakeCase(true)).toBe(true)
+    })
+  })
+
+  describe('zBooleanString', () => {
+    it('should transform "true" string to boolean true', () => {
+      const schema = zBooleanString()
+      const result = schema.parse('true')
+      expect(result).toBe(true)
+    })
+
+    it('should transform "false" string to boolean false', () => {
+      const schema = zBooleanString()
+      const result = schema.parse('false')
+      expect(result).toBe(false)
+    })
+
+    it('should throw error for invalid boolean string', () => {
+      const schema = zBooleanString()
+      expect(() => schema.parse('invalid')).toThrow('must be a boolean string')
+    })
+
+    it('should throw custom error message when provided', () => {
+      const customError = 'Custom boolean error'
+      const schema = zBooleanString(customError)
+      expect(() => schema.parse('invalid')).toThrow(customError)
+    })
+
+    it('should throw error for empty string', () => {
+      const schema = zBooleanString()
+      expect(() => schema.parse('')).toThrow('must be a boolean string')
+    })
+
+    it('should throw error for non-string input', () => {
+      const schema = zBooleanString()
+      expect(() => schema.parse(true)).toThrow()
+      expect(() => schema.parse(false)).toThrow()
+      expect(() => schema.parse(123)).toThrow()
+    })
+  })
+
+  describe('commaSeparatedStringIntoArray', () => {
+    it('should split comma-separated string into array', () => {
+      const result = commaSeparatedStringIntoArray('a,b,c')
+      expect(result).toEqual(['a', 'b', 'c'])
+    })
+
+    it('should trim whitespace from values', () => {
+      const result = commaSeparatedStringIntoArray('a, b , c')
+      expect(result).toEqual(['a', 'b', 'c'])
+    })
+
+    it('should filter out empty values', () => {
+      const result = commaSeparatedStringIntoArray('a,,b,')
+      expect(result).toEqual(['a', 'b'])
+    })
+
+    it('should handle single value', () => {
+      const result = commaSeparatedStringIntoArray('single')
+      expect(result).toEqual(['single'])
+    })
+
+    it('should handle empty string', () => {
+      const result = commaSeparatedStringIntoArray('')
+      expect(result).toEqual([])
+    })
+
+    it('should handle string with only commas', () => {
+      const result = commaSeparatedStringIntoArray(',,,')
+      expect(result).toEqual([])
     })
   })
 })

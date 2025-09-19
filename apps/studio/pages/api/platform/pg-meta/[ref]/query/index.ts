@@ -1,7 +1,6 @@
-import { fetchPost } from 'data/fetchers'
 import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PG_META_URL } from 'lib/constants'
+import { executeQuery } from 'lib/api/local/query'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
@@ -22,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
-  const response = await fetchPost(`${PG_META_URL}/query`, { query }, { headers })
+  const response = await executeQuery({ query, headers })
 
   if (response.error) {
     const { code, message } = response.error
