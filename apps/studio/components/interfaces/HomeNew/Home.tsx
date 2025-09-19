@@ -74,7 +74,7 @@ export const HomeV2 = () => {
 
       if (project?.ref && organization?.slug) {
         sendEvent({
-          action: 'home_section_reordered',
+          action: 'home_section_rows_moved',
           properties: {
             section_moved: String(active.id),
             old_position: oldIndex,

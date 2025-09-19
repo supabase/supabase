@@ -1429,8 +1429,8 @@ export interface DpaPdfOpenedEvent {
  * @source studio
  * @page /project/{ref}
  */
-export interface HomeGettingStartedWorkflowSelectedEvent {
-  action: 'home_getting_started_workflow_selected'
+export interface HomeGettingStartedWorkflowClickedEvent {
+  action: 'home_getting_started_workflow_clicked'
   properties: {
     /**
      * The workflow selected by the user
@@ -1661,8 +1661,8 @@ export interface HomeCustomReportBlockRemovedEvent {
  * @source studio
  * @page /project/{ref}
  */
-export interface HomeGettingStartedDismissedEvent {
-  action: 'home_getting_started_dismissed'
+export interface HomeGettingStartedClosedEvent {
+  action: 'home_getting_started_closed'
   properties: {
     /**
      * The current workflow when dismissed
@@ -1687,8 +1687,8 @@ export interface HomeGettingStartedDismissedEvent {
  * @source studio
  * @page /project/{ref}
  */
-export interface HomeSectionReorderedEvent {
-  action: 'home_section_reordered'
+export interface HomeSectionRowsMovedEvent {
+  action: 'home_section_rows_moved'
   properties: {
     /**
      * The section that was moved
@@ -1839,10 +1839,10 @@ export type TelemetryEvent =
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
   | DpaPdfOpenedEvent
-  | HomeGettingStartedWorkflowSelectedEvent
+  | HomeGettingStartedWorkflowClickedEvent
   | HomeGettingStartedStepClickedEvent
-  | HomeGettingStartedDismissedEvent
-  | HomeSectionReorderedEvent
+  | HomeGettingStartedClosedEvent
+  | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
   | HomeAdvisorAskAssistantClickedEvent
   | HomeAdvisorIssueCardClickedEvent
