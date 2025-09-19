@@ -1479,6 +1479,28 @@ export interface HomeGettingStartedStepClickedEvent {
 }
 
 /**
+ * User clicked on an activity stat in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeActivityStatClickedEvent {
+  action: 'home_activity_stat_clicked'
+  properties: {
+    /**
+     * The type of activity stat clicked
+     */
+    stat_type: 'migrations' | 'backups' | 'branches'
+    /**
+     * The current value of the stat
+     */
+    stat_value: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User dismissed the Getting Started section in HomeV2.
  *
  * @group Events
@@ -1526,50 +1548,6 @@ export interface HomeSectionReorderedEvent {
      * The new position of the section (0-based index)
      */
     new_position: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on an activity stat in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeActivityStatClickedEvent {
-  action: 'home_activity_stat_clicked'
-  properties: {
-    /**
-     * The type of activity stat clicked
-     */
-    stat_type: 'migrations' | 'backups' | 'branches' | 'tables' | 'functions' | 'replicas'
-    /**
-     * The current value of the stat
-     */
-    stat_value: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User toggled the visibility of a section in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeSectionVisibilityToggledEvent {
-  action: 'home_section_visibility_toggled'
-  properties: {
-    /**
-     * The section that was toggled
-     */
-    section_name: string
-    /**
-     * The new visibility state
-     */
-    is_visible: boolean
   }
   groups: TelemetryGroups
 }
@@ -1712,7 +1690,6 @@ export type TelemetryEvent =
   | HomeGettingStartedDismissedEvent
   | HomeSectionReorderedEvent
   | HomeActivityStatClickedEvent
-  | HomeSectionVisibilityToggledEvent
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent

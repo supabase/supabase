@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import type { HomeActivityStatClickedEvent } from 'common/telemetry-constants'
 
 type SingleStatProps = {
   icon: ReactNode
@@ -13,7 +14,7 @@ type SingleStatProps = {
   onClick?: () => void
   trackingAction?: 'home_activity_stat_clicked'
   trackingProperties?: {
-    stat_type: 'migrations' | 'backups' | 'branches' | 'tables' | 'functions' | 'replicas'
+    stat_type: 'migrations' | 'backups' | 'branches'
     stat_value: number
   }
 }
@@ -34,15 +35,21 @@ export const SingleStat = ({
 
   const handleClick = () => {
     if (onClick) onClick()
-    if (trackingAction && trackingProperties && project?.ref && organization?.slug) {
-      sendEvent({
-        action: trackingAction,
+    if (
+      trackingAction === 'home_activity_stat_clicked' &&
+      trackingProperties &&
+      project?.ref &&
+      organization?.slug
+    ) {
+      const event: HomeActivityStatClickedEvent = {
+        action: 'home_activity_stat_clicked',
         properties: trackingProperties,
         groups: {
           project: project.ref,
           organization: organization.slug,
         },
-      })
+      }
+      sendEvent(event)
     }
   }
   const content = (
@@ -65,15 +72,21 @@ export const SingleStat = ({
         className="group block"
         href={href}
         onClick={() => {
-          if (trackingAction && trackingProperties && project?.ref && organization?.slug) {
-            sendEvent({
-              action: trackingAction,
+          if (
+            trackingAction === 'home_activity_stat_clicked' &&
+            trackingProperties &&
+            project?.ref &&
+            organization?.slug
+          ) {
+            const event: HomeActivityStatClickedEvent = {
+              action: 'home_activity_stat_clicked',
               properties: trackingProperties,
               groups: {
                 project: project.ref,
                 organization: organization.slug,
               },
-            })
+            }
+            sendEvent(event)
           }
         }}
       >
