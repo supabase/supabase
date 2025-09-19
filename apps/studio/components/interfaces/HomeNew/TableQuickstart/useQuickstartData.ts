@@ -53,9 +53,13 @@ export const useQuickstartData = ({
 
         const columns: TableField['columns'] = fields.map(
           (field: QuickstartTableField, index: number) => {
-            const looksLikePrimaryKey =
+            // Check if field is marked as primary or if it's an id field
+            const isPrimaryKey = field.isPrimary === true || field.name === 'id'
+
+            const looksLikeIdentity =
               field.name === 'id' &&
-              (field.type === 'uuid' || field.type.toLowerCase().includes('int'))
+              field.type.toLowerCase().includes('int') &&
+              !field.default
 
             return {
               id: `column-${index}`,
@@ -64,9 +68,8 @@ export const useQuickstartData = ({
               defaultValue: field.default ? String(field.default) : null,
               isNullable: field.nullable !== false,
               isUnique: field.unique ?? false,
-              isIdentity:
-                looksLikePrimaryKey && field.type.toLowerCase().includes('int') && !field.default,
-              isPrimaryKey: looksLikePrimaryKey,
+              isIdentity: looksLikeIdentity,
+              isPrimaryKey: isPrimaryKey,
               comment: field.description || '',
               isNewColumn: true,
               table: tableName,
