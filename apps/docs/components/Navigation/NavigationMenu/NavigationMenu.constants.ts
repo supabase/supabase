@@ -620,6 +620,10 @@ export const auth: NavMenuConstant = {
           name: 'React Native',
           url: '/guides/auth/quickstarts/react-native' as `/${string}`,
         },
+        {
+          name: 'React Native with Expo & Social Auth',
+          url: '/guides/auth/quickstarts/with-expo-react-native-social-auth',
+        },
       ],
     },
 
