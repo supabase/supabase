@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import type { Edge, Node } from 'reactflow'
 import { Layers } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
-import { Button, Badge, cn } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { formatMs, formatNumber, blocksToBytes } from './utils/formats'
 
 type SidebarMetricKey = 'time' | 'rows' | 'cost' | 'buffers' | 'io'
@@ -17,7 +17,7 @@ type SidebarRow = {
   branchTrail: boolean[]
 }
 
-type PlanMetricsSidebarProps = {
+type MetricsSidebarProps = {
   nodes: Node<PlanNodeData>[]
   edges: Edge[]
   meta?: PlanMeta
@@ -237,127 +237,137 @@ const TreeGuide = ({ branchTrail, isLast }: { branchTrail: boolean[]; isLast: bo
   )
 }
 
+const renderMetricCellForMode = (
+  data: PlanNodeData,
+  stats: MetricStats,
+  metric: SidebarMetricKey,
+  mode: 'visual' | 'tooltip'
+): ReactNode => {
+  switch (metric) {
+    case 'time': {
+      const exclusive = data.exclusiveTimeMs ?? 0
+      const inclusive = Math.max(
+        (data.actualTotalTime ?? 0) * (data.actualLoops ?? 1) - exclusive,
+        0
+      )
+      const totalPercent = stats.totalTime > 0 ? (exclusive / stats.totalTime) * 100 : 0
+      const secondaryPercent = stats.totalTime > 0 ? (inclusive / stats.totalTime) * 100 : 0
+      const formattedExclusive = formatMs(exclusive)
+
+      if (mode === 'tooltip') {
+        return <span>Exclusive {formattedExclusive ? `${formattedExclusive} ms` : '0 ms'}</span>
+      }
+
+      return (
+        <MetricBar
+          percent={totalPercent}
+          secondaryPercent={secondaryPercent}
+          color="bg-brand"
+          secondaryColor="bg-brand/30"
+        />
+      )
+    }
+    case 'rows': {
+      const actualTotalRows =
+        data.estActualTotalRows ?? (data.actualRows ?? 0) * (data.actualLoops ?? 1)
+      const percent = stats.maxRows > 0 ? (actualTotalRows / stats.maxRows) * 100 : 0
+      if (mode === 'tooltip') {
+        return (
+          <span>
+            Actual {formatNumber(actualTotalRows) ?? '0'}
+            {data.planRows !== undefined ? ` · Est ${formatNumber(data.planRows)}` : ''}
+          </span>
+        )
+      }
+      return <MetricBar percent={percent} color="bg-brand" />
+    }
+    case 'cost': {
+      const exclusiveCost = data.exclusiveCost ?? 0
+      const percent =
+        stats.maxExclusiveCost > 0 ? (exclusiveCost / stats.maxExclusiveCost) * 100 : 0
+      if (mode === 'tooltip') {
+        return <span>Self cost {exclusiveCost.toFixed(2)}</span>
+      }
+      return <MetricBar percent={percent} color="bg-brand" />
+    }
+    case 'buffers': {
+      const breakdown = computeBufferBreakdown(data)
+      if (breakdown.total <= 0) {
+        if (mode === 'tooltip') return null
+        return <span className="text-[11px] text-foreground-light">No buffers</span>
+      }
+      const totalPercent =
+        stats.maxBufferTotal > 0 ? (breakdown.total / stats.maxBufferTotal) * 100 : 0
+      const sharedPercent =
+        breakdown.total > 0 ? (breakdown.shared / breakdown.total) * totalPercent : 0
+      const tempPercent =
+        breakdown.total > 0 ? (breakdown.temp / breakdown.total) * totalPercent : 0
+      const localPercent =
+        breakdown.total > 0 ? (breakdown.local / breakdown.total) * totalPercent : 0
+
+      if (mode === 'tooltip') {
+        return (
+          <div className="space-y-1">
+            <div>
+              Shared {formatNumber(breakdown.shared) ?? '0'} · Temp{' '}
+              {formatNumber(breakdown.temp) ?? '0'} · Local {formatNumber(breakdown.local) ?? '0'}{' '}
+              blocks
+            </div>
+            <div className="text-[10px] text-foreground-light">
+              Total {formatNumber(breakdown.total) ?? '0'} blocks ({blocksToBytes(breakdown.total)})
+            </div>
+          </div>
+        )
+      }
+
+      return (
+        <BufferBar
+          sharedPercent={sharedPercent}
+          tempPercent={tempPercent}
+          localPercent={localPercent}
+        />
+      )
+    }
+    case 'io': {
+      const read = data.ioReadTime ?? 0
+      const write = data.ioWriteTime ?? 0
+      const total = read + write
+      if (total <= 0) {
+        if (mode === 'tooltip') return null
+        return <span className="text-[11px] text-foreground-light">No IO timing</span>
+      }
+      const percent = stats.maxIO > 0 ? (total / stats.maxIO) * 100 : 0
+      const readPercent = total > 0 ? (read / total) * percent : 0
+      const writePercent = total > 0 ? (write / total) * percent : 0
+
+      if (mode === 'tooltip') {
+        return (
+          <span>
+            Read {formatMs(read) ?? '0'} ms · Write {formatMs(write) ?? '0'} ms
+          </span>
+        )
+      }
+
+      return <BufferBar sharedPercent={readPercent} tempPercent={writePercent} localPercent={0} />
+    }
+    default:
+      return null
+  }
+}
+
 export const MetricsSidebar = ({
   nodes,
   edges,
   meta,
   selectedNode,
   onSelect,
-}: PlanMetricsSidebarProps) => {
+}: MetricsSidebarProps) => {
   const [activeMetric, setActiveMetric] = useState<SidebarMetricKey>('time')
 
   const rows = useMemo(() => computeRows(nodes, edges), [nodes, edges])
   const stats = useMemo(() => computeStats(nodes, meta), [nodes, meta])
 
   if (!rows.length) return null
-
-  const renderMetricCell = (data: PlanNodeData) => {
-    switch (activeMetric) {
-      case 'time': {
-        const exclusive = data.exclusiveTimeMs ?? 0
-        const inclusive = Math.max(
-          (data.actualTotalTime ?? 0) * (data.actualLoops ?? 1) - exclusive,
-          0
-        )
-        const totalPercent = stats.totalTime > 0 ? (exclusive / stats.totalTime) * 100 : 0
-        const secondaryPercent = stats.totalTime > 0 ? (inclusive / stats.totalTime) * 100 : 0
-        // const formattedExclusive = formatMs(exclusive)
-
-        return (
-          // <div className="flex flex-col gap-1">
-          <MetricBar
-            percent={totalPercent}
-            secondaryPercent={secondaryPercent}
-            color="bg-brand"
-            secondaryColor="bg-brand/30"
-          />
-          //  <span className="text-[11px] text-foreground-light">
-          //   Exclusive {formattedExclusive ? `${formattedExclusive} ms` : '0 ms'}
-          // </span>
-          // </div>
-        )
-      }
-      case 'rows': {
-        const actualTotalRows =
-          data.estActualTotalRows ?? (data.actualRows ?? 0) * (data.actualLoops ?? 1)
-        const percent = stats.maxRows > 0 ? (actualTotalRows / stats.maxRows) * 100 : 0
-        return (
-          <div className="flex flex-col gap-1">
-            <MetricBar percent={percent} color="bg-brand" />
-            {/* <span className="text-[11px] text-foreground-light">
-              Actual {formatNumber(actualTotalRows) ?? '0'}
-              {data.planRows !== undefined ? ` · Est ${formatNumber(data.planRows)}` : ''}
-            </span> */}
-          </div>
-        )
-      }
-      case 'cost': {
-        const exclusiveCost = data.exclusiveCost ?? 0
-        const percent =
-          stats.maxExclusiveCost > 0 ? (exclusiveCost / stats.maxExclusiveCost) * 100 : 0
-        return (
-          <div className="flex flex-col gap-1">
-            <MetricBar percent={percent} color="bg-brand" />
-            {/* <span className="text-[11px] text-foreground-light">
-              Self cost {exclusiveCost.toFixed(2)}
-            </span> */}
-          </div>
-        )
-      }
-      case 'buffers': {
-        const breakdown = computeBufferBreakdown(data)
-        if (breakdown.total <= 0) {
-          return <span className="text-[11px] text-foreground-light">No buffers</span>
-        }
-        const totalPercent =
-          stats.maxBufferTotal > 0 ? (breakdown.total / stats.maxBufferTotal) * 100 : 0
-        const totalBlocks = formatNumber(breakdown.total) ?? '0'
-        const sharedPercent =
-          breakdown.total > 0 ? (breakdown.shared / breakdown.total) * totalPercent : 0
-        const tempPercent =
-          breakdown.total > 0 ? (breakdown.temp / breakdown.total) * totalPercent : 0
-        const localPercent =
-          breakdown.total > 0 ? (breakdown.local / breakdown.total) * totalPercent : 0
-        return (
-          <div className="flex flex-col gap-1">
-            <BufferBar
-              sharedPercent={sharedPercent}
-              tempPercent={tempPercent}
-              localPercent={localPercent}
-            />
-            {/* <span className="text-[11px] text-foreground-light">
-              Shared {formatNumber(breakdown.shared) ?? '0'} · Temp{' '}
-              {formatNumber(breakdown.temp) ?? '0'} · Local {formatNumber(breakdown.local) ?? '0'}{' '}
-              blocks
-            </span>
-            <span className="text-[10px] text-foreground-muted">
-              Total {totalBlocks} blocks ({blocksToBytes(breakdown.total)})
-            </span> */}
-          </div>
-        )
-      }
-      case 'io': {
-        const read = data.ioReadTime ?? 0
-        const write = data.ioWriteTime ?? 0
-        const total = read + write
-        if (total <= 0)
-          return <span className="text-[11px] text-foreground-light">No IO timing</span>
-        const percent = stats.maxIO > 0 ? (total / stats.maxIO) * 100 : 0
-        const readPercent = total > 0 ? (read / total) * percent : 0
-        const writePercent = total > 0 ? (write / total) * percent : 0
-        return (
-          <div className="flex flex-col gap-1">
-            <BufferBar sharedPercent={readPercent} tempPercent={writePercent} localPercent={0} />
-            {/* <span className="text-[11px] text-foreground-light">
-              Read {formatMs(read) ?? '0'} ms · Write {formatMs(write) ?? '0'} ms
-            </span> */}
-          </div>
-        )
-      }
-      default:
-        return null
-    }
-  }
 
   return (
     <aside className="hidden lg:flex w-72 flex-col border-r border-border bg-background">
@@ -384,9 +394,28 @@ export const MetricsSidebar = ({
       <div className="flex-1 overflow-y-auto px-3 py-2">
         <ul className="flex flex-col">
           {rows.map((row) => {
-            const { node, index, branchTrail, isLast } = row
+            const { node, branchTrail, isLast } = row
             const data = node.data
             const isActive = selectedNode && selectedNode === data
+            const visual = renderMetricCellForMode(data, stats, activeMetric, 'visual')
+            const tooltip = renderMetricCellForMode(data, stats, activeMetric, 'tooltip')
+            const hasTooltip = tooltip !== null && tooltip !== undefined && tooltip !== ''
+
+            const buttonBody = (
+              <button
+                type="button"
+                className="w-full py-0 px-1 text-xs"
+                onClick={() => onSelect?.(data)}
+              >
+                <div className="flex items-center gap-x-1 h-[16px]">
+                  <TreeGuide branchTrail={branchTrail} isLast={isLast} />
+                  <span className="flex-1 min-w-0 font-medium text-[11px] text-left text-foreground">
+                    {data.label}
+                  </span>
+                  {visual ? <div className="flex-none w-[120px]">{visual}</div> : null}
+                </div>
+              </button>
+            )
 
             return (
               <li
@@ -396,37 +425,16 @@ export const MetricsSidebar = ({
                   isActive ? 'border-brand bg-brand/10' : 'hover:border-border'
                 )}
               >
-                <button
-                  type="button"
-                  className="w-full py-0 px-1 text-xs"
-                  onClick={() => onSelect?.(data)}
-                >
-                  {/* <span className="text-foreground-light text-[11px] leading-4 pt-[2px]">
-                      #{index}
-                    </span> */}
-                  <div className="flex items-center gap-x-1 h-[16px]">
-                    <TreeGuide branchTrail={branchTrail} isLast={isLast} />
-                    <span className="flex-1 min-w-0 font-medium text-[11px] text-left text-foreground">
-                      {data.label}
-                    </span>
-                    {/* {data.cteName ? (
-                          <Badge size="small" className="text-[10px]" variant="outline">
-                            CTE
-                          </Badge>
-                        ) : null}
-                        {data.subplanName && !data.cteName ? (
-                          <Badge size="small" className="text-[10px]" variant="outline">
-                            {data.subplanName}
-                          </Badge>
-                        ) : null}
-                        {data.neverExecuted ? (
-                          <Badge size="small" variant="destructive" className="text-[10px]">
-                            Never executed
-                          </Badge>
-                        ) : null} */}
-                    <div className="flex-none w-[120px]">{renderMetricCell(data)}</div>
-                  </div>
-                </button>
+                {hasTooltip ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>{buttonBody}</TooltipTrigger>
+                    <TooltipContent side="left" className="text-[11px]">
+                      {tooltip}
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
+                  buttonBody
+                )}
               </li>
             )
           })}
