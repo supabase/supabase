@@ -40,6 +40,13 @@ type BufferBreakdown = {
   total: number
 }
 
+type MetricRenderResult = {
+  visual: ReactNode | null
+  tooltip: ReactNode | null
+}
+
+type MetricRenderer = (data: PlanNodeData, stats: MetricStats) => MetricRenderResult
+
 const METRIC_OPTIONS: { key: SidebarMetricKey; label: string }[] = [
   { key: 'time', label: 'time' },
   { key: 'rows', label: 'rows' },
@@ -237,123 +244,127 @@ const TreeGuide = ({ branchTrail, isLast }: { branchTrail: boolean[]; isLast: bo
   )
 }
 
-const renderMetricCellForMode = (
-  data: PlanNodeData,
-  stats: MetricStats,
-  metric: SidebarMetricKey,
-  mode: 'visual' | 'tooltip'
-): ReactNode => {
-  switch (metric) {
-    case 'time': {
-      const exclusive = data.exclusiveTimeMs ?? 0
-      const inclusive = Math.max(
-        (data.actualTotalTime ?? 0) * (data.actualLoops ?? 1) - exclusive,
-        0
-      )
-      const totalPercent = stats.totalTime > 0 ? (exclusive / stats.totalTime) * 100 : 0
-      const secondaryPercent = stats.totalTime > 0 ? (inclusive / stats.totalTime) * 100 : 0
-      const formattedExclusive = formatMs(exclusive)
+const renderTimeMetric: MetricRenderer = (data, stats) => {
+  const exclusive = data.exclusiveTimeMs ?? 0
+  const inclusive = Math.max((data.actualTotalTime ?? 0) * (data.actualLoops ?? 1) - exclusive, 0)
+  const totalPercent = stats.totalTime > 0 ? (exclusive / stats.totalTime) * 100 : 0
+  const secondaryPercent = stats.totalTime > 0 ? (inclusive / stats.totalTime) * 100 : 0
+  const formattedExclusive = formatMs(exclusive)
 
-      if (mode === 'tooltip') {
-        return <span>Exclusive {formattedExclusive ? `${formattedExclusive} ms` : '0 ms'}</span>
-      }
-
-      return (
-        <MetricBar
-          percent={totalPercent}
-          secondaryPercent={secondaryPercent}
-          color="bg-brand"
-          secondaryColor="bg-brand/30"
-        />
-      )
-    }
-    case 'rows': {
-      const actualTotalRows =
-        data.estActualTotalRows ?? (data.actualRows ?? 0) * (data.actualLoops ?? 1)
-      const percent = stats.maxRows > 0 ? (actualTotalRows / stats.maxRows) * 100 : 0
-      if (mode === 'tooltip') {
-        return (
-          <span>
-            Actual {formatNumber(actualTotalRows) ?? '0'}
-            {data.planRows !== undefined ? ` · Est ${formatNumber(data.planRows)}` : ''}
-          </span>
-        )
-      }
-      return <MetricBar percent={percent} color="bg-brand" />
-    }
-    case 'cost': {
-      const exclusiveCost = data.exclusiveCost ?? 0
-      const percent =
-        stats.maxExclusiveCost > 0 ? (exclusiveCost / stats.maxExclusiveCost) * 100 : 0
-      if (mode === 'tooltip') {
-        return <span>Self cost {exclusiveCost.toFixed(2)}</span>
-      }
-      return <MetricBar percent={percent} color="bg-brand" />
-    }
-    case 'buffers': {
-      const breakdown = computeBufferBreakdown(data)
-      if (breakdown.total <= 0) {
-        if (mode === 'tooltip') return null
-        return <span className="text-[11px] text-foreground-light">No buffers</span>
-      }
-      const totalPercent =
-        stats.maxBufferTotal > 0 ? (breakdown.total / stats.maxBufferTotal) * 100 : 0
-      const sharedPercent =
-        breakdown.total > 0 ? (breakdown.shared / breakdown.total) * totalPercent : 0
-      const tempPercent =
-        breakdown.total > 0 ? (breakdown.temp / breakdown.total) * totalPercent : 0
-      const localPercent =
-        breakdown.total > 0 ? (breakdown.local / breakdown.total) * totalPercent : 0
-
-      if (mode === 'tooltip') {
-        return (
-          <div className="space-y-1">
-            <div>
-              Shared {formatNumber(breakdown.shared) ?? '0'} · Temp{' '}
-              {formatNumber(breakdown.temp) ?? '0'} · Local {formatNumber(breakdown.local) ?? '0'}{' '}
-              blocks
-            </div>
-            <div className="text-[10px] text-foreground-light">
-              Total {formatNumber(breakdown.total) ?? '0'} blocks ({blocksToBytes(breakdown.total)})
-            </div>
-          </div>
-        )
-      }
-
-      return (
-        <BufferBar
-          sharedPercent={sharedPercent}
-          tempPercent={tempPercent}
-          localPercent={localPercent}
-        />
-      )
-    }
-    case 'io': {
-      const read = data.ioReadTime ?? 0
-      const write = data.ioWriteTime ?? 0
-      const total = read + write
-      if (total <= 0) {
-        if (mode === 'tooltip') return null
-        return <span className="text-[11px] text-foreground-light">No IO timing</span>
-      }
-      const percent = stats.maxIO > 0 ? (total / stats.maxIO) * 100 : 0
-      const readPercent = total > 0 ? (read / total) * percent : 0
-      const writePercent = total > 0 ? (write / total) * percent : 0
-
-      if (mode === 'tooltip') {
-        return (
-          <span>
-            Read {formatMs(read) ?? '0'} ms · Write {formatMs(write) ?? '0'} ms
-          </span>
-        )
-      }
-
-      return <BufferBar sharedPercent={readPercent} tempPercent={writePercent} localPercent={0} />
-    }
-    default:
-      return null
+  return {
+    visual: (
+      <MetricBar
+        percent={totalPercent}
+        secondaryPercent={secondaryPercent}
+        color="bg-brand"
+        secondaryColor="bg-brand/30"
+      />
+    ),
+    tooltip: <span>Exclusive {formattedExclusive ? `${formattedExclusive} ms` : '0 ms'}</span>,
   }
 }
+
+const renderRowsMetric: MetricRenderer = (data, stats) => {
+  const actualTotalRows =
+    data.estActualTotalRows ?? (data.actualRows ?? 0) * (data.actualLoops ?? 1)
+  const percent = stats.maxRows > 0 ? (actualTotalRows / stats.maxRows) * 100 : 0
+
+  return {
+    visual: <MetricBar percent={percent} color="bg-brand" />,
+    tooltip: (
+      <span>
+        Actual {formatNumber(actualTotalRows) ?? '0'}
+        {data.planRows !== undefined ? ` · Est ${formatNumber(data.planRows)}` : ''}
+      </span>
+    ),
+  }
+}
+
+const renderCostMetric: MetricRenderer = (data, stats) => {
+  const exclusiveCost = data.exclusiveCost ?? 0
+  const percent = stats.maxExclusiveCost > 0 ? (exclusiveCost / stats.maxExclusiveCost) * 100 : 0
+
+  return {
+    visual: <MetricBar percent={percent} color="bg-brand" />,
+    tooltip: <span>Self cost {exclusiveCost.toFixed(2)}</span>,
+  }
+}
+
+const renderBuffersMetric: MetricRenderer = (data, stats) => {
+  const breakdown = computeBufferBreakdown(data)
+
+  if (breakdown.total <= 0) {
+    return {
+      visual: <span className="text-[11px] text-foreground-light">No buffers</span>,
+      tooltip: null,
+    }
+  }
+
+  const totalPercent = stats.maxBufferTotal > 0 ? (breakdown.total / stats.maxBufferTotal) * 100 : 0
+  const sharedPercent =
+    breakdown.total > 0 ? (breakdown.shared / breakdown.total) * totalPercent : 0
+  const tempPercent = breakdown.total > 0 ? (breakdown.temp / breakdown.total) * totalPercent : 0
+  const localPercent = breakdown.total > 0 ? (breakdown.local / breakdown.total) * totalPercent : 0
+
+  return {
+    visual: (
+      <BufferBar
+        sharedPercent={sharedPercent}
+        tempPercent={tempPercent}
+        localPercent={localPercent}
+      />
+    ),
+    tooltip: (
+      <div className="space-y-1">
+        <div>
+          Shared {formatNumber(breakdown.shared) ?? '0'} · Temp{' '}
+          {formatNumber(breakdown.temp) ?? '0'} · Local {formatNumber(breakdown.local) ?? '0'}{' '}
+          blocks
+        </div>
+        <div className="text-[10px] text-foreground-light">
+          Total {formatNumber(breakdown.total) ?? '0'} blocks ({blocksToBytes(breakdown.total)})
+        </div>
+      </div>
+    ),
+  }
+}
+
+const renderIOMetric: MetricRenderer = (data, stats) => {
+  const read = data.ioReadTime ?? 0
+  const write = data.ioWriteTime ?? 0
+  const total = read + write
+
+  if (total <= 0) {
+    return {
+      visual: <span className="text-[11px] text-foreground-light">No IO timing</span>,
+      tooltip: null,
+    }
+  }
+
+  const percent = stats.maxIO > 0 ? (total / stats.maxIO) * 100 : 0
+  const readPercent = total > 0 ? (read / total) * percent : 0
+  const writePercent = total > 0 ? (write / total) * percent : 0
+
+  return {
+    visual: <BufferBar sharedPercent={readPercent} tempPercent={writePercent} localPercent={0} />,
+    tooltip: (
+      <span>
+        Read {formatMs(read) ?? '0'} ms · Write {formatMs(write) ?? '0'} ms
+      </span>
+    ),
+  }
+}
+
+const METRIC_RENDERERS: Record<SidebarMetricKey, MetricRenderer> = {
+  time: renderTimeMetric,
+  rows: renderRowsMetric,
+  cost: renderCostMetric,
+  buffers: renderBuffersMetric,
+  io: renderIOMetric,
+}
+
+const hasTooltipContent = (content: ReactNode | null) =>
+  content !== null && content !== undefined && content !== false && content !== ''
 
 export const MetricsSidebar = ({
   nodes,
@@ -397,9 +408,8 @@ export const MetricsSidebar = ({
             const { node, branchTrail, isLast } = row
             const data = node.data
             const isActive = selectedNodeId === node.id
-            const visual = renderMetricCellForMode(data, stats, activeMetric, 'visual')
-            const tooltip = renderMetricCellForMode(data, stats, activeMetric, 'tooltip')
-            const hasTooltip = tooltip !== null && tooltip !== undefined && tooltip !== ''
+            const { visual, tooltip } = METRIC_RENDERERS[activeMetric](data, stats)
+            const hasTooltip = hasTooltipContent(tooltip)
 
             const buttonBody = (
               <button
