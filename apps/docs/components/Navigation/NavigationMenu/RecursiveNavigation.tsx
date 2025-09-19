@@ -43,12 +43,10 @@ const RecursiveNavItem: React.FC<RecursiveNavItemProps> = ({
   const isActive = item.url === pathname
   const hasChildren = item.children && item.children.length > 0
   
-  // Don't render disabled items
   if (item.enabled === false) {
     return null
   }
 
-  // For items with children - render as accordion
   if (hasChildren) {
     return (
       <Accordion.Root 
@@ -104,7 +102,6 @@ const RecursiveNavItem: React.FC<RecursiveNavItemProps> = ({
     )
   }
 
-  // For leaf items - render as link
   return (
     <Link
       href={item.url || '#'}
