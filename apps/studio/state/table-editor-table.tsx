@@ -30,6 +30,16 @@ export const createTableEditorTableState = ({
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void
 }) => {
+  if (!originalTable)
+    return proxy({
+      editable,
+      _originalTableRef: undefined,
+      table: { name: '', schema: '' },
+      gridColumns: [],
+      updateTable: () => {},
+      setEditable: () => {},
+    })
+
   const table = parseSupaTable(originalTable)
 
   const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
