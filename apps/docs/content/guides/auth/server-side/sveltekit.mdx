@@ -644,4 +644,61 @@ export const load: PageServerLoad = async ({ depends, locals: { supabase } }) =>
 
 </StepHikeCompact.Step>
 
+<StepHikeCompact.Step step={12} title="Add OAuth login" id="oauth-login">
+
+<StepHikeCompact.Details title="Extend your auth actions with OAuth">
+
+Extend your `+page.server.ts` with an `oauth` action to handle third-party providers.  
+Then, update your `+page.svelte` to include a login button.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+<$CodeTabs>
+
+```ts name=src/routes/auth/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import type { Actions } from './$types'
+import type { Provider } from '@supabase/supabase-js'
+
+export const actions: Actions = {
+  // ...existing signup and login actions...
+
+  oauth: async ({ url, locals: { supabase } }) => {
+    const provider = url.searchParams.get('provider')
+    if (!provider) {
+      return redirect(303, '/auth/error')
+    }
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider as Provider,
+      options: {
+        redirectTo: `${url.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      console.error(error)
+      return redirect(303, '/auth/error')
+    }
+
+    // Redirect to OAuth provider
+    return redirect(303, data.url)
+  }
+}
+```
+
+```svelte name=src/routes/auth/+page.svelte
+<form method="POST" action="?/oauth&provider=github">
+  <button type="submit">Sign in with GitHub</button>
+</form>
+```
+
+</$CodeTabs>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
 </StepHikeCompact>
