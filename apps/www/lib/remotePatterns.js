@@ -147,6 +147,12 @@ module.exports = [
     port: '',
     pathname: '/dms/image/**',
   },
+  {
+    protocol: 'https',
+    hostname: 'cms.supabase.com',
+    port: '',
+    pathname: '**',
+  },
   // Dynamically generated CMS patterns based on CMS_SITE_ORIGIN
   ...generateCMSRemotePatterns(),
 ]
