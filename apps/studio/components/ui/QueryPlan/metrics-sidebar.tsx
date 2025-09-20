@@ -22,7 +22,7 @@ type MetricsSidebarProps = {
   edges: Edge[]
   meta?: PlanMeta
   selectedNodeId?: string | null
-  onSelect?: (node: Node<PlanNodeData>) => void
+  onSelect: (node: Node<PlanNodeData>) => void
 }
 
 type MetricStats = {
@@ -517,10 +517,14 @@ export const MetricsSidebar = ({
             const hasTooltip = hasTooltipContent(tooltip)
 
             const buttonBody = (
-              <button
-                type="button"
-                className="w-full py-0 px-1 text-xs"
-                onClick={() => onSelect?.(node)}
+              <Button
+                type="default"
+                size="tiny"
+                onClick={() => onSelect(node)}
+                className={cn(
+                  'w-full py-0 px-1 text-xs block bg-sidebar dark:bg-sidebar border border-transparent transition-colors rounded hover:border-border hover:bg-surface-100 dark:hover:bg-surface-100',
+                  isActive && 'border-stronger bg-surface-100 dark:bg-surface-100'
+                )}
               >
                 <div className="flex items-center gap-x-1 h-[24px]">
                   <TreeGuide branchTrail={branchTrail} isLast={isLast} />
@@ -529,17 +533,11 @@ export const MetricsSidebar = ({
                   </span>
                   {visual ? <div className="flex-none w-[120px]">{visual}</div> : null}
                 </div>
-              </button>
+              </Button>
             )
 
             return (
-              <li
-                key={row.id}
-                className={cn(
-                  'rounded border border-transparent transition-colors flex px-1 hover:border-border hover:bg-surface-100',
-                  isActive && 'border-stronger bg-surface-100'
-                )}
-              >
+              <li key={row.id}>
                 {hasTooltip ? (
                   <Tooltip>
                     <TooltipTrigger asChild>{buttonBody}</TooltipTrigger>
