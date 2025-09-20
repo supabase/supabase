@@ -1,6 +1,6 @@
 import { type ReactNode, useContext } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-import { Workflow, TimerOff, Clock, Rows3, CircleDollarSign, Layers, Ruler } from 'lucide-react'
+import { Workflow, TimerOff, Clock, Rows3, CircleDollarSign, Layers, Table } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -193,6 +193,18 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
         </>
       ),
     },
+    {
+      id: 'plan-width',
+      condition: metricsVisibility.rows && data.planWidth !== undefined,
+      tooltip: 'Average bytes per row output by this step.',
+      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
+      element: (
+        <>
+          <span>Row size</span>
+          <span className="ml-auto">{formatOrDash(data.planWidth)} bytes</span>
+        </>
+      ),
+    },
     // {
     //   id: 'est-factor',
     //   condition: vis.rows && data.estFactor !== undefined,
@@ -230,7 +242,7 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       icon: <CircleDollarSign size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
-          <span>Cost for this step</span>
+          <span>Self cost</span>
           <span className="ml-auto">{data.exclusiveCost?.toFixed(2)}</span>
         </>
       ),
@@ -307,49 +319,42 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'plan-width',
-      condition: metricsVisibility.output && data.planWidth !== undefined,
-      tooltip: 'Average bytes per row output by this step.',
-      icon: <Ruler size={10} strokeWidth={1} className="mr-1" />,
+      id: 'output-cols',
+      condition:
+        metricsVisibility.output && Array.isArray(data.outputCols) && data.outputCols.length > 0,
+      icon: <Table size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: (
+        <div className="space-y-1">
+          <p>Columns passed to the next step.</p>
+          <span className="block whitespace-pre-wrap">{data.outputCols?.join(', ')}</span>
+        </div>
+      ),
       element: (
         <>
-          <span>Row size</span>
-          <span className="ml-auto">{formatOrDash(data.planWidth)} bytes</span>
+          <span>Columns returned</span>
+          <span className="truncate max-w-[95px] ml-auto">{data.outputCols?.join(', ')}</span>
         </>
       ),
     },
-    // {
-    //   id: 'output-cols',
-    //   condition: vis.output && Array.isArray(data.outputCols) && data.outputCols.length > 0,
-    //   tooltip: (
-    //     <div className="space-y-1">
-    //       <p>Columns passed to the next step.</p>
-    //       <span className="block whitespace-pre-wrap">{data.outputCols?.join(', ')}</span>
-    //     </div>
-    //   ),
-    //   element: (
-    //     <>
-    //       <span>Columns returned</span>
-    //       <span className="truncate max-w-[95px]">{data.outputCols?.join(', ')}</span>
-    //     </>
-    //   ),
-    // },
-    // {
-    //   id: 'io-times',
-    //   condition: vis.buffers && (data.ioReadTime !== undefined || data.ioWriteTime !== undefined),
-    //   tooltip: 'Time spent performing disk reads and writes for this step.',
-    //   element: (
-    //     <>
-    //       <span>Disk I/O time</span>
-    //       <span>
-    //         {data.ioReadTime !== undefined ? `read ${data.ioReadTime}ms` : ''}
-    //         {data.ioWriteTime !== undefined
-    //           ? `${data.ioReadTime !== undefined ? ' · ' : ''}write ${data.ioWriteTime}ms`
-    //           : ''}
-    //       </span>
-    //     </>
-    //   ),
-    // },
+    {
+      id: 'io-times',
+      condition:
+        metricsVisibility.output &&
+        (data.ioReadTime !== undefined || data.ioWriteTime !== undefined),
+      tooltip: 'Time spent performing disk reads and writes for this step.',
+      icon: <Table size={10} strokeWidth={1} className="mr-1" />,
+      element: (
+        <>
+          <span>Disk I/O time</span>
+          <span className="ml-auto">
+            {data.ioReadTime !== undefined ? `read ${data.ioReadTime}ms` : ''}
+            {data.ioWriteTime !== undefined
+              ? `${data.ioReadTime !== undefined ? ' · ' : ''}write ${data.ioWriteTime}ms`
+              : ''}
+          </span>
+        </>
+      ),
+    },
   ]
 }
 
