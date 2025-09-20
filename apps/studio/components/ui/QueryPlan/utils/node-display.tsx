@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Timer, BadgeDollarSign, ExternalLink } from 'lucide-react'
+import { Clock, ExternalLink, CircleDollarSign } from 'lucide-react'
 import { capitalize } from 'lodash'
 
 import type { PlanNodeData } from '../types'
@@ -315,7 +315,7 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             aria-label="Slow node"
             className="p-0.5 rounded"
           >
-            <Timer size={10} strokeWidth={1.5} />
+            <Clock size={10} strokeWidth={1.5} />
           </Badge>
         </TooltipTrigger>
         <TooltipContent side="top" className="space-y-1 max-w-[220px] pb-2">
@@ -351,7 +351,7 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             aria-label="Cost is high"
             className="p-0.5 rounded"
           >
-            <BadgeDollarSign size={10} strokeWidth={1.5} />
+            <CircleDollarSign size={10} strokeWidth={1.5} />
           </Badge>
         </TooltipTrigger>
         <TooltipContent side="top" className="space-y-1 max-w-[220px] pb-2">
