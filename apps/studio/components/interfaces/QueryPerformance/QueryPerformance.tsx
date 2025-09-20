@@ -61,6 +61,7 @@ export const QueryPerformance = ({
   return (
     <>
       <QueryPerformanceMetrics />
+
       <QueryPerformanceFilterBar
         queryPerformanceQuery={queryPerformanceQuery}
         onResetReportClick={() => setShowResetgPgStatStatements(true)}

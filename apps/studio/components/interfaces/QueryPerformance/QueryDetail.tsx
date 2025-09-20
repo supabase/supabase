@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 import { formatSql } from 'lib/formatSql'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
+import { QueryPlan } from './QueryPlan'
 
 interface QueryDetailProps {
   reportType: QUERY_PERFORMANCE_REPORT_TYPES
@@ -83,6 +84,10 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
               </div>
             )
           })}
+      </QueryPanelSection>
+      <div className="border-t" />
+      <QueryPanelSection>
+        <QueryPlan query={query} />
       </QueryPanelSection>
     </QueryPanelContainer>
   )
