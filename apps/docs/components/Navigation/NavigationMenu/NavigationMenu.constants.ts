@@ -7,8 +7,16 @@ import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Naviga
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
   billingAll: billingEnabled,
+  docsAuth: authEnabled,
   docsCompliance: complianceEnabled,
+  docsContribution: contributionEnabled,
   'docsSelf-hosting': selfHostingEnabled,
+  docsFrameworkQuickstarts: frameworkQuickstartsEnabled,
+  docsFullPlatform: fullPlatformEnabled,
+  docsMobileTutorials: mobileTutorialsEnabled,
+  docsPgtap: pgTapEnabled,
+  docsProductionChecklist: productionChecklistEnabled,
+  docsWebApps: webAppsEnabled,
   integrationsPartners: integrationsEnabled,
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
@@ -18,8 +26,16 @@ const {
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
+  'docs:auth',
+  'docs:contribution',
   'docs:compliance',
   'docs:self-hosting',
+  'docs:framework_quickstarts',
+  'docs:full_platform',
+  'docs:mobile_tutorials',
+  'docs:pgtap',
+  'docs:production_checklist',
+  'docs:web_apps',
   'integrations:partners',
   'sdk:csharp',
   'sdk:dart',
@@ -56,6 +72,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'auth',
             href: '/guides/auth' as `/${string}`,
             level: 'auth',
+            enabled: authEnabled,
           },
           {
             label: 'Storage',
@@ -280,6 +297,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'Contributing',
             icon: 'contributing',
             href: '/contributing' as `/${string}`,
+            enabled: contributionEnabled,
           },
         ],
       ],
@@ -296,26 +314,39 @@ export const gettingstarted: NavMenuConstant = {
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
       name: 'Framework Quickstarts',
+      enabled: frameworkQuickstartsEnabled,
       items: [
-        { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
-        { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'Nuxt', url: '/guides/getting-started/quickstarts/nuxtjs' },
-        { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
-        { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
+        {
+          name: 'Next.js',
+          url: '/guides/getting-started/quickstarts/nextjs',
+        },
+        {
+          name: 'React',
+          url: '/guides/getting-started/quickstarts/reactjs',
+        },
+        {
+          name: 'Nuxt',
+          url: '/guides/getting-started/quickstarts/nuxtjs',
+        },
+        {
+          name: 'Vue',
+          url: '/guides/getting-started/quickstarts/vue',
+        },
+        {
+          name: 'Hono',
+          url: '/guides/getting-started/quickstarts/hono',
+        },
         {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
-          enabled: sdkDartEnabled,
         },
         {
           name: 'iOS SwiftUI',
           url: '/guides/getting-started/quickstarts/ios-swiftui',
-          enabled: sdkSwiftEnabled,
         },
         {
           name: 'Android Kotlin',
           url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
-          enabled: sdkKotlinEnabled,
         },
         {
           name: 'SvelteKit',
@@ -332,16 +363,23 @@ export const gettingstarted: NavMenuConstant = {
           enabled: !jsOnly,
         },
 
-        { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
+        {
+          name: 'SolidJS',
+          url: '/guides/getting-started/quickstarts/solidjs',
+        },
         {
           name: 'RedwoodJS',
           url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
         },
-        { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
+        {
+          name: 'refine',
+          url: '/guides/getting-started/quickstarts/refine',
+        },
       ],
     },
     {
       name: 'Web app demos',
+      enabled: webAppsEnabled,
       items: [
         {
           name: 'Next.js',
@@ -387,6 +425,7 @@ export const gettingstarted: NavMenuConstant = {
     },
     {
       name: 'Mobile tutorials',
+      enabled: mobileTutorialsEnabled,
       items: [
         {
           name: 'Flutter',
@@ -599,6 +638,7 @@ export const PhoneLoginsItems = [
 export const auth: NavMenuConstant = {
   icon: 'auth',
   title: 'Auth',
+  enabled: authEnabled,
   items: [
     {
       name: 'Overview',
@@ -619,6 +659,10 @@ export const auth: NavMenuConstant = {
         {
           name: 'React Native',
           url: '/guides/auth/quickstarts/react-native' as `/${string}`,
+        },
+        {
+          name: 'React Native with Expo & Social Auth',
+          url: '/guides/auth/quickstarts/with-expo-react-native-social-auth',
         },
       ],
     },
@@ -1510,6 +1554,7 @@ export const functions: NavMenuConstant = {
         {
           name: 'Limits',
           url: '/guides/functions/limits' as `/${string}`,
+          enabled: billingEnabled,
         },
         {
           name: 'Pricing',
@@ -1709,7 +1754,7 @@ export const realtime: NavMenuConstant = {
       name: 'Deep dive',
       url: undefined,
       items: [
-        { name: 'Quotas', url: '/guides/realtime/quotas' },
+        { name: 'Quotas', url: '/guides/realtime/quotas', enabled: billingEnabled },
         {
           name: 'Pricing',
           url: '/guides/realtime/pricing' as `/${string}`,
@@ -1780,7 +1825,7 @@ export const storage: NavMenuConstant = {
           name: 'S3 Uploads',
           url: '/guides/storage/uploads/s3-uploads' as `/${string}`,
         },
-        { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
+        { name: 'Limits', url: '/guides/storage/uploads/file-limits', enabled: billingEnabled },
       ],
     },
     {
@@ -1795,6 +1840,7 @@ export const storage: NavMenuConstant = {
         {
           name: 'Bandwidth & Storage Egress',
           url: '/guides/storage/serving/bandwidth' as `/${string}`,
+          enabled: billingEnabled,
         },
       ],
     },
@@ -1835,6 +1881,7 @@ export const storage: NavMenuConstant = {
         {
           name: 'Limits',
           url: '/guides/storage/analytics/limits' as `/${string}`,
+          enabled: billingEnabled,
         },
       ],
     },
@@ -2097,6 +2144,7 @@ export const local_development: NavMenuConstant = {
         {
           name: 'pgTAP advanced guide',
           url: '/guides/local-development/testing/pgtap-extended' as `/${string}`,
+          enabled: pgTapEnabled,
         },
         { name: 'Database testing', url: '/guides/database/testing' },
         {
@@ -2112,6 +2160,7 @@ export const contributing: NavMenuConstant = {
   icon: 'contributing',
   title: 'Contributing',
   url: '/contributing',
+  enabled: contributionEnabled,
   items: [{ name: 'Overview', url: '/contributing' }],
 }
 
@@ -2209,7 +2258,11 @@ export const security: NavMenuConstant = {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Production Checklist', url: '/guides/deployment/going-into-prod' },
+        {
+          name: 'Production Checklist',
+          url: '/guides/deployment/going-into-prod',
+          enabled: productionChecklistEnabled,
+        },
         {
           name: 'Shared Responsibility Model',
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
@@ -2239,6 +2292,7 @@ export const platform: NavMenuConstant = {
     {
       name: 'Upgrades & Migrations',
       url: undefined,
+      enabled: fullPlatformEnabled,
       items: [
         { name: 'Upgrading', url: '/guides/platform/upgrading' },
         {
@@ -2273,6 +2327,7 @@ export const platform: NavMenuConstant = {
         {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
+          enabled: fullPlatformEnabled,
           items: [
             {
               name: 'Enforce MFA on organization',
@@ -2283,6 +2338,7 @@ export const platform: NavMenuConstant = {
         {
           name: 'Transfer Project',
           url: '/guides/platform/project-transfer' as `/${string}`,
+          enabled: fullPlatformEnabled,
         },
         {
           name: 'Restore to a new project',
@@ -2291,6 +2347,7 @@ export const platform: NavMenuConstant = {
         {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
+          enabled: fullPlatformEnabled,
           items: [
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
             {
@@ -2307,8 +2364,16 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Regions', url: '/guides/platform/regions' as `/${string}` },
-        { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' as `/${string}` },
-        { name: 'Database Size', url: '/guides/platform/database-size' as `/${string}` },
+        {
+          name: 'Compute and Disk',
+          url: '/guides/platform/compute-and-disk' as `/${string}`,
+          enabled: fullPlatformEnabled,
+        },
+        {
+          name: 'Database Size',
+          url: '/guides/platform/database-size' as `/${string}`,
+          enabled: fullPlatformEnabled,
+        },
         { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' as `/${string}` },
         {
           name: 'Network Restrictions',
@@ -2607,7 +2672,11 @@ export const deployment: NavMenuConstant = {
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
-        { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        {
+          name: 'Production checklist',
+          url: '/guides/deployment/going-into-prod',
+          enabled: productionChecklistEnabled,
+        },
         { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
       ],
     },
