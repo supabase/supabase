@@ -9,7 +9,7 @@ import { cn } from 'ui'
 
 interface OrganizationInviteError {
   data?: OrganizationInviteByToken
-  error?: ResponseError
+  error?: ResponseError | null
   isError: boolean
 }
 
