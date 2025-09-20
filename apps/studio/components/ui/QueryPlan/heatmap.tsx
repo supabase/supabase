@@ -1,7 +1,13 @@
 import { useContext, useMemo } from 'react'
 
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import type { PlanNodeData } from './types'
 import { HeatmapContext } from './contexts'
+
+const Bar = ({ pct, heatColor }: { pct: number; heatColor: string }) => (
+  <div className="h-full transition-all" style={{ width: `${pct}%`, backgroundColor: heatColor }} />
+)
 
 export const Heatmap = ({ data }: { data: PlanNodeData }) => {
   const heat = useContext(HeatmapContext)
@@ -45,21 +51,27 @@ export const Heatmap = ({ data }: { data: PlanNodeData }) => {
     return `hsl(${hue}, 85%, 45%)`
   }, [heat.mode, pct])
 
+  const tooltipText = useMemo(() => {
+    if (heat.mode === 'time') return `time (self): ${valueForHeat.toFixed(2)} ms`
+    if (heat.mode === 'rows') return `rows: ${valueForHeat}`
+    if (heat.mode === 'cost') return `self cost: ${valueForHeat.toFixed(2)}`
+    return null
+  }, [heat.mode, valueForHeat])
+
   return (
     <div className="h-[3px] w-full bg-surface-100">
-      <div
-        className="h-full transition-all"
-        style={{ width: `${pct}%`, backgroundColor: heatColor }}
-        title={
-          heat.mode === 'time'
-            ? `time (self): ${valueForHeat.toFixed(2)} ms`
-            : heat.mode === 'rows'
-              ? `rows: ${valueForHeat}`
-              : heat.mode === 'cost'
-                ? `self cost: ${valueForHeat.toFixed(2)}`
-                : undefined
-        }
-      />
+      {tooltipText ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Bar pct={pct} heatColor={heatColor} />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="text-xs">
+            {tooltipText}
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <Bar pct={pct} heatColor={heatColor} />
+      )}
     </div>
   )
 }
