@@ -34,6 +34,7 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
+import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
 
 export const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -353,6 +354,18 @@ export const Connect = () => {
                   <div className={DIALOG_PADDING_Y}>
                     <DatabaseConnectionString />
                   </div>
+                </TabsContent_Shadcn_>
+              )
+            }
+
+            if (type.key === 'mcp') {
+              return (
+                <TabsContent_Shadcn_
+                  key="mcp"
+                  value="mcp"
+                  className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+                >
+                  <McpTabContent />
                 </TabsContent_Shadcn_>
               )
             }
