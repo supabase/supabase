@@ -11,7 +11,7 @@ import { BookOpen, Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 
 import type { PlanNodeData } from './types'
-import { Button, cn } from 'ui'
+import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { MetaOverlay } from './meta-overlay'
 import { ControlsOverlay } from './controls-overlay'
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, NODE_TYPE } from './constants'
@@ -140,173 +140,193 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     []
   )
 
-  const renderVisualizer = (isExpanded: boolean) => (
-    <>
-      <div
-        className={cn(
-          'relative w-full h-full bg-background',
-          isExpanded ? 'border-none' : 'border rounded-md'
-        )}
-      >
-        <div className="flex h-full">
-          {isExpanded && (
-            <MetricsSidebar
-              nodes={layout.nodes}
-              edges={layout.edges}
-              meta={meta}
-              selectedNodeId={selectedNodeId}
-              onSelect={handleSelectNode}
-            />
-          )}
-          <div className="relative flex-1">
-            {meta?.errorMessage && (
-              <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
-                <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
-                  <div className="font-semibold text-red-600">{meta.errorMessage}</div>
-                  {meta.errorDetail && (
-                    <div className="mt-1 whitespace-pre-wrap text-foreground-lighter">
-                      {meta.errorDetail}
-                    </div>
-                  )}
+  const renderVisualizer = (isExpanded: boolean) => {
+    const sidebarElement = isExpanded ? (
+      <MetricsSidebar
+        nodes={layout.nodes}
+        edges={layout.edges}
+        meta={meta}
+        selectedNodeId={selectedNodeId}
+        onSelect={handleSelectNode}
+      />
+    ) : null
+
+    const planPanel = (
+      <div className="relative flex-1">
+        {meta?.errorMessage && (
+          <div className="pointer-events-none absolute inset-0 z-20 mt-10 flex items-start justify-center">
+            <div className="pointer-events-auto max-w-[720px] rounded border border-red-500/70 bg-foreground-muted/20 px-3 py-2 text-[11px] backdrop-blur-sm">
+              <div className="font-semibold text-red-600">{meta.errorMessage}</div>
+              {meta.errorDetail && (
+                <div className="mt-1 whitespace-pre-wrap text-foreground-lighter">
+                  {meta.errorDetail}
                 </div>
-              </div>
-            )}
-            {isExpanded ? (
-              <div className="flex h-[41px] w-full items-center gap-x-3 border-b border-border px-3 bg-sidebar">
-                <ControlsOverlay
-                  metricsVisibility={metricsVisibility}
-                  setMetricsVisibility={setMetricsVisibility}
-                  heatmapMode={heatmapMode}
-                  setHeatmapMode={setHeatmapMode}
-                  variant="toolbar"
-                  portal={false}
-                  className="shrink-0"
-                />
-                <div className="hidden md:block h-[20px] w-px border-r border-control" />
-                <MetaOverlay
-                  planningTime={meta?.planningTime}
-                  executionTime={meta?.executionTime}
-                  jitTotalTime={meta?.jitTotalTime}
-                  className="hidden h-full flex-1 items-center border-0 bg-transparent px-0 py-0 text-xs md:flex"
-                />
-
-                <div className="flex items-center gap-x-2 ml-auto">
-                  <Button
-                    asChild
-                    type="default"
-                    size="tiny"
-                    icon={<BookOpen />}
-                    className="h-[28px]"
-                  >
-                    <Link
-                      href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Learn about query plans
-                    </Link>
-                  </Button>
-
-                  <Button
-                    type="default"
-                    size="tiny"
-                    icon={<Minimize2 size={14} className="text-foreground" />}
-                    onClick={toggleExpanded}
-                    aria-label="Exit expanded view"
-                    className="h-7 w-7"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="absolute top-2.5 left-2.5 right-2.5 z-20 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border bg-sidebar px-2.5 py-1.5 shadow-sm">
-                <ControlsOverlay
-                  metricsVisibility={metricsVisibility}
-                  setMetricsVisibility={setMetricsVisibility}
-                  heatmapMode={heatmapMode}
-                  setHeatmapMode={setHeatmapMode}
-                  variant="toolbar"
-                  className="shrink-0"
-                />
-                <div className="h-5 w-px border-l border-border" />
-                <MetaOverlay
-                  planningTime={meta?.planningTime}
-                  executionTime={meta?.executionTime}
-                  jitTotalTime={meta?.jitTotalTime}
-                  className="min-h-0 flex-1 border-0 bg-transparent px-0 py-0 text-xs"
-                />
-                <div className="h-5 w-px border-l border-border" />
-                <Button
-                  type="default"
-                  size="tiny"
-                  icon={<Maximize2 size={14} className="text-foreground" />}
-                  onClick={toggleExpanded}
-                  aria-label="Enter expanded view"
-                  className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
-                />
-              </div>
-            )}
-
-            {isExpanded && (
-              <div className="absolute top-[46px] left-3 z-20 md:hidden">
-                <MetaOverlay
-                  planningTime={meta?.planningTime}
-                  executionTime={meta?.executionTime}
-                  jitTotalTime={meta?.jitTotalTime}
-                  className="rounded-md bg-transparent border-none border-border px-2 py-1 text-[11px] shadow-sm"
-                />
-              </div>
-            )}
-
-            <MetricsVisibilityContext.Provider value={metricsVisibility}>
-              <HeatmapContext.Provider
-                value={{
-                  mode: heatmapMode,
-                  maxTime: heatMax.maxTime,
-                  maxRows: heatMax.maxRows,
-                  maxCost: heatMax.maxCost,
-                }}
-              >
-                <ReactFlow
-                  className="rounded-md"
-                  defaultNodes={[]}
-                  defaultEdges={[]}
-                  nodesConnectable={false}
-                  defaultEdgeOptions={{
-                    type: 'smoothstep',
-                    animated: true,
-                    deletable: false,
-                    style: {
-                      stroke: 'hsl(var(--border-stronger))',
-                      strokeWidth: 1,
-                    },
-                  }}
-                  fitView
-                  nodeTypes={nodeTypes}
-                  nodes={nodesWithSelection}
-                  edges={layout.edges}
-                  minZoom={0.8}
-                  maxZoom={1.8}
-                  proOptions={{ hideAttribution: true }}
-                  onNodeClick={(_event, node) => handleSelectNode(node)}
-                  onPaneClick={() => {
-                    setSelectedNodeId(null)
-                  }}
-                  onInit={(instance) => setRfInstance(instance)}
-                >
-                  <Background
-                    gap={16}
-                    className="[&>*]:stroke-foreground-muted opacity-[25%]"
-                    variant={BackgroundVariant.Dots}
-                    color="inherit"
-                  />
-                </ReactFlow>
-              </HeatmapContext.Provider>
-            </MetricsVisibilityContext.Provider>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {isExpanded ? (
+          <div className="flex h-[41px] w-full items-center gap-x-3 border-b border-border bg-sidebar px-3">
+            <ControlsOverlay
+              metricsVisibility={metricsVisibility}
+              setMetricsVisibility={setMetricsVisibility}
+              heatmapMode={heatmapMode}
+              setHeatmapMode={setHeatmapMode}
+              variant="toolbar"
+              portal={false}
+              className="shrink-0"
+            />
+            <div className="hidden h-[20px] w-px border-r border-control md:block" />
+            <MetaOverlay
+              planningTime={meta?.planningTime}
+              executionTime={meta?.executionTime}
+              jitTotalTime={meta?.jitTotalTime}
+              className="hidden h-full flex-1 items-center border-0 bg-transparent px-0 py-0 text-xs md:flex"
+            />
+
+            <div className="ml-auto flex items-center gap-x-2">
+              <Button asChild type="default" size="tiny" icon={<BookOpen />} className="h-[28px]">
+                <Link
+                  href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn about query plans
+                </Link>
+              </Button>
+
+              <Button
+                type="default"
+                size="tiny"
+                icon={<Minimize2 size={14} className="text-foreground" />}
+                onClick={toggleExpanded}
+                aria-label="Exit expanded view"
+                className="h-7 w-7"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="absolute left-2.5 right-2.5 top-2.5 z-20 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border bg-sidebar px-2.5 py-1.5 shadow-sm">
+            <ControlsOverlay
+              metricsVisibility={metricsVisibility}
+              setMetricsVisibility={setMetricsVisibility}
+              heatmapMode={heatmapMode}
+              setHeatmapMode={setHeatmapMode}
+              variant="toolbar"
+              className="shrink-0"
+            />
+            <div className="h-5 w-px border-l border-border" />
+            <MetaOverlay
+              planningTime={meta?.planningTime}
+              executionTime={meta?.executionTime}
+              jitTotalTime={meta?.jitTotalTime}
+              className="min-h-0 flex-1 border-0 bg-transparent px-0 py-0 text-xs"
+            />
+            <div className="h-5 w-px border-l border-border" />
+            <Button
+              type="default"
+              size="tiny"
+              icon={<Maximize2 size={14} className="text-foreground" />}
+              onClick={toggleExpanded}
+              aria-label="Enter expanded view"
+              className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
+            />
+          </div>
+        )}
+
+        {isExpanded && (
+          <div className="absolute left-3 top-[46px] z-20 md:hidden">
+            <MetaOverlay
+              planningTime={meta?.planningTime}
+              executionTime={meta?.executionTime}
+              jitTotalTime={meta?.jitTotalTime}
+              className="border-none border-border bg-transparent px-2 py-1 text-[11px] shadow-sm"
+            />
+          </div>
+        )}
+
+        <MetricsVisibilityContext.Provider value={metricsVisibility}>
+          <HeatmapContext.Provider
+            value={{
+              mode: heatmapMode,
+              maxTime: heatMax.maxTime,
+              maxRows: heatMax.maxRows,
+              maxCost: heatMax.maxCost,
+            }}
+          >
+            <ReactFlow
+              className="rounded-md"
+              defaultNodes={[]}
+              defaultEdges={[]}
+              nodesConnectable={false}
+              defaultEdgeOptions={{
+                type: 'smoothstep',
+                animated: true,
+                deletable: false,
+                style: {
+                  stroke: 'hsl(var(--border-stronger))',
+                  strokeWidth: 1,
+                },
+              }}
+              fitView
+              nodeTypes={nodeTypes}
+              nodes={nodesWithSelection}
+              edges={layout.edges}
+              minZoom={0.8}
+              maxZoom={1.8}
+              proOptions={{ hideAttribution: true }}
+              onNodeClick={(_event, node) => handleSelectNode(node)}
+              onPaneClick={() => {
+                setSelectedNodeId(null)
+              }}
+              onInit={(instance) => setRfInstance(instance)}
+            >
+              <Background
+                gap={16}
+                className="opacity-[25%] [&>*]:stroke-foreground-muted"
+                variant={BackgroundVariant.Dots}
+                color="inherit"
+              />
+            </ReactFlow>
+          </HeatmapContext.Provider>
+        </MetricsVisibilityContext.Provider>
       </div>
-    </>
-  )
+    )
+
+    const containerClass = cn(
+      'relative h-full w-full bg-background',
+      isExpanded ? 'border-none' : 'border rounded-md'
+    )
+
+    if (isExpanded) {
+      return (
+        <>
+          <div className={containerClass}>
+            <ResizablePanelGroup direction="horizontal" className="flex h-full">
+              {sidebarElement}
+              {sidebarElement ? <ResizableHandle withHandle className="hidden lg:flex" /> : null}
+              <ResizablePanel
+                defaultSize={sidebarElement ? 72 : 100}
+                minSize={sidebarElement ? 45 : 60}
+                className="flex flex-1"
+              >
+                {planPanel}
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
+        </>
+      )
+    }
+
+    return (
+      <>
+        <div className={containerClass}>
+          <div className="flex h-full">{planPanel}</div>
+        </div>
+      </>
+    )
+  }
 
   const expandedPortal =
     isExpanded && typeof document !== 'undefined'

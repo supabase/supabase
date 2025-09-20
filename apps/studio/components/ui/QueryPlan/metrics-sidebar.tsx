@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import type { Edge, Node } from 'reactflow'
 
 import type { PlanMeta, PlanNodeData } from './types'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, ResizablePanel, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { formatMs, formatNumber, blocksToBytes } from './utils/formats'
 
 type SidebarMetricKey = 'time' | 'rows' | 'cost' | 'buffers' | 'io'
@@ -22,6 +22,9 @@ type MetricsSidebarProps = {
   meta?: PlanMeta
   selectedNodeId?: string | null
   onSelect: (node: Node<PlanNodeData>) => void
+  defaultSize?: number
+  minSize?: number
+  maxSize?: number
 }
 
 type MetricStats = {
@@ -255,12 +258,11 @@ const TreeGuide = ({ branchTrail, isLast }: { branchTrail: boolean[]; isLast: bo
   if (branchTrail.length === 0) return null
 
   const ancestors = branchTrail.slice(0, -1)
-  const connector = isLast ? '└─ ' : '├─ '
-  const prefix = `${ancestors.map((hasNext) => (hasNext ? '│  ' : '   ')).join('')}${connector}`
+  const connector = isLast ? '└─' : '├─'
+  const prefix = `${ancestors.map((hasNext) => (hasNext ? '│ ' : '  ')).join('')}${connector} `
+  const formatted = prefix.replace(/ /g, '\u00A0')
 
-  return (
-    <span className="font-mono text-[11px] text-foreground-muted whitespace-pre">{prefix}</span>
-  )
+  return <span className="font-mono text-[11px] text-foreground-muted">{formatted}</span>
 }
 
 const renderTimeMetric: MetricRenderer = (data, stats) => {
@@ -470,6 +472,9 @@ export const MetricsSidebar = ({
   meta,
   selectedNodeId,
   onSelect,
+  defaultSize = 20,
+  minSize = 15,
+  maxSize = 45,
 }: MetricsSidebarProps) => {
   const [activeMetric, setActiveMetric] = useState<SidebarMetricKey>('time')
 
@@ -479,31 +484,39 @@ export const MetricsSidebar = ({
   if (!rows.length) return null
 
   return (
-    <aside className="hidden lg:flex w-72 flex-col border-r border-border bg-sidebar">
-      <div className="h-[41px] flex items-center justify-between px-3 py-2 border-b">
+    <ResizablePanel
+      defaultSize={defaultSize}
+      minSize={minSize}
+      maxSize={maxSize}
+      collapsible
+      className="hidden lg:flex min-w-[220px] flex-col bg-sidebar"
+    >
+      <div className="flex items-center justify-between border-b px-3 py-2">
         <div className="text-xs font-medium">
           <span>Metrics</span>
         </div>
         <span className="text-[11px] text-foreground-light">{rows.length} nodes</span>
       </div>
-      <div className="flex gap-2 px-3 py-2 border-b justify-between">
-        {METRIC_OPTIONS.map((option) => (
-          <Tooltip key={option.key}>
-            <TooltipTrigger asChild>
-              <Button
-                type={activeMetric === option.key ? 'default' : 'dashed'}
-                size="tiny"
-                className="px-2 py-1"
-                onClick={() => setActiveMetric(option.key)}
-              >
-                {option.label}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="max-w-[220px] text-[11px] leading-relaxed">
-              {option.description}
-            </TooltipContent>
-          </Tooltip>
-        ))}
+      <div className="px-3 py-2 border-b overflow-x-auto">
+        <div className="flex gap-2 justify-between max-w-[320px] mx-auto">
+          {METRIC_OPTIONS.map((option) => (
+            <Tooltip key={option.key}>
+              <TooltipTrigger asChild>
+                <Button
+                  type={activeMetric === option.key ? 'default' : 'dashed'}
+                  size="tiny"
+                  className="px-2 py-1"
+                  onClick={() => setActiveMetric(option.key)}
+                >
+                  {option.label}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-[220px] text-[11px] leading-relaxed">
+                {option.description}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-2">
         <ul className="flex flex-col gap-y-1">
@@ -524,12 +537,12 @@ export const MetricsSidebar = ({
                   isActive && 'border-stronger bg-surface-100 dark:bg-surface-100'
                 )}
               >
-                <div className="flex items-center gap-x-1 h-[24px]">
-                  <TreeGuide branchTrail={branchTrail} isLast={isLast} />
-                  <span className="flex-1 min-w-0 font-medium text-[11px] text-left text-foreground">
-                    {data.label}
-                  </span>
-                  {visual ? <div className="flex-none w-[120px]">{visual}</div> : null}
+                <div className="grid h-[24px] w-full grid-cols-[minmax(0,1fr),120px] items-center gap-x-2">
+                  <div className="flex min-w-0 items-center gap-x-1 overflow-hidden whitespace-nowrap text-[11px] text-foreground text-ellipsis">
+                    <TreeGuide branchTrail={branchTrail} isLast={isLast} />
+                    <span className="truncate font-medium text-foreground">{data.label}</span>
+                  </div>
+                  {visual ? <div className="w-[120px]">{visual}</div> : null}
                 </div>
               </Button>
             )
@@ -551,6 +564,6 @@ export const MetricsSidebar = ({
           })}
         </ul>
       </div>
-    </aside>
+    </ResizablePanel>
   )
 }
