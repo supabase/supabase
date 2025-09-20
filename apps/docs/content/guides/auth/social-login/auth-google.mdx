@@ -464,6 +464,8 @@ import { supabase } from '../utils/supabase'
 export default function () {
   GoogleSignin.configure({
     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+    // Provide iosClientId if you are developing for iOS
+    iosClientId: 'YOUR CLIENT ID FROM GOOGLE CONSOLE',
     webClientId: 'YOUR CLIENT ID FROM GOOGLE CONSOLE',
   })
 
