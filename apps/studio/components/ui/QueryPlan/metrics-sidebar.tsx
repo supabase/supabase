@@ -1,6 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import type { Edge, Node } from 'reactflow'
-import { Layers } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -482,8 +481,7 @@ export const MetricsSidebar = ({
   return (
     <aside className="hidden lg:flex w-72 flex-col border-r border-border bg-sidebar">
       <div className="h-[41px] flex items-center justify-between px-3 py-2 border-b">
-        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-          <Layers size={14} />
+        <div className="text-xs font-medium">
           <span>Metrics</span>
         </div>
         <span className="text-[11px] text-foreground-light">{rows.length} nodes</span>
