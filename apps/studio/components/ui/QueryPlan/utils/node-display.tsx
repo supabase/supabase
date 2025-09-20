@@ -307,7 +307,7 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
     const slowTime = formatMs(data.slowHint.selfTimeMs) ?? data.slowHint.selfTimeMs.toFixed(2)
 
     hints.push(
-      <Tooltip>
+      <Tooltip key="slow-hint">
         <TooltipTrigger className="flex">
           <Badge
             size="small"
@@ -343,7 +343,7 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
         : undefined
 
     hints.push(
-      <Tooltip>
+      <Tooltip key="cost-hint">
         <TooltipTrigger className="flex">
           <Badge
             size="small"
