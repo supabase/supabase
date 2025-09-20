@@ -15,13 +15,6 @@ export const NodeItem = ({
   height = DEFAULT_NODE_HEIGHT_CONSTANTS.ITEM_H,
   className,
 }: PropsWithChildren<NodeItemProps>) => {
-  // const tooltipContent: ReactNode | undefined =
-  //   typeof tooltip === 'string' ? (
-  //     <span className="block whitespace-pre-line">{tooltip}</span>
-  //   ) : (
-  //     tooltip
-  //   )
-
   const item = (
     <li
       style={{ height: `${height}px` }}
@@ -31,7 +24,6 @@ export const NodeItem = ({
         'border-t',
         'border-t-[0.5px]',
         'hover:bg-scale-500 transition-[background-color]',
-        tooltip ? 'cursor-help' : 'cursor-default',
         className
       )}
     >
@@ -42,7 +34,7 @@ export const NodeItem = ({
   if (!tooltip) return item
 
   return (
-    <Tooltip delayDuration={150}>
+    <Tooltip>
       <TooltipTrigger asChild>{item}</TooltipTrigger>
       <TooltipContent side="right" align="start" className="max-w-[240px] text-[10px] leading-4">
         {tooltip}
