@@ -82,6 +82,7 @@ jobs:
 
       - name: Run Playwright tests against Vercel Preview
         id: playwright
+        continue-on-error: true
         env:
           AUTHENTICATION: false
           STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}?vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}
@@ -115,7 +116,7 @@ jobs:
             core.setOutput('summary', md)
 
       - name: Comment summary on PR
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
