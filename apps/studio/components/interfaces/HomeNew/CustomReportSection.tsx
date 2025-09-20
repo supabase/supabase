@@ -23,7 +23,9 @@ import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { Dashboards } from 'types'
@@ -35,6 +37,8 @@ export function CustomReportSection() {
   const endDate = dayjs().toISOString()
   const { ref } = useParams()
   const { profile } = useProfile()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
@@ -185,6 +189,20 @@ export function CustomReportSection() {
           content: newReport,
         },
       })
+
+      if (ref && organization?.slug) {
+        sendEvent({
+          action: 'home_custom_report_block_added',
+          properties: {
+            block_id: snippet.id,
+            position: 0,
+          },
+          groups: {
+            project: ref,
+            organization: organization.slug,
+          },
+        })
+      }
       return
     }
     const current = [...editableReport.layout]
@@ -193,16 +211,46 @@ export function CustomReportSection() {
     const updated = { ...editableReport, layout: current }
     setEditableReport(updated)
     persistReport(updated)
+
+    if (ref && organization?.slug) {
+      sendEvent({
+        action: 'home_custom_report_block_added',
+        properties: {
+          block_id: snippet.id,
+          position: current.length - 1,
+        },
+        groups: {
+          project: ref,
+          organization: organization.slug,
+        },
+      })
+    }
   }
 
   const handleRemoveChart = ({ metric }: { metric: { key: string } }) => {
     if (!editableReport) return
+    const removedChart = editableReport.layout.find(
+      (x) => x.attribute === (metric.key as unknown as Dashboards.Chart['attribute'])
+    )
     const nextLayout = editableReport.layout.filter(
       (x) => x.attribute !== (metric.key as unknown as Dashboards.Chart['attribute'])
     )
     const updated = { ...editableReport, layout: nextLayout }
     setEditableReport(updated)
     persistReport(updated)
+
+    if (ref && organization?.slug && removedChart) {
+      sendEvent({
+        action: 'home_custom_report_block_removed',
+        properties: {
+          block_id: String(removedChart.id),
+        },
+        groups: {
+          project: ref,
+          organization: organization.slug,
+        },
+      })
+    }
   }
 
   const handleUpdateChart = (

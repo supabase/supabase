@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -93,6 +94,7 @@ export const ProjectUsageSection = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
@@ -210,7 +212,7 @@ export const ProjectUsageSection = () => {
 
   const isLoading = services.some((s) => s.stats.isLoading)
 
-  const handleBarClick = (logRoute: string) => (datum: any) => {
+  const handleBarClick = (logRoute: string, serviceKey: ServiceKey) => (datum: any) => {
     if (!datum?.timestamp) return
 
     const datumTimestamp = dayjs(datum.timestamp).toISOString()
@@ -223,6 +225,20 @@ export const ProjectUsageSection = () => {
     })
 
     router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
+
+    if (projectRef && organization?.slug) {
+      sendEvent({
+        action: 'home_project_usage_chart_clicked',
+        properties: {
+          service_type: serviceKey,
+          bar_timestamp: datum.timestamp,
+        },
+        groups: {
+          project: projectRef,
+          organization: organization.slug,
+        },
+      })
+    }
   }
 
   const enabledServices = services.filter((s) => s.enabled)
@@ -346,7 +362,31 @@ export const ProjectUsageSection = () => {
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <CardTitle className="text-foreground-light">
-                      {s.href ? <Link href={s.href}>{s.title}</Link> : s.title}
+                      {s.href ? (
+                        <Link
+                          href={s.href}
+                          onClick={() => {
+                            if (projectRef && organization?.slug) {
+                              sendEvent({
+                                action: 'home_project_usage_service_clicked',
+                                properties: {
+                                  service_type: s.key,
+                                  total_requests: s.total || 0,
+                                  error_count: s.err || 0,
+                                },
+                                groups: {
+                                  project: projectRef,
+                                  organization: organization.slug,
+                                },
+                              })
+                            }
+                          }}
+                        >
+                          {s.title}
+                        </Link>
+                      ) : (
+                        s.title
+                      )}
                     </CardTitle>
                   </div>
                   <span className="text-foreground text-xl">{(s.total || 0).toLocaleString()}</span>
@@ -375,7 +415,7 @@ export const ProjectUsageSection = () => {
                   data={s.data}
                   height="120px"
                   DateTimeFormat={datetimeFormat}
-                  onBarClick={handleBarClick(s.route)}
+                  onBarClick={handleBarClick(s.route, s.key)}
                   EmptyState={
                     <NoDataPlaceholder size="small" message="No data for selected period" />
                   }
