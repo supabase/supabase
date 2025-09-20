@@ -1,0 +1,58 @@
+---
+title: Quick Start
+description: Install shadcn/ui and use the components in your project
+---
+
+## Set up shadcn/ui
+
+Start by installing [shadcn/ui](https://ui.shadcn.com/) in your project. Use the appropriate setup guide linked below for your framework of choice.
+
+If you're already using a recent version of shadcn/ui in your existing project, you can skip this step—this library should work with your current setup. However, if you encounter issues, try deleting your existing `components.json` file and follow one of the guides to reset your setup.
+
+<div className="grid grid-cols-12 xs:gap-x-10 gap-y-10 not-prose py-8">
+  {[
+    {
+      title: 'Next.js',
+      href: 'https://ui.shadcn.com/docs/installation/next',
+      icon: '/docs/img/icons/nextjs-icon',
+      hasLightIcon: true,
+      enabled: true,
+    },
+    {
+      title: 'React Router',
+      href: 'https://ui.shadcn.com/docs/installation/react-router',
+      icon: '/docs/img/icons/react-router-icon',
+      hasLightIcon: true,
+      enabled: true,
+    },
+    {
+      title: 'TanStack Start',
+      href: 'https://ui.shadcn.com/docs/installation/tanstack',
+      icon: '/docs/img/icons/tanstack-icon',
+      hasLightIcon: true,
+      enabled: true,
+    },
+    {
+      title: 'React',
+      href: 'https://ui.shadcn.com/docs/installation/manual',
+      icon: '/docs/img/icons/react-icon',
+      enabled: true,
+    },
+  ]
+    .filter((item) => item.enabled !== false)
+    .map((item) => {
+      return (
+        <Link href={`${item.href}`} key={item.name} passHref className="col-span-12 md:col-span-6">
+          <IconPanel title={item.title} icon={item.icon} hasLightIcon={item.hasLightIcon} />
+        </Link>
+      )
+    })}
+</div>
+
+When you've finished setting up shadcn/ui, you can start exploring the components in the sidebar
+
+## Troubleshooting
+
+If you encounter issues, try deleting your existing `components.json` file and follow one of the guides to reset your setup.
+
+For issues and questions about specific frameworks, see the [FAQs](/ui/docs/getting-started/faq)
