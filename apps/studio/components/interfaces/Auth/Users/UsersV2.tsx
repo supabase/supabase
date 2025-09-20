@@ -21,7 +21,6 @@ import AlertError from 'components/ui/AlertError'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
@@ -68,12 +67,13 @@ import {
   USERS_TABLE_COLUMNS,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
+import { UsersBarChart } from './UsersBarChart'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
 // [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
 // Can change it to remove V2 thereafter
-export const UsersV2 = () => {
+export const UsersV2 = ({ showChart = true }: { showChart?: boolean }) => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -290,7 +290,11 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0" title="Users" />
+        {showChart && (
+          <div className="px-6 py-3">
+            <UsersBarChart />
+          </div>
+        )}
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
