@@ -19,6 +19,7 @@ import {
   self_hosting,
   storage,
   telemetry,
+  ui,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
 // Map of section names to their nav constants
@@ -41,6 +42,7 @@ const SECTION_NAV_MAPS: Record<string, NavMenuConstant> = {
   'self-hosting': self_hosting,
   storage,
   telemetry,
+  ui,
 }
 
 interface ConditionalNavItem {

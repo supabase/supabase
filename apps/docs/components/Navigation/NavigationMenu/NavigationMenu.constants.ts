@@ -268,7 +268,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           {
             label: 'UI Library',
             icon: 'ui',
-            href: 'https://supabase.com/ui' as `/${string}`,
+            href: '/guides/ui' as `/${string}`,
             level: 'ui',
           },
         ],
@@ -3207,6 +3207,13 @@ export const references = [
     ],
   },
 ]
+
+export const ui: NavMenuConstant = {
+  icon: 'ui',
+  title: 'UI Library',
+  url: '/guides/ui',
+  items: [{ name: 'Overview', url: '/guides/ui' }],
+}
 
 export const navDataForMdx = {
   migrationPages: MIGRATION_PAGES,
