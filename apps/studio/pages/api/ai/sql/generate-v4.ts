@@ -1,9 +1,14 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
+import {
+  convertToModelMessages,
+  ModelMessage,
+  stepCountIs,
+  streamText,
+  wrapLanguageModel,
+} from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -12,6 +17,11 @@ import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { initLogger, BraintrustMiddleware } from 'braintrust'
+
+initLogger({
+  projectName: process.env.BRAINTRUST_PROJECT_NAME,
+})
 
 import {
   CHAT_PROMPT,
@@ -21,6 +31,7 @@ import {
   RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
+import { renderingToolOutputParser } from 'lib/ai/tools/rendering-tools'
 
 export const maxDuration = 120
 
@@ -72,26 +83,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
 
-  // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
-  // Results property is used to cache results client-side after queries are run
-  // Tool results will still be included in history sent to model
-  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
-    if (msg && msg.role === 'assistant' && 'results' in msg) {
-      const cleanedMsg = { ...msg }
-      delete cleanedMsg.results
-      return cleanedMsg
-    }
-    // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
-    // this happens when a user stops the assistant response while the tool is being called
-    if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts.filter((part: any) => {
-        return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
-      })
-      return { ...msg, parts: cleanedParts }
-    }
-    return msg
-  })
-
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
 
@@ -117,6 +108,44 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
+  // Only returns last 7 messages
+  // Filters out tools with invalid states
+  // Filters out tool outputs based on opt-in level using renderingToolOutputParser
+  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
+    if (msg && msg.role === 'assistant' && 'results' in msg) {
+      const cleanedMsg = { ...msg }
+      delete cleanedMsg.results
+      return cleanedMsg
+    }
+    if (msg && msg.role === 'assistant' && msg.parts) {
+      console.log('msg.parts', msg.parts)
+      const cleanedParts = msg.parts
+        .filter((part: any) => {
+          if (part.type.startsWith('tool-')) {
+            const invalidStates = ['input-streaming', 'input-available', 'output-error']
+            return !invalidStates.includes(part.state)
+          }
+          return true
+        })
+        .map((part: any) => {
+          if (part.type?.startsWith('tool-') && part.output) {
+            const toolName = part.type.split('-')[1]
+            if (renderingToolOutputParser[toolName as keyof typeof renderingToolOutputParser]) {
+              return {
+                ...part,
+                output: renderingToolOutputParser[
+                  toolName as keyof typeof renderingToolOutputParser
+                ](part.output, aiOptInLevel),
+              }
+            }
+          }
+          return part
+        })
+      return { ...msg, parts: cleanedParts }
+    }
+    return msg
+  })
+
   const {
     model,
     error: modelError,
@@ -132,6 +161,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
   }
+
+  const wrappedModel = wrapLanguageModel({
+    model,
+    middleware: BraintrustMiddleware({ debug: true }),
+  })
 
   try {
     // Get a list of all schemas to add to context
@@ -199,12 +233,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const result = streamText({
-      model,
+      model: wrappedModel,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       abortSignal: abortController.signal,
+      experimental_telemetry: {
+        isEnabled: true,
+      },
     })
 
     result.pipeUIMessageStreamToResponse(res, {
