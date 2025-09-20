@@ -28,8 +28,6 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    # Make the job non-blocking
-    continue-on-error: true
     # Require approval only for external contributors
     environment: ${{ github.event.pull_request.author_association != 'MEMBER' && 'Studio E2E Tests' || '' }}
 
@@ -136,3 +134,9 @@ jobs:
               issue_number: context.issue.number,
               body,
             })
+
+      - name: Fail job if tests failed
+        if: steps.playwright.outcome != 'success'
+        run: |
+          echo "E2E tests failed" >&2
+          exit 1
