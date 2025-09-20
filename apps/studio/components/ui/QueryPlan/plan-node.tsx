@@ -1,6 +1,6 @@
 import { type ReactNode, useContext } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-import { Workflow, ArrowBigUp, ArrowBigDown, TimerOff } from 'lucide-react'
+import { Workflow, TimerOff, Clock, Rows3, CircleDollarSign, Layers, Ruler } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -29,17 +29,18 @@ type MetricRow = {
   id: string
   condition: boolean
   element: ReactNode
+  icon?: ReactNode
   tooltip?: ReactNode
 }
 
-const metricsListData = (data: PlanNodeData, vis: MetricsVisibility): MetricRow[] => {
+const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibility): MetricRow[] => {
   const formattedLoops =
     data.actualLoops !== undefined
       ? formatNumber(data.actualLoops) ?? `${data.actualLoops}`
       : undefined
   const loopsSuffix =
     formattedLoops !== undefined
-      ? ` · ran ${formattedLoops} time${data.actualLoops === 1 ? '' : 's'}`
+      ? `ran ${formattedLoops} time${data.actualLoops === 1 ? '' : 's'}`
       : ''
   const formattedTotalTime = formatMs(data.actualTotalTime)
   const formattedSelfTime = formatMs(data.exclusiveTimeMs)
@@ -47,20 +48,20 @@ const metricsListData = (data: PlanNodeData, vis: MetricsVisibility): MetricRow[
   const actualRows = data.actualRows !== undefined ? formatOrDash(data.actualRows) : data.actualRows
   const estimatedRows = data.planRows !== undefined ? formatOrDash(data.planRows) : data.planRows
 
-  const estimationTooltip =
-    data.estActualTotalRows !== undefined && data.planRows !== undefined
-      ? `Estimate accuracy
-Actual rows across runs: ${formatOrDash(data.estActualTotalRows)}
-Planner expected rows: ${formatOrDash(data.planRows)}
-Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
-      : 'Estimate accuracy compares actual rows to the planner estimate. Values above 1.00 mean more rows than expected; below 1.00 mean fewer.'
+  //   const estimationTooltip =
+  //     data.estActualTotalRows !== undefined && data.planRows !== undefined
+  //       ? `Estimate accuracy
+  // Actual rows across runs: ${formatOrDash(data.estActualTotalRows)}
+  // Planner expected rows: ${formatOrDash(data.planRows)}
+  // Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
+  //       : 'Estimate accuracy compares actual rows to the planner estimate. Values above 1.00 mean more rows than expected; below 1.00 mean fewer.'
 
-  const estimationIcon =
-    data.estDirection === 'under' ? (
-      <ArrowBigDown size={10} strokeWidth={1} fill="currentColor" />
-    ) : data.estDirection === 'over' ? (
-      <ArrowBigUp size={10} strokeWidth={1} fill="currentColor" />
-    ) : null
+  //   const estimationIcon =
+  //     data.estDirection === 'under' ? (
+  //       <ArrowBigDown size={10} strokeWidth={1} fill="currentColor" />
+  //     ) : data.estDirection === 'over' ? (
+  //       <ArrowBigUp size={10} strokeWidth={1} fill="currentColor" />
+  //     ) : null
 
   const filterPercent = removedPercentValue(data, data.rowsRemovedByFilter)
   const joinFilterPercent = removedPercentValue(data, data.rowsRemovedByJoinFilter)
@@ -90,65 +91,132 @@ Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
     },
     {
       id: 'time',
-      condition: vis.time && data.actualTotalTime !== undefined,
+      condition: metricsVisibility.time && data.actualTotalTime !== undefined,
       tooltip: 'Time spent on this step including any child steps.',
+      icon: <Clock size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Total time</span>
-          <span>
-            {formattedTotalTime ?? data.actualTotalTime} ms
-            {loopsSuffix}
+          <span className="flex items-center gap-x-1 ml-auto">
+            <span>{formattedTotalTime ?? data.actualTotalTime} ms</span>
+            <span className="text-foreground-light">({loopsSuffix})</span>
           </span>
         </>
       ),
     },
     {
       id: 'time-self',
-      condition: vis.time && data.exclusiveTimeMs !== undefined,
+      condition: metricsVisibility.time && data.exclusiveTimeMs !== undefined,
       tooltip: 'Time spent only inside this node. Child steps are not included.',
+      icon: <Clock size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Step time</span>
-          <span>{formattedSelfTime ?? data.exclusiveTimeMs} ms</span>
+          <span className="ml-auto">{formattedSelfTime ?? data.exclusiveTimeMs} ms</span>
         </>
       ),
     },
     {
       id: 'rows',
-      condition: vis.rows && (data.actualRows !== undefined || data.planRows !== undefined),
+      condition:
+        metricsVisibility.rows && (data.actualRows !== undefined || data.planRows !== undefined),
       tooltip: 'Rows processed versus what the planner expected.',
+      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Rows seen</span>
-          <span>
-            {actualRows !== undefined ? actualRows : '-'}
-            {estimatedRows !== undefined ? ` · expected ${estimatedRows}` : ''}
+          <span className="flex items-center gap-x-1 ml-auto">
+            <span>{actualRows !== undefined ? actualRows : '-'}</span>
+            {estimatedRows !== undefined ? (
+              <span className="text-foreground-light">(expected {estimatedRows})</span>
+            ) : (
+              ''
+            )}
           </span>
         </>
       ),
     },
     {
-      id: 'est-factor',
-      condition: vis.rows && data.estFactor !== undefined,
-      tooltip: estimationTooltip,
+      id: 'removed-filter',
+      condition: metricsVisibility.rows && data.rowsRemovedByFilter !== undefined,
+      tooltip: 'Rows skipped because a WHERE or filter condition returned false.',
+      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
-          <span>Estimate accuracy</span>
-          <span className="inline-flex items-center gap-[4px]">
-            {estimationIcon}
-            {data.estFactor?.toFixed(2)}×
+          <span>Filtered out rows</span>
+          <span className="flex items-center gap-x-1 ml-auto">
+            <span>{formatOrDash(data.rowsRemovedByFilter)}</span>
+            {filterPercent !== undefined ? (
+              <span className="text-foreground-light">({filterPercent}%)</span>
+            ) : (
+              ''
+            )}
           </span>
         </>
       ),
     },
     {
+      id: 'removed-join-filter',
+      condition: metricsVisibility.rows && data.rowsRemovedByJoinFilter !== undefined,
+      tooltip: 'Rows dropped because the join filter did not match.',
+      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
+      element: (
+        <>
+          <span>Join filter drops</span>
+          <span className="flex items-center gap-x-1 ml-auto">
+            <span>{formatOrDash(data.rowsRemovedByJoinFilter)}</span>
+            {joinFilterPercent !== undefined ? (
+              <span className="text-foreground-light">({joinFilterPercent}%)</span>
+            ) : (
+              ''
+            )}
+          </span>
+        </>
+      ),
+    },
+    {
+      id: 'removed-index-recheck',
+      condition: metricsVisibility.rows && data.rowsRemovedByIndexRecheck !== undefined,
+      tooltip: 'Rows removed after an index recheck (commonly due to visibility rules).',
+      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
+      element: (
+        <>
+          <span>Index recheck drops</span>
+          <span className="flex items-center gap-x-1 ml-auto">
+            <span>{formatOrDash(data.rowsRemovedByIndexRecheck)}</span>
+            {recheckPercent !== undefined ? (
+              <span className="text-foreground-light">({recheckPercent}%)</span>
+            ) : (
+              ''
+            )}
+          </span>
+        </>
+      ),
+    },
+    // {
+    //   id: 'est-factor',
+    //   condition: vis.rows && data.estFactor !== undefined,
+    //   tooltip: estimationTooltip,
+    //   element: (
+    //     <>
+    //       <span>Estimate accuracy</span>
+    //       <span className="inline-flex items-center gap-[4px]">
+    //         {estimationIcon}
+    //         {data.estFactor?.toFixed(2)}×
+    //       </span>
+    //     </>
+    //   ),
+    // },
+    {
       id: 'cost',
-      condition: vis.cost && (data.startupCost !== undefined || data.totalCost !== undefined),
+      condition:
+        metricsVisibility.cost && (data.startupCost !== undefined || data.totalCost !== undefined),
       tooltip: 'Planner cost units (not milliseconds). Shows startup cost → total cost.',
+      icon: <CircleDollarSign size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Planner cost</span>
-          <span>
+          <span className="ml-auto">
             {data.startupCost !== undefined ? formatOrDash(data.startupCost) : '-'}
             {data.totalCost !== undefined ? ` → ${formatOrDash(data.totalCost)}` : ''}
           </span>
@@ -157,92 +225,42 @@ Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
     },
     {
       id: 'cost-self',
-      condition: vis.cost && data.exclusiveCost !== undefined,
+      condition: metricsVisibility.cost && data.exclusiveCost !== undefined,
       tooltip: 'Portion of the planner cost assigned only to this step.',
+      icon: <CircleDollarSign size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Cost for this step</span>
-          <span>{data.exclusiveCost?.toFixed(2)}</span>
-        </>
-      ),
-    },
-    {
-      id: 'plan-width',
-      condition: data.planWidth !== undefined,
-      tooltip: 'Average bytes per row output by this step.',
-      element: (
-        <>
-          <span>Row size</span>
-          <span>{formatOrDash(data.planWidth)} bytes</span>
-        </>
-      ),
-    },
-    {
-      id: 'removed-filter',
-      condition: data.rowsRemovedByFilter !== undefined,
-      tooltip: 'Rows skipped because a WHERE or filter condition returned false.',
-      element: (
-        <>
-          <span>Filtered out rows</span>
-          <span>
-            {formatOrDash(data.rowsRemovedByFilter)}
-            {filterPercent !== undefined ? ` (${filterPercent}%)` : ''}
-          </span>
-        </>
-      ),
-    },
-    {
-      id: 'removed-join-filter',
-      condition: data.rowsRemovedByJoinFilter !== undefined,
-      tooltip: 'Rows dropped because the join filter did not match.',
-      element: (
-        <>
-          <span>Join filter drops</span>
-          <span>
-            {formatOrDash(data.rowsRemovedByJoinFilter)}
-            {joinFilterPercent !== undefined ? ` (${joinFilterPercent}%)` : ''}
-          </span>
-        </>
-      ),
-    },
-    {
-      id: 'removed-index-recheck',
-      condition: data.rowsRemovedByIndexRecheck !== undefined,
-      tooltip: 'Rows removed after an index recheck (commonly due to visibility rules).',
-      element: (
-        <>
-          <span>Index recheck drops</span>
-          <span>
-            {formatOrDash(data.rowsRemovedByIndexRecheck)}
-            {recheckPercent !== undefined ? ` (${recheckPercent}%)` : ''}
-          </span>
+          <span className="ml-auto">{data.exclusiveCost?.toFixed(2)}</span>
         </>
       ),
     },
     {
       id: 'heap-fetches',
-      condition: data.heapFetches !== undefined,
+      condition: metricsVisibility.buffers && data.heapFetches !== undefined,
       tooltip: 'Rows fetched directly from the table because they were not already in cache.',
+      icon: <Layers size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Table fetches</span>
-          <span>{formatOrDash(data.heapFetches)}</span>
+          <span className="ml-auto">{formatOrDash(data.heapFetches)}</span>
         </>
       ),
     },
     {
       id: 'shared-buffers',
-      condition: vis.buffers && hasShared(data),
+      condition: metricsVisibility.buffers && hasShared(data),
       tooltip: (
         <div className="space-y-1">
           <p>Shared cache blocks touched (all runs vs. just this node).</p>
           <span className="block font-mono whitespace-pre-wrap">{sharedTooltip(data)}</span>
         </div>
       ),
+      icon: <Layers size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Shared cache (self)</span>
-          <span>
+          <span className="ml-auto">
             h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0} d:{data.exSharedDirtied ?? 0} w:
             {data.exSharedWritten ?? 0}
           </span>
@@ -251,17 +269,18 @@ Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
     },
     {
       id: 'temp-buffers',
-      condition: vis.buffers && hasTemp(data),
+      condition: metricsVisibility.buffers && hasTemp(data),
       tooltip: (
         <div className="space-y-1">
           <p>Temporary blocks written to disk for this step.</p>
           <span className="block font-mono whitespace-pre-wrap">{tempTooltip(data)}</span>
         </div>
       ),
+      icon: <Layers size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Temporary blocks (self)</span>
-          <span>
+          <span className="ml-auto">
             r:{data.exTempRead ?? 0} w:{data.exTempWritten ?? 0}
           </span>
         </>
@@ -269,17 +288,18 @@ Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
     },
     {
       id: 'local-buffers',
-      condition: vis.buffers && hasLocal(data),
+      condition: metricsVisibility.buffers && hasLocal(data),
       tooltip: (
         <div className="space-y-1">
           <p>Local cache blocks touched (per worker memory).</p>
           <span className="block font-mono whitespace-pre-wrap">{localTooltip(data)}</span>
         </div>
       ),
+      icon: <Layers size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Local cache (self)</span>
-          <span>
+          <span className="ml-auto">
             h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0} d:{data.exLocalDirtied ?? 0} w:
             {data.exLocalWritten ?? 0}
           </span>
@@ -287,37 +307,49 @@ Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
       ),
     },
     {
-      id: 'output-cols',
-      condition: vis.output && Array.isArray(data.outputCols) && data.outputCols.length > 0,
-      tooltip: (
-        <div className="space-y-1">
-          <p>Columns passed to the next step.</p>
-          <span className="block whitespace-pre-wrap">{data.outputCols?.join(', ')}</span>
-        </div>
-      ),
+      id: 'plan-width',
+      condition: metricsVisibility.output && data.planWidth !== undefined,
+      tooltip: 'Average bytes per row output by this step.',
+      icon: <Ruler size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
-          <span>Columns returned</span>
-          <span className="truncate max-w-[95px]">{data.outputCols?.join(', ')}</span>
+          <span>Row size</span>
+          <span className="ml-auto">{formatOrDash(data.planWidth)} bytes</span>
         </>
       ),
     },
-    {
-      id: 'io-times',
-      condition: vis.buffers && (data.ioReadTime !== undefined || data.ioWriteTime !== undefined),
-      tooltip: 'Time spent performing disk reads and writes for this step.',
-      element: (
-        <>
-          <span>Disk I/O time</span>
-          <span>
-            {data.ioReadTime !== undefined ? `read ${data.ioReadTime}ms` : ''}
-            {data.ioWriteTime !== undefined
-              ? `${data.ioReadTime !== undefined ? ' · ' : ''}write ${data.ioWriteTime}ms`
-              : ''}
-          </span>
-        </>
-      ),
-    },
+    // {
+    //   id: 'output-cols',
+    //   condition: vis.output && Array.isArray(data.outputCols) && data.outputCols.length > 0,
+    //   tooltip: (
+    //     <div className="space-y-1">
+    //       <p>Columns passed to the next step.</p>
+    //       <span className="block whitespace-pre-wrap">{data.outputCols?.join(', ')}</span>
+    //     </div>
+    //   ),
+    //   element: (
+    //     <>
+    //       <span>Columns returned</span>
+    //       <span className="truncate max-w-[95px]">{data.outputCols?.join(', ')}</span>
+    //     </>
+    //   ),
+    // },
+    // {
+    //   id: 'io-times',
+    //   condition: vis.buffers && (data.ioReadTime !== undefined || data.ioWriteTime !== undefined),
+    //   tooltip: 'Time spent performing disk reads and writes for this step.',
+    //   element: (
+    //     <>
+    //       <span>Disk I/O time</span>
+    //       <span>
+    //         {data.ioReadTime !== undefined ? `read ${data.ioReadTime}ms` : ''}
+    //         {data.ioWriteTime !== undefined
+    //           ? `${data.ioReadTime !== undefined ? ' · ' : ''}write ${data.ioWriteTime}ms`
+    //           : ''}
+    //       </span>
+    //     </>
+    //   ),
+    // },
   ]
 }
 
@@ -391,6 +423,7 @@ export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
 
           return (
             <NodeItem key={metric.id} tooltip={metric.tooltip}>
+              {metric?.icon && <div className="min-w-fit">{metric.icon}</div>}
               {metric.element}
             </NodeItem>
           )
