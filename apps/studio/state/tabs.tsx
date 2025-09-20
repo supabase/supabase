@@ -347,7 +347,7 @@ function createTabsState(projectRef: string) {
               router.push(`/project/${router.query.ref}/editor`)
               break
             default:
-              router.push(`/project/${router.query.ref}/${editor}`)
+              router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
           }
         }
       }

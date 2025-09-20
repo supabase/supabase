@@ -22,6 +22,9 @@ concurrency:
 
 permissions:
   contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
 
 jobs:
   test:
@@ -36,10 +39,10 @@ jobs:
       EMAIL: ${{ secrets.CI_EMAIL }}
       PASSWORD: ${{ secrets.CI_PASSWORD }}
       PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
-      NEXT_PUBLIC_IS_PLATFORM: true
       NEXT_PUBLIC_API_URL: https://api.supabase.green
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_HOSTED_PROJECT_ID }}
+      # Studio Self-Hosted project ID
+      VERCEL_PROJECT_ID: prj_CnatEuo7L6bUZAgmujMrm5P1rxtv
       NEXT_PUBLIC_HCAPTCHA_SITE_KEY: 10000000-ffff-ffff-ffff-000000000001
 
     steps:
@@ -57,13 +60,16 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
+      # Deploy a preview to Vercel (CLI mode) and capture the URL
       - name: Install Vercel CLI
         run: pnpm add --global vercel@latest
 
       - name: Pull Vercel Environment Information (Preview)
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build Project Artifacts for Vercel
+      - name: Build Project Artifacts for Vercel (is_platform=false)
+        env:
+          NEXT_PUBLIC_IS_PLATFORM: false
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project to Vercel and Get URL
@@ -76,11 +82,12 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm -C e2e/studio exec playwright install --with-deps
 
-      - name: Run Playwright tests
+      - name: Run Playwright tests against Vercel Preview
         id: playwright
         env:
-          AUTHENTICATION: true
-          STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
+          AUTHENTICATION: false
+          STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
+          API_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
         run: pnpm e2e
 
       - uses: actions/upload-artifact@v4
@@ -91,3 +98,62 @@ jobs:
             e2e/studio/playwright-report/
             e2e/studio/test-results/
           retention-days: 7
+
+      - name: Prepare summary (outputs)
+        if: always()
+        id: summarize
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const p = 'e2e/studio/test-results/test-results.json'
+            let s={total:0,passed:0,failed:0,skipped:0,timedOut:0,interrupted:0,durationMs:0,note:''}
+            try {
+              const data = JSON.parse(fs.readFileSync(p,'utf8'))
+              const walk=n=>{ if(!n)return; n.suites?.forEach(walk); n.specs?.forEach(sp=>sp.tests?.forEach(t=>t.results?.forEach(r=>{s.total++; s.durationMs+=r.duration||0; s[r.status]=(s[r.status]||0)+1;})))}
+              walk(data)
+            } catch { s.note='No JSON report found or parse error.' }
+            const md = s.note ? `Note: ${s.note}` : `- Total: ${s.total}\n- Passed: ${s.passed||0}\n- Failed: ${s.failed||0}\n- Skipped: ${s.skipped||0}\n- Timed out: ${s.timedOut||0}\n- Interrupted: ${s.interrupted||0}\n- Duration: ${(s.durationMs/1000).toFixed(1)}s`
+            core.setOutput('summary', md)
+
+      - name: Upload HTML report to Pages artifact
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: e2e/studio/playwright-report
+
+    outputs:
+      summary: ${{ steps.summarize.outputs.summary }}
+
+  deploy:
+    needs: [test]
+    if: always()
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Comment summary on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `${{ toJson(needs.test.outputs.summary) }}`.replace(/^"|"$/g,'')
+            const body = [
+              `**Studio E2E Results**`,
+              '',
+              summary,
+              '',
+              `Report: ${{ steps.deployment.outputs.page_url }}`
+            ].join('\n')
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            })
