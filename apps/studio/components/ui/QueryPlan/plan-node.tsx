@@ -1,6 +1,15 @@
 import { type ReactNode, useContext } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-import { Workflow, TimerOff, Clock, Rows3, CircleDollarSign, Layers, Table } from 'lucide-react'
+import {
+  Workflow,
+  TimerOff,
+  Clock,
+  Rows3,
+  CircleDollarSign,
+  Layers,
+  Table,
+  MoveRight,
+} from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -228,10 +237,17 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       element: (
         <>
           <span>Planner cost</span>
-          <span className="ml-auto">
+          <div className="ml-auto flex items-center">
             {data.startupCost !== undefined ? formatOrDash(data.startupCost) : '-'}
-            {data.totalCost !== undefined ? ` → ${formatOrDash(data.totalCost)}` : ''}
-          </span>
+            {data.totalCost !== undefined ? (
+              <>
+                <MoveRight size={10} className="mx-1 text-foreground-light" />
+                {formatOrDash(data.totalCost)}
+              </>
+            ) : (
+              ''
+            )}
+          </div>
         </>
       ),
     },
