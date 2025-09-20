@@ -15,6 +15,7 @@ import {
   resources,
   self_hosting,
   storage,
+  ui,
 } from '../../components/Navigation/NavigationMenu/NavigationMenu.constants.js'
 
 const DOCS_ROOT_DIR = join(__dirname, '..', '..')
@@ -76,6 +77,7 @@ const main = async () => {
       platform.items,
       resources.items,
       self_hosting.items,
+      ui.items,
     ]
       .flatMap((items) => recGetUrl(items))
       // Remove initial slash

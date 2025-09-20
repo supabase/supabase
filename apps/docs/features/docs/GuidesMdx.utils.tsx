@@ -38,6 +38,7 @@ const PUBLISHED_SECTIONS = [
   'self-hosting',
   'storage',
   'telemetry',
+  'ui',
 ] as const
 
 const getGuidesMarkdownInternal = async (slug: string[]) => {
@@ -115,23 +116,23 @@ const getGuidesMarkdown = cache_fullProcess_withDevCacheBust(
 const genGuidesStaticParams = (directory?: string) => async () => {
   const promises = directory
     ? (await readdir(join(GUIDES_DIRECTORY, directory), { recursive: true }))
-        .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1)?.startsWith('_'))
-        .map((file) => ({ slug: file.replace(/\.mdx$/, '').split(sep) }))
-        .concat(
-          (await existsFile(join(GUIDES_DIRECTORY, `${directory}.mdx`))) ? [{ slug: [] }] : []
-        )
-    : PUBLISHED_SECTIONS.map(async (section) =>
-        (await readdir(join(GUIDES_DIRECTORY, section), { recursive: true }))
-          .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1)?.startsWith('_'))
-          .map((file) => ({
-            slug: [section, ...file.replace(/\.mdx$/, '').split(sep)],
-          }))
-          .concat(
-            (await existsFile(join(GUIDES_DIRECTORY, `${section}.mdx`)))
-              ? [{ slug: [section] }]
-              : []
-          )
+      .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1)?.startsWith('_'))
+      .map((file) => ({ slug: file.replace(/\.mdx$/, '').split(sep) }))
+      .concat(
+        (await existsFile(join(GUIDES_DIRECTORY, `${directory}.mdx`))) ? [{ slug: [] }] : []
       )
+    : PUBLISHED_SECTIONS.map(async (section) =>
+      (await readdir(join(GUIDES_DIRECTORY, section), { recursive: true }))
+        .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1)?.startsWith('_'))
+        .map((file) => ({
+          slug: [section, ...file.replace(/\.mdx$/, '').split(sep)],
+        }))
+        .concat(
+          (await existsFile(join(GUIDES_DIRECTORY, `${section}.mdx`)))
+            ? [{ slug: [section] }]
+            : []
+        )
+    )
 
   // Flattening earlier will not work because there is nothing to flatten
   // until the promises resolve.
@@ -158,36 +159,36 @@ const genGuideMeta =
   <Params,>(
     generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
   ) =>
-  async (props: { params: Promise<Params> }, parent: ResolvingMetadata): Promise<Metadata> => {
-    const params = await props.params
-    const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
-      pluckPromise(parent, 'alternates'),
-      pluckPromise(parent, 'openGraph'),
-      generate(params),
-    ])
+    async (props: { params: Promise<Params> }, parent: ResolvingMetadata): Promise<Metadata> => {
+      const params = await props.params
+      const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
+        pluckPromise(parent, 'alternates'),
+        pluckPromise(parent, 'openGraph'),
+        generate(params),
+      ])
 
-    // Pathname has form `/guides/(section)/**`
-    const ogType = pathname.split('/')[2]
+      // Pathname has form `/guides/(section)/**`
+      const ogType = pathname.split('/')[2]
 
-    return {
-      title: `${meta.title} | Supabase Docs`,
-      description: meta.description || meta.subtitle,
-      // @ts-ignore
-      alternates: {
-        ...parentAlternates,
-        canonical: meta.canonical || `${BASE_PATH}${pathname}`,
-      },
-      openGraph: {
-        ...parentOg,
-        url: `${BASE_PATH}${pathname}`,
-        images: generateOpenGraphImageMeta({
-          type: ogType,
-          title: meta.title,
-          description: meta.description,
-        }),
-      },
+      return {
+        title: `${meta.title} | Supabase Docs`,
+        description: meta.description || meta.subtitle,
+        // @ts-ignore
+        alternates: {
+          ...parentAlternates,
+          canonical: meta.canonical || `${BASE_PATH}${pathname}`,
+        },
+        openGraph: {
+          ...parentOg,
+          url: `${BASE_PATH}${pathname}`,
+          images: generateOpenGraphImageMeta({
+            type: ogType,
+            title: meta.title,
+            description: meta.description,
+          }),
+        },
+      }
     }
-  }
 
 function removeRedundantH1(content: string) {
   const mdxTree = fromMarkdown(content, 'utf-8', {
