@@ -33,7 +33,7 @@ export async function getTableEditor(
     signal
   )
 
-  return (result[0]?.entity ?? undefined) as Entity | undefined
+  return (result[0]?.entity ?? null) as Entity | undefined
 }
 
 export type TableEditorData = Awaited<ReturnType<typeof getTableEditor>>
