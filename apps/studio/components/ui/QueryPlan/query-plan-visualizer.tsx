@@ -185,6 +185,15 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                     Learn about query plans
                   </Link>
                 </Button>
+
+                <Button
+                  type="default"
+                  size="tiny"
+                  icon={<Minimize2 size={14} className="text-foreground" />}
+                  onClick={toggleExpanded}
+                  aria-label="Exit expanded view"
+                  className="h-7 w-7"
+                />
               </div>
             ) : (
               <div className="absolute top-2.5 left-2.5 right-2.5 z-20 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border bg-sidebar px-2.5 py-1.5 shadow-sm">
@@ -271,16 +280,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 </ReactFlow>
               </HeatmapContext.Provider>
             </MetricsVisibilityContext.Provider>
-            {isExpanded && (
-              <Button
-                type="default"
-                size="tiny"
-                icon={<Minimize2 size={14} className="text-foreground" />}
-                onClick={toggleExpanded}
-                aria-label="Exit expanded view"
-                className="absolute top-12 right-3 z-10 inline-flex h-7 w-7 items-center justify-center rounded-md border"
-              />
-            )}
           </div>
         </div>
       </div>
