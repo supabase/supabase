@@ -189,30 +189,33 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                   jitTotalTime={meta?.jitTotalTime}
                   className="hidden h-full flex-1 items-center border-0 bg-transparent px-0 py-0 text-xs md:flex"
                 />
-                <Button
-                  asChild
-                  type="default"
-                  size="tiny"
-                  icon={<BookOpen />}
-                  className="ml-auto h-[28px]"
-                >
-                  <Link
-                    href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Learn about query plans
-                  </Link>
-                </Button>
 
-                <Button
-                  type="default"
-                  size="tiny"
-                  icon={<Minimize2 size={14} className="text-foreground" />}
-                  onClick={toggleExpanded}
-                  aria-label="Exit expanded view"
-                  className="h-7 w-7"
-                />
+                <div className="flex items-center gap-x-2 ml-auto">
+                  <Button
+                    asChild
+                    type="default"
+                    size="tiny"
+                    icon={<BookOpen />}
+                    className="h-[28px]"
+                  >
+                    <Link
+                      href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Learn about query plans
+                    </Link>
+                  </Button>
+
+                  <Button
+                    type="default"
+                    size="tiny"
+                    icon={<Minimize2 size={14} className="text-foreground" />}
+                    onClick={toggleExpanded}
+                    aria-label="Exit expanded view"
+                    className="h-7 w-7"
+                  />
+                </div>
               </div>
             ) : (
               <div className="absolute top-2.5 left-2.5 right-2.5 z-20 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border bg-sidebar px-2.5 py-1.5 shadow-sm">
