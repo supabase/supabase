@@ -78,7 +78,7 @@ jobs:
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
       - name: Install Playwright Browsers
-        run: pnpm -C e2e/studio exec playwright install --with-deps
+        run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
 
       - name: Run Playwright tests against Vercel Preview
         id: playwright
