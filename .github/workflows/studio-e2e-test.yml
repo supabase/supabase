@@ -23,8 +23,6 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
-  pages: write
-  id-token: write
 
 jobs:
   test:
@@ -116,40 +114,19 @@ jobs:
             const md = s.note ? `Note: ${s.note}` : `- Total: ${s.total}\n- Passed: ${s.passed||0}\n- Failed: ${s.failed||0}\n- Skipped: ${s.skipped||0}\n- Timed out: ${s.timedOut||0}\n- Interrupted: ${s.interrupted||0}\n- Duration: ${(s.durationMs/1000).toFixed(1)}s`
             core.setOutput('summary', md)
 
-      - name: Upload HTML report to Pages artifact
-        if: always()
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: e2e/studio/playwright-report
-
-    outputs:
-      summary: ${{ steps.summarize.outputs.summary }}
-
-  deploy:
-    needs: [test]
-    if: always()
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      pages: write
-      id-token: write
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
       - name: Comment summary on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
-            const summary = `${{ toJson(needs.test.outputs.summary) }}`.replace(/^"|"$/g,'')
+            const summary = `${{ steps.summarize.outputs.summary }}`.replace(/^"|"$/g,'')
+            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`
             const body = [
               `**Studio E2E Results**`,
               '',
               summary,
               '',
-              `Report: ${{ steps.deployment.outputs.page_url }}`
+              `Artifacts: ${runUrl}`
             ].join('\n')
             await github.rest.issues.createComment({
               owner: context.repo.owner,
