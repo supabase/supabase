@@ -4,6 +4,8 @@ on:
   repository_dispatch:
     types:
       - vercel.deployment.*
+  # Allow manual runs for debugging
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.client_payload.git.branch || github.ref }}
@@ -21,6 +23,11 @@ jobs:
     timeout-minutes: 60
     continue-on-error: true
     steps:
+      - name: Debug incoming event
+        run: |
+          echo '${{ toJson(github.event) }}' | tee repository_dispatch_event.json
+          echo 'Project ID from payload:'
+          echo '${{ github.event.client_payload.project.id }}'
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.client_payload.git.sha || github.sha }}
