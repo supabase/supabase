@@ -3,9 +3,9 @@ import { Timer, BadgeDollarSign, ExternalLink } from 'lucide-react'
 import { capitalize } from 'lodash'
 
 import type { PlanNodeData } from '../types'
-import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { MetricsVisibility, HeatmapMode } from '../contexts'
-import { formatKeys, stripParens, blocksToBytes, formatMs, formatNumber } from './formats'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { formatKeys, stripParens, blocksToBytes, formatMs } from './formats'
 import { DEFAULT_NODE_HEIGHT_CONSTANTS, type NodeHeightConstants } from '../constants'
 
 /**
@@ -307,7 +307,7 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
     const slowTime = formatMs(data.slowHint.selfTimeMs) ?? data.slowHint.selfTimeMs.toFixed(2)
 
     hints.push(
-      <Tooltip key="slow">
+      <Tooltip>
         <TooltipTrigger className="flex">
           <Badge
             size="small"
@@ -343,7 +343,7 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
         : undefined
 
     hints.push(
-      <Tooltip key="cost">
+      <Tooltip>
         <TooltipTrigger className="flex">
           <Badge
             size="small"
