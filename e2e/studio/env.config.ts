@@ -14,6 +14,8 @@ export const env = {
   PASSWORD: process.env.PASSWORD,
   PROJECT_REF: process.env.PROJECT_REF || 'default',
   IS_PLATFORM: process.env.IS_PLATFORM || 'false',
+  VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO:
+    process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO || 'false',
 }
 
 export const STORAGE_STATE_PATH = path.join(__dirname, './playwright/.auth/user.json')

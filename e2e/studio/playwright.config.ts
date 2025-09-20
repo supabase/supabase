@@ -22,6 +22,10 @@ export default defineConfig({
     headless: IS_CI,
     trace: 'retain-on-failure',
     permissions: ['clipboard-read', 'clipboard-write'],
+    extraHTTPHeaders: {
+      'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO,
+      'x-vercel-set-bypass-cookie': 'true',
+    },
   },
   projects: [
     {
