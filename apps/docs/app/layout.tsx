@@ -6,8 +6,7 @@ import '../styles/prism-okaidia.scss'
 
 import { type Metadata, type Viewport } from 'next'
 
-import { genFaviconData } from 'common/MetaFavicons/app-router'
-
+import { genFaviconData } from 'common'
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'

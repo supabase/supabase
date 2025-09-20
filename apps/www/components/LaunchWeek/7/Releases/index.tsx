@@ -14,7 +14,7 @@ import {
   StyledArticleBadge,
 } from './components'
 
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { useBreakpoint } from 'common'
 import { motion } from 'framer-motion'
 import Day5 from './Day5'
 
