@@ -1052,6 +1052,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/configuration' as `/${string}`,
         },
         {
+          name: 'Database replication',
+          url: '/guides/database/replication',
+          items: [
+            {
+              name: 'ETL',
+              url: '/guides/database/replication/etl',
+            },
+          ],
+        },
+        {
           name: 'Query optimization',
           url: '/guides/database/query-optimization' as `/${string}`,
         },
