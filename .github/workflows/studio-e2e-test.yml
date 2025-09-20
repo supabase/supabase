@@ -84,8 +84,8 @@ jobs:
         id: playwright
         env:
           AUTHENTICATION: false
-          STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
-          API_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
+          STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}?vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}
+          API_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}?vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}
         run: pnpm e2e
 
       - uses: actions/upload-artifact@v4
