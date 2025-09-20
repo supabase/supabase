@@ -7,7 +7,6 @@ import { useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
 import { useProfile } from 'lib/profile'
-import { ResponseError } from 'types'
 import { Button, cn } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { OrganizationInviteError } from './OrganizationInviteError'
@@ -17,7 +16,13 @@ export const OrganizationInvite = () => {
   const { profile } = useProfile()
   const { slug, token } = useParams()
 
-  const { data, error, isSuccess, isError, isLoading } = useOrganizationInvitationTokenQuery(
+  const {
+    data,
+    error,
+    isSuccess: isSuccessInvitation,
+    isError: isErrorInvitation,
+    isLoading: isLoadingInvitation,
+  } = useOrganizationInvitationTokenQuery(
     { slug, token },
     {
       retry: false,
@@ -26,11 +31,12 @@ export const OrganizationInvite = () => {
     }
   )
   const hasError =
-    isError || (isSuccess && (data.token_does_not_exist || data.expired_token || !data.email_match))
-  const inviteHasBeenAccepted =
+    isErrorInvitation ||
+    (isSuccessInvitation && (data.token_does_not_exist || data.expired_token || !data.email_match))
+  const inviteIsNoLongerValid =
     error?.code === 401 && error?.message.includes('Failed to retrieve organization')
 
-  const organizationName = isSuccess ? data?.organization_name : 'An organization'
+  const organizationName = isSuccessInvitation ? data?.organization_name : 'An organization'
   const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   const { mutate: joinOrganization, isLoading: isJoining } =
@@ -57,11 +63,11 @@ export const OrganizationInvite = () => {
         'md:w-[400px]'
       )}
     >
-      {isLoading ? (
+      {isLoadingInvitation ? (
         <div className="p-5">
           <GenericSkeletonLoader />
         </div>
-      ) : inviteHasBeenAccepted ? (
+      ) : inviteIsNoLongerValid ? (
         <>
           <Admonition
             type="default"
@@ -82,7 +88,7 @@ export const OrganizationInvite = () => {
             <p className={cn('text-foreground', !!profile ? 'text-2xl' : 'text-3xl')}>
               {organizationName}
             </p>
-            {isSuccess && slug && (
+            {isSuccessInvitation && (
               <p className="text-xs text-foreground-lighter">{`Organization slug: ${slug}`}</p>
             )}
           </div>
@@ -104,15 +110,16 @@ export const OrganizationInvite = () => {
                 </div>
               </div>
             )}
-            <div className={cn('flex flex-col gap-4', !isLoading && !hasError && 'px-6 py-4')}>
-              {!!profile && hasError && (
-                <OrganizationInviteError
-                  data={data}
-                  error={error as unknown as ResponseError}
-                  isError={isError}
-                />
+            <div
+              className={cn(
+                'flex flex-col gap-4',
+                !isLoadingInvitation && !hasError && 'px-6 py-4'
               )}
-              {isSuccess && !hasError && (
+            >
+              {!!profile && hasError && (
+                <OrganizationInviteError data={data} error={error} isError={isErrorInvitation} />
+              )}
+              {isSuccessInvitation && !hasError && (
                 <div className="flex flex-row items-center justify-center gap-3">
                   <Button type="default" disabled={isJoining} asChild>
                     <Link href="/projects">Decline</Link>
