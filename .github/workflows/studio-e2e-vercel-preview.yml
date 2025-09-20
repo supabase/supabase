@@ -3,7 +3,7 @@ name: Studio E2E Tests (Vercel Preview)
 on:
   repository_dispatch:
     types:
-      - vercel.deployment.success
+      - vercel.deployment.*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.client_payload.git.branch || github.ref }}
@@ -15,7 +15,8 @@ permissions:
 
 jobs:
   run-e2es:
-    if: github.event_name == 'repository_dispatch'
+    # Only run for Studio Self-Hosted Vercel project
+    if: github.event_name == 'repository_dispatch' && github.event.client_payload.project.id == 'prj_CnatEuo7L6bUZAgmujMrm5P1rxtv'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     continue-on-error: true
