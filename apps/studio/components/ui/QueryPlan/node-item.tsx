@@ -36,7 +36,7 @@ export const NodeItem = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>{item}</TooltipTrigger>
-      <TooltipContent side="right" align="start" className="max-w-[240px] text-[10px] leading-4">
+      <TooltipContent side="right" align="start" className="max-w-[240px] text-[11px] leading-4">
         {tooltip}
       </TooltipContent>
     </Tooltip>

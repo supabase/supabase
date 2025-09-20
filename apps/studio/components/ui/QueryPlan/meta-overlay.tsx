@@ -50,7 +50,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
     >
       <ul className="flex flex-wrap items-center gap-x-4 gap-y-1">
         {metrics.map((metric) => (
-          <li key={metric.label} className="cursor-help">
+          <li key={metric.label}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-x-1">
@@ -60,7 +60,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
                   <span>{formatMs(metric.value)} ms</span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="max-w-[240px] whitespace-normal">
+              <TooltipContent className="max-w-[240px] whitespace-normal text-[11px] leading-4">
                 {metric.description}
               </TooltipContent>
             </Tooltip>
