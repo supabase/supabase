@@ -168,7 +168,7 @@ const Pagination = () => {
               onKeyDown={(e) => {
                 const parsedValue = Number(value)
                 if (
-                  e.code === 'Enter' &&
+                  (e.code === 'Enter' || e.code === 'NumpadEnter') &&
                   !Number.isNaN(parsedValue) &&
                   parsedValue >= 1 &&
                   parsedValue <= maxPages
