@@ -254,15 +254,14 @@ const BufferBar = ({
   )
 }
 
-const TreeGuide = ({ branchTrail, isLast }: { branchTrail: boolean[]; isLast: boolean }) => {
-  if (branchTrail.length === 0) return null
+const getTreeGuidePrefix = (branchTrail: boolean[], isLast: boolean): string => {
+  if (branchTrail.length === 0) return ''
 
   const ancestors = branchTrail.slice(0, -1)
   const connector = isLast ? '└─' : '├─'
   const prefix = `${ancestors.map((hasNext) => (hasNext ? '│ ' : '  ')).join('')}${connector} `
-  const formatted = prefix.replace(/ /g, '\u00A0')
 
-  return <span className="font-mono text-[11px] text-foreground-muted">{formatted}</span>
+  return prefix.replace(/ /g, '\u00A0')
 }
 
 const renderTimeMetric: MetricRenderer = (data, stats) => {
@@ -519,13 +518,15 @@ export const MetricsSidebar = ({
         </div>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-2">
-        <ul className="flex flex-col gap-y-1">
+        <ul className="flex flex-col gap-y-0.5">
           {rows.map((row) => {
             const { node, branchTrail, isLast } = row
             const data = node.data
             const isActive = selectedNodeId === node.id
             const { visual, tooltip } = METRIC_RENDERERS[activeMetric](data, stats)
             const hasTooltip = hasTooltipContent(tooltip)
+
+            const treePrefix = getTreeGuidePrefix(branchTrail, isLast)
 
             const buttonBody = (
               <Button
@@ -538,10 +539,14 @@ export const MetricsSidebar = ({
                 )}
               >
                 <div className="grid h-[24px] w-full grid-cols-[minmax(0,1fr),120px] items-center gap-x-2">
-                  <div className="flex min-w-0 items-center gap-x-1 overflow-hidden whitespace-nowrap text-[11px] text-foreground text-ellipsis">
-                    <TreeGuide branchTrail={branchTrail} isLast={isLast} />
-                    <span className="truncate font-medium text-foreground">{data.label}</span>
-                  </div>
+                  <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-[11px]">
+                    {treePrefix ? (
+                      <span aria-hidden className="font-mono text-foreground-lighter">
+                        {treePrefix}
+                      </span>
+                    ) : null}
+                    <span className="font-medium text-foreground">{data.label}</span>
+                  </span>
                   {visual ? <div className="w-[120px]">{visual}</div> : null}
                 </div>
               </Button>
