@@ -110,6 +110,25 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     }
   }, [isExpanded])
 
+  useEffect(() => {
+    if (!isExpanded) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+
+      // prevent Query Details sheet from closing
+      event.stopPropagation()
+      event.preventDefault()
+
+      setIsExpanded(false)
+    }
+
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true)
+    }
+  }, [isExpanded])
+
   const toggleExpanded = useCallback(() => {
     setIsExpanded((prev) => !prev)
   }, [])
