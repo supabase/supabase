@@ -231,7 +231,7 @@ export const ProjectUsageSection = () => {
         action: 'home_project_usage_chart_clicked',
         properties: {
           service_type: serviceKey,
-          timestamp: datum.timestamp,
+          bar_timestamp: datum.timestamp,
         },
         groups: {
           project: projectRef,

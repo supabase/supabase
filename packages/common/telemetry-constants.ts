@@ -1606,7 +1606,7 @@ export interface HomeProjectUsageChartClickedEvent {
     /**
      * Timestamp of the bar clicked
      */
-    timestamp: string
+    bar_timestamp: string
   }
   groups: TelemetryGroups
 }
@@ -1625,10 +1625,6 @@ export interface HomeCustomReportBlockAddedEvent {
      * ID of the snippet/block added
      */
     block_id: string
-    /**
-     * Name of the snippet/block added
-     */
-    block_name: string
     /**
      * If position is 0 it is equivalent to 'Add your first chart'.
      */

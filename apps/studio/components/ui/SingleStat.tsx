@@ -65,7 +65,11 @@ export const SingleStat = ({
   }
 
   if (onClick) {
-    return <button className="group">{content}</button>
+    return (
+      <button className="group" onClick={onClick}>
+        {content}
+      </button>
+    )
   }
 
   return content

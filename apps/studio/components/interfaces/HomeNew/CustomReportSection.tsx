@@ -195,7 +195,6 @@ export function CustomReportSection() {
           action: 'home_custom_report_block_added',
           properties: {
             block_id: snippet.id,
-            block_name: snippet.name,
             position: 0,
           },
           groups: {
@@ -218,7 +217,6 @@ export function CustomReportSection() {
         action: 'home_custom_report_block_added',
         properties: {
           block_id: snippet.id,
-          block_name: snippet.name,
           position: current.length - 1,
         },
         groups: {
