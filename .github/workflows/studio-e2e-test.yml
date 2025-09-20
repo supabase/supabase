@@ -39,10 +39,10 @@ jobs:
       EMAIL: ${{ secrets.CI_EMAIL }}
       PASSWORD: ${{ secrets.CI_PASSWORD }}
       PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
-      NEXT_PUBLIC_IS_PLATFORM: true
       NEXT_PUBLIC_API_URL: https://api.supabase.green
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_HOSTED_PROJECT_ID }}
+      # Studio Self-Hosted project ID
+      VERCEL_PROJECT_ID: prj_CnatEuo7L6bUZAgmujMrm5P1rxtv
       NEXT_PUBLIC_HCAPTCHA_SITE_KEY: 10000000-ffff-ffff-ffff-000000000001
 
     steps:
@@ -60,43 +60,35 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      # Build Studio in CLI mode (is_platform=false)
-      - name: Build Studio (CLI mode)
+      # Deploy a preview to Vercel (CLI mode) and capture the URL
+      - name: Install Vercel CLI
+        run: pnpm add --global vercel@latest
+
+      - name: Pull Vercel Environment Information (Preview)
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts for Vercel (is_platform=false)
         env:
           NEXT_PUBLIC_IS_PLATFORM: false
-        run: pnpm -C apps/studio build
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-      # Start the built Studio locally
-      - name: Start Studio (next start)
-        env:
-          NEXT_PUBLIC_IS_PLATFORM: false
-          PORT: 3000
+      - name: Deploy Project to Vercel and Get URL
+        id: deploy_vercel
         run: |
-          pnpm -C apps/studio start & echo $! > /tmp/studio_pid
-
-      - name: Wait for Studio to be ready
-        run: |
-          for i in {1..60}; do
-            if curl -sSf http://localhost:3000 > /dev/null; then
-              echo "Studio is up"; exit 0; fi; sleep 2; done; echo "Studio failed to start"; exit 1
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Vercel Preview URL: $DEPLOY_URL"
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
       - name: Install Playwright Browsers
         run: pnpm -C e2e/studio exec playwright install --with-deps
 
-      - name: Run Playwright tests against local Studio (CLI)
+      - name: Run Playwright tests against Vercel Preview
         id: playwright
         env:
           AUTHENTICATION: false
-          STUDIO_URL: http://localhost:3000
-          API_URL: http://localhost:3000
+          STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
+          API_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
         run: pnpm e2e
-
-      - name: Stop Studio
-        if: always()
-        run: |
-          if [ -f /tmp/studio_pid ]; then
-            kill $(cat /tmp/studio_pid) || true
-          fi
 
       - uses: actions/upload-artifact@v4
         if: always()
