@@ -269,42 +269,40 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
           <Separator />
           <Section title="Rows & filters">
             <div className="grid gap-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-x-2 text-xs font-semibold">
                 <Rows3 size={14} className="text-foreground-light" />
-                <div className="flex flex-col text-[11px]">
-                  <span className="text-xs text-foreground">Actual rows</span>
-                  <span className="text-foreground-light">
-                    {actualRows ?? '—'}
-                    {data.planRows !== undefined ? (
-                      <span className="ml-1 text-foreground-lighter">
-                        (estimated {formatNumber(data.planRows)})
-                      </span>
-                    ) : null}
-                  </span>
-                </div>
+                <span>Actual rows</span>
               </div>
+
+              <div>
+                {actualRows ?? '—'}
+                {data.planRows !== undefined ? (
+                  <span className="ml-1 text-foreground-lighter">
+                    (estimated {formatNumber(data.planRows)})
+                  </span>
+                ) : null}
+              </div>
+
               {data.rowsRemovedByFilter !== undefined ? (
-                <div className="rounded border border-border px-2 py-1 text-[11px]">
+                <div className="text-[11px]">
                   WHERE / filter removed {formatOrDash(data.rowsRemovedByFilter)} rows
                   {filteredPercent !== undefined ? ` (${filteredPercent}%)` : ''}
                 </div>
               ) : null}
               {data.rowsRemovedByJoinFilter !== undefined ? (
-                <div className="rounded border border-border px-2 py-1 text-[11px]">
+                <div className="text-[11px]">
                   Join filter removed {formatOrDash(data.rowsRemovedByJoinFilter)} rows
                   {joinFilteredPercent !== undefined ? ` (${joinFilteredPercent}%)` : ''}
                 </div>
               ) : null}
               {data.rowsRemovedByIndexRecheck !== undefined ? (
-                <div className="rounded border border-border px-2 py-1 text-[11px]">
+                <div className="text-[11px]">
                   Index recheck removed {formatOrDash(data.rowsRemovedByIndexRecheck)} rows
                   {recheckPercent !== undefined ? ` (${recheckPercent}%)` : ''}
                 </div>
               ) : null}
               {data.heapFetches !== undefined ? (
-                <div className="rounded border border-border px-2 py-1 text-[11px]">
-                  Heap Fetches: {formatOrDash(data.heapFetches)}
-                </div>
+                <div className="text-[11px]">Heap Fetches: {formatOrDash(data.heapFetches)}</div>
               ) : null}
             </div>
           </Section>
@@ -448,26 +446,6 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
                     ))}
                   </ul>
                 </div>
-              </Section>
-            </>
-          ) : null}
-
-          {data.raw ? (
-            <>
-              <Separator />
-              <Section title="Raw JSON">
-                <Button
-                  type="dashed"
-                  size="tiny"
-                  onClick={() => {
-                    if (typeof navigator === 'undefined') return
-                    const payload = JSON.stringify(data.raw ?? {}, null, 2)
-                    navigator.clipboard?.writeText(payload).catch(() => {})
-                  }}
-                  className="self-start"
-                >
-                  Copy JSON
-                </Button>
               </Section>
             </>
           ) : null}
