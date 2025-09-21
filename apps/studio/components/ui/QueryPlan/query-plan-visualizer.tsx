@@ -202,9 +202,9 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           appear
           enter="transition-all duration-300 ease-out"
           enterFrom="w-0 opacity-0"
-          enterTo="w-[340px] opacity-100"
+          enterTo="w-[350px] opacity-100"
           leave="transition-all duration-200 ease-in"
-          leaveFrom="w-[340px] opacity-100"
+          leaveFrom="w-[350px] opacity-100"
           leaveTo="w-0 opacity-0"
           afterLeave={() => setPanelNode(null)}
         >
