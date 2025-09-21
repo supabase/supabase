@@ -451,7 +451,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
       <>
         <div className={containerClass}>
           <div className="flex h-full">{planPanel}</div>
-          {detailPanelExpanded}
         </div>
       </>
     )
