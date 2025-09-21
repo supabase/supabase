@@ -3,7 +3,7 @@ import { Fragment, type ReactNode } from 'react'
 import { AlertTriangle, Clock, Layers, Rows3, Table, TimerReset, X } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
-import { Badge, Button } from 'ui'
+import { Badge, Button, Separator } from 'ui'
 import { formatMs, formatNumber, formatOrDash } from './utils/formats'
 import { hasLocal, hasShared, hasTemp, removedPercentValue } from './utils/node-display'
 
@@ -47,8 +47,6 @@ const Section = ({
     </section>
   )
 }
-
-const Divider = () => <div className="border-b border-border" />
 
 const formatPercent = (value?: number) => {
   if (value === undefined || Number.isNaN(value)) return undefined
@@ -248,7 +246,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
 
             {hasHints ? (
               <>
-                <Divider />
+                <Separator />
                 <Section title="Attention needed">
                   <div className="flex flex-col gap-2">
                     {data.slowHint ? (
@@ -288,7 +286,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
               </>
             ) : null}
 
-            <Divider />
+            <Separator />
             <Section title="Rows & filters">
               <div className="grid gap-2">
                 <div className="flex items-center gap-2">
@@ -331,7 +329,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
               </div>
             </Section>
 
-            <Divider />
+            <Separator className="bg-border" />
             <Section title="Planner estimates">
               <dl className="grid grid-cols-2 gap-2 text-[11px]">
                 {plannerEstimates.map((item) => (
@@ -345,7 +343,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
 
             {hasBufferData || hasIOTiming ? (
               <>
-                <Divider />
+                <Separator />
                 <Section title="Buffers / IO">
                   {hasBufferData ? (
                     <div className="space-y-2 text-[11px]">
@@ -437,7 +435,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
 
             {conditionRows.some((row) => row.value) ? (
               <>
-                <Divider />
+                <Separator />
                 <Section title="Conditions">
                   <div className="space-y-2">
                     {conditionRows
@@ -467,7 +465,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
 
             {outputColumns.length ? (
               <>
-                <Divider />
+                <Separator />
                 <Section title="Output columns">
                   <div className="rounded border border-border bg-surface-100 px-2 py-2 text-[11px]">
                     <ul className="flex flex-col gap-1">
@@ -484,7 +482,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
 
             {data.raw ? (
               <>
-                <Divider />
+                <Separator />
                 <Section title="Raw JSON">
                   <Button
                     type="dashed"
