@@ -185,6 +185,14 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     setIsExpanded((prev) => !prev)
   }, [])
 
+  const clearSelection = useCallback(() => {
+    setSelectedNodeId(null)
+  }, [])
+
+  const handleDetailPanelAfterLeave = useCallback(() => {
+    setPanelNode(null)
+  }, [])
+
   const nodeTypes = useMemo(
     () => ({
       [NODE_TYPE]: PlanNode,
@@ -203,7 +211,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
       />
     ) : null
 
-    const detailPanelElement =
+    const detailPanelExpanded =
       isExpanded && panelNode ? (
         <Transition
           as={Fragment}
@@ -215,14 +223,41 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           leave="transition-all duration-200 ease-in"
           leaveFrom="w-[350px] opacity-100"
           leaveTo="w-0 opacity-0"
-          afterLeave={() => setPanelNode(null)}
+          afterLeave={handleDetailPanelAfterLeave}
         >
-          <div className="hidden xl:flex overflow-hidden">
-            <NodeDetailsPanel
-              node={panelNode}
-              meta={meta}
-              onClearSelection={() => setSelectedNodeId(null)}
-            />
+          <div className="flex overflow-hidden">
+            <NodeDetailsPanel node={panelNode} meta={meta} onClearSelection={clearSelection} />
+          </div>
+        </Transition>
+      ) : null
+
+    const detailPanelOverlay =
+      !isExpanded && panelNode ? (
+        <Transition
+          as={Fragment}
+          show={!!selectedNode}
+          appear
+          afterLeave={handleDetailPanelAfterLeave}
+        >
+          <div className="absolute inset-0 z-30 flex">
+            <Transition.Child
+              as={Fragment}
+              enter="transform transition-all duration-300 ease-out"
+              enterFrom="translate-x-full opacity-0"
+              enterTo="translate-x-0 opacity-100"
+              leave="transform transition-all duration-200 ease-in"
+              leaveFrom="translate-x-0 opacity-100"
+              leaveTo="translate-x-full opacity-0"
+            >
+              <div className="pointer-events-auto flex h-full w-full">
+                <NodeDetailsPanel
+                  node={panelNode}
+                  meta={meta}
+                  onClearSelection={clearSelection}
+                  variant="overlay"
+                />
+              </div>
+            </Transition.Child>
           </div>
         </Transition>
       ) : null
@@ -340,9 +375,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
               maxZoom={1.8}
               proOptions={{ hideAttribution: true }}
               onNodeClick={(_event, node) => handleSelectNode(node)}
-              onPaneClick={() => {
-                setSelectedNodeId(null)
-              }}
+              onPaneClick={clearSelection}
               onInit={(instance) => setRfInstance(instance)}
             >
               <Background
@@ -354,6 +387,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
             </ReactFlow>
           </HeatmapContext.Provider>
         </MetricsVisibilityContext.Provider>
+        {detailPanelOverlay}
       </div>
     )
 
@@ -406,7 +440,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
           <div className={containerClass}>
             <div className="flex h-full">
               {mainContent}
-              {detailPanelElement}
+              {detailPanelExpanded}
             </div>
           </div>
         </>
@@ -417,6 +451,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
       <>
         <div className={containerClass}>
           <div className="flex h-full">{planPanel}</div>
+          {detailPanelExpanded}
         </div>
       </>
     )

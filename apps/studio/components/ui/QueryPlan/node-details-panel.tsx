@@ -3,7 +3,14 @@ import { Fragment, type ReactNode } from 'react'
 import { AlertTriangle, Clock, Rows3, Table, TimerReset, X } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Separator } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Separator,
+  cn,
+} from 'ui'
 import { formatMs, formatNumber, formatOrDash } from './utils/formats'
 import { hasLocal, hasShared, hasTemp, removedPercentValue } from './utils/node-display'
 
@@ -11,6 +18,7 @@ type NodeDetailsPanelProps = {
   node: Node<PlanNodeData>
   meta?: PlanMeta
   onClearSelection: () => void
+  variant?: 'sidebar' | 'overlay'
 }
 
 type KeyValue = {
@@ -87,7 +95,12 @@ const inclusiveBufferTotal = (data: PlanNodeData) => {
   return { shared, temp, local, total: shared + temp + local }
 }
 
-export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPanelProps) => {
+export const NodeDetailsPanel = ({
+  node,
+  meta,
+  onClearSelection,
+  variant = 'sidebar',
+}: NodeDetailsPanelProps) => {
   const data = node.data
 
   const loops = data.actualLoops ?? 1
@@ -153,7 +166,14 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
   const hasHints = Boolean(data.slowHint || data.costHint)
 
   return (
-    <aside className="flex w-[350px] min-w-[280px] max-w-[360px] flex-col border-l border-border bg-sidebar shadow-lg">
+    <aside
+      className={cn(
+        'flex h-full flex-col bg-sidebar shadow-lg border-border',
+        variant === 'overlay'
+          ? 'w-full max-w-none rounded-md'
+          : 'w-[350px] min-w-[280px] max-w-[360px] border-l border-border'
+      )}
+    >
       <div className="flex items-center justify-between border-b border-border px-4 py-2 h-[41px]">
         <div className="flex items-center gap-2">
           <span className="truncate text-xs font-semibold text-foreground">{data.label}</span>
