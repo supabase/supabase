@@ -3,7 +3,7 @@ import { Fragment, type ReactNode } from 'react'
 import { AlertTriangle, Clock, Layers, Rows3, Table, TimerReset, X } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
-import { Badge, Button, Separator } from 'ui'
+import { Button, Separator } from 'ui'
 import { formatMs, formatNumber, formatOrDash } from './utils/formats'
 import { hasLocal, hasShared, hasTemp, removedPercentValue } from './utils/node-display'
 
@@ -36,9 +36,9 @@ const Section = ({
   children: ReactNode
 }) => {
   return (
-    <section className="flex flex-col gap-2">
+    <section className="flex flex-col gap-2 px-4">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-foreground-light">{title}</h3>
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {description ? (
           <span className="text-[11px] text-foreground-light">{description}</span>
         ) : null}
@@ -157,22 +157,12 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
   const hasHints = Boolean(data?.slowHint || data?.costHint)
 
   return (
-    <aside className="flex w-[340px] min-w-[280px] max-w-[360px] flex-col border-l border-border bg-sidebar shadow-lg">
-      <div className="flex items-center justify-between border-b border-border px-3 py-2 h-[41px]">
+    <aside className="flex w-[350px] min-w-[280px] max-w-[360px] flex-col border-l border-border bg-sidebar shadow-lg">
+      <div className="flex items-center justify-between border-b border-border px-4 py-2 h-[41px]">
         <div className="flex items-center gap-2">
           <span className="truncate text-xs font-semibold text-foreground">
             {data?.label ?? 'Select a node'}
           </span>
-          {data?.joinType ? (
-            <Badge size="small" variant="outline" className="uppercase">
-              {data.joinType}
-            </Badge>
-          ) : null}
-          {data?.parallelAware ? (
-            <Badge size="small" variant="outline" className="uppercase">
-              Parallel
-            </Badge>
-          ) : null}
         </div>
         <Button
           type="default"
@@ -184,7 +174,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-3">
+      <div className="flex-1 overflow-y-auto py-3">
         {!data ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-sm text-foreground-light">
             <Layers size={18} />
@@ -193,7 +183,7 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-y-4">
             <Section
               title="Overview"
               description={data.neverExecuted ? 'This step never executed' : undefined}
