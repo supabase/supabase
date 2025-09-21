@@ -9,6 +9,7 @@ import {
   Info,
   ListFilter,
   Rows3,
+  SquareChartGantt,
   Table,
   TimerReset,
   TrendingUp,
@@ -229,7 +230,7 @@ export const NodeDetailsPanel = ({
           <Section
             title="Overview"
             description={data.neverExecuted ? 'This step never executed' : undefined}
-            icon={<Clock className="h-4 w-4" />}
+            icon={<SquareChartGantt className="h-4 w-4" />}
             tooltip="Execution time, loop counts, and planner accuracy for this node."
           >
             <div className="grid grid-cols-2 gap-2">
@@ -493,17 +494,9 @@ export const NodeDetailsPanel = ({
                         <div className="flex items-center justify-between text-[11px] text-foreground-light">
                           <span>{row.label}</span>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (!row.value || typeof navigator === 'undefined') return
-                            navigator.clipboard?.writeText(row.value).catch(() => {})
-                          }}
-                          title="Click to copy"
-                          className="w-full rounded border border-border bg-surface-100 px-2 py-1 text-left font-mono text-[11px] leading-relaxed text-foreground hover:border-border-stronger"
-                        >
+                        <div className="w-full rounded border bg-surface-100 px-2 py-1 text-left font-mono text-[11px] leading-relaxed text-foreground">
                           {row.value}
-                        </button>
+                        </div>
                       </div>
                     ))}
                 </div>
