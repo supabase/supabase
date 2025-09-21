@@ -12,7 +12,16 @@ import 'reactflow/dist/style.css'
 import { Transition } from '@headlessui/react'
 
 import type { PlanNodeData } from './types'
-import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  cn,
+} from 'ui'
 import { MetaOverlay } from './meta-overlay'
 import { ControlsOverlay } from './controls-overlay'
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, NODE_TYPE } from './constants'
@@ -220,19 +229,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
 
     const planPanel = (
       <div className="relative flex-1">
-        {meta?.errorMessage && (
-          <div className="pointer-events-none absolute inset-0 z-20 mt-10 flex items-start justify-center">
-            <div className="pointer-events-auto max-w-[720px] rounded border border-red-500/70 bg-foreground-muted/20 px-3 py-2 text-[11px] backdrop-blur-sm">
-              <div className="font-semibold text-red-600">{meta.errorMessage}</div>
-              {meta.errorDetail && (
-                <div className="mt-1 whitespace-pre-wrap text-foreground-lighter">
-                  {meta.errorDetail}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {isExpanded ? (
           <div className="flex h-[41px] w-full items-center gap-x-3 border-b border-border bg-sidebar px-3">
             <ControlsOverlay
@@ -365,6 +361,32 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
       'relative h-full w-full bg-background',
       isExpanded ? 'border-none' : 'border rounded-md'
     )
+
+    if (meta?.errorMessage) {
+      return (
+        <div className={containerClass}>
+          <div className="flex h-full items-center justify-center px-4 py-10">
+            <div className="w-full max-w-md">
+              <Alert_Shadcn_ variant="destructive">
+                <AlertTitle_Shadcn_>{meta.errorMessage}</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="space-y-3 text-sm">
+                  {meta.errorDetail && (
+                    <p className="whitespace-pre-wrap text-foreground-lighter">
+                      {meta.errorDetail}
+                    </p>
+                  )}
+                  <Button asChild type="default" size="tiny">
+                    <Link href="/support/new" target="_blank" rel="noreferrer">
+                      Contact support
+                    </Link>
+                  </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </div>
+          </div>
+        </div>
+      )
+    }
 
     if (isExpanded) {
       const mainContent = sidebarElement ? (
