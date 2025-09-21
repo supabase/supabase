@@ -472,7 +472,7 @@ export const MetricsSidebar = ({
   selectedNodeId,
   onSelect,
   defaultSize = 20,
-  minSize = 15,
+  minSize = 20,
   maxSize = 45,
 }: MetricsSidebarProps) => {
   const [activeMetric, setActiveMetric] = useState<SidebarMetricKey>('time')
@@ -488,7 +488,7 @@ export const MetricsSidebar = ({
       minSize={minSize}
       maxSize={maxSize}
       collapsible
-      className="hidden lg:flex min-w-[220px] flex-col bg-sidebar"
+      className="hidden lg:flex min-w-[310px] flex-col bg-sidebar"
     >
       <div className="flex items-center justify-between border-b px-3 py-2">
         <div className="text-xs font-medium">
