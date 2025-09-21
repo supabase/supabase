@@ -46,26 +46,35 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
 
   return (
     <div
-      className={cn('text-xs px-2 py-1 rounded-md border bg-alternative min-h-[36px]', className)}
+      className={cn(
+        'text-xs px-2 py-1 rounded-md border bg-alternative min-h-[36px] overflow-x-auto',
+        className
+      )}
     >
-      <ul className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        {metrics.map((metric) => (
-          <li key={metric.label}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-x-1">
-                  <span className="text-foreground-light leading-tight font-medium">
-                    {metric.label}:
-                  </span>
-                  <span>{formatMs(metric.value)} ms</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-[240px] whitespace-normal text-[11px] leading-4">
-                {metric.description}
-              </TooltipContent>
-            </Tooltip>
-          </li>
-        ))}
+      <ul className="flex items-center gap-x-4 overflow-hidden whitespace-nowrap">
+        {metrics.map((metric) => {
+          const formattedValue = formatMs(metric.value)
+
+          return (
+            <li key={metric.label} className="min-w-0">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex min-w-0 items-center gap-x-1">
+                    <span className="shrink-0 text-foreground-light leading-tight font-medium">
+                      {metric.label}:
+                    </span>
+                    <span className="truncate" title={`${metric.label}: ${formattedValue} ms`}>
+                      {formattedValue} ms
+                    </span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[240px] whitespace-normal text-[11px] leading-4">
+                  {metric.description}
+                </TooltipContent>
+              </Tooltip>
+            </li>
+          )
+        })}
       </ul>
     </div>
   )
