@@ -101,7 +101,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a React app.',
       icon: '/docs/img/icons/react-icon',
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
     {
       title: 'Next.js',
@@ -110,7 +110,7 @@ hideToc: true
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
       icon: '/docs/img/icons/nextjs-icon',
       hasLightIcon: true,
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
     {
       title: 'Nuxt',
@@ -118,7 +118,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Nuxt app.',
       icon: '/docs/img/icons/nuxt-icon',
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
     {
       title: 'Hono',
@@ -126,7 +126,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, secure it with auth, and query the data from a Hono app.',
       icon: '/docs/img/icons/hono-icon',
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
     {
       title: 'RedwoodJS',
@@ -134,7 +134,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.',
       icon: '/docs/img/icons/redwood-icon',
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
     {
       title: 'Flutter',
@@ -166,7 +166,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SvelteKit app.',
       icon: '/docs/img/icons/svelte-icon',
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
     {
       title: 'SolidJS',
@@ -174,7 +174,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SolidJS app.',
       icon: '/docs/img/icons/solidjs-icon',
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
     {
       title: 'Vue',
@@ -182,7 +182,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.',
       icon: '/docs/img/icons/vuejs-icon',
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
     {
       title: 'refine',
@@ -190,7 +190,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a refine app.',
       icon: '/docs/img/icons/refine-icon',
-      enabled: true,
+      enabled: isFeatureEnabled('docs:framework_quickstarts'),
     },
   ]
     .filter((item) => item.enabled !== false)
@@ -210,6 +210,8 @@ hideToc: true
       )
     })}
 </div>
+
+<$Show if="docs:web_apps">
 
 ### Web app demos
 
@@ -299,6 +301,9 @@ hideToc: true
 })}
 
 </div>
+</$Show>
+
+<$Show if="docs:mobile_tutorials">
 
 ### Mobile tutorials
 
@@ -320,6 +325,14 @@ hideToc: true
       icon: '/docs/img/icons/expo-icon',
       hasLightIcon: true,
       enabled: true
+    },
+    {
+      title: 'Expo React Native Social Auth',
+      href: '/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+      description:
+        'Learn how to implement social authentication in an app with Expo React Native and Supabase Database and Auth functionality.',
+      icon: '/docs/img/icons/expo-icon',
+      hasLightIcon: true
     },
     {
       title: 'Android Kotlin',
@@ -381,3 +394,4 @@ hideToc: true
 })}
 
 </div>
+</$Show>
