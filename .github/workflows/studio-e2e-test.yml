@@ -40,6 +40,7 @@ jobs:
       # Studio Self-Hosted project ID
       VERCEL_PROJECT_ID: prj_CnatEuo7L6bUZAgmujMrm5P1rxtv
       NEXT_PUBLIC_HCAPTCHA_SITE_KEY: 10000000-ffff-ffff-ffff-000000000001
+      VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}
 
     steps:
       - uses: actions/checkout@v4
