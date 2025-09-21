@@ -458,9 +458,7 @@ test.describe.serial('table editor', () => {
       force: true,
     })
     await expect(page.getByRole('menuitem', { name: 'Export table via CLI' })).toBeVisible()
-    await page.getByRole('menuitem', { name: 'Export table via CLI' }).click({
-      force: true,
-    })
+    await page.getByRole('menuitem', { name: 'Export table via CLI' }).click()
     await expect(page.getByRole('heading', { name: 'Export table data via CLI' })).toBeVisible()
     await page.getByRole('button', { name: 'Close' }).first().click()
 

@@ -455,7 +455,6 @@ test.describe.serial('Database', () => {
       await page.getByTestId('schema-selector').click()
       await page.getByPlaceholder('Find schema...').fill('auth')
       await page.getByRole('option', { name: 'auth' }).click()
-      await page.waitForLoadState('networkidle')
       await page.waitForTimeout(500)
       expect(page.getByText('sso_providers_pkey')).toBeVisible()
       expect(page.getByText('confirmation_token_idx')).toBeVisible()
