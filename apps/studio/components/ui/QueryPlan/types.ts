@@ -169,7 +169,6 @@ export type PlanNodeData = {
     severity: 'warn' | 'alert'
     selfCost?: number
     selfCostShare?: number
-    totalCostShare?: number
   }
   // Raw JSON for detail panel
   raw?: RawPlan

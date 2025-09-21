@@ -197,9 +197,6 @@ const annotateNodesWithHints = (
   const p90Cost = percentile(costValues, 0.9)
   const p95Cost = percentile(costValues, 0.95)
 
-  const rootNode = nodes.find((node) => node.id === 'root')
-  const rootTotalCost = rootNode?.data.totalCost ?? 0
-
   nodes.forEach((node) => {
     const data = node.data
 
@@ -227,23 +224,9 @@ const annotateNodesWithHints = (
       }
     }
 
-    const totalCost = data.totalCost ?? 0
     const selfCost = data.exclusiveCost ?? 0
     let costSeverity: 'warn' | 'alert' | undefined
-    let totalCostShare: number | undefined
     let selfCostShare: number | undefined
-
-    if (node.id === 'root' && rootTotalCost > 0 && totalCost > 0) {
-      const share = totalCost / rootTotalCost
-      if (share >= 0.6) {
-        costSeverity = 'alert'
-      } else if (share >= 0.25) {
-        costSeverity = 'warn'
-      }
-      if (costSeverity) {
-        totalCostShare = share
-      }
-    }
 
     if (!costSeverity && selfCost > 0) {
       if (totalSelfCost > 0) {
@@ -270,7 +253,6 @@ const annotateNodesWithHints = (
         severity: costSeverity,
         selfCost,
         selfCostShare,
-        totalCostShare,
       }
     }
   })
