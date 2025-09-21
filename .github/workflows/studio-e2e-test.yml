@@ -45,8 +45,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify Vercel bypass secret exists
         run: |
-          if [ -z "${{ secrets.VERCEL_BYPASS }}" ]; then
-            echo "Required secret VERCEL_BYPASS is not set" >&2
+          if [ -z "${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}" ]; then
+            echo "Required secret VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO is not set" >&2
             exit 1
           fi
       - uses: pnpm/action-setup@v4
@@ -125,21 +125,30 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const issue_number = context.issue.number
             const summary = `${{ steps.summarize.outputs.summary }}`.replace(/^"|"$/g,'')
             const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+            const marker = '<!-- studio-e2e-summary -->'
             const body = [
+              marker,
               `**Studio E2E Results**`,
               '',
               summary,
               '',
-              `Artifacts: ${runUrl}`
+              `Artifacts: ${runUrl}`,
+              '',
+              `Last updated: ${new Date().toISOString()}`
             ].join('\n')
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body,
-            })
+
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number, per_page: 100 })
+            const existing = comments.find(c => c.body && c.body.includes(marker))
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body })
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body })
+            }
 
       - name: Fail job if tests failed
         if: steps.playwright.outcome != 'success'
