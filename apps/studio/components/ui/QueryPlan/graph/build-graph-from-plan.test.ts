@@ -82,4 +82,34 @@ describe('buildGraphFromPlan', () => {
     expect(subplanNode?.data.estDirection).toBe('over')
     expect(subplanNode?.data.neverExecuted).toBe(true)
   })
+
+  it('normalizes child timing for gather nodes before computing self-time hints', () => {
+    const plan = {
+      Plan: {
+        'Node Type': 'Gather Merge',
+        'Actual Total Time': 12,
+        'Actual Loops': 1,
+        'Workers Planned': 2,
+        Plans: [
+          {
+            'Node Type': 'Seq Scan',
+            'Parent Relationship': 'Outer',
+            'Actual Total Time': 6,
+            'Actual Loops': 2,
+          },
+        ],
+      },
+      'Execution Time': 12,
+    }
+
+    const { nodes } = buildGraphFromPlan(plan, { executionTime: 12 })
+
+    const gatherNode = nodes.find((n) => n.id === 'root')
+    expect(gatherNode?.data.label).toBe('Gather Merge')
+    expect(gatherNode?.data.exclusiveTimeMs).toBeCloseTo(8)
+    expect(gatherNode?.data.slowHint?.severity).toBe('warn')
+
+    const workerNode = nodes.find((n) => n.id === 'root-0')
+    expect(workerNode?.data.exclusiveTimeMs).toBeCloseTo(4)
+  })
 })

@@ -20,9 +20,9 @@ const zeroAgg = (): Agg => ({
   tempWritten: 0,
 })
 
-const computeInclusiveBasics = (plan: RawPlan) => {
+const computeInclusiveBasics = (plan: RawPlan, workerMultiplier: number) => {
   const loops = plan['Actual Loops'] ?? 1
-  const nodeTimeIncl = (plan['Actual Total Time'] ?? 0) * loops
+  const nodeTimeIncl = ((plan['Actual Total Time'] ?? 0) * loops) / workerMultiplier
   const nodeCostIncl = plan['Total Cost'] ?? 0
   const actualRowsPerLoop = plan['Actual Rows'] ?? 0
   const actualRowsTotal = actualRowsPerLoop * loops
@@ -275,7 +275,8 @@ export const buildGraphFromPlan = (
     plan: RawPlan,
     parentId?: string,
     index: number = 0,
-    currentSubplanName?: string
+    currentSubplanName?: string,
+    gatherWorkers?: number
   ): Agg => {
     const id = parentId ? `${parentId}-${index}` : 'root'
     const label = plan['Node Type'] ?? 'Node'
@@ -286,9 +287,29 @@ export const buildGraphFromPlan = (
     }
 
     const children: RawPlan[] = plan['Plans'] ?? []
+    const nodeType = plan['Node Type'] ?? ''
+
+    let gatherWorkersForChildren = gatherWorkers
+    if (nodeType === 'Gather' || nodeType === 'Gather Merge') {
+      const planned = plan['Workers Planned']
+      const launched = plan['Workers Launched']
+      if (typeof planned === 'number' && planned > 0) {
+        gatherWorkersForChildren = planned
+      } else if (typeof launched === 'number' && launched > 0) {
+        gatherWorkersForChildren = launched
+      }
+    }
+
     let childAgg: Agg = zeroAgg()
     children.forEach((child, i) => {
-      const agg = addPlan(child, id, i, subName)
+      const relationship = child['Parent Relationship']
+      const shouldPropagateGather =
+        gatherWorkersForChildren !== undefined &&
+        relationship !== 'InitPlan' &&
+        relationship !== 'SubPlan'
+
+      const childGatherWorkers = shouldPropagateGather ? gatherWorkersForChildren : undefined
+      const agg = addPlan(child, id, i, subName, childGatherWorkers)
       // create edge to child now that we know ids
       const childId = `${id}-${i}`
       edges.push({ id: `${id}->${childId}`, source: id, target: childId, animated: true })
@@ -307,7 +328,8 @@ export const buildGraphFromPlan = (
       childAgg.tempWritten += agg.tempWritten
     })
 
-    const inclusiveBasics = computeInclusiveBasics(plan)
+    const workerMultiplier = (gatherWorkers ?? 0) + 1
+    const inclusiveBasics = computeInclusiveBasics(plan, workerMultiplier)
     const buffers = extractBuffers(plan)
 
     const est = computeEstimation(plan, inclusiveBasics.actualRowsTotal)
