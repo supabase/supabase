@@ -43,6 +43,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Verify Vercel bypass secret exists
+        run: |
+          if [ -z "${{ secrets.VERCEL_BYPASS }}" ]; then
+            echo "Required secret VERCEL_BYPASS is not set" >&2
+            exit 1
+          fi
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
