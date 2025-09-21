@@ -55,7 +55,7 @@ export const ActivityStats = () => {
 
   return (
     <div className="@container">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-wrap">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-6 flex-wrap">
         <ServiceStatus />
 
         <SingleStat
