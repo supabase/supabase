@@ -22,7 +22,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
   const metrics: Metric[] = []
   if (planningTime !== undefined) {
     metrics.push({
-      label: 'Plan time',
+      label: 'Plan',
       value: planningTime,
       description:
         'How long PostgreSQL spent preparing the query plan before any rows were processed.',
@@ -30,14 +30,14 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
   }
   if (executionTime !== undefined) {
     metrics.push({
-      label: 'Run time',
+      label: 'Run',
       value: executionTime,
       description: 'Time PostgreSQL needed to execute the plan and produce results.',
     })
   }
   if (jitTotalTime !== undefined) {
     metrics.push({
-      label: 'Instant compile',
+      label: 'JIT',
       value: jitTotalTime,
       description:
         'Time spent compiling parts of the plan immediately before running (also known as just-in-time compilation).',
