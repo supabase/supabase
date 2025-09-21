@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import ReactFlow, {
   Background,
@@ -9,6 +9,7 @@ import ReactFlow, {
 } from 'reactflow'
 import { BookOpen, Maximize2, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
+import { Transition } from '@headlessui/react'
 
 import type { PlanNodeData } from './types'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
@@ -28,6 +29,7 @@ import { useHeatmapMax } from './hooks/use-heatmap-max'
 import { usePlanGraph } from './hooks/use-plan-graph'
 import { useDagreLayout } from './hooks/use-dagre-layout'
 import { MetricsSidebar } from './metrics-sidebar'
+import { NodeDetailsPanel } from './node-details-panel'
 
 export const QueryPlanVisualizer = ({ json, className }: { json: string; className?: string }) => {
   const { nodes, edges, meta } = usePlanGraph(json)
@@ -42,10 +44,26 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [panelNode, setPanelNode] = useState<Node<PlanNodeData> | null>(null)
   const layout = useDagreLayout(nodes, edges, metricsVisibility, heatmapMode)
 
   useEffect(() => {
-    requestAnimationFrame(() => rfInstance?.fitView())
+    if (!isExpanded || !rfInstance) return
+
+    let frameId: number | null = null
+    let secondFrameId: number | null = null
+
+    // Delay fitView until after the layout has settled with the detail panel width.
+    frameId = requestAnimationFrame(() => {
+      secondFrameId = requestAnimationFrame(() => {
+        rfInstance.fitView()
+      })
+    })
+
+    return () => {
+      if (frameId) cancelAnimationFrame(frameId)
+      if (secondFrameId) cancelAnimationFrame(secondFrameId)
+    }
   }, [isExpanded, rfInstance])
 
   const centerNodeInView = useCallback(
@@ -72,14 +90,9 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     [rfInstance]
   )
 
-  const handleSelectNode = useCallback(
-    (node: Node<PlanNodeData>) => {
-      setSelectedNodeId(node.id)
-
-      requestAnimationFrame(() => centerNodeInView(node.id))
-    },
-    [centerNodeInView]
-  )
+  const handleSelectNode = useCallback((node: Node<PlanNodeData>) => {
+    setSelectedNodeId(node.id)
+  }, [])
 
   useEffect(() => {
     if (!selectedNodeId) return
@@ -98,6 +111,36 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
       })),
     [layout.nodes, selectedNodeId]
   )
+
+  const selectedNode = useMemo(
+    () => layout.nodes.find((node) => node.id === selectedNodeId) ?? null,
+    [layout.nodes, selectedNodeId]
+  )
+
+  useEffect(() => {
+    if (selectedNode) {
+      setPanelNode(selectedNode)
+    }
+  }, [selectedNode])
+
+  useEffect(() => {
+    if (!selectedNodeId || !rfInstance) return
+
+    let frameId: number | null = null
+    let secondFrameId: number | null = null
+
+    // Wait an extra frame so React Flow recalculates node positions after sidebar resizing.
+    frameId = requestAnimationFrame(() => {
+      secondFrameId = requestAnimationFrame(() => {
+        centerNodeInView(selectedNodeId)
+      })
+    })
+
+    return () => {
+      if (frameId !== null) cancelAnimationFrame(frameId)
+      if (secondFrameId !== null) cancelAnimationFrame(secondFrameId)
+    }
+  }, [centerNodeInView, rfInstance, selectedNodeId])
 
   useEffect(() => {
     if (!isExpanded || typeof document === 'undefined') return
@@ -150,6 +193,30 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         onSelect={handleSelectNode}
       />
     ) : null
+
+    const detailPanelElement =
+      isExpanded && panelNode ? (
+        <Transition
+          as={Fragment}
+          show={Boolean(selectedNode)}
+          appear
+          enter="transition-all duration-300 ease-out"
+          enterFrom="w-0 opacity-0"
+          enterTo="w-[340px] opacity-100"
+          leave="transition-all duration-200 ease-in"
+          leaveFrom="w-[340px] opacity-100"
+          leaveTo="w-0 opacity-0"
+          afterLeave={() => setPanelNode(null)}
+        >
+          <div className="hidden xl:flex overflow-hidden">
+            <NodeDetailsPanel
+              node={panelNode}
+              meta={meta}
+              onClearSelection={() => setSelectedNodeId(null)}
+            />
+          </div>
+        </Transition>
+      ) : null
 
     const planPanel = (
       <div className="relative flex-1">
@@ -300,20 +367,25 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     )
 
     if (isExpanded) {
+      const mainContent = sidebarElement ? (
+        <ResizablePanelGroup direction="horizontal" className="flex h-full flex-1">
+          {sidebarElement}
+          <ResizableHandle withHandle className="hidden lg:flex" />
+          <ResizablePanel defaultSize={72} minSize={45} className="flex flex-1">
+            {planPanel}
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      ) : (
+        <div className="flex flex-1">{planPanel}</div>
+      )
+
       return (
         <>
           <div className={containerClass}>
-            <ResizablePanelGroup direction="horizontal" className="flex h-full">
-              {sidebarElement}
-              {sidebarElement ? <ResizableHandle withHandle className="hidden lg:flex" /> : null}
-              <ResizablePanel
-                defaultSize={sidebarElement ? 72 : 100}
-                minSize={sidebarElement ? 45 : 60}
-                className="flex flex-1"
-              >
-                {planPanel}
-              </ResizablePanel>
-            </ResizablePanelGroup>
+            <div className="flex h-full">
+              {mainContent}
+              {detailPanelElement}
+            </div>
           </div>
         </>
       )
