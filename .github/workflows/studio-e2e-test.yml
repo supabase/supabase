@@ -34,7 +34,6 @@ jobs:
     env:
       EMAIL: ${{ secrets.CI_EMAIL }}
       PASSWORD: ${{ secrets.CI_PASSWORD }}
-      PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
       NEXT_PUBLIC_API_URL: https://api.supabase.green
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       # Studio Self-Hosted project ID
