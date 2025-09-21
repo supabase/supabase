@@ -168,10 +168,8 @@ export const NodeDetailsPanel = ({
   return (
     <aside
       className={cn(
-        'flex h-full flex-col bg-sidebar shadow-lg border-border',
-        variant === 'overlay'
-          ? 'w-full max-w-none rounded-md'
-          : 'w-[350px] min-w-[280px] max-w-[360px] border-l border-border'
+        'flex h-full flex-col bg-sidebar shadow-lg',
+        variant === 'overlay' ? 'w-full max-w-none rounded-md' : 'w-[380px] border-l border-border'
       )}
     >
       <div className="flex items-center justify-between border-b border-border px-4 py-2 h-[41px]">
