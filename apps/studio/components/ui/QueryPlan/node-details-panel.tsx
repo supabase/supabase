@@ -3,7 +3,7 @@ import { Fragment, type ReactNode } from 'react'
 import { AlertTriangle, Clock, Rows3, Table, TimerReset, X } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
-import { Button, Separator } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Separator } from 'ui'
 import { formatMs, formatNumber, formatOrDash } from './utils/formats'
 import { hasLocal, hasShared, hasTemp, removedPercentValue } from './utils/node-display'
 
@@ -226,36 +226,40 @@ export const NodeDetailsPanel = ({ node, meta, onClearSelection }: NodeDetailsPa
               <Section title="Attention needed">
                 <div className="flex flex-col gap-2">
                   {data.slowHint ? (
-                    <div className="rounded border border-warning/60 bg-warning/10 px-2 py-2 text-[11px] text-foreground">
-                      <div className="flex items-center gap-2 text-xs font-semibold">
-                        <Clock size={12} />
-                        High self-time node
+                    <Alert_Shadcn_ variant="warning">
+                      <Clock size={16} />
+                      <div>
+                        <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
+                          High self-time node
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
+                          This step alone spent {formatMs(data.slowHint.selfTimeMs)} ms, taking
+                          {Math.round(data.slowHint.selfTimeShare * 100)}% of total runtime.
+                        </AlertDescription_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
+                          Consider filtering earlier in the plan or adding supporting indexes.
+                        </AlertDescription_Shadcn_>
                       </div>
-                      <p className="mt-1 leading-relaxed">
-                        This step alone spent {formatMs(data.slowHint.selfTimeMs)} ms, taking
-                        {Math.round(data.slowHint.selfTimeShare * 100)}% of total runtime.
-                      </p>
-                      <p className="mt-1 text-foreground-light">
-                        Consider filtering earlier in the plan or adding supporting indexes.
-                      </p>
-                    </div>
+                    </Alert_Shadcn_>
                   ) : null}
                   {data.costHint ? (
-                    <div className="rounded border border-warning/60 bg-warning/10 px-2 py-2 text-[11px] text-foreground">
-                      <div className="flex items-center gap-2 text-xs font-semibold">
-                        <AlertTriangle size={12} />
-                        Planner flagged as expensive
+                    <Alert_Shadcn_ variant="warning">
+                      <AlertTriangle size={16} />
+                      <div>
+                        <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
+                          Planner flagged as expensive
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
+                          Estimated cost{' '}
+                          {data.totalCost?.toFixed(2) ?? data.costHint.selfCost?.toFixed(2) ?? '—'}
+                          stands out in this plan.
+                        </AlertDescription_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
+                          Try refreshing statistics or rewriting the query to steer the planner
+                          toward a cheaper path.
+                        </AlertDescription_Shadcn_>
                       </div>
-                      <p className="mt-1 leading-relaxed">
-                        Estimated cost{' '}
-                        {data.totalCost?.toFixed(2) ?? data.costHint.selfCost?.toFixed(2) ?? '—'}
-                        stands out in this plan.
-                      </p>
-                      <p className="mt-1 text-foreground-light">
-                        Try refreshing statistics or rewriting the query to steer the planner toward
-                        a cheaper path.
-                      </p>
-                    </div>
+                    </Alert_Shadcn_>
                   ) : null}
                 </div>
               </Section>
