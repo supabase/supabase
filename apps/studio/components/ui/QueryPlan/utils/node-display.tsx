@@ -263,7 +263,7 @@ export function estimateNodeHeight(
 /**
  * Builds the header hint badges/tooltips for a plan node.
  */
-const SLOW_HELP_LINKS = [
+export const SLOW_HELP_LINKS = [
   {
     label: 'Examine query performance',
     href: 'https://supabase.com/docs/guides/platform/performance#examining-query-performance',
@@ -274,14 +274,14 @@ const SLOW_HELP_LINKS = [
   },
 ]
 
-const COST_HELP_LINKS = [
+export const COST_HELP_LINKS = [
   {
     label: 'Examine query performance',
     href: 'https://supabase.com/docs/guides/platform/performance#examining-query-performance',
   },
 ]
 
-const renderHelpLinks = (links: { label: string; href: string }[]) => (
+export const renderHelpLinks = (links: { label: string; href: string }[]) => (
   <ul className="flex flex-col gap-1 pt-1 text-[11px]">
     {links.map((link) => (
       <li key={link.href}>

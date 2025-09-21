@@ -2,6 +2,7 @@ import type { Node } from 'reactflow'
 import { Fragment, type ReactNode } from 'react'
 import {
   AlertTriangle,
+  CircleDollarSign,
   Clock,
   Columns3,
   Filter,
@@ -29,7 +30,15 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { formatMs, formatNumber, formatOrDash } from './utils/formats'
-import { hasLocal, hasShared, hasTemp, removedPercentValue } from './utils/node-display'
+import {
+  COST_HELP_LINKS,
+  SLOW_HELP_LINKS,
+  hasLocal,
+  hasShared,
+  hasTemp,
+  removedPercentValue,
+  renderHelpLinks,
+} from './utils/node-display'
 
 type NodeDetailsPanelProps = {
   node: Node<PlanNodeData>
@@ -202,7 +211,32 @@ export const NodeDetailsPanel = ({
 
   const outputColumns = data.outputCols ?? []
 
-  const hasHints = Boolean(data.slowHint || data.costHint)
+  const slowHint = data.slowHint
+  const costHint = data.costHint
+  const slowHintShare = slowHint ? Math.round(slowHint.selfTimeShare * 100) : undefined
+  const slowHintTimeText = slowHint
+    ? `${formatMs(slowHint.selfTimeMs) ?? slowHint.selfTimeMs.toFixed(2)} ms`
+    : undefined
+  const costHighlightValue = data.totalCost ?? costHint?.selfCost
+  const formattedCostHighlight =
+    costHighlightValue !== undefined ? costHighlightValue.toFixed(2) : undefined
+  const costHintShare =
+    costHint?.selfCostShare !== undefined
+      ? Math.round((costHint.selfCostShare ?? 0) * 100)
+      : undefined
+
+  const hasTimeDetails = Boolean(
+    data.actualTotalTime !== undefined ||
+      data.exclusiveTimeMs !== undefined ||
+      slowHint ||
+      data.actualLoops !== undefined
+  )
+  const hasCostDetails = Boolean(
+    data.startupCost !== undefined ||
+      data.totalCost !== undefined ||
+      data.exclusiveCost !== undefined ||
+      costHint
+  )
 
   return (
     <aside
@@ -279,48 +313,134 @@ export const NodeDetailsPanel = ({
             </div>
           </Section>
 
-          {hasHints ? (
+          {hasTimeDetails ? (
             <>
               <Separator />
               <Section
-                title="Attention needed"
-                icon={<AlertTriangle className="h-4 w-4" />}
-                tooltip="Heuristics that flag this node for follow-up, such as high self-time or planner cost."
+                title="Execution time"
+                icon={<Clock className="h-4 w-4" />}
+                tooltip="Detailed runtime stats for this node, including self time and loop counts."
               >
-                <div className="flex flex-col gap-2">
-                  {data.slowHint ? (
-                    <Alert_Shadcn_ variant="warning">
+                <div className="space-y-3">
+                  <dl className="space-y-1 text-[11px]">
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Total time (per loop)</dt>
+                      <dd className="text-foreground font-medium">
+                        {formattedTotalTimePerLoop ? `${formattedTotalTimePerLoop} ms` : '—'}
+                      </dd>
+                    </div>
+                    {formattedTotalTimeAllLoops ? (
+                      <div className="flex items-center justify-between">
+                        <dt className="text-foreground-light">All loops combined</dt>
+                        <dd className="text-foreground font-medium">
+                          {formattedTotalTimeAllLoops} ms
+                        </dd>
+                      </div>
+                    ) : null}
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Self time</dt>
+                      <dd className="text-foreground font-medium">
+                        {formattedSelfTime ? `${formattedSelfTime} ms` : '—'}
+                        {executionShare ? (
+                          <span className="ml-1 text-foreground-light">({executionShare})</span>
+                        ) : null}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Loops observed</dt>
+                      <dd className="text-foreground font-medium">{formattedLoops}</dd>
+                    </div>
+                    {rowsAcrossLoops ? (
+                      <div className="flex items-center justify-between">
+                        <dt className="text-foreground-light">Rows across loops</dt>
+                        <dd className="text-foreground font-medium">{rowsAcrossLoops}</dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                  {slowHint ? (
+                    <Alert_Shadcn_
+                      variant={slowHint.severity === 'alert' ? 'destructive' : 'warning'}
+                    >
                       <Clock size={16} />
                       <div>
                         <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
-                          High self-time node
+                          Slow node
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
-                          This step alone spent {formatMs(data.slowHint.selfTimeMs)} ms, taking
-                          {Math.round(data.slowHint.selfTimeShare * 100)}% of total runtime.
+                          Self time {slowHintTimeText ?? '—'} ({slowHintShare ?? '—'}% of total
+                          execution time).
                         </AlertDescription_Shadcn_>
                         <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
-                          Consider filtering earlier in the plan or adding supporting indexes.
+                          Consider narrowing the rows earlier in the plan or adding an index to
+                          reduce work.
                         </AlertDescription_Shadcn_>
+                        <div className="mt-2 text-[11px] leading-relaxed">
+                          {renderHelpLinks(SLOW_HELP_LINKS)}
+                        </div>
                       </div>
                     </Alert_Shadcn_>
                   ) : null}
-                  {data.costHint ? (
-                    <Alert_Shadcn_ variant="warning">
+                </div>
+              </Section>
+            </>
+          ) : null}
+
+          {hasCostDetails ? (
+            <>
+              <Separator />
+              <Section
+                title="Planner cost"
+                icon={<CircleDollarSign className="h-4 w-4" />}
+                tooltip="Planner-assigned cost units and any heuristics that flag this node."
+              >
+                <div className="space-y-3">
+                  <dl className="space-y-1 text-[11px]">
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Startup cost</dt>
+                      <dd className="text-foreground font-medium">
+                        {data.startupCost !== undefined ? data.startupCost.toFixed(2) : '—'}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Total cost</dt>
+                      <dd className="text-foreground font-medium">
+                        {data.totalCost !== undefined ? data.totalCost.toFixed(2) : '—'}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Self cost</dt>
+                      <dd className="text-foreground font-medium">
+                        {data.exclusiveCost !== undefined ? data.exclusiveCost.toFixed(2) : '—'}
+                        {costHintShare !== undefined ? (
+                          <span className="ml-1 text-foreground-light">
+                            (~{costHintShare}% of exclusive plan cost)
+                          </span>
+                        ) : null}
+                      </dd>
+                    </div>
+                  </dl>
+                  {costHint ? (
+                    <Alert_Shadcn_
+                      variant={costHint.severity === 'alert' ? 'destructive' : 'warning'}
+                    >
                       <AlertTriangle size={16} />
                       <div>
                         <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
-                          Planner flagged as expensive
+                          Cost is high
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
-                          Estimated cost{' '}
-                          {data.totalCost?.toFixed(2) ?? data.costHint.selfCost?.toFixed(2) ?? '—'}
-                          stands out in this plan.
+                          Estimated cost {formattedCostHighlight ?? '—'}
+                          {costHintShare !== undefined
+                            ? ` (~${costHintShare}% of exclusive plan cost).`
+                            : '.'}
                         </AlertDescription_Shadcn_>
                         <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
-                          Try refreshing statistics or rewriting the query to steer the planner
-                          toward a cheaper path.
+                          Reduce scanned rows or improve indexes so the planner considers cheaper
+                          strategies.
                         </AlertDescription_Shadcn_>
+                        <div className="mt-2 text-[11px] leading-relaxed">
+                          {renderHelpLinks(COST_HELP_LINKS)}
+                        </div>
                       </div>
                     </Alert_Shadcn_>
                   ) : null}
