@@ -1,9 +1,12 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button, cn } from 'ui'
 import { tableTemplates } from './templates'
-import { QuickstartVariant } from './types'
+import { QuickstartVariant, ViewMode } from './types'
 import { convertTableSuggestionToTableField } from './utils'
+import { InitialView } from './components/InitialView'
+import { CategoryView } from './components/CategoryView'
+import { ResultsView } from './components/ResultsView'
+import { createViewConfig, type ViewKey } from './viewConfig'
 import type { TableSuggestion } from './types'
 import type { TableField } from '../TableEditor.types'
 
@@ -16,20 +19,40 @@ interface TableTemplateSelectorProps {
 
 const SUCCESS_MESSAGE_DURATION_MS = 3000
 
+interface ViewState {
+  mode: ViewMode
+  selectedCategory: string | null
+  selectedTemplate: TableSuggestion | null
+  generatedTables: TableSuggestion[]
+  error: string | null
+  isLoading: boolean
+}
+
+const initialViewState: ViewState = {
+  mode: ViewMode.INITIAL,
+  selectedCategory: null,
+  selectedTemplate: null,
+  generatedTables: [],
+  error: null,
+  isLoading: false,
+}
+
 export const TableTemplateSelector = ({
-  variant: _variant,
+  variant,
   onSelectTemplate,
   onDismiss,
   disabled,
 }: TableTemplateSelectorProps) => {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null) // null => All
-  const [selectedTemplate, setSelectedTemplate] = useState<TableSuggestion | null>(null)
+  const [viewState, setViewState] = useState<ViewState>(initialViewState)
+
+  // Memoize view configuration
+  const viewConfig = useMemo(() => createViewConfig(), [])
 
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
-      setSelectedTemplate(template)
+      setViewState((prev) => ({ ...prev, selectedTemplate: template }))
       toast.success(
         `${template.tableName} template applied. You can add or modify the fields below.`,
         {
@@ -40,82 +63,60 @@ export const TableTemplateSelector = ({
     [onSelectTemplate]
   )
 
-  const categories = useMemo(() => Object.keys(tableTemplates), [])
+  const handleReset = useCallback(() => {
+    setViewState(initialViewState)
+  }, [])
 
-  useEffect(() => {
-    if (activeCategory === null && categories.length > 0) {
-      setActiveCategory(categories[0])
+  // Handler collection for views
+  const handlers = useMemo(
+    () => ({
+      onCategorySelect: (category: string) => {
+        setViewState((prev) => ({
+          ...prev,
+          mode: ViewMode.CATEGORY_SELECTED,
+          selectedCategory: category,
+        }))
+      },
+      onBack: handleReset,
+      onSelectTemplate: handleSelectTemplate,
+    }),
+    [handleReset, handleSelectTemplate]
+  )
+
+  // Get the appropriate view component
+  const getView = (): JSX.Element | null => {
+    const { mode, selectedCategory } = viewState
+
+    // Determine the view key based on mode
+    let viewKey: ViewKey = mode
+
+    // Get the view configuration
+    const config = viewConfig.get(viewKey)
+    if (!config) return null
+
+    // Check if view should render
+    if (config.shouldRender && !config.shouldRender(viewState)) {
+      return null
     }
-  }, [categories, activeCategory])
 
-  const displayed = useMemo(
-    () => (activeCategory ? tableTemplates[activeCategory] || [] : []),
-    [activeCategory]
-  )
+    // Get templates for category view
+    const templates = selectedCategory ? tableTemplates[selectedCategory] ?? [] : []
 
-  return (
-    <div className="rounded-lg border border-default bg-surface-75 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <h3 className="text-sm font-medium">Start faster with a table template</h3>
-          <p className="text-xs text-foreground-lighter mt-1">
-            Save time by starting from a ready-made table schema.
-          </p>
-        </div>
-        {onDismiss && (
-          <Button type="text" size="tiny" onClick={onDismiss}>
-            Dismiss
-          </Button>
-        )}
-      </div>
+    // Render the view with all necessary props
+    return config.render({
+      // Components
+      InitialView,
+      CategoryView,
+      ResultsView,
+      // Props
+      variant,
+      disabled,
+      onDismiss,
+      state: viewState,
+      templates,
+      handlers,
+    })
+  }
 
-      <div className="flex flex-wrap gap-2 mb-3">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
-            disabled={disabled}
-            className={cn(
-              'px-2 py-1 rounded-md text-xs capitalize border',
-              activeCategory === category
-                ? 'border-foreground bg-surface-200'
-                : 'border-default hover:border-foreground-muted hover:bg-surface-100',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
-            )}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid gap-2">
-        {displayed.map((t) => (
-          <button
-            key={`${activeCategory}:${t.tableName}`}
-            onClick={() => handleSelectTemplate(t)}
-            disabled={disabled}
-            className={cn(
-              'text-left p-3 rounded-md border transition-all w-full',
-              selectedTemplate?.tableName === t.tableName
-                ? 'border-foreground bg-surface-200'
-                : 'border-default hover:border-foreground-muted hover:bg-surface-100',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="text-sm font-medium font-mono">{t.tableName}</div>
-                {t.rationale && (
-                  <div className="text-sm text-foreground-light mt-1">{t.rationale}</div>
-                )}
-              </div>
-              <div className="flex items-center gap-1 text-sm text-foreground-muted ml-3">
-                <span>{t.fields.length} columns</span>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
+  return getView()
 }
