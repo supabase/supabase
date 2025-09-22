@@ -84,7 +84,7 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
 
-      - name: Run Playwright tests against Vercel Preview
+      - name: 🚀 Run Playwright tests against Vercel Preview
         id: playwright
         continue-on-error: true
         env:
@@ -131,6 +131,14 @@ jobs:
             const summary = `${{ steps.summarize.outputs.summary }}`.replace(/^"|"$/g,'')
             const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`
             const marker = '<!-- studio-e2e-summary -->'
+
+            const now = new Date()
+            const weekday = now.toLocaleString('en-US', { weekday: 'long', timeZone: 'UTC' })
+            const day = now.toLocaleString('en-US', { day: 'numeric', timeZone: 'UTC' })
+            const month = now.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })
+            const year = now.toLocaleString('en-US', { year: 'numeric', timeZone: 'UTC' })
+            const date = `${weekday} ${day}, ${month}, ${year} (UTC)`
+
             const body = [
               marker,
               `**Studio E2E Results**`,
@@ -139,7 +147,7 @@ jobs:
               '',
               `Artifacts: ${runUrl}`,
               '',
-              `Last updated: ${new Date().toISOString()}`
+              `Last updated: ${date}`
             ].join('\n')
 
             const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number, per_page: 100 })
