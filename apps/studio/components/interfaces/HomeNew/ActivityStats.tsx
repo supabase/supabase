@@ -89,6 +89,7 @@ export const ActivityStats = () => {
             ) : latestBackup ? (
               <TimestampInfo
                 className="text-base"
+                displayAs="utc"
                 label={dayjs(latestBackup.inserted_at).fromNow()}
                 utcTimestamp={latestBackup.inserted_at}
               />
