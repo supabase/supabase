@@ -3,9 +3,11 @@ import Image from 'next/image'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { BASE_PATH } from 'lib/constants'
+import { useIsAdvisorRulesEnabled } from './FeaturePreviewContext'
 
 export const AdvisorRulesPreview = () => {
   const { ref } = useParams()
+  const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
 
   return (
     <div>
@@ -26,7 +28,15 @@ export const AdvisorRulesPreview = () => {
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
             Allow you to disable advisor rules for your project from the{' '}
-            <InlineLink href={`/project/${ref}/advisors/security`}>Advisors section.</InlineLink>
+            <InlineLink
+              href={
+                isAdvisorRulesEnabled
+                  ? `/project/${ref}/advisors/rules/security`
+                  : `/project/${ref}/advisors/security`
+              }
+            >
+              Advisors section.
+            </InlineLink>
           </li>
         </ul>
       </div>
