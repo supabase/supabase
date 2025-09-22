@@ -33,7 +33,7 @@
 
 import * as acorn from 'acorn'
 import tsPlugin from 'acorn-typescript'
-import { type DefinitionContent, type BlockContent, type Code, type Root } from 'mdast'
+import { type BlockContent, type Code, type DefinitionContent, type Root } from 'mdast'
 import type { MdxJsxAttributeValueExpression, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import assert from 'node:assert'
 import { readFile } from 'node:fs/promises'
@@ -41,7 +41,7 @@ import { join } from 'node:path'
 import { removeTypes } from 'remove-types'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
-import { z, type SafeParseError } from 'zod'
+import { z, type ZodSafeParseError } from 'zod'
 
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
 import { IS_PLATFORM } from '~/lib/constants'
@@ -182,7 +182,7 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
 
       if (!result.success) {
         throw new Error(
-          `Invalid $CodeSample directive: ${(result as SafeParseError<ICodeSampleExternal>).error.message}`
+          `Invalid $CodeSample directive: ${(result as ZodSafeParseError<ICodeSampleExternal>).error.message}`
         )
       }
 
@@ -224,7 +224,7 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
 
       if (!result.success) {
         throw new Error(
-          `Invalid $CodeSample directive: ${(result as SafeParseError<ICodeSampleInternal>).error.message}`
+          `Invalid $CodeSample directive: ${(result as ZodSafeParseError<ICodeSampleInternal>).error.message}`
         )
       }
 

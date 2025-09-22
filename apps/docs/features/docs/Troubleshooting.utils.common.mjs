@@ -55,44 +55,45 @@ export const TROUBLESHOOTING_DIRECTORY = join(process.cwd(), 'content/troublesho
  */
 
 export const TroubleshootingSchema = z.strictObject({
-    title: z.string(),
-    topics: z.array(
-      z.enum([
-        'ai',
-        'auth',
-        'branching',
-        'cli',
-        'database',
-        'functions',
-        'platform',
-        'realtime',
-        'self-hosting',
-        'storage',
-        'studio',
-        'supavisor',
-        'terraform',
-      ])
-    ),
-    keywords: z.array(z.string()).optional(),
-    api: z.strictObject({
-            sdk: z.array(z.string()).optional(),
-            management_api: z.array(z.string()).optional(),
-            cli: z.array(z.string()).optional(),
-          })
-      .optional(),
-    errors: z
-      .array(
-        z.strictObject({
-                      http_status_code: z.number().optional(),
-                      code: z.string().optional(),
-                      message: z.string().optional(),
-                    })
-      )
-      .optional(),
-    database_id: z.string().prefault(`pseudo-${uuidv4()}`),
-    github_url: z.url().optional(),
-    date_created: z.date({ coerce: true }).optional(),
-  })
+  title: z.string(),
+  topics: z.array(
+    z.enum([
+      'ai',
+      'auth',
+      'branching',
+      'cli',
+      'database',
+      'functions',
+      'platform',
+      'realtime',
+      'self-hosting',
+      'storage',
+      'studio',
+      'supavisor',
+      'terraform',
+    ])
+  ),
+  keywords: z.array(z.string()).optional(),
+  api: z
+    .strictObject({
+      sdk: z.array(z.string()).optional(),
+      management_api: z.array(z.string()).optional(),
+      cli: z.array(z.string()).optional(),
+    })
+    .optional(),
+  errors: z
+    .array(
+      z.strictObject({
+        http_status_code: z.number().optional(),
+        code: z.string().optional(),
+        message: z.string().optional(),
+      })
+    )
+    .optional(),
+  database_id: z.string().prefault(`pseudo-${uuidv4()}`),
+  github_url: z.url().optional(),
+  date_created: z.coerce.date().optional(),
+})
 
 /**
  * @param {unknown} troubleshootingMetadata
