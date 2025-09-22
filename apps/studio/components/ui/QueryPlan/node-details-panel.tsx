@@ -363,18 +363,18 @@ export const NodeDetailsPanel = ({
                 <span className="text-sm font-medium">
                   {formattedSelfTime ? `${formattedSelfTime} ms` : '—'}
                 </span>
-                {executionShare ? (
+                {executionShare && (
                   <span className="text-[11px] text-foreground-light">
                     {executionShare} of total execution
                   </span>
-                ) : null}
+                )}
               </div>
               <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
                 <span className="text-[11px] text-foreground-light">Self cost</span>
                 <span className="text-sm font-medium">{formattedSelfCost ?? '—'}</span>
-                {costShareSummary ? (
+                {costShareSummary && (
                   <span className="text-[11px] text-foreground-light">{costShareSummary}</span>
-                ) : null}
+                )}
               </div>
               <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
                 <span className="text-[11px] text-foreground-light">Loops</span>
@@ -383,11 +383,11 @@ export const NodeDetailsPanel = ({
               <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
                 <span className="text-[11px] text-foreground-light">Rows seen</span>
                 <span className="text-sm font-medium">{actualRows ?? '—'}</span>
-                {rowsAcrossLoops ? (
+                {rowsAcrossLoops && (
                   <span className="text-[11px] text-foreground-light">
                     All loops combined {rowsAcrossLoops}
                   </span>
-                ) : null}
+                )}
               </div>
             </div>
           </Section>
@@ -407,33 +407,33 @@ export const NodeDetailsPanel = ({
                         {formattedTotalTimePerLoop ? `${formattedTotalTimePerLoop} ms` : '—'}
                       </div>
                     </li>
-                    {formattedTotalTimeAllLoops ? (
+                    {formattedTotalTimeAllLoops && (
                       <li className="flex items-center justify-between pt-3">
                         <div className="text-foreground-light">All loops combined</div>
                         <div className="font-medium">{formattedTotalTimeAllLoops} ms</div>
                       </li>
-                    ) : null}
+                    )}
                     <li className="flex items-center justify-between pt-3">
                       <div className="text-foreground-light">Self time</div>
                       <div className="font-medium">
                         {formattedSelfTime ? `${formattedSelfTime} ms` : '—'}
-                        {executionShare ? (
+                        {executionShare && (
                           <span className="ml-1 text-foreground-light">({executionShare})</span>
-                        ) : null}
+                        )}
                       </div>
                     </li>
                     <li className="flex items-center justify-between pt-3">
                       <div className="text-foreground-light">Loops observed</div>
                       <div className="font-medium">{formattedLoops}</div>
                     </li>
-                    {rowsAcrossLoops ? (
+                    {rowsAcrossLoops && (
                       <li className="flex items-center justify-between pt-3">
                         <div className="text-foreground-light">Rows across loops</div>
                         <div className="font-medium">{rowsAcrossLoops}</div>
                       </li>
-                    ) : null}
+                    )}
                   </ul>
-                  {slowHint ? (
+                  {slowHint && (
                     <Alert_Shadcn_
                       variant={slowHint.severity === 'alert' ? 'destructive' : 'warning'}
                     >
@@ -457,7 +457,7 @@ export const NodeDetailsPanel = ({
                         </div>
                       </div>
                     </Alert_Shadcn_>
-                  ) : null}
+                  )}
                 </div>
               </Section>
             </>
@@ -491,7 +491,7 @@ export const NodeDetailsPanel = ({
                       </div>
                     </li>
                   </ul>
-                  {costHint ? (
+                  {costHint && (
                     <Alert_Shadcn_
                       variant={costHint.severity === 'alert' ? 'destructive' : 'warning'}
                     >
@@ -515,7 +515,7 @@ export const NodeDetailsPanel = ({
                         </div>
                       </div>
                     </Alert_Shadcn_>
-                  ) : null}
+                  )}
                 </div>
               </Section>
             </>
@@ -530,35 +530,35 @@ export const NodeDetailsPanel = ({
               <div className="text-foreground-light">Actual rows</div>
               <div>
                 {actualRows ?? '—'}
-                {data.planRows !== undefined ? (
+                {data.planRows !== undefined && (
                   <span className="ml-1 text-foreground-lighter">
                     (estimated {formatNumber(data.planRows)})
                   </span>
-                ) : null}
+                )}
               </div>
             </div>
 
-            {data.rowsRemovedByFilter !== undefined ? (
+            {data.rowsRemovedByFilter !== undefined && (
               <div>
                 WHERE / filter removed {formatOrDash(data.rowsRemovedByFilter)} rows
                 {filteredPercent !== undefined ? ` (${filteredPercent}%)` : ''}
               </div>
-            ) : null}
-            {data.rowsRemovedByJoinFilter !== undefined ? (
+            )}
+            {data.rowsRemovedByJoinFilter !== undefined && (
               <div>
                 Join filter removed {formatOrDash(data.rowsRemovedByJoinFilter)} rows
                 {joinFilteredPercent !== undefined ? ` (${joinFilteredPercent}%)` : ''}
               </div>
-            ) : null}
-            {data.rowsRemovedByIndexRecheck !== undefined ? (
+            )}
+            {data.rowsRemovedByIndexRecheck !== undefined && (
               <div>
                 Index recheck removed {formatOrDash(data.rowsRemovedByIndexRecheck)} rows
                 {recheckPercent !== undefined ? ` (${recheckPercent}%)` : ''}
               </div>
-            ) : null}
-            {data.heapFetches !== undefined ? (
+            )}
+            {data.heapFetches !== undefined && (
               <div>Heap Fetches: {formatOrDash(data.heapFetches)}</div>
-            ) : null}
+            )}
           </Section>
 
           {hasEstimateDetails && (
@@ -574,11 +574,11 @@ export const NodeDetailsPanel = ({
                       <div className="text-foreground-light">Estimate factor</div>
                       <div className="font-medium flex items-center gap-2">
                         {estFactor ?? '—'}
-                        {estimationInsight ? (
+                        {estimationInsight && (
                           <Badge variant={estimationInsight.variant} size="small">
                             {estimationInsight.badgeText}
                           </Badge>
-                        ) : null}
+                        )}
                       </div>
                     </li>
                     <li className="flex items-center justify-between pt-3">
@@ -634,11 +634,13 @@ export const NodeDetailsPanel = ({
                         </div>
                       </div>
                     </Alert_Shadcn_>
-                  ) : estimationDirectionLabel ? (
-                    <div className="text-[11px] text-foreground-light">
-                      {estimationDirectionLabel}
-                    </div>
-                  ) : null}
+                  ) : (
+                    estimationDirectionLabel && (
+                      <div className="text-[11px] text-foreground-light">
+                        {estimationDirectionLabel}
+                      </div>
+                    )
+                  )}
                 </div>
               </Section>
             </>
