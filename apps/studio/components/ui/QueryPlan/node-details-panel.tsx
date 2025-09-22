@@ -1,21 +1,6 @@
 import type { Node } from 'reactflow'
 import { type ReactNode } from 'react'
-import {
-  AlertTriangle,
-  CircleDollarSign,
-  Clock,
-  Columns3,
-  Filter,
-  HardDrive,
-  Info,
-  ListFilter,
-  Rows3,
-  SquareChartGantt,
-  Table,
-  TimerReset,
-  TrendingUp,
-  X,
-} from 'lucide-react'
+import { AlertTriangle, Clock, Info, Rows3, Table, TimerReset, X } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
 import {
@@ -63,13 +48,6 @@ type NodeDetailsPanelProps = {
   variant?: 'sidebar' | 'overlay'
 }
 
-type KeyValue = {
-  key: string
-  label: string
-  value?: string | number
-  hint?: string
-}
-
 type ConditionRow = {
   key: string
   label: string
@@ -80,38 +58,33 @@ const Section = ({
   title,
   description,
   children,
-  icon,
   tooltip,
 }: {
   title: string
   description?: string
   children: ReactNode
-  icon?: ReactNode
   tooltip?: ReactNode
 }) => {
   return (
     <section className="flex flex-col gap-2 px-4">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
-          {icon ?? null}
-          <div className="flex items-start">
-            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-            {tooltip && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    aria-label={`About ${title}`}
-                    className="flex w-5 items-center justify-center rounded border border-transparent text-foreground-lighter transition-colors hover:text-foreground"
-                  >
-                    <Info size={10} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-[240px] text-[11px] leading-relaxed">
-                  {tooltip}
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
+        <div className="flex items-start">
+          <h4 className="mb-2">{title}</h4>
+          {tooltip && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  aria-label={`About ${title}`}
+                  className="flex w-5 items-center justify-center rounded border border-transparent text-foreground-lighter transition-colors hover:text-foreground"
+                >
+                  <Info size={10} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[240px] text-[11px] leading-relaxed">
+                {tooltip}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
         {description && <span className="text-[11px] text-foreground-light">{description}</span>}
       </div>
@@ -392,7 +365,6 @@ export const NodeDetailsPanel = ({
           <Section
             title="Overview"
             description={data.neverExecuted ? 'This step never executed' : undefined}
-            icon={<SquareChartGantt className="h-4 w-4" />}
             tooltip="Execution time, loop counts, and planner accuracy for this node."
           >
             <div className="grid grid-cols-2 gap-2">
@@ -435,7 +407,6 @@ export const NodeDetailsPanel = ({
               <Separator />
               <Section
                 title="Execution time"
-                icon={<Clock className="h-4 w-4" />}
                 tooltip="Detailed runtime stats for this node, including self time and loop counts."
               >
                 <div className="space-y-3">
@@ -509,7 +480,6 @@ export const NodeDetailsPanel = ({
               <Separator />
               <Section
                 title="Planner cost"
-                icon={<CircleDollarSign className="h-4 w-4" />}
                 tooltip="Planner-assigned cost units and any heuristics that flag this node."
               >
                 <div className="space-y-3">
@@ -566,7 +536,6 @@ export const NodeDetailsPanel = ({
           <Separator />
           <Section
             title="Rows & filters"
-            icon={<Filter className="h-4 w-4" />}
             tooltip="Actual versus estimated rows and how many were removed by filters at this step."
           >
             <div className="grid gap-2">
@@ -613,7 +582,6 @@ export const NodeDetailsPanel = ({
               <Separator />
               <Section
                 title="Planner estimate"
-                icon={<TrendingUp className="h-4 w-4" />}
                 tooltip="How closely the planner's row estimate matched reality and what it means for this step."
               >
                 <div className="space-y-3">
@@ -701,7 +669,6 @@ export const NodeDetailsPanel = ({
               <Separator />
               <Section
                 title="Buffers / IO"
-                icon={<HardDrive className="h-4 w-4" />}
                 tooltip="Buffer activity and I/O wait time attributable to this node, split by self and inclusive totals."
               >
                 {hasBufferData ? (
@@ -789,7 +756,6 @@ export const NodeDetailsPanel = ({
               <Separator />
               <Section
                 title="Conditions"
-                icon={<ListFilter className="h-4 w-4" />}
                 tooltip="Predicate expressions applied here. Click any row to copy the exact text."
               >
                 <div className="space-y-2">
@@ -815,7 +781,6 @@ export const NodeDetailsPanel = ({
               <Separator />
               <Section
                 title="Output columns"
-                icon={<Columns3 className="h-4 w-4" />}
                 tooltip="Columns emitted by this node before parent nodes apply additional projections."
               >
                 <div className="rounded border border-border bg-surface-100 px-2 py-2 text-[11px]">
