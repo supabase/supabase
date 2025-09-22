@@ -33,8 +33,17 @@
   "database:replication": true,
   "database:roles": true,
 
+  "docs:auth": true,
   "docs:compliance": true,
+  "docs:contribution": true,
   "docs:self-hosting": true,
+  "docs:framework_quickstarts": true,
+  "docs:full_getting_started": true,
+  "docs:full_platform": true,
+  "docs:mobile_tutorials": true,
+  "docs:pgtap": true,
+  "docs:production_checklist": true,
+  "docs:web_apps": true,
 
   "feedback:docs": true,
 
