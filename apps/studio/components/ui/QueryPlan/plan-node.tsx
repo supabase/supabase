@@ -63,21 +63,6 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
   const actualRows = data.actualRows !== undefined ? formatOrDash(data.actualRows) : data.actualRows
   const estimatedRows = data.planRows !== undefined ? formatOrDash(data.planRows) : data.planRows
 
-  //   const estimationTooltip =
-  //     data.estActualTotalRows !== undefined && data.planRows !== undefined
-  //       ? `Estimate accuracy
-  // Actual rows across runs: ${formatOrDash(data.estActualTotalRows)}
-  // Planner expected rows: ${formatOrDash(data.planRows)}
-  // Values above 1.00 mean more rows than expected; below 1.00 mean fewer.`
-  //       : 'Estimate accuracy compares actual rows to the planner estimate. Values above 1.00 mean more rows than expected; below 1.00 mean fewer.'
-
-  //   const estimationIcon =
-  //     data.estDirection === 'under' ? (
-  //       <ArrowBigDown size={10} strokeWidth={1} fill="currentColor" />
-  //     ) : data.estDirection === 'over' ? (
-  //       <ArrowBigUp size={10} strokeWidth={1} fill="currentColor" />
-  //     ) : null
-
   const filterPercent = removedPercentValue(data, data.rowsRemovedByFilter)
   const joinFilterPercent = removedPercentValue(data, data.rowsRemovedByJoinFilter)
   const recheckPercent = removedPercentValue(data, data.rowsRemovedByIndexRecheck)
@@ -228,20 +213,6 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
         </>
       ),
     },
-    // {
-    //   id: 'est-factor',
-    //   condition: vis.rows && data.estFactor !== undefined,
-    //   tooltip: estimationTooltip,
-    //   element: (
-    //     <>
-    //       <span>Estimate accuracy</span>
-    //       <span className="inline-flex items-center gap-[4px]">
-    //         {estimationIcon}
-    //         {data.estFactor?.toFixed(2)}×
-    //       </span>
-    //     </>
-    //   ),
-    // },
     {
       id: 'cost',
       condition: metricsVisibility.cost && data.totalCost !== undefined,
