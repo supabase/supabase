@@ -63,9 +63,7 @@ export const MetaOverlay = ({ planningTime, executionTime, jitTotalTime, classNa
                     <span className="shrink-0 text-foreground-light leading-tight font-medium">
                       {metric.label}:
                     </span>
-                    <span className="truncate" title={`${metric.label}: ${formattedValue} ms`}>
-                      {formattedValue} ms
-                    </span>
+                    <span className="truncate">{formattedValue} ms</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-[240px] whitespace-normal text-[11px] leading-4">
