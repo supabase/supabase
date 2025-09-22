@@ -530,9 +530,6 @@ export const NodeDetailsPanel = ({
                       <dt className="text-foreground-light">Self cost</dt>
                       <dd className="text-foreground font-medium">
                         {data.exclusiveCost !== undefined ? data.exclusiveCost.toFixed(2) : '—'}
-                        {costShareSummary ? (
-                          <span className="ml-1 text-foreground-light">({costShareSummary})</span>
-                        ) : null}
                       </dd>
                     </div>
                   </dl>
