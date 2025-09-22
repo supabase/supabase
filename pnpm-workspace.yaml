@@ -15,6 +15,6 @@ catalog:
   '@types/react-dom': '^18.3.0'
   'valtio': '^1.12.0'
   'vite': '^6.2.7'
-  'zod': '^3.25.76'
+  'zod': '^4.0.0'
 
 minimumReleaseAge: 10080

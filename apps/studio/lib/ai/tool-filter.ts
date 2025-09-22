@@ -16,7 +16,7 @@ const basicToolSchema = z.custom<Tool>((value) => typeof value === 'object')
 /**
  * Schema for validating that a tool set only contains known tools.
  */
-export const toolSetValidationSchema = z.record(
+export const toolSetValidationSchema = z.partialRecord(
   z.enum([
     // MCP tools
     'list_tables',

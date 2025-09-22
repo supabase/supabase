@@ -47,7 +47,7 @@ export const columnFilterSchema = z.object({
     .pipe(z.enum(REGIONS).array())
     .optional(),
   date: z
-    .string()
+    .any()
     .transform((val) => val.split(RANGE_DELIMITER).map(Number))
     .pipe(z.coerce.date().array())
     .optional(),
@@ -72,7 +72,7 @@ export const timelineChartSchema = z.object({
   ...LEVELS.reduce(
     (acc, level) => ({
       ...acc,
-      [level]: z.number().default(0),
+      [level]: z.number().prefault(0),
     }),
     {} as Record<(typeof LEVELS)[number], z.ZodNumber>
   ),

@@ -318,7 +318,7 @@ export function update(currentFunc: PGFunction, { name, schema, definition }: PG
 }
 
 export const pgFunctionDeleteZod = z.object({
-  cascade: z.boolean().default(false).optional(),
+  cascade: z.boolean().prefault(false).optional(),
 })
 
 export type PGFunctionDelete = z.infer<typeof pgFunctionDeleteZod>

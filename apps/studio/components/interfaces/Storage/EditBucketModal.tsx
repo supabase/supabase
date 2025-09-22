@@ -47,13 +47,13 @@ export interface EditBucketModalProps {
 
 const BucketSchema = z.object({
   name: z.string(),
-  public: z.boolean().default(false),
-  has_file_size_limit: z.boolean().default(false),
+  public: z.boolean().prefault(false),
+  has_file_size_limit: z.boolean().prefault(false),
   formatted_size_limit: z.coerce
     .number()
     .min(0, 'File size upload limit has to be at least 0')
     .optional(),
-  allowed_mime_types: z.string().trim().default(''),
+  allowed_mime_types: z.string().trim().prefault(''),
 })
 
 const formId = 'edit-storage-bucket-form'

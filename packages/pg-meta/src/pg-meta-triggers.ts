@@ -91,9 +91,9 @@ export function retrieve(params: TriggerIdentifier): TriggersRetrieveReturn {
 
 export const pgTriggerCreateZod = z.object({
   name: z.string(),
-  schema: z.string().optional().default('public'),
+  schema: z.string().optional().prefault('public'),
   table: z.string(),
-  function_schema: z.string().optional().default('public'),
+  function_schema: z.string().optional().prefault('public'),
   function_name: z.string(),
   function_args: z.array(z.string()).optional(),
   activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),

@@ -30,7 +30,7 @@ const FormSchema = z.object({
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   username: z.string().optional(),
-  primary_email: z.string().email().optional(),
+  primary_email: z.email().optional(),
 })
 
 const formId = 'profile-information-form'

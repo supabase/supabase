@@ -69,21 +69,21 @@ const FormSchema = z
         (value) => value !== 'public',
         '"public" is a reserved name. Please choose another name'
       ),
-    type: z.enum(['STANDARD', 'ANALYTICS']).default('STANDARD'),
-    public: z.boolean().default(false),
-    has_file_size_limit: z.boolean().default(false),
+    type: z.enum(['STANDARD', 'ANALYTICS']).prefault('STANDARD'),
+    public: z.boolean().prefault(false),
+    has_file_size_limit: z.boolean().prefault(false),
     formatted_size_limit: z.coerce
       .number()
       .min(0, 'File size upload limit has to be at least 0')
       .optional(),
-    allowed_mime_types: z.string().trim().default(''),
+    allowed_mime_types: z.string().trim().prefault(''),
   })
   .superRefine((data, ctx) => {
     if (!validBucketNameRegex.test(data.name)) {
       const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
       ctx.addIssue({
         path: ['name'],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: !!match
           ? `Bucket name cannot contain the "${match}" character`
           : 'Bucket name contains an invalid special character',

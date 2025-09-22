@@ -17,7 +17,7 @@ interface SendMessageModalProps {
 }
 
 const FormSchema = z.object({
-  delay: z.coerce.number().int().gte(0).default(5),
+  delay: z.coerce.number().int().gte(0).prefault(5),
   payload: z.string().refine(
     (val) => {
       try {
@@ -27,7 +27,7 @@ const FormSchema = z.object({
       }
     },
     {
-      message: 'The payload should be a JSON object',
+        error: 'The payload should be a JSON object'
     }
   ),
 })

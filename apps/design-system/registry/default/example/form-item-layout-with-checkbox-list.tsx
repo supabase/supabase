@@ -6,8 +6,8 @@ import { z } from 'zod'
 
 const FormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: 'You have to select at least one item.',
-  }),
+      error: 'You have to select at least one item.'
+}),
 })
 
 const items = [

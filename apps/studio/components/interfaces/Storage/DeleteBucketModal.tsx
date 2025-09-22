@@ -44,7 +44,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
 
   const schema = z.object({
     confirm: z.literal(bucket.name, {
-      errorMap: () => ({ message: `Please enter "${bucket.name}" to confirm` }),
+      error: () => `Please enter "${bucket.name}" to confirm`,
     }),
   })
 

@@ -5,7 +5,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 const FormSchema = z.object({
-  switch_option: z.boolean().default(false).optional(),
+  switch_option: z.boolean().prefault(false).optional(),
 })
 
 export default function FormItemLayoutDemo() {

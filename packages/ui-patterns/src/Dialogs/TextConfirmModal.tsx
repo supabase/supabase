@@ -85,7 +85,7 @@ const TextConfirmModal = forwardRef<
       confirmValue: z.preprocess(
         (val) => (typeof val === 'string' ? val.trim() : val),
         z.literal(confirmString.trim(), {
-          errorMap: () => ({ message: errorMessage }),
+          error: () => errorMessage,
         })
       ),
     })

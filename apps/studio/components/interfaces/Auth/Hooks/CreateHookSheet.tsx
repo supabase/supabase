@@ -76,14 +76,14 @@ const FormSchema = z
       if (!data.httpsValues.url.startsWith('https://')) {
         ctx.addIssue({
           path: ['httpsValues', 'url'],
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'The URL must start with https://',
         })
       }
       if (!data.httpsValues.secret) {
         ctx.addIssue({
           path: ['httpsValues', 'secret'],
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'Missing secret value',
         })
       }
@@ -92,19 +92,18 @@ const FormSchema = z
       if (!data.postgresValues.schema) {
         ctx.addIssue({
           path: ['postgresValues', 'schema'],
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'You must select a schema',
         })
       }
       if (!data.postgresValues.functionName) {
         ctx.addIssue({
           path: ['postgresValues', 'functionName'],
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'You must select a Postgres function',
         })
       }
     }
-    return true
   })
 
 export const CreateHookSheet = ({

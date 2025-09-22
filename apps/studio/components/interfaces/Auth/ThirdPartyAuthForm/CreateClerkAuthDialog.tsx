@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
 import {
   Button,
@@ -22,7 +22,6 @@ import {
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { InlineLink } from 'components/ui/InlineLink'
 
 interface CreateClerkAuthIntegrationProps {
   visible: boolean
@@ -45,7 +44,7 @@ const FormSchema = z
       !val.domain.match(/https:\/\/[a-z0-9-]+[.]clerk[.]accounts[.]dev\/?$/)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.invalid_string,
+        code: 'custom',
         path: ['domain'],
         message:
           'Production Clerk domains use HTTPS and start with the clerk subdomain (https://clerk.example.com). Development Clerk domains use HTTPS and end with .clerk.accounts.dev (https://example.clerk.accounts.dev).',

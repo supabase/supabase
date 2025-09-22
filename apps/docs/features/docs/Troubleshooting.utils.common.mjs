@@ -54,8 +54,7 @@ export const TROUBLESHOOTING_DIRECTORY = join(process.cwd(), 'content/troublesho
  * @property {string} [message]
  */
 
-export const TroubleshootingSchema = z
-  .object({
+export const TroubleshootingSchema = z.strictObject({
     title: z.string(),
     topics: z.array(
       z.enum([
@@ -75,30 +74,25 @@ export const TroubleshootingSchema = z
       ])
     ),
     keywords: z.array(z.string()).optional(),
-    api: z
-      .object({
-        sdk: z.array(z.string()).optional(),
-        management_api: z.array(z.string()).optional(),
-        cli: z.array(z.string()).optional(),
-      })
-      .strict()
+    api: z.strictObject({
+            sdk: z.array(z.string()).optional(),
+            management_api: z.array(z.string()).optional(),
+            cli: z.array(z.string()).optional(),
+          })
       .optional(),
     errors: z
       .array(
-        z
-          .object({
-            http_status_code: z.number().optional(),
-            code: z.string().optional(),
-            message: z.string().optional(),
-          })
-          .strict()
+        z.strictObject({
+                      http_status_code: z.number().optional(),
+                      code: z.string().optional(),
+                      message: z.string().optional(),
+                    })
       )
       .optional(),
-    database_id: z.string().default(`pseudo-${uuidv4()}`),
-    github_url: z.string().url().optional(),
+    database_id: z.string().prefault(`pseudo-${uuidv4()}`),
+    github_url: z.url().optional(),
     date_created: z.date({ coerce: true }).optional(),
   })
-  .strict()
 
 /**
  * @param {unknown} troubleshootingMetadata

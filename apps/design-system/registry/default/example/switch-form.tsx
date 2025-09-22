@@ -17,7 +17,7 @@ import {
 } from 'ui'
 
 const FormSchema = z.object({
-  marketing_emails: z.boolean().default(false).optional(),
+  marketing_emails: z.boolean().prefault(false).optional(),
   security_emails: z.boolean(),
 })
 

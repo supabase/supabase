@@ -12,7 +12,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 const FormSchema = z.object({
-  consistent_settings: z.boolean().default(false).optional(),
+  consistent_settings: z.boolean().prefault(false).optional(),
 })
 
 export default function FormItemLayoutDemo() {

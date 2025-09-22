@@ -75,22 +75,14 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     },
   })
 
-  const getFormSchema = () => {
-    if (selectedId === 'new-folder') {
-      return z
-        .object({
-          name: z.string().min(1, 'Please provide a name for the folder'),
-        })
-        .refine((data) => !snapV2.allFolderNames.includes(data.name), {
-          message: 'This folder name already exists',
-          path: ['name'],
-        })
-    } else {
-      return z.object({})
-    }
-  }
-
-  const FormSchema = getFormSchema()
+  const FormSchema = z
+    .object({
+      name: z.string().min(1, 'Please provide a name for the folder'),
+    })
+    .refine((data) => !snapV2.allFolderNames.includes(data.name), {
+      message: 'This folder name already exists',
+      path: ['name'],
+    })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',

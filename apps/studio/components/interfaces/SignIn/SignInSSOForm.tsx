@@ -16,7 +16,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
 const schema = z.object({
-  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+  email: z.email('Must be a valid email').min(1, 'Email is required'),
 })
 
 const formId = 'sso-sign-in-form'

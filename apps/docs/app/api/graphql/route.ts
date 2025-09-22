@@ -85,7 +85,7 @@ function isDevGraphiQL(request: Request) {
 
 const graphQLRequestSchema = z.object({
   query: z.string(),
-  variables: z.record(z.any()).optional(),
+  variables: z.record(z.string(), z.any()).optional(),
   operationName: z.string().optional(),
 })
 

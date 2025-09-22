@@ -21,10 +21,10 @@ const FormSchema = z.object({
   bio: z
     .string()
     .min(10, {
-      message: 'Bio must be at least 10 characters.',
+        error: 'Bio must be at least 10 characters.'
     })
     .max(160, {
-      message: 'Bio must not be longer than 30 characters.',
+        error: 'Bio must not be longer than 30 characters.'
     }),
 })
 
