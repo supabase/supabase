@@ -1,6 +1,6 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -43,7 +43,7 @@ withTestDatabase('list with system schemas', async ({ executeQuery }) => {
 
 withTestDatabase('list without system schemas', async ({ executeQuery }) => {
   const { sql, zod } = await pgMeta.schemas.list({ includeSystemSchemas: false })
-  const rq = await executeQuery<typeof zod._type>(sql)
+  const rq = await executeQuery<typeof zod.type>(sql)
   const res = zod.parse(rq)
 
   expect(res.find(({ name }) => name === 'pg_catalog')).toMatchInlineSnapshot(`undefined`)

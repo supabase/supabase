@@ -75,7 +75,7 @@ async function openAiDb(): Promise<IDBPDatabase<AiAssistantDB>> {
 }
 
 async function getAiState(projectRef: string): Promise<StoredAiAssistantState | undefined> {
-  if (!projectRef) return undefined
+  if (typeof window === 'undefined' || !projectRef) return undefined
   try {
     const db = await openAiDb()
     return await db.get(STORE_NAME, projectRef)

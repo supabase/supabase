@@ -5,8 +5,8 @@ import { z } from 'zod'
 import {
   TOOL_CATEGORIES,
   TOOL_CATEGORY_MAP,
-  filterToolsByOptInLevel,
   createPrivacyMessageTool,
+  filterToolsByOptInLevel,
   toolSetValidationSchema,
   transformToolResult,
 } from './tool-filter'
@@ -309,7 +309,7 @@ describe('toolSetValidationSchema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues).toHaveLength(2) // Two unknown tools
-      expect(result.error.issues[0].message).toContain('Invalid enum value')
+      expect(result.error.issues[0].message).toContain('Invalid key in record')
     }
   })
 
