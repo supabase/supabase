@@ -561,7 +561,7 @@ export const MetricsSidebar = ({
       minSize={minSize}
       maxSize={maxSize}
       collapsible
-      className="hidden lg:flex min-w-[300px] flex-col bg-sidebar"
+      className="hidden md:flex min-w-[300px] flex-col bg-sidebar"
     >
       <div className="flex items-center justify-between border-b px-3 py-2">
         <div className="text-xs font-medium">
