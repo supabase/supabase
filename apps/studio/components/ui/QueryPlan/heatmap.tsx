@@ -1,13 +1,21 @@
-import { useContext, useMemo } from 'react'
-
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { forwardRef, useContext, useMemo } from 'react'
 
 import type { PlanNodeData } from './types'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { HeatmapContext } from './contexts'
 
-const Bar = ({ pct, heatColor }: { pct: number; heatColor: string }) => (
-  <div className="h-full transition-all" style={{ width: `${pct}%`, backgroundColor: heatColor }} />
-)
+type BarProps = { pct: number; heatColor: string }
+
+// using forwardRef for TooltipTrigger
+const Bar = forwardRef<HTMLDivElement, BarProps>(function Bar({ pct, heatColor }, ref) {
+  return (
+    <div
+      ref={ref}
+      className="h-full transition-all"
+      style={{ width: `${pct}%`, backgroundColor: heatColor }}
+    />
+  )
+})
 
 export const Heatmap = ({ data }: { data: PlanNodeData }) => {
   const heat = useContext(HeatmapContext)
