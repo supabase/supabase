@@ -10,6 +10,12 @@ import {
   Badge,
   Button,
   Separator,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   cn,
 } from 'ui'
 import { formatMs, formatNumber, formatOrDash } from './utils/formats'
@@ -72,7 +78,7 @@ const Section = ({
         </div>
         {description && <span className="text-[11px] text-foreground-light">{description}</span>}
       </div>
-      <div className="space-y-2 text-xs text-foreground">{children}</div>
+      <div className="space-y-4 text-xs text-foreground">{children}</div>
     </section>
   )
 }
@@ -645,79 +651,86 @@ export const NodeDetailsPanel = ({
                 title="Buffers / IO"
                 tooltip="Buffer activity and I/O wait time attributable to this node, split by self and inclusive totals."
               >
-                {hasBufferData ? (
+                {hasBufferData && (
                   <div className="space-y-2">
                     <div className="text-xs font-semibold">Block access (self / inclusive)</div>
-                    <table className="w-full text-left text-[11px]">
-                      <thead>
-                        <tr className="text-foreground-light">
-                          <th className="py-1 font-normal">Type</th>
-                          <th className="py-1 text-right font-normal">Self</th>
-                          <th className="py-1 text-right font-normal">Inclusive</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {hasSharedBuffers ? (
-                          <tr>
-                            <td className="py-1">Shared</td>
-                            <td className="py-1 text-right">
+                    <Table className="text-xs text-left">
+                      <TableHeader>
+                        <TableRow className="text-[11px] text-foreground-light">
+                          <TableHead className="h-auto px-0 py-1 text-foreground-light">
+                            Type
+                          </TableHead>
+                          <TableHead className="h-auto px-0 py-1 text-right font-normal text-foreground-light">
+                            Self
+                          </TableHead>
+                          <TableHead className="h-auto px-0 py-1 text-right font-normal text-foreground-light">
+                            Inclusive
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {hasSharedBuffers && (
+                          <TableRow>
+                            <TableCell className="px-0 py-1">Shared</TableCell>
+                            <TableCell className="px-0 py-1 text-right">
                               {exclusiveBuffers
                                 ? formatNumber(exclusiveBuffers.shared) ?? '0'
                                 : '0'}
-                            </td>
-                            <td className="py-1 text-right">
+                            </TableCell>
+                            <TableCell className="px-0 py-1 text-right">
                               {inclusiveBuffers
                                 ? formatNumber(inclusiveBuffers.shared) ?? '0'
                                 : '0'}
-                            </td>
-                          </tr>
-                        ) : null}
-                        {hasTempBuffers ? (
-                          <tr>
-                            <td className="py-1">Temp</td>
-                            <td className="py-1 text-right">
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {hasTempBuffers && (
+                          <TableRow>
+                            <TableCell className="px-0 py-1">Temp</TableCell>
+                            <TableCell className="px-0 py-1 text-right">
                               {exclusiveBuffers ? formatNumber(exclusiveBuffers.temp) ?? '0' : '0'}
-                            </td>
-                            <td className="py-1 text-right">
+                            </TableCell>
+                            <TableCell className="px-0 py-1 text-right">
                               {inclusiveBuffers ? formatNumber(inclusiveBuffers.temp) ?? '0' : '0'}
-                            </td>
-                          </tr>
-                        ) : null}
-                        {hasLocalBuffers ? (
-                          <tr>
-                            <td className="py-1">Local</td>
-                            <td className="py-1 text-right">
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {hasLocalBuffers && (
+                          <TableRow>
+                            <TableCell className="px-0 py-1">Local</TableCell>
+                            <TableCell className="px-0 py-1 text-right">
                               {exclusiveBuffers ? formatNumber(exclusiveBuffers.local) ?? '0' : '0'}
-                            </td>
-                            <td className="py-1 text-right">
+                            </TableCell>
+                            <TableCell className="px-0 py-1 text-right">
                               {inclusiveBuffers ? formatNumber(inclusiveBuffers.local) ?? '0' : '0'}
-                            </td>
-                          </tr>
-                        ) : null}
-                      </tbody>
-                    </table>
-                    <p className="text-foreground-light">
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                    <p className="text-foreground-light text-[11px]">
                       1 block = 8 KB. Self is this node only; inclusive includes descendants.
                     </p>
                   </div>
-                ) : null}
+                )}
 
-                {hasIOTiming ? (
-                  <div className="space-y-1 rounded border border-border bg-surface-100 px-3 py-2 text-[11px]">
+                {hasIOTiming && (
+                  <div className="space-y-2">
                     <div className="flex items-center gap-2 text-xs font-semibold">
-                      <TimerReset size={14} />
-                      I/O wait time
+                      IO wait time
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground-light">Read</span>
-                      <span className="font-medium">{formatMs(data.ioReadTime) ?? '0'} ms</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground-light">Write</span>
-                      <span className="font-medium">{formatMs(data.ioWriteTime) ?? '0'} ms</span>
-                    </div>
+                    <ul className="flex flex-col gap-y-3 divide-y divide-dashed text-xs">
+                      <li className="flex items-center justify-between">
+                        <div className="text-foreground-light">Read</div>
+                        <div className="font-medium">{formatMs(data.ioReadTime) ?? '0'} ms</div>
+                      </li>
+                      <li className="flex items-center justify-between pt-3">
+                        <div className="text-foreground-light">Write</div>
+                        <div className="font-medium">{formatMs(data.ioWriteTime) ?? '0'} ms</div>
+                      </li>
+                    </ul>
                   </div>
-                ) : null}
+                )}
               </Section>
             </>
           )}
@@ -733,11 +746,11 @@ export const NodeDetailsPanel = ({
                   {conditionRows
                     .filter((row) => row.value)
                     .map((row) => (
-                      <div key={row.key} className="space-y-1">
-                        <div className="flex items-center justify-between text-[11px] text-foreground-light">
+                      <div key={row.key} className="space-y-1 text-xs">
+                        <div className="flex items-center justify-between text-foreground-light">
                           <span>{row.label}</span>
                         </div>
-                        <div className="w-full rounded border bg-surface-100 px-2 py-1 text-left font-mono text-[11px] leading-relaxed text-foreground">
+                        <div className="w-full rounded border bg-surface-100 px-2 py-1 text-left font-mono leading-relaxed text-foreground">
                           {row.value}
                         </div>
                       </div>
@@ -754,10 +767,10 @@ export const NodeDetailsPanel = ({
                 title="Output columns"
                 tooltip="Columns emitted by this node before parent nodes apply additional projections."
               >
-                <div className="rounded border border-border bg-surface-100 px-2 py-2 text-[11px]">
+                <div className="rounded border border-border bg-surface-100 px-2 py-2">
                   <ul className="flex flex-col gap-1">
                     {outputColumns.map((column) => (
-                      <li key={column} className="font-mono text-[11px] text-foreground">
+                      <li key={column} className="font-mono text-foreground">
                         {column}
                       </li>
                     ))}
