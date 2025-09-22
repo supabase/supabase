@@ -132,7 +132,7 @@ export function GettingStarted({ steps }: GettingStartedProps) {
           <div className="relative w-full flex-1 min-h-[100px] shrink-0 overflow-hidden">
             {activeStep.image ? (
               <Image
-                className="w-full select-none"
+                className="w-full select-none invert dark:invert-0"
                 src={activeStep.image}
                 fill
                 objectFit="cover"

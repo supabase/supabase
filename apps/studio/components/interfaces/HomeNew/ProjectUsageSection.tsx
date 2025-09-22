@@ -344,7 +344,7 @@ export const ProjectUsageSection = () => {
       </div>
       <Row columns={[3, 2, 1]}>
         {enabledServices.map((s) => (
-          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col">
+          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col h-64">
             <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
               <div className="flex items-center gap-2">
                 <div className="flex flex-col">
@@ -373,15 +373,19 @@ export const ProjectUsageSection = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 pt-4 flex-1">
-              <Loading active={isLoading}>
+            <CardContent className="p-6 pt-4 flex-1 h-full overflow-hidden">
+              <Loading isFullHeight active={isLoading}>
                 <LogsBarChart
                   data={s.data}
-                  height="120px"
                   DateTimeFormat={datetimeFormat}
                   onBarClick={handleBarClick(s.route)}
+                  isFullHeight
                   EmptyState={
-                    <NoDataPlaceholder size="small" message="No data for selected period" />
+                    <NoDataPlaceholder
+                      size="small"
+                      message="No data for selected period"
+                      isFullHeight
+                    />
                   }
                 />
               </Loading>
