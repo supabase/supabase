@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useEffect } from 'react'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -45,7 +44,6 @@ const InfrastructureInfo = () => {
     isLoading: isLoadingUpgradeEligibility,
     isError: isErrorUpgradeEligibility,
     isSuccess: isSuccessUpgradeEligibility,
-    refetch: refetchUpgradeEligibility,
   } = useProjectUpgradeEligibilityQuery({
     projectRef: ref,
   })
@@ -80,13 +78,6 @@ const InfrastructureInfo = () => {
   const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
   const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
   const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
-
-  // Refetch upgrade eligibility when component mounts to ensure we have the latest data
-  useEffect(() => {
-    if (ref && project?.status === 'ACTIVE_HEALTHY') {
-      refetchUpgradeEligibility()
-    }
-  }, [ref, project?.status, refetchUpgradeEligibility])
 
   return (
     <>
