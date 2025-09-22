@@ -1,6 +1,15 @@
 import { type ReactNode, useContext } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-import { Workflow, TimerOff, Clock, Rows3, CircleDollarSign, Layers, Table } from 'lucide-react'
+import {
+  Workflow,
+  TimerOff,
+  Clock,
+  Rows3,
+  CircleDollarSign,
+  Layers,
+  Table,
+  Columns3,
+} from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -334,7 +343,7 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       id: 'output-cols',
       condition:
         metricsVisibility.output && Array.isArray(data.outputCols) && data.outputCols.length > 0,
-      icon: <Table size={10} strokeWidth={1} className="mr-1" />,
+      icon: <Columns3 size={10} strokeWidth={1} className="mr-1" />,
       tooltip: (
         <div className="space-y-1">
           <p>Columns passed to the next step.</p>
