@@ -1,6 +1,5 @@
 import { type PropsWithChildren, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
 import { ChevronsUpDown } from 'lucide-react'
 
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -9,16 +8,12 @@ import { removeCommentsFromSql } from 'lib/helpers'
 import { useExplainPlanQuery } from './hooks/useExplainPlanQuery'
 import { QueryPanelSection } from './QueryPanel'
 import { useFlag } from 'common/feature-flags'
-import { SVG } from 'ui-patterns/info-tooltip'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   WarningIcon,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  Button_Shadcn_,
   Button,
   cn,
 } from 'ui'
@@ -112,24 +107,11 @@ export const QueryPlan = ({ query }: { query: string }) => {
 
   return (
     <QueryPanelSection className="pt-6 border-b relative">
-      <div className="flex items-center mb-2">
+      <div className="flex items-center mb-4 gap-x-1">
         <h4>Query plan</h4>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button_Shadcn_ asChild size="icon" variant="link">
-              <Link
-                href="https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Learn how to read EXPLAIN"
-                className="h-auto"
-              >
-                <SVG strokeWidth={2} className="transition-colors fill-foreground-muted w-4 h-4" />
-              </Link>
-            </Button_Shadcn_>
-          </TooltipTrigger>
-          <TooltipContent>What is a query plan?</TooltipContent>
-        </Tooltip>
+        <InfoTooltip>
+          Visualize how Postgres executes your SQL so you can pinpoint costly steps faster.
+        </InfoTooltip>
       </div>
       <div
         className={cn(
