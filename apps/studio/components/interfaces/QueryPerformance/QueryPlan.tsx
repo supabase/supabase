@@ -108,7 +108,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
   }
 
   return (
-    <QueryPanelSection className="py-6 border-b relative">
+    <QueryPanelSection className="pt-6 border-b relative">
       <div className="flex items-center mb-2">
         <h4>Query plan</h4>
         <Tooltip>
@@ -131,7 +131,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
       <div
         className={cn(
           'overflow-hidden pb-0 z-0 relative transition-all duration-300',
-          isExpanded ? 'h-[453px]' : 'h-[120px]'
+          isExpanded ? 'h-[477px]' : 'h-[120px]'
         )}
       >
         <p className="text-xs text-foreground-light mb-4">
