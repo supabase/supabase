@@ -1,6 +1,6 @@
 import type { Node } from 'reactflow'
 import { type ReactNode } from 'react'
-import { AlertTriangle, Clock, Rows3, Table, TimerReset, X } from 'lucide-react'
+import { AlertTriangle, Clock, TimerReset, X } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
 import {
@@ -394,41 +394,39 @@ export const NodeDetailsPanel = ({
                 tooltip="Detailed runtime stats for this node, including self time and loop counts."
               >
                 <div className="space-y-3">
-                  <dl className="space-y-1 text-[11px]">
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Total time (per loop)</dt>
-                      <dd className="text-foreground font-medium">
+                  <ul className="flex flex-col gap-y-3 divide-y divide-dashed text-xs">
+                    <li className="flex items-center justify-between">
+                      <div className="text-foreground-light">Total time (per loop)</div>
+                      <div className="font-medium">
                         {formattedTotalTimePerLoop ? `${formattedTotalTimePerLoop} ms` : '—'}
-                      </dd>
-                    </div>
-                    {formattedTotalTimeAllLoops ? (
-                      <div className="flex items-center justify-between">
-                        <dt className="text-foreground-light">All loops combined</dt>
-                        <dd className="text-foreground font-medium">
-                          {formattedTotalTimeAllLoops} ms
-                        </dd>
                       </div>
+                    </li>
+                    {formattedTotalTimeAllLoops ? (
+                      <li className="flex items-center justify-between pt-3">
+                        <div className="text-foreground-light">All loops combined</div>
+                        <div className="font-medium">{formattedTotalTimeAllLoops} ms</div>
+                      </li>
                     ) : null}
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Self time</dt>
-                      <dd className="text-foreground font-medium">
+                    <li className="flex items-center justify-between pt-3">
+                      <div className="text-foreground-light">Self time</div>
+                      <div className="font-medium">
                         {formattedSelfTime ? `${formattedSelfTime} ms` : '—'}
                         {executionShare ? (
                           <span className="ml-1 text-foreground-light">({executionShare})</span>
                         ) : null}
-                      </dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Loops observed</dt>
-                      <dd className="text-foreground font-medium">{formattedLoops}</dd>
-                    </div>
-                    {rowsAcrossLoops ? (
-                      <div className="flex items-center justify-between">
-                        <dt className="text-foreground-light">Rows across loops</dt>
-                        <dd className="text-foreground font-medium">{rowsAcrossLoops}</dd>
                       </div>
+                    </li>
+                    <li className="flex items-center justify-between pt-3">
+                      <div className="text-foreground-light">Loops observed</div>
+                      <div className="font-medium">{formattedLoops}</div>
+                    </li>
+                    {rowsAcrossLoops ? (
+                      <li className="flex items-center justify-between pt-3">
+                        <div className="text-foreground-light">Rows across loops</div>
+                        <div className="font-medium">{rowsAcrossLoops}</div>
+                      </li>
                     ) : null}
-                  </dl>
+                  </ul>
                   {slowHint ? (
                     <Alert_Shadcn_
                       variant={slowHint.severity === 'alert' ? 'destructive' : 'warning'}
@@ -467,26 +465,26 @@ export const NodeDetailsPanel = ({
                 tooltip="Planner-assigned cost units and any heuristics that flag this node."
               >
                 <div className="space-y-3">
-                  <dl className="space-y-1 text-[11px]">
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Startup cost</dt>
-                      <dd className="text-foreground font-medium">
+                  <ul className="flex flex-col gap-y-3 divide-y divide-dashed text-xs">
+                    <li className="flex items-center justify-between">
+                      <div className="text-foreground-light">Startup cost</div>
+                      <div className="font-medium">
                         {data.startupCost !== undefined ? data.startupCost.toFixed(2) : '—'}
-                      </dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Total cost</dt>
-                      <dd className="text-foreground font-medium">
+                      </div>
+                    </li>
+                    <li className="flex items-center justify-between pt-3">
+                      <div className="text-foreground-light">Total cost</div>
+                      <div className="font-medium">
                         {data.totalCost !== undefined ? data.totalCost.toFixed(2) : '—'}
-                      </dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Self cost</dt>
-                      <dd className="text-foreground font-medium">
+                      </div>
+                    </li>
+                    <li className="flex items-center justify-between pt-3">
+                      <div className="text-foreground-light">Self cost</div>
+                      <div className="font-medium">
                         {data.exclusiveCost !== undefined ? data.exclusiveCost.toFixed(2) : '—'}
-                      </dd>
-                    </div>
-                  </dl>
+                      </div>
+                    </li>
+                  </ul>
                   {costHint ? (
                     <Alert_Shadcn_
                       variant={costHint.severity === 'alert' ? 'destructive' : 'warning'}
@@ -522,12 +520,8 @@ export const NodeDetailsPanel = ({
             title="Rows & filters"
             tooltip="Actual versus estimated rows and how many were removed by filters at this step."
           >
-            <div className="grid gap-2">
-              <div className="flex items-center text-foreground-light gap-x-2 text-xs font-semibold">
-                <Rows3 size={14} />
-                <span>Actual rows</span>
-              </div>
-
+            <div className="flex text-xs justify-between">
+              <div className="text-foreground-light">Actual rows</div>
               <div>
                 {actualRows ?? '—'}
                 {data.planRows !== undefined ? (
@@ -536,29 +530,29 @@ export const NodeDetailsPanel = ({
                   </span>
                 ) : null}
               </div>
-
-              {data.rowsRemovedByFilter !== undefined ? (
-                <div className="text-[11px]">
-                  WHERE / filter removed {formatOrDash(data.rowsRemovedByFilter)} rows
-                  {filteredPercent !== undefined ? ` (${filteredPercent}%)` : ''}
-                </div>
-              ) : null}
-              {data.rowsRemovedByJoinFilter !== undefined ? (
-                <div className="text-[11px]">
-                  Join filter removed {formatOrDash(data.rowsRemovedByJoinFilter)} rows
-                  {joinFilteredPercent !== undefined ? ` (${joinFilteredPercent}%)` : ''}
-                </div>
-              ) : null}
-              {data.rowsRemovedByIndexRecheck !== undefined ? (
-                <div className="text-[11px]">
-                  Index recheck removed {formatOrDash(data.rowsRemovedByIndexRecheck)} rows
-                  {recheckPercent !== undefined ? ` (${recheckPercent}%)` : ''}
-                </div>
-              ) : null}
-              {data.heapFetches !== undefined ? (
-                <div className="text-[11px]">Heap Fetches: {formatOrDash(data.heapFetches)}</div>
-              ) : null}
             </div>
+
+            {data.rowsRemovedByFilter !== undefined ? (
+              <div>
+                WHERE / filter removed {formatOrDash(data.rowsRemovedByFilter)} rows
+                {filteredPercent !== undefined ? ` (${filteredPercent}%)` : ''}
+              </div>
+            ) : null}
+            {data.rowsRemovedByJoinFilter !== undefined ? (
+              <div>
+                Join filter removed {formatOrDash(data.rowsRemovedByJoinFilter)} rows
+                {joinFilteredPercent !== undefined ? ` (${joinFilteredPercent}%)` : ''}
+              </div>
+            ) : null}
+            {data.rowsRemovedByIndexRecheck !== undefined ? (
+              <div>
+                Index recheck removed {formatOrDash(data.rowsRemovedByIndexRecheck)} rows
+                {recheckPercent !== undefined ? ` (${recheckPercent}%)` : ''}
+              </div>
+            ) : null}
+            {data.heapFetches !== undefined ? (
+              <div>Heap Fetches: {formatOrDash(data.heapFetches)}</div>
+            ) : null}
           </Section>
 
           {hasEstimateDetails && (
@@ -569,51 +563,47 @@ export const NodeDetailsPanel = ({
                 tooltip="How closely the planner's row estimate matched reality and what it means for this step."
               >
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-foreground-light">Estimate factor</span>
-                    <span className="text-sm font-medium flex items-center gap-2">
-                      {estFactor ?? '—'}
-                      {estimationInsight ? (
-                        <Badge variant={estimationInsight.variant} size="small">
-                          {estimationInsight.badgeText}
-                        </Badge>
-                      ) : null}
-                    </span>
-                  </div>
-                  <dl className="space-y-1 text-[11px]">
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Direction</dt>
-                      <dd className="text-foreground font-medium">
-                        {estimationDirectionLabel ?? '—'}
-                      </dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Observed rows (per loop)</dt>
-                      <dd className="text-foreground font-medium">{actualRows ?? '—'}</dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Estimated rows (per loop)</dt>
-                      <dd className="text-foreground font-medium">{plannedRowsPerLoop ?? '—'}</dd>
-                    </div>
-                    {loops > 1 ? (
+                  <ul className="flex flex-col gap-y-3 divide-y divide-dashed text-xs">
+                    <li className="flex items-center justify-between text-xs">
+                      <div className="text-foreground-light">Estimate factor</div>
+                      <div className="font-medium flex items-center gap-2">
+                        {estFactor ?? '—'}
+                        {estimationInsight ? (
+                          <Badge variant={estimationInsight.variant} size="small">
+                            {estimationInsight.badgeText}
+                          </Badge>
+                        ) : null}
+                      </div>
+                    </li>
+                    <li className="flex items-center justify-between pt-3">
+                      <div className="text-foreground-light">Direction</div>
+                      <div className="font-medium">{estimationDirectionLabel ?? '—'}</div>
+                    </li>
+                    <li className="flex items-center justify-between pt-3">
+                      <div className="text-foreground-light">Observed rows (per loop)</div>
+                      <div className="font-medium">{actualRows ?? '—'}</div>
+                    </li>
+                    <li className="flex items-center justify-between pt-3">
+                      <div className="text-foreground-light">Estimated rows (per loop)</div>
+                      <div className="font-medium">{plannedRowsPerLoop ?? '—'}</div>
+                    </li>
+                    {loops > 1 && (
                       <>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-foreground-light">Observed rows (all loops)</dt>
-                          <dd className="text-foreground font-medium">{rowsAcrossLoops ?? '—'}</dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-foreground-light">Estimated rows (all loops)</dt>
-                          <dd className="text-foreground font-medium">
-                            {plannedRowsAcrossLoops ?? '—'}
-                          </dd>
-                        </div>
+                        <li className="flex items-center justify-between pt-3">
+                          <div className="text-foreground-light">Observed rows (all loops)</div>
+                          <div className="font-medium">{rowsAcrossLoops ?? '—'}</div>
+                        </li>
+                        <li className="flex items-center justify-between pt-3">
+                          <div className="text-foreground-light">Estimated rows (all loops)</div>
+                          <div className="font-medium">{plannedRowsAcrossLoops ?? '—'}</div>
+                        </li>
                       </>
-                    ) : null}
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Loops observed</dt>
-                      <dd className="text-foreground font-medium">{formattedLoops}</dd>
-                    </div>
-                  </dl>
+                    )}
+                    <li className="flex items-center justify-between pt-3">
+                      <div className="text-foreground-light">Loops observed</div>
+                      <div className="font-medium">{formattedLoops}</div>
+                    </li>
+                  </ul>
 
                   {estimationInsight ? (
                     <Alert_Shadcn_ variant={estimationInsight.variant}>
@@ -656,11 +646,8 @@ export const NodeDetailsPanel = ({
                 tooltip="Buffer activity and I/O wait time attributable to this node, split by self and inclusive totals."
               >
                 {hasBufferData ? (
-                  <div className="space-y-2 text-[11px]">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-foreground-light">
-                      <Table size={14} />
-                      Block access (self / inclusive)
-                    </div>
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold">Block access (self / inclusive)</div>
                     <table className="w-full text-left text-[11px]">
                       <thead>
                         <tr className="text-foreground-light">
