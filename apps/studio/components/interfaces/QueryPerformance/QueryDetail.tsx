@@ -1,10 +1,11 @@
-import { Lightbulb } from 'lucide-react'
+import { Lightbulb, ChevronsUpDown, Expand } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
 
 import { formatSql } from 'lib/formatSql'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_COLUMNS,
@@ -70,7 +71,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
             value={query}
             height={324}
             lineNumbers="off"
-            wrapperClassName="pl-3 bg-surface-100"
+            wrapperClassName={cn('pl-3 bg-surface-100', !isExpanded && 'pointer-events-none')}
           />
           {isLinterWarning && (
             <Alert_Shadcn_
@@ -90,8 +91,21 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
             </Alert_Shadcn_>
           )}
         </div>
-        <div className="absolute -bottom-3 left-0 right-0 w-full flex items-center justify-center z-10">
-          <button onClick={() => setIsExpanded(!isExpanded)}>Expand</button>
+        <div
+          className={cn(
+            'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/50 to-transparent h-24 transition-opacity duration-300',
+            isExpanded && 'opacity-0 pointer-events-none'
+          )}
+        />
+        <div className="absolute -bottom-[13px] left-0 right-0 w-full flex items-center justify-center z-10">
+          <Button
+            type="default"
+            className="rounded-full"
+            icon={<ChevronsUpDown />}
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? 'Collapse' : 'Expand'}
+          </Button>
         </div>
       </QueryPanelSection>
       <QueryPanelSection className="pb-3 pt-6">
