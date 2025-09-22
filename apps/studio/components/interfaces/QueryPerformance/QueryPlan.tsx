@@ -1,9 +1,13 @@
-import { type PropsWithChildren, useMemo } from 'react'
+import { type PropsWithChildren, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { ChevronsUpDown, HelpCircle } from 'lucide-react'
 
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { removeCommentsFromSql } from 'lib/helpers'
+import { useExplainPlanQuery } from './hooks/useExplainPlanQuery'
+import { QueryPanelSection } from './QueryPanel'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -13,10 +17,9 @@ import {
   TooltipContent,
   TooltipTrigger,
   Button_Shadcn_,
+  Button,
+  cn,
 } from 'ui'
-import { HelpCircle } from 'lucide-react'
-import { removeCommentsFromSql } from 'lib/helpers'
-import { useExplainPlanQuery } from './hooks/useExplainPlanQuery'
 
 type WarningMessageProps = PropsWithChildren<{ title: string }>
 const WarningMessage = ({ title, children }: WarningMessageProps) => {
@@ -47,6 +50,8 @@ export const QueryPlan = ({ query }: { query: string }) => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const connectionString = project?.connectionString
+
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const cleanedSql = useMemo(() => {
     const cleanedSql = removeCommentsFromSql(query)
@@ -103,9 +108,9 @@ export const QueryPlan = ({ query }: { query: string }) => {
   }
 
   return (
-    <>
-      <div className="flex items-center">
-        <p className="text-sm">Query plan</p>
+    <QueryPanelSection className="py-6 border-b relative">
+      <div className="flex items-center mb-2">
+        <h4>Query plan</h4>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button_Shadcn_ asChild size="icon" variant="link">
@@ -123,20 +128,43 @@ export const QueryPlan = ({ query }: { query: string }) => {
           <TooltipContent>What is a query plan?</TooltipContent>
         </Tooltip>
       </div>
-      <p className="text-xs text-foreground-light mb-2">
-        Visualize how Postgres executes your SQL so you can pinpoint costly steps faster.
-      </p>
-      {explainError && (
-        <WarningMessage title={explainError.title || 'Failed to run EXPLAIN'}>
-          {explainError.message}
-        </WarningMessage>
-      )}
-      {isFetching && <GenericSkeletonLoader />}
-      {explainJsonString && (
-        <div className="h-[420px]">
-          <QueryPlanVisualizer json={explainJsonString} className="h-full" />
-        </div>
-      )}
-    </>
+      <div
+        className={cn(
+          'overflow-hidden pb-0 z-0 relative transition-all duration-300',
+          isExpanded ? 'h-[453px]' : 'h-[120px]'
+        )}
+      >
+        <p className="text-xs text-foreground-light mb-4">
+          Visualize how Postgres executes your SQL so you can pinpoint costly steps faster.
+        </p>
+        {explainError && (
+          <WarningMessage title={explainError.title || 'Failed to run EXPLAIN'}>
+            {explainError.message}
+          </WarningMessage>
+        )}
+        {isFetching && <GenericSkeletonLoader />}
+        {explainJsonString && (
+          <div className="h-[420px]">
+            <QueryPlanVisualizer json={explainJsonString} className="h-full" />
+          </div>
+        )}
+      </div>
+      <div
+        className={cn(
+          'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/30 to-transparent h-24 transition-opacity duration-300',
+          isExpanded && 'opacity-0 pointer-events-none'
+        )}
+      />
+      <div className="absolute -bottom-[13px] left-0 right-0 w-full flex items-center justify-center z-10">
+        <Button
+          type="default"
+          className="rounded-full"
+          icon={<ChevronsUpDown />}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? 'Collapse' : 'Expand'}
+        </Button>
+      </div>
+    </QueryPanelSection>
   )
 }
