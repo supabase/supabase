@@ -324,7 +324,10 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             Self time {slowTime} ms ({share}% of total execution time).
           </p>
           <p className="text-[11px] text-foreground-light">
-            Consider narrowing the rows earlier in the plan or adding an index to reduce work.
+            This step is the primary bottleneck, so the query stays slow until you shrink the work it performs.
+          </p>
+          <p className="text-[11px] text-foreground-light">
+            Filter rows sooner or add supporting indexes so fewer tuples reach this node.
           </p>
           {renderHelpLinks(SLOW_HELP_LINKS)}
         </TooltipContent>
@@ -368,7 +371,10 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             {shareSummary ?? '.'}
           </p>
           <p className="text-[11px] text-foreground-light">
-            Reduce scanned rows or improve indexes so the planner considers cheaper strategies.
+            The planner expects this step to consume most of the plan budget, often forcing conservative join or scan choices.
+          </p>
+          <p className="text-[11px] text-foreground-light">
+            Tighten predicates, reduce scanned data, or improve indexing so cheaper alternatives become viable.
           </p>
           {renderHelpLinks(COST_HELP_LINKS)}
         </TooltipContent>
