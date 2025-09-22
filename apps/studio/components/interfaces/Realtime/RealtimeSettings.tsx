@@ -41,10 +41,11 @@ export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
-  const { can: canUpdateConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.REALTIME_ADMIN_READ,
-    '*'
-  )
+  const {
+    can: canUpdateConfig,
+    isLoading: isLoadingPermissions,
+    isSuccess: isPermissionsLoaded,
+  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
 
   const { data: maxConn } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -433,7 +434,7 @@ export const RealtimeSettings = () => {
               </CardContent> */}
               <CardFooter className="justify-between">
                 <div>
-                  {!canUpdateConfig && (
+                  {isPermissionsLoaded && !canUpdateConfig && (
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update realtime settings
                     </p>
