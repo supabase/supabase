@@ -92,9 +92,9 @@ const InfrastructureInfo = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>
-            <p>Service Versions</p>
-            <p className="text-foreground-light text-sm">
-              Information on your provisioned instance
+            <h4 className="text-base capitalize m-0">Service Versions</h4>
+            <p className="text-foreground-light text-sm pr-8 mt-1">
+              Information on your provisioned instance.
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
