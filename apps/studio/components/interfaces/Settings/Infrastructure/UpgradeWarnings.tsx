@@ -70,7 +70,7 @@ export const UnsupportedExtensionsWarning = ({
       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
         <>
           <p className="mb-1">
-            The following extensions are not supported in newer version of Postgres and must be
+            The following extensions are not supported in newer versions of Postgres and must be
             removed before you can upgrade.{' '}
             <InlineLink
               href="https://supabase.com/docs/guides/platform/upgrading#upgrading-to-postgres-17"
