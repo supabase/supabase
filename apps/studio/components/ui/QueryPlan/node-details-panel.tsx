@@ -1,6 +1,6 @@
 import type { Node } from 'reactflow'
 import { type ReactNode } from 'react'
-import { AlertTriangle, Clock, Info, Rows3, Table, TimerReset, X } from 'lucide-react'
+import { AlertTriangle, Clock, Rows3, Table, TimerReset, X } from 'lucide-react'
 
 import type { PlanMeta, PlanNodeData } from './types'
 import {
@@ -11,9 +11,6 @@ import {
   Button,
   Separator,
   cn,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { formatMs, formatNumber, formatOrDash } from './utils/formats'
 import {
@@ -25,6 +22,7 @@ import {
   removedPercentValue,
   renderHelpLinks,
 } from './utils/node-display'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 const ESTIMATE_HELP_LINKS = [
   {
@@ -68,23 +66,9 @@ const Section = ({
   return (
     <section className="flex flex-col gap-2 px-4">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-start">
-          <h4 className="mb-2">{title}</h4>
-          {tooltip && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  aria-label={`About ${title}`}
-                  className="flex w-5 items-center justify-center rounded border border-transparent text-foreground-lighter transition-colors hover:text-foreground"
-                >
-                  <Info size={10} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-[240px] text-[11px] leading-relaxed">
-                {tooltip}
-              </TooltipContent>
-            </Tooltip>
-          )}
+        <div className="flex items-center gap-x-1 mb-2">
+          <h4>{title}</h4>
+          <InfoTooltip>{tooltip}</InfoTooltip>
         </div>
         {description && <span className="text-[11px] text-foreground-light">{description}</span>}
       </div>
