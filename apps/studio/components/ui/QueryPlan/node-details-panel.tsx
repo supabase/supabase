@@ -1,5 +1,5 @@
 import type { Node } from 'reactflow'
-import { Fragment, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import {
   AlertTriangle,
   CircleDollarSign,
@@ -665,7 +665,7 @@ export const NodeDetailsPanel = ({
 
                   {estimationInsight ? (
                     <Alert_Shadcn_ variant={estimationInsight.variant}>
-                      <TrendingUp size={16} />
+                      <AlertTriangle size={16} />
                       <div>
                         <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
                           {estimationInsight.severity === 'critical'
