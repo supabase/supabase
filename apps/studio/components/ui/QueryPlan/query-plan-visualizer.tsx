@@ -266,7 +266,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
 
     const planPanel = (
       <div className="relative flex-1">
-        {isExpanded ? (
+        {isExpanded && (
           <div className="flex h-[41px] w-full items-center gap-x-3 border-b border-border bg-sidebar px-3">
             <ControlsOverlay
               metricsVisibility={metricsVisibility}
@@ -305,33 +305,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
                 className="h-7 w-7"
               />
             </div>
-          </div>
-        ) : (
-          <div className="absolute left-2.5 right-2.5 top-2.5 z-20 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border bg-sidebar px-2.5 py-1.5 shadow-sm">
-            <ControlsOverlay
-              metricsVisibility={metricsVisibility}
-              setMetricsVisibility={setMetricsVisibility}
-              heatmapMode={heatmapMode}
-              setHeatmapMode={setHeatmapMode}
-              variant="toolbar"
-              className="shrink-0"
-            />
-            <div className="h-5 w-px border-l border-border" />
-            <MetaOverlay
-              planningTime={meta?.planningTime}
-              executionTime={meta?.executionTime}
-              jitTotalTime={meta?.jitTotalTime}
-              className="min-h-0 flex-1 border-0 bg-transparent px-0 py-0 text-xs"
-            />
-            <div className="h-5 w-px border-l border-border" />
-            <Button
-              type="default"
-              size="tiny"
-              icon={<Maximize2 size={14} className="text-foreground" />}
-              onClick={toggleExpanded}
-              aria-label="Enter expanded view"
-              className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
-            />
           </div>
         )}
 
