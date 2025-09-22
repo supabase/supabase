@@ -7,7 +7,7 @@ import { McpAddToClientButton } from './components/AddToClientButton'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { DEFAULT_BASE_URL, FEATURE_GROUPS, MCP_CLIENTS } from './constants'
+import { FEATURE_GROUPS, MCP_CLIENTS } from './constants'
 import { getMcpUrl } from './utils/getMcpUrl'
 import type { McpClient } from './types'
 
@@ -23,7 +23,7 @@ export interface McpConfigPanelProps {
 
 export function McpConfigPanel({
   basePath,
-  baseUrl = DEFAULT_BASE_URL,
+  baseUrl,
   projectRef,
   initialSelectedClient,
   onClientSelect,

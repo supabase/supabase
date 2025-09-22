@@ -197,4 +197,4 @@ export const MCP_CLIENTS: McpClient[] = [
   },
 ]
 
-export const DEFAULT_BASE_URL = 'https://mcp.supabase.com/mcp'
+export const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL ?? 'http://localhost:8080/mcp'

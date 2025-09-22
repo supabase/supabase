@@ -1,4 +1,4 @@
-import { DEFAULT_BASE_URL } from '../constants'
+import { MCP_URL } from '../constants'
 import type { McpClient, McpClientConfig } from '../types'
 
 interface GetMcpUrlOptions {
@@ -16,7 +16,7 @@ interface GetMcpUrlReturn {
 
 export function getMcpUrl({
   projectRef,
-  baseUrl = DEFAULT_BASE_URL,
+  baseUrl = MCP_URL,
   readonly = false,
   features = [],
   selectedClient,
