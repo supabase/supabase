@@ -263,6 +263,8 @@ export const NodeDetailsPanel = ({
   const formattedTotalTimePerLoop = formatMs(totalTimePerLoop)
   const formattedTotalTimeAllLoops = totalTimeAllLoops ? formatMs(totalTimeAllLoops) : undefined
   const formattedSelfTime = formatMs(data.exclusiveTimeMs)
+  const formattedSelfCost =
+    data.exclusiveCost !== undefined ? data.exclusiveCost.toFixed(2) : undefined
   const executionShare =
     data.exclusiveTimeMs !== undefined && meta?.executionTime
       ? formatPercent((data.exclusiveTimeMs / meta.executionTime) * 100)
@@ -337,6 +339,7 @@ export const NodeDetailsPanel = ({
   if (costHintMaxTotalShare !== undefined) {
     costShareDetails.push(`~${costHintMaxTotalShare}% of the plan's highest total cost`)
   }
+  const costShareSummary = costShareDetails.length > 0 ? costShareDetails.join('; ') : undefined
   const costHintSummary =
     costHintMaxTotalShare !== undefined && costHintMaxTotalShare >= (costHintExclusiveShare ?? -1)
       ? ` (~${costHintMaxTotalShare}% of the plan's highest total cost).`
@@ -394,17 +397,6 @@ export const NodeDetailsPanel = ({
           >
             <div className="grid grid-cols-2 gap-2">
               <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
-                <span className="text-[11px] text-foreground-light">Total time (per loop)</span>
-                <span className="text-sm font-medium">
-                  {formattedTotalTimePerLoop ? `${formattedTotalTimePerLoop} ms` : '—'}
-                </span>
-                {formattedTotalTimeAllLoops ? (
-                  <span className="text-[11px] text-foreground-light">
-                    All loops combined {formattedTotalTimeAllLoops} ms
-                  </span>
-                ) : null}
-              </div>
-              <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
                 <span className="text-[11px] text-foreground-light">Self time</span>
                 <span className="text-sm font-medium">
                   {formattedSelfTime ? `${formattedSelfTime} ms` : '—'}
@@ -416,11 +408,22 @@ export const NodeDetailsPanel = ({
                 ) : null}
               </div>
               <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
+                <span className="text-[11px] text-foreground-light">Self cost</span>
+                <span className="text-sm font-medium">{formattedSelfCost ?? '—'}</span>
+                {costShareSummary ? (
+                  <span className="text-[11px] text-foreground-light">{costShareSummary}</span>
+                ) : null}
+              </div>
+              <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
                 <span className="text-[11px] text-foreground-light">Loops</span>
                 <span className="text-sm font-medium">{formattedLoops}</span>
+              </div>
+              <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
+                <span className="text-[11px] text-foreground-light">Rows seen</span>
+                <span className="text-sm font-medium">{actualRows ?? '—'}</span>
                 {rowsAcrossLoops ? (
                   <span className="text-[11px] text-foreground-light">
-                    Rows across loops {rowsAcrossLoops}
+                    All loops combined {rowsAcrossLoops}
                   </span>
                 ) : null}
               </div>
@@ -527,10 +530,8 @@ export const NodeDetailsPanel = ({
                       <dt className="text-foreground-light">Self cost</dt>
                       <dd className="text-foreground font-medium">
                         {data.exclusiveCost !== undefined ? data.exclusiveCost.toFixed(2) : '—'}
-                        {costShareDetails.length > 0 ? (
-                          <span className="ml-1 text-foreground-light">
-                            ({costShareDetails.join('; ')})
-                          </span>
+                        {costShareSummary ? (
+                          <span className="ml-1 text-foreground-light">({costShareSummary})</span>
                         ) : null}
                       </dd>
                     </div>
