@@ -617,7 +617,7 @@ test.describe.serial('Database Enumerated Types', () => {
     await page.getByRole('textbox', { name: 'Search for a type' }).fill('code')
     await page.waitForTimeout(1000) // wait for enum types to be loaded
     await expect(page.getByText('factor_type')).not.toBeVisible()
-    await expect(page.getByText('code_challenge_method')).not.toBeVisible()
+    await expect(page.getByText('code_challenge_method')).toBeVisible()
   })
 
   test('CRUD operations works as expected', async ({ page, ref }) => {
