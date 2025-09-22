@@ -311,8 +311,8 @@ function createTabsState(projectRef: string) {
       const nextTabId = !editor
         ? undefined
         : tabsAfterClosing.filter((tab) => {
-          return editorEntityTypes[editor]?.includes(tab.type)
-        })[0]?.id
+            return editorEntityTypes[editor]?.includes(tab.type)
+          })[0]?.id
 
       const { [id]: value, ...otherTabs } = store.tabsMap
       store.tabsMap = otherTabs

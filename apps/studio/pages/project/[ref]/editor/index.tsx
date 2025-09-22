@@ -35,7 +35,10 @@ const TableEditorPage: NextPageWithLayout = () => {
         router.push(`/project/${projectRef}/editor/${history.editor}`)
       } else if (lastTabId) {
         const lastTab = tabStore.tabsMap[lastTabId]
-        if (lastTab) router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}?${LOAD_TAB_FROM_CACHE_PARAM}=true`)
+        if (lastTab)
+          router.push(
+            `/project/${projectRef}/editor/${lastTab.metadata?.tableId}?${LOAD_TAB_FROM_CACHE_PARAM}=true`
+          )
       }
     }
   }, [isHistoryLoaded])

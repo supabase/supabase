@@ -18,7 +18,7 @@ export function useTableFilter() {
       const newUrlFilters = filtersToUrlParams(appliedFilters)
       setParams((prevParams) => ({ ...prevParams, filter: newUrlFilters }))
     },
-    [setParams ]
+    [setParams]
   )
 
   return {

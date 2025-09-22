@@ -33,7 +33,6 @@ export function useTableSort() {
       const newUrlSorts = sortsToUrlParams(sortsWithTable)
 
       setParams((prevParams) => ({ ...prevParams, sort: newUrlSorts }))
-
     },
     [snap, setParams]
   )

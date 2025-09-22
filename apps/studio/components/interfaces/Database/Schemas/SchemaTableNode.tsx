@@ -68,7 +68,9 @@ const TableNode = ({
             </div>
             {data.id && !placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={`/project/${data.ref}/editor/${data.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`}>
+                <Link
+                  href={`/project/${data.ref}/editor/${data.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`}
+                >
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>
