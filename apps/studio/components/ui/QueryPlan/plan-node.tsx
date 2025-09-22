@@ -363,7 +363,7 @@ export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
       className={cn(
         'border overflow-hidden rounded-[4px] shadow-sm bg-background transition-all',
         selected
-          ? 'border-brand-500/70 ring ring-brand-500/60 ring-offset-[3px] ring-offset-background'
+          ? 'border-foreground-muted/70 ring ring-foreground-muted/40 ring-offset-[3px] ring-offset-background'
           : 'border-border',
         isNeverExecuted && 'border-dashed opacity-70'
       )}
