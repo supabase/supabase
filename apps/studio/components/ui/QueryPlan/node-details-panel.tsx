@@ -41,6 +41,21 @@ import {
   renderHelpLinks,
 } from './utils/node-display'
 
+const ESTIMATE_HELP_LINKS = [
+  {
+    label: 'Query troubleshooting guide',
+    href: 'https://supabase.com/docs/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX',
+  },
+  {
+    label: 'Tune planner estimates',
+    href: 'https://www.postgresql.org/docs/current/routine-vacuuming.html',
+  },
+  {
+    label: 'Manage indexes effectively',
+    href: 'https://supabase.com/docs/guides/database/postgres/indexes',
+  },
+]
+
 type NodeDetailsPanelProps = {
   node: Node<PlanNodeData>
   meta?: PlanMeta
@@ -149,7 +164,9 @@ const ESTIMATION_THRESHOLD_CRITICAL = 100
 
 type EstimationInsight = {
   badgeText: string
-  description: string
+  summary: string
+  implication: string
+  guidance: string
   severity: 'major' | 'critical'
   variant: 'warning' | 'destructive'
 }
@@ -198,21 +215,34 @@ const computeEstimationInsight = (data: PlanNodeData): EstimationInsight | undef
   const plannedTotal =
     plannedPerLoop && loops > 1 ? formatNumber((data.planRows ?? 0) * loops) : undefined
 
-  let description = `Planner ${directionLower}estimated rows by `
-  description += Number.isFinite(normalizedFactor)
-    ? `~${multiplierText}×.`
-    : 'an extremely large margin.'
+  const summaryParts: string[] = []
+  summaryParts.push(
+    `Planner ${directionLower}estimated rows ${
+      Number.isFinite(normalizedFactor) ? `by ~${multiplierText}×` : 'by an extremely large margin'
+    }.`
+  )
 
   if (actualPerLoop && plannedPerLoop) {
-    description += ` Observed ${actualPerLoop} vs ${plannedPerLoop} planned per loop.`
+    summaryParts.push(`Observed ${actualPerLoop} vs ${plannedPerLoop} planned per loop.`)
     if (loops > 1 && actualTotal && plannedTotal) {
-      description += ` Across ${formatNumber(loops)} loops (~${actualTotal} rows vs ${plannedTotal} planned).`
+      summaryParts.push(
+        `Across ${formatNumber(loops)} loops (~${actualTotal} rows vs ${plannedTotal} planned).`
+      )
     }
   }
 
+  const implication =
+    data.estDirection === 'under'
+      ? 'This gap usually means the planner picked a strategy optimized for far fewer rows, which can lead to expensive nested loops or repeat scans.'
+      : 'This gap usually means the planner avoided selective indexes and chose broader scans because it expected many more rows.'
+  const guidance =
+    'Make sure table statistics are current (autovacuum or a manual ANALYZE if you have access) and review indexes or predicates so the planner has more reliable estimates.'
+
   return {
     badgeText: `${directionTitle}estimated ×${multiplierText}`,
-    description,
+    summary: summaryParts.join(' '),
+    implication,
+    guidance,
     severity,
     variant,
   }
@@ -242,9 +272,20 @@ export const NodeDetailsPanel = ({
     data.actualRows !== undefined
       ? formatNumber((data.actualRows ?? 0) * Math.max(loops, 1))
       : undefined
+  const plannedRowsPerLoop = data.planRows !== undefined ? formatNumber(data.planRows) : undefined
+  const plannedRowsAcrossLoops =
+    data.planRows !== undefined
+      ? formatNumber((data.planRows ?? 0) * Math.max(loops, 1))
+      : undefined
   const estFactor =
     data.estFactor !== undefined
       ? `${data.estFactor.toFixed(data.estFactor >= 10 ? 0 : 2)}×`
+      : undefined
+  const estimationDirectionLabel =
+    data.estDirection && data.estDirection !== 'none'
+      ? data.estDirection === 'under'
+        ? 'Planner underestimated'
+        : 'Planner overestimated'
       : undefined
 
   const filteredPercent = removedPercentValue(data, data.rowsRemovedByFilter)
@@ -330,6 +371,12 @@ export const NodeDetailsPanel = ({
       data.exclusiveCost !== undefined ||
       costHint
   )
+  const hasEstimateDetails = Boolean(
+    data.estFactor !== undefined ||
+      (data.estDirection && data.estDirection !== 'none') ||
+      data.planRows !== undefined ||
+      data.actualRows !== undefined
+  )
 
   return (
     <aside
@@ -392,49 +439,98 @@ export const NodeDetailsPanel = ({
                   </span>
                 ) : null}
               </div>
-              <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
-                <span className="text-[11px] text-foreground-light">Estimate factor</span>
-                <span className="text-sm font-medium flex flex-wrap items-center gap-2">
-                  {estFactor ?? '—'}
-                  {estimationInsight ? (
-                    <Badge variant={estimationInsight.variant} size="small">
-                      {estimationInsight.badgeText}
-                    </Badge>
-                  ) : null}
-                </span>
-                {estimationInsight ? (
-                  <span className="text-[11px] text-foreground-light leading-snug">
-                    {estimationInsight.description}
-                  </span>
-                ) : data.estDirection && data.estDirection !== 'none' ? (
-                  <span className="text-[11px] text-foreground-light">
-                    {data.estDirection === 'over'
-                      ? 'Planner overestimated'
-                      : 'Planner underestimated'}
-                  </span>
-                ) : null}
-              </div>
             </div>
-            {estimationInsight && estimationInsight.severity === 'critical' ? (
-              <Alert_Shadcn_ variant={estimationInsight.variant}>
-                <TrendingUp size={16} />
-                <div>
-                  <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
-                    Planner estimate is far off
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
-                    {estimationInsight.description}
-                  </AlertDescription_Shadcn_>
-                  <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
-                    Postgres chose a suboptimal strategy. Refreshing table statistics or reviewing
-                    indexes can help align planner estimates.
-                  </AlertDescription_Shadcn_>
-                </div>
-              </Alert_Shadcn_>
-            ) : null}
           </Section>
 
-          {hasTimeDetails ? (
+          {hasEstimateDetails && (
+            <>
+              <Separator />
+              <Section
+                title="Planner estimate"
+                icon={<TrendingUp className="h-4 w-4" />}
+                tooltip="How closely the planner's row estimate matched reality and what it means for this step."
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-foreground-light">Estimate factor</span>
+                    <span className="text-sm font-medium flex items-center gap-2">
+                      {estFactor ?? '—'}
+                      {estimationInsight ? (
+                        <Badge variant={estimationInsight.variant} size="small">
+                          {estimationInsight.badgeText}
+                        </Badge>
+                      ) : null}
+                    </span>
+                  </div>
+                  <dl className="space-y-1 text-[11px]">
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Direction</dt>
+                      <dd className="text-foreground font-medium">
+                        {estimationDirectionLabel ?? '—'}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Observed rows (per loop)</dt>
+                      <dd className="text-foreground font-medium">{actualRows ?? '—'}</dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Estimated rows (per loop)</dt>
+                      <dd className="text-foreground font-medium">{plannedRowsPerLoop ?? '—'}</dd>
+                    </div>
+                    {loops > 1 ? (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-foreground-light">Observed rows (all loops)</dt>
+                          <dd className="text-foreground font-medium">{rowsAcrossLoops ?? '—'}</dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-foreground-light">Estimated rows (all loops)</dt>
+                          <dd className="text-foreground font-medium">
+                            {plannedRowsAcrossLoops ?? '—'}
+                          </dd>
+                        </div>
+                      </>
+                    ) : null}
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Loops observed</dt>
+                      <dd className="text-foreground font-medium">{formattedLoops}</dd>
+                    </div>
+                  </dl>
+
+                  {estimationInsight ? (
+                    <Alert_Shadcn_ variant={estimationInsight.variant}>
+                      <TrendingUp size={16} />
+                      <div>
+                        <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
+                          {estimationInsight.severity === 'critical'
+                            ? 'Planner estimate is far off'
+                            : 'Planner estimate needs attention'}
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
+                          {estimationInsight.summary}
+                        </AlertDescription_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed text-foreground-light">
+                          {estimationInsight.implication}
+                        </AlertDescription_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed text-foreground-light">
+                          {estimationInsight.guidance}
+                        </AlertDescription_Shadcn_>
+                        <div className="mt-2 text-[11px] leading-relaxed">
+                          {renderHelpLinks(ESTIMATE_HELP_LINKS)}
+                        </div>
+                      </div>
+                    </Alert_Shadcn_>
+                  ) : estimationDirectionLabel ? (
+                    <div className="text-[11px] text-foreground-light">
+                      {estimationDirectionLabel}
+                    </div>
+                  ) : null}
+                </div>
+              </Section>
+            </>
+          )}
+
+          {hasTimeDetails && (
             <>
               <Separator />
               <Section
@@ -504,9 +600,9 @@ export const NodeDetailsPanel = ({
                 </div>
               </Section>
             </>
-          ) : null}
+          )}
 
-          {hasCostDetails ? (
+          {hasCostDetails && (
             <>
               <Separator />
               <Section
@@ -566,7 +662,7 @@ export const NodeDetailsPanel = ({
                 </div>
               </Section>
             </>
-          ) : null}
+          )}
 
           <Separator />
           <Section
@@ -629,7 +725,7 @@ export const NodeDetailsPanel = ({
             </dl>
           </Section>
 
-          {hasBufferData || hasIOTiming ? (
+          {(hasBufferData || hasIOTiming) && (
             <>
               <Separator />
               <Section
@@ -715,9 +811,9 @@ export const NodeDetailsPanel = ({
                 ) : null}
               </Section>
             </>
-          ) : null}
+          )}
 
-          {conditionRows.some((row) => row.value) ? (
+          {conditionRows.some((row) => row.value) && (
             <>
               <Separator />
               <Section
@@ -741,9 +837,9 @@ export const NodeDetailsPanel = ({
                 </div>
               </Section>
             </>
-          ) : null}
+          )}
 
-          {outputColumns.length ? (
+          {outputColumns.length && (
             <>
               <Separator />
               <Section
@@ -762,7 +858,7 @@ export const NodeDetailsPanel = ({
                 </div>
               </Section>
             </>
-          ) : null}
+          )}
         </div>
       </div>
     </aside>
