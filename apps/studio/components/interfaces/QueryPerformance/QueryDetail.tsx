@@ -2,7 +2,6 @@ import { Lightbulb } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
 
 import { formatSql } from 'lib/formatSql'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
