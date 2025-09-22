@@ -302,21 +302,6 @@ export const NodeDetailsPanel = ({
   const hasIOTiming = (data.ioReadTime ?? 0) + (data.ioWriteTime ?? 0) > 0
   const estimationInsight = computeEstimationInsight(data)
 
-  const plannerEstimates: KeyValue[] = [
-    { key: 'startup', label: 'Startup cost', value: data.startupCost?.toFixed(2) },
-    { key: 'total', label: 'Total cost', value: data.totalCost?.toFixed(2) },
-    {
-      key: 'planRows',
-      label: 'Estimated rows',
-      value: data.planRows ? formatNumber(data.planRows) : undefined,
-    },
-    {
-      key: 'planWidth',
-      label: 'Row width',
-      value: data.planWidth ? `${data.planWidth} B` : undefined,
-    },
-  ]
-
   const conditionRows: ConditionRow[] = [
     { key: 'filter', label: 'Filter', value: data.filter },
     { key: 'hash-cond', label: 'Hash condition', value: data.hashCond },
@@ -496,12 +481,14 @@ export const NodeDetailsPanel = ({
                           Slow node
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
-                          Self time {slowHintTimeText ?? '—'} ({slowHintShare ?? '—'}% of total
-                          execution time).
-                        </AlertDescription_Shadcn_>
-                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
-                          Consider narrowing the rows earlier in the plan or adding an index to
-                          reduce work.
+                          <p>
+                            Self time {slowHintTimeText ?? '—'} ({slowHintShare ?? '—'}% of total
+                            execution time).
+                          </p>
+                          <p className="text-foreground-light">
+                            Consider narrowing the rows earlier in the plan or adding an index to
+                            reduce work.
+                          </p>
                         </AlertDescription_Shadcn_>
                         <div className="mt-2 text-[11px] leading-relaxed">
                           {renderHelpLinks(SLOW_HELP_LINKS)}
@@ -558,12 +545,14 @@ export const NodeDetailsPanel = ({
                           Cost is high
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
-                          Estimated cost {formattedCostHighlight ?? '—'}
-                          {costHintSummary}
-                        </AlertDescription_Shadcn_>
-                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
-                          Reduce scanned rows or improve indexes so the planner considers cheaper
-                          strategies.
+                          <p>
+                            Estimated cost {formattedCostHighlight ?? '—'}
+                            {costHintSummary}
+                          </p>
+                          <p className="text-foreground-light">
+                            Reduce scanned rows or improve indexes so the planner considers cheaper
+                            strategies.
+                          </p>
                         </AlertDescription_Shadcn_>
                         <div className="mt-2 text-[11px] leading-relaxed">
                           {renderHelpLinks(COST_HELP_LINKS)}
