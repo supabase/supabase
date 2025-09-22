@@ -8,6 +8,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { removeCommentsFromSql } from 'lib/helpers'
 import { useExplainPlanQuery } from './hooks/useExplainPlanQuery'
 import { QueryPanelSection } from './QueryPanel'
+import { useFlag } from 'common/feature-flags'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -47,6 +48,7 @@ const QueryPlanVisualizer = dynamic(
 )
 
 export const QueryPlan = ({ query }: { query: string }) => {
+  const isQueryPlanEnabled = useFlag('EnableQueryPlan')
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const connectionString = project?.connectionString
@@ -103,7 +105,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
     }
   }, [rawExplainResult])
 
-  if (isUnsupportedQueryType) {
+  if (!isQueryPlanEnabled || isUnsupportedQueryType) {
     return null
   }
 
