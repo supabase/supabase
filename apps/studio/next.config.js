@@ -534,7 +534,8 @@ const nextConfig = {
     // On previews, typechecking is run via GitHub Action only for efficiency
     // On production, we turn it on to prevent errors from conflicting PRs getting into
     // prod
-    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
+    // ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
+    ignoreBuildErrors: false,
   },
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
