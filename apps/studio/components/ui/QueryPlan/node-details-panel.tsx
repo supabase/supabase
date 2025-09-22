@@ -442,94 +442,6 @@ export const NodeDetailsPanel = ({
             </div>
           </Section>
 
-          {hasEstimateDetails && (
-            <>
-              <Separator />
-              <Section
-                title="Planner estimate"
-                icon={<TrendingUp className="h-4 w-4" />}
-                tooltip="How closely the planner's row estimate matched reality and what it means for this step."
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-foreground-light">Estimate factor</span>
-                    <span className="text-sm font-medium flex items-center gap-2">
-                      {estFactor ?? '—'}
-                      {estimationInsight ? (
-                        <Badge variant={estimationInsight.variant} size="small">
-                          {estimationInsight.badgeText}
-                        </Badge>
-                      ) : null}
-                    </span>
-                  </div>
-                  <dl className="space-y-1 text-[11px]">
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Direction</dt>
-                      <dd className="text-foreground font-medium">
-                        {estimationDirectionLabel ?? '—'}
-                      </dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Observed rows (per loop)</dt>
-                      <dd className="text-foreground font-medium">{actualRows ?? '—'}</dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Estimated rows (per loop)</dt>
-                      <dd className="text-foreground font-medium">{plannedRowsPerLoop ?? '—'}</dd>
-                    </div>
-                    {loops > 1 ? (
-                      <>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-foreground-light">Observed rows (all loops)</dt>
-                          <dd className="text-foreground font-medium">{rowsAcrossLoops ?? '—'}</dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-foreground-light">Estimated rows (all loops)</dt>
-                          <dd className="text-foreground font-medium">
-                            {plannedRowsAcrossLoops ?? '—'}
-                          </dd>
-                        </div>
-                      </>
-                    ) : null}
-                    <div className="flex items-center justify-between">
-                      <dt className="text-foreground-light">Loops observed</dt>
-                      <dd className="text-foreground font-medium">{formattedLoops}</dd>
-                    </div>
-                  </dl>
-
-                  {estimationInsight ? (
-                    <Alert_Shadcn_ variant={estimationInsight.variant}>
-                      <TrendingUp size={16} />
-                      <div>
-                        <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
-                          {estimationInsight.severity === 'critical'
-                            ? 'Planner estimate is far off'
-                            : 'Planner estimate needs attention'}
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
-                          {estimationInsight.summary}
-                        </AlertDescription_Shadcn_>
-                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed text-foreground-light">
-                          {estimationInsight.implication}
-                        </AlertDescription_Shadcn_>
-                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed text-foreground-light">
-                          {estimationInsight.guidance}
-                        </AlertDescription_Shadcn_>
-                        <div className="mt-2 text-[11px] leading-relaxed">
-                          {renderHelpLinks(ESTIMATE_HELP_LINKS)}
-                        </div>
-                      </div>
-                    </Alert_Shadcn_>
-                  ) : estimationDirectionLabel ? (
-                    <div className="text-[11px] text-foreground-light">
-                      {estimationDirectionLabel}
-                    </div>
-                  ) : null}
-                </div>
-              </Section>
-            </>
-          )}
-
           {hasTimeDetails && (
             <>
               <Separator />
@@ -709,21 +621,93 @@ export const NodeDetailsPanel = ({
             </div>
           </Section>
 
-          <Separator className="bg-border" />
-          <Section
-            title="Planner estimates"
-            icon={<TrendingUp className="h-4 w-4" />}
-            tooltip="Planner predictions from EXPLAIN, including estimated cost, rows, and row width."
-          >
-            <dl className="grid grid-cols-2 gap-2 text-[11px]">
-              {plannerEstimates.map((item) => (
-                <Fragment key={item.key}>
-                  <dt className="text-foreground-light">{item.label}</dt>
-                  <dd className="text-foreground text-right">{item.value ?? '—'}</dd>
-                </Fragment>
-              ))}
-            </dl>
-          </Section>
+          {hasEstimateDetails && (
+            <>
+              <Separator />
+              <Section
+                title="Planner estimate"
+                icon={<TrendingUp className="h-4 w-4" />}
+                tooltip="How closely the planner's row estimate matched reality and what it means for this step."
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-foreground-light">Estimate factor</span>
+                    <span className="text-sm font-medium flex items-center gap-2">
+                      {estFactor ?? '—'}
+                      {estimationInsight ? (
+                        <Badge variant={estimationInsight.variant} size="small">
+                          {estimationInsight.badgeText}
+                        </Badge>
+                      ) : null}
+                    </span>
+                  </div>
+                  <dl className="space-y-1 text-[11px]">
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Direction</dt>
+                      <dd className="text-foreground font-medium">
+                        {estimationDirectionLabel ?? '—'}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Observed rows (per loop)</dt>
+                      <dd className="text-foreground font-medium">{actualRows ?? '—'}</dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Estimated rows (per loop)</dt>
+                      <dd className="text-foreground font-medium">{plannedRowsPerLoop ?? '—'}</dd>
+                    </div>
+                    {loops > 1 ? (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-foreground-light">Observed rows (all loops)</dt>
+                          <dd className="text-foreground font-medium">{rowsAcrossLoops ?? '—'}</dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-foreground-light">Estimated rows (all loops)</dt>
+                          <dd className="text-foreground font-medium">
+                            {plannedRowsAcrossLoops ?? '—'}
+                          </dd>
+                        </div>
+                      </>
+                    ) : null}
+                    <div className="flex items-center justify-between">
+                      <dt className="text-foreground-light">Loops observed</dt>
+                      <dd className="text-foreground font-medium">{formattedLoops}</dd>
+                    </div>
+                  </dl>
+
+                  {estimationInsight ? (
+                    <Alert_Shadcn_ variant={estimationInsight.variant}>
+                      <TrendingUp size={16} />
+                      <div>
+                        <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
+                          {estimationInsight.severity === 'critical'
+                            ? 'Planner estimate is far off'
+                            : 'Planner estimate needs attention'}
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
+                          {estimationInsight.summary}
+                        </AlertDescription_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed text-foreground-light">
+                          {estimationInsight.implication}
+                        </AlertDescription_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed text-foreground-light">
+                          {estimationInsight.guidance}
+                        </AlertDescription_Shadcn_>
+                        <div className="mt-2 text-[11px] leading-relaxed">
+                          {renderHelpLinks(ESTIMATE_HELP_LINKS)}
+                        </div>
+                      </div>
+                    </Alert_Shadcn_>
+                  ) : estimationDirectionLabel ? (
+                    <div className="text-[11px] text-foreground-light">
+                      {estimationDirectionLabel}
+                    </div>
+                  ) : null}
+                </div>
+              </Section>
+            </>
+          )}
 
           {(hasBufferData || hasIOTiming) && (
             <>
