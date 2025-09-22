@@ -4,6 +4,7 @@ packages:
   - 'e2e/*'
 
 catalog:
+  '@hookform/resolvers': ^5.1.0
   '@types/node': ^22.0.0
   '@supabase/auth-js': 2.72.0-rc.11
   '@supabase/supabase-js': ^2.47.14

@@ -16,7 +16,7 @@
     "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.1.1",
+    "@hookform/resolvers": "catalog:",
     "contentlayer2": "0.4.6",
     "date-fns": "^2.30.0",
     "eslint-config-supabase": "workspace:*",
