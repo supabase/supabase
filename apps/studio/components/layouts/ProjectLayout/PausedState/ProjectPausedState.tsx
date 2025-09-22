@@ -139,9 +139,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   return (
     <>
       <div className="space-y-4">
-        <div className="w-full mx-auto mb-8 md:mb-16 max-w-7xl">
+        <div className="w-full mx-auto mb-8 md:mb-16">
           <div className="flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
-            <div className="grid w-[550px] gap-4">
+            <div className="grid max-w-2xl gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <PauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
               </div>
