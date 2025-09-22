@@ -69,7 +69,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
         >
           <SqlMonacoBlock
             value={query}
-            height={324}
+            height={322}
             lineNumbers="off"
             wrapperClassName={cn('pl-3 bg-surface-100', !isExpanded && 'pointer-events-none')}
           />
@@ -93,7 +93,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
         </div>
         <div
           className={cn(
-            'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/50 to-transparent h-24 transition-opacity duration-300',
+            'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/30 to-transparent h-24 transition-opacity duration-300',
             isExpanded && 'opacity-0 pointer-events-none'
           )}
         />
