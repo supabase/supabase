@@ -63,7 +63,24 @@ export const OrganizationInvite = () => {
         'md:w-[400px]'
       )}
     >
-      {isLoadingInvitation ? (
+      {!profile ? (
+        <>
+          <Admonition
+            showIcon={false}
+            type="default"
+            title="Sign in or create an account first to view this invitation"
+            className="mb-0 border-0 rounded-none text-left"
+          />
+          <div className="p-4 border-muted border-t flex gap-x-3 justify-center">
+            <Button asChild type="default">
+              <Link href={loginRedirectLink}>Sign in</Link>
+            </Button>
+            <Button asChild type="default">
+              <Link href={loginRedirectLink}>Create an account</Link>
+            </Button>
+          </div>
+        </>
+      ) : isLoadingInvitation ? (
         <div className="p-5">
           <GenericSkeletonLoader />
         </div>
@@ -85,9 +102,7 @@ export const OrganizationInvite = () => {
         <>
           <div className="flex flex-col gap-y-1 px-6 py-6">
             <p className="text-sm text-foreground-light">You have been invited to join </p>
-            <p className={cn('text-foreground', !!profile ? 'text-2xl' : 'text-3xl')}>
-              {organizationName}
-            </p>
+            <p className="text-foreground text-2xl">{organizationName}</p>
             {isSuccessInvitation && (
               <p className="text-xs text-foreground-lighter">{`Organization slug: ${slug}`}</p>
             )}
@@ -95,28 +110,13 @@ export const OrganizationInvite = () => {
           <div
             className={cn('border-t border-muted', hasError ? 'bg-alternative' : 'bg-transparent')}
           >
-            {profile === undefined && (
-              <div className="flex flex-col gap-y-4 p-4">
-                <p className="text-sm text-foreground">
-                  Sign in or create an account first to view this invitation
-                </p>
-                <div className="flex justify-center gap-3">
-                  <Button asChild type="default">
-                    <Link href={loginRedirectLink}>Sign in</Link>
-                  </Button>
-                  <Button asChild type="default">
-                    <Link href={loginRedirectLink}>Create an account</Link>
-                  </Button>
-                </div>
-              </div>
-            )}
             <div
               className={cn(
                 'flex flex-col gap-4',
                 !isLoadingInvitation && !hasError && 'px-6 py-4'
               )}
             >
-              {!!profile && hasError && (
+              {hasError && (
                 <OrganizationInviteError data={data} error={error} isError={isErrorInvitation} />
               )}
               {isSuccessInvitation && !hasError && (
