@@ -333,10 +333,21 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
   }
 
   if (data.costHint) {
-    const selfShare =
+    const exclusiveShare =
       data.costHint.selfCostShare !== undefined
         ? Math.round((data.costHint.selfCostShare ?? 0) * 100)
         : undefined
+    const maxTotalCostShare =
+      data.costHint.maxTotalCostShare !== undefined
+        ? Math.round((data.costHint.maxTotalCostShare ?? 0) * 100)
+        : undefined
+
+    let shareSummary: string | undefined
+    if (maxTotalCostShare !== undefined && maxTotalCostShare >= (exclusiveShare ?? -1)) {
+      shareSummary = ` (~${maxTotalCostShare}% of the plan's highest total cost).`
+    } else if (exclusiveShare !== undefined) {
+      shareSummary = ` (~${exclusiveShare}% of exclusive plan cost).`
+    }
 
     hints.push(
       <Tooltip key="cost-hint">
@@ -354,7 +365,7 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
           <p className="font-medium text-xs">Cost is high</p>
           <p className="text-[11px]">
             Estimated cost {(data.totalCost ?? data.costHint.selfCost ?? 0).toFixed(2)}
-            {selfShare !== undefined ? ` (~${selfShare}% of exclusive plan cost).` : '.'}
+            {shareSummary ?? '.'}
           </p>
           <p className="text-[11px] text-foreground-light">
             Reduce scanned rows or improve indexes so the planner considers cheaper strategies.

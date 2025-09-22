@@ -196,6 +196,7 @@ const annotateNodesWithHints = (
   const totalSelfCost = costValues.reduce((sum, value) => sum + value, 0)
   const p90Cost = percentile(costValues, 0.9)
   const p95Cost = percentile(costValues, 0.95)
+  const maxTotalCost = nodes.reduce((max, node) => Math.max(max, node.data.totalCost ?? 0), 0)
 
   nodes.forEach((node) => {
     const data = node.data
@@ -227,23 +228,48 @@ const annotateNodesWithHints = (
     const selfCost = data.exclusiveCost ?? 0
     let costSeverity: 'warn' | 'alert' | undefined
     let selfCostShare: number | undefined
+    let maxTotalCostShare: number | undefined
 
-    if (!costSeverity && selfCost > 0) {
+    const applySeverity = (newSeverity: 'warn' | 'alert' | undefined) => {
+      if (!newSeverity) return
+      if (!costSeverity) {
+        costSeverity = newSeverity
+        return
+      }
+      const rank = { warn: 1, alert: 2 } as const
+      if (rank[newSeverity] > rank[costSeverity]) {
+        costSeverity = newSeverity
+      }
+    }
+
+    if (selfCost > 0) {
       if (totalSelfCost > 0) {
         const share = selfCost / totalSelfCost
         selfCostShare = share
         if (share >= 0.5) {
-          costSeverity = 'alert'
+          applySeverity('alert')
         } else if (share >= 0.25) {
-          costSeverity = 'warn'
+          applySeverity('warn')
+        }
+      }
+
+      if (maxTotalCost > 0) {
+        const percentOfMax = selfCost / maxTotalCost
+        maxTotalCostShare = percentOfMax
+        if (percentOfMax >= 0.9) {
+          applySeverity('alert')
+        } else if (percentOfMax >= 0.4) {
+          applySeverity('warn')
+        } else if (percentOfMax >= 0.1) {
+          applySeverity('warn')
         }
       }
 
       if (!costSeverity) {
         if (p95Cost > 0 && selfCost >= p95Cost) {
-          costSeverity = 'alert'
+          applySeverity('alert')
         } else if (p90Cost > 0 && selfCost >= p90Cost) {
-          costSeverity = 'warn'
+          applySeverity('warn')
         }
       }
     }
@@ -253,6 +279,7 @@ const annotateNodesWithHints = (
         severity: costSeverity,
         selfCost,
         selfCostShare,
+        maxTotalCostShare,
       }
     }
   })

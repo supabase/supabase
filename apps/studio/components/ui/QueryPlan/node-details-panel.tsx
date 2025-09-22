@@ -22,6 +22,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Badge,
   Button,
   Separator,
   cn,
@@ -143,6 +144,80 @@ const inclusiveBufferTotal = (data: PlanNodeData) => {
   return { shared, temp, local, total: shared + temp + local }
 }
 
+const ESTIMATION_THRESHOLD_MAJOR = 10
+const ESTIMATION_THRESHOLD_CRITICAL = 100
+
+type EstimationInsight = {
+  badgeText: string
+  description: string
+  severity: 'major' | 'critical'
+  variant: 'warning' | 'destructive'
+}
+
+const formatEstimateMultiplier = (value: number): string => {
+  if (!Number.isFinite(value)) return '∞'
+  if (value >= 100) {
+    const rounded = Math.round(value)
+    return formatNumber(rounded) ?? `${rounded}`
+  }
+  const formatted = value.toFixed(1)
+  return formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted
+}
+
+const computeEstimationInsight = (data: PlanNodeData): EstimationInsight | undefined => {
+  if (data.estFactor === undefined || data.estFactor <= 0) return undefined
+  if (!data.estDirection || data.estDirection === 'none') return undefined
+
+  const normalizedFactor =
+    data.estDirection === 'over'
+      ? data.estFactor === 0
+        ? Number.POSITIVE_INFINITY
+        : 1 / data.estFactor
+      : data.estFactor
+
+  if (!Number.isFinite(normalizedFactor) && normalizedFactor !== Number.POSITIVE_INFINITY)
+    return undefined
+
+  if (normalizedFactor < ESTIMATION_THRESHOLD_MAJOR) return undefined
+
+  const severity = normalizedFactor >= ESTIMATION_THRESHOLD_CRITICAL ? 'critical' : 'major'
+  const variant = severity === 'critical' ? 'destructive' : 'warning'
+  const directionTitle = data.estDirection === 'over' ? 'Over' : 'Under'
+  const directionLower = directionTitle.toLowerCase()
+  const multiplierText = formatEstimateMultiplier(normalizedFactor)
+
+  const loops = data.actualLoops ?? 1
+  const actualPerLoop = data.actualRows !== undefined ? formatNumber(data.actualRows) : undefined
+  const plannedPerLoop = data.planRows !== undefined ? formatNumber(data.planRows) : undefined
+  const actualTotal =
+    data.estActualTotalRows !== undefined
+      ? formatNumber(data.estActualTotalRows)
+      : actualPerLoop && loops > 1
+        ? formatNumber((data.actualRows ?? 0) * loops)
+        : undefined
+  const plannedTotal =
+    plannedPerLoop && loops > 1 ? formatNumber((data.planRows ?? 0) * loops) : undefined
+
+  let description = `Planner ${directionLower}estimated rows by `
+  description += Number.isFinite(normalizedFactor)
+    ? `~${multiplierText}×.`
+    : 'an extremely large margin.'
+
+  if (actualPerLoop && plannedPerLoop) {
+    description += ` Observed ${actualPerLoop} vs ${plannedPerLoop} planned per loop.`
+    if (loops > 1 && actualTotal && plannedTotal) {
+      description += ` Across ${formatNumber(loops)} loops (~${actualTotal} rows vs ${plannedTotal} planned).`
+    }
+  }
+
+  return {
+    badgeText: `${directionTitle}estimated ×${multiplierText}`,
+    description,
+    severity,
+    variant,
+  }
+}
+
 export const NodeDetailsPanel = ({
   node,
   meta,
@@ -184,6 +259,7 @@ export const NodeDetailsPanel = ({
   const hasLocalBuffers = hasLocal(data)
   const hasBufferData = hasSharedBuffers || hasTempBuffers || hasLocalBuffers
   const hasIOTiming = (data.ioReadTime ?? 0) + (data.ioWriteTime ?? 0) > 0
+  const estimationInsight = computeEstimationInsight(data)
 
   const plannerEstimates: KeyValue[] = [
     { key: 'startup', label: 'Startup cost', value: data.startupCost?.toFixed(2) },
@@ -220,10 +296,27 @@ export const NodeDetailsPanel = ({
   const costHighlightValue = data.totalCost ?? costHint?.selfCost
   const formattedCostHighlight =
     costHighlightValue !== undefined ? costHighlightValue.toFixed(2) : undefined
-  const costHintShare =
+  const costHintExclusiveShare =
     costHint?.selfCostShare !== undefined
       ? Math.round((costHint.selfCostShare ?? 0) * 100)
       : undefined
+  const costHintMaxTotalShare =
+    costHint?.maxTotalCostShare !== undefined
+      ? Math.round((costHint.maxTotalCostShare ?? 0) * 100)
+      : undefined
+  const costShareDetails: string[] = []
+  if (costHintExclusiveShare !== undefined) {
+    costShareDetails.push(`~${costHintExclusiveShare}% of exclusive plan cost`)
+  }
+  if (costHintMaxTotalShare !== undefined) {
+    costShareDetails.push(`~${costHintMaxTotalShare}% of the plan's highest total cost`)
+  }
+  const costHintSummary =
+    costHintMaxTotalShare !== undefined && costHintMaxTotalShare >= (costHintExclusiveShare ?? -1)
+      ? ` (~${costHintMaxTotalShare}% of the plan's highest total cost).`
+      : costHintExclusiveShare !== undefined
+        ? ` (~${costHintExclusiveShare}% of exclusive plan cost).`
+        : '.'
 
   const hasTimeDetails = Boolean(
     data.actualTotalTime !== undefined ||
@@ -301,8 +394,19 @@ export const NodeDetailsPanel = ({
               </div>
               <div className="flex flex-col rounded border border-border bg-surface-100 px-2 py-2">
                 <span className="text-[11px] text-foreground-light">Estimate factor</span>
-                <span className="text-sm font-medium">{estFactor ?? '—'}</span>
-                {data.estDirection && data.estDirection !== 'none' ? (
+                <span className="text-sm font-medium flex flex-wrap items-center gap-2">
+                  {estFactor ?? '—'}
+                  {estimationInsight ? (
+                    <Badge variant={estimationInsight.variant} size="small">
+                      {estimationInsight.badgeText}
+                    </Badge>
+                  ) : null}
+                </span>
+                {estimationInsight ? (
+                  <span className="text-[11px] text-foreground-light leading-snug">
+                    {estimationInsight.description}
+                  </span>
+                ) : data.estDirection && data.estDirection !== 'none' ? (
                   <span className="text-[11px] text-foreground-light">
                     {data.estDirection === 'over'
                       ? 'Planner overestimated'
@@ -311,6 +415,23 @@ export const NodeDetailsPanel = ({
                 ) : null}
               </div>
             </div>
+            {estimationInsight && estimationInsight.severity === 'critical' ? (
+              <Alert_Shadcn_ variant={estimationInsight.variant}>
+                <TrendingUp size={16} />
+                <div>
+                  <AlertTitle_Shadcn_ className="text-xs font-semibold text-foreground">
+                    Planner estimate is far off
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
+                    {estimationInsight.description}
+                  </AlertDescription_Shadcn_>
+                  <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
+                    Postgres chose a suboptimal strategy. Refreshing table statistics or reviewing
+                    indexes can help align planner estimates.
+                  </AlertDescription_Shadcn_>
+                </div>
+              </Alert_Shadcn_>
+            ) : null}
           </Section>
 
           {hasTimeDetails ? (
@@ -411,9 +532,9 @@ export const NodeDetailsPanel = ({
                       <dt className="text-foreground-light">Self cost</dt>
                       <dd className="text-foreground font-medium">
                         {data.exclusiveCost !== undefined ? data.exclusiveCost.toFixed(2) : '—'}
-                        {costHintShare !== undefined ? (
+                        {costShareDetails.length > 0 ? (
                           <span className="ml-1 text-foreground-light">
-                            (~{costHintShare}% of exclusive plan cost)
+                            ({costShareDetails.join('; ')})
                           </span>
                         ) : null}
                       </dd>
@@ -430,9 +551,7 @@ export const NodeDetailsPanel = ({
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_ className="mt-1 text-[11px] leading-relaxed !text-foreground">
                           Estimated cost {formattedCostHighlight ?? '—'}
-                          {costHintShare !== undefined
-                            ? ` (~${costHintShare}% of exclusive plan cost).`
-                            : '.'}
+                          {costHintSummary}
                         </AlertDescription_Shadcn_>
                         <AlertDescription_Shadcn_ className="mt-1 text-[11px] text-foreground-light">
                           Reduce scanned rows or improve indexes so the planner considers cheaper
