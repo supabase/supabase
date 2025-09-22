@@ -82,9 +82,9 @@ export const UnsupportedExtensionsWarning = ({
             .
           </p>
 
-          <ul className="flex flex-col divide-y divide-border-muted">
+          <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
             {unsupportedExtensions.map((obj: string) => (
-              <li className="py-2 flex flex-row justify-between gap-2" key={obj}>
+              <li className="py-3 last:pb-0 flex flex-row justify-between gap-2" key={obj}>
                 <div className="flex flex-row gap-2 items-center flex-1 min-w-0">
                   <p className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{obj}</p>
                   <Badge variant="warning" size="small" className="flex-shrink-0">
