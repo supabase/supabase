@@ -117,7 +117,7 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       icon: <Clock size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
-          <span>Step time</span>
+          <span>Self time</span>
           <span className={cn('ml-auto', slowHighlightClass)}>
             {formattedSelfTime ?? data.exclusiveTimeMs} ms
           </span>
