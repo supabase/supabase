@@ -1,4 +1,4 @@
-name: Studio E2E Tests
+name: Selfhosted Studio E2E Tests
 on:
   push:
     branches: [master]
@@ -111,14 +111,36 @@ jobs:
           script: |
             const fs = require('fs')
             const p = 'e2e/studio/test-results/test-results.json'
-            let s={total:0,passed:0,failed:0,skipped:0,timedOut:0,interrupted:0,durationMs:0,note:''}
+            // Initialize a summary object to hold test statistics.
+            let s={total:0,passed:0,failed:0,skipped:0,timedOut:0,interrupted:0,flaky:0,durationMs:0,note:''}
             try {
               const data = JSON.parse(fs.readFileSync(p,'utf8'))
-              const walk=n=>{ if(!n)return; n.suites?.forEach(walk); n.specs?.forEach(sp=>sp.tests?.forEach(t=>t.results?.forEach(r=>{s.total++; s.durationMs+=r.duration||0; s[r.status]=(s[r.status]||0)+1;})))}
-              walk(data)
+              // Recursively walk through the test suites to process each test.
+              const walk=suite=>{
+                if(!suite)return;
+                suite.specs?.forEach(spec=>{
+                  spec.tests?.forEach(test=>{
+                    s.total++;
+                    // Get the last result of the test, as tests can be retried.
+                    const lastResult = test.results[test.results.length - 1];
+                    s.durationMs += lastResult.duration || 0;
+                    // A test is considered flaky if it has more than one run and the final status is 'passed'.
+                    if (test.results.length > 1 && lastResult.status === 'passed') {
+                      s.flaky++
+                    }
+                    const status = lastResult.status === 'passed' && s.flaky > 0 ? 'flaky' : lastResult.status
+                    s[status] = (s[status]||0)+1;
+                  })
+                })
+                suite.suites?.forEach(walk)
+              }
+              walk(data.suites?.[0])
             } catch { s.note='No JSON report found or parse error.' }
-            const md = s.note ? `Note: ${s.note}` : `- Total: ${s.total}\n- Passed: ${s.passed||0}\n- Failed: ${s.failed||0}\n- Skipped: ${s.skipped||0}\n- Timed out: ${s.timedOut||0}\n- Interrupted: ${s.interrupted||0}\n- Duration: ${(s.durationMs/1000).toFixed(1)}s`
+            // Generate the markdown for the summary comment.
+            const md = s.note ? `Note: ${s.note}` : `- Total: ${s.total}\n- Passed: ${s.passed||0}\n- Failed: ${s.failed||0}\n- Skipped: ${s.skipped||0}\n- Timed out: ${s.timedOut||0}\n- Interrupted: ${s.interrupted||0}\n- Flaky: ${s.flaky||0}\n- Duration: ${(s.durationMs/1000).toFixed(1)}s`
+            // Set the summary and flaky_count as outputs for subsequent steps.
             core.setOutput('summary', md)
+            core.setOutput('flaky_count', s.flaky)
 
       - name: Comment summary on PR
         if: always() && github.event_name == 'pull_request'
@@ -137,7 +159,14 @@ jobs:
             const day = now.toLocaleString('en-US', { day: 'numeric', timeZone: 'UTC' })
             const month = now.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })
             const year = now.toLocaleString('en-US', { year: 'numeric', timeZone: 'UTC' })
-            const date = `${weekday} ${day}, ${month}, ${year} (UTC)`
+            const time = now.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false,
+              timeZone: 'UTC',
+            })
+            const date = `${weekday} ${day}, ${month}, ${year} ${time} (UTC)`
 
             const body = [
               marker,
@@ -159,7 +188,7 @@ jobs:
             }
 
       - name: Fail job if tests failed
-        if: steps.playwright.outcome != 'success'
+        if: steps.playwright.outcome != 'success' || steps.summarize.outputs.flaky_count > 0
         run: |
           echo "E2E tests failed" >&2
           exit 1
