@@ -18,10 +18,8 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AdvisorSection } from './AdvisorSection'
 import { CustomReportSection } from './CustomReportSection'
-import {
-  GettingStartedSection,
-  type GettingStartedState,
-} from './GettingStarted/GettingStartedSection'
+import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
+import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
 import { ProjectUsageSection } from './ProjectUsageSection'
 
 export const HomeV2 = () => {

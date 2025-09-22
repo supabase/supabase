@@ -4,7 +4,7 @@ import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { cn, Button, Card, CardContent, CardHeader, CardTitle, Badge } from 'ui'
 
-import { GettingStartedStep } from './GettingStartedSection'
+import { GettingStartedStep } from './GettingStarted.types'
 import Image from 'next/image'
 import { BASE_PATH } from 'lib/constants'
 
