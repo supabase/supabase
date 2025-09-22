@@ -1,7 +1,7 @@
 import { type PropsWithChildren, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { ChevronsUpDown } from 'lucide-react'
 
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -9,6 +9,7 @@ import { removeCommentsFromSql } from 'lib/helpers'
 import { useExplainPlanQuery } from './hooks/useExplainPlanQuery'
 import { QueryPanelSection } from './QueryPanel'
 import { useFlag } from 'common/feature-flags'
+import { SVG } from 'ui-patterns/info-tooltip'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -123,7 +124,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
                 aria-label="Learn how to read EXPLAIN"
                 className="h-auto"
               >
-                <HelpCircle size={14} strokeWidth={1.5} className="text-foreground-light" />
+                <SVG strokeWidth={2} className="transition-colors fill-foreground-muted w-4 h-4" />
               </Link>
             </Button_Shadcn_>
           </TooltipTrigger>
