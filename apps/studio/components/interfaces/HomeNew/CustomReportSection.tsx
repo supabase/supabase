@@ -230,7 +230,7 @@ export function CustomReportSection() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="heading-section">At a glance</h3>
+        <h3 className="heading-section">Report</h3>
         {canUpdateReport || canCreateReport ? (
           <SnippetDropdown
             projectRef={ref}
@@ -250,14 +250,18 @@ export function CustomReportSection() {
         {(() => {
           if (layout.length === 0) {
             return (
-              <div className="flex min-h-[270px] items-center justify-center rounded border-2 border-dashed p-16 border-default">
+              <div className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 border-default">
+                <h4>Build a custom report</h4>
+                <p className="text-sm text-foreground-light mb-4">
+                  Keep track of your most important metrics{' '}
+                </p>
                 {canUpdateReport || canCreateReport ? (
                   <SnippetDropdown
                     projectRef={ref}
                     onSelect={addSnippetToReport}
                     trigger={
                       <Button type="default" iconRight={<Plus size={14} />}>
-                        Add your first chart
+                        Add your first block
                       </Button>
                     }
                     side="bottom"
