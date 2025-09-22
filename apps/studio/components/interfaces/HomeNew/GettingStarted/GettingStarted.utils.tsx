@@ -71,7 +71,6 @@ export const getCodeWorkflowSteps = ({
       status: hasTables ? 'complete' : 'incomplete',
       title: 'Design your database schema',
       icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
-      image: '/img/getting-started/declarative-schemas.png',
       description:
         'Next, create a schema file that defines the structure of your database, either following our declarative schema guide or asking the AI assistant to generate one for you.',
       actions: [
@@ -252,7 +251,6 @@ export const getNoCodeWorkflowSteps = ({
       status: hasTables ? 'complete' : 'incomplete',
       title: 'Create your first table',
       icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
-      image: '/img/getting-started/sample.png',
       description:
         "To kick off your new project, let's start by creating your very first database table using either the table editor or the AI assistant to shape the structure for you.",
       actions: [
