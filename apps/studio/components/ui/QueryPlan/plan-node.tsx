@@ -1,15 +1,6 @@
 import { type ReactNode, useContext } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-import {
-  Workflow,
-  TimerOff,
-  Clock,
-  Rows3,
-  CircleDollarSign,
-  Layers,
-  Table,
-  MoveRight,
-} from 'lucide-react'
+import { Workflow, TimerOff, Clock, Rows3, CircleDollarSign, Layers, Table } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -230,24 +221,13 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
     // },
     {
       id: 'cost',
-      condition:
-        metricsVisibility.cost && (data.startupCost !== undefined || data.totalCost !== undefined),
-      tooltip: 'Planner cost units (not milliseconds). Shows startup cost → total cost.',
+      condition: metricsVisibility.cost && data.totalCost !== undefined,
+      tooltip: 'Planner cost units (not milliseconds). Shows the total cost.',
       icon: <CircleDollarSign size={10} strokeWidth={1} className="mr-1" />,
       element: (
         <>
           <span>Planner cost</span>
-          <div className="ml-auto flex items-center">
-            {data.startupCost !== undefined ? formatOrDash(data.startupCost) : '-'}
-            {data.totalCost !== undefined ? (
-              <>
-                <MoveRight size={10} className="mx-1 text-foreground-light" />
-                {formatOrDash(data.totalCost)}
-              </>
-            ) : (
-              ''
-            )}
-          </div>
+          <span className="ml-auto">{formatOrDash(data.totalCost)}</span>
         </>
       ),
     },
