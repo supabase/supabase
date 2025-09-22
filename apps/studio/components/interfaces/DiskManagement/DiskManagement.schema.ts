@@ -19,17 +19,20 @@ const baseSchema = z.object({
   computeSize: z
     .custom<ComputeInstanceAddonVariantId>((val): val is ComputeInstanceAddonVariantId => true)
     .describe('Compute size'),
-  growthPercent: z.int('Value must be an integer')
+  growthPercent: z
+    .int('Value must be an integer')
     .min(10, 'Growth percent must be at least 10%')
     .max(100, 'Growth percent cannot exceed 100%')
     .optional()
     .nullable(),
-  minIncrementGb: z.int('Value must be an integer')
+  minIncrementGb: z
+    .int('Value must be an integer')
     .min(1, 'Minimum increment must be at least 1 GB')
     .max(200, 'Minimum increment cannot exceed 200 GB')
     .optional()
     .nullable(),
-  maxSizeGb: z.int('Value must be an integer')
+  maxSizeGb: z
+    .int('Value must be an integer')
     .max(60000, 'Maximum size cannot exceed 60TB')
     .optional()
     .nullable(),
@@ -43,7 +46,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
     if (!isFlyProject && totalSize < 8) {
       ctx.addIssue({
-        code: "custom",
+        code: 'custom',
         message: 'Allocated disk size must be at least 8 GB.',
         path: ['totalSize'],
       })
@@ -51,7 +54,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
     if (!isFlyProject && totalSize < defaultTotalSize) {
       ctx.addIssue({
-        code: "custom",
+        code: 'custom',
         message: `Disk size cannot be reduced in size. Reduce your database size and then head to the Infrastructure settings and go through a Postgres version upgrade to right-size your disk.`,
         path: ['totalSize'],
       })
@@ -60,7 +63,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
     // Validate maxSizeGb cannot be lower than totalSize
     if (!isFlyProject && !!maxSizeGb && maxSizeGb < totalSize) {
       ctx.addIssue({
-        code: "custom",
+        code: 'custom',
         message: `Max disk size cannot be lower than the current disk size. Must be at least ${formatNumber(totalSize)} GB.`,
         path: ['maxSizeGb'],
       })
@@ -71,7 +74,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
       if (provisionedIOPS > DISK_LIMITS[DiskType.IO2].maxIops) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: `IOPS can not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxIops)} for io2 Disk type. Please reach out to support if you need higher IOPS than this.`,
           path: ['provisionedIOPS'],
         })
@@ -81,7 +84,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
       if (provisionedIOPS < DISK_LIMITS[DiskType.IO2].minIops) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: `Provisioned IOPS must be at least ${formatNumber(DISK_LIMITS[DiskType.IO2].minIops)}`,
           path: ['provisionedIOPS'],
         })
@@ -92,14 +95,14 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
           if (diskSizeRequiredForIopsWithIo2 > totalSize) {
             ctx.addIssue({
-              code: "custom",
+              code: 'custom',
               message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
               path: ['provisionedIOPS'],
             })
           }
         } else {
           ctx.addIssue({
-            code: "custom",
+            code: 'custom',
             message: `Invalid IOPS value due to small disk size`,
             path: ['provisionedIOPS'],
           })
@@ -108,7 +111,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
       if (throughput !== undefined) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: 'Throughput is not configurable for io2.',
           path: ['throughput'],
         })
@@ -116,7 +119,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
       if (totalSize > DISK_LIMITS[DiskType.IO2].maxStorage) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: `Allocated disksize must not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxStorage)} GB `,
           path: ['totalSize'],
         })
@@ -128,7 +131,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
       if (provisionedIOPS > DISK_LIMITS[DiskType.GP3].maxIops) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: `IOPS can not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxIops)} for GP3 Disk. Change the Disk type to io2 for higher IOPS support.`,
           path: ['provisionedIOPS'],
         })
@@ -136,7 +139,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
       if (provisionedIOPS < DISK_LIMITS[DiskType.GP3].minIops) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: `IOPS must be at least ${formatNumber(DISK_LIMITS[DiskType.GP3].minIops)}`,
           path: ['provisionedIOPS'],
         })
@@ -146,13 +149,13 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
             calculateDiskSizeRequiredForIopsWithGp3(provisionedIOPS)
 
           ctx.addIssue({
-            code: "custom",
+            code: 'custom',
             message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithGp3)} GB required. Current max is ${formatNumber(maxIopsAllowedForDiskSizeWithGp3)} IOPS.`,
             path: ['provisionedIOPS'],
           })
         } else {
           ctx.addIssue({
-            code: "custom",
+            code: 'custom',
             message: `Invalid IOPS value due to invalid disk size`,
             path: ['provisionedIOPS'],
           })
@@ -164,7 +167,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
         if (throughput > DISK_LIMITS['gp3'].maxThroughput) {
           ctx.addIssue({
-            code: "custom",
+            code: 'custom',
             message: `Throughput can not exceed ${formatNumber(maxThroughput)} MB/s`,
             path: ['throughput'],
           })
@@ -172,14 +175,14 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
         if (throughput > maxThroughput) {
           const iopsRequiredForThroughput = calculateIopsRequiredForThroughput(throughput)
           ctx.addIssue({
-            code: "custom",
+            code: 'custom',
             message: `Need at least ${formatNumber(iopsRequiredForThroughput)} IOPS to support ${formatNumber(throughput)} MB/s.`,
             path: ['throughput'],
           })
         }
         if (throughput < DISK_LIMITS[DiskType.GP3].minThroughput) {
           ctx.addIssue({
-            code: "custom",
+            code: 'custom',
             message: `Throughput must be at least ${formatNumber(DISK_LIMITS[DiskType.GP3].minThroughput)} MB/s`,
             path: ['throughput'],
           })
@@ -188,7 +191,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider:
 
       if (totalSize > DISK_LIMITS[DiskType.GP3].maxStorage) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: `Allocated disksize must not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxStorage)} GB`,
           path: ['totalSize'],
         })

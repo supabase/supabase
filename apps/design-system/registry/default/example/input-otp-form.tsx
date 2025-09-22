@@ -21,8 +21,8 @@ import {
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
-      error: 'Your one-time password must be 6 characters.'
-}),
+    error: 'Your one-time password must be 6 characters.',
+  }),
 })
 
 export default function InputOTPForm() {

@@ -19,8 +19,9 @@ import {
 
 const FormSchema = z.object({
   type: z.enum(['all', 'mentions', 'none'], {
-      error: (issue) => issue.input === undefined ? 'You need to select a notification type.' : undefined
-}),
+    error: (issue) =>
+      issue.input === undefined ? 'You need to select a notification type.' : undefined,
+  }),
 })
 
 export default function RadioGroupForm() {

@@ -33,9 +33,12 @@ import {
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
   billingEmail: z.email('Please provide a valid email address').optional(),
-  additionalBillingEmails: z.email({
-        error: 'invalid_email'
-  }).array().prefault([]),
+  additionalBillingEmails: z
+    .email({
+      error: 'invalid_email',
+    })
+    .array()
+    .prefault([]),
 })
 
 const BillingEmail = () => {

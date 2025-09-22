@@ -73,7 +73,7 @@ const formSchema = z
     },
     {
       path: ['dbSchema'],
-        error: 'Must have at least one schema if Data API is enabled'
+      error: 'Must have at least one schema if Data API is enabled',
     }
   )
 

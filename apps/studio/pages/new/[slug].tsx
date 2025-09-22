@@ -100,8 +100,8 @@ const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'sm
 
 const FormSchema = z.object({
   organization: z.string({
-      error: (issue) => issue.input === undefined ? 'Please select an organization' : undefined
-}),
+    error: (issue) => (issue.input === undefined ? 'Please select an organization' : undefined),
+  }),
   projectName: z
     .string()
     .trim()
@@ -109,18 +109,19 @@ const FormSchema = z.object({
     .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
     .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
   postgresVersion: z.string({
-      error: (issue) => issue.input === undefined ? 'Please enter a Postgres version.' : undefined
-}),
+    error: (issue) => (issue.input === undefined ? 'Please enter a Postgres version.' : undefined),
+  }),
   dbRegion: z.string({
-      error: (issue) => issue.input === undefined ? 'Please select a region.' : undefined
-}),
+    error: (issue) => (issue.input === undefined ? 'Please select a region.' : undefined),
+  }),
   cloudProvider: z.string({
-      error: (issue) => issue.input === undefined ? 'Please select a cloud provider.' : undefined
-}),
+    error: (issue) => (issue.input === undefined ? 'Please select a cloud provider.' : undefined),
+  }),
   dbPassStrength: z.number(),
   dbPass: z
     .string({
-        error: (issue) => issue.input === undefined ? 'Please enter a database password.' : undefined
+      error: (issue) =>
+        issue.input === undefined ? 'Please enter a database password.' : undefined,
     })
     .min(1, 'Password is required.'),
   instanceSize: z.string(),
@@ -297,7 +298,7 @@ const Wizard: NextPageWithLayout = () => {
   FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
     if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
       refinementContext.addIssue({
-        code: "custom",
+        code: 'custom',
         path: ['dbPass'],
         message: passwordStrengthWarning || 'Password not secure enough',
       })

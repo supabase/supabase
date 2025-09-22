@@ -1,10 +1,17 @@
 'use client'
 
+import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
+import { Button } from '@/registry/default/components/ui/button'
+import { Skeleton } from '@/registry/default/components/ui/skeleton'
 import { DynamicForm } from '@/registry/default/platform/platform-kit-nextjs/components/dynamic-form'
+import { useSheetNavigation } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
 import {
   useGetAuthConfig,
   useUpdateAuthConfig,
 } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-auth'
+import { AlertTriangle, ChevronRight, Mail, Phone, User } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
+import { z } from 'zod'
 import {
   authEmailProviderSchema,
   authFieldLabels,
@@ -13,13 +20,6 @@ import {
   authGoogleProviderSchema,
   authPhoneProviderSchema,
 } from '../../lib/schemas/auth'
-import { AlertTriangle, ChevronRight, Mail, Phone, User } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
-import { z } from 'zod'
-import { useSheetNavigation } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
-import { Skeleton } from '@/registry/default/components/ui/skeleton'
-import { Button } from '@/registry/default/components/ui/button'
-import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 
 function ProviderSettingsView({
   projectRef,
@@ -29,14 +29,16 @@ function ProviderSettingsView({
   onSuccess,
 }: {
   projectRef: string
-  schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>>
+  schema: z.ZodObject<any>
   title: string
   initialValues: any
   onSuccess: () => void
 }) {
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useUpdateAuthConfig()
 
-  const actualSchema = 'shape' in schema ? schema : (schema._def.schema as z.ZodObject<any>)
+  // [Joshen] Temp as any to silence warnings for zod migration to V4
+  const actualSchema =
+    'shape' in schema ? schema : ((schema as any)._def.schema as z.ZodObject<any>)
 
   const handleUpdateAuthConfig = (formData: z.infer<typeof actualSchema>) => {
     const payload = Object.fromEntries(
@@ -121,7 +123,7 @@ export function AuthManager({ projectRef }: { projectRef: string }) {
     name: string
     icon: React.ReactNode
     description: string
-    schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>>
+    schema: z.ZodObject<any>
   }[] = [
     {
       icon: <Mail className="h-4 w-4 text-muted-foreground" />,
@@ -144,7 +146,7 @@ export function AuthManager({ projectRef }: { projectRef: string }) {
   ]
 
   const handleProviderClick = useCallback(
-    (provider: { name: string; schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>> }) => {
+    (provider: { name: string; schema: z.ZodObject<any> }) => {
       push({
         title: `${provider.name} Provider Settings`,
         component: (

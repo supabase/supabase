@@ -27,7 +27,7 @@ const FormSchema = z.object({
       }
     },
     {
-        error: 'The payload should be a JSON object'
+      error: 'The payload should be a JSON object',
     }
   ),
 })

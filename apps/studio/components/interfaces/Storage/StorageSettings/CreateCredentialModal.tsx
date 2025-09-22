@@ -50,7 +50,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
 
   const FormSchema = z.object({
     description: z.string().min(3, {
-        error: 'Description must be at least 3 characters long'
+      error: 'Description must be at least 3 characters long',
     }),
   })
   const form = useForm<z.infer<typeof FormSchema>>({

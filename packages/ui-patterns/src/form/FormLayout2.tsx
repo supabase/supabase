@@ -61,19 +61,20 @@ const items = [
 export const Page = () => {
   const FormSchema = z.object({
     username: z.string().min(2, {
-        error: 'Username must be at least 2 characters.'
+      error: 'Username must be at least 2 characters.',
     }),
     kevins_input: z.string().min(6, {
-        error: 'Username must be at least 6 characters.'
+      error: 'Username must be at least 6 characters.',
     }),
     email: z.email(),
     consistent_settings: z.boolean().prefault(false).optional(),
     switch_option: z.boolean().prefault(false).optional(),
     items: z.array(z.string()).refine((value) => value.some((item) => item), {
-        error: 'You have to select at least one item.'
+      error: 'You have to select at least one item.',
     }),
     type: z.enum(['all', 'mentions', 'none'], {
-        error: (issue) => issue.input === undefined ? 'You need to select a notification type.' : undefined
+      error: (issue) =>
+        issue.input === undefined ? 'You need to select a notification type.' : undefined,
     }),
   })
 

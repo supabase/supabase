@@ -48,8 +48,8 @@ import type { PaymentMethod } from '@stripe/stripe-js'
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
   tax_id_value: z.string().min(2, {
-      error: 'Tax ID needs to be set.'
-}),
+    error: 'Tax ID needs to be set.',
+  }),
   tax_id_name: z.string(),
 })
 

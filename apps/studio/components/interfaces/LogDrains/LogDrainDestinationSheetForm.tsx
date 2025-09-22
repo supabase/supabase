@@ -53,10 +53,10 @@ const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('datadog'),
     api_key: z.string().min(1, {
-        error: 'API key is required'
+      error: 'API key is required',
     }),
     region: z.string().min(1, {
-        error: 'Region is required'
+      error: 'Region is required',
     }),
   }),
   z.object({
@@ -71,7 +71,7 @@ const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('loki'),
     url: z.string().min(1, {
-        error: 'Loki URL is required'
+      error: 'Loki URL is required',
     }),
     headers: z.record(z.string(), z.string()),
     username: z.string().optional(),
@@ -82,7 +82,7 @@ const formUnion = z.discriminatedUnion('type', [
 const formSchema = z
   .object({
     name: z.string().min(1, {
-        error: 'Destination name is required'
+      error: 'Destination name is required',
     }),
     description: z.string().optional(),
   })

@@ -43,8 +43,8 @@ const languages = [
 
 const FormSchema = z.object({
   language: z.string({
-      error: (issue) => issue.input === undefined ? 'Please select a language.' : undefined
-}),
+    error: (issue) => (issue.input === undefined ? 'Please select a language.' : undefined),
+  }),
 })
 
 export default function ComboboxForm() {

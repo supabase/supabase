@@ -38,7 +38,7 @@ const FormSchema = z.object({
         .string()
         .min(1, 'Please provide a name for your secret')
         .refine((value) => !value.match(/^(SUPABASE_).*/), {
-            error: 'Name must not start with the SUPABASE_ prefix'
+          error: 'Name must not start with the SUPABASE_ prefix',
         }),
       value: z.string().min(1, 'Please provide a value for your secret'),
     })

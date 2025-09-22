@@ -61,7 +61,7 @@ export const ImportForeignSchemaDialog = ({
           return !schemas?.find((s) => s.name === val)
         },
         {
-            error: 'This schema already exists. Please specify a unique schema name.'
+          error: 'This schema already exists. Please specify a unique schema name.',
         }
       ),
   })

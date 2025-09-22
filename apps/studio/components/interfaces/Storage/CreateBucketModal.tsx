@@ -83,7 +83,7 @@ const FormSchema = z
       const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
       ctx.addIssue({
         path: ['name'],
-        code: "custom",
+        code: 'custom',
         message: !!match
           ? `Bucket name cannot contain the "${match}" character`
           : 'Bucket name contains an invalid special character',

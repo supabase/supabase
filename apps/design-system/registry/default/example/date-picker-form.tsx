@@ -25,8 +25,8 @@ import {
 
 const FormSchema = z.object({
   dob: z.date({
-      error: (issue) => issue.input === undefined ? 'A date of birth is required.' : undefined
-}),
+    error: (issue) => (issue.input === undefined ? 'A date of birth is required.' : undefined),
+  }),
 })
 
 export default function DatePickerForm() {

@@ -54,12 +54,12 @@ const FormSchema = z
   // set the error on both fields
   .refine((data) => data.metadataXmlUrl || data.metadataXmlFile, {
     path: ['metadataXmlUrl'],
-      error: 'Please provide either a metadata XML URL or upload a metadata XML file'
-})
+    error: 'Please provide either a metadata XML URL or upload a metadata XML file',
+  })
   .refine((data) => data.metadataXmlUrl || data.metadataXmlFile, {
     path: ['metadataXmlFile'],
-      error: 'Please provide either a metadata XML URL or upload a metadata XML file'
-})
+    error: 'Please provide either a metadata XML URL or upload a metadata XML file',
+  })
 
 export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 

@@ -60,7 +60,7 @@ const linesValidator = z
       return linesSchema.parse(array)
     } catch (e) {
       ctx.addIssue({
-        code: "custom",
+        code: 'custom',
         message: 'Lines should be an array of [number, number] tuples',
       })
       return z.NEVER

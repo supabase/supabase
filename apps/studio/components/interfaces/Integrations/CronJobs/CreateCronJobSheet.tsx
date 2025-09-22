@@ -158,7 +158,7 @@ const FormSchema = z
     if (!cronPattern.test(data.schedule)) {
       if (!(data.supportsSeconds && secondsPattern.test(data.schedule))) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: 'Seconds are supported only in pg_cron v1.5.0+. Please use a valid Cron format.',
           path: ['schedule'],
         })

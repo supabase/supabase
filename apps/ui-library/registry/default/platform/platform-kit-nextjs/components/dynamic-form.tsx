@@ -1,8 +1,5 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import type { z, ZodTypeAny } from 'zod'
 import { Button } from '@/registry/default/components/ui/button'
 import {
   Form,
@@ -14,7 +11,6 @@ import {
   FormMessage,
 } from '@/registry/default/components/ui/form'
 import { Input } from '@/registry/default/components/ui/input'
-import { Switch } from '@/registry/default/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -22,7 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/registry/default/components/ui/select'
+import { Switch } from '@/registry/default/components/ui/switch'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import type { z, ZodTypeAny } from 'zod'
 
 interface DynamicFormProps<T extends z.ZodRawShape = z.ZodRawShape> {
   schema: z.ZodObject<T>
@@ -84,7 +84,8 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
 
   const defaultValues = Object.keys(schema.shape).reduce(
     (acc, key) => {
-      const originalFieldSchema = schema.shape[key]
+      // [Joshen] Temp as any here to silence warnings for zod migration to v4
+      const originalFieldSchema = schema.shape[key] as any
       if (typeof originalFieldSchema === 'undefined') {
         throw new Error(
           `Schema error: schema.shape['${key}'] is undefined. Check schema definition.`
@@ -147,11 +148,12 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
       const schemaKeys = Object.keys(schema.shape)
       const processedInitialValues = schemaKeys.reduce(
         (acc, key) => {
-          const fieldDefFromSchema = schema.shape[key]
+          // [Joshen] Temp as any here to silence warnings for zod migration to v4
+          const fieldDefFromSchema = schema.shape[key] as any
           if (typeof fieldDefFromSchema === 'undefined') {
             throw new Error(`Schema error in useEffect: schema.shape['${key}'] is undefined.`)
           }
-          const value = initialValues.hasOwnProperty(key) ? initialValues[key] : undefined
+          const value = initialValues.hasOwnProperty(key) ? (initialValues as any)[key] : undefined
           const baseFieldType = unwrapZodType(fieldDefFromSchema)
 
           // Support both old (typeName) and new (type) Zod formats
@@ -404,7 +406,7 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         {Object.keys(schema.shape).map((fieldName) =>
-          renderField(fieldName, schema.shape[fieldName])
+          renderField(fieldName, (schema.shape as any)[fieldName])
         )}
         <div className="pt-6">
           <Button type="submit" disabled={isLoading}>
