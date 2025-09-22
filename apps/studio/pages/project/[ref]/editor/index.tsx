@@ -11,6 +11,7 @@ import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -34,7 +35,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         router.push(`/project/${projectRef}/editor/${history.editor}`)
       } else if (lastTabId) {
         const lastTab = tabStore.tabsMap[lastTabId]
-        if (lastTab) router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
+        if (lastTab) router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}?${LOAD_TAB_FROM_CACHE_PARAM}=true`)
       }
     }
   }, [isHistoryLoaded])

@@ -63,6 +63,7 @@ import {
 } from 'ui'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 
 interface TableListProps {
   onAddTable: () => void
@@ -154,8 +155,8 @@ export const TableList = ({
         return filterString.length === 0
           ? materializedViews
           : materializedViews.filter((view) =>
-              view.name.toLowerCase().includes(filterString.toLowerCase())
-            )
+            view.name.toLowerCase().includes(filterString.toLowerCase())
+          )
       },
     }
   )
@@ -177,8 +178,8 @@ export const TableList = ({
         return filterString.length === 0
           ? foreignTables
           : foreignTables.filter((table) =>
-              table.name.toLowerCase().includes(filterString.toLowerCase())
-            )
+            table.name.toLowerCase().includes(filterString.toLowerCase())
+          )
       },
     }
   )
@@ -355,11 +356,11 @@ export const TableList = ({
                                 : visibleTypes.length === 1
                                   ? `${formatTooltipText(visibleTypes[0])}s`
                                   : `${visibleTypes
-                                      .slice(0, -1)
-                                      .map((x) => `${formatTooltipText(x)}s`)
-                                      .join(
-                                        ', '
-                                      )}, and ${formatTooltipText(visibleTypes[visibleTypes.length - 1])}s`}{' '}
+                                    .slice(0, -1)
+                                    .map((x) => `${formatTooltipText(x)}s`)
+                                    .join(
+                                      ', '
+                                    )}, and ${formatTooltipText(visibleTypes[visibleTypes.length - 1])}s`}{' '}
                               found in the schema "{selectedSchema}"
                             </p>
                           </>
@@ -400,9 +401,9 @@ export const TableList = ({
                                   className={cn(
                                     'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
                                     x.type === ENTITY_TYPE.FOREIGN_TABLE &&
-                                      'text-yellow-900 bg-yellow-500',
+                                    'text-yellow-900 bg-yellow-500',
                                     x.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-                                      'text-purple-1000 bg-purple-500'
+                                    'text-purple-1000 bg-purple-500'
                                     // [Alaister]: tables endpoint doesn't distinguish between tables and partitioned tables
                                     // once we update the endpoint to include partitioned tables, we can uncomment this
                                     // x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
@@ -488,7 +489,7 @@ export const TableList = ({
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
                                     onClick={() =>
-                                      router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                      router.push(`/project/${project?.ref}/editor/${x.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`)
                                     }
                                     onMouseEnter={() =>
                                       prefetchEditorTablePage({
