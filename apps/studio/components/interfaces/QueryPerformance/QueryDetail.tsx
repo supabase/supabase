@@ -1,6 +1,7 @@
 import { Lightbulb } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import dayjs from 'dayjs'
 
 import { formatSql } from 'lib/formatSql'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
@@ -37,10 +38,26 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
     }
   }, [selectedRow])
 
+  const formatDuration = (seconds: number) => {
+    const dur = dayjs.duration(seconds, 'seconds')
+
+    const minutes = Math.floor(dur.asMinutes())
+    const remainingSeconds = dur.seconds() + dur.milliseconds() / 1000
+
+    const parts = []
+    if (minutes > 0) parts.push(`${minutes}m`)
+    if (remainingSeconds > 0) {
+      const formattedSeconds = remainingSeconds.toFixed(2)
+      parts.push(`${formattedSeconds}s`)
+    }
+
+    return parts.join(' ')
+  }
+
   return (
     <QueryPanelContainer>
       <QueryPanelSection>
-        <p className="text-sm">Query pattern</p>
+        <h4 className="mb-2">Query pattern</h4>
         <SqlMonacoBlock value={query} height={310} lineNumbers="off" wrapperClassName="pl-3" />
         {isLinterWarning && (
           <Alert_Shadcn_
@@ -61,28 +78,113 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
         )}
       </QueryPanelSection>
       <div className="border-t" />
-      <QueryPanelSection className="gap-y-1">
-        {report
-          .filter((x) => x.id !== 'query')
-          .map((x) => {
-            const rawValue = selectedRow?.[x.id]
-            const isTime = x.name.includes('time')
+      <QueryPanelSection className="pb-3">
+        <h4 className="mb-2">Metadata</h4>
+        <ul className="flex flex-col gap-y-3 divide-y divide-dashed">
+          {report
+            .filter((x) => x.id !== 'query')
+            .map((x) => {
+              const rawValue = selectedRow?.[x.id]
+              const isTime = x.name.includes('time')
 
-            const formattedValue = isTime
-              ? typeof rawValue === 'number' && !isNaN(rawValue) && isFinite(rawValue)
-                ? `${rawValue.toFixed(2)}ms`
-                : 'N/A'
-              : rawValue != null
-                ? String(rawValue)
-                : 'N/A'
+              const formattedValue = isTime
+                ? typeof rawValue === 'number' && !isNaN(rawValue) && isFinite(rawValue)
+                  ? `${Math.round(rawValue).toLocaleString()}ms`
+                  : 'n/a'
+                : rawValue != null
+                  ? String(rawValue)
+                  : 'n/a'
 
-            return (
-              <div key={x.id} className="flex gap-x-2">
-                <p className="text-foreground-lighter text-sm w-32">{x.name}</p>
-                <p className="text-sm w-32">{formattedValue}</p>
-              </div>
-            )
-          })}
+              if (x.id === 'prop_total_time') {
+                const percentage = selectedRow?.prop_total_time || 0
+                const totalTime = selectedRow?.total_time || 0
+
+                return (
+                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                    <p className="text-foreground-light">{x.name}</p>
+                    {percentage && totalTime ? (
+                      <p className="flex items-center gap-x-1.5">
+                        <span
+                          className={cn(
+                            'tabular-nums',
+                            percentage.toFixed(1) === '0.0' && 'text-foreground-lighter'
+                          )}
+                        >
+                          {percentage.toFixed(1)}%
+                        </span>{' '}
+                        <span className="text-muted">/</span>{' '}
+                        <span
+                          className={cn(
+                            'tabular-nums',
+                            formatDuration(rawValue / 1000) === '0.00s' && 'text-foreground-lighter'
+                          )}
+                        >
+                          {formatDuration(totalTime / 1000)}
+                        </span>
+                      </p>
+                    ) : (
+                      <p className="text-muted">&ndash;</p>
+                    )}
+                  </li>
+                )
+              }
+
+              if (x.id == 'rows_read') {
+                return (
+                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                    <p className="text-foreground-light">{x.name}</p>
+                    {typeof rawValue === 'number' && !isNaN(rawValue) && isFinite(rawValue) ? (
+                      <p
+                        className={cn('tabular-nums', rawValue === 0 && 'text-foreground-lighter')}
+                      >
+                        {rawValue.toLocaleString()}
+                      </p>
+                    ) : (
+                      <p className="text-muted">&ndash;</p>
+                    )}
+                  </li>
+                )
+              }
+
+              const cacheHitRateToNumber = (value: number | string) => {
+                if (typeof value === 'number') return value
+                return parseFloat(value.toString().replace('%', '')) || 0
+              }
+
+              if (x.id === 'cache_hit_rate') {
+                return (
+                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                    <p className="text-foreground-light">{x.name}</p>
+                    {typeof rawValue === 'string' ? (
+                      <p
+                        className={cn(
+                          cacheHitRateToNumber(rawValue).toFixed(2) === '0.00' &&
+                            'text-foreground-lighter'
+                        )}
+                      >
+                        {cacheHitRateToNumber(rawValue).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                        %
+                      </p>
+                    ) : (
+                      <p className="text-muted">&ndash;</p>
+                    )}
+                  </li>
+                )
+              }
+
+              return (
+                <li key={x.id} className="flex justify-between pt-3 text-sm">
+                  <p className="text-foreground-light">{x.name}</p>
+                  <p className={cn('tabular-nums', x.id === 'rolname' && 'font-mono')}>
+                    {formattedValue}
+                  </p>
+                </li>
+              )
+            })}
+        </ul>
       </QueryPanelSection>
     </QueryPanelContainer>
   )

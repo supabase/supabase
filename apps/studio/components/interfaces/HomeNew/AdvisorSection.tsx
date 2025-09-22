@@ -85,7 +85,7 @@ export const AdvisorSection = () => {
               return (
                 <Card
                   key={lint.cache_key}
-                  className="h-full flex flex-col items-stretch cursor-pointer"
+                  className="min-h-full flex flex-col items-stretch cursor-pointer h-64"
                   onClick={() => {
                     handleCardClick(lint)
                   }}

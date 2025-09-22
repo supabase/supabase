@@ -93,6 +93,8 @@ hideToc: true
 
 ### Framework quickstarts
 
+<$Show if="docs:framework_quickstarts">
+
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {[
     {
@@ -210,6 +212,14 @@ hideToc: true
       )
     })}
 </div>
+
+</$Show>
+
+<$Show if="!quickstarts:hide_nimbus">
+
+<$Partial path="quickstart_nimbus.mdx" />
+
+</$Show>
 
 <$Show if="docs:web_apps">
 
