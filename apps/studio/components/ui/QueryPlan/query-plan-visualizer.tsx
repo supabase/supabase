@@ -427,7 +427,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
         <ResizablePanelGroup direction="horizontal" className="flex h-full flex-1">
           {sidebarElement}
           <ResizableHandle withHandle className="hidden lg:flex" />
-          <ResizablePanel defaultSize={72} minSize={45} className="flex flex-1">
+          <ResizablePanel defaultSize={80} minSize={45} className="flex flex-1">
             {planPanel}
           </ResizablePanel>
         </ResizablePanelGroup>
