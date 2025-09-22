@@ -300,32 +300,34 @@ export const LogsPreviewer = ({
       >
         <div className={condensedLayout ? 'px-3' : ''}>
           {showChart && (
-            <LogsBarChart
-              data={eventChartData}
-              onBarClick={(datum) => {
-                if (!datum?.timestamp) return
+            <div className="h-24">
+              <LogsBarChart
+                data={eventChartData}
+                onBarClick={(datum) => {
+                  if (!datum?.timestamp) return
 
-                const { start, end } = calculateBarClickTimeRange(
-                  timestampStart,
-                  timestampEnd,
-                  datum.timestamp
-                )
+                  const { start, end } = calculateBarClickTimeRange(
+                    timestampStart,
+                    timestampEnd,
+                    datum.timestamp
+                  )
 
-                handleSearch('event-chart-bar-click', {
-                  query: filters.search_query?.toString(),
-                  to: end,
-                  from: start,
-                })
-              }}
-              EmptyState={
-                <div className="flex flex-col items-center justify-center h-[67px]">
-                  <p className="text-foreground-light text-xs">No data</p>
-                  <p className="text-foreground-lighter text-xs">
-                    It may take up to 24 hours for data to refresh
-                  </p>
-                </div>
-              }
-            />
+                  handleSearch('event-chart-bar-click', {
+                    query: filters.search_query?.toString(),
+                    to: end,
+                    from: start,
+                  })
+                }}
+                EmptyState={
+                  <div className="flex flex-col items-center justify-center h-[67px]">
+                    <p className="text-foreground-light text-xs">No data</p>
+                    <p className="text-foreground-lighter text-xs">
+                      It may take up to 24 hours for data to refresh
+                    </p>
+                  </div>
+                }
+              />
+            </div>
           )}
         </div>
       </div>

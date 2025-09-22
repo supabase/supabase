@@ -1,6 +1,5 @@
 import React from 'react'
 import { Loader2 } from 'lucide-react'
-
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface Props {
