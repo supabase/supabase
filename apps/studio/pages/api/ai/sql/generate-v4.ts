@@ -20,6 +20,7 @@ import {
   PG_BEST_PRACTICES,
   RLS_PROMPT,
   SECURITY_PROMPT,
+  LIMITATIONS_PROMPT,
 } from 'lib/ai/prompts'
 import { renderingToolOutputParser } from 'lib/ai/tools/rendering-tools'
 
@@ -186,6 +187,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ${RLS_PROMPT}
       ${EDGE_FUNCTION_PROMPT}
       ${SECURITY_PROMPT}
+      ${LIMITATIONS_PROMPT}
     `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
