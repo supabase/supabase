@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ChevronDown, TextSearch, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -10,15 +10,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
+  Sheet,
+  SheetContent,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
   cn,
   CodeBlock,
+  SheetTitle,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -42,6 +42,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const gridRef = useRef<DataGridHandle>(null)
   const { sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
+  const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
@@ -313,6 +314,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
     return rawData
   }, [data, sort])
+
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
   const showIndexSuggestions =
@@ -364,12 +366,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   }, [handleKeyDown])
 
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="relative flex flex-grow bg-alternative min-h-0"
-      autoSaveId="query-performance-layout-v1"
-    >
-      <ResizablePanel defaultSize={1}>
+    <div className="relative flex flex-grow bg-alternative min-h-0">
+      <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
@@ -393,7 +391,9 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 <Row
                   {...props}
                   key={`qp-row-${props.rowIdx}`}
-                  onClick={() => {
+                  onClick={(event) => {
+                    event.stopPropagation()
+
                     if (typeof idx === 'number' && idx >= 0) {
                       setSelectedRow(idx)
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
@@ -424,58 +424,70 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             ),
           }}
         />
-      </ResizablePanel>
-      {selectedRow !== undefined && (
-        <>
-          <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={30} maxSize={45} minSize={30} className="bg-studio border-t">
-            <Button
-              type="text"
-              className="absolute top-3 right-3 px-1"
-              icon={<X />}
-              onClick={() => setSelectedRow(undefined)}
-            />
-            <Tabs_Shadcn_
-              value={view}
-              className="flex flex-col h-full"
-              onValueChange={(value: any) => setView(value)}
-            >
-              <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
+      </div>
+
+      <Sheet
+        open={selectedRow !== undefined}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedRow(undefined)
+          }
+        }}
+        modal={false}
+      >
+        <SheetTitle className="sr-only">Query details</SheetTitle>
+        <SheetContent
+          side="right"
+          className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
+          hasOverlay={false}
+          onInteractOutside={(event) => {
+            if (dataGridContainerRef.current?.contains(event.target as Node)) {
+              event.preventDefault()
+            }
+          }}
+        >
+          <Tabs_Shadcn_
+            value={view}
+            className="flex flex-col h-full"
+            onValueChange={(value: any) => setView(value)}
+          >
+            <div className="px-5 border-b">
+              <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
                 <TabsTrigger_Shadcn_
                   value="details"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
                 {showIndexSuggestions && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
-                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+                    className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
                   >
                     Indexes
                   </TabsTrigger_Shadcn_>
                 )}
               </TabsList_Shadcn_>
-              <TabsContent_Shadcn_
-                value="details"
-                className="mt-0 flex-grow min-h-0 overflow-y-auto"
-              >
+            </div>
+
+            <TabsContent_Shadcn_ value="details" className="mt-0 flex-grow min-h-0 overflow-y-auto">
+              {selectedRow !== undefined && (
                 <QueryDetail
                   reportType={reportType}
                   selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
                 />
-              </TabsContent_Shadcn_>
-              <TabsContent_Shadcn_
-                value="suggestion"
-                className="mt-0 flex-grow min-h-0 overflow-y-auto"
-              >
-                <QueryIndexes selectedRow={reportData[selectedRow]} />
-              </TabsContent_Shadcn_>
-            </Tabs_Shadcn_>
-          </ResizablePanel>
-        </>
-      )}
-    </ResizablePanelGroup>
+              )}
+            </TabsContent_Shadcn_>
+            <TabsContent_Shadcn_
+              value="suggestion"
+              className="mt-0 flex-grow min-h-0 overflow-y-auto"
+            >
+              {selectedRow !== undefined && <QueryIndexes selectedRow={reportData[selectedRow]} />}
+            </TabsContent_Shadcn_>
+          </Tabs_Shadcn_>
+        </SheetContent>
+      </Sheet>
+    </div>
   )
 }

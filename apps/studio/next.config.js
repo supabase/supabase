@@ -387,6 +387,11 @@ const nextConfig = {
         destination: '/organizations',
         permanent: false,
       },
+      {
+        source: '/project/:ref/settings/auth',
+        destination: '/project/:ref/auth',
+        permanent: false,
+      },
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
