@@ -33,6 +33,12 @@ type MetricRow = {
   tooltip?: ReactNode
 }
 
+const hintSeverityHighlightClass = (severity?: 'warn' | 'alert') => {
+  if (severity === 'alert') return 'font-semibold text-destructive'
+  if (severity === 'warn') return 'font-semibold text-warning'
+  return undefined
+}
+
 const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibility): MetricRow[] => {
   const formattedLoops =
     data.actualLoops !== undefined
@@ -66,6 +72,12 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
   const filterPercent = removedPercentValue(data, data.rowsRemovedByFilter)
   const joinFilterPercent = removedPercentValue(data, data.rowsRemovedByJoinFilter)
   const recheckPercent = removedPercentValue(data, data.rowsRemovedByIndexRecheck)
+  const slowHighlightClass = data.slowHint
+    ? hintSeverityHighlightClass(data.slowHint.severity)
+    : undefined
+  const costHighlightClass = data.costHint
+    ? hintSeverityHighlightClass(data.costHint.severity)
+    : undefined
 
   return [
     {
@@ -112,7 +124,9 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       element: (
         <>
           <span>Step time</span>
-          <span className="ml-auto">{formattedSelfTime ?? data.exclusiveTimeMs} ms</span>
+          <span className={cn('ml-auto', slowHighlightClass)}>
+            {formattedSelfTime ?? data.exclusiveTimeMs} ms
+          </span>
         </>
       ),
     },
@@ -239,7 +253,9 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       element: (
         <>
           <span>Self cost</span>
-          <span className="ml-auto">{data.exclusiveCost?.toFixed(2)}</span>
+          <span className={cn('ml-auto', costHighlightClass)}>
+            {data.exclusiveCost?.toFixed(2)}
+          </span>
         </>
       ),
     },
