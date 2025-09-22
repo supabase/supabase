@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useMemo, useState } from 'react'
+import { type PropsWithChildren, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ChevronsUpDown } from 'lucide-react'
@@ -57,6 +57,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
   const connectionString = project?.connectionString
 
   const [isQueryPlanVisualizerExpanded, setIsQueryPlanVisualizerExpanded] = useState(false)
+  const dialogContentRef = useRef<HTMLDivElement | null>(null)
 
   const cleanedSql = useMemo(() => {
     const cleanedSql = removeCommentsFromSql(query)
@@ -158,7 +159,16 @@ export const QueryPlan = ({ query }: { query: string }) => {
                   <DialogContent
                     size="xxxlarge"
                     hideClose
-                    className="flex h-[92vh] max-h-[96vh] w-[min(1600px,96vw)] flex-col overflow-hidden border bg-background p-0 shadow-2xl"
+                    ref={dialogContentRef}
+                    // Keep initial focus inside the dialog so tooltips in the metrics sidebar stay closed
+                    onOpenAutoFocus={(event) => {
+                      event.preventDefault()
+                      requestAnimationFrame(() => {
+                        dialogContentRef.current?.focus({ preventScroll: true })
+                      })
+                    }}
+                    tabIndex={-1}
+                    className="flex h-[92vh] max-h-[96vh] w-[min(1600px,96vw)] flex-col overflow-hidden border bg-background p-0 shadow-2xl focus:outline-none"
                   >
                     {content}
                   </DialogContent>
