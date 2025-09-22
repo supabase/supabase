@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { cn, Separator } from 'ui'
 
-import { McpAddToClientButton } from './components/AddToClientButton'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
@@ -82,18 +81,14 @@ export function McpConfigPanel({
         </p>
       </div>
       <div className={cn('border rounded-lg')}>
-        <div className={cn('flex items-center justify-between', innerPanelSpacing)}>
+        <div className={innerPanelSpacing}>
           <h3>Installation</h3>
-          <McpAddToClientButton
-            theme={theme}
-            basePath={basePath}
-            selectedClient={selectedClient}
-            clientConfig={clientConfig}
-          />
         </div>
         <Separator />
         <McpConfigurationDisplay
           className={innerPanelSpacing}
+          theme={theme}
+          basePath={basePath}
           selectedClient={selectedClient}
           clientConfig={clientConfig}
         />
