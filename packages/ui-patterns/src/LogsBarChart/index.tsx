@@ -26,11 +26,13 @@ export const LogsBarChart = ({
   onBarClick,
   EmptyState,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
+  isFullHeight = false,
 }: {
   data: LogsBarChartDatum[]
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
   DateTimeFormat?: string
+  isFullHeight?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -43,7 +45,10 @@ export const LogsBarChart = ({
   const endDate = dayjs(data[data?.length - 1]?.['timestamp']).format(DateTimeFormat)
 
   return (
-    <div data-testid="logs-bar-chart" className={cn('flex flex-col gap-y-3 h-full')}>
+    <div
+      data-testid="logs-bar-chart"
+      className={cn('flex flex-col gap-y-3', isFullHeight ? 'h-full' : 'h-24')}
+    >
       <ChartContainer
         className="h-full"
         config={

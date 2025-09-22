@@ -374,13 +374,18 @@ export const ProjectUsageSection = () => {
               </div>
             </CardHeader>
             <CardContent className="p-6 pt-4 flex-1 h-full overflow-hidden">
-              <Loading active={isLoading}>
+              <Loading isFullHeight active={isLoading}>
                 <LogsBarChart
                   data={s.data}
                   DateTimeFormat={datetimeFormat}
                   onBarClick={handleBarClick(s.route)}
+                  isFullHeight
                   EmptyState={
-                    <NoDataPlaceholder size="small" message="No data for selected period" />
+                    <NoDataPlaceholder
+                      size="small"
+                      message="No data for selected period"
+                      isFullHeight
+                    />
                   }
                 />
               </Loading>

@@ -1410,9 +1410,9 @@ export default {
   },
 
   loading: {
-    base: `relative h-full`,
+    base: `relative`,
     content: {
-      base: `transition-opacity duration-300 h-full`,
+      base: `transition-opacity duration-300`,
       active: `opacity-40`,
     },
     spinner: `
