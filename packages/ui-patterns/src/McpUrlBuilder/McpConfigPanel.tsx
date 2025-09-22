@@ -56,6 +56,18 @@ export function McpConfigPanel({
 
   return (
     <div className={cn('space-y-6', className)}>
+      <div className={cn('border rounded-lg')}>
+        <h3 className={innerPanelSpacing}>Options</h3>
+        <Separator />
+        <McpConfigurationOptions
+          className={innerPanelSpacing}
+          readonly={readonly}
+          onReadonlyChange={setReadonly}
+          selectedFeatures={selectedFeatures}
+          onFeaturesChange={setSelectedFeatures}
+          featureGroups={FEATURE_GROUPS}
+        />
+      </div>
       <div className="flex flex-col gap-y-3">
         <ClientSelectDropdown
           label="Client"
@@ -68,18 +80,6 @@ export function McpConfigPanel({
         <p className="text-xs text-foreground-lighter">
           Configure your MCP client to connect with your Supabase project
         </p>
-      </div>
-      <div className={cn('border rounded-lg')}>
-        <h3 className={innerPanelSpacing}>Options</h3>
-        <Separator />
-        <McpConfigurationOptions
-          className={innerPanelSpacing}
-          readonly={readonly}
-          onReadonlyChange={setReadonly}
-          selectedFeatures={selectedFeatures}
-          onFeaturesChange={setSelectedFeatures}
-          featureGroups={FEATURE_GROUPS}
-        />
       </div>
       <div className={cn('border rounded-lg')}>
         <div className={cn('flex items-center justify-between', innerPanelSpacing)}>
