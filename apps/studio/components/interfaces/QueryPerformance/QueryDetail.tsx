@@ -109,6 +109,9 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
           </Button>
         </div>
       </QueryPanelSection>
+      <QueryPanelSection className="py-6 border-b">
+        <QueryPlan query={query} />
+      </QueryPanelSection>
       <QueryPanelSection className="pb-3 pt-6">
         <h4 className="mb-2">Metadata</h4>
         <ul className="flex flex-col gap-y-3 divide-y divide-dashed">
@@ -216,10 +219,6 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
               )
             })}
         </ul>
-      </QueryPanelSection>
-      <div className="border-t" />
-      <QueryPanelSection>
-        <QueryPlan query={query} />
       </QueryPanelSection>
     </QueryPanelContainer>
   )
