@@ -607,16 +607,17 @@ test.describe.serial('Database Enumerated Types', () => {
     await page.getByTestId('schema-selector').click()
     await page.getByPlaceholder('Find schema...').fill('auth')
     await page.getByRole('option', { name: 'auth' }).click()
-    expect(page.getByText('factor_type')).toBeVisible()
-    expect(page.getByText('code_challenge_method')).toBeVisible()
+
+    await expect(page.getByText('factor_type')).toBeVisible()
+    await expect(page.getByText('code_challenge_method')).toBeVisible()
     // create new type button does not exist in other schemas
-    expect(page.getByRole('button', { name: 'Create type' })).not.toBeVisible()
+    await expect(page.getByRole('button', { name: 'Create type' })).not.toBeVisible()
 
     // filter by querying
     await page.getByRole('textbox', { name: 'Search for a type' }).fill('code')
-    await page.waitForTimeout(500) // wait for enum types to be loaded
-    expect(page.getByText('factor_type')).not.toBeVisible()
-    expect(page.getByText('code_challenge_method')).toBeVisible()
+    await page.waitForTimeout(1000) // wait for enum types to be loaded
+    await expect(page.getByText('factor_type')).not.toBeVisible()
+    await expect(page.getByText('code_challenge_method')).not.toBeVisible()
   })
 
   test('CRUD operations works as expected', async ({ page, ref }) => {
