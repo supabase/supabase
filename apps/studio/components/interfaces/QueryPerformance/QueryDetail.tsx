@@ -58,7 +58,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
   return (
     <QueryPanelContainer>
       <QueryPanelSection>
-        <p className="text-sm">Query pattern</p>
+        <h4 className="mb-2">Query pattern</h4>
         <SqlMonacoBlock value={query} height={310} lineNumbers="off" wrapperClassName="pl-3" />
         {isLinterWarning && (
           <Alert_Shadcn_
