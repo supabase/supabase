@@ -236,22 +236,73 @@ const MetricBar = ({
   )
 }
 
-const BufferBar = ({
-  sharedPercent,
-  tempPercent,
-  localPercent,
-}: {
-  sharedPercent: number
-  tempPercent: number
-  localPercent: number
-}) => {
+type SegmentedBarSegment = {
+  id: string
+  percent: number
+  color: string
+}
+
+const SegmentedBar = ({ segments }: { segments: SegmentedBarSegment[] }) => {
+  let remaining = 100
+
   return (
     <div className="flex h-2 w-full overflow-hidden rounded-sm bg-border">
-      <div className="h-full bg-foreground" style={{ width: `${Math.min(sharedPercent, 100)}%` }} />
-      <div className="h-full bg-warning" style={{ width: `${Math.min(tempPercent, 100)}%` }} />
-      <div className="h-full bg-info" style={{ width: `${Math.min(localPercent, 100)}%` }} />
+      {segments.map((segment) => {
+        const width = Math.max(Math.min(segment.percent, remaining), 0)
+        remaining = Math.max(remaining - width, 0)
+
+        if (width <= 0) return null
+
+        return (
+          <div
+            key={segment.id}
+            className={cn('h-full transition-[width] duration-300', segment.color)}
+            style={{ width: `${width}%` }}
+          />
+        )
+      })}
     </div>
   )
+}
+
+type LegendItem = {
+  id: string
+  label: string
+  color: string
+}
+
+const MetricLegend = ({ items }: { items: LegendItem[] }) => {
+  if (!items.length) return null
+
+  return (
+    <ul className="mb-3 flex items-center justify-center gap-x-3 text-[11px] text-foreground-light">
+      {items.map((item) => (
+        <li key={item.id} className="inline-flex items-center gap-1 whitespace-nowrap">
+          <span className={cn('h-2.5 w-2.5 rounded-full', item.color)} />
+          <span>{item.label}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+const METRIC_LEGENDS = {
+  time: null,
+  rows: null,
+  cost: null,
+  buffers: {
+    items: [
+      { id: 'buffers-shared', label: 'Shared', color: 'bg-foreground' },
+      { id: 'buffers-temp', label: 'Temp', color: 'bg-warning' },
+      { id: 'buffers-local', label: 'Local', color: 'bg-brand-400 dark:bg-brand-500' },
+    ],
+  },
+  io: {
+    items: [
+      { id: 'io-read', label: 'Read', color: 'bg-foreground' },
+      { id: 'io-write', label: 'Write', color: 'bg-warning' },
+    ],
+  },
 }
 
 const getTreeGuidePrefix = (branchTrail: boolean[], isLast: boolean): string => {
@@ -383,14 +434,14 @@ const renderBuffersMetric: MetricRenderer = (data, stats) => {
   const tempPercent = breakdown.total > 0 ? (breakdown.temp / breakdown.total) * totalPercent : 0
   const localPercent = breakdown.total > 0 ? (breakdown.local / breakdown.total) * totalPercent : 0
 
+  const segments: SegmentedBarSegment[] = [
+    { id: 'buffers-shared-bar', percent: sharedPercent, color: 'bg-foreground' },
+    { id: 'buffers-temp-bar', percent: tempPercent, color: 'bg-warning' },
+    { id: 'buffers-local-bar', percent: localPercent, color: 'bg-brand-400 dark:bg-brand-500' },
+  ]
+
   return {
-    visual: (
-      <BufferBar
-        sharedPercent={sharedPercent}
-        tempPercent={tempPercent}
-        localPercent={localPercent}
-      />
-    ),
+    visual: <SegmentedBar segments={segments} />,
     tooltip: (
       <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
         <li>
@@ -434,8 +485,13 @@ const renderIOMetric: MetricRenderer = (data, stats) => {
   const readPercent = total > 0 ? (read / total) * percent : 0
   const writePercent = total > 0 ? (write / total) * percent : 0
 
+  const segments: SegmentedBarSegment[] = [
+    { id: 'io-read-bar', percent: readPercent, color: 'bg-foreground' },
+    { id: 'io-write-bar', percent: writePercent, color: 'bg-warning' },
+  ]
+
   return {
-    visual: <BufferBar sharedPercent={readPercent} tempPercent={writePercent} localPercent={0} />,
+    visual: <SegmentedBar segments={segments} />,
     tooltip: (
       <ul className="list-disc -space-y-0.5 pl-4 text-foreground-light">
         <li>
@@ -479,6 +535,7 @@ export const MetricsSidebar = ({
 
   const rows = useMemo(() => computeRows(nodes, edges), [nodes, edges])
   const stats = useMemo(() => computeStats(nodes, meta), [nodes, meta])
+  const legend = METRIC_LEGENDS[activeMetric]
 
   if (!rows.length) return null
 
@@ -518,6 +575,8 @@ export const MetricsSidebar = ({
         </div>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-2">
+        {legend && <MetricLegend items={legend.items} />}
+
         <ul className="flex flex-col gap-y-0.5">
           {rows.map((row) => {
             const { node, branchTrail, isLast } = row
