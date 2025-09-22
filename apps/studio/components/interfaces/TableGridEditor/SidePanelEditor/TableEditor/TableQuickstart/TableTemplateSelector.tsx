@@ -9,6 +9,7 @@ import { CategoryView } from './components/CategoryView'
 import { AIInputView } from './components/AIInputView'
 import { ResultsView } from './components/ResultsView'
 import { createViewConfig, type ViewKey } from './viewConfig'
+import { useSendEventMutation } from '../../../../../../data/telemetry/send-event-mutation'
 import type { TableSuggestion } from './types'
 import type { TableField } from '../TableEditor.types'
 
@@ -49,24 +50,69 @@ export const TableTemplateSelector = ({
   const [aiPrompt, setAiPrompt] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const hasInteractedRef = useRef(false)
+  const selectedTemplateRef = useRef<TableSuggestion | null>(null)
+  const startTimeRef = useRef(Date.now())
   const { generateTables, isGenerating, error: apiError } = useAITableGeneration()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   // Memoize view configuration
   const viewConfig = useMemo(() => createViewConfig(), [])
 
-  // Cleanup timeout on unmount
+  // Track exposure event on mount
+  useEffect(() => {
+    sendEvent({
+      action: 'tableeditor_quickstart_viewed',
+      properties: {
+        variant: variant as string,
+      },
+    })
+  }, [variant])
+
+  // Track abandonment on unmount if necessary
   useEffect(() => {
     return () => {
+      // Track abandonment on unmount if user interacted but didn't complete
+      if (hasInteractedRef.current && !selectedTemplateRef.current) {
+        const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000)
+        // Map ViewMode to telemetry stage values
+        let stage: 'initial' | 'ai_input' | 'category_selection' | 'template_preview' | 'results'
+        switch (viewState.mode) {
+          case ViewMode.INITIAL:
+            stage = 'initial'
+            break
+          case ViewMode.AI_INPUT:
+            stage = 'ai_input'
+            break
+          case ViewMode.CATEGORY_SELECTED:
+            stage = 'category_selection'
+            break
+          case ViewMode.AI_RESULTS:
+            stage = 'results'
+            break
+          default:
+            stage = 'initial'
+        }
+        sendEvent({
+          action: 'tableeditor_quickstart_abandoned',
+          properties: {
+            stage,
+            timeSpentSeconds: timeSpent,
+            hadInteraction: true,
+          },
+        })
+      }
+      // Cleanup timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [])
+  }, [viewState.mode])
 
   // Focus management
   useEffect(() => {
     if (viewState.mode === ViewMode.AI_INPUT && inputRef.current) {
-      inputRef.current.focus()
+      inputRef.current?.focus()
     }
   }, [viewState.mode])
 
@@ -79,6 +125,18 @@ export const TableTemplateSelector = ({
 
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
+      hasInteractedRef.current = true
+      selectedTemplateRef.current = template
+
+      // Track template selected event
+      sendEvent({
+        action: 'tableeditor_quickstart_template_selected',
+        properties: {
+          templateName: template.tableName,
+          source: template.source,
+        },
+      })
+
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
       setViewState((prev) => ({ ...prev, selectedTemplate: template }))
@@ -95,12 +153,30 @@ export const TableTemplateSelector = ({
   const handleGenerateTables = useCallback(async () => {
     if (!aiPrompt.trim() || isGenerating) return
 
+    hasInteractedRef.current = true
     setViewState((prev) => ({ ...prev, isLoading: true, error: null }))
+
+    // Track AI generation attempt
+    sendEvent({
+      action: 'tableeditor_quickstart_ai_generation_started',
+      properties: {
+        promptLength: aiPrompt.length,
+      },
+    })
 
     try {
       const tables = await generateTables(aiPrompt)
 
       if (tables.length > 0) {
+        // Track successful generation
+        sendEvent({
+          action: 'tableeditor_quickstart_ai_generation_succeeded',
+          properties: {
+            tablesGenerated: tables.length,
+            promptLength: aiPrompt.length,
+          },
+        })
+
         setViewState({
           mode: ViewMode.AI_RESULTS,
           selectedCategory: null,
@@ -118,6 +194,15 @@ export const TableTemplateSelector = ({
         }))
       }
     } catch (error) {
+      // Track generation failure
+      sendEvent({
+        action: 'tableeditor_quickstart_ai_generation_failed',
+        properties: {
+          promptLength: aiPrompt.length,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        },
+      })
+
       setViewState((prev) => ({
         ...prev,
         error: 'Failed to generate tables. Please try again.',
@@ -128,6 +213,15 @@ export const TableTemplateSelector = ({
 
   const handleQuickIdea = useCallback(
     (idea: string) => {
+      hasInteractedRef.current = true
+      // Track quick idea selection
+      sendEvent({
+        action: 'tableeditor_quickstart_quick_idea_selected',
+        properties: {
+          idea,
+        },
+      })
+
       setAiPrompt(idea)
       setViewState((prev) => ({ ...prev, mode: ViewMode.AI_INPUT }))
 
@@ -156,6 +250,14 @@ export const TableTemplateSelector = ({
   const handlers = useMemo(
     () => ({
       onCategorySelect: (category: string) => {
+        hasInteractedRef.current = true
+        // Track category selection
+        sendEvent({
+          action: 'tableeditor_quickstart_category_selected',
+          properties: {
+            category,
+          },
+        })
         setViewState((prev) => ({
           ...prev,
           mode: ViewMode.CATEGORY_SELECTED,
@@ -163,6 +265,12 @@ export const TableTemplateSelector = ({
         }))
       },
       onAISelect: () => {
+        hasInteractedRef.current = true
+        // Track AI option selection
+        sendEvent({
+          action: 'tableeditor_quickstart_ai_selected',
+          properties: {},
+        })
         setViewState((prev) => ({ ...prev, mode: ViewMode.AI_INPUT }))
       },
       onQuickIdea: handleQuickIdea,
