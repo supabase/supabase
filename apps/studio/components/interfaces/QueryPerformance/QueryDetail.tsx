@@ -96,43 +96,31 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
                   : 'n/a'
 
               if (x.id === 'prop_total_time') {
+                const percentage = selectedRow?.prop_total_time || 0
+                const totalTime = selectedRow?.total_time || 0
+
                 return (
                   <li key={x.id} className="flex justify-between pt-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
-                    {rawValue ? (
-                      <p
-                        className={cn(
-                          'tabular-nums',
-                          rawValue.toFixed(1) === '0.0' && 'text-foreground-lighter'
-                        )}
-                      >
-                        {rawValue.toFixed(1)}%
-                      </p>
-                    ) : (
-                      <p className="text-muted">&ndash;</p>
-                    )}
-                  </li>
-                )
-              }
-
-              if (x.id == 'total_time') {
-                return (
-                  <li key={x.id} className="flex justify-between pt-3 text-sm">
-                    <p className="text-foreground-light">
-                      {x.name + ' '}
-                      <span className="text-foreground-lighter">latency</span>
-                    </p>
-                    {isTime &&
-                    typeof rawValue === 'number' &&
-                    !isNaN(rawValue) &&
-                    isFinite(rawValue) ? (
-                      <p
-                        className={cn(
-                          'tabular-nums',
-                          formatDuration(rawValue / 1000) === '0.0s' && 'text-foreground-lighter'
-                        )}
-                      >
-                        {formatDuration(rawValue / 1000)}
+                    {percentage && totalTime ? (
+                      <p className="flex items-center gap-x-1.5">
+                        <span
+                          className={cn(
+                            'tabular-nums',
+                            percentage.toFixed(1) === '0.0' && 'text-foreground-lighter'
+                          )}
+                        >
+                          {percentage.toFixed(1)}%
+                        </span>{' '}
+                        <span className="text-muted">/</span>{' '}
+                        <span
+                          className={cn(
+                            'tabular-nums',
+                            formatDuration(rawValue / 1000) === '0.00s' && 'text-foreground-lighter'
+                          )}
+                        >
+                          {formatDuration(totalTime / 1000)}
+                        </span>
                       </p>
                     ) : (
                       <p className="text-muted">&ndash;</p>
