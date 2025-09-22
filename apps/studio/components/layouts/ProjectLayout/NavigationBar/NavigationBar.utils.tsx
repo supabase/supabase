@@ -1,4 +1,4 @@
-import { Blocks, FileText, Lightbulb, List, Logs, Settings } from 'lucide-react'
+import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
@@ -119,12 +119,14 @@ export const generateProductRoutes = (
 export const generateOtherRoutes = (
   ref?: string,
   project?: Project,
-  features?: { unifiedLogs?: boolean }
+  features?: { unifiedLogs?: boolean; showReports?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
-  const showUnifiedLogs = features?.unifiedLogs ?? false
+  const { unifiedLogs, showReports } = features ?? {}
+  const unifiedLogsEnabled = unifiedLogs ?? false
+  const reportsEnabled = showReports ?? true
 
   return [
     {
@@ -133,7 +135,7 @@ export const generateOtherRoutes = (
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
     },
-    ...(IS_PLATFORM
+    ...(IS_PLATFORM && reportsEnabled
       ? [
           {
             key: 'reports',
@@ -147,18 +149,14 @@ export const generateOtherRoutes = (
       key: 'logs',
       label: 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs`),
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : unifiedLogsEnabled
+            ? `/project/${ref}/logs`
+            : `/project/${ref}/logs/explorer`),
     },
-    ...(showUnifiedLogs
-      ? [
-          {
-            key: 'unified-logs',
-            label: 'Unified Logs',
-            icon: <Logs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/unified-logs`),
-          },
-        ]
-      : []),
     {
       key: 'api',
       label: 'API Docs',

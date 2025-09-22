@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
 
@@ -12,7 +12,7 @@ export const BranchingPITRNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -24,11 +24,12 @@ export const BranchingPITRNotice = () => {
           <Clock className="text-warning-700" size={20} strokeWidth={2} />
         </figure>
       </div>
-      <div className="flex grow items-center justify-between">
+      <div className="flex grow items-center justify-between gap-4">
         <div className="flex flex-col gap-y-1">
           <p className="text-sm text-foreground">Consider enabling Point in Time Recovery (PITR)</p>
           <p className="text-sm text-foreground-light">
-            This ensures you can recover data if you make a bad migration (e.g. delete a column).
+            This ensures you can recover production data if you merge a bad migration (e.g. delete a
+            column).
           </p>
         </div>
         {!canUpdateSubscription ? (
@@ -49,7 +50,7 @@ export const BranchingPITRNotice = () => {
           <Button size="tiny" type="default" asChild>
             <Link
               href={`/project/${ref}/settings/addons?panel=pitr`}
-              onClick={() => snap.setShowEnableBranchingModal(false)}
+              onClick={() => snap.setShowCreateBranchModal(false)}
             >
               Enable PITR
             </Link>

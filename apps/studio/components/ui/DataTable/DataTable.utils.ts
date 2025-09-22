@@ -78,7 +78,6 @@ export function getLevelColor(
         bg: 'bg-destructive',
         border: 'border-destructive',
       }
-    case 'info':
     default:
       return {
         text: 'text-info',
@@ -108,8 +107,8 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
     case 'warning':
     case 'redirect':
       return {
-        text: 'text-warning-600 dark:text-warning',
-        bg: 'bg-warning-300 dark:bg-waning-200',
+        text: 'text-warning',
+        bg: 'bg-warning-300 dark:bg-warning-200',
         border: 'border border-warning-400/50 dark:border-warning-400/50',
       }
     case '5':

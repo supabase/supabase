@@ -1,16 +1,14 @@
-import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
-import relativeTime from 'dayjs/plugin/relativeTime'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useMemo, useRef } from 'react'
+import dayjs from 'dayjs'
+import { ReactNode, useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { Card, CardContent, EyeOffIcon, Skeleton, WarningIcon, cn } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Card, CardContent, EyeOffIcon, Skeleton, cn } from 'ui'
 import {
   Table,
   TableBody,
@@ -21,9 +19,6 @@ import {
 } from 'ui/src/components/shadcn/ui/table'
 import { APIKeyRow } from './APIKeyRow'
 import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
-
-dayjs.extend(duration)
-dayjs.extend(relativeTime)
 
 interface LastSeenData {
   [hash: string]: { timestamp: string }
@@ -58,12 +53,15 @@ export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
   const {
     data: apiKeysData,
-    isLoading: isLoadingApiKeys,
     error,
+    isLoading: isLoadingApiKeys,
+    isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false })
 
-  const isLoadingPermissions = !usePermissionsLoaded()
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    '*'
+  )
 
   const lastSeen = useLastSeen(projectRef!)
 
@@ -94,14 +92,14 @@ export const SecretAPIKeys = () => {
     </TableRow>
   )
 
-  const TableContainer = ({ children }: { children: React.ReactNode }) => (
+  const TableContainer = ({ children, className }: { children: ReactNode; className?: string }) => (
     <div className="pb-30">
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
         actions={<CreateSecretAPIKeyDialog />}
       />
-      <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100')}>
+      <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100', className)}>
         <CardContent className="p-0">
           <Table className="p-5 table-auto">
             <TableHeader>
@@ -112,10 +110,8 @@ export const SecretAPIKeys = () => {
                 <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
                   API Key
                 </TableHead>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                  Description
-                </TableHead>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+
+                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 hidden lg:table-cell">
                   Last Seen
                 </TableHead>
                 <TableHead className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2" />
@@ -153,14 +149,10 @@ export const SecretAPIKeys = () => {
     )
   }
 
-  if (error) {
+  if (isErrorApiKeys) {
     return (
-      <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-          <WarningIcon />
-          <p className="text-sm text-warning-600">Error loading Secret API Keys</p>
-          <p className="text-warning/75">{error.message}</p>
-        </div>
+      <TableContainer className="border-0">
+        <AlertError error={error} subject="Failed to load secret API keys" />
       </TableContainer>
     )
   }

@@ -1,9 +1,8 @@
-import { useConstant } from 'common'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { partition } from 'lodash'
 import { NextRouter } from 'next/router'
-import { createContext, PropsWithChildren, ReactNode, useContext, useEffect } from 'react'
+import { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useState } from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 
 export const editorEntityTypes = {
@@ -78,6 +77,7 @@ const DEFAULT_TABS_STATE = {
   openTabs: [] as string[],
   tabsMap: {} as { [key: string]: Tab },
   previewTabId: undefined as string | undefined,
+  recentItems: [],
 }
 const TABS_STORAGE_KEY = 'supabase_studio_tabs'
 const getTabsStorageKey = (ref: string) => `${TABS_STORAGE_KEY}_${ref}`
@@ -399,8 +399,14 @@ export type TabsState = ReturnType<typeof createTabsState>
 export const TabsStateContext = createContext<TabsState>(createTabsState(''))
 
 export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
-  const project = useSelectedProject()
-  const state = useConstant(() => createTabsState(project?.ref ?? ''))
+  const { data: project } = useSelectedProjectQuery()
+  const [state, setState] = useState(createTabsState(project?.ref ?? ''))
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !!project?.ref) {
+      setState(createTabsState(project?.ref ?? ''))
+    }
+  }, [project?.ref])
 
   useEffect(() => {
     if (typeof window !== 'undefined' && project?.ref) {
@@ -422,8 +428,7 @@ export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
         )
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [project?.ref, state])
 
   return <TabsStateContext.Provider value={state}>{children}</TabsStateContext.Provider>
 }

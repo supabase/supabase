@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Label_Shadcn_ as Label } from 'ui'
 import type { DataTableInputFilterField } from '../DataTable.types'
 import { useDebounce } from '../hooks/useDebounce'
-import { InputWithAddons } from '../InputWithAddons'
+import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
 
 function getFilter(filterValue: unknown) {
@@ -40,8 +40,8 @@ export function DataTableFilterInput<TData>({ value: _value }: DataTableInputFil
       </Label>
       <InputWithAddons
         placeholder="Search"
-        leading={<Search className="mt-0.5 h-4 w-4" />}
-        containerClassName="h-9 rounded-lg"
+        leading={<Search className="h-4 w-4" />}
+        containerClassName="h-9 rounded"
         name={value}
         id={value}
         value={input || ''}

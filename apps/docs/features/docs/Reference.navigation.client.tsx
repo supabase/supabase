@@ -214,7 +214,7 @@ export function RefLink({
         <Link
           ref={ref}
           // We don't use these links because we never do real navigation, so
-          // prefetching just wastes bandwidth
+          // prefetching just wastes egress
           prefetch={false}
           href={href}
           className={getLinkStyles(isActive, className)}

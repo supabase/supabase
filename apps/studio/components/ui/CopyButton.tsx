@@ -7,7 +7,6 @@ type CopyButtonBaseProps = {
   iconOnly?: boolean
   copyLabel?: string
   copiedLabel?: string
-  onCopy?: () => Promise<string> | string
 }
 
 type CopyButtonWithText = CopyButtonBaseProps & {

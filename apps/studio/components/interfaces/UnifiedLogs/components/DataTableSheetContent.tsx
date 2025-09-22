@@ -71,7 +71,7 @@ export function DataTableSheetContent<TData, TMeta>({
                 )}
               >
                 <dt className="shrink-0 text-muted-foreground">{field.label}</dt>
-                <dd className="font-mono w-full text-right">
+                <dd className="font-mono w-full text-right truncate">
                   {Component ? <Component {...data} metadata={metadata} /> : value}
                 </dd>
               </div>
@@ -87,7 +87,7 @@ export function DataTableSheetContent<TData, TMeta>({
                 )}
               >
                 <dt className="shrink-0 text-muted-foreground">{field.label}</dt>
-                <dd className="font-mono w-full text-right">
+                <dd className="font-mono w-full text-right truncate">
                   {Component ? <Component {...data} metadata={metadata} /> : value}
                 </dd>
               </DataTableSheetRowAction>

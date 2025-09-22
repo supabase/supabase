@@ -6,7 +6,7 @@ interface DotGridProps {
   count: number
 }
 
-const DotGrid = ({ rows, columns, count }: DotGridProps) => {
+export const DotGrid = ({ rows, columns, count }: DotGridProps) => {
   const container = {
     hidden: { opacity: 1 },
     visible: {
@@ -65,5 +65,3 @@ const DotGrid = ({ rows, columns, count }: DotGridProps) => {
     </div>
   )
 }
-
-export default DotGrid

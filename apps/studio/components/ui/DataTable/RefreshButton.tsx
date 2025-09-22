@@ -1,21 +1,18 @@
 import { LoaderCircle, RefreshCcw } from 'lucide-react'
-import { Button } from 'ui'
-
-import { useDataTable } from './providers/DataTableProvider'
+import { ButtonTooltip } from '../ButtonTooltip'
 
 interface RefreshButtonProps {
-  onClick: () => void
+  isLoading: boolean
+  onRefresh: () => void
 }
 
-export function RefreshButton({ onClick }: RefreshButtonProps) {
-  const { isLoading } = useDataTable()
-
+export const RefreshButton = ({ isLoading, onRefresh }: RefreshButtonProps) => {
   return (
-    <Button
+    <ButtonTooltip
       size="tiny"
       type="outline"
       disabled={isLoading}
-      onClick={onClick}
+      onClick={onRefresh}
       className="w-[26px]"
       icon={
         isLoading ? (
@@ -24,6 +21,7 @@ export function RefreshButton({ onClick }: RefreshButtonProps) {
           <RefreshCcw className="text-foreground" />
         )
       }
+      tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
     />
   )
 }

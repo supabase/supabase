@@ -1,5 +1,6 @@
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
+import { withSentryConfig } from '@sentry/nextjs'
 
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
@@ -10,8 +11,6 @@ import rewrites from './lib/rewrites.js'
 
 import { remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-
-import { withContentlayer } from 'next-contentlayer2'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -59,15 +58,51 @@ const nextConfig = {
     // needed to make the octokit packages work in /changelog
     esmExternals: 'loose',
   },
+  /**
+   * Exclude huge directories from being traced into serverless functions
+   * to avoid the max size limit for Serverless Functions on Vercel:
+   * https://vercel.com/guides/troubleshooting-function-250mb-limit
+   */
+  outputFileTracingExcludes: {
+    '*': [
+      // Next.js build artifacts
+      '.next/cache/**/*',
+      '.next/static/**/*',
+      // Static assets
+      'public/**/*',
+    ],
+  },
   reactStrictMode: true,
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     remotePatterns,
   },
   async headers() {
     return [
+      // Allow CMS preview iframe embedding by omitting X-Frame-Options for blog routes
       {
-        source: '/:path*',
+        source: '/blog/:slug*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+          // No X-Frame-Options header to allow iframe embedding
+        ],
+      },
+      {
+        source: '/api-v2/cms/preview',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'text/html',
+          },
+          // No X-Frame-Options header to allow iframe embedding
+        ],
+      },
+      // Default X-Frame-Options for all other paths
+      {
+        source: '/((?!blog|api-v2/cms/preview).*)',
         headers: [
           {
             key: 'X-Robots-Tag',
@@ -113,9 +148,10 @@ const nextConfig = {
     return redirects
   },
   typescript: {
-    // WARNING: production builds can successfully complete even there are type errors
-    // Typechecking is checked separately via .github/workflows/typecheck.yml
-    ignoreBuildErrors: true,
+    // On previews, typechecking is run via GitHub Action only for efficiency
+    // On production, we turn it on to prevent errors from conflicting PRs getting into
+    // prod
+    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel.
@@ -124,10 +160,36 @@ const nextConfig = {
 }
 
 // next.config.js.
-export default () => {
-  const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
+const configExport = () => {
+  const plugins = [withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
+
+export default withSentryConfig(configExport, {
+  // For all available options, see:
+  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+
+  org: 'supabase',
+  project: 'www',
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+
+  // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  // This can increase your server load as well as your hosting bill.
+  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+  // side errors will fail.
+  // tunnelRoute: "/monitoring",
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+})
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN

@@ -6,24 +6,24 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { setProjectStatus } from 'data/projects/projects-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import BackupItem from './BackupItem'
-import BackupsEmpty from './BackupsEmpty'
-import BackupsStorageAlert from './BackupsStorageAlert'
+import { BackupItem } from './BackupItem'
+import { BackupsEmpty } from './BackupsEmpty'
+import { BackupsStorageAlert } from './BackupsStorageAlert'
 
 const BackupsList = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
 
-  const { project: selectedProject } = useProjectContext()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const isHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()

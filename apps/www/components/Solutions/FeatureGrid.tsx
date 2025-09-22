@@ -11,13 +11,13 @@ interface Feature {
   className?: string
 }
 
-interface Props {
+export interface FeatureGridProps {
   id: string
   features: Feature[]
   className?: string
 }
 
-const FeatureGrid = ({ id, features, className }: Props) => {
+const FeatureGrid = ({ id, features, className }: FeatureGridProps) => {
   return (
     <SectionContainer id={id} className={cn('flex flex-col gap-12 py-16 md:py-24', className)}>
       <div

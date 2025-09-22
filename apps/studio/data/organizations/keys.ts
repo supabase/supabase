@@ -20,4 +20,6 @@ export const organizationKeys = {
     ['organizations', slug, 'validate-token', token] as const,
   projectClaim: (slug: string, token: string) =>
     ['organizations', slug, 'project-claim', token] as const,
+  availableRegions: (slug: string | undefined, cloudProvider: string) =>
+    ['organizations', slug, 'available-regions', cloudProvider] as const,
 }

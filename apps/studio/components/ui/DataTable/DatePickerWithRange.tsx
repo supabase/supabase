@@ -22,7 +22,7 @@ import {
   SelectValue_Shadcn_ as SelectValue,
 } from 'ui'
 import { presets as defaultPresets } from './DataTable.constants'
-import type { DatePreset } from './DataTable.types'
+import type { DatePreset, DateRangeDisabled } from './DataTable.types'
 import { useDebounce } from './hooks/useDebounce'
 import { kdbClassName } from './primitives/Kbd'
 
@@ -30,6 +30,7 @@ interface DatePickerWithRangeProps extends HTMLAttributes<HTMLDivElement> {
   date: DateRange | undefined
   setDate: (date: DateRange | undefined) => void
   presets?: DatePreset[]
+  dateRangeDisabled?: DateRangeDisabled
 }
 
 // [Joshen] This might be better placed in ui instead of DataTable since it could be reusable
@@ -38,6 +39,7 @@ export function DatePickerWithRange({
   date,
   setDate,
   presets = defaultPresets,
+  dateRangeDisabled,
 }: DatePickerWithRangeProps) {
   const [open, setOpen] = useState(false)
 
@@ -98,6 +100,8 @@ export function DatePickerWithRange({
               selected={date}
               onSelect={setDate}
               numberOfMonths={1}
+              // @ts-ignore
+              disabled={dateRangeDisabled}
             />
           </div>
           <PopoverSeparator />

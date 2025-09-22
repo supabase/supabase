@@ -1,3 +1,5 @@
+import { CreateWrapperSheetProps } from './CreateWrapperSheet'
+
 export type WrapperMeta = {
   name: string
   handlerName: string
@@ -8,14 +10,20 @@ export type WrapperMeta = {
   extensionName: string
   label: string
   server: Server
-  tables: Table[]
   docsUrl: string
   minimumExtensionVersion?: string
+  createComponent?: React.ComponentType<CreateWrapperSheetProps>
+  // If true, the wrapper can target a schema which will be populated with tables specified by the wrapper..
+  canTargetSchema?: boolean
+  sourceSchemaOption?: ServerOption
+  // Array of tables that needs to be supplied to the wrapper. If the array is empty, the wrapper should target a schema.
+  tables: Table[]
 }
 
 export type ServerOption = {
   name: string
   label: string
+  description?: string
   required: boolean
   encrypted: boolean
   secureEntry: boolean
@@ -23,6 +31,7 @@ export type ServerOption = {
   isTextArea?: boolean
   urlHelper?: string
   defaultValue?: string
+  readOnly?: boolean
 }
 
 export type Server = {

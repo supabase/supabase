@@ -9,14 +9,16 @@ export type DatabaseIndexDeleteVariables = {
   projectRef: string
   connectionString?: string | null
   name: string
+  schema: string
 }
 
 export async function deleteDatabaseIndex({
   projectRef,
   connectionString,
   name,
+  schema,
 }: DatabaseIndexDeleteVariables) {
-  const sql = `drop index if exists "${name}"`
+  const sql = `drop index if exists "${schema}"."${name}"`
 
   const { result } = await executeSql({
     projectRef,

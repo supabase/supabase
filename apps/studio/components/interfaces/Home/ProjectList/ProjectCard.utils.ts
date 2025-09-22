@@ -1,9 +1,8 @@
-import type { ProjectInfo } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 
-export const inferProjectStatus = (project: ProjectInfo) => {
+export const inferProjectStatus = (projectStatus: string) => {
   let status = undefined
-  switch (project.status) {
+  switch (projectStatus) {
     case PROJECT_STATUS.ACTIVE_HEALTHY:
       status = 'isHealthy'
       break

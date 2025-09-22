@@ -136,7 +136,7 @@ Rotating a secret key (`sb_secret_...`) is easy and painless. Use the [API Keys]
 If you are still using the JWT-based `service_role` key, there are two options.
 
 1. **Strongly recommended:** Replace the `service_role` key with a new secret key instead. Follow the guide from above as if you are rotating an existing secret key.
-2. [Rotate your project's JWT secret.](/dashboard/project/_/settings/api) This operation is only recommended if you suspect that the JWT secret has leaked itself. Consider switching your `anon` JWT-based key to the publishable key, and all `service_role` JWT-based keys to secret keys. Only then rotate the JWT secret. Check the FAQ below if you use the JWT-based keys in mobile, desktop or CLI applications!
+2. [Rotate your project's JWT secret.](/dashboard/project/_/settings/jwt) This operation is only recommended if you suspect that the JWT secret has leaked itself. Consider switching your `anon` JWT-based key to the publishable key, and all `service_role` JWT-based keys to secret keys. Only then rotate the JWT secret. Check the FAQ below if you use the JWT-based keys in mobile, desktop or CLI applications!
 
 ## Known limitations and compatibility differences
 
@@ -155,6 +155,10 @@ As the publishable and secret keys are no longer JWT-based, there are some known
 If you know or suspect that the JWT secret itself is leaked, refer to the section on [rotating the JWT](#what-to-do-if-a-secret-key-or-servicerole-has-been-leaked-or-compromised).
 
 If the JWT secret is secure, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard. This will prevent downtime for your application.
+
+### Can I still use my old `anon` and `service-role` API keys after enabling the publishable and secret keys?
+
+Yes. This allows you to transition between the API keys with zero downtime by gradually swapping your clients while both sets of keys are active. See the next question for how to deactivate your keys once all your clients are switched over.
 
 ### How do I deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
 

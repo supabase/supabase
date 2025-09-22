@@ -17,7 +17,7 @@ The S3 protocol supports file upload using:
 
 The `PutObject` action uploads the file in a single request. This matches the behavior of the Supabase SDK [Standard Upload](/docs/guides/storage/uploads/standard-uploads).
 
-Use `PutObject` to upload smaller files, where retrying the entire upload won't be an issue. The maximum file size on paid plans is 50 GB.
+Use `PutObject` to upload smaller files, where retrying the entire upload won't be an issue. The maximum file size on paid plans is 500 GB.
 
 For example, using JavaScript and the `aws-sdk` client:
 
@@ -42,7 +42,7 @@ await s3Client.send(uploadCommand)
 
 Multipart Uploads split the file into smaller parts and upload them in parallel, maximizing the upload speed on a fast network. When uploading large files, this allows you to retry the upload of individual parts in case of network issues.
 
-This method is preferable over [Resumable Upload](/docs/guides/storage/uploads/resumable-uploads) for server-side uploads, when you want to maximize upload speed at the cost of resumability. The maximum file size on paid plans is 50 GB.
+This method is preferable over [Resumable Upload](/docs/guides/storage/uploads/resumable-uploads) for server-side uploads, when you want to maximize upload speed at the cost of resumability. The maximum file size on paid plans is 500 GB.
 
 ### Upload a file in parts
 

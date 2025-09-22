@@ -1,26 +1,27 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import DeleteProjectModal from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import {
-  Button,
-  CriticalIcon,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
-import { useProjectContext } from './ProjectContext'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
-const RestoreFailedState = () => {
+export const RestoreFailedState = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
+
+  const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: { project_id: project?.id },
+  })
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
@@ -56,8 +57,12 @@ const RestoreFailedState = () => {
               <div className="space-y-1">
                 <p>Something went wrong while restoring your project</p>
                 <p className="text-sm text-foreground-light">
-                  Your project's data is intact, but your project is inaccessible due to the
-                  restoration failure. Please contact support for assistance.
+                  Your project's data is intact, but your project is inaccessible due to a
+                  restoration failure. Database backups for this project can still be accessed{' '}
+                  <InlineLink href={`/project/${ref}/database/backups/scheduled`}>here</InlineLink>.
+                </p>
+                <p className="text-sm text-foreground-light">
+                  Please contact support for assistance.
                 </p>
               </div>
             </div>
@@ -70,6 +75,7 @@ const RestoreFailedState = () => {
                   Contact support
                 </Link>
               </Button>
+
               <ButtonTooltip
                 type="default"
                 icon={<Download />}
@@ -78,21 +84,36 @@ const RestoreFailedState = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: backups.length === 0 ? 'No available backups to download' : undefined,
+                    text:
+                      data?.status === 'physical-backups-enabled'
+                        ? 'No available backups to download as project is on physical backups'
+                        : backups.length === 0
+                          ? 'No available backups to download'
+                          : undefined,
                   },
                 }}
                 onClick={onClickDownloadBackup}
               >
                 Download backup
               </ButtonTooltip>
+
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+                  <Button type="default" className="w-7" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
-                  <DropdownMenuItem
+                  <DropdownMenuItemTooltip
                     onClick={() => setVisible(true)}
                     className="items-start gap-x-2"
+                    disabled={!canDeleteProject}
+                    tooltip={{
+                      content: {
+                        side: 'right',
+                        text: !canDeleteProject
+                          ? 'You need additional permissions to delete this project'
+                          : undefined,
+                      },
+                    }}
                   >
                     <div className="translate-y-0.5">
                       <Trash size={14} />
@@ -103,7 +124,7 @@ const RestoreFailedState = () => {
                         Project cannot be restored once it is deleted
                       </p>
                     </div>
-                  </DropdownMenuItem>
+                  </DropdownMenuItemTooltip>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -114,5 +135,3 @@ const RestoreFailedState = () => {
     </>
   )
 }
-
-export default RestoreFailedState

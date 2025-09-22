@@ -1,13 +1,13 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Trash2 } from 'lucide-react'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common/hooks'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DropdownMenuItem } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface APIKeyDeleteDialogProps {
@@ -19,7 +19,10 @@ export const APIKeyDeleteDialog = ({ apiKey, lastSeen }: APIKeyDeleteDialogProps
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
-  const canDeleteAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+  const { can: canDeleteAPIKeys } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    '*'
+  )
 
   const { mutate: deleteAPIKey, isLoading: isDeletingAPIKey } = useAPIKeyDeleteMutation({
     onSuccess: () => {
@@ -35,17 +38,26 @@ export const APIKeyDeleteDialog = ({ apiKey, lastSeen }: APIKeyDeleteDialogProps
 
   return (
     <>
-      <DropdownMenuItem
-        className="flex gap-2 !pointer-events-auto"
+      <DropdownMenuItemTooltip
+        className="flex gap-2"
         onClick={async (e) => {
           if (canDeleteAPIKeys) {
             e.preventDefault()
             setIsOpen(true)
           }
         }}
+        disabled={!canDeleteAPIKeys}
+        tooltip={{
+          content: {
+            side: 'left',
+            text: !canDeleteAPIKeys
+              ? 'You need additional permissions to delete API keys'
+              : undefined,
+          },
+        }}
       >
-        <Trash2 className="size-4 text-destructive" strokeWidth={1.5} /> Delete API key
-      </DropdownMenuItem>
+        <Trash2 size={14} strokeWidth={1.5} /> Delete API key
+      </DropdownMenuItemTooltip>
       <TextConfirmModal
         visible={isOpen}
         onCancel={() => setIsOpen(false)}

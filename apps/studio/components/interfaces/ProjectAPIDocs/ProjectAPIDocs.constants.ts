@@ -410,7 +410,7 @@ You can generate types from your database either through the [Supabase CLI](http
 If you have a GraphQL background, you might be wondering if you can fetch your data in a single round-trip. The answer is yes! The syntax is very similar. This example shows how you might achieve the same thing with Apollo GraphQL and Supabase.
 
 Still want GraphQL?
-If you still want to use GraphQL, you can. Supabase provides you with a full Postgres database, so as long as your middleware can connect to the database then you can still use the tools you love. You can find the database connection details [in the settings](/project/[ref]/settings/database).
+If you still want to use GraphQL, you can. Supabase provides you with a full Postgres database, so as long as your middleware can connect to the database then you can still use the tools you love. You can find the database connection details [in the settings](/project/[ref]/database/settings).
 `,
     js: (apikey?: string, endpoint?: string) => `
 // With Apollo GraphQL

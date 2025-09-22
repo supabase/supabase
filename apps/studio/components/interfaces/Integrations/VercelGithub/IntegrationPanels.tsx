@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
+import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Image from 'next/legacy/image'
+import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -11,8 +13,6 @@ import type {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { ArrowRight, ExternalLink, Github } from 'lucide-react'
-import Link from 'next/link'
 import { Badge, Button, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
@@ -149,8 +149,10 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
     { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
     ref
   ) => {
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data } = useProjectsQuery()
+    const project = (data?.projects ?? []).find(
+      (project) => project.ref === connection.supabase_project_ref
+    )
 
     return (
       <li
@@ -236,8 +238,10 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
 
 const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ connection, type, ...props }, ref) => {
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data } = useProjectsQuery()
+    const project = (data?.projects ?? []).find(
+      (project) => project.ref === connection.supabase_project_ref
+    )
 
     return (
       <li

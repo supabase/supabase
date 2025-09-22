@@ -1,164 +1,190 @@
-import { useEffect, useRef, useState } from 'react'
-import { animate, createSpring, createTimeline, stagger } from 'animejs'
-import Link from 'next/link'
-import Image from 'next/image'
-import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 
-import { Button, Checkbox, cn } from 'ui'
-import { PopupFrame } from 'ui-patterns'
-import { Input } from 'ui/src/components/shadcn/ui/input'
-import { Label } from 'ui/src/components/shadcn/ui/label'
+import { NextSeo } from 'next-seo'
+import Link from 'next/link'
+
+import { motion } from 'framer-motion'
+import { Button, cn } from 'ui'
+
+import { useFlag } from 'common'
 import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
+import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
+import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
+import { StateOfStartupsHeader } from '~/components/SurveyResults/StateOfStartupsHeader'
+import SupabaseSelectPromo from '~/components/SupabaseSelectPromo'
+
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
-import data from '~/data/surveys/state-of-startups-2025'
-
-interface FormData {
-  email: string
-  terms: boolean
-}
-
-interface FormItem {
-  type: 'email' | 'checkbox'
-  label: string
-  placeholder: string
-  required: boolean
-  className?: string
-  component: typeof Input | typeof Checkbox
-}
-
-type FormConfig = {
-  [K in keyof FormData]: FormItem
-}
-
-const formConfig: FormConfig = {
-  email: {
-    type: 'email',
-    label: 'Email',
-    placeholder: 'Email',
-    required: true,
-    className: '',
-    component: Input,
-  },
-  terms: {
-    type: 'checkbox',
-    label: '',
-    placeholder: '',
-    required: true,
-    className: '',
-    component: Checkbox,
-  },
-}
-
-const defaultFormValue: FormData = {
-  email: '',
-  terms: false,
-}
-
-const isValidEmail = (email: string): boolean => {
-  const emailPattern = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/
-  return emailPattern.test(email)
-}
+import pageData from '~/data/surveys/state-of-startups-2025'
 
 function StateOfStartupsPage() {
-  const pageData = data()
-  const meta_title = pageData.metaTitle
-  const meta_description = pageData.metaDescription
-  const meta_image = pageData.metaImage
+  const router = useRouter()
+  const isPageEnabled = useFlag('stateOfStartups')
 
-  const [formData, setFormData] = useState<FormData>(defaultFormValue)
-  const [honeypot, setHoneypot] = useState<string>('') // field to prevent spam
-  const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [startTime, setStartTime] = useState<number>(0)
+  const meta_title = pageData.metaTitle || 'State of Startups 2025 | Supabase'
+  const meta_description =
+    pageData.metaDescription ||
+    'We surveyed over 2,000 startup founders and builders to uncover what’s powering modern startups: their stacks, their go-to-market motion, and their approach to AI.'
 
-  const sendTelemetryEvent = useSendTelemetryEvent()
+  const [showFloatingToc, setShowFloatingToc] = useState(false)
+  const [isTocOpen, setIsTocOpen] = useState(false)
+  const [activeChapter, setActiveChapter] = useState(1)
+  const tocRef = useRef<HTMLDivElement>(null)
+  const heroRef = useRef<HTMLDivElement>(null)
+  const ctaBannerRef = useRef<HTMLElement>(null)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setErrors({})
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  useEffect(() => {
+    if (isPageEnabled !== undefined && !isPageEnabled) router.push('/')
+  }, [isPageEnabled, router])
 
-  const handleReset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault()
-    setFormData(defaultFormValue)
-    setSuccess(null)
-    setErrors({})
-  }
+  // Scroll detection to show floating ToC
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroElement = heroRef.current
+      const ctaBannerElement = ctaBannerRef.current
 
-  const validate = (): boolean => {
-    const newErrors: { [key in keyof FormData]?: string } = {}
+      if (heroElement && ctaBannerElement) {
+        const heroRect = heroElement.getBoundingClientRect()
+        const ctaBannerRect = ctaBannerElement.getBoundingClientRect()
 
-    // Check required fields
-    for (const key in formConfig) {
-      if (formConfig[key as keyof FormData].required && !formData[key as keyof FormData]) {
-        if (key === 'email') {
-          newErrors[key as keyof FormData] = `Email is required`
-        } else if (key === 'terms') {
-          newErrors[key as keyof FormData] = `You must agree to the terms`
+        // Show floating ToC when the hero section is completely out of view
+        // but hide it when the CTA banner comes into view
+        if (heroRect.bottom < 0 && ctaBannerRect.top > window.innerHeight) {
+          setShowFloatingToc(true)
+        } else {
+          setShowFloatingToc(false)
+          setIsTocOpen(false)
         }
       }
     }
 
-    // Validate email
-    if (formData.email && !isValidEmail(formData.email)) {
-      newErrors.email = 'Invalid email address'
-    }
-
-    setErrors(newErrors)
-
-    // Return validation status, also check if honeypot is filled (indicating a bot)
-    return Object.keys(newErrors).length === 0 && honeypot === ''
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const currentTime = Date.now()
-    const timeElapsed = (currentTime - startTime) / 1000
-
-    // Spam prevention: Reject form if submitted too quickly (less than 3 seconds)
-    if (timeElapsed < 3) {
-      setErrors({ general: 'Submission too fast. Please fill the form correctly.' })
-      return
-    }
-
-    if (!validate()) {
-      return
-    }
-
-    setIsSubmitting(true)
-    setSuccess(null)
-
-    try {
-      const response = await fetch('/api-v2/submit-form-sos2025-newsletter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (response.ok) {
-        setSuccess('Thank you for your submission!')
-        setFormData({ email: '', terms: false })
-      } else {
-        const errorData = await response.json()
-        setErrors({ general: `Submission failed: ${errorData.message}` })
-      }
-    } catch (error) {
-      setErrors({ general: 'An unexpected error occurred. Please try again.' })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  useEffect(() => {
-    setStartTime(Date.now())
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Active chapter detection
+  useEffect(() => {
+    const handleScroll = () => {
+      const chapters = pageData.pageChapters
+      const scrollY = window.scrollY + 100 // Offset for better detection
+
+      for (let i = chapters.length - 1; i >= 0; i--) {
+        const chapterElement = document.getElementById(`chapter-${i + 1}`)
+        if (chapterElement && scrollY >= chapterElement.offsetTop) {
+          setActiveChapter(i + 1)
+          break
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Close ToC when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const isOutsideFloating = tocRef.current && !tocRef.current.contains(event.target as Node)
+
+      if (isOutsideFloating) {
+        setIsTocOpen(false)
+      }
+    }
+
+    if (isTocOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isTocOpen])
+
+  // Floating Table of Contents
+  const FloatingTableOfContents = () => {
+    const currentChapter = pageData.pageChapters[activeChapter - 1]
+
+    if (!showFloatingToc) return null
+
+    return (
+      <div
+        ref={tocRef}
+        className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300"
+      >
+        <div className="relative">
+          {/* Closed ToC */}
+          <Button
+            type="default"
+            size="small"
+            onClick={() => setIsTocOpen(true)}
+            className={cn(
+              'flex flex-row gap-2 shadow-xl rounded-full px-2 pr-4',
+              isTocOpen && 'hidden'
+            )}
+          >
+            <div className={cn('flex items-center gap-2 font-mono uppercase text-xs')}>
+              <span className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light">
+                {activeChapter}
+              </span>
+              <motion.span
+                key={currentChapter?.shortTitle}
+                className="text-foreground tracking-widest"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.1 }}
+              >
+                {currentChapter?.shortTitle}
+              </motion.span>
+            </div>
+          </Button>
+
+          {/* Open ToC */}
+          {isTocOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.86, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.1, ease: 'easeOut' }}
+              className="origin-[50%_25%] bg-background/80 backdrop-blur-lg border border-default rounded-xl shadow-xl overflow-hidden"
+            >
+              <ol className="max-h-[60vh] overflow-y-auto py-2 flex flex-col">
+                {pageData.pageChapters.map((chapter, chapterIndex) => (
+                  <motion.li
+                    key={chapterIndex + 1}
+                    initial={{ opacity: 0, y: -2 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.1,
+                      ease: 'easeOut',
+                      delay:
+                        0.1 +
+                        Math.exp(-(pageData.pageChapters.length - chapterIndex - 1) * 0.3) * 0.2,
+                    }}
+                  >
+                    <Link
+                      href={`#chapter-${chapterIndex + 1}`}
+                      onClick={() => setIsTocOpen(false)}
+                      className={cn(
+                        'block px-6 py-2 text-xs transition-colors font-mono uppercase tracking-wider text-center text-foreground-light hover:text-brand-link hover:bg-brand-300/25',
+                        chapterIndex + 1 === activeChapter &&
+                          'bg-brand-300/40 text-brand-link dark:text-brand'
+                      )}
+                    >
+                      {chapter.shortTitle}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ol>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  if (!isPageEnabled) return null
 
   return (
     <>
@@ -171,364 +197,166 @@ function StateOfStartupsPage() {
           url: `https://supabase.com/state-of-startups`,
           images: [
             {
-              url: meta_image,
+              url: `https://supabase.com/images/state-of-startups/state-of-startups-og.png`,
             },
           ],
         }}
       />
-      <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
-        <Hero {...pageData.heroSection} />
-        <SectionContainer>
-          <div className="flex flex-col text-center gap-4 py-8 items-center justify-center">
-            <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">Stay in touch</h2>
-            <p className="mx-auto text-foreground-lighter w-full">
-              Sign up for our newsletter to be notified when the survey results are available.
-            </p>
-            <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-              {success ? (
-                <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
-                  <p className="text-center text-sm">{success}</p>
-                  <Button onClick={handleReset}>Reset</Button>
-                </div>
-              ) : (
-                <form
-                  noValidate
-                  id="state-of-startups-form"
-                  onSubmit={handleSubmit}
-                  className="w-full max-w-md flex flex-col gap-4 items-center"
-                >
-                  <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2">
-                    {/* Spam prevention */}
-                    <input
-                      type="text"
-                      name="honeypot"
-                      value={honeypot}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setHoneypot(e.target.value)
-                      }
-                      style={{ display: 'none' }}
-                      aria-hidden="true"
-                    />
-                    <Input
-                      required
-                      onChange={handleChange}
-                      value={formData['email']}
-                      name="email"
-                      type="email"
-                      placeholder="Email"
-                    />
-                    <Button
-                      htmlType="submit"
-                      disabled={isSubmitting}
-                      size="small"
-                      onClick={() =>
-                        sendTelemetryEvent({
-                          action: 'register_for_state_of_startups_newsletter_clicked',
-                          properties: { buttonLocation: 'State of Startups 2025 Newsletter Form' },
-                        })
-                      }
-                    >
-                      Register
-                    </Button>
-                  </div>
-                  <div className="flex items-center gap-2 text-left">
-                    <Checkbox
-                      required
-                      name="terms"
-                      id="terms"
-                      onChange={handleChange}
-                      className="[&>input]:m-0"
-                    />
-                    <Label htmlFor="terms" className="text-foreground-lighter leading-5">
-                      We process your information in accordance with our{' '}
-                      <Link href="/privacy" className="text-foreground-light hover:underline">
-                        Privacy Policy
-                      </Link>
-                      .
-                    </Label>
-                  </div>
-                  <div
-                    className={cn(
-                      'flex flex-nowrap text-right gap-1 items-center text-xs leading-none transition-opacity opacity-0 text-foreground-lighter',
-                      errors['email'] && 'opacity-100 animate-fade-in',
-                      errors['terms'] && 'opacity-100 animate-fade-in'
-                    )}
-                  >
-                    {errors['email'] ? errors['email'] : errors['terms']}
-                  </div>
-                </form>
-              )}
+
+      <DefaultLayout className="bg-alternative overflow-hidden">
+        <FloatingTableOfContents />
+        {/* Intro section */}
+        <section ref={heroRef} className="w-full">
+          <StateOfStartupsHeader />
+          <SurveySectionBreak className="hidden md:block" />
+          <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
+            {/* Intro text */}
+            <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
+              <p>{pageData.heroSection.subheader}</p>
+              <p>{pageData.heroSection.cta}</p>
             </div>
+
+            {/* Table of contents */}
+            <ol className="flex flex-col py-5">
+              {pageData.pageChapters.map((chapter, chapterIndex) => (
+                <li key={chapterIndex + 1}>
+                  <Link
+                    href={`#chapter-${chapterIndex + 1}`}
+                    className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
+                  >
+                    <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
+                      {chapterIndex + 1}
+                    </span>{' '}
+                    {chapter.shortTitle}
+                  </Link>
+                </li>
+              ))}
+            </ol>
           </div>
-        </SectionContainer>
+
+          <SurveySectionBreak />
+        </section>
+
+        {pageData.pageChapters.map((chapter, chapterIndex) => (
+          <SurveyChapter
+            key={chapterIndex + 1}
+            number={chapterIndex + 1}
+            shortTitle={chapter.shortTitle}
+            title={chapter.title}
+            description={chapter.description}
+            pullQuote={chapter.pullQuote}
+          >
+            {chapter.sections.map((section, sectionIndex) => (
+              <SurveyChapterSection
+                key={sectionIndex + 1}
+                title={section.title}
+                description={section.description}
+                stats={section.stats}
+                charts={section.charts}
+                wordCloud={section.wordCloud}
+                summarizedAnswer={section.summarizedAnswer}
+                rankedAnswersPair={section.rankedAnswersPair}
+              />
+            ))}
+          </SurveyChapter>
+        ))}
+        <CTABanner ref={ctaBannerRef} />
+        <ParticipantsList />
+        <SupabaseSelectPromo />
       </DefaultLayout>
     </>
   )
 }
 
-const Hero = (props: any) => {
-  const animRef = useRef<HTMLDivElement | null>(null)
+export default StateOfStartupsPage
+
+// Component for the participants list
+const ParticipantsList = () => {
+  const [shuffledParticipants, setShuffledParticipants] = useState(pageData.participantsList)
 
   useEffect(() => {
-    if (!animRef.current) return
-
-    const strings = [
-      "What's your tech stack?",
-      "What's your favorite AI developer tool?",
-      'Which vector database are you using?',
-      'Are you building AI Agents?',
-      'Do you use OpenTelemetry?',
-      'Where do you go to learn?',
-    ]
-
-    let currentIndex = 0
-
-    const animateText = () => {
-      const animatedText = animRef.current?.querySelector('#anim')
-      if (!animatedText) return
-
-      const currentText = strings[currentIndex]
-
-      animatedText.textContent = currentText
-      // Split by words and wrap each word, then wrap letters within each word
-      animatedText.innerHTML = currentText
-        .split(' ')
-        .map((word) => {
-          if (word.trim() === '') return ' '
-          const wrappedLetters = word.replace(
-            /\S/g,
-            "<span class='letter' style='opacity: 0; transform: translateY(-6px); display: inline-block;'>$&</span>"
-          )
-          return `<span class="word" style="display: inline-block; white-space: nowrap;">${wrappedLetters}</span>`
-        })
-        .join(' ')
-
-      createTimeline({
-        onComplete: () => {
-          currentIndex = (currentIndex + 1) % strings.length
-          setTimeout(() => {
-            animateOut()
-          }, 100)
-        },
-      }).add(animatedText.querySelectorAll('.letter'), {
-        opacity: [0, 1],
-        translateY: [-8, 0],
-        ease: createSpring({ stiffness: 150, damping: 15 }),
-        duration: 500,
-        delay: stagger(10),
-      })
-    }
-
-    const animateOut = () => {
-      const animatedText = animRef.current?.querySelector('#anim')
-      if (!animatedText) return
-
-      animate(animatedText.querySelectorAll('.letter'), {
-        opacity: [1, 0],
-        translateY: [0, 8],
-        ease: 'inExpo',
-        duration: 500,
-        delay: stagger(10),
-        onComplete: () => {
-          setTimeout(animateText, -100)
-        },
-      })
-    }
-
-    animateText()
-
-    return () => {}
+    // Simple shuffle after mount, no animation because it's at the bottom of the page
+    const shuffled = [...pageData.participantsList].sort(() => Math.random() - 0.5)
+    setShuffledParticipants(shuffled)
   }, [])
 
   return (
-    <>
-      <div
-        className={cn(
-          'container relative w-full mx-auto px-6 py-8 md:py-16 sm:px-16 xl:px-20',
-          props.className
-        )}
-      >
-        <div
-          ref={animRef}
-          className="flex flex-col text-center items-center justify-center min-h-[600px] lg:min-h-[70vh]"
-        >
-          <div className="absolute overflow-hidden -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center">
-            <svg
-              width="558"
-              height="392"
-              viewBox="0 0 558 392"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute w-full h-full inset-0 -top-40 lg:top-0 xl:-left-40 animate-pulse"
-              style={{
-                animationDuration: '20000ms',
-              }}
-            >
-              <circle
-                cx="278.831"
-                cy="112.952"
-                r="278.5"
-                transform="rotate(75 278.831 112.952)"
-                fill="url(#paint0_radial_183_1691)"
-                fillOpacity="0.2"
-              />
-              <defs>
-                <radialGradient
-                  id="paint0_radial_183_1691"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform="translate(349.764 144.755) rotate(-132.179) scale(202.74 202.839)"
-                >
-                  <stop stopColor="hsl(var(--foreground-default))" />
-                  <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
-                </radialGradient>
-              </defs>
-            </svg>
-            <div className="sm:w-full sm_h-full sm:flex sm:justify-center">
-              <svg
-                width="1119"
-                height="1119"
-                viewBox="0 0 1119 1119"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="sm:w-auto -mb-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
-                style={{
-                  animationDuration: '20000ms',
-                }}
-              >
-                <g clipPath="url(#clip0_183_1690)">
-                  <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
-                  <path
-                    d="M982.759 -15.7995C1100.79 61.9162 1134.95 153.728 1129.8 236.892C1124.68 319.611 1080.66 393.869 1041.31 437.283C968.75 168.701 692.591 9.3387 423.687 80.9161C430.529 20.4699 450.367 -27.8768 480.826 -63.4144C511.422 -99.1129 552.763 -121.922 602.496 -131.075C701.21 -149.241 833.009 -113.601 979.3 -18.0675L982.759 -15.7995Z"
-                    stroke="url(#paint2_radial_183_1690)"
-                    strokeWidth="1.15887"
-                  />
-                </g>
-                <defs>
-                  <radialGradient
-                    id="paint1_radial_183_1690"
-                    cx="0"
-                    cy="0"
-                    r="1"
-                    gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(571.212 579.87) rotate(122.182) scale(542.117 690.275)"
-                  >
-                    <stop stopColor="hsl(var(--border-muted))" />
-                    <stop
-                      offset="0.716346"
-                      stopColor="hsl(var(--background-alternative-default))"
-                    />
-                    <stop
-                      offset="0.754808"
-                      stopColor="hsl(var(--background-alternative-default))"
-                    />
-                    <stop offset="1" stopColor="hsl(var(--border-strong))" />
-                  </radialGradient>
-                  <radialGradient
-                    id="paint2_radial_183_1690"
-                    cx="0"
-                    cy="0"
-                    r="1"
-                    gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(814.301 175.03) rotate(-38.9601) scale(142.974 294.371)"
-                  >
-                    <stop stopColor="hsl(var(--foreground-default))" />
-                    <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
-                  </radialGradient>
-                  <clipPath id="clip0_183_1690">
-                    <rect width="1119" height="1119" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </div>
-            <svg
-              width="1096"
-              height="482"
-              viewBox="0 0 1096 482"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute min-w-full inset-0 top-auto z-10"
-            >
-              <rect x="0.500488" width="1095" height="482" fill="url(#paint0_linear_183_1694)" />
-              <defs>
-                <linearGradient
-                  id="paint0_linear_183_1694"
-                  x1="922.165"
-                  y1="63.3564"
-                  x2="922.165"
-                  y2="419.772"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop stopColor="hsl(var(--background-alternative-default))" stopOpacity="0" />
-                  <stop offset="1" stopColor="hsl(var(--background-alternative-default))" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <div className="relative w-full z-10 flex flex-col items-center mx-auto">
-            <div className="flex gap-2 mb-4 md:mb-8">
-              <div className="w-11 h-11 relative flex items-center justify-center bg-default border rounded-lg">
-                <Image
-                  src="/images/supabase-logo-icon.svg"
-                  alt="Supabase icon"
-                  width={60}
-                  height={60}
-                  className="w-6 h-6"
-                />
-              </div>
-            </div>
-            <div>
-              {props.icon || props.title ? (
-                <div className="mb-2 flex justify-center items-center gap-3">
-                  {props.title && (
-                    <h1
-                      className="text-brand font-mono uppercase tracking-widest text-sm"
-                      key={`product-name-${props.title}`}
-                    >
-                      {props.title}
-                    </h1>
-                  )}
-                </div>
-              ) : null}
-            </div>
-            <div className={cn('flex flex-col gap-4 items-center')}>
-              <div className="flex h-[150px] items-center">
-                <div
-                  id="anim"
-                  className="will-change-transform leading-[120%] text-4xl sm:text-5xl md:text-6xl min-h-[4rem] max-w-2xl [&_.letter]:transform"
-                >
-                  State of Startups
-                </div>
-              </div>
-              <p className="p !text-foreground-light max-w-lg">{props.subheader}</p>
-            </div>
-            <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
-              <PopupFrame
-                trigger={
-                  <Button size="small" asChild>
-                    <span>Take the survey</span>
-                  </Button>
-                }
-                className="[&_.modal-content]:min-h-[650px] [&_.modal-content]:!h-[75vh] [&_.modal-content]:flex [&_.modal-content]:flex-col"
-              >
-                <div className="w-full !h-full flex-1 flex flex-col">
-                  <iframe
-                    src={`https://form.typeform.com/to/si6Z7XlW?embedded=true`}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    className="w-full !min-h-full flex-1"
-                  />
-                </div>
-              </PopupFrame>
-            </div>
-          </div>
-        </div>
+    <section className="flex flex-col items-center gap-12 md:gap-20 px-4 py-20 md:py-28 text-center border-b border-muted">
+      <div className="flex flex-col items-center gap-4 max-w-prose">
+        <h2 className="text-foreground text-3xl text-balance">Thank you</h2>
+        <p className="text-foreground-light text-lg text-balance max-w-prose">
+          A special thanks to the following companies for participating in this year’s survey.
+        </p>
       </div>
-    </>
+
+      <ul className="flex flex-wrap items-center justify-center gap-5 md:gap-7 max-w-7xl mx-auto px-4">
+        {shuffledParticipants.map((participant, index) => (
+          <li key={participant.company} className="">
+            <Link
+              href={participant.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs md:text-sm font-mono text-center tracking-widest uppercase text-foreground-lighter hover:text-brand-link transition-colors"
+            >
+              {participant.company}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
 
-export default StateOfStartupsPage
+// Component for the 'Builders choose Supabase' CTA at the bottom of the page
+const CTABanner = forwardRef<HTMLElement>((props, ref) => {
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  return (
+    <section
+      className="flex flex-col items-center gap-4 px-4 py-32 text-center border-b border-muted"
+      style={{
+        background:
+          'radial-gradient(circle at center 220%, hsl(var(--brand-400)), transparent 70%)',
+      }}
+      ref={ref}
+    >
+      <div className="flex flex-col items-center gap-4 max-w-prose">
+        <h2 className="text-foreground text-5xl text-balance">Builders choose Supabase</h2>
+        <p className="text-foreground-light text-lg">
+          Supabase is the Postgres development platform. Build your startup with a Postgres
+          database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage,
+          and Vector embeddings.
+        </p>
+      </div>
+      <div className="flex items-center justify-center gap-2 mt-4">
+        <Button asChild size="medium">
+          <Link
+            href="https://supabase.com/dashboard"
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'start_project_button_clicked',
+                properties: { buttonLocation: 'CTA Banner' },
+              })
+            }
+          >
+            Start your project
+          </Link>
+        </Button>
+        <Button asChild size="medium" type="default">
+          <Link
+            href="/contact/sales"
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'request_demo_button_clicked',
+                properties: { buttonLocation: 'CTA Banner' },
+              })
+            }
+          >
+            Request a demo
+          </Link>
+        </Button>
+      </div>
+    </section>
+  )
+})
+
+CTABanner.displayName = 'CTABanner'

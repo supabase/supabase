@@ -9,8 +9,6 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
   const value = _value as string
   const column = table.getColumn(value)
   const filterValue = columnFilters.find((f) => f.id === value)?.value
-
-  // TODO: check if we could useMemo
   const filters = filterValue ? (Array.isArray(filterValue) ? filterValue : [filterValue]) : []
 
   if (filters.length === 0) return null
@@ -18,7 +16,8 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
   return (
     <Button
       type="outline"
-      className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px]"
+      icon={<X />}
+      className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:-translate-y-[0.6px] space-x-1"
       onClick={(e) => {
         e.stopPropagation()
         column?.setFilterValue(undefined)
@@ -29,13 +28,8 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
           column?.setFilterValue(undefined)
         }
       }}
-      icon={<X className="h-2.5 w-2.5 text-muted-foreground" />}
-      asChild
     >
-      {/* REMINDER: `AccordionTrigger` is also a button(!) and we get Hydration error when rendering button within button */}
-      <div role="button" tabIndex={0}>
-        <span>{filters.length}</span>
-      </div>
+      {filters.length}
     </Button>
   )
 }

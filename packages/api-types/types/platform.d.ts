@@ -227,6 +227,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/cloud-marketplace/buyers/{buyer_id}/onboarding-info': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get info needed for AWS Marketplace onboarding */
+    get: operations['ClazarController_getCloudMarketplaceOnboardingInfo']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/database/{ref}/backups': {
     parameters: {
       query?: never
@@ -441,7 +458,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Send exit survey to HubSpot, Notion, and survey_responses table */
+    /** Send exit survey to HubSpot and survey_responses table */
     post: operations['SendFeedbackController_sendExitSurvey']
     delete?: never
     options?: never
@@ -622,6 +639,62 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/github/repositories/{repositoryId}/branches': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List GitHub repository branches */
+    get: operations['GitHubRepositoriesController_listRepositoryBranches']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/integrations/github/repositories/{repositoryId}/branches/{branchName}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get GitHub repository branch
+     * @deprecated
+     * @description This is a temporary endpoint before dashboard switches to combo box
+     */
+    get: operations['GitHubRepositoriesController_getRepository']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/integrations/private-link/{slug}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get organization's PrivateLink configuration. */
+    get: operations['PrivateLinkController_getPrivateLinkConfig']
+    /** Update organization's PrivateLink configuration. */
+    put: operations['PrivateLinkController_updatePrivateLinkConfig']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/vercel': {
     parameters: {
       query?: never
@@ -728,6 +801,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/vercel/connections/project/{project_ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets all Vercel integrations (regular and marketplace) with their connections for a given project */
+    get: operations['VercelConnectionsController_getProjectVercelConnections']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/vercel/projects/{organization_integration_id}': {
     parameters: {
       query?: never
@@ -792,6 +882,23 @@ export interface paths {
     get: operations['NotificationsController_getNotificationsSummary']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/oauth/apps/register': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Dynamically register an OAuth client (RFC-7591) */
+    post: operations['PlatformOAuthAppsController_dynamicRegister']
     delete?: never
     options?: never
     head?: never
@@ -1041,6 +1148,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/cloud-marketplace/link': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Makes an existing organization being billed by AWS Marketplace */
+    put: operations['ClazarController_link']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/cloud-marketplace/redirect': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the AWS Marketplace redirect url */
+    get: operations['ClazarController_getRedirectUrl']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/customer': {
     parameters: {
       query?: never
@@ -1087,6 +1228,23 @@ export interface paths {
     get: operations['OrgDailyStatsController_getDailyStatsCompute']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/documents/dpa': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create DPA document using PandaDoc */
+    post: operations['OrgDocumentsController_createDpaDocument']
     delete?: never
     options?: never
     head?: never
@@ -1433,7 +1591,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets all projects for the given organization */
+    /**
+     * Gets all projects for the given organization
+     * @description Returns a paginated list of projects for the specified organization.
+     *
+     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     */
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
     post?: never
@@ -1460,6 +1623,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/sso': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the organization's SSO Provider */
+    get: operations['SSOProvidersController_getSSOProvider']
+    /** Update the organization's SSO Provider */
+    put: operations['SSOProvidersController_updateSSOProvider']
+    /** Create the organization's SSO Provider */
+    post: operations['SSOProvidersController_createSSOProvider']
+    /** Delete the organization's SSO Provider */
+    delete: operations['SSOProvidersController_deleteSSOProvider']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/tax-ids': {
     parameters: {
       query?: never
@@ -1479,23 +1662,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/transfer': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Transfers the organization to the given member */
-    post: operations['TransferController_transferOrganization']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/organizations/{slug}/usage': {
     parameters: {
       query?: never
@@ -1507,6 +1673,23 @@ export interface paths {
     get: operations['OrgUsageController_getOrgUsage']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/cloud-marketplace': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates organization billed by AWS Marketplace */
+    post: operations['OrganizationsController_createAwsBilledOrganization']
     delete?: never
     options?: never
     head?: never
@@ -1968,23 +2151,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/profile/search': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Search profiles by username, email with the given keywords */
-    post: operations['SearchProfileController_searchProfile']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/projects': {
     parameters: {
       query?: never
@@ -2045,15 +2211,15 @@ export interface paths {
     patch: operations['ProjectsRefController_updateProject']
     trace?: never
   }
-  '/platform/projects/{ref}/analytics/endpoints/functions.inv-stats': {
+  '/platform/projects/{ref}/analytics/endpoints/functions.combined-stats': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets a project's function invocation statistics */
-    get: operations['FunctionInvocationLogsController_getStatus']
+    /** Gets a project's function combined statistics */
+    get: operations['FunctionsLogsController_getCombinedStats']
     put?: never
     post?: never
     delete?: never
@@ -2070,7 +2236,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets a project's function request statistics */
-    get: operations['FunctionRequestLogsController_getStatus']
+    get: operations['FunctionsLogsController_getRequestStats']
     put?: never
     post?: never
     delete?: never
@@ -2087,7 +2253,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets a project's function resource usage */
-    get: operations['FunctionResourceLogsController_getStatus']
+    get: operations['FunctionsLogsController_getResourceUsage']
     put?: never
     post?: never
     delete?: never
@@ -2104,10 +2270,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's logs */
-    get: operations['LogsController_getApiPaths']
+    get: operations['LogsController_getProjectLogsViaGet']
     put?: never
-    /** Post project's logs */
-    post: operations['LogsController_postApiPaths']
+    /** Gets project's logs */
+    post: operations['LogsController_getProjectLogsViaPost']
     delete?: never
     options?: never
     head?: never
@@ -2354,6 +2520,23 @@ export interface paths {
     get: operations['TenantController_getTenant']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/api-keys/temporary': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create a temporary API key */
+    post: operations['ApiKeysController_createTemporaryApiKey']
     delete?: never
     options?: never
     head?: never
@@ -3193,6 +3376,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/available-regions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the list of available regions that can be used for a new project */
+    get: operations['ProjectsController_getRegions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/fly/{fly_extension_id}': {
     parameters: {
       query?: never
@@ -3217,10 +3417,16 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets replication destinations */
+    /**
+     * List replication destinations
+     * @description List all destinations for the project. Requires bearer auth and an active, healthy project.
+     */
     get: operations['ReplicationDestinationsController_getDestinations']
     put?: never
-    /** Creates a destination */
+    /**
+     * Create replication destination
+     * @description Create a destination for the project. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationDestinationsController_createDestination']
     delete?: never
     options?: never
@@ -3237,7 +3443,10 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Creates a replication destination and pipeline. */
+    /**
+     * Create destination and pipeline
+     * @description Create a destination and pipeline in one call. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationDestinationsPipelinesController_createDestinationPipeline']
     delete?: never
     options?: never
@@ -3254,26 +3463,16 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Updates a replication destination and pipeline */
+    /**
+     * Update destination and pipeline
+     * @description Update a destination and pipeline in one call. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationDestinationsPipelinesController_updateDestinationPipeline']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/replication/{ref}/destinations/{destinaion_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Updates a destination */
-    post: operations['ReplicationDestinationsController_updateDestination']
-    delete?: never
+    /**
+     * Delete destination and pipeline
+     * @description Delete a destination and pipeline. Requires bearer auth and an active, healthy project.
+     */
+    delete: operations['ReplicationDestinationsPipelinesController_deleteDestinationPipeline']
     options?: never
     head?: never
     patch?: never
@@ -3286,11 +3485,21 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets a destination by id */
+    /**
+     * Get replication destination
+     * @description Get a destination by id. Requires bearer auth and an active, healthy project.
+     */
     get: operations['ReplicationDestinationsController_getDestination']
     put?: never
-    post?: never
-    /** Deletes a destination */
+    /**
+     * Update replication destination
+     * @description Update a destination for the project. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationDestinationsController_updateDestination']
+    /**
+     * Delete replication destination
+     * @description Delete a destination from the project. Requires bearer auth and an active, healthy project.
+     */
     delete: operations['ReplicationDestinationsController_deleteDestination']
     options?: never
     head?: never
@@ -3304,10 +3513,16 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets replication pipelines */
+    /**
+     * List replication pipelines
+     * @description List all pipelines for the project. Requires bearer auth and an active, healthy project.
+     */
     get: operations['ReplicationPipelinesController_getPipelines']
     put?: never
-    /** Creates a pipeline */
+    /**
+     * Create replication pipeline
+     * @description Create a pipeline for the project. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationPipelinesController_createPipeline']
     delete?: never
     options?: never
@@ -3322,13 +3537,62 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets a pipeline by id */
+    /**
+     * Get replication pipeline
+     * @description Get a pipeline by id. Requires bearer auth and an active, healthy project.
+     */
     get: operations['ReplicationPipelinesController_getPipeline']
     put?: never
-    /** Updates a pipeline */
+    /**
+     * Update replication pipeline
+     * @description Update a pipeline. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationPipelinesController_updatePipeline']
-    /** Deletes a pipeline */
+    /**
+     * Delete replication pipeline
+     * @description Delete a pipeline from the project. Requires bearer auth and an active, healthy project.
+     */
     delete: operations['ReplicationPipelinesController_deletePipeline']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/replication-status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get pipeline replication status
+     * @description Get the pipeline replication status. Requires bearer auth and an active, healthy project.
+     */
+    get: operations['ReplicationPipelinesController_getPipelineReplicationStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Rollback pipeline table state
+     * @description Rollback a table state for the pipeline. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationPipelinesController_rollbackTableState']
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -3343,7 +3607,10 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Starts a pipeline */
+    /**
+     * Start pipeline
+     * @description Start the pipeline. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationPipelinesController_startPipeline']
     delete?: never
     options?: never
@@ -3358,7 +3625,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets status of a pipeline */
+    /**
+     * Get pipeline status
+     * @description Get the current pipeline status. Requires bearer auth and an active, healthy project.
+     */
     get: operations['ReplicationPipelinesController_getPipelineStatus']
     put?: never
     post?: never
@@ -3377,8 +3647,35 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Stops a pipeline */
+    /**
+     * Stop pipeline
+     * @description Stop the pipeline. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationPipelinesController_stopPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/version': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get pipeline version
+     * @description Get the current pipeline version. Requires bearer auth and an active, healthy project.
+     */
+    get: operations['ReplicationPipelinesController_getPipelineVersion']
+    put?: never
+    /**
+     * Update pipeline version
+     * @description Update the pipeline to a new version. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationPipelinesController_updatePipelineVersion']
     delete?: never
     options?: never
     head?: never
@@ -3392,10 +3689,16 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Returns replication sources. */
+    /**
+     * List replication sources
+     * @description List all sources for the project. Requires bearer auth and an active, healthy project.
+     */
     get: operations['ReplicationSourcesController_getSources']
     put?: never
-    /** Creates a replication source. */
+    /**
+     * Create replication source
+     * @description Create a source for the project. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationSourcesController_createSource']
     delete?: never
     options?: never
@@ -3410,10 +3713,16 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Returns source publications. */
+    /**
+     * List publications for source
+     * @description List publications for a source. Requires bearer auth and an active, healthy project.
+     */
     get: operations['ReplicationSourcesController_getPublications']
     put?: never
-    /** Creates a publication. */
+    /**
+     * Create publication for source
+     * @description Create a publication for a source. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationSourcesController_createPublication']
     delete?: never
     options?: never
@@ -3431,7 +3740,10 @@ export interface paths {
     get?: never
     put?: never
     post?: never
-    /** Deletes a publication. */
+    /**
+     * Delete publication for source
+     * @description Delete a publication for a source. Requires bearer auth and an active, healthy project.
+     */
     delete: operations['ReplicationSourcesController_deletePublication']
     options?: never
     head?: never
@@ -3445,7 +3757,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Returns source tables. */
+    /**
+     * List tables for source
+     * @description List tables available for a source. Requires bearer auth and an active, healthy project.
+     */
     get: operations['ReplicationSourcesController_getTables']
     put?: never
     post?: never
@@ -3464,7 +3779,10 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Creates a replication tenant and source. */
+    /**
+     * Create tenant and source
+     * @description Create a replication tenant and source. Requires bearer auth and an active, healthy project.
+     */
     post: operations['ReplicationTenantsSourcesController_createTenantSource']
     delete?: never
     options?: never
@@ -3987,58 +4305,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/vercel/projects': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the list of Vercel projects */
-    get: operations['VercelProjectsController_getVercelProjects']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/vercel/projects/{id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the Vercel project with the given ID */
-    get: operations['VercelProjectsController_getVercelProject']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/vercel/projects/envs': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the environment variables for the given project ID on behalf of the given team ID */
-    get: operations['VercelEnvironmentVariablesController_getEnvironmentVariables']
-    put?: never
-    /** Creates the environment variable for the given project ID on behalf of the given team ID */
-    post: operations['VercelEnvironmentVariablesController_createEnvironmentVariable']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/vercel/redirect/{installation_id}': {
     parameters: {
       query?: never
@@ -4117,7 +4383,9 @@ export interface components {
     }
     AccessToken: {
       created_at: string
+      expires_at: string | null
       id: number
+      last_used_at: string | null
       name: string
       /** @enum {string} */
       scope?: 'V0'
@@ -4200,6 +4468,7 @@ export interface components {
           | 'auth_password_policy_missing'
           | 'leaked_service_key'
           | 'no_backup_admin'
+          | 'vulnerable_postgres_version'
         remediation: string
         title: string
       }[]
@@ -4225,12 +4494,12 @@ export interface components {
     BillingCustomerUpdateBody: {
       additional_emails?: string[]
       address?: {
-        city?: string
+        city?: string | null
         country: string
         line1: string
-        line2?: string
-        postal_code?: string
-        state?: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
       }
       billing_name?: string
     }
@@ -4262,12 +4531,26 @@ export interface components {
       walg_enabled: boolean
     }
     CloneProject: {
-      /** @default 0 */
       cloneBackupId?: number
       newDbPass: string
       newProjectName: string
-      /** @default 0 */
       recoveryTimeTarget?: number
+    }
+    CloudMarketplaceOnboardingInfoResponse: {
+      aws_contract_auto_renewal: boolean
+      aws_contract_end_date: string
+      aws_contract_settings_url: string
+      aws_contract_start_date: string
+      organization_linking_eligibility: {
+        is_eligible: boolean
+        reasons: (
+          | 'ALREADY_MANAGED_BY_PARTNER'
+          | 'ALREADY_MANAGED_BY_PARTNER_AWS'
+          | 'OVERDUE_INVOICES'
+        )[]
+        slug: string
+      }[]
+      plan_name_selected_on_marketplace: string
     }
     ConfirmCreateSubscriptionChangeBody: {
       kind?: string
@@ -4286,18 +4569,28 @@ export interface components {
       path: string
     }
     CreateAccessTokenBody: {
+      /** Format: date-time */
+      expires_at?: string
       name: string
       /** @enum {string} */
       scope?: 'V0'
     }
     CreateAccessTokenResponse: {
       created_at: string
+      expires_at: string | null
       id: number
+      last_used_at: string | null
       name: string
       /** @enum {string} */
       scope?: 'V0'
       token: string
       token_alias: string
+    }
+    CreateAwsBilledOrganizationBody: {
+      buyer_id: string
+      kind?: string
+      name: string
+      size?: string
     }
     CreateBackendParamsOpenapi: {
       config:
@@ -4391,13 +4684,34 @@ export interface components {
       parent_id?: string
     }
     CreateDestinationPipelineResponse: {
-      /** @description Destination id */
+      /**
+       * @description Destination id
+       * @example 2001
+       */
       destination_id: number
-      /** @description Pipeline id */
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
       pipeline_id: number
     }
     CreateDestinationResponse: {
+      /**
+       * @description Destination id
+       * @example 2001
+       */
       id: number
+    }
+    CreateDpaDocumentRequest: {
+      /** Format: email */
+      recipient_email: string
+    }
+    CreateDpaDocumentResponse: {
+      date_created: string
+      document_id: string
+      download_url?: string
+      name: string
+      status: string
     }
     CreateExtensionBody: {
       cascade: boolean
@@ -4422,10 +4736,24 @@ export interface components {
     CreateGitHubAuthorizationBody: {
       code: string
     }
-    CreateGitHubConnectionsBody: {
+    CreateGitHubConnectionBody: {
+      branch_limit?: number
       installation_id: number
+      new_branch_per_pr?: boolean
       project_ref: string
       repository_id: number
+      supabase_changes_only?: boolean
+      workdir?: string
+    }
+    CreateGitHubConnectionResponse: {
+      branch_limit: number
+      id: number
+      inserted_at: string
+      installation_id: number
+      new_branch_per_pr: boolean
+      supabase_changes_only: boolean
+      updated_at: string
+      workdir: string
     }
     CreateInvitationBody: {
       email: string
@@ -4535,22 +4863,26 @@ export interface components {
       created_by: string
       /** Format: uuid */
       id: string
+      /** Format: date-time */
+      last_used_at: string | null
       /** Format: uuid */
       oauth_app_id: string
     }
     CreateOAuthAppResponse: {
       client_id: string
       client_secret: string
+      client_secret_expires_at: number
       id: string
+      redirect_uris: string[]
     }
     CreateOrganizationBody: {
       address?: {
-        city?: string
+        city?: string | null
         country: string
         line1: string
-        line2?: string
-        postal_code?: string
-        state?: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
       }
       billing_name?: string
       kind?: string
@@ -4571,6 +4903,8 @@ export interface components {
         }
       | {
           billing_email: string | null
+          /** @enum {string|null} */
+          billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
@@ -4592,6 +4926,10 @@ export interface components {
           usage_billing_enabled: boolean
         }
     CreatePipelineResponse: {
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
       id: number
     }
     CreatePolicyBody: {
@@ -4608,7 +4946,8 @@ export interface components {
     }
     CreateProjectBody: {
       auth_site_url?: string
-      cloud_provider: string
+      /** @enum {string} */
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       custom_supabase_internal_requests?: {
         ami: {
           search_tags?: {
@@ -4621,10 +4960,10 @@ export interface components {
       db_pass: string
       db_pricing_tier_id?: string
       /**
-       * @description Provider region description
+       * @description Provider region description. Only one of db_region or region_selection can be specified.
        * @example Southeast Asia (Singapore)
        */
-      db_region: string
+      db_region?: string
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
@@ -4649,13 +4988,29 @@ export interface components {
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
       name: string
-      org_id?: number
-      organization_slug?: string
+      organization_slug: string
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
       postgres_engine?: '13' | '14' | '15' | '17' | '17-oriole'
+      /** @description Provider region selection. Only one of db_region or region_selection can be specified. */
+      region_selection?:
+        | {
+            code: string
+            /** @enum {string} */
+            type: 'specific'
+          }
+        | {
+            /**
+             * @description The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.
+             * @example apac
+             * @enum {string}
+             */
+            code: 'americas' | 'emea' | 'apac'
+            /** @enum {string} */
+            type: 'smartGroup'
+          }
       /**
        * @description Release channel. If not provided, GA will be used.
        * @enum {string}
@@ -4713,66 +5068,139 @@ export interface components {
       tables?: string[] | null
     }
     CreateReplicationDestinationBody: {
-      /** @description BigQuery dataset id */
-      dataset_id: string
-      /** @description Destination name */
-      destination_name: string
-      /** @description Max staleness in minutes */
-      max_staleness_mins: number
-      /** @description BigQuery project id */
-      project_id: string
-      /** @description BigQuery service account key */
-      service_account_key: string
-    }
-    CreateReplicationDestinationPipelineBody: {
-      /** @description Destination config */
-      destination_config: {
+      /** @description Destination configuration */
+      config: {
         big_query: {
-          /** @description BigQuery dataset id */
+          /**
+           * @description BigQuery dataset id
+           * @example analytics
+           */
           dataset_id: string
-          /** @description Max staleness in minutes */
-          max_staleness_mins: number
-          /** @description BigQuery project id */
+          /**
+           * @description Maximum number of concurrent write streams
+           * @example 8
+           */
+          max_concurrent_streams?: number
+          /**
+           * @description Maximum data staleness in minutes
+           * @example 5
+           */
+          max_staleness_mins?: number
+          /**
+           * @description BigQuery project id
+           * @example my-gcp-project
+           */
           project_id: string
           /** @description BigQuery service account key */
           service_account_key: string
         }
       }
-      /** @description Destination name */
-      destination_name: string
-      /** @description Pipeline config */
-      pipeline_config: {
-        config: {
-          max_fill_secs: number
-          max_size: number
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
+      name: string
+    }
+    CreateReplicationDestinationPipelineBody: {
+      /** @description Destination configuration */
+      destination_config: {
+        big_query: {
+          /**
+           * @description BigQuery dataset id
+           * @example analytics
+           */
+          dataset_id: string
+          /**
+           * @description Maximum number of concurrent write streams
+           * @example 8
+           */
+          max_concurrent_streams?: number
+          /**
+           * @description Maximum data staleness in minutes
+           * @example 5
+           */
+          max_staleness_mins?: number
+          /**
+           * @description BigQuery project id
+           * @example my-gcp-project
+           */
+          project_id: string
+          /** @description BigQuery service account key */
+          service_account_key: string
         }
       }
-      /** @description Publication name */
-      publication_name: string
-      /** @description Source id */
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
+      destination_name: string
+      /** @description Pipeline configuration */
+      pipeline_config: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+        }
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
+      }
+      /**
+       * @description Source id
+       * @example 3001
+       */
       source_id: number
     }
     CreateReplicationPipelineBody: {
-      /** @description Pipeline config */
+      /** @description Pipeline configuration */
       config: {
-        config: {
-          max_fill_secs: number
-          max_size: number
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
         }
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
       }
-      /** @description Destination id */
+      /**
+       * @description Destination id
+       * @example 2001
+       */
       destination_id: number
-      /** @description Publication name */
-      publication_name: string
-      /** @description Source id */
+      /**
+       * @description Source id
+       * @example 3001
+       */
       source_id: number
     }
     CreateReplicationPublicationBody: {
-      /** @description Publication name */
+      /**
+       * @description Publication name
+       * @example pub_orders
+       */
       name: string
       /** @description Publication tables */
       tables: {
+        /**
+         * @description Table name
+         * @example orders
+         */
         name: string
+        /**
+         * @description Table schema
+         * @example public
+         */
         schema: string
       }[]
     }
@@ -4781,13 +5209,72 @@ export interface components {
       owner: string
     }
     CreateSourceResponse: {
+      /** @description Source ID */
       id: number
     }
+    CreateSSOProviderBody:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
+    CreateSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     CreateStorageBucketBody: {
       allowed_mime_types?: string[]
       file_size_limit?: number
       id: string
       public: boolean
+      /** @enum {string} */
+      type?: 'STANDARD' | 'ANALYTICS'
     }
     CreateStorageCredentialBody: {
       description: string
@@ -4809,9 +5296,15 @@ export interface components {
       value: string
     }
     CreateTenantSourceResponse: {
-      /** @description Source id */
+      /**
+       * @description Source id
+       * @example 3001
+       */
       source_id: number
-      /** @description Tenant id */
+      /**
+       * @description Tenant id
+       * @example tenant_9f3a2c
+       */
       tenant_id: string
     }
     CreateTriggerBody: {
@@ -4901,12 +5394,6 @@ export interface components {
       }
       organization_integration_id: string
     }
-    CreateVercelEnvironmentVariableBody: {
-      key: string
-      target: string[]
-      type: string
-      value: string
-    }
     CreateVercelIntegrationBody: {
       code: string
       configuration_id: string
@@ -4918,9 +5405,23 @@ export interface components {
       teamId?: string
     }
     CreditsTopUpRequest: {
+      address?: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
       amount: number
+      billing_name?: string
       hcaptcha_token?: string
       payment_method_id: string
+      tax_id?: {
+        country: string
+        type: string
+        value: string
+      }
     }
     CreditsTopUpResponse: {
       payment_intent_secret?: string
@@ -4937,12 +5438,12 @@ export interface components {
     CustomerResponse: {
       additional_emails: string[] | null
       address?: {
-        city?: string
+        city?: string | null
         country: string
         line1: string
-        line2?: string
-        postal_code?: string
-        state?: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
       }
       balance: number
       billing_name?: string
@@ -4951,7 +5452,7 @@ export interface components {
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       /** @default null */
       connection_string_read_only?: string | null
       /** @default null */
@@ -5134,6 +5635,19 @@ export interface components {
       }
       path: string
     }
+    DynamicRegisterOAuthAppBody: {
+      client_name: string
+      /** Format: uri */
+      client_uri?: string
+      grant_types?: string[]
+      /** Format: uri */
+      logo_uri?: string
+      redirect_uris: string[]
+      response_types?: string[]
+      /** @default analytics:read */
+      scope?: string
+      token_endpoint_auth_method?: string
+    }
     FormatQueryBody: {
       query: string
     }
@@ -5141,6 +5655,9 @@ export interface components {
       archive_empty: boolean
       file_url: string
       fileUrl: string
+    }
+    GetCloudMarketplaceRedirectUrlResponse: {
+      url: string
     }
     GetContentCountResponse: {
       count: number
@@ -5210,6 +5727,7 @@ export interface components {
           | 'auth_password_policy_missing'
           | 'leaked_service_key'
           | 'no_backup_admin'
+          | 'vulnerable_postgres_version'
         remediation: string
         title: string
       }[]
@@ -5349,9 +5867,77 @@ export interface components {
         | 'auth_password_policy_missing'
         | 'leaked_service_key'
         | 'no_backup_admin'
+        | 'vulnerable_postgres_version'
       remediation: string
       title: string
     }[]
+    GetProjectLogsBody: {
+      iso_timestamp_end?: string
+      iso_timestamp_start?: string
+      sql?: string
+    }
+    GetProjectVercelConnectionsResponse: {
+      integrations: {
+        added_by: {
+          primary_email: string
+          username: string
+        }
+        connections: {
+          added_by: {
+            primary_email: string
+            username: string
+          }
+          env_sync_targets: string[]
+          foreign_project_id: string
+          id: string
+          inserted_at: string
+          metadata: {
+            framework?: string | null
+            name: string
+            supabaseConfig: {
+              projectEnvVars: {
+                write: boolean
+              }
+            }
+          }
+          organization_integration_id: string
+          public_env_var_prefix: string
+          supabase_project_ref: string
+          updated_at: string
+        }[]
+        id: string
+        inserted_at: string
+        metadata: {
+          account: {
+            avatar: string | null
+            name: string
+            source: string
+            team_id: string | null
+            team_slug: string | null
+            type: string
+          }
+          configuration_id: string
+        }
+        organization_slug: string
+        updated_at: string
+      }[]
+      marketplace_integrations: {
+        connections: {
+          foreign_project_id: string
+          framework: string | null
+          id: string
+          inserted_at: string
+          marketplace_installation_id: string
+          name: string
+          updated_at: string
+          vercel_owner_id: string | null
+        }[]
+        id: string
+        inserted_at: string
+        organization_slug: string
+        updated_at: string
+      }[]
+    }
     GetPublicUrlBody: {
       options?: {
         download?: boolean
@@ -5393,6 +5979,34 @@ export interface components {
       }
       path: string[]
     }
+    GetSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     GetStorageCredentialsResponse: {
       data: {
         created_at: string
@@ -5408,8 +6022,9 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws' | 'vercel_marketplace'
+      billing_partner?: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
+      cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
       customer_balance: number
@@ -5617,8 +6232,12 @@ export interface components {
       sender_id: number
       user_id: number
     }
+    GitHubBranchResponse: {
+      name: string
+    }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
+      AUDIT_LOG_DISABLE_POSTGRES: boolean | null
       DB_MAX_POOL_SIZE: number | null
       DISABLE_SIGNUP: boolean
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
@@ -5684,6 +6303,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID: string
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
+      EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean
       EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
       EXTERNAL_WORKOS_ENABLED: boolean
@@ -5739,6 +6359,8 @@ export interface components {
       MFA_TOTP_VERIFY_ENABLED: boolean
       MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
       MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
+      NIMBUS_OAUTH_CLIENT_ID: string | null
+      NIMBUS_OAUTH_CLIENT_SECRET: string | null
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -5786,6 +6408,7 @@ export interface components {
       SMS_VONAGE_API_KEY: string
       SMS_VONAGE_API_SECRET: string
       SMS_VONAGE_FROM: string
+      /** Format: email */
       SMTP_ADMIN_EMAIL: string
       SMTP_HOST: string
       SMTP_MAX_FREQUENCY: number
@@ -5933,12 +6556,16 @@ export interface components {
       phone: string | null
       token: string
     }
+    LinkClazarBuyerBody: {
+      buyer_id: string
+    }
     ListGitHubConnectionsResponse: {
       connections: {
         branch_limit: number
         id: number
         inserted_at: string
         installation_id: number
+        new_branch_per_pr: boolean
         project: {
           id: number
           name: string
@@ -5956,6 +6583,14 @@ export interface components {
           username: string
         } | null
         workdir: string
+      }[]
+    }
+    ListGitHubRepositoriesResponse: {
+      repositories: {
+        default_branch: string
+        id: number
+        installation_id: number
+        name: string
       }[]
     }
     ListNotificationExceptionsResponse: {
@@ -5987,8 +6622,63 @@ export interface components {
         created_by: string
         /** Format: uuid */
         id: string
+        /** Format: date-time */
+        last_used_at: string | null
         /** Format: uuid */
         oauth_app_id: string
+      }[]
+    }
+    ListProjectsPaginatedResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page (actual number may be less) */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
+      projects: {
+        cloud_provider: string
+        disk_volume_size_gb?: number
+        id: number
+        /** @enum {string} */
+        infra_compute_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
+        inserted_at: string | null
+        is_branch_enabled: boolean
+        is_physical_backups_enabled: boolean | null
+        name: string
+        organization_id: number
+        organization_slug: string
+        preview_branch_refs: string[]
+        ref: string
+        region: string
+        status: string
+        subscription_id: string | null
+      }[]
+    }
+    ListRepositoryBranchesResponse: {
+      branches: {
+        name: string
       }[]
     }
     LoadBalancerDetailResponse: {
@@ -6068,6 +6758,8 @@ export interface components {
       id: string
       name: string
       redirect_uris?: string[]
+      /** @enum {string} */
+      registration_type: 'manual' | 'dynamic'
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
@@ -6095,7 +6787,16 @@ export interface components {
       website: string
     }
     OrganizationProjectsResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
       projects: {
+        cloud_provider: string
         databases: {
           cloud_provider: string
           disk_last_modified_at?: string
@@ -6144,6 +6845,7 @@ export interface components {
           /** @enum {string} */
           type: 'PRIMARY' | 'READ_REPLICA'
         }[]
+        inserted_at: string
         is_branch: boolean
         name: string
         ref: string
@@ -6169,6 +6871,8 @@ export interface components {
     }
     OrganizationResponse: {
       billing_email: string | null
+      /** @enum {string|null} */
+      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
@@ -6206,7 +6910,8 @@ export interface components {
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
-      provider: string
+      /** @enum {string} */
+      provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       region: string
     }
     OrganizationSlugAvailableVersionsResponse: {
@@ -6220,9 +6925,8 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata: {
-        [key: string]: unknown
-      } | null
+      /** @enum {string|null} */
+      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -6291,6 +6995,7 @@ export interface components {
         /** @enum {string} */
         metric:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -6383,6 +7088,7 @@ export interface components {
           last4: string
         }
         created: number
+        has_address: boolean
         id: string
         is_default: boolean
         type: string
@@ -6397,7 +7103,7 @@ export interface components {
       db_port: number
       db_user: string
       default_pool_size?: number
-      ignore_startup_parameters: string
+      ignore_startup_parameters?: string
       inserted_at: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
@@ -6405,6 +7111,10 @@ export interface components {
       pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
+      query_wait_timeout?: number
+      reserve_pool_size?: number
+      server_idle_timeout?: number
+      server_lifetime?: number
       ssl_enforced: boolean
     }
     PgbouncerStatusResponse: {
@@ -6705,9 +7415,6 @@ export interface components {
       name: string
       schema: string
     }
-    PostProjectLogsBody: {
-      sql: string
-    }
     PreviewProjectTransferResponse: {
       errors: {
         key: string
@@ -6736,12 +7443,11 @@ export interface components {
         message: string
       }[]
     }
-    Profile: {
-      first_name: string
-      gotrue_id: string
-      id: number
-      last_name: string
-      username: string
+    PrivateLinkResponse: {
+      appliedSuccessfully: boolean
+      currentConfig: {
+        enabled: boolean
+      }
     }
     ProfileResponse: {
       auth0_id: string
@@ -6767,6 +7473,7 @@ export interface components {
       gotrue_id: string
       id: number
       is_alpha_user: boolean
+      is_sso_user: boolean
       last_name: string
       mobile: string
       primary_email: string
@@ -7035,6 +7742,7 @@ export interface components {
       app_config?: {
         db_schema: string
         endpoint: string
+        storage_endpoint: string
       }
       cloud_provider: string
       db_dns_name: string
@@ -7085,108 +7793,444 @@ export interface components {
       /** @description Whether to only allow private channels */
       private_only: boolean | null
     }
+    RegionsInfo: {
+      all: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'emea' | 'apac'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }[]
+        specific: {
+          code: string
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
+      recommendations: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'emea' | 'apac'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }
+        specific: {
+          code: string
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
+    }
+    RemoveProjectResponse: {
+      id: number
+      name: string
+      ref: string
+      vercel?: {
+        resourceUninstallFailure: boolean
+      }
+    }
     ReplicationDestinationResponse: {
+      /** @description Destination configuration */
       config: {
         big_query: {
-          /** @description BigQuery dataset id */
+          /**
+           * @description BigQuery dataset id
+           * @example analytics
+           */
           dataset_id: string
-          /** @description Max staleness in minutes */
-          max_staleness_mins: number
-          /** @description BigQuery project id */
+          /**
+           * @description Maximum number of concurrent write streams
+           * @example 8
+           */
+          max_concurrent_streams?: number
+          /**
+           * @description Maximum data staleness in minutes
+           * @example 5
+           */
+          max_staleness_mins?: number
+          /**
+           * @description BigQuery project id
+           * @example my-gcp-project
+           */
           project_id: string
           /** @description BigQuery service account key */
           service_account_key: string
         }
       }
+      /**
+       * @description Destination id
+       * @example 2001
+       */
       id: number
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
       name: string
+      /**
+       * @description Tenant id
+       * @example tenant_9f3a2c
+       */
       tenant_id: string
     }
     ReplicationDestinationsResponse: {
+      /** @description List of destinations */
       destinations: {
+        /** @description Destination configuration */
         config: {
           big_query: {
-            /** @description BigQuery dataset id */
+            /**
+             * @description BigQuery dataset id
+             * @example analytics
+             */
             dataset_id: string
-            /** @description Max staleness in minutes */
-            max_staleness_mins: number
-            /** @description BigQuery project id */
+            /**
+             * @description Maximum number of concurrent write streams
+             * @example 8
+             */
+            max_concurrent_streams?: number
+            /**
+             * @description Maximum data staleness in minutes
+             * @example 5
+             */
+            max_staleness_mins?: number
+            /**
+             * @description BigQuery project id
+             * @example my-gcp-project
+             */
             project_id: string
             /** @description BigQuery service account key */
             service_account_key: string
           }
         }
+        /**
+         * @description Destination id
+         * @example 2001
+         */
         id: number
+        /**
+         * @description Destination name
+         * @example bq-analytics
+         */
         name: string
+        /**
+         * @description Tenant id
+         * @example tenant_9f3a2c
+         */
         tenant_id: string
       }[]
     }
+    ReplicationPipelineReplicationStatusResponse: {
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
+      pipeline_id: number
+      /** @description Table statuses */
+      table_statuses: {
+        /** @description Table replication state */
+        state:
+          | {
+              /** @enum {string} */
+              name: 'queued'
+            }
+          | {
+              /** @enum {string} */
+              name: 'copying_table'
+            }
+          | {
+              /** @enum {string} */
+              name: 'copied_table'
+            }
+          | {
+              lag: number
+              /** @enum {string} */
+              name: 'following_wal'
+            }
+          | {
+              /** @enum {string} */
+              name: 'error'
+              reason: string
+              retry_policy:
+                | {
+                    /** @enum {string} */
+                    policy: 'no_retry'
+                  }
+                | {
+                    /** @enum {string} */
+                    policy: 'manual_retry'
+                  }
+                | {
+                    /**
+                     * @description Next retry time (RFC 3339 timestamp)
+                     * @example 2025-01-02T03:04:05Z
+                     */
+                    next_retry: string
+                    /** @enum {string} */
+                    policy: 'timed_retry'
+                  }
+              solution?: string
+            }
+        /**
+         * @description Table id (Postgres OID)
+         * @example 16408
+         */
+        table_id: number
+        /**
+         * @description Table name
+         * @example public.orders
+         */
+        table_name: string
+      }[]
+    }
+    /** @description Pipeline */
     ReplicationPipelineResponse: {
+      /** @description Pipeline configuration */
       config: {
-        config: {
-          max_fill_secs: number
-          max_size: number
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
         }
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
       }
+      /**
+       * @description Destination id
+       * @example 2001
+       */
       destination_id: number
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
       destination_name: string
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
       id: number
-      publication_name: string
+      /**
+       * @description Replicator id
+       * @example 9001
+       */
       replicator_id: number
+      /**
+       * @description Source id
+       * @example 3001
+       */
       source_id: number
+      /**
+       * @description Source name
+       * @example main-db
+       */
       source_name: string
+      /**
+       * @description Tenant id
+       * @example tenant_9f3a2c
+       */
       tenant_id: string
     }
     ReplicationPipelinesResponse: {
+      /** @description List of pipelines */
       pipelines: {
+        /** @description Pipeline configuration */
         config: {
-          config: {
-            max_fill_secs: number
-            max_size: number
+          /** @description Batch configuration */
+          batch?: {
+            /**
+             * @description Maximum fill time in milliseconds
+             * @example 200
+             */
+            max_fill_ms?: number
           }
+          /**
+           * @description Publication name
+           * @example pub_orders
+           */
+          publication_name: string
         }
+        /**
+         * @description Destination id
+         * @example 2001
+         */
         destination_id: number
+        /**
+         * @description Destination name
+         * @example bq-analytics
+         */
         destination_name: string
+        /**
+         * @description Pipeline id
+         * @example 1012
+         */
         id: number
-        publication_name: string
+        /**
+         * @description Replicator id
+         * @example 9001
+         */
         replicator_id: number
+        /**
+         * @description Source id
+         * @example 3001
+         */
         source_id: number
+        /**
+         * @description Source name
+         * @example main-db
+         */
         source_name: string
+        /**
+         * @description Tenant id
+         * @example tenant_9f3a2c
+         */
         tenant_id: string
       }[]
     }
-    ReplicationPipelinesStatusResponse: {
+    ReplicationPipelineStatusResponse: {
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
       pipeline_id: number
-      status: string
+      /** @description Pipeline status */
+      status: {
+        /**
+         * @example started
+         * @enum {string}
+         */
+        name: 'stopped' | 'starting' | 'started' | 'stopping' | 'unknown' | 'failed'
+      }
+    }
+    ReplicationPipelineVersionResponse: {
+      /** @description New pipeline version */
+      new_version?: {
+        /**
+         * @description Version id
+         * @example 3
+         */
+        id: number
+        /**
+         * @description Version name
+         * @example v0.3.0
+         */
+        name: string
+      }
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
+      pipeline_id: number
+      /** @description Current pipeline version */
+      version: {
+        /**
+         * @description Version id
+         * @example 3
+         */
+        id: number
+        /**
+         * @description Version name
+         * @example v0.3.0
+         */
+        name: string
+      }
     }
     ReplicationPublicationsResponse: {
+      /** @description List of publications */
       publications: {
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
         name: string
+        /** @description Publication tables */
         tables: {
+          /**
+           * @description Table name
+           * @example orders
+           */
           name: string
+          /**
+           * @description Table schema
+           * @example public
+           */
           schema: string
         }[]
       }[]
     }
     ReplicationSourcesResponse: {
+      /** @description List of sources */
       sources: {
+        /** @description Source configuration */
         config: {
-          postgres: {
-            host: string
-            name: string
-            port: number
-            slot_name: string
-            username: string
-          }
+          /**
+           * @description Source host
+           * @example db.internal
+           */
+          host: string
+          /**
+           * @description Source name
+           * @example main-db
+           */
+          name: string
+          /**
+           * @description Source port
+           * @example 5432
+           */
+          port: number
+          /**
+           * @description Source username
+           * @example etl_user
+           */
+          username: string
         }
+        /**
+         * @description Source id
+         * @example 3001
+         */
         id: number
+        /**
+         * @description Source name
+         * @example main-db
+         */
         name: string
+        /**
+         * @description Tenant id
+         * @example tenant_9f3a2c
+         */
         tenant_id: string
       }[]
     }
     ReplicationTablesResponse: {
+      /** @description List of tables */
       tables: {
+        /**
+         * @description Table name
+         * @example orders
+         */
         name: string
+        /**
+         * @description Table schema
+         * @example public
+         */
         schema: string
       }[]
     }
@@ -7246,6 +8290,74 @@ export interface components {
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
     }[]
+    RollbackTableStateBody: {
+      /**
+       * @description Rollback type
+       * @example individual
+       * @enum {string}
+       */
+      rollback_type: 'individual' | 'full'
+      /**
+       * @description Table id (Postgres OID)
+       * @example 16408
+       */
+      table_id: number
+    }
+    RollbackTableStateResponse: {
+      /** @description Table replication state */
+      new_state:
+        | {
+            /** @enum {string} */
+            name: 'queued'
+          }
+        | {
+            /** @enum {string} */
+            name: 'copying_table'
+          }
+        | {
+            /** @enum {string} */
+            name: 'copied_table'
+          }
+        | {
+            lag: number
+            /** @enum {string} */
+            name: 'following_wal'
+          }
+        | {
+            /** @enum {string} */
+            name: 'error'
+            reason: string
+            retry_policy:
+              | {
+                  /** @enum {string} */
+                  policy: 'no_retry'
+                }
+              | {
+                  /** @enum {string} */
+                  policy: 'manual_retry'
+                }
+              | {
+                  /**
+                   * @description Next retry time (RFC 3339 timestamp)
+                   * @example 2025-01-02T03:04:05Z
+                   */
+                  next_retry: string
+                  /** @enum {string} */
+                  policy: 'timed_retry'
+                }
+            solution?: string
+          }
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
+      pipeline_id: number
+      /**
+       * @description Table id (Postgres OID)
+       * @example 16408
+       */
+      table_id: number
+    }
     RunLintByNameResponse: {
       lints: {
         cache_key: string
@@ -7295,6 +8407,7 @@ export interface components {
           | 'auth_password_policy_missing'
           | 'leaked_service_key'
           | 'no_backup_admin'
+          | 'vulnerable_postgres_version'
         remediation: string
         title: string
       }[]
@@ -7303,9 +8416,6 @@ export interface components {
       /** @default false */
       disable_statement_timeout?: boolean
       query: string
-    }
-    SearchProfileBody: {
-      keywords: string
     }
     SendDocsFeedbackBody: {
       feedback?: string
@@ -7384,10 +8494,23 @@ export interface components {
       name: string
       owner: string
       public: boolean
+      /** @enum {string} */
+      type?: 'STANDARD' | 'ANALYTICS'
       updated_at: string
     }
     StorageConfigResponse: {
+      capabilities: {
+        iceberg_catalog: boolean
+        list_v2: boolean
+      }
+      external: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -7408,6 +8531,8 @@ export interface components {
         name: string
         owner: string
         public: boolean
+        /** @enum {string} */
+        type?: 'STANDARD' | 'ANALYTICS'
         updated_at: string
       }
       created_at: string
@@ -7490,6 +8615,10 @@ export interface components {
       feature_flags?: {
         [key: string]: unknown
       }
+      groups?: {
+        organization?: string
+        project?: string
+      }
       page_title: string
       page_url: string
       pathname: string
@@ -7510,11 +8639,8 @@ export interface components {
       page_url: string
       pathname: string
     }
-    TransferOrganizationBody: {
-      /** Format: uuid */
-      member_gotrue_id: string
-      member_id?: number
-      org_id: number
+    TemporaryApiKeyResponse: {
+      api_key: string
     }
     TransferProjectBody: {
       target_organization_slug: string
@@ -7549,7 +8675,6 @@ export interface components {
       organization_id: number
       region: string
       status: string
-      subscription_id: string
     }
     UpcomingInvoice: {
       amount_projected?: number
@@ -7627,6 +8752,7 @@ export interface components {
         /** @enum {string} */
         usage_metric?:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -7818,11 +8944,13 @@ export interface components {
     }
     UpdateGitHubConnectionBody: {
       branch_limit?: number
+      new_branch_per_pr?: boolean
       supabase_changes_only?: boolean
       workdir?: string
     }
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
+      AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
       DB_MAX_POOL_SIZE?: number | null
       DISABLE_SIGNUP?: boolean | null
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
@@ -7888,6 +9016,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID?: string | null
       EXTERNAL_TWITTER_ENABLED?: boolean | null
       EXTERNAL_TWITTER_SECRET?: string | null
+      EXTERNAL_WEB3_ETHEREUM_ENABLED?: boolean | null
       EXTERNAL_WEB3_SOLANA_ENABLED?: boolean | null
       EXTERNAL_WORKOS_CLIENT_ID?: string | null
       EXTERNAL_WORKOS_ENABLED?: boolean | null
@@ -7943,6 +9072,8 @@ export interface components {
       MFA_TOTP_VERIFY_ENABLED?: boolean | null
       MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean | null
       MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean | null
+      NIMBUS_OAUTH_CLIENT_ID?: string | null
+      NIMBUS_OAUTH_CLIENT_SECRET?: string | null
       PASSWORD_HIBP_ENABLED?: boolean | null
       PASSWORD_MIN_LENGTH?: number | null
       /** @enum {string|null} */
@@ -7999,6 +9130,7 @@ export interface components {
       SMS_VONAGE_API_KEY?: string | null
       SMS_VONAGE_API_SECRET?: string | null
       SMS_VONAGE_FROM?: string | null
+      /** Format: email */
       SMTP_ADMIN_EMAIL?: string | null
       SMTP_HOST?: string | null
       SMTP_MAX_FREQUENCY?: number | null
@@ -8080,7 +9212,11 @@ export interface components {
     }
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number
-      ignore_startup_parameters: string
+      /**
+       * @deprecated
+       * @default options,extra_float_digits
+       */
+      ignore_startup_parameters?: string
       max_client_conn?: number
       /** @deprecated */
       pgbouncer_enabled?: boolean
@@ -8089,6 +9225,10 @@ export interface components {
        * @enum {string}
        */
       pool_mode?: 'transaction' | 'session' | 'statement'
+      query_wait_timeout?: number
+      reserve_pool_size?: number
+      server_idle_timeout?: number
+      server_lifetime?: number
     }
     UpdatePolicyBody: {
       check?: string
@@ -8110,6 +9250,8 @@ export interface components {
        * @enum {string}
        */
       pool_mode?: 'transaction' | 'session' | 'statement'
+      server_idle_timeout?: number
+      server_lifetime?: number
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string
@@ -8151,9 +9293,17 @@ export interface components {
       db_schema: string
       max_rows: number
     }
+    UpdatePrivateLinkBody: {
+      requestedConfig: {
+        enabled: boolean
+      }
+    }
     UpdateProfileBody: {
       first_name?: string
       last_name?: string
+      /** Format: email */
+      primary_email?: string
+      username?: string
     }
     UpdateProjectBody: {
       name: string
@@ -8185,59 +9335,128 @@ export interface components {
       private_only?: boolean
     }
     UpdateReplicationDestinationBody: {
-      /** @description BigQuery dataset id */
-      dataset_id: string
-      /** @description Destination name */
-      destination_name: string
-      /** @description Max staleness in minutes */
-      max_staleness_mins: number
-      /** @description BigQuery project id */
-      project_id: string
-      /** @description BigQuery service account key */
-      service_account_key: string
-    }
-    UpdateReplicationDestinationPipelineBody: {
-      /** @description Destination config */
-      destination_config: {
+      /** @description Destination configuration */
+      config: {
         big_query: {
-          /** @description BigQuery dataset id */
+          /**
+           * @description BigQuery dataset id
+           * @example analytics
+           */
           dataset_id: string
-          /** @description Max staleness in minutes */
-          max_staleness_mins: number
-          /** @description BigQuery project id */
+          /**
+           * @description Maximum number of concurrent write streams
+           * @example 8
+           */
+          max_concurrent_streams?: number
+          /**
+           * @description Maximum data staleness in minutes
+           * @example 5
+           */
+          max_staleness_mins?: number
+          /**
+           * @description BigQuery project id
+           * @example my-gcp-project
+           */
           project_id: string
           /** @description BigQuery service account key */
           service_account_key: string
         }
       }
-      /** @description Destination name */
-      destination_name: string
-      /** @description Pipeline config */
-      pipeline_config: {
-        config: {
-          max_fill_secs: number
-          max_size: number
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
+      name: string
+    }
+    UpdateReplicationDestinationPipelineBody: {
+      /** @description Destination configuration */
+      destination_config: {
+        big_query: {
+          /**
+           * @description BigQuery dataset id
+           * @example analytics
+           */
+          dataset_id: string
+          /**
+           * @description Maximum number of concurrent write streams
+           * @example 8
+           */
+          max_concurrent_streams?: number
+          /**
+           * @description Maximum data staleness in minutes
+           * @example 5
+           */
+          max_staleness_mins?: number
+          /**
+           * @description BigQuery project id
+           * @example my-gcp-project
+           */
+          project_id: string
+          /** @description BigQuery service account key */
+          service_account_key: string
         }
       }
-      /** @description Publication name */
-      publication_name: string
-      /** @description Source id */
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
+      destination_name: string
+      /** @description Pipeline configuration */
+      pipeline_config: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+        }
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
+      }
+      /**
+       * @description Source id
+       * @example 3001
+       */
       source_id: number
     }
     UpdateReplicationPipelineBody: {
-      /** @description Pipeline config */
-      config?: {
-        config: {
-          max_fill_secs: number
-          max_size: number
+      /** @description Pipeline configuration */
+      config: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
         }
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
       }
-      /** @description Destination id */
-      destination_id?: number
-      /** @description Publication name */
-      publication_name?: string
-      /** @description Source id */
-      source_id?: number
+      /**
+       * @description Destination id
+       * @example 2001
+       */
+      destination_id: number
+      /**
+       * @description Source id
+       * @example 3001
+       */
+      source_id: number
+    }
+    UpdateReplicationPipelineVersionBody: {
+      /**
+       * @description Pipeline version id
+       * @example 4
+       */
+      version_id: number
     }
     UpdateSchemaBody: {
       name?: string
@@ -8250,13 +9469,76 @@ export interface components {
     UpdateSecretsResponse: {
       message: string
     }
+    UpdateSSOProviderBody:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
+    UpdateSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     UpdateStorageBucketBody: {
       allowed_mime_types?: string[] | null
       file_size_limit?: number | null
       public: boolean
     }
     UpdateStorageConfigBody: {
+      external?: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features?: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -8268,7 +9550,21 @@ export interface components {
       fileSizeLimit?: number
     }
     UpdateSubscriptionBody: {
+      address?: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
+      billing_name?: string
       payment_method?: string
+      tax_id?: {
+        country: string
+        type: string
+        value: string
+      }
       /** @enum {string} */
       tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
     }
@@ -8374,7 +9670,7 @@ export interface components {
       folder_id?: (null | (string | null)) | null
       id: string
       name: string
-      owner_id: number
+      owner_id?: number
       project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
@@ -8513,6 +9809,12 @@ export interface operations {
           'application/json': components['schemas']['GoTrueConfigResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve GoTrue config */
       500: {
         headers: {
@@ -8545,6 +9847,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GoTrueConfigResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update GoTrue config */
       500: {
@@ -9017,6 +10325,34 @@ export interface operations {
       }
     }
   }
+  ClazarController_getCloudMarketplaceOnboardingInfo: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        buyer_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CloudMarketplaceOnboardingInfoResponse']
+        }
+      }
+      /** @description Failed to get info for AWS Marketplace onboarding */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   BackupsController_getBackups: {
     parameters: {
       query?: never
@@ -9036,6 +10372,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['BackupsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get project backups */
       500: {
@@ -9070,6 +10412,12 @@ export interface operations {
           'application/json': components['schemas']['DownloadBackupResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to download project backup */
       500: {
         headers: {
@@ -9099,6 +10447,12 @@ export interface operations {
           'application/json': components['schemas']['DownloadableBackupsResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project backups */
       500: {
         headers: {
@@ -9121,6 +10475,12 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -9157,6 +10517,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to restore project to a previous point in time */
       500: {
         headers: {
@@ -9183,6 +10549,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -9219,6 +10591,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to restore project with physical backup */
       500: {
         headers: {
@@ -9247,6 +10625,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['CloneBackupsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to list available valid backups */
       500: {
@@ -9281,6 +10665,12 @@ export interface operations {
           'application/json': components['schemas']['ProjectClonedResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to clone the current project */
       500: {
         headers: {
@@ -9309,6 +10699,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ProjectClonedStatusResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve clone project status */
       500: {
@@ -9556,6 +10952,12 @@ export interface operations {
           'application/json': components['schemas']['GetOrganizationIntegrationResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get integration with the given organization slug */
       500: {
         headers: {
@@ -9637,7 +11039,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['GitHubBranchResponse'][]
+        }
       }
       /** @description Failed to list GitHub connection branches */
       500: {
@@ -9664,7 +11068,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['GitHubBranchResponse']
+        }
       }
       /** @description Failed to get GitHub connection branch */
       500: {
@@ -9712,7 +11118,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateGitHubConnectionsBody']
+        'application/json': components['schemas']['CreateGitHubConnectionBody']
       }
     }
     responses: {
@@ -9720,7 +11126,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['CreateGitHubConnectionResponse']
+        }
       }
       /** @description Failed to create project connections */
       500: {
@@ -9800,9 +11208,140 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['ListGitHubRepositoriesResponse']
+        }
       }
       /** @description Failed to get GitHub repositories for user */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GitHubRepositoriesController_listRepositoryBranches: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        repositoryId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListRepositoryBranchesResponse']
+        }
+      }
+      /** @description Failed to list GitHub repository branches */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GitHubRepositoriesController_getRepository: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        branchName: string
+        repositoryId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GitHubBranchResponse']
+        }
+      }
+      /** @description Failed to get GitHub repository branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PrivateLinkController_getPrivateLinkConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrivateLinkResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve organization's PrivateLink config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PrivateLinkController_updatePrivateLinkConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePrivateLinkBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrivateLinkResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update organization's PrivateLink configuration. */
       500: {
         headers: {
           [name: string]: unknown
@@ -10007,6 +11546,34 @@ export interface operations {
       }
     }
   }
+  VercelConnectionsController_getProjectVercelConnections: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        project_ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetProjectVercelConnectionsResponse']
+        }
+      }
+      /** @description Failed to get Vercel integrations for the given project */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   VercelProjectController_getVercelProjects: {
     parameters: {
       query?: {
@@ -10175,6 +11742,29 @@ export interface operations {
       }
     }
   }
+  PlatformOAuthAppsController_dynamicRegister: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DynamicRegisterOAuthAppBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateOAuthAppResponse']
+        }
+      }
+    }
+  }
   OAuthAuthorizationsController_getAuthorizationRequest: {
     parameters: {
       query?: never
@@ -10273,6 +11863,12 @@ export interface operations {
           'application/json': components['schemas']['OrganizationSlugResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   OrganizationSlugController_deleteOrganization: {
@@ -10331,6 +11927,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UpdateOrganizationResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update organization */
       500: {
@@ -10823,6 +12425,78 @@ export interface operations {
       }
     }
   }
+  ClazarController_link: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkClazarBuyerBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to make organization being billed by AWS Marketplace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ClazarController_getRedirectUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetCloudMarketplaceRedirectUrlResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get AWS Marketplace redirect url */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   CustomerController_getCustomer: {
     parameters: {
       query?: never
@@ -10842,6 +12516,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['CustomerResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve the Billing customer */
       500: {
@@ -10896,6 +12576,7 @@ export interface operations {
         interval?: string
         metric:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -10957,6 +12638,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get daily organization stats */
       500: {
         headers: {
@@ -10988,8 +12675,43 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get daily organization stats for compute */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgDocumentsController_createDpaDocument: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateDpaDocumentRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateDpaDocumentResponse']
+        }
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -11017,6 +12739,12 @@ export interface operations {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   OrgDocumentsController_getStandardSecurityQuestionnaireUrl: {
@@ -11038,6 +12766,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -11089,6 +12823,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to remove organization member */
       500: {
         headers: {
@@ -11116,6 +12856,12 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -11154,6 +12900,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to update organization member role */
       500: {
         headers: {
@@ -11178,6 +12930,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -11212,6 +12970,12 @@ export interface operations {
           'application/json': components['schemas']['InvitationResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get organization invitations */
       500: {
         headers: {
@@ -11243,6 +13007,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to create organization invitation */
       500: {
         headers: {
@@ -11266,6 +13036,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -11359,6 +13135,12 @@ export interface operations {
           'application/json': components['schemas']['MfaStatusResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get organization MFA status */
       500: {
         headers: {
@@ -11427,6 +13209,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['MemberWithFreeProjectLimit'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve organization members who have reached their free project limit */
       500: {
@@ -11882,7 +13670,20 @@ export interface operations {
   }
   OrganizationProjectsController_getOrganizationProjects: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Number of projects to return per page */
+        limit?: number
+        /** @description Number of projects to skip */
+        offset?: number
+        /** @description Search projects by name */
+        search?: string
+        /** @description Sort order for projects */
+        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+        /** @description A comma-separated list of project statuses to filter by.
+         *
+         *     The following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`. */
+        statuses?: string
+      }
       header?: never
       path: {
         /** @description Organization slug */
@@ -11899,12 +13700,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrganizationProjectsResponse']
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to retrieve projects */
       500: {
@@ -11935,8 +13730,132 @@ export interface operations {
           'application/json': components['schemas']['OrganizationRoleResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve the organization's roles */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_getSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_updateSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSSOProviderBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_createSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSSOProviderBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_deleteSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12051,34 +13970,6 @@ export interface operations {
       }
     }
   }
-  TransferController_transferOrganization: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TransferOrganizationBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update owner */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   OrgUsageController_getOrgUsage: {
     parameters: {
       query?: {
@@ -12104,7 +13995,43 @@ export interface operations {
           'application/json': components['schemas']['OrgUsageResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get usage stats */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_createAwsBilledOrganization: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAwsBilledOrganizationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationResponse']
+        }
+      }
+      /** @description Failed to create organization billed by AWS Marketplace */
       500: {
         headers: {
           [name: string]: unknown
@@ -12169,6 +14096,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12206,6 +14135,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12247,6 +14178,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12291,6 +14224,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12328,6 +14263,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12373,6 +14310,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12412,6 +14351,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12453,6 +14394,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12490,6 +14433,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12533,6 +14478,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12575,6 +14522,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12615,6 +14564,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12652,6 +14603,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12695,6 +14648,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12734,6 +14689,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12783,6 +14740,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12823,6 +14782,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12860,6 +14821,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12903,6 +14866,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12942,6 +14907,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12983,6 +14950,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13020,6 +14989,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13063,6 +15034,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13102,6 +15075,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13143,6 +15118,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13199,6 +15176,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to format sql query */
       500: {
         headers: {
@@ -13232,6 +15215,12 @@ export interface operations {
           'application/json': components['schemas']['ValidateQueryResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to validate sql query */
       500: {
         headers: {
@@ -13246,6 +15235,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13283,6 +15274,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13326,6 +15319,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13365,6 +15360,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13414,6 +15411,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13451,6 +15450,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13496,6 +15497,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13535,6 +15538,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13579,6 +15584,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13616,6 +15623,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13659,6 +15668,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13698,6 +15709,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13742,6 +15755,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13787,6 +15802,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14148,36 +16165,6 @@ export interface operations {
       }
     }
   }
-  SearchProfileController_searchProfile: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SearchProfileBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Profile'][]
-        }
-      }
-      /** @description Failed to search profiles with the given keywords */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ProjectsController_getProjects: {
     parameters: {
       query?: never
@@ -14259,6 +16246,12 @@ export interface operations {
           'application/json': components['schemas']['ProjectDetailResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   ProjectsRefController_deleteProject: {
@@ -14278,7 +16271,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectRefResponse']
+          'application/json': components['schemas']['RemoveProjectResponse']
         }
       }
       403: {
@@ -14328,49 +16321,11 @@ export interface operations {
       }
     }
   }
-  FunctionInvocationLogsController_getStatus: {
+  FunctionsLogsController_getCombinedStats: {
     parameters: {
       query: {
         function_id: string
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
-      }
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project's function invocation statistics */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  FunctionRequestLogsController_getStatus: {
-    parameters: {
-      query: {
-        function_id: string
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+        interval: '15min' | '1hr' | '3hr' | '1day'
       }
       header?: never
       path: {
@@ -14404,11 +16359,49 @@ export interface operations {
       }
     }
   }
-  FunctionResourceLogsController_getStatus: {
+  FunctionsLogsController_getRequestStats: {
     parameters: {
       query: {
         function_id: string
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+        interval: '15min' | '1hr' | '3hr' | '1day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's function request statistics */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  FunctionsLogsController_getResourceUsage: {
+    parameters: {
+      query: {
+        function_id: string
+        interval: '15min' | '1hr' | '3hr' | '1day'
       }
       header?: never
       path: {
@@ -14442,12 +16435,11 @@ export interface operations {
       }
     }
   }
-  LogsController_getApiPaths: {
+  LogsController_getProjectLogsViaGet: {
     parameters: {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
-        project?: string
         sql?: string
       }
       header?: never
@@ -14482,14 +16474,9 @@ export interface operations {
       }
     }
   }
-  LogsController_postApiPaths: {
+  LogsController_getProjectLogsViaPost: {
     parameters: {
-      query?: {
-        iso_timestamp_end?: string
-        iso_timestamp_start?: string
-        project?: string
-        sql?: string
-      }
+      query?: never
       header?: never
       path: {
         /** @description Project ref */
@@ -14499,7 +16486,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['PostProjectLogsBody']
+        'application/json': components['schemas']['GetProjectLogsBody']
       }
     }
     responses: {
@@ -14517,7 +16504,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to POST project's logs */
+      /** @description Failed to get project's logs */
       500: {
         headers: {
           [name: string]: unknown
@@ -14582,6 +16569,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['AnalyticsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get project's usage api requests count */
       500: {
@@ -15292,6 +17285,38 @@ export interface operations {
       }
     }
   }
+  ApiKeysController_createTemporaryApiKey: {
+    parameters: {
+      query: {
+        authorization_exp: string
+        claims: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Temporary API key */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TemporaryApiKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ProjectsApiController_projectGraphql: {
     parameters: {
       query?: never
@@ -15516,6 +17541,12 @@ export interface operations {
           'application/json': components['schemas']['PgbouncerConfigResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's pgbouncer config */
       500: {
         headers: {
@@ -15584,6 +17615,12 @@ export interface operations {
           'application/json': components['schemas']['PgbouncerStatusResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's pgbouncer status */
       500: {
         headers: {
@@ -15612,6 +17649,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PostgresConfigResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve project's Postgres config */
       500: {
@@ -15853,6 +17896,12 @@ export interface operations {
           'application/json': components['schemas']['GetJwtSecretUpdateStatus']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve JWT secret update status */
       500: {
         headers: {
@@ -15956,6 +18005,12 @@ export interface operations {
           'application/json': components['schemas']['SupavisorConfigResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's supavisor config */
       500: {
         headers: {
@@ -16034,6 +18089,12 @@ export interface operations {
           'application/json': components['schemas']['GetUserContentResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's content */
       500: {
         headers: {
@@ -16060,6 +18121,12 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16098,6 +18165,12 @@ export interface operations {
           'application/json': components['schemas']['UserContentObject']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to create project's content */
       500: {
         headers: {
@@ -16110,7 +18183,7 @@ export interface operations {
   ContentController_deleteContents: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path: {
@@ -16128,6 +18201,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['BulkDeleteUserContentResponse'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to delete project's contents */
       500: {
@@ -16160,6 +18239,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetContentCountV2Response']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve user's content counts */
       500: {
@@ -16198,6 +18283,12 @@ export interface operations {
           'application/json': components['schemas']['GetUserContentFolderResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's content root folder */
       500: {
         headers: {
@@ -16231,6 +18322,12 @@ export interface operations {
           'application/json': components['schemas']['CreateUserContentFolderResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to create project's content folder */
       500: {
         headers: {
@@ -16243,7 +18340,7 @@ export interface operations {
   ContentFoldersController_DeleteFolder: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path?: never
@@ -16252,6 +18349,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16294,6 +18397,12 @@ export interface operations {
           'application/json': components['schemas']['GetUserContentFolderResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's content folder */
       500: {
         headers: {
@@ -16322,6 +18431,12 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16357,6 +18472,12 @@ export interface operations {
           'application/json': components['schemas']['GetUserContentByIdResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's content by the given id */
       500: {
         headers: {
@@ -16374,6 +18495,7 @@ export interface operations {
           | 'total_realtime_egress'
           | 'total_ingress'
           | 'total_egress'
+          | 'total_cached_egress'
           | 'total_requests'
           | 'total_get_requests'
           | 'total_patch_requests'
@@ -16421,6 +18543,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get daily project stats */
       500: {
         headers: {
@@ -16450,6 +18578,12 @@ export interface operations {
           'application/json': components['schemas']['DatabaseDetailResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   DatabasesStatusesController_getStatus: {
@@ -16471,6 +18605,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['DatabaseStatusResponse'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get statuses of databases of a project */
       500: {
@@ -16747,6 +18887,15 @@ export interface operations {
           | 'network_receive_bytes'
           | 'network_transmit_bytes'
           | 'pgbouncer_pools_client_active_connections'
+          | 'realtime_connections_connected'
+          | 'realtime_channel_joins'
+          | 'realtime_channel_events'
+          | 'realtime_channel_presence_events'
+          | 'realtime_channel_db_events'
+          | 'realtime_authorization_rls_execution_time'
+          | 'realtime_payload_size'
+          | 'realtime_sum_connections_connected'
+          | 'realtime_replication_connection_lag'
         databaseIdentifier?: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
@@ -16762,6 +18911,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16829,6 +18984,12 @@ export interface operations {
           'application/json': components['schemas']['LoadBalancerDetailResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   ProjectAdvisorNotificationsController_listNotificationExceptions: {
@@ -16850,6 +19011,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ListNotificationExceptionsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve advisor notification exceptions */
       500: {
@@ -16884,7 +19051,13 @@ export interface operations {
           'application/json': components['schemas']['CreateNotificationExceptionsResponse']
         }
       }
-      /** @description Failed to creare advisor notification exceptions */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create advisor notification exceptions */
       500: {
         headers: {
           [name: string]: unknown
@@ -16896,7 +19069,7 @@ export interface operations {
   ProjectAdvisorNotificationsController_deleteNotificationExceptions: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path: {
@@ -16908,6 +19081,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16940,6 +19119,12 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -17007,6 +19192,12 @@ export interface operations {
           'application/json': components['schemas']['PauseStatusResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   ResizeController_resizeDatabase: {
@@ -17026,6 +19217,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -17094,6 +19291,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -17279,6 +19482,7 @@ export interface operations {
           | 'auth_password_policy_missing'
           | 'leaked_service_key'
           | 'no_backup_admin'
+          | 'vulnerable_postgres_version'
         /** @description Project ref */
         ref: string
       }
@@ -17378,6 +19582,12 @@ export interface operations {
           'application/json': components['schemas']['ServiceVersions']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   SettingsController_getProjectSettings: {
@@ -17399,6 +19609,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ProjectSettingsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve project's settings */
       500: {
@@ -17461,6 +19677,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -17537,6 +19759,28 @@ export interface operations {
       }
     }
   }
+  ProjectsController_getRegions: {
+    parameters: {
+      query: {
+        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+        organization_slug: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RegionsInfo']
+        }
+      }
+    }
+  }
   ProjectsController_getProjectByFlyExtensionId: {
     parameters: {
       query?: never
@@ -17556,6 +19800,12 @@ export interface operations {
           'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   ReplicationDestinationsController_getDestinations: {
@@ -17570,6 +19820,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description All destinations for the project. */
       200: {
         headers: {
           [name: string]: unknown
@@ -17584,7 +19835,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get replication destinations */
+      /** @description Unexpected error while listing destinations. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17609,8 +19860,8 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returns the created replication destination id. */
-      201: {
+      /** @description Destination created. */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -17624,7 +19875,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to create destination */
+      /** @description Unexpected error while creating destination. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17649,8 +19900,8 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returns the created replication destination and pipeline ids. */
-      201: {
+      /** @description Destination and pipeline created. */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -17664,7 +19915,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to create the replication destination or pipeline. */
+      /** @description Unexpected error while creating destination or pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17682,7 +19933,7 @@ export interface operations {
         destination_id: number
         /** @description Pipeline id */
         pipeline_id: number
-        /** @description Project reference */
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17693,7 +19944,8 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      /** @description Destination and pipeline updated. */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -17705,7 +19957,83 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to update the replication destination or pipeline */
+      /** @description Unexpected error while updating destination or pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsPipelinesController_deleteDestinationPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Destination id */
+        destination_id: number
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Destination and pipeline deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while deleting destination or pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsController_getDestination: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Destination id */
+        destination_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Destination details. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationDestinationResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while retrieving destination. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17732,49 +20060,12 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update destination */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationDestinationsController_getDestination: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Destination id */
-        destination_id: number
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Returns the destination. */
+      /** @description Destination updated. */
       200: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ReplicationDestinationResponse']
-        }
+        content?: never
       }
       403: {
         headers: {
@@ -17782,7 +20073,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get destination */
+      /** @description Unexpected error while updating destination. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17805,6 +20096,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description Destination deleted. */
       200: {
         headers: {
           [name: string]: unknown
@@ -17817,7 +20109,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to delete destination */
+      /** @description Unexpected error while deleting destination. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17838,6 +20130,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description All pipelines for the project. */
       200: {
         headers: {
           [name: string]: unknown
@@ -17852,7 +20145,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get replication pipeline */
+      /** @description Unexpected error while listing pipelines. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17877,8 +20170,8 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returns the created replication pipeline id. */
-      201: {
+      /** @description Pipeline created. */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -17892,7 +20185,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to create pipeline */
+      /** @description Unexpected error while creating pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17915,7 +20208,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline. */
+      /** @description Pipeline details. */
       200: {
         headers: {
           [name: string]: unknown
@@ -17930,7 +20223,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline */
+      /** @description Unexpected error while retrieving pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17957,7 +20250,8 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      /** @description Pipeline updated. */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -17969,7 +20263,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update pipeline */
+      /** @description Unexpected error while updating pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -17992,6 +20286,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description Pipeline deleted. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18004,7 +20299,87 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to delete pipeline */
+      /** @description Unexpected error while deleting pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_getPipelineReplicationStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pipeline replication status. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationPipelineReplicationStatusResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while retrieving replication status. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_rollbackTableState: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RollbackTableStateBody']
+      }
+    }
+    responses: {
+      /** @description New table state after rollback. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RollbackTableStateResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while rolling back table state. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18027,6 +20402,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description Pipeline started. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18039,7 +20415,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to start pipeline */
+      /** @description Unexpected error while starting pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18062,12 +20438,13 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description Current pipeline status. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationPipelinesStatusResponse']
+          'application/json': components['schemas']['ReplicationPipelineStatusResponse']
         }
       }
       403: {
@@ -18076,7 +20453,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline status */
+      /** @description Unexpected error while retrieving pipeline status. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18099,6 +20476,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description Pipeline stopped. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18111,7 +20489,85 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to stop pipeline */
+      /** @description Unexpected error while stopping pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_getPipelineVersion: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Current pipeline version. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationPipelineVersionResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while retrieving pipeline version. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_updatePipelineVersion: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationPipelineVersionBody']
+      }
+    }
+    responses: {
+      /** @description Pipeline version updated. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while updating pipeline version. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18132,7 +20588,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns all sources. */
+      /** @description All sources for the project. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18147,7 +20603,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to get replication sources. */
+      /** @description Unexpected error while listing sources. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18168,8 +20624,8 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the created replication source id. */
-      201: {
+      /** @description Source created. */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -18183,7 +20639,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to create the replication source. */
+      /** @description Unexpected error while creating source. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18206,7 +20662,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns all publications. */
+      /** @description All publications for the source. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18221,7 +20677,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to get source publications. */
+      /** @description Unexpected error while listing publications. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18248,8 +20704,8 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returned when the publication is created. */
-      201: {
+      /** @description Publication created. */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -18261,7 +20717,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to create the publication. */
+      /** @description Unexpected error while creating publication. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18279,13 +20735,14 @@ export interface operations {
         publication_name: string
         /** @description Project ref */
         ref: string
+        /** @description Source id */
         source_id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the publication is deleted. */
+      /** @description Publication deleted. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18298,7 +20755,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to delete the publication. */
+      /** @description Unexpected error while deleting publication. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18321,7 +20778,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns all tables. */
+      /** @description All tables for the source. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18336,7 +20793,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to get source tables. */
+      /** @description Unexpected error while listing tables. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18357,8 +20814,8 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the created replication tenant and source ids. */
-      201: {
+      /** @description Tenant and source created. */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -18372,7 +20829,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Returned when the API fails to create the replication tenant or source. */
+      /** @description Unexpected error while creating tenant or source. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18467,6 +20924,12 @@ export interface operations {
           'application/json': components['schemas']['GetArchiveResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project storage archive */
       500: {
         headers: {
@@ -18489,6 +20952,12 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -19485,126 +21954,6 @@ export interface operations {
     }
     responses: {
       200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelProjectsController_getVercelProjects: {
-    parameters: {
-      query?: {
-        teamId?: string
-      }
-      header: {
-        vercel_authorization: string
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get projects */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelProjectsController_getVercelProject: {
-    parameters: {
-      query?: {
-        teamId?: string
-      }
-      header: {
-        vercel_authorization: string
-      }
-      path: {
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelEnvironmentVariablesController_getEnvironmentVariables: {
-    parameters: {
-      query: {
-        projectId: string
-        teamId?: string
-      }
-      header: {
-        vercel_authorization: string
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get Vercel environment variables */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelEnvironmentVariablesController_createEnvironmentVariable: {
-    parameters: {
-      query: {
-        projectId: string
-        teamId?: string
-      }
-      header: {
-        vercel_authorization: string
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateVercelEnvironmentVariableBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create Vercel environment variables */
-      500: {
         headers: {
           [name: string]: unknown
         }

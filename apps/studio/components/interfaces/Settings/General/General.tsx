@@ -1,27 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle, BarChart2, ChevronRight } from 'lucide-react'
+import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   Form,
   Input,
   WarningIcon,
@@ -30,15 +25,15 @@ import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
 const General = () => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const parentProject = useProjectByRef(project?.parent_project_ref)
+  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
 
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+  const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
     },
@@ -125,7 +120,7 @@ const General = () => {
           <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex flex-col px-8 py-4">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm">Restart project</p>
                     <div className="max-w-[420px]">

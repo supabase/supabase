@@ -16,7 +16,8 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import RequestADemoForm from '../components/Forms/RequestADemoForm'
+import RequestADemoForm from 'components/Forms/RequestADemoForm'
+import { companyStats } from 'data/company-stats'
 
 export default {
   metadata: {
@@ -138,12 +139,12 @@ export default {
       "Supabase ensures optimal database performance at any scale, so you can focus on innovating and growing without worrying about infrastructure limitations—whether you're handling high-traffic applications, complex queries, or massive data volumes.",
     highlights: [
       {
-        heading: 'Databases managed',
-        subheading: '1,000,000+',
+        heading: companyStats.databasesManaged.label,
+        subheading: companyStats.databasesManaged.text,
       },
       {
-        heading: 'Databases launched daily',
-        subheading: '3,500+',
+        heading: companyStats.databasesLaunchedDaily.label,
+        subheading: companyStats.databasesLaunchedDaily.text,
       },
     ],
   },

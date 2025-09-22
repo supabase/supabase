@@ -7,7 +7,7 @@ import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { logsKeys } from './keys'
 import {
   getUnifiedLogsISOStartEnd,
-  UNIFIED_LOGS_STALE_TIME,
+  UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
 } from './unified-logs-infinite-query'
 
@@ -88,7 +88,7 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      staleTime: UNIFIED_LOGS_STALE_TIME,
+      ...UNIFIED_LOGS_QUERY_OPTIONS,
       ...options,
     }
   )

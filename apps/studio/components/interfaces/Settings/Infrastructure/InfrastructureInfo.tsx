@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -13,24 +12,29 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
-  Button,
   Input,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
-import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
+import {
+  ObjectsToBeDroppedWarning,
+  ReadReplicasWarning,
+  UnsupportedExtensionsWarning,
+  UserDefinedObjectsInInternalSchemasWarning,
+} from './UpgradeWarnings'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
 
@@ -52,9 +56,6 @@ const InfrastructureInfo = () => {
     isSuccess: isSuccessServiceVersions,
   } = useProjectServiceVersionsQuery({ projectRef: ref })
 
-  const { data: projectUpgradeEligibilityData } = useProjectUpgradeEligibilityQuery({
-    projectRef: ref,
-  })
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
   const { current_app_version, current_app_version_release_channel, latest_app_version } =
     data || {}
@@ -63,8 +64,9 @@ const InfrastructureInfo = () => {
   const currentPgVersion = (current_app_version ?? '')
     .split('supabase-postgres-')[1]
     ?.replace('-orioledb', '')
-  const isOnNonGenerallyAvailableReleaseChannel =
-    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+  const isVisibleReleaseChannel =
+    current_app_version_release_channel &&
+    !['ga', 'withdrawn'].includes(current_app_version_release_channel)
       ? current_app_version_release_channel
       : undefined
   const isOrioleDb = useIsOrioleDb()
@@ -72,6 +74,10 @@ const InfrastructureInfo = () => {
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
+
+  const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
+  const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
+  const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
 
   return (
     <>
@@ -86,9 +92,9 @@ const InfrastructureInfo = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>
-            <p>Service Versions</p>
-            <p className="text-foreground-light text-sm">
-              Information on your provisioned instance
+            <h4 className="text-base capitalize m-0">Service Versions</h4>
+            <p className="text-foreground-light text-sm pr-8 mt-1">
+              Information on your provisioned instance.
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
@@ -138,16 +144,16 @@ const InfrastructureInfo = () => {
                           value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
                           label="Postgres version"
                           actions={[
-                            isOnNonGenerallyAvailableReleaseChannel && (
+                            isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1 capitalize">
-                                    {isOnNonGenerallyAvailableReleaseChannel}
+                                    {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
-                                  database version release
+                                  This project uses a {isVisibleReleaseChannel} database version
+                                  release
                                 </TooltipContent>
                               </Tooltip>
                             ),
@@ -181,149 +187,29 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
-                    {data.eligible && hasReadReplicas && (
-                      <Alert_Shadcn_>
-                        <AlertTitle_Shadcn_>
-                          A new version of Postgres is available for your project
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          You will need to remove all read replicas prior to upgrading your Postgres
-                          version to the latest available ({latestPgVersion}).
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
-                    {/* TODO(bobbie): once extension_dependent_objects is removed on the backend, remove this block and the ts-ignores below */}
-                    {!data?.eligible && (data?.extension_dependent_objects || []).length > 0 && (
-                      <Alert_Shadcn_
-                        variant="warning"
-                        title="A new version of Postgres is available for your project"
-                      >
-                        <AlertTitle_Shadcn_>
-                          A new version of Postgres is available
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                          <div>
-                            <p className="mb-1">
-                              You'll need to remove the following extensions before upgrading:
-                            </p>
+                    {data.eligible ? (
+                      hasReadReplicas ? (
+                        <ReadReplicasWarning latestPgVersion={latestPgVersion} />
+                      ) : (
+                        <ProjectUpgradeAlert />
+                      )
+                    ) : null}
 
-                            <ul className="pl-4">
-                              {(data?.extension_dependent_objects || []).map((obj) => (
-                                <li className="list-disc" key={obj}>
-                                  {obj}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <p>
-                            {projectUpgradeEligibilityData?.potential_breaking_changes?.includes(
-                              'pg17_upgrade_unsupported_extensions'
-                            )
-                              ? 'These extensions are not supported in newer versions of Supabase Postgres. If you are not using them, it is safe to remove them.'
-                              : 'Check the docs for which ones might need to be removed.'}
-                          </p>
-                          <div>
-                            <Button size="tiny" type="default" asChild>
-                              <a
-                                href="https://supabase.com/docs/guides/platform/upgrading#extensions"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                View docs
-                              </a>
-                            </Button>
-                          </div>
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
-                    {!data?.eligible &&
-                      // @ts-ignore
-                      (data?.objects_to_be_dropped || []).length > 0 && (
-                        <Alert_Shadcn_
-                          variant="warning"
-                          title="A new version of Postgres is available for your project"
-                        >
-                          <AlertTitle_Shadcn_>
-                            A new version of Postgres is available
-                          </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                            <div>
-                              <p className="mb-1">
-                                You'll need to remove the following objects before upgrading:
-                              </p>
-
-                              <ul className="pl-4">
-                                {
-                                  // @ts-ignore
-                                  (data?.objects_to_be_dropped || []).map((obj: string) => (
-                                    <li className="list-disc" key={obj}>
-                                      {obj}
-                                    </li>
-                                  ))
-                                }
-                              </ul>
-                            </div>
-                            <p>Check the docs for which objects need to be removed.</p>
-                            <div>
-                              <Button size="tiny" type="default" asChild>
-                                <a
-                                  href="https://supabase.com/docs/guides/platform/upgrading#extensions"
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  View docs
-                                </a>
-                              </Button>
-                            </div>
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      )}
-                    {!data?.eligible &&
-                      // @ts-ignore
-                      (data?.unsupported_extensions || []).length > 0 && (
-                        <Alert_Shadcn_
-                          variant="warning"
-                          title="A new version of Postgres is available for your project"
-                        >
-                          <AlertTitle_Shadcn_>
-                            A new version of Postgres is available
-                          </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                            <div>
-                              <p className="mb-1">
-                                You'll need to remove the following extensions before upgrading:
-                              </p>
-
-                              <ul className="pl-4">
-                                {
-                                  // @ts-ignore
-                                  (data?.unsupported_extensions || []).map((obj: string) => (
-                                    <li className="list-disc" key={obj}>
-                                      {obj}
-                                    </li>
-                                  ))
-                                }
-                              </ul>
-                            </div>
-                            <p>
-                              These extensions are not supported in newer versions of Supabase
-                              Postgres. If you are not using them, it is safe to remove them.
-                            </p>
-                            <div>
-                              <Button size="tiny" type="default" asChild>
-                                <a
-                                  href="https://supabase.com/docs/guides/platform/upgrading#extensions"
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  View docs
-                                </a>
-                              </Button>
-                            </div>
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      )}
+                    {!data.eligible ? (
+                      hasObjectsToBeDropped ? (
+                        <ObjectsToBeDroppedWarning
+                          objectsToBeDropped={data.objects_to_be_dropped}
+                        />
+                      ) : hasUnsupportedExtensions ? (
+                        <UnsupportedExtensionsWarning
+                          unsupportedExtensions={data.unsupported_extensions}
+                        />
+                      ) : hasObjectsInternalSchema ? (
+                        <UserDefinedObjectsInInternalSchemasWarning
+                          objects={data.user_defined_objects_in_internal_schemas}
+                        />
+                      ) : null
+                    ) : null}
                   </>
                 )}
               </>

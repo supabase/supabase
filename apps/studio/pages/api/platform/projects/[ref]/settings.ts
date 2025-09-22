@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { components } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'lib/constants/api'
 
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
   protocol?: string
@@ -30,6 +30,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     app_config: {
       db_schema: 'public',
       endpoint: PROJECT_ENDPOINT,
+      storage_endpoint: PROJECT_ENDPOINT,
       // manually added to force the frontend to use the correct URL
       protocol: PROJECT_ENDPOINT_PROTOCOL,
     },

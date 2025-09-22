@@ -1,17 +1,17 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Eye } from 'lucide-react'
+
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export function ApiKeyPill({
@@ -28,14 +28,15 @@ export function ApiKeyPill({
   const isSecret = apiKey.type === 'secret'
 
   // Permission check for revealing/copying secret API keys
-  const { can: canManageSecretKeys, isLoading: isLoadingPermission } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'service_api_keys')
+  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
 
   // This query only runs when show=true (enabled: show)
   // It fetches the fully revealed API key when needed
   const {
     data,
-    isLoading: isLoadingApiKey,
     error,
     refetch: refetchApiKey,
   } = useAPIKeyIdQuery(
@@ -68,18 +69,18 @@ export function ApiKeyPill({
     }
   }, [show, data?.api_key, projectRef, queryClient, apiKey.id])
 
-  async function onSubmitShow() {
+  async function onSubmitToggle() {
     // Don't reveal key if not allowed or loading
     if (isSecret && !canManageSecretKeys) return
     if (isLoadingPermission) return
 
-    // This will enable the API key query to fetch and reveal the key
-    setShowState(true)
+    // Toggle the show state
+    setShowState(!show)
   }
 
   async function onCopy() {
     // If key is already revealed, use that value
-    if (data?.api_key) return data?.api_key
+    if (data?.api_key) return data?.api_key ?? ''
 
     try {
       // Fetch full key and immediately clear from cache after copying
@@ -89,13 +90,15 @@ export function ApiKeyPill({
         exact: true,
       })
 
-      if (result.isSuccess) return result.data.api_key
+      if (result.isSuccess) return result.data.api_key ?? ''
 
       if (error) {
         toast.error('Failed to copy secret API key')
+        return ''
       }
     } catch (error) {
       console.error('Failed to fetch API key:', error)
+      return ''
     }
 
     // Fallback to the masked version if fetch fails
@@ -104,78 +107,53 @@ export function ApiKeyPill({
 
   // States for disabling buttons/showing tooltips
   const isRestricted = isSecret && !canManageSecretKeys
-  const isLoading = isLoadingPermission
 
   return (
     <>
-      <AnimatePresence mode="wait" initial={false}>
-        <div
-          className={cn(
-            InputVariants({ size: 'tiny' }),
-            'flex-1 grow gap-0 font-mono rounded-full',
-            isSecret ? 'overflow-hidden' : '',
-            show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
-            'transition-all',
-            'max-w-[340px]',
-            'cursor-text',
-            'relative'
-          )}
-          style={{ userSelect: 'all' }}
-        >
-          {isSecret ? (
-            <>
-              <span>{apiKey?.api_key.slice(0, 15)}</span>
-              <motion.span
-                key={show ? 'shown' : 'hidden'}
-                initial={{ opacity: 0, y: show ? 16 : -16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: show ? 16 : -16 }}
-                transition={{
-                  duration: 0.1,
-                  y: { type: 'spring', stiffness: 1000, damping: 55 },
-                }}
-              >
-                {show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}
-              </motion.span>
-            </>
-          ) : (
-            <span>{apiKey?.api_key}</span>
-          )}
-        </div>
-      </AnimatePresence>
+      <div
+        className={cn(
+          InputVariants({ size: 'tiny' }),
+          'w-[100px] sm:w-[140px] md:w-[180px] lg:w-[340px] gap-0 font-mono rounded-full',
+          isSecret ? 'overflow-hidden' : '',
+          show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
+          'transition-all',
+          'cursor-text',
+          'relative'
+        )}
+        style={{ userSelect: 'all' }}
+      >
+        {isSecret ? (
+          <>
+            <span>{apiKey?.api_key.slice(0, 15)}</span>
+            <span>{show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}</span>
+          </>
+        ) : (
+          <span>{apiKey?.api_key}</span>
+        )}
+      </div>
 
-      {/* Reveal button - only shown for secret keys and when not already revealed */}
+      {/* Toggle button */}
       {isSecret && (
-        <AnimatePresence initial={false}>
-          {!show && (
-            <motion.div
-              initial={{ opacity: 0, scale: 1, width: 0 }}
-              animate={{ opacity: 1, scale: 1, width: 'auto' }}
-              exit={{ opacity: 0, scale: 1, width: 0 }}
-              transition={{ duration: 0.12 }}
-              style={{ overflow: 'hidden' }}
-            >
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="outline"
-                    className="rounded-full px-2 pointer-events-auto cursor-default"
-                    icon={<Eye strokeWidth={2} />}
-                    onClick={onSubmitShow}
-                    disabled={isRestricted}
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  {isRestricted
-                    ? 'You need additional permissions to reveal secret API keys'
-                    : isLoadingPermission
-                      ? 'Loading permissions...'
-                      : 'Reveal API key'}
-                </TooltipContent>
-              </Tooltip>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="outline"
+              className="rounded-full px-2 pointer-events-auto"
+              icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
+              onClick={onSubmitToggle}
+              disabled={isRestricted}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {isRestricted
+              ? 'You need additional permissions to reveal secret API keys'
+              : isLoadingPermission
+                ? 'Loading permissions...'
+                : show
+                  ? 'Hide API key'
+                  : 'Reveal API key'}
+          </TooltipContent>
+        </Tooltip>
       )}
 
       <Tooltip>
@@ -184,7 +162,7 @@ export function ApiKeyPill({
             type="default"
             asyncText={onCopy}
             iconOnly
-            className="rounded-full px-2 pointer-events-auto cursor-default"
+            className="rounded-full px-2 pointer-events-auto"
             disabled={isRestricted || isLoadingPermission}
           />
         </TooltipTrigger>

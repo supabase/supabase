@@ -15,7 +15,7 @@ Each project is provisioned with a unique JWT secret used to sign and verify aut
 - If you reuse the original JWT secret in the new project, existing tokens will remain valid and users will not need to re-authenticate.
 
 You can configure a custom JWT secret in the new project by going to:
-[Settings > API > JWT Secret](https://supabase.com/dashboard/project/_/settings/api)
+[Settings > API > JWT Secret](/dashboard/project/_/settings/api)
 
 Note: Updating the JWT secret will regenerate your anon and service_role API keys in the new project.
 
@@ -26,4 +26,4 @@ We don’t currently provide a one-size-fits-all script for migrating only the a
 - A full .backup file from the dashboard, or
 - SQL export/import via the Supabase CLI (e.g., pg_dump and psql)
 
-[View Full Migration Guide](https://supabase.com/docs/guides/platform/migrating-within-supabase)
+[View Full Migration Guide](/docs/guides/platform/migrating-within-supabase)

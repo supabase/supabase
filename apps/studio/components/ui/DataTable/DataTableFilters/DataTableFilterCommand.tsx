@@ -4,7 +4,6 @@ import { ParserBuilder } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import {
   cn,
   Command_Shadcn_ as Command,
@@ -33,9 +32,13 @@ import {
 interface DataTableFilterCommandProps {
   // TODO: maybe use generics for the parser
   searchParamsParser: Record<string, ParserBuilder<any>>
+  placeholder?: string
 }
 
-export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCommandProps) {
+export function DataTableFilterCommand({
+  searchParamsParser,
+  placeholder = 'Search data table...',
+}: DataTableFilterCommandProps) {
   const { table, isLoading, filterFields: _filterFields, getFacetedUniqueValues } = useDataTable()
   const columnFilters = table.getState().columnFilters
   const inputRef = useRef<HTMLInputElement>(null)
@@ -59,7 +62,12 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
 
   const trimmedInputValue = inputValue.trim()
 
-  useHotKey(() => setOpen((open) => !open), 'k')
+  const queryFields = filterFields.filter(
+    (x) => typeof x.value === 'string' && currentWord.includes(`${x.value}:`)
+  )
+
+  // [Joshen] Temporarily disabling as this conflicts with our current CMD K behaviour
+  // useHotKey(() => setOpen((open) => !open), 'k')
 
   useEffect(() => {
     // TODO: we could check for ARRAY_DELIMITER or SLIDER_DELIMITER to auto-set filter when typing
@@ -76,18 +84,6 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
       const field = _filterFields?.find((field) => field.value === filter.id)
       return !field?.commandDisabled
     })
-    const currentDisabledFilters = currentFilters.filter((filter) => {
-      const field = _filterFields?.find((field) => field.value === filter.id)
-      return field?.commandDisabled
-    })
-
-    const commandDisabledFilterKeys = currentDisabledFilters.reduce(
-      (prev, curr) => {
-        prev[curr.id] = curr.value
-        return prev
-      },
-      {} as Record<string, unknown>
-    )
 
     for (const key of Object.keys(searchParams)) {
       const value = searchParams[key as keyof typeof searchParams]
@@ -139,13 +135,15 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
             trimmedInputValue ? 'text-foreground' : 'text-foreground-light'
           )}
         >
-          {trimmedInputValue ? inputValue : 'Search data table...'}
+          {trimmedInputValue ? inputValue : placeholder}
         </span>
-        <Kbd className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
+        {/* [Joshen] Temporarily disabling as this conflicts with existing CMD K shortcut */}
+        {/* <Kbd className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
           <span className="mr-1">⌘</span>
           <span>K</span>
-        </Kbd>
+        </Kbd> */}
       </button>
+
       <Command
         className={cn(
           'overflow-visible rounded-lg border border-border shadow-md [&>div]:border-none bg',
@@ -154,6 +152,12 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
         filter={(value, search, keywords) =>
           getFilterValue({ value, search, keywords, currentWord })
         }
+        onKeyDown={(e) => {
+          // Stop arrow key navigation from propagating to parent components
+          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.stopPropagation()
+          }
+        }}
       >
         <CommandInput
           ref={inputRef}
@@ -185,13 +189,14 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
             const word = getWordByCaretPosition({ value, caretPosition })
             setCurrentWord(word)
           }}
-          placeholder="Search data table..."
+          placeholder={placeholder}
           className="text-foreground"
         />
         <div className="relative">
           <div className="absolute top-2 z-50 w-full overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-md outline-none animate-in">
             {/* default height is 300px but in case of more, we'd like to tease the user */}
             <CommandList className="max-h-[310px] bg-surface-100">
+              <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup heading="Filter">
                 {filterFields.map((field) => {
                   if (typeof field.value !== 'string') return null
@@ -221,106 +226,113 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
                       }}
                       className="group"
                     >
-                      {field.value}
+                      {field.label}
                       <CommandItemSuggestions field={field} />
                     </CommandItem>
                   )
                 })}
               </CommandGroup>
+
               <CommandSeparator />
-              <CommandGroup heading="Query">
-                {filterFields?.map((field) => {
-                  if (typeof field.value !== 'string') return null
-                  if (!currentWord.includes(`${field.value}:`)) return null
 
-                  const column = table.getColumn(field.value)
-                  const facetedValue =
-                    getFacetedUniqueValues?.(table, field.value) || column?.getFacetedUniqueValues()
+              {queryFields.length > 0 && (
+                <>
+                  <CommandGroup heading="Query">
+                    {queryFields.map((field) => {
+                      const column = table.getColumn(field.value)
+                      const facetedValue =
+                        getFacetedUniqueValues?.(table, field.value) ||
+                        column?.getFacetedUniqueValues()
 
-                  const options = getFieldOptions({ field })
+                      const options = getFieldOptions({ field })
 
-                  return options.map((optionValue) => {
-                    return (
-                      <CommandItem
-                        key={`${String(field.value)}:${optionValue}`}
-                        value={`${String(field.value)}:${optionValue}`}
-                        onMouseDown={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                        }}
-                        onSelect={(value) => {
-                          setInputValue((prev) =>
-                            replaceInputByFieldType({
-                              prev,
-                              currentWord,
-                              optionValue,
-                              value,
-                              field,
-                            })
-                          )
-                          setCurrentWord('')
-                        }}
-                      >
-                        {`${optionValue}`}
-                        {facetedValue?.has(optionValue) ? (
-                          <span className="ml-auto font-mono text-muted-foreground">
-                            {formatCompactNumber(facetedValue.get(optionValue) || 0)}
-                          </span>
-                        ) : null}
-                      </CommandItem>
-                    )
-                  })
-                })}
-              </CommandGroup>
-              <CommandSeparator />
-              <CommandGroup heading="Suggestions">
-                {lastSearches
-                  ?.sort((a, b) => b.timestamp - a.timestamp)
-                  .slice(0, 5)
-                  .map((item) => {
-                    return (
-                      <CommandItem
-                        key={`suggestion:${item.search}`}
-                        value={`suggestion:${item.search}`}
-                        onMouseDown={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                        }}
-                        onSelect={(value) => {
-                          const search = value.replace('suggestion:', '')
-                          setInputValue(`${search} `)
-                          setCurrentWord('')
-                        }}
-                        className="group"
-                      >
-                        {item.search}
-                        <span className="ml-auto truncate text-muted-foreground/80 group-aria-[selected=true]:block">
-                          {formatDistanceToNow(item.timestamp, {
-                            addSuffix: true,
-                          })}
-                        </span>
-                        <button
-                          type="button"
+                      return options.map((optionValue) => {
+                        return (
+                          <CommandItem
+                            key={`${String(field.value)}:${optionValue}`}
+                            value={`${String(field.value)}:${optionValue}`}
+                            onMouseDown={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                            }}
+                            onSelect={(value) => {
+                              setInputValue((prev) =>
+                                replaceInputByFieldType({
+                                  prev,
+                                  currentWord,
+                                  optionValue,
+                                  value,
+                                  field,
+                                })
+                              )
+                              setCurrentWord('')
+                            }}
+                          >
+                            {`${optionValue}`}
+                            {facetedValue?.has(optionValue) ? (
+                              <span className="ml-auto font-mono text-muted-foreground">
+                                {formatCompactNumber(facetedValue.get(optionValue) || 0)}
+                              </span>
+                            ) : null}
+                          </CommandItem>
+                        )
+                      })
+                    })}
+                  </CommandGroup>
+                  <CommandSeparator />
+                </>
+              )}
+
+              {lastSearches.length > 0 && (
+                <CommandGroup heading="Suggestions">
+                  {lastSearches
+                    .sort((a, b) => b.timestamp - a.timestamp)
+                    .slice(0, 5)
+                    .map((item) => {
+                      return (
+                        <CommandItem
+                          key={`suggestion:${item.search}`}
+                          value={`suggestion:${item.search}`}
                           onMouseDown={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
                           }}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            // TODO: extract into function
-                            setLastSearches(lastSearches.filter((i) => i.search !== item.search))
+                          onSelect={(value) => {
+                            const search = value.replace('suggestion:', '')
+                            setInputValue(`${search} `)
+                            setCurrentWord('')
                           }}
-                          className="ml-1 hidden rounded-md p-0.5 hover:bg-background group-aria-[selected=true]:block"
+                          className="group"
                         >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </CommandItem>
-                    )
-                  })}
-              </CommandGroup>
-              <CommandEmpty>No results found.</CommandEmpty>
+                          {item.search}
+                          <span className="ml-auto truncate text-muted-foreground/80 group-aria-[selected=true]:block">
+                            {formatDistanceToNow(item.timestamp, {
+                              addSuffix: true,
+                            })}
+                          </span>
+                          <button
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                            }}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              // TODO: extract into function
+                              setLastSearches(lastSearches.filter((i) => i.search !== item.search))
+                            }}
+                            className="ml-1 hidden rounded-md p-0.5 hover:bg-background group-aria-[selected=true]:block"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </CommandItem>
+                      )
+                    })}
+                </CommandGroup>
+              )}
             </CommandList>
+
             <div className="bg-surface-100 flex flex-wrap justify-between gap-3 border-t bg-accent/50 px-2 py-1.5 text-sm text-accent-foreground">
               <div className="flex flex-wrap gap-3">
                 <span>
@@ -364,10 +376,12 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
 function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<TData> }) {
   const { table, getFacetedMinMaxValues, getFacetedUniqueValues } = useDataTable()
   const value = field.value as string
+  const className = 'ml-2 hidden truncate text-foreground-lighter group-aria-[selected=true]:block'
+
   switch (field.type) {
     case 'checkbox': {
       return (
-        <span className="ml-1 hidden truncate text-muted-foreground/80 group-aria-[selected=true]:block">
+        <span className={cn(className)}>
           {getFacetedUniqueValues
             ? Array.from(getFacetedUniqueValues(table, value)?.keys() || [])
                 .map((value) => `[${value}]`)
@@ -379,17 +393,13 @@ function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<
     case 'slider': {
       const [min, max] = getFacetedMinMaxValues?.(table, value) || [field.min, field.max]
       return (
-        <span className="ml-1 hidden truncate text-muted-foreground/80 group-aria-[selected=true]:block">
+        <span className={cn(className)}>
           [{min} - {max}]
         </span>
       )
     }
     case 'input': {
-      return (
-        <span className="ml-1 hidden truncate text-muted-foreground/80 group-aria-[selected=true]:block">
-          [{`${String(field.value)}`} input]
-        </span>
-      )
+      return <span className={cn(className)}>[{`${String(field.value)}`} input]</span>
     }
     default: {
       return null
