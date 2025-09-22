@@ -21,6 +21,8 @@ import {
   Button_Shadcn_,
   Button,
   cn,
+  Dialog,
+  DialogContent,
 } from 'ui'
 
 type WarningMessageProps = PropsWithChildren<{ title: string }>
@@ -54,7 +56,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
   const projectRef = project?.ref
   const connectionString = project?.connectionString
 
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isQueryPlanVisualizerExpanded, setIsQueryPlanVisualizerExpanded] = useState(false)
 
   const cleanedSql = useMemo(() => {
     const cleanedSql = removeCommentsFromSql(query)
@@ -131,12 +133,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
           <TooltipContent>What is a query plan?</TooltipContent>
         </Tooltip>
       </div>
-      <div
-        className={cn(
-          'overflow-hidden pb-0 z-0 relative transition-all duration-300',
-          isExpanded ? 'h-[477px]' : 'h-[120px]'
-        )}
-      >
+      <div className="h-[120px] overflow-hidden pb-0 z-0 relative transition-all duration-300">
         <p className="text-xs text-foreground-light mb-4">
           Visualize how Postgres executes your SQL so you can pinpoint costly steps faster.
         </p>
@@ -147,15 +144,33 @@ export const QueryPlan = ({ query }: { query: string }) => {
         )}
         {isFetching && <GenericSkeletonLoader />}
         {explainJsonString && (
-          <div className="h-[420px]">
-            <QueryPlanVisualizer json={explainJsonString} className="h-full" />
-          </div>
+          <Dialog
+            open={isQueryPlanVisualizerExpanded}
+            onOpenChange={setIsQueryPlanVisualizerExpanded}
+          >
+            <div className="h-[420px]">
+              <QueryPlanVisualizer
+                json={explainJsonString}
+                className="h-full"
+                isExpanded={isQueryPlanVisualizerExpanded}
+                setIsExpanded={setIsQueryPlanVisualizerExpanded}
+                renderExpandedContent={(content) => (
+                  <DialogContent
+                    size="xxxlarge"
+                    className="flex h-[80vh] max-h-[90vh] w-[min(1200px,90vw)] flex-col overflow-hidden border bg-background p-0 shadow-2xl"
+                  >
+                    {content}
+                  </DialogContent>
+                )}
+              />
+            </div>
+          </Dialog>
         )}
       </div>
       <div
         className={cn(
           'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/30 to-transparent h-24 transition-opacity duration-300',
-          isExpanded && 'opacity-0 pointer-events-none'
+          isQueryPlanVisualizerExpanded && 'opacity-0 pointer-events-none'
         )}
       />
       <div className="absolute -bottom-[13px] left-0 right-0 w-full flex items-center justify-center z-10">
@@ -163,9 +178,9 @@ export const QueryPlan = ({ query }: { query: string }) => {
           type="default"
           className="rounded-full"
           icon={<ChevronsUpDown />}
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => setIsQueryPlanVisualizerExpanded((prev) => !prev)}
         >
-          {isExpanded ? 'Collapse' : 'Expand'}
+          {isQueryPlanVisualizerExpanded ? 'Collapse' : 'Expand'}
         </Button>
       </div>
     </QueryPanelSection>

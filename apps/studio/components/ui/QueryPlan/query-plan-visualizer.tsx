@@ -1,13 +1,20 @@
 import Link from 'next/link'
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
+import {
+  type ReactNode,
+  Fragment,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
   type Node,
   type ReactFlowInstance,
 } from 'reactflow'
-import { BookOpen, Maximize2, Minimize2 } from 'lucide-react'
+import { BookOpen, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 import { Transition } from '@headlessui/react'
 
@@ -40,7 +47,19 @@ import { useDagreLayout } from './hooks/use-dagre-layout'
 import { MetricsSidebar } from './metrics-sidebar'
 import { NodeDetailsPanel } from './node-details-panel'
 
-export const QueryPlanVisualizer = ({ json, className }: { json: string; className?: string }) => {
+export const QueryPlanVisualizer = ({
+  json,
+  className,
+  isExpanded,
+  setIsExpanded,
+  renderExpandedContent,
+}: {
+  json: string
+  className?: string
+  isExpanded: boolean
+  setIsExpanded: (value: SetStateAction<boolean>) => void
+  renderExpandedContent: (content: ReactNode) => ReactNode
+}) => {
   const { nodes, edges, meta } = usePlanGraph(json)
 
   const [metricsVisibility, setMetricsVisibility] =
@@ -52,7 +71,6 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
-  const [isExpanded, setIsExpanded] = useState(false)
   const [panelNode, setPanelNode] = useState<Node<PlanNodeData> | null>(null)
   const layout = useDagreLayout(nodes, edges, metricsVisibility, heatmapMode)
 
@@ -179,11 +197,11 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     return () => {
       window.removeEventListener('keydown', handleKeyDown, true)
     }
-  }, [isExpanded])
+  }, [isExpanded, setIsExpanded])
 
   const toggleExpanded = useCallback(() => {
-    setIsExpanded((prev) => !prev)
-  }, [])
+    setIsExpanded((prev: boolean) => !prev)
+  }, [setIsExpanded])
 
   const clearSelection = useCallback(() => {
     setSelectedNodeId(null)
@@ -431,37 +449,15 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
     )
   }
 
-  const expandedPortal =
-    isExpanded && typeof document !== 'undefined'
-      ? createPortal(
-          <div className="fixed inset-0 z-50 flex">
-            <div
-              className="absolute inset-0 bg-foreground/20 backdrop-blur-sm"
-              aria-hidden="true"
-              onClick={() => setIsExpanded(false)}
-            />
-            <div
-              role="dialog"
-              aria-modal="true"
-              className="relative z-10 flex w-full bg-background"
-            >
-              <div
-                className={cn(
-                  'flex flex-col h-full w-full overflow-hidden border shadow-2xl',
-                  className
-                )}
-              >
-                {renderVisualizer(true)}
-              </div>
-            </div>
-          </div>,
-          document.body
-        )
-      : null
+  const expandedContent = isExpanded ? (
+    <div className={cn('flex h-full w-full flex-col', className)}>{renderVisualizer(true)}</div>
+  ) : null
+
+  const expandedView = expandedContent ? renderExpandedContent(expandedContent) : null
 
   return (
     <>
-      {expandedPortal}
+      {expandedView}
       <div
         className={cn(
           'w-full h-full flex flex-col',
