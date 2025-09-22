@@ -190,8 +190,10 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
   }, [])
 
   const handleDetailPanelAfterLeave = useCallback(() => {
-    setPanelNode(null)
-  }, [])
+    if (!selectedNode) {
+      setPanelNode(null)
+    }
+  }, [selectedNode])
 
   const nodeTypes = useMemo(
     () => ({
@@ -215,7 +217,7 @@ export const QueryPlanVisualizer = ({ json, className }: { json: string; classNa
       isExpanded && panelNode ? (
         <Transition
           as={Fragment}
-          show={Boolean(selectedNode)}
+          show={!!selectedNode}
           appear
           enter="transition-all duration-300 ease-out"
           enterFrom="w-0 opacity-0"
