@@ -260,6 +260,54 @@ Consider the following:
 
 Check the JWT verification libraries for your language on how to securely verify JWTs signed with the legacy JWT secret or a shared secret (HS256) signing key. We strongly recommend relying on the Auth server as described above, or switching to a different signing key based on public key cryptography (RSA, Elliptic Curves) instead.
 
+### Configuring JWTs for Self-Hosted Supabase
+
+If you're hosting Supabase yourself (using Docker, Railway, Render, or your own VPS), you'll need to configure JWTs manually to ensure authentication and authorization work as expected.
+
+Supabase services rely on a shared secret (`JWT_SECRET`) to validate tokens. If this is misconfigured, users may receive "JWT verification failed" errors or fail to access protected resources.
+
+Your tokens should include the following claims:
+
+```json
+{
+  "aud": "authenticated",
+  "sub": "user-id",
+  "iss": "your-app",
+  "exp": 1712345678,
+  "email": "user@example.com",
+  "role": "authenticated"
+}
+
+```
+
+**Explanation of claims:**
+
+- `aud`: Audience – typically set to `"authenticated"` for Supabase projects  
+- `sub`: Subject – the user's unique ID  
+- `iss`: Issuer – identifies who created the token (your app name)  
+- `exp`: Expiration time in UNIX timestamp  
+- `email`: Optional – used for user identification  
+- `role`: Supabase uses this for role-based access  
+
+
+
+
+To make Supabase validate your tokens correctly, ensure your `.env` or environment config includes:
+
+```bash
+JWT_SECRET=your-very-secure-secret
+
+```
+
+This secret is used to **sign** the JWT and also by Supabase to **verify** the token's validity.
+
+You can create and debug your tokens at [https://jwt.io](https://jwt.io).  
+Make sure to match the claims and signing secret exactly.
+
+This setup is essential for using Supabase Auth securely when you're managing your own infrastructure instead of using the official Supabase Cloud.
+
+
+
 ## Resources
 
 - JWT debugger: https://jwt.io/
