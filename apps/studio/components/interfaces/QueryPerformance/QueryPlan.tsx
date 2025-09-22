@@ -157,7 +157,8 @@ export const QueryPlan = ({ query }: { query: string }) => {
                 renderExpandedContent={(content) => (
                   <DialogContent
                     size="xxxlarge"
-                    className="flex h-[80vh] max-h-[90vh] w-[min(1200px,90vw)] flex-col overflow-hidden border bg-background p-0 shadow-2xl"
+                    hideClose
+                    className="flex h-[92vh] max-h-[96vh] w-[min(1600px,96vw)] flex-col overflow-hidden border bg-background p-0 shadow-2xl"
                   >
                     {content}
                   </DialogContent>
