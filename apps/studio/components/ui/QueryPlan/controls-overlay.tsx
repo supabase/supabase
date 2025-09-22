@@ -78,7 +78,7 @@ export const ControlsOverlay = ({
               </Button>
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_
-              className="p-0 min-w-[200px] pointer-events-auto"
+              className="p-0 w-44 pointer-events-auto"
               side="bottom"
               align="start"
               portal={portal}
@@ -124,7 +124,7 @@ export const ControlsOverlay = ({
               Filters
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={portal}>
+          <PopoverContent_Shadcn_ className="p-0 w-44" side="bottom" align="center" portal={portal}>
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Show items</p>
               <ul className="flex flex-col">
