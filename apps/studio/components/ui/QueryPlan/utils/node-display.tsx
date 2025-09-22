@@ -279,6 +279,10 @@ export const COST_HELP_LINKS = [
     label: 'Examine query performance',
     href: 'https://supabase.com/docs/guides/platform/performance#examining-query-performance',
   },
+  {
+    label: 'Managing Indexes',
+    href: 'https://supabase.com/docs/guides/database/postgres/indexes',
+  },
 ]
 
 export const renderHelpLinks = (links: { label: string; href: string }[]) => (
@@ -324,7 +328,8 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             Self time {slowTime} ms ({share}% of total execution time).
           </p>
           <p className="text-[11px] text-foreground-light">
-            This step is the primary bottleneck, so the query stays slow until you shrink the work it performs.
+            This step is the primary bottleneck, so the query stays slow until you shrink the work
+            it performs.
           </p>
           <p className="text-[11px] text-foreground-light">
             Filter rows sooner or add supporting indexes so fewer tuples reach this node.
@@ -371,10 +376,12 @@ export const buildHints = (data: PlanNodeData): JSX.Element[] => {
             {shareSummary ?? '.'}
           </p>
           <p className="text-[11px] text-foreground-light">
-            The planner expects this step to consume most of the plan budget, often forcing conservative join or scan choices.
+            The planner expects this step to consume most of the plan budget, often forcing
+            conservative join or scan choices.
           </p>
           <p className="text-[11px] text-foreground-light">
-            Tighten predicates, reduce scanned data, or improve indexing so cheaper alternatives become viable.
+            Tighten predicates, reduce scanned data, or improve indexing so cheaper alternatives
+            become viable.
           </p>
           {renderHelpLinks(COST_HELP_LINKS)}
         </TooltipContent>
