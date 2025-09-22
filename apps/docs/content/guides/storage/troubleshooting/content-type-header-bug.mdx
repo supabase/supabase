@@ -1,0 +1,125 @@
+---
+id: 'content-type-header-bug'
+title: 'Content-Type Header Case Sensitivity Bug'
+description: 'Learn about the Content-Type header case sensitivity issue in Supabase Storage and how to fix it.'
+subtitle: 'Content-Type Header Case Sensitivity Bug'
+sidebar_label: 'Content-Type Header Bug'
+---
+
+## Overview
+
+There is a known issue with the Supabase Storage API where using a capitalized `"Content-Type"` header in the `file_options` parameter causes files to be stored with multipart form data boundaries instead of the actual file content.
+
+## Problem Description
+
+When uploading files with a capitalized `"Content-Type"` header, the storage API incorrectly treats the upload as multipart form data, resulting in:
+
+- Files being stored with multipart boundaries (e.g., `--boundary123\r\nContent-Disposition: form-data...`)
+- Downloads returning malformed content instead of the original file
+- No error thrown - uploads appear successful but contain wrong data
+
+## Root Cause
+
+The storage backend handles HTTP headers in a case-sensitive manner, which violates HTTP RFC 7230 that states headers should be case-insensitive. When a capitalized `"Content-Type"` header is detected, the backend incorrectly processes the upload as multipart form data.
+
+## Affected Usage Patterns
+
+### Python Client
+
+```python
+# ❌ This causes the issue
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'Content-Type': 'image/jpeg',  # Capitalized - causes bug
+})
+
+# ✅ This works correctly
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'content-type': 'image/jpeg',  # Lowercase - works correctly
+})
+```
+
+### Direct REST API Calls
+
+```bash
+# ❌ This causes the issue
+curl -X POST 'https://project.supabase.co/storage/v1/object/bucket/file.png' \
+  -H 'Content-Type: image/png' \
+  -H 'Authorization: Bearer token' \
+  --data-binary @file.png
+
+# ✅ This works correctly
+curl -X POST 'https://project.supabase.co/storage/v1/object/bucket/file.png' \
+  -H 'content-type: image/png' \
+  -H 'Authorization: Bearer token' \
+  --data-binary @file.png
+```
+
+## Solution
+
+### For Python Client
+
+Always use lowercase `content-type` in the `file_options`:
+
+```python
+# ✅ Correct usage
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'content-type': 'image/jpeg',
+  'cache-control': '3600',
+  'upsert': 'true'
+})
+```
+
+### For Direct API Calls
+
+Use lowercase `content-type` header:
+
+```bash
+curl -X POST 'https://project.supabase.co/storage/v1/object/bucket/file.png' \
+  -H 'content-type: image/png' \
+  -H 'Authorization: Bearer token' \
+  --data-binary @file.png
+```
+
+### For Other SDKs
+
+All Supabase SDKs handle this correctly by using lowercase headers internally:
+
+```javascript
+// JavaScript - works correctly
+await supabase.storage.from('bucket_name').upload('file_path', file, {
+  contentType: 'image/jpeg', // SDK converts to lowercase
+})
+```
+
+```dart
+// Dart - works correctly
+await supabase.storage.from('bucket_name').upload(
+  'file_path',
+  file,
+  fileOptions: const FileOptions(contentType: 'image/jpeg'),
+);
+```
+
+## Verification
+
+To verify your uploads are working correctly:
+
+1. Upload a file with the correct lowercase `content-type`
+2. Download the file and verify it contains the original content
+3. Check that the file size matches the original
+
+## Impact
+
+- **Affects**: Python client and direct REST API calls
+- **Does not affect**: JavaScript, Dart, Swift, Kotlin SDKs (they handle headers correctly)
+- **Environment**: All Supabase projects
+- **Status**: Known issue, backend fix in progress
+
+## Workaround
+
+Until the backend is fixed, always use lowercase `content-type` headers in your upload requests.
+
+## Related Issues
+
+- [GitHub Issue #37315](https://github.com/supabase/supabase/issues/37315)
+- HTTP RFC 7230 Section 3.2: Header fields are case-insensitive
