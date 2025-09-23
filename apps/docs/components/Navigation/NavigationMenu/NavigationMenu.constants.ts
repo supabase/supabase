@@ -7,7 +7,11 @@ import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Naviga
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
   billingAll: billingEnabled,
-  docsAuth: authEnabled,
+  docsAuthArchitecture: authArchitectureEnabled,
+  docsAuthConfiguration: authConfigurationEnabled,
+  docsAuthFlows: authFlowsEnabled,
+  docsAuthFullSecurity: authFullSecurityEnabled,
+  docsAuthTroubleshooting: authTroubleshootingEnabled,
   docsCompliance: complianceEnabled,
   docsContribution: contributionEnabled,
   'docsSelf-hosting': selfHostingEnabled,
@@ -27,9 +31,13 @@ const {
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
-  'docs:auth',
-  'docs:contribution',
+  'docs:auth_architecture',
+  'docs:auth_configuration',
+  'docs:auth_flows',
+  'docs:auth_full_security',
+  'docs:auth_troubleshooting',
   'docs:compliance',
+  'docs:contribution',
   'docs:self-hosting',
   'docs:framework_quickstarts',
   'docs:full_platform',
@@ -648,11 +656,11 @@ export const auth: NavMenuConstant = {
     {
       name: 'Architecture',
       url: '/guides/auth/architecture',
-      enabled: authEnabled,
+      enabled: authArchitectureEnabled,
     },
     {
       name: 'Getting Started',
-      enabled: authEnabled,
+      enabled: frameworkQuickstartsEnabled,
       items: [
         {
           name: 'Next.js',
@@ -687,7 +695,7 @@ export const auth: NavMenuConstant = {
     },
     {
       name: 'Flows (How-tos)',
-      enabled: authEnabled,
+      enabled: authFlowsEnabled,
       items: [
         {
           name: 'Server-Side Rendering',
@@ -777,7 +785,11 @@ export const auth: NavMenuConstant = {
       name: 'Debugging',
       items: [
         { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
-        { name: 'Troubleshooting', url: '/guides/auth/troubleshooting', enabled: authEnabled },
+        {
+          name: 'Troubleshooting',
+          url: '/guides/auth/troubleshooting',
+          enabled: authTroubleshootingEnabled,
+        },
       ],
     },
     {
@@ -794,7 +806,7 @@ export const auth: NavMenuConstant = {
     },
     {
       name: 'Configuration',
-      enabled: authEnabled,
+      enabled: authConfigurationEnabled,
       items: [
         {
           name: 'General Configuration',
@@ -842,17 +854,29 @@ export const auth: NavMenuConstant = {
     {
       name: 'Security',
       items: [
-        { name: 'Password Security', url: '/guides/auth/password-security', enabled: authEnabled },
-        { name: 'Rate Limits', url: '/guides/auth/rate-limits', enabled: authEnabled },
-        { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha', enabled: authEnabled },
-        { name: 'Audit Logs', url: '/guides/auth/audit-logs', enabled: authEnabled },
+        {
+          name: 'Password Security',
+          url: '/guides/auth/password-security',
+          enabled: authFullSecurityEnabled,
+        },
+        { name: 'Rate Limits', url: '/guides/auth/rate-limits', enabled: authFullSecurityEnabled },
+        {
+          name: 'Bot Detection (CAPTCHA)',
+          url: '/guides/auth/auth-captcha',
+          enabled: authFullSecurityEnabled,
+        },
+        { name: 'Audit Logs', url: '/guides/auth/audit-logs', enabled: authFullSecurityEnabled },
         {
           name: 'JSON Web Tokens (JWT)',
-          enabled: authEnabled,
           url: '/guides/auth/jwts',
+          enabled: authFullSecurityEnabled,
           items: [{ name: 'Claims Reference', url: '/guides/auth/jwt-fields' }],
         },
-        { name: 'JWT Signing Keys', url: '/guides/auth/signing-keys', enabled: authEnabled },
+        {
+          name: 'JWT Signing Keys',
+          url: '/guides/auth/signing-keys',
+          enabled: authFullSecurityEnabled,
+        },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         {
           name: 'Column Level Security',
@@ -2103,6 +2127,7 @@ export const ai: NavMenuConstant = {
 export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
+  enabled: localDevelopmentEnabled,
   url: '/guides/local-development',
   items: [
     { name: 'Overview', url: '/guides/local-development' },

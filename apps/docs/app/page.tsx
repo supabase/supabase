@@ -11,8 +11,7 @@ import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
 import { BASE_PATH } from '~/lib/constants'
 
-const { auth, sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
-  'docs:auth',
+const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
   'sdk:csharp',
   'sdk:dart',
   'sdk:kotlin',
@@ -44,7 +43,6 @@ const products = [
     description:
       'Supabase provides a full Postgres database for every project with Realtime functionality, database backups, extensions, and more.',
     span: 'col-span-12 md:col-span-6',
-    enabled: true,
   },
   {
     title: 'Auth',
@@ -54,7 +52,6 @@ const products = [
     description:
       'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
     span: 'col-span-12 md:col-span-6',
-    enabled: auth,
   },
   {
     title: 'Storage',
@@ -63,7 +60,6 @@ const products = [
     href: '/guides/storage',
     description:
       'Store, organize, transform, and serve large files—fully integrated with your Postgres database with Row Level Security access policies.',
-    enabled: true,
   },
   {
     title: 'Realtime',
@@ -72,7 +68,6 @@ const products = [
     href: '/guides/realtime',
     description:
       'Listen to database changes, store and sync user states across clients, broadcast data to clients subscribed to a channel, and more.',
-    enabled: true,
   },
   {
     title: 'Edge Functions',
@@ -81,7 +76,6 @@ const products = [
     href: '/guides/functions',
     description:
       'Globally distributed, server-side functions to execute your code closest to your users for the lowest latency.',
-    enabled: true,
   },
 ]
 
@@ -200,20 +194,17 @@ const HomePage = () => (
     <div className="flex flex-col">
       <h2 id="products">Products</h2>
       <ul className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600">
-        {products
-          .filter((product) => product.enabled)
-
-          .map((product) => {
-            return (
-              <li key={product.title} className={cn(product.span ?? 'col-span-12 md:col-span-4')}>
-                <Link href={product.href} passHref>
-                  <GlassPanelWithIconPicker {...product}>
-                    {product.description}
-                  </GlassPanelWithIconPicker>
-                </Link>
-              </li>
-            )
-          })}
+        {products.map((product) => {
+          return (
+            <li key={product.title} className={cn(product.span ?? 'col-span-12 md:col-span-4')}>
+              <Link href={product.href} passHref>
+                <GlassPanelWithIconPicker {...product}>
+                  {product.description}
+                </GlassPanelWithIconPicker>
+              </Link>
+            </li>
+          )
+        })}
       </ul>
 
       <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
