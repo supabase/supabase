@@ -14,8 +14,7 @@ export const QUERY_PERFORMANCE_PRESET_MAP = {
 
 export const QUERY_PERFORMANCE_COLUMNS = [
   { id: 'query', name: 'Query', description: undefined, minWidth: 500 },
-  { id: 'prop_total_time', name: 'Time consumed', description: undefined, minWidth: 130 },
-  { id: 'total_time', name: 'Total time', description: 'latency', minWidth: 150 },
+  { id: 'prop_total_time', name: 'Time consumed', description: undefined, minWidth: 150 },
   { id: 'calls', name: 'Count', description: undefined, minWidth: 100 },
   { id: 'max_time', name: 'Max time', description: undefined, minWidth: 100 },
   { id: 'mean_time', name: 'Mean time', description: undefined, minWidth: 100 },
