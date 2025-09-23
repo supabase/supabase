@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Archive, ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
+import { Archive, Code, Database, Key, Zap, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -19,14 +19,15 @@ import {
   CardHeader,
   CardTitle,
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuTrigger,
+  TooltipTrigger,
   Loading,
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
+  cn,
 } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -268,17 +269,20 @@ export const ProjectUsageSection = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-row justify-between items-center gap-x-2">
-        <div className="flex items-center gap-6">
-          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-6">
+          <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{totalRequests.toLocaleString()}</span>
             <span>Total Requests</span>
-            <span className={`${totalDeltaClass}`}>{formatDelta(totalRequestsChangePct)}</span>
+            <span className={cn('text-sm', totalDeltaClass)}>
+              {formatDelta(totalRequestsChangePct)}
+            </span>
           </div>
-          <span className="text-foreground-muted">/</span>
-          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+          <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{errorRate.toFixed(1)}%</span>
             <span>Error Rate</span>
-            <span className={`${errorDeltaClass}`}>{formatDelta(errorRateChangePct)}</span>
+            <span className={cn('text-sm', errorDeltaClass)}>
+              {formatDelta(errorRateChangePct)}
+            </span>
           </div>
         </div>
         <DropdownMenu>
@@ -340,7 +344,7 @@ export const ProjectUsageSection = () => {
       </div>
       <Row columns={[3, 2, 1]}>
         {enabledServices.map((s) => (
-          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col">
+          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col h-64">
             <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
               <div className="flex items-center gap-2">
                 <div className="flex flex-col">
@@ -369,15 +373,19 @@ export const ProjectUsageSection = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 pt-4 flex-1">
-              <Loading active={isLoading}>
+            <CardContent className="p-6 pt-4 flex-1 h-full overflow-hidden">
+              <Loading isFullHeight active={isLoading}>
                 <LogsBarChart
                   data={s.data}
-                  height="120px"
                   DateTimeFormat={datetimeFormat}
                   onBarClick={handleBarClick(s.route)}
+                  isFullHeight
                   EmptyState={
-                    <NoDataPlaceholder size="small" message="No data for selected period" />
+                    <NoDataPlaceholder
+                      size="small"
+                      message="No data for selected period"
+                      isFullHeight
+                    />
                   }
                 />
               </Loading>
