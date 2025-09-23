@@ -8,7 +8,7 @@ type MetricBarProps = {
 }
 
 /**
- * Mirrors SparkBar styling
+ * Mirrors SparkBar styling (except height)
  */
 export const MetricBar = ({
   percent,
@@ -20,7 +20,7 @@ export const MetricBar = ({
   const secondaryWidth = Math.max(Math.min(secondaryPercent, 100 - primaryWidth), 0)
 
   return (
-    <div className="relative flex h-1 w-full overflow-hidden rounded bg-surface-400 border border-transparent">
+    <div className="relative flex h-[8px] w-full overflow-hidden rounded bg-surface-400 border border-transparent">
       <div
         className={cn(
           'h-full rounded-l transition-[width] duration-300',
@@ -66,7 +66,7 @@ export const SegmentedBar = ({ segments }: SegmentedBarProps) => {
   })
 
   return (
-    <div className="relative flex h-1 w-full overflow-hidden rounded bg-surface-400 border border-transparent">
+    <div className="relative flex h-[8px] w-full overflow-hidden rounded bg-surface-400 border border-transparent">
       {normalizedSegments.map((segment, idx) => (
         <div
           key={segment.id}
