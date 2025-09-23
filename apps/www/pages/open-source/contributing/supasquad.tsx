@@ -6,9 +6,10 @@ import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
 
 import { data as content } from 'data/open-source/contributing/supasquad'
+import { Separator } from 'ui'
 
-const Quotes = dynamic(() => import('components/Supasquad/Quotes'))
 const WhySupaSquad = dynamic(() => import('components/Supasquad/FeaturesSection'))
+const FeaturedSection = dynamic(() => import('components/Supasquad/FeaturesSection'))
 const PerfectTiming = dynamic(() => import('components/Supasquad/PerfectTiming'))
 const Benefits = dynamic(() => import('components/Supasquad/FeaturesSection'))
 const ApplicationFormSection = dynamic(() => import('components/Supasquad/ApplicationFormSection'))
@@ -32,7 +33,11 @@ const BeginnersPage: NextPage = () => {
           sectionContainerClassName="lg:gap-4"
         />
         {/* <Quotes {...content.quotes} /> */}
+        <Separator />
         <WhySupaSquad {...content.why} />
+        <Separator />
+        <FeaturedSection {...content.featured} />
+        <Separator />
         <PerfectTiming
           id={content.timing.id}
           heading={content.timing.heading}
