@@ -17,22 +17,75 @@ export async function waitForApiResponse(
   action: string,
   options?: Options
 ): Promise<void> {
-  // regex trims "/" both start and end.
+  return createApiResponseWaiter(page, basePath, ref, action, options)
+}
+
+function buildUrlMatcher(basePath: string, ref: string, action: string, method?: HttpMethod) {
+  // Normalize inputs and build a tolerant matcher that works across environments
   const trimmedBasePath = basePath.replace(/^\/+|\/+$/g, '')
-  const httpMethod = options?.method
+  const refAlternatives = [ref, 'default']
 
-  await page.waitForResponse((response) => {
-    const urlMatches =
-      response.url().includes(`${trimmedBasePath}/${ref}/${action}`) ||
-      response.url().includes(`${trimmedBasePath}/default/${action}`)
+  return (response: any) => {
+    const url = response.url()
+    const requestMethod = response.request().method()
 
-    // checks HTTP method if exists
-    return httpMethod ? urlMatches && response.request().method() === httpMethod : urlMatches
-  })
+    // Must include base path and one of the ref alternatives
+    const hasBasePath = url.includes(`${trimmedBasePath}/`)
+    const hasRef = refAlternatives.some((r) => url.includes(`/${r}/`))
+
+    // Action match should be tolerant to extra query params ordering
+    const hasAction = url.includes(action)
+
+    const urlMatches = hasBasePath && hasRef && hasAction
+    if (method) return urlMatches && requestMethod === method
+    return urlMatches
+  }
+}
+
+/**
+ * Starts listening for a specific API response and returns a promise you can await later.
+ * Use this to avoid races by creating the waiter BEFORE triggering navigation/clicks.
+ *
+ * Example:
+ *   const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=schemas')
+ *   await page.goto(...)
+ *   await wait
+ */
+export function createApiResponseWaiter(
+  page: Page,
+  basePath: string,
+  ref: string,
+  action: string,
+  options?: Options
+): Promise<void> {
+  const matcher = buildUrlMatcher(basePath, ref, action, options?.method)
+
+  return page
+    .waitForResponse(matcher, { timeout: options?.timeout })
+    .then(() => {})
+    .catch((error) => {
+      const trimmedBasePath = basePath.replace(/^\/+|\/+$/g, '')
+      const message = `Error waiting for response: ${error}. Method: ${options?.method}, URL contains: ${trimmedBasePath}/(default|${ref})/${action}`
+      if (options?.soft) {
+        console.warn(`[soft-wait] ${message}`)
+        const fallback = options?.fallbackWaitMs ?? 0
+        if (fallback > 0) {
+          return page.waitForTimeout(fallback).then(() => {})
+        }
+        return
+      } else {
+        console.error(message)
+        throw error
+      }
+    })
 }
 
 type Options = {
   method?: HttpMethod
+  timeout?: number
+  // When true, do not throw on timeout/error; optionally wait fallbackWaitMs and continue
+  soft?: boolean
+  fallbackWaitMs?: number
 }
 
 export async function waitForTableToLoad(page: Page, ref: string, schema?: string) {

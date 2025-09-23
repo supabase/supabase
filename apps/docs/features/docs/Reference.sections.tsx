@@ -43,7 +43,7 @@ async function RefSections({ libraryId, version }: RefSectionsProps) {
     flattenedSections = trimIntro(flattenedSections)
   }
 
-  if (!isFeatureEnabled('docs:auth')) {
+  if (!isFeatureEnabled('sdk:auth')) {
     flattenedSections = flattenedSections?.filter(
       (section) =>
         'product' in section && section.product !== 'auth' && section.product !== 'auth-admin'

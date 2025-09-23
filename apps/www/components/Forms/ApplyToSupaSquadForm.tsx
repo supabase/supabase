@@ -75,6 +75,7 @@ const tracks: Track[] = [
 
 const productAreasOfInterest: string[] = [
   'Auth',
+  'AI Builders',
   'Branching',
   'Client libraries',
   'Database / Postgres',

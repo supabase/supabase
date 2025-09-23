@@ -44,10 +44,10 @@ export async function executeSql<T = any>(
   >,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
-  fetcherOverride?: (
-    sql: string,
+  fetcherOverride?: (options: {
+    query: string
     headers?: HeadersInit
-  ) => Promise<{ data: T } | { error: ResponseError }>
+  }) => Promise<{ data: T } | { error: ResponseError }>
 ): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -64,7 +64,7 @@ export async function executeSql<T = any>(
   let error
 
   if (fetcherOverride) {
-    const result = await fetcherOverride(sql, headers)
+    const result = await fetcherOverride({ query: sql, headers })
     if ('data' in result) {
       data = result.data
     } else {
