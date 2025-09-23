@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import type { PlanMeta, PlanNodeData } from '../types'
 import { hasLocal, hasShared, hasTemp, removedPercentValue } from '../utils/node-display'
 import { formatMs, formatNumber } from '../utils/formats'
+import { getMetricDefinition } from '../utils/metrics'
 
 export type OverviewMetric = {
   id: string
@@ -268,27 +269,38 @@ export const useNodeDetails = (data: PlanNodeData, meta?: PlanMeta): NodeDetails
           ? ` (~${costHintExclusiveShare}% of exclusive plan cost).`
           : '.'
 
+    const selfTimeDef = getMetricDefinition('self-time')
+    const selfCostDef = getMetricDefinition('self-cost')
+    const loopsDef = getMetricDefinition('loops')
+    const rowsSeenDef = getMetricDefinition('rows-seen')
+    const totalTimePerLoopDef = getMetricDefinition('total-time-per-loop')
+    const totalTimeAllLoopsDef = getMetricDefinition('total-time-all-loops')
+    const loopsObservedDef = getMetricDefinition('loops-observed')
+    const rowsAcrossLoopsDef = getMetricDefinition('rows-across-loops')
+    const startupCostDef = getMetricDefinition('startup-cost')
+    const totalCostDef = getMetricDefinition('total-cost')
+
     const overviewMetrics: OverviewMetric[] = [
       {
-        id: 'self-time',
-        label: 'Self time',
+        id: selfTimeDef.id,
+        label: selfTimeDef.label,
         value: formattedSelfTime ? `${formattedSelfTime} ms` : '—',
         subLabel: executionShare ? `${executionShare} of total execution` : undefined,
       },
       {
-        id: 'self-cost',
-        label: 'Self cost',
+        id: selfCostDef.id,
+        label: selfCostDef.label,
         value: formattedSelfCost ?? '—',
         subLabel: costShareSummary,
       },
       {
-        id: 'loops',
-        label: 'Loops',
+        id: loopsDef.id,
+        label: loopsDef.label,
         value: formattedLoops,
       },
       {
-        id: 'rows-seen',
-        label: 'Rows seen',
+        id: rowsSeenDef.id,
+        label: rowsSeenDef.label,
         value: actualRows ?? '—',
         subLabel: rowsAcrossLoops ? `All loops combined ${rowsAcrossLoops}` : undefined,
       },
@@ -296,56 +308,56 @@ export const useNodeDetails = (data: PlanNodeData, meta?: PlanMeta): NodeDetails
 
     const executionMetrics: ExecutionMetric[] = [
       {
-        id: 'total-time-per-loop',
-        label: 'Total time (per loop)',
+        id: totalTimePerLoopDef.id,
+        label: totalTimePerLoopDef.label,
         value: formattedTotalTimePerLoop ? `${formattedTotalTimePerLoop} ms` : '—',
       },
     ]
 
     if (formattedTotalTimeAllLoops) {
       executionMetrics.push({
-        id: 'total-time-all-loops',
-        label: 'All loops combined',
+        id: totalTimeAllLoopsDef.id,
+        label: totalTimeAllLoopsDef.label,
         value: `${formattedTotalTimeAllLoops} ms`,
       })
     }
 
     executionMetrics.push(
       {
-        id: 'self-time-detail',
-        label: 'Self time',
+        id: `${selfTimeDef.id}-detail`,
+        label: selfTimeDef.label,
         value: formattedSelfTime ? `${formattedSelfTime} ms` : '—',
         helper: executionShare ? `(${executionShare})` : undefined,
       },
       {
-        id: 'loops-observed',
-        label: 'Loops observed',
+        id: loopsObservedDef.id,
+        label: loopsObservedDef.label,
         value: formattedLoops,
       }
     )
 
     if (rowsAcrossLoops) {
       executionMetrics.push({
-        id: 'rows-across-loops',
-        label: 'Rows across loops',
+        id: rowsAcrossLoopsDef.id,
+        label: rowsAcrossLoopsDef.label,
         value: rowsAcrossLoops,
       })
     }
 
     const costMetrics: CostMetric[] = [
       {
-        id: 'startup-cost',
-        label: 'Startup cost',
+        id: startupCostDef.id,
+        label: startupCostDef.label,
         value: data.startupCost !== undefined ? data.startupCost.toFixed(2) : '—',
       },
       {
-        id: 'total-cost',
-        label: 'Total cost',
+        id: totalCostDef.id,
+        label: totalCostDef.label,
         value: data.totalCost !== undefined ? data.totalCost.toFixed(2) : '—',
       },
       {
-        id: 'self-cost-detail',
-        label: 'Self cost',
+        id: `${selfCostDef.id}-detail`,
+        label: selfCostDef.label,
         value: data.exclusiveCost !== undefined ? data.exclusiveCost.toFixed(2) : '—',
       },
     ]

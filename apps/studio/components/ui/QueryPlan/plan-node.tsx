@@ -1,15 +1,6 @@
 import { type ReactNode, useContext } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-import {
-  Workflow,
-  TimerOff,
-  Clock,
-  Rows3,
-  CircleDollarSign,
-  Layers,
-  Table,
-  Columns3,
-} from 'lucide-react'
+import { Workflow, TimerOff } from 'lucide-react'
 
 import type { PlanNodeData } from './types'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -33,6 +24,7 @@ import {
   buildHints,
 } from './utils/node-display'
 import { formatMs, formatNumber, formatOrDash } from './utils/formats'
+import { getMetricDefinition } from './utils/metrics'
 
 type MetricRow = {
   id: string
@@ -49,6 +41,23 @@ const hintSeverityHighlightClass = (severity?: 'warn' | 'alert') => {
 }
 
 const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibility): MetricRow[] => {
+  const parallelHelpersDef = getMetricDefinition('parallel-helpers')
+  const totalTimeDef = getMetricDefinition('total-time')
+  const selfTimeDef = getMetricDefinition('self-time')
+  const rowsSeenDef = getMetricDefinition('rows-seen')
+  const rowsFilteredDef = getMetricDefinition('rows-filtered')
+  const rowsJoinFilterDef = getMetricDefinition('rows-join-filter')
+  const rowsIndexRecheckDef = getMetricDefinition('rows-index-recheck')
+  const rowSizeDef = getMetricDefinition('row-size')
+  const totalCostDef = getMetricDefinition('total-cost')
+  const selfCostDef = getMetricDefinition('self-cost')
+  const tableFetchesDef = getMetricDefinition('table-fetches')
+  const sharedBuffersDef = getMetricDefinition('buffers-shared')
+  const tempBuffersDef = getMetricDefinition('buffers-temp')
+  const localBuffersDef = getMetricDefinition('buffers-local')
+  const columnsReturnedDef = getMetricDefinition('columns-returned')
+  const ioTimeDef = getMetricDefinition('io-time')
+
   const formattedLoops =
     data.actualLoops !== undefined
       ? formatNumber(data.actualLoops) ?? `${data.actualLoops}`
@@ -75,19 +84,12 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
 
   return [
     {
-      id: 'workers',
+      id: parallelHelpersDef.id,
       condition: !(data.workersPlanned === undefined && data.workersLaunched === undefined),
-      tooltip: (
-        <div className="space-y-1">
-          <p>Postgres can launch helper processes to run this step in parallel.</p>
-          <p className="font-semibold">
-            Planned = expected helpers, Started = helpers that actually ran.
-          </p>
-        </div>
-      ),
+      tooltip: parallelHelpersDef.description,
       element: (
         <>
-          <span>Parallel helpers</span>
+          <span>{parallelHelpersDef.label}</span>
           <span className="flex flex-row items-center flex-1 justify-end gap-x-2">
             <span>Planned: {formatOrDash(data.workersPlanned)}</span>
             <span>Started: {formatOrDash(data.workersLaunched)}</span>
@@ -96,13 +98,13 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'time',
+      id: totalTimeDef.id,
       condition: metricsVisibility.time && data.actualTotalTime !== undefined,
-      tooltip: 'Time spent on this step including any child steps.',
-      icon: <Clock size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: totalTimeDef.description,
+      icon: totalTimeDef.icon,
       element: (
         <>
-          <span>Total time</span>
+          <span>{totalTimeDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{formattedTotalTime ?? data.actualTotalTime} ms</span>
             <span className="text-foreground-light">({loopsSuffix})</span>
@@ -111,13 +113,13 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'time-self',
+      id: selfTimeDef.id,
       condition: metricsVisibility.time && data.exclusiveTimeMs !== undefined,
-      tooltip: 'Time spent only inside this node. Child steps are not included.',
-      icon: <Clock size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: selfTimeDef.description,
+      icon: selfTimeDef.icon,
       element: (
         <>
-          <span>Self time</span>
+          <span>{selfTimeDef.label}</span>
           <span className={cn('ml-auto', slowHighlightClass)}>
             {formattedSelfTime ?? data.exclusiveTimeMs} ms
           </span>
@@ -125,14 +127,14 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'rows',
+      id: rowsSeenDef.id,
       condition:
         metricsVisibility.rows && (data.actualRows !== undefined || data.planRows !== undefined),
-      tooltip: 'Rows processed versus what the planner expected.',
-      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: rowsSeenDef.description,
+      icon: rowsSeenDef.icon,
       element: (
         <>
-          <span>Rows seen</span>
+          <span>{rowsSeenDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{actualRows !== undefined ? actualRows : '-'}</span>
             {estimatedRows !== undefined ? (
@@ -145,13 +147,13 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'removed-filter',
+      id: rowsFilteredDef.id,
       condition: metricsVisibility.rows && data.rowsRemovedByFilter !== undefined,
-      tooltip: 'Rows skipped because a WHERE or filter condition returned false.',
-      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: rowsFilteredDef.description,
+      icon: rowsFilteredDef.icon,
       element: (
         <>
-          <span>Filtered out rows</span>
+          <span>{rowsFilteredDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{formatOrDash(data.rowsRemovedByFilter)}</span>
             {filterPercent !== undefined ? (
@@ -164,13 +166,13 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'removed-join-filter',
+      id: rowsJoinFilterDef.id,
       condition: metricsVisibility.rows && data.rowsRemovedByJoinFilter !== undefined,
-      tooltip: 'Rows dropped because the join filter did not match.',
-      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: rowsJoinFilterDef.description,
+      icon: rowsJoinFilterDef.icon,
       element: (
         <>
-          <span>Join filter drops</span>
+          <span>{rowsJoinFilterDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{formatOrDash(data.rowsRemovedByJoinFilter)}</span>
             {joinFilterPercent !== undefined ? (
@@ -183,13 +185,13 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'removed-index-recheck',
+      id: rowsIndexRecheckDef.id,
       condition: metricsVisibility.rows && data.rowsRemovedByIndexRecheck !== undefined,
-      tooltip: 'Rows removed after an index recheck (commonly due to visibility rules).',
-      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: rowsIndexRecheckDef.description,
+      icon: rowsIndexRecheckDef.icon,
       element: (
         <>
-          <span>Index recheck drops</span>
+          <span>{rowsIndexRecheckDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{formatOrDash(data.rowsRemovedByIndexRecheck)}</span>
             {recheckPercent !== undefined ? (
@@ -202,37 +204,37 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'plan-width',
+      id: rowSizeDef.id,
       condition: metricsVisibility.rows && data.planWidth !== undefined,
-      tooltip: 'Average bytes per row output by this step.',
-      icon: <Rows3 size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: rowSizeDef.description,
+      icon: rowSizeDef.icon,
       element: (
         <>
-          <span>Row size</span>
+          <span>{rowSizeDef.label}</span>
           <span className="ml-auto">{formatOrDash(data.planWidth)} bytes</span>
         </>
       ),
     },
     {
-      id: 'cost',
+      id: totalCostDef.id,
       condition: metricsVisibility.cost && data.totalCost !== undefined,
-      tooltip: 'Planner cost units (not milliseconds). Shows the total cost.',
-      icon: <CircleDollarSign size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: totalCostDef.description,
+      icon: totalCostDef.icon,
       element: (
         <>
-          <span>Planner cost</span>
+          <span>{totalCostDef.label}</span>
           <span className="ml-auto">{formatOrDash(data.totalCost)}</span>
         </>
       ),
     },
     {
-      id: 'cost-self',
+      id: selfCostDef.id,
       condition: metricsVisibility.cost && data.exclusiveCost !== undefined,
-      tooltip: 'Portion of the planner cost assigned only to this step.',
-      icon: <CircleDollarSign size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: selfCostDef.description,
+      icon: selfCostDef.icon,
       element: (
         <>
-          <span>Self cost</span>
+          <span>{selfCostDef.label}</span>
           <span className={cn('ml-auto', costHighlightClass)}>
             {data.exclusiveCost?.toFixed(2)}
           </span>
@@ -240,30 +242,30 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'heap-fetches',
+      id: tableFetchesDef.id,
       condition: metricsVisibility.buffers && data.heapFetches !== undefined,
-      tooltip: 'Rows fetched directly from the table because they were not already in cache.',
-      icon: <Layers size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: tableFetchesDef.description,
+      icon: tableFetchesDef.icon,
       element: (
         <>
-          <span>Table fetches</span>
+          <span>{tableFetchesDef.label}</span>
           <span className="ml-auto">{formatOrDash(data.heapFetches)}</span>
         </>
       ),
     },
     {
-      id: 'shared-buffers',
+      id: sharedBuffersDef.id,
       condition: metricsVisibility.buffers && hasShared(data),
       tooltip: (
         <div className="space-y-1">
-          <p>Shared cache blocks touched (all runs vs. just this node).</p>
+          <p>{sharedBuffersDef.description}</p>
           <span className="block font-mono whitespace-pre-wrap">{sharedTooltip(data)}</span>
         </div>
       ),
-      icon: <Layers size={10} strokeWidth={1} className="mr-1" />,
+      icon: sharedBuffersDef.icon,
       element: (
         <>
-          <span>Shared cache (self)</span>
+          <span>{sharedBuffersDef.label}</span>
           <span className="ml-auto">
             h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0} d:{data.exSharedDirtied ?? 0} w:
             {data.exSharedWritten ?? 0}
@@ -272,18 +274,18 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'temp-buffers',
+      id: tempBuffersDef.id,
       condition: metricsVisibility.buffers && hasTemp(data),
       tooltip: (
         <div className="space-y-1">
-          <p>Temporary blocks written to disk for this step.</p>
+          <p>{tempBuffersDef.description}</p>
           <span className="block font-mono whitespace-pre-wrap">{tempTooltip(data)}</span>
         </div>
       ),
-      icon: <Layers size={10} strokeWidth={1} className="mr-1" />,
+      icon: tempBuffersDef.icon,
       element: (
         <>
-          <span>Temporary blocks (self)</span>
+          <span>{tempBuffersDef.label}</span>
           <span className="ml-auto">
             r:{data.exTempRead ?? 0} w:{data.exTempWritten ?? 0}
           </span>
@@ -291,18 +293,18 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'local-buffers',
+      id: localBuffersDef.id,
       condition: metricsVisibility.buffers && hasLocal(data),
       tooltip: (
         <div className="space-y-1">
-          <p>Local cache blocks touched (per worker memory).</p>
+          <p>{localBuffersDef.description}</p>
           <span className="block font-mono whitespace-pre-wrap">{localTooltip(data)}</span>
         </div>
       ),
-      icon: <Layers size={10} strokeWidth={1} className="mr-1" />,
+      icon: localBuffersDef.icon,
       element: (
         <>
-          <span>Local cache (self)</span>
+          <span>{localBuffersDef.label}</span>
           <span className="ml-auto">
             h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0} d:{data.exLocalDirtied ?? 0} w:
             {data.exLocalWritten ?? 0}
@@ -311,33 +313,33 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
       ),
     },
     {
-      id: 'output-cols',
+      id: columnsReturnedDef.id,
       condition:
         metricsVisibility.output && Array.isArray(data.outputCols) && data.outputCols.length > 0,
-      icon: <Columns3 size={10} strokeWidth={1} className="mr-1" />,
+      icon: columnsReturnedDef.icon,
       tooltip: (
         <div className="space-y-1">
-          <p>Columns passed to the next step.</p>
+          <p>{columnsReturnedDef.description}</p>
           <span className="block whitespace-pre-wrap">{data.outputCols?.join(', ')}</span>
         </div>
       ),
       element: (
         <>
-          <span>Columns returned</span>
+          <span>{columnsReturnedDef.label}</span>
           <span className="truncate max-w-[95px] ml-auto">{data.outputCols?.join(', ')}</span>
         </>
       ),
     },
     {
-      id: 'io-times',
+      id: ioTimeDef.id,
       condition:
         metricsVisibility.output &&
         (data.ioReadTime !== undefined || data.ioWriteTime !== undefined),
-      tooltip: 'Time spent performing disk reads and writes for this step.',
-      icon: <Table size={10} strokeWidth={1} className="mr-1" />,
+      tooltip: ioTimeDef.description,
+      icon: ioTimeDef.icon,
       element: (
         <>
-          <span>Disk I/O time</span>
+          <span>{ioTimeDef.label}</span>
           <span className="ml-auto">
             {data.ioReadTime !== undefined ? `read ${data.ioReadTime}ms` : ''}
             {data.ioWriteTime !== undefined
