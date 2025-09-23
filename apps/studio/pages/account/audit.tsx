@@ -9,6 +9,7 @@ import type { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
 
 const Audit: NextPageWithLayout = () => {
+  console.log('Beep')
   return (
     <>
       <ScaffoldContainer>
