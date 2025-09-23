@@ -95,7 +95,7 @@
     "glob": "^8.1.0",
     "style-dictionary": "^3.7.1",
     "tsconfig": "workspace:*",
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "^3.0.5"
   },

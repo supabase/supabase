@@ -199,7 +199,7 @@
     "require-in-the-middle": "^7.5.2",
     "tailwindcss": "catalog:",
     "tsx": "^4.19.3",
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^3.0.5"
