@@ -40,6 +40,7 @@
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,
   "docs:full_platform": true,
+  "docs:hide_cli_profiles": true,
   "docs:mobile_tutorials": true,
   "docs:pgtap": true,
   "docs:production_checklist": true,
@@ -79,6 +80,8 @@
   "project_settings:show_disable_legacy_api_keys": true,
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
+
+  "quickstarts:hide_nimbus": true,
 
   "reports:all": true,
 
