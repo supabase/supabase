@@ -1,0 +1,71 @@
+---
+title: Color usage
+description: Colors system breakdown with best practices.
+---
+
+The shorthand utility classes below simplify our full color palette by providing sensible, contrast-checked defaults. Use them whenever possible to ensure accessible text colors and balanced background fills.
+
+## Text
+
+Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
+
+<Colors definition={'text'} />
+
+## Background
+
+<Colors definition={'background'} />
+
+### App backgrounds
+
+We use backgrounds in 2 different ways. In the ./www and ./docs sites, we use a darker background, so we have an extra background color we can use
+
+```jsx
+/**
+ * ./www background color
+ * ./docs background color
+ */
+<body className="bg">{children}</body>
+
+/**
+ * ./studio background color
+ */
+<body className="bg-studio">{children}</body>
+```
+
+### Backgrounds and Surfaces
+
+#### `./apps/www` + `./apps/docs`
+
+We use surfaces in 2 different ways. In the ./www and ./docs sites, we use a darker background, so we have an extra surface color we can use
+
+<CodeFragment name="color-usage-surface-www-and-docs" />
+
+#### `./apps/studio`
+
+For the studio (dashboard) we can use `bg-surface-100`, `bg-surface-200`, `bg-surface-300`
+
+<CodeFragment name="color-usage-surface-studio" />
+
+#### Data grid and frame space
+
+Data grids use an alternative background color for empty space to add depth to the layout.
+The background of the empty space is the same background as used in `./apps/docs` and `./apps/www` - although; the color has been mapped to `bg-alternative` so it works well across different themes.
+
+<CodeFragment name="color-usage-surface-studio-frame" />
+
+Dealing with large areas of empty space in data display should also be catered for. You can use the `bg-200` or `bg` class to fill the space.
+
+### Overlays
+
+We use the `./bg-overlay` background color for overlays.
+This is not to be confused with `Dialogs`, they require to use the same app background color as the site.
+
+## Border
+
+<Colors definition={'border'} />
+
+## Other Colors
+
+These can also be accessed with `foreground`. Like `text-foreground-light`.
+
+<Colors definition={'colors'} />

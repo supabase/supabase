@@ -17,7 +17,7 @@ toc_depth: 3
 
 When we announced Point-in-Time a few months ago, it was only available for Enterprise customers. Today, we're making PITR available for more projects, with a new Dashboard UI that makes it simple to use.
 
-Pro-plan projects created from August 2022 onwards (excluding Northeast Asia / Seoul region), can now enable Point In Time Recovery (PITR) from the dashboard. Projects must have the "Small" compute add-on to ensure that PITR operates smoothly behind the scenes.
+Pro Plan projects created from August 2022 onwards (excluding Northeast Asia / Seoul region), can now enable Point In Time Recovery (PITR) from the dashboard. Projects must have the "Small" compute add-on to ensure that PITR operates smoothly behind the scenes.
 
 For older projects, don't worry - we're working on making it available for everybody. In the meantime, if you would like to have PITR enabled for your ineligible project, reach out directly [here](https://supabase.com/dashboard/support/new), or stay tuned for further updates.
 
@@ -37,7 +37,7 @@ Under the hood, we use [WAL-G](https://github.com/wal-g/wal-g), an open source a
 
 Consider your Recovery Point Objective (RPO) when deciding whether to enable Point in Time Recovery. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This is dependent on a business and its underlying requirements. The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
 
-While all Pro-plan projects and above are backed up on a daily basis, this means that at the worst case, a project could lose up to 24 hours worth of data if disaster hits at the most inopportune time. With Point in Time Recovery however, backups are made at much shorter intervals, shortening the RPO. WAL files are backed up at two minute intervals. This could be faster if it hits a certain file threshold before the the two minute mark.
+While all Pro Plan projects and above are backed up on a daily basis, this means that at the worst case, a project could lose up to 24 hours worth of data if disaster hits at the most inopportune time. With Point in Time Recovery however, backups are made at much shorter intervals, shortening the RPO. WAL files are backed up at two minute intervals. This could be faster if it hits a certain file threshold before the the two minute mark.
 
 ## Getting started
 

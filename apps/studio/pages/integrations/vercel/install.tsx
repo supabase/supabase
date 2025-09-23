@@ -1,9 +1,11 @@
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import { useParams } from 'common'
-import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
+import OrganizationPicker from 'components/interfaces/Integrations/Vercel/OrganizationPicker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
@@ -11,18 +13,9 @@ import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useStore } from 'hooks'
-import Link from 'next/link'
-import { NextPageWithLayout, Organization } from 'types'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconInfo,
-} from 'ui'
+import { AlertTriangle, Info } from 'lucide-react'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
+import type { NextPageWithLayout, Organization } from 'types'
 
 /**
  * Variations of the Vercel integration flow.
@@ -36,7 +29,6 @@ export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ui } = useStore()
   const { code, configurationId, teamId, source, externalId } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
 
@@ -87,22 +79,35 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   /**
    * Handle the correct route change based on whether the vercel integration
-   * is following the 'marketplace' flow or 'deploy button' flow.
-   *
+   * is following the 'marketplace/external' flow or 'deploy button' flow.
+   * See:
+   * - https://vercel.com/docs/integrations/create-integration/submit-integration#query-parameters-for-marketplace
+   * - https://vercel.com/docs/integrations/create-integration/submit-integration#query-parameters-for-external-flow
+   * - https://vercel.com/docs/integrations/create-integration/submit-integration#query-parameters-for-deploy-button
    */
   function handleRouteChange() {
     const orgSlug = selectedOrg?.slug
 
-    if (externalId) {
-      router.push({
-        pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
-        query: router.query,
-      })
-    } else {
-      router.push({
-        pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
-        query: router.query,
-      })
+    switch (source) {
+      case 'deploy-button': {
+        router.push({
+          pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
+          query: router.query,
+        })
+        break
+      }
+      case 'marketplace':
+      case 'external': {
+        router.push({
+          pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
+          query: router.query,
+        })
+        break
+      }
+      default:
+        toast.error(
+          `Unsupported Vercel installation source: ${source}. Please contact support if this error persists.`
+        )
     }
   }
 
@@ -126,22 +131,19 @@ const VercelIntegration: NextPageWithLayout = () => {
     const isIntegrationInstalled = orgSlug ? installed[orgSlug] : false
 
     if (!orgSlug) {
-      return ui.setNotification({ category: 'error', message: 'Please select an organization' })
+      return toast.error('Please select an organization')
     }
 
     if (!code) {
-      return ui.setNotification({ category: 'error', message: 'Vercel code missing' })
+      return toast.error('Vercel code missing')
     }
 
     if (!configurationId) {
-      return ui.setNotification({ category: 'error', message: 'Vercel Configuration ID missing' })
+      return toast.error('Vercel Configuration ID missing')
     }
 
     if (!source) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Vercel Configuration source missing',
-      })
+      return toast.error('Vercel Configuration source missing')
     }
 
     /**
@@ -187,7 +189,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
-          <h1 className="text-xl text-foreground">Choose organization</h1>
+          <h2>Choose organization</h2>
           <>
             <Markdown content={`Choose the Supabase organization you wish to install in`} />
             <OrganizationPicker
@@ -202,7 +204,7 @@ const VercelIntegration: NextPageWithLayout = () => {
             />
             {alreadyInstalled && (
               <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                <AlertTriangle className="h-4 w-4" strokeWidth={2} />
                 <AlertTitle_Shadcn_>Vercel Integration is already installed.</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   You will need to choose another organization to install the integration.
@@ -211,7 +213,7 @@ const VercelIntegration: NextPageWithLayout = () => {
             )}
             {noOrganizations && (
               <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                <AlertTriangle className="h-4 w-4" strokeWidth={2} />
                 <AlertTitle_Shadcn_>
                   No Supabase Organizations to install Integration.
                 </AlertTitle_Shadcn_>
@@ -241,7 +243,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-6 py-3">
         <Alert_Shadcn_ variant="default">
-          <IconInfo className="h-4 w-4" strokeWidth={2} />
+          <Info className="h-4 w-4" strokeWidth={2} />
           <AlertTitle_Shadcn_>You can uninstall this Integration at any time.</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             Remove this integration at any time from Vercel or the Supabase dashboard.

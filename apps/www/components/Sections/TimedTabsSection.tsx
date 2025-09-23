@@ -1,11 +1,14 @@
-import React, { useState, useEffect, ReactNode } from 'react'
-import Link from 'next/link'
+import 'swiper/css'
+
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Button, IconArrowUpRight } from 'ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { ReactNode, useEffect, useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { ArrowUpRight } from 'lucide-react'
 
 interface TabProps {
   label: string
@@ -43,7 +46,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1, transition: { delay: 0.2 } }}
-          className="hidden md:block mt-1 text-foreground-muted text-sm"
+          className="hidden md:block mt-1 text-foreground-lighter text-sm"
         >
           {paragraph}
         </motion.p>
@@ -133,12 +136,10 @@ const TimedTabsSection = ({
           <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
             {title}
           </h2>
-          <p className="text-foreground-muted mb-4 max-w-sm">{paragraph}</p>
+          <p className="text-foreground-lighter mb-4 max-w-sm">{paragraph}</p>
           {cta && (
-            <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
-              <Link href={cta.link} className="">
-                {cta.label ?? 'Explore more'}
-              </Link>
+            <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
+              <Link href={cta.link}>{cta.label ?? 'Explore more'}</Link>
             </Button>
           )}
         </div>
@@ -187,13 +188,13 @@ const TimedTabsSection = ({
         ))}
       </div>
       <div className="block md:hidden">
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           <motion.p
             key={tabs[activeTab]?.paragraph}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.1, delay: 0.2 } }}
             exit={{ opacity: 0, transition: { duration: 0.05 } }}
-            className="text-foreground-muted text-sm"
+            className="text-foreground-lighter text-sm"
           >
             {tabs[activeTab]?.paragraph}
           </motion.p>
@@ -208,7 +209,7 @@ const OpenInColab = ({ colabUrl, className }: { colabUrl: string; className?: st
     href={colabUrl}
     target="_blank"
     className={[
-      'flex items-center z-10 h-10 bg-surface-100 hover:bg-surface-200 hover:text-foreground-muted text-sm text-foreground-muted shadow-lg hover:shadow-md rounded-full py-1 px-3 gap-2',
+      'flex items-center z-10 h-10 bg-surface-100 hover:bg-surface-200 hover:text-foreground-lighter text-sm text-foreground-lighter shadow-lg hover:shadow-md rounded-full py-1 px-3 gap-2',
       className,
     ].join(' ')}
   >

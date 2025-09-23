@@ -1,6 +1,6 @@
-import { IntegrationsData } from 'data/integrations/integrations-query'
-import { IntegrationName } from 'data/integrations/integrations.types'
-import { Organization } from 'types'
+import type { IntegrationsData } from 'data/integrations/integrations-query'
+import type { IntegrationName } from 'data/integrations/integrations.types'
+import type { Organization } from 'types'
 
 export function getHasInstalledObject({
   integrationName,
@@ -41,8 +41,8 @@ export function getHasInstalledObject({
                 integration.organization.slug === org.slug &&
                 integration.integration.name === 'GitHub' &&
                 integration.metadata !== undefined &&
-                'installation_id' in integration.metadata &&
-                String(integration.metadata.installation_id) === String(installationId)
+                'installation_id' in (integration.metadata as any) &&
+                String((integration.metadata as any).installation_id) === String(installationId)
             )
           ),
         ])

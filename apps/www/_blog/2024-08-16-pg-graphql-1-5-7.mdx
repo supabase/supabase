@@ -1,0 +1,119 @@
+---
+title: 'pg_graphql 1.5.7: pagination and multi-tenancy support'
+description: Latest features of pg_graphql
+author: oli_rice
+image: lw12/day-5/OG_pg_graphql.png
+thumb: lw12/day-5/thumb_pg_graphql.png
+launchweek: '12'
+categories:
+  - launch-week
+  - developers
+  - platform
+tags:
+  - launch-week
+  - graphql
+date: '2024-08-15'
+toc_depth: 3
+---
+
+# What's new in pg_graphql 1.5.7
+
+Since our [last check-in on pg_graphql](/blog/whats-new-in-pg-graphql-v1-2) there have been a few quality of life improvements worth calling out. A quick roundup of the key differences includes:
+
+- Pagination via First/Offset
+- Schema based multi-tenancy
+- Filtering on array typed columns with `contains`, `containedBy` and `overlaps`
+
+## First/Offset pagination
+
+Since the earliest days of pg_graphql, [keyset pagination](https://supabase.github.io/pg_graphql/api/#keyset-pagination) has been supported. Keyset pagination allows for paging forwards and backwards through a collection by specifying a number of records and the unique id of a record within the collection. For example:
+
+```graphql
+{
+  blogCollection(
+    first: 2,
+    after: "Y3Vyc29yMQ=="
+  ) {
+  ...
+}
+```
+
+to retrieve the first 2 records after the record with unique id `Y3Vyc29yMQ==` .
+
+Starting in version `1.5.0` there is support for `offset` based pagination, which is based on skipping `offset` number of records before returning the results.
+
+```graphql
+{
+  blogCollection(
+    first: 2,
+    offset: 5
+  ) {
+  ...
+}
+```
+
+That is roughly equivalent to the SQL
+
+```graphql
+select
+    *
+from
+    blog
+limit
+    2
+offset
+    5
+```
+
+In general as offset values increase, the performance of the query will decrease. For that reason its important to use keyset pagination where possible.
+
+## Performance schema based multi-tennancy
+
+pg_graphql caches the database schema on first query and rebuilds that cache any time the schema changes. The cache key is a combination of the postgres role and the database schema's version number. Initially, the structure of all schemas was loaded for all roles, and table/column visibility was filtered down within `pg_graphql`.
+
+In multi-tenant environments with 1 schema per tenant, that meant every time a tenant updated their schema, all tenants had to rebuild the cache. When the number of tenants gets large, that burdens the database if its under heavy load.
+
+Following version `1.5.2` each tenant's cache only loads the schemas that they have `usage` permission for, which greatly reduces the query time in multi-tenant environments and the size of the schema cache. At time of writing this solution powers a project with >2200 tenants.
+
+## Filtering array column types
+
+From `1.5.6` pg_graphql has added `contains`, `containedBy`, `overlaps` filter operators for scalar array fields like `text[]` or `int[]`.
+
+For example, given a table
+
+```sql
+create table blog (
+  id int primary key,
+  name text not null,
+  tags text[] not null,
+  created_at timestamp not null
+);
+```
+
+the `tags` column with type `text[]` can be filtered on.
+
+```graphql
+{
+  blogCollection(filter: { tags: { contains: ["tech", "innovation"] } }) {
+    edges {
+      cursor
+      node {
+        name
+        tags
+        createdAt
+      }
+    }
+  }
+}
+```
+
+In this case, the result set is filtered to records where the `tags` column contains both `tech` and `innovation`.
+
+## Roadmap
+
+The headline features we aim to launch in coming releases of pg_graphql include support for:
+
+- Insert on conflict / Upsert
+- Nested inserts
+
+If you want to get started with GraphQL today, check out the [Docs](/docs/guides/graphql) or the [source code](https://github.com/supabase/pg_graphql/).

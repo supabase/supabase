@@ -1,6 +1,7 @@
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useAudio } from 'react-use'
-import { IconArrowRight, cn } from 'ui'
+import { cn } from 'ui'
 
 const Player = () => {
   const [audio, state, controls, ref] = useAudio({
@@ -29,7 +30,7 @@ const Player = () => {
         <span className="text-border-strong">Now playing</span>
         <span className="tracking-widest flex justify-end gap-px text-right translate-x-0 transition-transform group-hover:-translate-x-2">
           {trackName}
-          <IconArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -mr-full absolute -right-3 text-current transition-opacity" />
+          <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -mr-full absolute -right-3 text-current transition-opacity" />
         </span>
       </Link>
       <button

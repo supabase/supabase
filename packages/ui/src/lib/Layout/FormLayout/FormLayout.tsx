@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 // @ts-ignore
 import defaultTheme from '../../theme/defaultTheme'
+import { cn } from '../../utils'
 // @ts-ignore
 // import FormLayoutStyles from './FormLayout.module.css'
 
@@ -19,7 +20,7 @@ type Props = {
   responsive?: boolean
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   beforeLabel?: string
-  afterLabel?: string
+  afterLabel?: string | React.ReactNode
   nonBoxInput?: boolean
   labelLayout?: 'horizontal' | 'vertical'
 }
@@ -64,12 +65,12 @@ export function FormLayout({
 
   const flex = layout === 'flex'
 
-  let containerClasses = []
+  let containerClasses: Array<string> = []
 
   containerClasses.push(__styles.size[size])
 
-  let labelContainerClasses = []
-  let dataInputContainerClasses = []
+  let labelContainerClasses: Array<string> = []
+  let dataInputContainerClasses: Array<string> = []
 
   if (layout !== 'horizontal' && !labelLayout && !flex) {
     labelContainerClasses.push(__styles.labels_horizontal_layout)
@@ -148,7 +149,7 @@ export function FormLayout({
         >
           {labelled && (
             <label
-              className={[__styles.label.base, __styles.label.size[size]].join(' ')}
+              className={cn(__styles.label.base, __styles.label.size[size], 'break-all')}
               htmlFor={id}
             >
               {beforeLabel && (
@@ -198,8 +199,8 @@ export function FormLayout({
                 nonBoxInput && label && layout === 'vertical'
                   ? __styles.non_box_data_input_spacing_vertical
                   : nonBoxInput && label && layout === 'horizontal'
-                  ? __styles.non_box_data_input_spacing_horizontal
-                  : ''
+                    ? __styles.non_box_data_input_spacing_horizontal
+                    : ''
               }
             >
               {children}

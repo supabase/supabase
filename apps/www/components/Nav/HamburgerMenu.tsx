@@ -13,7 +13,7 @@ const HamburgerButton = (props: HamburgerButtonProps) => (
   >
     <button
       className={cn(
-        'text-foreground-lighter focus:ring-brand bg-background hover:bg-surface-100 inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset'
+        'text-foreground-lighter focus:ring-brand bg-transparent hover:text-foreground-light transition-colors hover:bg-overlay inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset'
       )}
       aria-expanded="false"
     >

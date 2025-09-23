@@ -2,31 +2,49 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
+const { getCSP } = require('./csp')
 
 // Required for nextjs standalone build
 const path = require('path')
 
-// This file sets a custom webpack configuration to use your Next.js app
-// with Sentry.
-// https://nextjs.org/docs/api-reference/next.config.js/introduction
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
 
-const csp = [
-  "frame-ancestors 'none';",
-  // IS_PLATFORM
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? 'upgrade-insecure-requests;'
-    : '',
-]
-  .filter(Boolean)
-  .join(' ')
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  const SUPABASE_ASSETS_URL =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? 'https://frontend-assets.supabase.green'
+      : 'https://frontend-assets.supabase.com'
+
+  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+}
 
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+  assetPrefix: getAssetPrefix(),
   output: 'standalone',
+  experimental: {
+    webpackBuildWorker: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: `/.well-known/vercel/flags`,
+        destination: `https://supabase.com/.well-known/vercel/flags`,
+        basePath: false,
+      },
+    ]
+  },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
@@ -45,7 +63,7 @@ const nextConfig = {
             },
             {
               source: '/',
-              destination: '/projects',
+              destination: '/org',
               permanent: false,
             },
             {
@@ -127,6 +145,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/settings/storage',
+        destination: '/project/:ref/storage/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/database',
+        destination: '/project/:ref/database/settings',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/settings',
         destination: '/project/:ref/settings/general',
         permanent: true,
@@ -169,7 +197,7 @@ const nextConfig = {
             value: 'computeInstance',
           },
         ],
-        destination: '/project/:ref/settings/addons?panel=computeInstance',
+        destination: '/project/:ref/settings/compute-and-disk',
         permanent: true,
       },
       {
@@ -270,10 +298,101 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/sql',
-        destination: '/project/:ref/sql/new',
+        permanent: true,
+        source: '/project/:ref/reports/linter',
+        destination: '/project/:ref/database/linter',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/auth/column-privileges',
+        destination: '/project/:ref/database/column-privileges',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/linter',
+        destination: '/project/:ref/database/security-advisor',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/security-advisor',
+        destination: '/project/:ref/advisors/security',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/performance-advisor',
+        destination: '/project/:ref/advisors/performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/webhooks',
+        destination: '/project/:ref/integrations/webhooks/overview',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/wrappers',
+        destination: '/project/:ref/integrations?category=wrapper',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/api/graphiql',
+        destination: '/project/:ref/integrations/graphiql',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/vault/secrets',
+        destination: '/project/:ref/integrations/vault/secrets',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/vault/keys',
+        destination: '/project/:ref/integrations/vault/keys',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/integrations/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/warehouse',
+        destination: '/project/:ref/settings/general',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/functions',
+        destination: '/project/:ref/functions/secrets',
+      },
+      {
+        source: '/org/:slug/invoices',
+        destination: '/org/:slug/billing#invoices',
         permanent: true,
       },
+      {
+        source: '/projects',
+        destination: '/organizations',
+        permanent: false,
+      },
+      {
+        source: '/project/:ref/settings/auth',
+        destination: '/project/:ref/auth',
+        permanent: false,
+      },
+
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
@@ -300,8 +419,16 @@ const nextConfig = {
             value: 'no-sniff',
           },
           {
+            key: 'Strict-Transport-Security',
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+                ? 'max-age=31536000; includeSubDomains; preload'
+                : '',
+          },
+          {
             key: 'Content-Security-Policy',
-            value: csp,
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? getCSP() : "frame-ancestors 'none';",
           },
           {
             key: 'Referrer-Policy',
@@ -310,26 +437,76 @@ const nextConfig = {
         ],
       },
       {
-        source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
       },
       {
-        source: '/fonts/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        source: '/img/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
+      },
+      {
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
+      },
+      {
+        source: '/(.*).ts',
+        headers: [{ key: 'content-type', value: 'text/typescript' }],
       },
     ]
   },
   images: {
     // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
-    dangerouslyAllowSVG: true,
-    domains: [
-      'github.com',
-      'avatars.githubusercontent.com',
-      'api-frameworks.vercel.sh',
-      'vercel.com',
+    dangerouslyAllowSVG: false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/u/*',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api-frameworks.vercel.sh',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'vercel.com',
+        port: '',
+        pathname: '**',
+      },
     ],
   },
-  transpilePackages: ['ui', 'common', 'shared-data'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'api-types',
+    'icons',
+    'libpg-query',
+  ],
+  turbopack: {
+    rules: {
+      '*.md': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+    },
+  },
+  // Both configs for turbopack and webpack need to exist (and sync) because Nextjs still uses webpack for production building
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)
@@ -341,11 +518,25 @@ const nextConfig = {
         }
       })
 
+    // .md files to be loaded as raw text
+    config.module.rules.push({
+      test: /\.md$/,
+      type: 'asset/source',
+    })
+
     return config
   },
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
     pagesBufferLength: 100,
+  },
+  typescript: {
+    // Typechecking is run via GitHub Action only for efficiency.
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
   },
 }
 
@@ -354,29 +545,30 @@ const nextConfig = {
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(
-        withBundleAnalyzer(nextConfig),
-        {
-          silent: true,
+    ? withSentryConfig(withBundleAnalyzer(nextConfig), {
+        silent: true,
+
+        // For all available options, see:
+        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+        // Upload a larger set of source maps for prettier stack traces (increases build time)
+        widenClientFileUpload: true,
+
+        // Automatically annotate React components to show their full name in breadcrumbs and session replay
+        reactComponentAnnotation: {
+          enabled: true,
         },
-        {
-          // For all available options, see:
-          // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-          // Upload a larger set of source maps for prettier stack traces (increases build time)
-          widenClientFileUpload: true,
+        // Hides source maps from generated client bundles
+        hideSourceMaps: true,
 
-          // Transpiles SDK to be compatible with IE11 (increases bundle size)
-          transpileClientSDK: false,
+        // Automatically tree-shake Sentry logger statements to reduce bundle size
+        disableLogger: true,
 
-          // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-          tunnelRoute: '/monitoring',
-
-          // Hides source maps from generated client bundles
-          hideSourceMaps: true,
-
-          // Automatically tree-shake Sentry logger statements to reduce bundle size
-          disableLogger: true,
-        }
-      )
+        // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+        // See the following for more information:
+        // https://docs.sentry.io/product/crons/
+        // https://vercel.com/docs/cron-jobs
+        automaticVercelMonitors: true,
+      })
     : nextConfig

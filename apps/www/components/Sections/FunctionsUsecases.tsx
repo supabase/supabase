@@ -1,9 +1,10 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Button, IconArrowUpRight } from 'ui'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import CodeBlock from '../CodeBlock/CodeBlock'
 import Link from 'next/link'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
+import CodeBlock from '../CodeBlock/CodeBlock'
+import { ArrowUpRight } from 'lucide-react'
 
 interface Example {
   lang: 'js' | 'py' | 'sql'
@@ -77,13 +78,7 @@ function FunctionsUsecases(props: Props) {
             )
           })}
           {props.documentation_link && (
-            <Button
-              asChild
-              size="small"
-              className="mt-4"
-              type="default"
-              icon={<IconArrowUpRight />}
-            >
+            <Button asChild size="small" className="mt-4" type="default" icon={<ArrowUpRight />}>
               <Link href={props.documentation_link} as={props.documentation_link}>
                 Explore documentation
               </Link>

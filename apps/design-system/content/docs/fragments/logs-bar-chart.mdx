@@ -1,0 +1,21 @@
+---
+title: Logs Bar Chart
+description: A stacked bar chart that displays logs errors and successes.
+fragment: true
+---
+
+<ComponentPreview name="logs-bar-chart" peekCode wide />
+
+## Usage
+
+This component is used to display the bar chart in logs pages.
+
+It requires that the `data` prop is an array of objects with the following shape:
+
+```ts
+type LogsBarChartDatum = {
+  timestamp: string
+  ok_count: number
+  error_count: number
+}
+```

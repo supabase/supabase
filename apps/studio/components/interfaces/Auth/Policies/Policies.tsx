@@ -1,158 +1,110 @@
-import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
-import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common/hooks'
-import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
-import { useStore } from 'hooks'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEmpty } from 'lodash'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { useCallback, useState } from 'react'
-import toast from 'react-hot-toast'
-import { IconHelpCircle } from 'ui'
+import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import InformationBox from 'components/ui/InformationBox'
-import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
+import { useParams } from 'common'
+import {
+  PolicyTableRow,
+  PolicyTableRowProps,
+} from 'components/interfaces/Auth/Policies/PolicyTableRow'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { tableKeys } from 'data/tables/keys'
+import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Button, Card, CardContent } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
-  tables: PostgresTable[]
+  search?: string
+  schema: string
+  tables: PolicyTableRowProps['table'][]
   hasTables: boolean
   isLocked: boolean
+  onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
+  onResetSearch?: () => void
 }
 
-const Policies = ({
+export const Policies = ({
+  search,
+  schema,
   tables,
   hasTables,
   isLocked,
+  onSelectCreatePolicy,
   onSelectEditPolicy: onSelectEditPolicyAI,
+  onResetSearch,
 }: PoliciesProps) => {
-  const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { ui, meta } = useStore()
-  const queryClient = useQueryClient()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
-
-  const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
-  const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
-  const [RLSEditorWithAIShown, showRLSEditorWithAI] = useState(false)
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy | {}>({})
+  const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }>()
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
 
-  const { mutateAsync: createDatabasePolicy } = useDatabasePolicyCreateMutation()
-  const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
+  const { mutate: updateTable } = useTableUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to toggle RLS: ${error.message}`)
+    },
+    onSettled: () => {
+      closeConfirmModal()
+    },
+  })
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted policy!')
+    },
+    onSettled: () => {
       closeConfirmModal()
     },
   })
 
-  const closePolicyEditorModal = useCallback(() => {
-    setSelectedPolicyToEdit({})
-    setSelectedSchemaAndTable({})
-    if (RLSEditorWithAIShown) {
-      showRLSEditorWithAI(false)
-    }
-  }, [RLSEditorWithAIShown])
-
   const closeConfirmModal = () => {
     setSelectedPolicyToDelete({})
-    setSelectedTableToToggleRLS({})
+    setSelectedTableToToggleRLS(undefined)
   }
 
-  const onSelectToggleRLS = (table: any) => {
+  const onSelectToggleRLS = (table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }) => {
     setSelectedTableToToggleRLS(table)
   }
 
-  const onSelectCreatePolicy = (table: any) => {
-    setSelectedSchemaAndTable({ schema: table.schema, table: table.name })
-  }
-
   const onSelectEditPolicy = (policy: any) => {
-    if (isAiAssistantEnabled) {
-      onSelectEditPolicyAI(policy)
-    } else {
-      setSelectedPolicyToEdit(policy)
-      setSelectedSchemaAndTable({ schema: policy.schema, table: policy.table })
-    }
+    onSelectEditPolicyAI(policy)
   }
 
   const onSelectDeletePolicy = (policy: any) => {
     setSelectedPolicyToDelete(policy)
   }
 
-  const onSavePolicySuccess = useCallback(async () => {
-    ui.setNotification({ category: 'success', message: 'Policy successfully saved!' })
-    closePolicyEditorModal()
-  }, [closePolicyEditorModal])
-
   // Methods that involve some API
   const onToggleRLS = async () => {
+    if (!selectedTableToToggleRLS) return console.error('Table is required')
+
     const payload = {
       id: selectedTableToToggleRLS.id,
       rls_enabled: !selectedTableToToggleRLS.rls_enabled,
     }
 
-    const res: any = await meta.tables.update(payload.id, payload)
-    if (res.error) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Failed to toggle RLS: ${res.error.message}`,
-      })
-    }
-
-    await queryClient.invalidateQueries(tableKeys.list(ref, selectedTableToToggleRLS.schema))
-    closeConfirmModal()
-  }
-
-  const onCreatePolicy = useCallback(
-    async (payload: any) => {
-      if (!project) {
-        console.error('Project is required')
-        return true
-      }
-
-      try {
-        await createDatabasePolicy({
-          projectRef: project.ref,
-          connectionString: project.connectionString,
-          payload,
-        })
-        return false
-      } catch (error) {
-        return true
-      }
-    },
-    [project]
-  )
-
-  const onUpdatePolicy = async (payload: any) => {
-    if (!project) {
-      console.error('Project is required')
-      return true
-    }
-
-    try {
-      await updateDatabasePolicy({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        id: payload.id,
-        payload,
-      })
-      return false
-    } catch (error) {
-      return true
-    }
+    updateTable({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      id: selectedTableToToggleRLS.id,
+      name: selectedTableToToggleRLS.name,
+      schema: selectedTableToToggleRLS.schema,
+      payload: payload,
+    })
   }
 
   const onDeletePolicy = async () => {
@@ -160,72 +112,49 @@ const Policies = ({
     deleteDatabasePolicy({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      id: selectedPolicyToDelete.id,
+      originalPolicy: selectedPolicyToDelete,
     })
+  }
+
+  if (!hasTables) {
+    return (
+      <Card className="w-full bg-transparent">
+        <CardContent className="flex flex-col items-center justify-center p-8">
+          <h2 className="heading-default">No tables to create policies for</h2>
+
+          <p className="text-sm text-foreground-light text-center mb-4">
+            RLS Policies control per-user access to table rows. Create a table in this schema first
+            before creating a policy.
+          </p>
+          <Button asChild type="default">
+            <Link href={`/project/${ref}/editor`}>Create a table</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
     <>
-      {tables.length > 0 ? (
-        tables.map((table: any) => (
-          <section key={table.id}>
-            <PolicyTableRow
-              table={table}
-              isLocked={isLocked}
-              onSelectToggleRLS={onSelectToggleRLS}
-              onSelectCreatePolicy={onSelectCreatePolicy}
-              onSelectEditPolicy={onSelectEditPolicy}
-              onSelectDeletePolicy={onSelectDeletePolicy}
-            />
-          </section>
-        ))
-      ) : hasTables ? (
-        <NoSearchResults />
-      ) : (
-        <div className="flex-grow">
-          <ProductEmptyState
-            size="large"
-            title="Row-Level Security (RLS) Policies"
-            ctaButtonLabel="Create a table"
-            infoButtonLabel="What is RLS?"
-            infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
-            onClickCta={() => router.push(`/project/${ref}/editor`)}
-          >
-            <div className="space-y-4">
-              <InformationBox
-                title="What are policies?"
-                icon={<IconHelpCircle strokeWidth={2} />}
-                description={
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      Policies restrict, on a per-user basis, which rows can be returned by normal
-                      queries, or inserted, updated, or deleted by data modification commands.
-                    </p>
-                    <p className="text-sm">
-                      This is also known as Row-Level Security (RLS). Each policy is attached to a
-                      table, and the policy is executed each time its accessed.
-                    </p>
-                  </div>
-                }
+      <div className="flex flex-col gap-y-4 pb-4">
+        {isLocked && <ProtectedSchemaWarning schema={schema} entity="policies" />}
+        {tables.length > 0 ? (
+          tables.map((table) => (
+            <section key={table.id}>
+              <PolicyTableRow
+                table={table}
+                isLocked={schema === 'realtime' ? true : isLocked}
+                onSelectToggleRLS={onSelectToggleRLS}
+                onSelectCreatePolicy={() => onSelectCreatePolicy(table.name)}
+                onSelectEditPolicy={onSelectEditPolicy}
+                onSelectDeletePolicy={onSelectDeletePolicy}
               />
-              <p className="text-sm text-foreground-light">
-                Create a table in this schema first before creating a policy.
-              </p>
-            </div>
-          </ProductEmptyState>
-        </div>
-      )}
-
-      <PolicyEditorModal
-        visible={!isEmpty(selectedSchemaAndTable)}
-        schema={selectedSchemaAndTable.schema}
-        table={selectedSchemaAndTable.table}
-        selectedPolicyToEdit={selectedPolicyToEdit}
-        onSelectCancel={closePolicyEditorModal}
-        onCreatePolicy={onCreatePolicy}
-        onUpdatePolicy={onUpdatePolicy}
-        onSaveSuccess={onSavePolicySuccess}
-      />
+            </section>
+          ))
+        ) : hasTables ? (
+          <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
+        ) : null}
+      </div>
 
       <ConfirmModal
         danger
@@ -239,12 +168,14 @@ const Policies = ({
       />
 
       <ConfirmModal
-        danger={selectedTableToToggleRLS.rls_enabled}
-        visible={!isEmpty(selectedTableToToggleRLS)}
-        title={`Confirm to ${selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'} RLS`}
+        danger={selectedTableToToggleRLS?.rls_enabled}
+        visible={selectedTableToToggleRLS !== undefined}
+        title={`Confirm to ${
+          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
+        } Row Level Security`}
         description={`Are you sure you want to ${
-          selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'
-        } row level security for the table "${selectedTableToToggleRLS.name}"?`}
+          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
+        } Row Level Security for the table "${selectedTableToToggleRLS?.name}"?`}
         buttonLabel="Confirm"
         buttonLoadingLabel="Saving"
         onSelectCancel={closeConfirmModal}
@@ -253,5 +184,3 @@ const Policies = ({
     </>
   )
 }
-
-export default observer(Policies)

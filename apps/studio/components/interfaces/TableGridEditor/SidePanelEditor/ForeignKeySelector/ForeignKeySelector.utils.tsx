@@ -1,7 +1,24 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { IconHelpCircle } from 'ui'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { HelpCircle } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
+import type { ForeignKey } from './ForeignKeySelector.types'
+
+export const formatForeignKeys = (fks: ForeignKeyConstraint[]): ForeignKey[] => {
+  return fks.map((x) => {
+    return {
+      id: x.id,
+      name: x.constraint_name,
+      tableId: x.target_id,
+      schema: x.target_schema,
+      table: x.target_table,
+      columns: x.source_columns.map((y, i) => ({ source: y, target: x.target_columns[i] })),
+      deletionAction: x.deletion_action,
+      updateAction: x.update_action,
+    }
+  })
+}
 
 export const generateCascadeActionDescription = (
   action: 'update' | 'delete',
@@ -34,27 +51,15 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="translate-y-[3px] mx-1">
-              <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'w-[300px] space-y-2 border border-background',
-                  ].join(' ')}
-                >
-                  <p className="text-xs text-foreground">
-                    This is similar to no action, but the restrict check cannot be deferred till
-                    later in the transaction
-                  </p>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <Tooltip>
+            <TooltipTrigger className="translate-y-[3px] mx-1">
+              <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="w-80">
+              This is similar to no action, but the restrict check cannot be deferred till later in
+              the transaction
+            </TooltipContent>
+          </Tooltip>
           : {actionVerb} a record from{' '}
           <code className="text-xs text-foreground-light">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">prevent {actionVerb.toLowerCase()}</span>{' '}

@@ -1,77 +1,68 @@
 import Editor from '@monaco-editor/react'
 import { useTheme } from 'next-themes'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useMemo, useRef } from 'react'
-import { format } from 'sql-formatter'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
+import { Footer } from 'components/grid/components/footer/Footer'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import useEntityType from 'hooks/misc/useEntityType'
+import {
+  Entity,
+  isMaterializedView,
+  isTableLike,
+  isView,
+  isViewLike,
+} from 'data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
-import Link from 'next/link'
 import { Button } from 'ui'
 
 export interface TableDefinitionProps {
-  id?: number
+  entity?: Entity
 }
 
-const TableDefinition = ({ id }: TableDefinitionProps) => {
+export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
   const { resolvedTheme } = useTheme()
-  const entityType = useEntityType(id)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const viewResult = useViewDefinitionQuery(
     {
-      schema: entityType?.schema,
-      name: entityType?.name,
+      id: entity?.id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     {
-      enabled:
-        entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW,
+      enabled: isViewLike(entity),
     }
   )
 
   const tableResult = useTableDefinitionQuery(
     {
-      schema: entityType?.schema,
-      name: entityType?.name,
+      id: entity?.id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     {
-      enabled: entityType?.type === ENTITY_TYPE.TABLE,
+      enabled: isTableLike(entity),
     }
   )
 
-  const { data: definition, isLoading } =
-    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-      ? viewResult
-      : tableResult
+  const { data: definition, isLoading } = isViewLike(entity) ? viewResult : tableResult
 
-  const prepend =
-    entityType?.type === ENTITY_TYPE.VIEW
-      ? `create view ${entityType.schema}.${entityType.name} as\n`
-      : entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-      ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
+  const prepend = isView(entity)
+    ? `create view ${entity.schema}.${entity.name} as\n`
+    : isMaterializedView(entity)
+      ? `create materialized view ${entity.schema}.${entity.name} as\n`
       : ''
 
   const formattedDefinition = useMemo(
-    () =>
-      definition
-        ? format(prepend + definition, {
-            language: 'postgresql',
-            keywordCase: 'lower',
-          })
-        : undefined,
+    () => (definition ? formatSql(prepend + definition) : undefined),
     [definition]
   )
 
@@ -95,40 +86,49 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
 
   if (isLoading) {
     return (
-      <div className="p-4">
-        <GenericSkeletonLoader />
+      <div className="h-full grid">
+        <div className="p-4">
+          <GenericSkeletonLoader />
+        </div>
+        <div className="mt-auto">
+          <Footer />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex-grow overflow-y-auto border-t border-muted relative">
-      <Button asChild type="default" className="absolute top-2 right-5 z-10">
-        <Link
-          href={`/project/${ref}/sql/new?content=${encodeURIComponent(formattedDefinition ?? '')}`}
-        >
-          Open in SQL Editor
-        </Link>
-      </Button>
-      <Editor
-        className="monaco-editor"
-        theme={resolvedTheme?.includes('dark') ? 'vs-dark' : 'vs'}
-        onMount={handleEditorOnMount}
-        defaultLanguage="pgsql"
-        value={formattedDefinition}
-        path={''}
-        options={{
-          domReadOnly: true,
-          readOnly: true,
-          tabSize: 2,
-          fontSize: 13,
-          minimap: { enabled: false },
-          wordWrap: 'on',
-          fixedOverflowWidgets: true,
-        }}
-      />
-    </div>
+    <>
+      <div className="flex-grow overflow-y-auto border-t border-muted relative">
+        <Button asChild type="default" className="absolute top-2 right-5 z-10">
+          <Link
+            href={`/project/${ref}/sql/new?content=${encodeURIComponent(
+              formattedDefinition ?? ''
+            )}`}
+          >
+            Open in SQL Editor
+          </Link>
+        </Button>
+        <Editor
+          className="monaco-editor"
+          theme={resolvedTheme?.includes('dark') ? 'vs-dark' : 'vs'}
+          onMount={handleEditorOnMount}
+          defaultLanguage="pgsql"
+          value={formattedDefinition}
+          path={''}
+          options={{
+            domReadOnly: true,
+            readOnly: true,
+            tabSize: 2,
+            fontSize: 13,
+            minimap: { enabled: false },
+            wordWrap: 'on',
+            fixedOverflowWidgets: true,
+          }}
+        />
+      </div>
+
+      <Footer />
+    </>
   )
 }
-
-export default observer(TableDefinition)

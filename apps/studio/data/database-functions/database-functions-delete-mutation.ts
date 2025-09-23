@@ -1,35 +1,34 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
-import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { databaseFunctionsKeys } from './keys'
+import pgMeta from '@supabase/pg-meta'
+import { databaseKeys } from 'data/database/keys'
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError } from 'types'
+import { DatabaseFunction } from './database-functions-query'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string
-  connectionString?: string
-  id: number
+  connectionString?: string | null
+  func: DatabaseFunction
 }
 
 export async function deleteDatabaseFunction({
   projectRef,
   connectionString,
-  id,
+  func,
 }: DatabaseFunctionDeleteVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql, zod } = pgMeta.functions.remove(func)
 
-  const { data, error } = await del('/platform/pg-meta/{ref}/functions', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['functions', 'delete', func.id.toString()],
   })
 
-  if (error) throw error
-  return data
+  return result as z.infer<typeof zod>
 }
 
 type DatabaseFunctionDeleteData = Awaited<ReturnType<typeof deleteDatabaseFunction>>
@@ -49,7 +48,7 @@ export const useDatabaseFunctionDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseFunctionsKeys.list(projectRef))
+        await queryClient.invalidateQueries(databaseKeys.databaseFunctions(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

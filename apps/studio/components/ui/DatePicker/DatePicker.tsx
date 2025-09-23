@@ -1,22 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import DatePicker from 'react-datepicker'
+import { format } from 'date-fns'
+import dayjs from 'dayjs'
+import { ArrowRight, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ReactNode, useEffect, useState } from 'react'
+import ReactDatePicker from 'react-datepicker'
+
+import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   Button,
-  IconArrowRight,
-  IconCalendar,
-  IconChevronLeft,
-  IconChevronRight,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-
-import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
-import { format } from 'date-fns'
-import dayjs from 'dayjs'
 import { ButtonProps } from 'ui/src/components/Button/Button'
-import TimeSplitInput from './TimeSplitInput'
+import { TimeSplitInput } from './TimeSplitInput'
 
 export interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
@@ -25,13 +22,15 @@ export interface DatePickerProps {
   triggerButtonType?: ButtonProps['type']
   triggerButtonClassName?: string
   triggerButtonTitle?: string
+  triggerButtonSize?: 'tiny' | 'small'
+  contentSide?: 'bottom' | 'top'
   minDate?: Date
   maxDate?: Date
   hideTime?: boolean
   hideClear?: boolean
   selectsRange?: boolean
-  renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
-  children?: React.ReactNode | React.ReactNode[] | null
+  renderFooter?: (args: DatePickerToFrom) => ReactNode | void
+  children?: ReactNode | ReactNode[] | null
 }
 
 const START_DATE_DEFAULT = new Date()
@@ -40,13 +39,15 @@ const END_DATE_DEFAULT = new Date()
 const START_TIME_DEFAULT = { HH: '00', mm: '00', ss: '00' }
 const END_TIME_DEFAULT = { HH: '23', mm: '59', ss: '59' }
 
-function _DatePicker({
+export function DatePicker({
   to,
   from,
   onChange,
   triggerButtonType = 'default',
   triggerButtonClassName = '',
   triggerButtonTitle,
+  triggerButtonSize,
+  contentSide = 'bottom',
   minDate,
   maxDate,
   hideTime = false,
@@ -149,7 +150,8 @@ function _DatePicker({
         <Button
           title={triggerButtonTitle}
           type={triggerButtonType}
-          icon={<IconCalendar />}
+          icon={<Calendar />}
+          size={triggerButtonSize}
           className={triggerButtonClassName}
         >
           {children !== undefined ? (
@@ -174,11 +176,11 @@ function _DatePicker({
           )}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="center" side="bottom" className="p-0">
+      <PopoverContent_Shadcn_ align="center" side={contentSide} className="p-0">
         <>
           {hideTime ? null : (
             <>
-              <div className="flex items-stretch justify-between py-2">
+              <div className="flex items-stretch justify-between p-2">
                 {!selectsRange ? null : (
                   <>
                     <div className="flex grow flex-col gap-1">
@@ -194,16 +196,8 @@ function _DatePicker({
                         endDate={endDate}
                       />
                     </div>
-                    <div
-                      className={`
-                      flex 
-                      w-12 
-                      items-center 
-                      justify-center
-                      text-foreground-lighter
-                    `}
-                    >
-                      <IconArrowRight strokeWidth={1.5} size={14} />
+                    <div className="flex items-center justify-center w-12 text-foreground-lighter">
+                      <ArrowRight strokeWidth={1.5} size={14} />
                     </div>
                   </>
                 )}
@@ -223,8 +217,8 @@ function _DatePicker({
               </div>
             </>
           )}
-          <div className="px-3 py-4">
-            <DatePicker
+          <div className="p-2">
+            <ReactDatePicker
               inline
               selectsRange={selectsRange}
               selected={startDate}
@@ -244,7 +238,7 @@ function _DatePicker({
                 prevMonthButtonDisabled,
                 nextMonthButtonDisabled,
               }) => (
-                <div className="flex items-center justify-between px-2 py-2">
+                <div className="flex items-center justify-between">
                   <div className="flex w-full items-center justify-between">
                     <button
                       onClick={decreaseMonth}
@@ -252,10 +246,10 @@ function _DatePicker({
                       type="button"
                       className={`
                         ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light hover:text-foreground focus:outline-none
+                        text-foreground-light hover:text-foreground focus:outline-none p-2
                     `}
                     >
-                      <IconChevronLeft size={16} strokeWidth={2} />
+                      <ChevronLeft size={16} strokeWidth={2} />
                     </button>
                     <span className="text-sm text-foreground-light">
                       {format(date, 'MMMM yyyy')}
@@ -266,10 +260,10 @@ function _DatePicker({
                       type="button"
                       className={`
                         ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light hover:text-foreground focus:outline-none
+                        text-foreground-light p-2 hover:text-foreground focus:outline-none
                     `}
                     >
-                      <IconChevronRight size={16} strokeWidth={2} />
+                      <ChevronRight size={16} strokeWidth={2} />
                     </button>
                   </div>
                 </div>
@@ -295,4 +289,4 @@ function _DatePicker({
   )
 }
 
-export default _DatePicker
+export default DatePicker

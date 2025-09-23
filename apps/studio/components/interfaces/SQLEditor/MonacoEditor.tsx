@@ -1,17 +1,20 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { useParams } from 'common'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useEffect, useRef } from 'react'
-import { cn } from 'ui'
 
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useSelectedProject } from 'hooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useTabsStateSnapshot } from 'state/tabs'
+import { cn } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
-import { IStandaloneCodeEditor } from './SQLEditor.types'
-import { createSqlSnippetSkeleton } from './SQLEditor.utils'
+import type { IStandaloneCodeEditor } from './SQLEditor.types'
+import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 
 export type MonacoEditorProps = {
   id: string
@@ -21,6 +24,15 @@ export type MonacoEditorProps = {
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
+  onMount?: (editor: IStandaloneCodeEditor) => void
+  onPrompt?: (value: {
+    selection: string
+    beforeSelection: string
+    afterSelection: string
+    startLineNumber: number
+    endLineNumber: number
+  }) => void
+  placeholder?: string
 }
 
 const MonacoEditor = ({
@@ -28,17 +40,30 @@ const MonacoEditor = ({
   editorRef,
   monacoRef,
   autoFocus = true,
+  placeholder = '',
   className,
   executeQuery,
   onHasSelection,
+  onPrompt,
+  onMount,
 }: MonacoEditorProps) => {
-  const { ref, content } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
-  const project = useSelectedProject()
+  const { ref, content } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
 
-  const snap = useSqlEditorStateSnapshot({ sync: true })
-  const snippet = snap.snippets[id]
+  const aiSnap = useAiAssistantStateSnapshot()
+
+  const [intellisenseEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    true
+  )
+
+  const snippet = snapV2.snippets[id]
+  const disableEdit =
+    snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
@@ -63,6 +88,65 @@ const MonacoEditor = ({
       },
     })
 
+    editor.addAction({
+      id: 'save-query',
+      label: 'Save Query',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: () => {
+        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+      },
+    })
+
+    editor.addAction({
+      id: 'explain-code',
+      label: 'Explain Code',
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 1,
+      run: () => {
+        const selectedValue = (editorRef?.current as any)
+          .getModel()
+          .getValueInRange((editorRef?.current as any)?.getSelection())
+        aiSnap.newChat({
+          name: 'Explain code section',
+          open: true,
+          sqlSnippets: [selectedValue],
+          initialInput: 'Can you explain this section to me in more detail?',
+        })
+      },
+    })
+
+    if (onPrompt) {
+      editor.addAction({
+        id: 'generate-sql',
+        label: 'Generate SQL',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+        run: () => {
+          const selection = editor.getSelection()
+          const model = editor.getModel()
+          if (!model || !selection) return
+
+          const allLines = model.getLinesContent()
+
+          const startLineIndex = selection.startLineNumber - 1
+          const endLineIndex = selection.endLineNumber
+
+          const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
+          const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
+          const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
+
+          onPrompt({
+            selection: selectedText,
+            beforeSelection,
+            afterSelection,
+            startLineNumber: selection?.startLineNumber ?? 0,
+            endLineNumber: selection?.endLineNumber ?? 0,
+          })
+        },
+      })
+    }
+
     editor.onDidChangeCursorSelection(({ selection }) => {
       const noSelection =
         selection.startLineNumber === selection.endLineNumber &&
@@ -70,40 +154,36 @@ const MonacoEditor = ({
       onHasSelection(!noSelection)
     })
 
-    // add margin above first line
-    editorRef.current.changeViewZones((accessor) => {
-      accessor.addZone({
-        afterLineNumber: 0,
-        heightInPx: 4,
-        domNode: document.createElement('div'),
-      })
-    })
-
     if (autoFocus) {
       if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
+
+    onMount?.(editor)
   }
 
-  const debouncedSetSql = debounce((id, value) => {
-    snap.setSql(id, value)
-  }, 1000)
+  const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
 
   function handleEditorChange(value: string | undefined) {
+    // make active tab permanent
+    tabsSnap.makeActiveTabPermanent()
+
+    const snippetCheck = snapV2.snippets[id]
+
     if (id && value) {
-      if (snap.snippets[id]) {
+      if (snippetCheck) {
         debouncedSetSql(id, value)
       } else {
-        const snippet = createSqlSnippetSkeleton({
-          id,
-          name: untitledSnippetTitle,
-          sql: value,
-          owner_id: profile?.id,
-          project_id: project?.id,
-        })
-        if (ref) {
-          snap.addSnippet(snippet as SqlSnippet, ref)
-          snap.addNeedsSaving(snippet.id!)
+        if (ref && profile !== undefined && project !== undefined) {
+          const snippet = createSqlSnippetSkeletonV2({
+            id,
+            name: untitledSnippetTitle,
+            sql: value,
+            owner_id: profile?.id,
+            project_id: project?.id,
+          })
+          snapV2.addSnippet({ projectRef: ref, snippet })
+          snapV2.addNeedsSaving(snippet.id)
           router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
         }
       }
@@ -113,33 +193,75 @@ const MonacoEditor = ({
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.
   useEffect(() => {
-    if (content && content.length > 0) {
-      handleEditorChange(content)
-    }
+    if (content && content.length > 0) handleEditorChange(content)
   }, [])
 
   return (
-    <Editor
-      className={cn(className, 'monaco-editor')}
-      theme={'supabase'}
-      onMount={handleEditorOnMount}
-      onChange={handleEditorChange}
-      defaultLanguage="pgsql"
-      defaultValue={snippet?.snippet.content.sql}
-      path={id}
-      options={{
-        tabSize: 2,
-        fontSize: 13,
-        minimap: { enabled: false },
-        wordWrap: 'on',
-        // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
-        // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
-        // comment just in case anyone might be wondering. Relevant issues:
-        // - https://github.com/microsoft/monaco-editor/issues/2229
-        // - https://github.com/microsoft/monaco-editor/issues/2503
-        // fixedOverflowWidgets: true,
-      }}
-    />
+    <>
+      {disableEdit && (
+        <Admonition
+          type="default"
+          className="m-0 py-2 rounded-none border-0 border-b [&>h5]:mb-0.5"
+          title="This snippet has been shared to the project and is only editable by the owner who created this snippet"
+          description='You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting "Duplicate query"'
+        />
+      )}
+      <Editor
+        className={cn(className, 'monaco-editor')}
+        theme={'supabase'}
+        onMount={handleEditorOnMount}
+        onChange={handleEditorChange}
+        defaultLanguage="pgsql"
+        defaultValue={snippet?.snippet.content?.sql}
+        path={id}
+        options={{
+          tabSize: 2,
+          fontSize: 13,
+          placeholder,
+          lineDecorationsWidth: 0,
+          readOnly: disableEdit,
+          minimap: { enabled: false },
+          wordWrap: 'on',
+          padding: { top: 4 },
+          // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
+          // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
+          // comment just in case anyone might be wondering. Relevant issues:
+          // - https://github.com/microsoft/monaco-editor/issues/2229
+          // - https://github.com/microsoft/monaco-editor/issues/2503
+          // fixedOverflowWidgets: true,
+          suggest: {
+            showMethods: intellisenseEnabled,
+            showFunctions: intellisenseEnabled,
+            showConstructors: intellisenseEnabled,
+            showDeprecated: intellisenseEnabled,
+            showFields: intellisenseEnabled,
+            showVariables: intellisenseEnabled,
+            showClasses: intellisenseEnabled,
+            showStructs: intellisenseEnabled,
+            showInterfaces: intellisenseEnabled,
+            showModules: intellisenseEnabled,
+            showProperties: intellisenseEnabled,
+            showEvents: intellisenseEnabled,
+            showOperators: intellisenseEnabled,
+            showUnits: intellisenseEnabled,
+            showValues: intellisenseEnabled,
+            showConstants: intellisenseEnabled,
+            showEnums: intellisenseEnabled,
+            showEnumMembers: intellisenseEnabled,
+            showKeywords: intellisenseEnabled,
+            showWords: intellisenseEnabled,
+            showColors: intellisenseEnabled,
+            showFiles: intellisenseEnabled,
+            showReferences: intellisenseEnabled,
+            showFolders: intellisenseEnabled,
+            showTypeParameters: intellisenseEnabled,
+            showIssues: intellisenseEnabled,
+            showUsers: intellisenseEnabled,
+            showSnippets: intellisenseEnabled,
+          },
+        }}
+      />
+    </>
   )
 }
 

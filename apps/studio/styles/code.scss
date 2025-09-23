@@ -90,7 +90,10 @@
     opacity: 0;
     position: absolute;
     visibility: hidden;
-    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out, bottom 200ms ease-in-out;
+    transition:
+      opacity 200ms ease-in-out,
+      visibility 200ms ease-in-out,
+      bottom 200ms ease-in-out;
 
     button {
       @apply rounded text-xs;

@@ -1,19 +1,16 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
+import type { AddonVariantId, ProjectAddonType } from './types'
 
 export type ProjectAddonUpdateVariables = {
-  projectRef: string
-  variant: string
-  type: 'custom_domain' | 'compute_instance' | 'pitr'
-}
-
-export type ProjectAddonUpdateResponse = {
-  error?: any
+  projectRef?: string
+  variant: AddonVariantId
+  type: ProjectAddonType
+  suppressToast?: boolean
 }
 
 export async function updateSubscriptionAddon({
@@ -25,13 +22,20 @@ export async function updateSubscriptionAddon({
   if (!variant) throw new Error('variant is required')
   if (!type) throw new Error('type is required')
 
-  const response = (await post(`${API_URL}/projects/${projectRef}/billing/addons`, {
-    addon_type: type,
-    addon_variant: variant,
-  })) as ProjectAddonUpdateResponse
-  if (response.error) throw response.error
+  const { data, error } = await post(`/platform/projects/{ref}/billing/addons`, {
+    params: {
+      path: {
+        ref: projectRef,
+      },
+    },
+    body: {
+      addon_type: type,
+      addon_variant: variant,
+    },
+  })
 
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type ProjectAddonUpdateData = Awaited<ReturnType<typeof updateSubscriptionAddon>>
@@ -43,7 +47,7 @@ export const useProjectAddonUpdateMutation = ({
 }: Omit<
   UseMutationOptions<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>,
   'mutationFn'
-> = {}) => {
+> & { suppressToast?: boolean } = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>(
@@ -51,7 +55,7 @@ export const useProjectAddonUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await Promise.all([queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))])
+        await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

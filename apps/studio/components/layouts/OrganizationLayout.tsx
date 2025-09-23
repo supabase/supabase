@@ -1,67 +1,65 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { ExternalLink } from 'lucide-react'
+import { type PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
-import { Tabs } from 'ui'
-import { AccountLayout } from './'
-import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
-import SettingsLayout from './SettingsLayout/SettingsLayout'
+import PartnerIcon from 'components/ui/PartnerIcon'
+import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
+import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
+import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { withAuth } from 'hooks/misc/withAuth'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
-const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
-  const selectedOrganization = useSelectedOrganization()
-  const router = useRouter()
-  const { slug } = useParams()
-  const id = router.asPath.split('/').at(-1)?.split('?')[0]?.split('#')[0]
+const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const invoicesEnabled = useIsFeatureEnabled('billing:invoices')
+  const vercelQuery = useVercelRedirectQuery(
+    {
+      installationId: selectedOrganization?.partner_id,
+    },
+    {
+      enabled: selectedOrganization?.managed_by === MANAGED_BY.VERCEL_MARKETPLACE,
+    }
+  )
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const awsQuery = useAwsRedirectQuery(
+    {
+      organizationSlug: selectedOrganization?.slug,
+    },
+    {
+      enabled: selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE,
+    }
+  )
 
-  if (navLayoutV2) {
-    return <SettingsLayout>{children}</SettingsLayout>
-  }
+  // Select the appropriate query based on partner
+  const { data, isSuccess } =
+    selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ? awsQuery : vercelQuery
 
   return (
-    <AccountLayout
-      title={selectedOrganization?.name ?? 'Supabase'}
-      breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
-    >
-      <ScaffoldHeader>
-        <ScaffoldContainer id="billing-page-top">
-          <ScaffoldTitle>{selectedOrganization?.name ?? 'Organization'} settings</ScaffoldTitle>
-        </ScaffoldContainer>
-        <ScaffoldContainer>
-          <nav>
-            <Tabs
-              listClassNames="border-none"
-              size="small"
-              type="underlined"
-              activeId={id}
-              onChange={(id: any) => {
-                router.push(`/org/${slug}/${id}`)
-              }}
-            >
-              <Tabs.Panel id="general" label="General" className="!my-0" />
-              <Tabs.Panel id="team" label="Team" className="!my-0" />
-
-              <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
-
-              <Tabs.Panel id="billing" label="Billing" className="!my-0" />
-              <Tabs.Panel id="usage" label="Usage" className="!my-0" />
-              {invoicesEnabled && <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />}
-              <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />
-              <Tabs.Panel id="audit" label="Audit Logs" className="!my-0" />
-
-              <Tabs.Panel id="documents" label="Legal Documents" className="!my-0" />
-            </Tabs>
-          </nav>
-        </ScaffoldContainer>
-      </ScaffoldHeader>
-      <ScaffoldDivider />
-      {children}
-    </AccountLayout>
+    <div className={cn('h-full w-full flex flex-col overflow-hidden')}>
+      {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
+        <Alert_Shadcn_
+          variant="default"
+          className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
+        >
+          <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
+          <AlertTitle_Shadcn_ className="flex-1">
+            This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
+          </AlertTitle_Shadcn_>
+          <Button asChild type="default" iconRight={<ExternalLink />} disabled={!isSuccess}>
+            <a href={data?.url} target="_blank" rel="noopener noreferrer">
+              Manage
+            </a>
+          </Button>
+        </Alert_Shadcn_>
+      )}
+      <main className="h-full w-full overflow-y-auto flex flex-col">{children}</main>
+    </div>
   )
 }
 
-export default OrganizationLayout
+const OrganizationLayout = ({ children }: PropsWithChildren) => {
+  return <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
+}
+
+export default withAuth(OrganizationLayout)

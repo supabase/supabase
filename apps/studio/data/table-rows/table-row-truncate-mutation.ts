@@ -1,18 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { Query, SupaTable } from 'components/grid'
+import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
+import { tableRowKeys } from './keys'
 
 export type TableRowTruncateVariables = {
   projectRef: string
-  connectionString?: string
-  table: SupaTable
-  impersonatedRole?: ImpersonationRole
+  connectionString?: string | null
+  table: { id: number; name: string; schema?: string }
 }
 
 export function getTableRowTruncateSql({ table }: Pick<TableRowTruncateVariables, 'table'>) {
@@ -25,18 +22,13 @@ export async function truncateTableRow({
   projectRef,
   connectionString,
   table,
-  impersonatedRole,
 }: TableRowTruncateVariables) {
-  const sql = wrapWithRoleImpersonation(getTableRowTruncateSql({ table }), {
-    projectRef,
-    role: impersonatedRole,
-  })
+  const sql = getTableRowTruncateSql({ table })
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
   })
 
   return result
@@ -59,7 +51,7 @@ export const useTableRowTruncateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
+        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

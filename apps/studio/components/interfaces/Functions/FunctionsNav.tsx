@@ -11,15 +11,18 @@ const FunctionsNav = ({ item }: any) => {
       defaultActiveId="1"
       type="underlined"
       size="medium"
-      activeId={!activeRoute ? 'metrics' : activeRoute}
-      onChange={(e: string) =>
-        router.push(`/project/${ref}/functions/${item.slug}/${e === 'metrics' ? '' : e}`)
-      }
+      baseClassNames="!space-y-0"
+      activeId={!activeRoute ? 'overview' : activeRoute}
+      onChange={(e: string) => {
+        if (item?.slug) {
+          router.push(`/project/${ref}/functions/${item.slug}/${e === 'overview' ? '' : e}`)
+        }
+      }}
     >
-      <Tabs.Panel id="details" label="Details" />
-      <Tabs.Panel id="metrics" label="Metrics" />
+      <Tabs.Panel id="overview" label="Overview" />
       <Tabs.Panel id="invocations" label="Invocations" />
       <Tabs.Panel id="logs" label="Logs" />
+      <Tabs.Panel id="details" label="Details" />
     </Tabs>
   )
 }

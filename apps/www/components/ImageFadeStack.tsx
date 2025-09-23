@@ -1,6 +1,9 @@
+'use client'
+
+import { PauseCircle, PlayCircle } from 'lucide-react'
 import Image from 'next/image'
-import React, { useState, useEffect } from 'react'
-import { IconPauseCircle, IconPlayCircle, cn } from 'ui'
+import { useEffect, useState } from 'react'
+import { cn } from 'ui'
 
 interface ImageFadeStackProps {
   autoplay?: boolean
@@ -70,7 +73,7 @@ const ImageFadeStack = ({
           onClick={() => setIsPlaying(!isPlaying)}
           className="text-white bg-foreground-light hover:bg-overlay rounded-full p-0.5 transition-colors"
         >
-          {isPlaying ? <IconPauseCircle w={12} /> : <IconPlayCircle w={12} />}
+          {isPlaying ? <PauseCircle size={12} /> : <PlayCircle size={12} />}
         </button>
       </div>
     </div>

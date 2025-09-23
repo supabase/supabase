@@ -2,7 +2,7 @@ import SqlEditor from 'components/ui/SqlEditor'
 import { isEmpty, noop } from 'lodash'
 import { useState } from 'react'
 import { Button, Modal } from 'ui'
-import { PolicyForReview } from './Policies.types'
+import type { PolicyForReview } from './Policies.types'
 
 interface PolicyReviewProps {
   policy: PolicyForReview
@@ -26,7 +26,7 @@ const PolicyReview = ({
   return (
     <>
       <Modal.Content>
-        <div className="space-y-6 py-8">
+        <div className="space-y-6">
           <div className="flex items-center justify-between space-y-8">
             <div className="flex flex-col">
               <p className="text-sm text-foreground-light">

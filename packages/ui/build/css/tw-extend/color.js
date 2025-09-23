@@ -401,111 +401,135 @@ module.exports = {
   },
   'foreground-DEFAULT': {
     cssVariable: 'var(--foreground-default)',
-    value: 'hsl(0, 0%, 92.9%)',
+    value: 'hsl(0, 0%, 98%)',
   },
   'foreground-light': {
     cssVariable: 'var(--foreground-light)',
-    value: 'hsl(0, 0%, 69%)',
+    value: 'hsl(0, 0%, 70.6%)',
   },
   'foreground-lighter': {
     cssVariable: 'var(--foreground-lighter)',
-    value: 'hsl(197.10000000000002, 3.1%, 55.9%)',
+    value: 'hsl(0, 0%, 53.7%)',
   },
   'foreground-muted': {
     cssVariable: 'var(--foreground-muted)',
-    value: 'hsl(198, 5.4%, 36.1%)',
+    value: 'hsl(0, 0%, 30.2%)',
   },
   'foreground-contrast': {
     cssVariable: 'var(--foreground-contrast)',
-    value: 'hsl(201.79999999999995, 16.9%, 12.7%)',
+    value: 'hsl(0, 0%, 8.6%)',
+  },
+  'background-200': {
+    cssVariable: 'var(--background-200)',
+    value: 'hsl(0, 0%, 9%)',
   },
   'background-DEFAULT': {
     cssVariable: 'var(--background-default)',
-    value: 'hsl(200, 11.1%, 5.3%)',
+    value: 'hsl(0, 0%, 7.1%)',
   },
   'background-alternative-200': {
     cssVariable: 'var(--background-alternative-200)',
-    value: 'hsl(0, 0%, 5.5%)',
+    value: 'hsl(0, 0%, 11%)',
   },
   'background-alternative-DEFAULT': {
     cssVariable: 'var(--background-alternative-default)',
-    value: 'hsl(200, 20%, 2.9%)',
+    value: 'hsl(0, 0%, 5.9%)',
   },
   'background-selection': {
     cssVariable: 'var(--background-selection)',
-    value: 'hsl(192, 9.8%, 10%)',
+    value: 'hsl(0, 0%, 19.2%)',
   },
   'background-control': {
     cssVariable: 'var(--background-control)',
-    value: 'hsl(192, 9.4%, 10.4%)',
+    value: 'hsl(0, 0%, 14.1%)',
+  },
+  'background-surface-75': {
+    cssVariable: 'var(--background-surface-75)',
+    value: 'hsl(0, 0%, 9%)',
   },
   'background-surface-100': {
     cssVariable: 'var(--background-surface-100)',
-    value: 'hsl(195, 10%, 7.8%)',
+    value: 'hsl(0, 0%, 12.2%)',
   },
   'background-surface-200': {
     cssVariable: 'var(--background-surface-200)',
-    value: 'hsl(192, 9.1%, 10.8%)',
+    value: 'hsl(0, 0%, 12.9%)',
   },
   'background-surface-300': {
     cssVariable: 'var(--background-surface-300)',
-    value: 'hsl(202.5, 10.5%, 14.9%)',
+    value: 'hsl(0, 0%, 16.1%)',
+  },
+  'background-surface-400': {
+    cssVariable: 'var(--background-surface-400)',
+    value: 'hsl(0, 0%, 16.1%)',
   },
   'background-overlay-DEFAULT': {
     cssVariable: 'var(--background-overlay-default)',
-    value: 'hsl(192, 14.3%, 6.9%)',
+    value: 'hsl(0, 0%, 14.1%)',
   },
   'background-overlay-hover': {
     cssVariable: 'var(--background-overlay-hover)',
-    value: 'hsl(190, 10.7%, 11%)',
+    value: 'hsl(0, 0%, 18%)',
   },
   'background-muted': {
     cssVariable: 'var(--background-muted)',
-    value: 'hsl(0, 0%, 100%)',
+    value: 'hsl(0, 0%, 14.1%)',
   },
   'background-button-DEFAULT': {
     cssVariable: 'var(--background-button-default)',
-    value: 'hsl(202.5, 10.5%, 14.9%)',
+    value: 'hsl(0, 0%, 18%)',
+  },
+  'background-dialog-DEFAULT': {
+    cssVariable: 'var(--background-dialog-default)',
+    value: 'hsl(0, 0%, 7.1%)',
+  },
+  'background-dash-sidebar': {
+    cssVariable: 'var(--background-dash-sidebar)',
+    value: 'hsl(0, 0%, 9%)',
+  },
+  'background-dash-canvas': {
+    cssVariable: 'var(--background-dash-canvas)',
+    value: 'hsl(0, 0%, 7.1%)',
   },
   'border-DEFAULT': {
     cssVariable: 'var(--border-default)',
-    value: 'hsl(186, 17.9%, 11%)',
+    value: 'hsl(0, 0%, 18%)',
   },
   'border-muted': {
     cssVariable: 'var(--border-muted)',
-    value: 'hsl(197.10000000000002, 14.9%, 9.2%)',
+    value: 'hsl(0, 0%, 14.1%)',
   },
   'border-secondary': {
     cssVariable: 'var(--border-secondary)',
-    value: 'hsl(196.39999999999998, 21.6%, 10%)',
+    value: 'hsl(0, 0%, 14.1%)',
   },
   'border-overlay': {
     cssVariable: 'var(--border-overlay)',
-    value: 'hsl(186.70000000000005, 33.3%, 5.3%)',
+    value: 'hsl(0, 0%, 20%)',
   },
   'border-control': {
     cssVariable: 'var(--border-control)',
-    value: 'hsl(180, 9.1%, 12.9%)',
+    value: 'hsl(0, 0%, 22.4%)',
   },
   'border-alternative': {
     cssVariable: 'var(--border-alternative)',
-    value: 'hsl(190.89999999999998, 16.4%, 13.1%)',
+    value: 'hsl(0, 0%, 26.7%)',
   },
   'border-strong': {
     cssVariable: 'var(--border-strong)',
-    value: 'hsl(188, 16.5%, 17.8%)',
+    value: 'hsl(0, 0%, 21.2%)',
   },
   'border-stronger': {
     cssVariable: 'var(--border-stronger)',
-    value: 'hsl(190, 16.1%, 22%)',
+    value: 'hsl(0, 0%, 27.1%)',
   },
   'border-button-DEFAULT': {
     cssVariable: 'var(--border-button-default)',
-    value: 'hsl(188, 16.5%, 17.8%)',
+    value: 'hsl(0, 0%, 24.3%)',
   },
   'border-button-hover': {
     cssVariable: 'var(--border-button-hover)',
-    value: 'hsl(0, 0%, 100%)',
+    value: 'hsl(0, 0%, 31.4%)',
   },
   'destructive-200': {
     cssVariable: 'var(--destructive-200)',
@@ -533,7 +557,7 @@ module.exports = {
   },
   'warning-200': {
     cssVariable: 'var(--warning-200)',
-    value: 'hsl(36.80000000000001, 100%, 6.1%)',
+    value: 'hsl(36.60000000000002, 100%, 8%)',
   },
   'warning-300': {
     cssVariable: 'var(--warning-300)',
@@ -549,11 +573,11 @@ module.exports = {
   },
   'warning-600': {
     cssVariable: 'var(--warning-600)',
-    value: 'hsl(38.89999999999998, 89.8%, 49.8%)',
+    value: 'hsl(38.89999999999998, 100%, 42.9%)',
   },
   'warning-DEFAULT': {
     cssVariable: 'var(--warning-default)',
-    value: 'hsl(38.89999999999998, 100%, 57.1%)',
+    value: 'hsl(38.89999999999998, 100%, 42.9%)',
   },
   'brand-200': {
     cssVariable: 'var(--brand-200)',
@@ -561,35 +585,27 @@ module.exports = {
   },
   'brand-300': {
     cssVariable: 'var(--brand-300)',
-    value: 'hsl(158.39999999999998, 100%, 4.9%)',
+    value: 'hsl(155.10000000000002, 100%, 8%)',
   },
   'brand-400': {
     cssVariable: 'var(--brand-400)',
-    value: 'hsl(160.39999999999998, 100%, 9.6%)',
+    value: 'hsl(155.5, 100%, 9.6%)',
   },
   'brand-500': {
     cssVariable: 'var(--brand-500)',
-    value: 'hsl(160.39999999999998, 100%, 19.2%)',
+    value: 'hsl(154.89999999999998, 100%, 19.2%)',
   },
   'brand-600': {
     cssVariable: 'var(--brand-600)',
-    value: 'hsl(156.29999999999995, 59.5%, 70%)',
-  },
-  'brand-link': {
-    cssVariable: 'var(--brand-link)',
-    value: 'hsl(156.29999999999995, 59.5%, 70%)',
+    value: 'hsl(154.89999999999998, 59.5%, 70%)',
   },
   'brand-DEFAULT': {
     cssVariable: 'var(--brand-default)',
-    value: 'hsl(159.89999999999998, 100%, 38.6%)',
+    value: 'hsl(153.10000000000002, 60.2%, 52.7%)',
   },
-  'brand-accent': {
-    cssVariable: 'var(--brand-accent)',
-    value: 'hsl(160, 100%, 50%)',
-  },
-  'brand-button': {
-    cssVariable: 'var(--brand-button)',
-    value: 'hsl(160.39999999999998, 100%, 19.2%)',
+  'brand-link': {
+    cssVariable: 'var(--brand-link)',
+    value: 'hsl(155, 100%, 38.6%)',
   },
   '_secondary-200': {
     cssVariable: 'var(--secondary-200)',

@@ -1,0 +1,24 @@
+description = "Replace '%s' with a more inclusive word."
+level = "ERROR"
+words = [
+    [
+        "mankind",
+        "humankind",
+    ],
+    [
+        "manmade",
+        "manufactured",
+    ],
+    [
+        "middleman",
+        "intermediary",
+    ],
+    [
+        "blacklist",
+        "denylist",
+    ],
+    [
+        "whitelist",
+        "allowlist",
+    ],
+]

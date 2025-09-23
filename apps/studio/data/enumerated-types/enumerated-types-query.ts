@@ -1,14 +1,14 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
-import { components } from 'data/api'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type EnumeratedType = components['schemas']['PostgresType']
@@ -23,16 +23,18 @@ export async function getEnumeratedTypes(
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await get('/platform/pg-meta/{ref}/types', {
-    // @ts-ignore: We don't need to pass included included_schemas / excluded_schemas in query params
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
     },
     headers: Object.fromEntries(headers),
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

@@ -1,0 +1,59 @@
+{
+  "name": "password-based-auth-react-router",
+  "type": "registry:block",
+  "title": "Password Based Auth flow for React Router and Supabase",
+  "description": "Password Based Auth flow for React Router and Supabase",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "dependencies": [
+    "@supabase/ssr@latest",
+    "@react-router/dev@latest",
+    "@react-router/fs-routes@latest"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/auth.confirm.tsx",
+      "type": "registry:file",
+      "target": "app/routes/auth.confirm.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/auth.error.tsx",
+      "type": "registry:file",
+      "target": "app/routes/auth.error.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx",
+      "type": "registry:file",
+      "target": "app/routes/forgot-password.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/login.tsx",
+      "type": "registry:file",
+      "target": "app/routes/login.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/logout.tsx",
+      "type": "registry:file",
+      "target": "app/routes/logout.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/protected.tsx",
+      "type": "registry:file",
+      "target": "app/routes/protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx",
+      "type": "registry:file",
+      "target": "app/routes/sign-up.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx",
+      "type": "registry:file",
+      "target": "app/routes/update-password.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes.ts",
+      "type": "registry:file",
+      "target": "app/routes.ts"
+    }
+  ]
+}

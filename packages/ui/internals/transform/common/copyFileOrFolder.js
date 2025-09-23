@@ -12,5 +12,5 @@ module.exports = {
       console.log(`Cleaning ${destination}`)
       fs.removeSync(destination)
     })
-  }
+  },
 }

@@ -7,8 +7,7 @@ You can add a global cache to your database for fast access to your data, global
 ## Setup
 1. Rename `.env.example` to `.env`
 2. Insert Supabase database connection string for `DATABASE_URL` in `.env` file
-3. (Optional) Create PolyScale cache - see [instructions](https://supabase.com/partners/integrations/polyscale) for adding a PolyScale cache.
-4. Replace `DATABASE_URL` with PolyScale connection string.
+3. Replace `DATABASE_URL` with PolyScale connection string.
 
 ## Deploy
 

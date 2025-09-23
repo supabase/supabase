@@ -132,8 +132,7 @@ button.graphiql-tab-add > svg {
 
 /* The query editor and the toolbar */
 .graphiql-container .graphiql-query-editor {
-  border-bottom: 1px solid
-    hsla(var(--color-neutral), var(--alpha-background-heavy));
+  border-bottom: 1px solid hsla(var(--color-neutral), var(--alpha-background-heavy));
   padding: var(--px-16);
   column-gap: var(--px-16);
   display: flex;
@@ -175,9 +174,7 @@ button.graphiql-tab-add > svg {
 }
 
 /* The tab buttons to switch between editor tools */
-.graphiql-container
-  .graphiql-editor-tools
-  > button:not(.graphiql-toggle-editor-tools) {
+.graphiql-container .graphiql-editor-tools > button:not(.graphiql-toggle-editor-tools) {
   padding: var(--px-8) var(--px-12);
 }
 
@@ -219,14 +216,12 @@ button.graphiql-tab-add > svg {
 
 /* The footer below the response view */
 .graphiql-container .graphiql-footer {
-  border-top: 1px solid
-    hsla(var(--color-neutral), var(--alpha-background-heavy));
+  border-top: 1px solid hsla(var(--color-neutral), var(--alpha-background-heavy));
 }
 
 /* The plugin container */
 .graphiql-container .graphiql-plugin {
-  border-left: 1px solid
-    hsla(var(--color-neutral), var(--alpha-background-heavy));
+  border-left: 1px solid hsla(var(--color-neutral), var(--alpha-background-heavy));
   flex: 1;
   overflow-y: auto;
   padding: var(--px-16);
@@ -239,8 +234,7 @@ button.graphiql-tab-add > svg {
 }
 
 .graphiql-horizontal-drag-bar:hover::after {
-  border: var(--px-2) solid
-    hsla(var(--color-neutral), var(--alpha-background-heavy));
+  border: var(--px-2) solid hsla(var(--color-neutral), var(--alpha-background-heavy));
   border-radius: var(--border-radius-2);
   content: '';
   display: block;
@@ -292,8 +286,7 @@ button.graphiql-tab-add > svg {
 /* A section inside the settings dialog */
 .graphiql-dialog .graphiql-dialog-section {
   align-items: center;
-  border-top: 1px solid
-    hsla(var(--color-neutral), var(--alpha-background-heavy));
+  border-top: 1px solid hsla(var(--color-neutral), var(--alpha-background-heavy));
   display: flex;
   justify-content: space-between;
   padding: var(--px-24);

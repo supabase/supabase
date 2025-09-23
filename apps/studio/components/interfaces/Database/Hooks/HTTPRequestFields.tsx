@@ -1,22 +1,21 @@
-import clsx from 'clsx'
+import { ChevronDown, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common/hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconPlus,
-  IconTrash,
   Input,
   Listbox,
   SidePanel,
@@ -28,7 +27,7 @@ interface HTTPRequestFieldsProps {
   errors: any
   httpHeaders: HTTPArgument[]
   httpParameters: HTTPArgument[]
-  onAddHeader: (header?: any) => void
+  onAddHeaders: (headers?: any[]) => void
   onUpdateHeader: (idx: number, property: string, value: string) => void
   onRemoveHeader: (idx: number) => void
   onAddParameter: () => void
@@ -41,23 +40,22 @@ const HTTPRequestFields = ({
   errors,
   httpHeaders = [],
   httpParameters = [],
-  onAddHeader,
+  onAddHeaders,
   onUpdateHeader,
   onRemoveHeader,
   onAddParameter,
   onUpdateParameter,
   onRemoveParameter,
 }: HTTPRequestFieldsProps) => {
-  const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
-  const { data: settings } = useProjectApiQuery({ projectRef: ref })
+  const { data: selectedProject } = useSelectedProjectQuery()
+
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
 
   const edgeFunctions = functions ?? []
-  const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
-    ? apiService.serviceApiKey
-    : '[YOUR API KEY]'
+  const { serviceKey, secretKey } = getKeys(apiKeys)
+  const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (
     <>
@@ -67,8 +65,8 @@ const HTTPRequestFields = ({
             {type === 'http_request'
               ? 'HTTP Request'
               : type === 'supabase_function'
-              ? 'Edge Function'
-              : ''}
+                ? 'Edge Function'
+                : ''}
           </FormSectionLabel>
         }
       >
@@ -104,7 +102,7 @@ const HTTPRequestFields = ({
             <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
               {edgeFunctions.map((fn) => {
                 const restUrl = selectedProject?.restUrl
-                const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+                const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
                 const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
 
                 return (
@@ -119,7 +117,7 @@ const HTTPRequestFields = ({
             id="timeout_ms"
             name="timeout_ms"
             label="Timeout"
-            labelOptional="Between 1000ms to 5000ms"
+            labelOptional="Between 1000ms to 10,000ms"
             type="number"
             actions={<p className="text-foreground-light pr-2">ms</p>}
           />
@@ -147,12 +145,12 @@ const HTTPRequestFields = ({
                   placeholder="Header value"
                   onChange={(event: any) => onUpdateHeader(idx, 'value', event.target.value)}
                 />
-                <Button
-                  type="default"
-                  size="medium"
-                  icon={<IconTrash size="tiny" />}
-                  className="px-[10px] py-[9px]"
+                <ButtonTooltip
+                  type="text"
+                  icon={<X />}
+                  className="py-4"
                   onClick={() => onRemoveHeader(idx)}
+                  tooltip={{ content: { side: 'bottom', text: 'Remove header' } }}
                 />
               </div>
             ))}
@@ -160,32 +158,39 @@ const HTTPRequestFields = ({
               <Button
                 type="default"
                 size="tiny"
-                icon={<IconPlus />}
-                className={clsx(type === 'supabase_function' && 'rounded-r-none px-3')}
-                onClick={onAddHeader}
+                icon={<Plus />}
+                className={cn(type === 'supabase_function' && 'rounded-r-none px-3')}
+                onClick={() => onAddHeaders()}
               >
                 Add a new header
               </Button>
               {type === 'supabase_function' && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
-                      <IconChevronDown />
-                    </Button>
+                    <Button
+                      type="default"
+                      icon={<ChevronDown />}
+                      className="rounded-l-none px-[4px] py-[5px]"
+                    />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
                     <DropdownMenuItem
                       key="add-auth-header"
-                      onClick={() =>
-                        onAddHeader({
-                          id: uuidv4(),
-                          name: 'Authorization',
-                          value: `Bearer ${anonKey}`,
-                        })
-                      }
+                      onClick={() => {
+                        onAddHeaders([
+                          {
+                            id: uuidv4(),
+                            name: 'Authorization',
+                            value: `Bearer ${apiKey}`,
+                          },
+                          ...(serviceKey?.type === 'secret'
+                            ? [{ id: uuidv4(), name: 'apikey', value: apiKey }]
+                            : []),
+                        ])
+                      }}
                     >
                       <div className="space-y-1">
-                        <p className="block text-foreground">Add auth header with service key</p>
+                        <p className="block text-foreground">Add auth header with secret key</p>
                         <p className="text-foreground-light">
                           Required if your edge function enforces JWT verification
                         </p>
@@ -195,11 +200,13 @@ const HTTPRequestFields = ({
                     <DropdownMenuItem
                       key="add-source-header"
                       onClick={() =>
-                        onAddHeader({
-                          id: uuidv4(),
-                          name: 'x-supabase-webhook-source',
-                          value: `[Use a secret value]`,
-                        })
+                        onAddHeaders([
+                          {
+                            id: uuidv4(),
+                            name: 'x-supabase-webhook-source',
+                            value: `[Use a secret value]`,
+                          },
+                        ])
                       }
                     >
                       <div className="space-y-1">
@@ -238,17 +245,17 @@ const HTTPRequestFields = ({
                   placeholder="Parameter value"
                   onChange={(event: any) => onUpdateParameter(idx, 'value', event.target.value)}
                 />
-                <Button
-                  type="default"
-                  size="medium"
-                  icon={<IconTrash size="tiny" />}
-                  className="px-[10px] py-[9px]"
+                <ButtonTooltip
+                  type="text"
+                  className="py-4"
+                  icon={<X />}
                   onClick={() => onRemoveParameter(idx)}
+                  tooltip={{ content: { side: 'bottom', text: 'Remove parameter' } }}
                 />
               </div>
             ))}
             <div>
-              <Button type="default" size="tiny" icon={<IconPlus />} onClick={onAddParameter}>
+              <Button type="default" size="tiny" icon={<Plus />} onClick={onAddParameter}>
                 Add a new parameter
               </Button>
             </div>

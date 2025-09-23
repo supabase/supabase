@@ -1,14 +1,14 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import type { XYCoord } from 'dnd-core'
+import { ArrowRight, Key, Link, Lock } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
+
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { XYCoord } from 'dnd-core'
-import * as React from 'react'
-import { useDrag, useDrop } from 'react-dnd'
-import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
-import { useDispatch, useTrackedState } from '../../store'
-import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
-import { useEffect } from 'react'
 
 export function ColumnHeader<R>({
   column,
@@ -18,23 +18,19 @@ export function ColumnHeader<R>({
   format,
   foreignKey,
 }: ColumnHeaderProps<R>) {
-  const ref = React.useRef<HTMLDivElement>(null)
-  const dispatch = useDispatch()
+  const ref = useRef<HTMLDivElement>(null)
   const columnIdx = column.idx
   const columnKey = column.key
   const columnFormat = getColumnFormat(columnType, format)
-  const state = useTrackedState()
+  const snap = useTableEditorTableStateSnapshot()
   const hoverValue = column.name as string
 
-  // keep state.gridColumns' order in sync with data grid component
+  // keep snap.gridColumns' order in sync with data grid component
   useEffect(() => {
-    if (state.gridColumns[columnIdx].key != columnKey) {
-      dispatch({
-        type: 'UPDATE_COLUMN_IDX',
-        payload: { columnKey, columnIdx },
-      })
+    if (snap.gridColumns[columnIdx].key != columnKey) {
+      snap.updateColumnIdx(columnKey, columnIdx)
     }
-  }, [columnKey, columnIdx, state.gridColumns])
+  }, [columnKey, columnIdx, snap.gridColumns])
 
   const [{ isDragging }, drag] = useDrag({
     type: 'column-header',
@@ -98,7 +94,7 @@ export function ColumnHeader<R>({
       }
 
       // Time to actually perform the action
-      moveColumn(dragKey, hoverKey)
+      snap.moveColumn(dragKey, hoverKey)
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
@@ -107,14 +103,6 @@ export function ColumnHeader<R>({
       ;(item as DragItem).index = hoverIndex
     },
   })
-
-  const moveColumn = (fromKey: string, toKey: string) => {
-    if (fromKey == toKey) return
-    dispatch({
-      type: 'MOVE_COLUMN',
-      payload: { fromKey, toKey },
-    })
-  }
 
   const opacity = isDragging ? 0 : 1
   const cursor = column.frozen ? 'sb-grid-column-header--cursor' : ''
@@ -126,50 +114,33 @@ export function ColumnHeader<R>({
         <div className="sb-grid-column-header__inner">
           {renderColumnIcon(columnType, { name: column.name as string, foreignKey })}
           {isPrimaryKey && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+            <Tooltip>
+              <TooltipTrigger>
                 <div className="sb-grid-column-header__inner__primary-key">
-                  <IconKey size="tiny" strokeWidth={2} />
+                  <Key size={14} strokeWidth={2} />
                 </div>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">Primary key</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
+                Primary key
+              </TooltipContent>
+            </Tooltip>
           )}
           <span className="sb-grid-column-header__inner__name" title={hoverValue}>
             {column.name}
           </span>
-          <span className="sb-grid-column-header__inner__format">{columnFormat}</span>
+          <span className="sb-grid-column-header__inner__format">
+            {columnFormat}
+            {columnFormat === 'bytea' ? ` (hex)` : ''}
+          </span>
           {isEncrypted && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <IconLock size="tiny" strokeWidth={2} />
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">Encrypted column</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+            <Tooltip>
+              <TooltipTrigger>
+                <Lock size={14} strokeWidth={2} />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
+                Encrypted column
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
         <ColumnMenu column={column} isEncrypted={isEncrypted} />
@@ -185,40 +156,36 @@ function renderColumnIcon(
   const { name, foreignKey } = columnMeta
   switch (type) {
     case 'foreign_key':
+      // [Joshen] Look into this separately but this should be a hover card instead
       return (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <IconLink size="tiny" strokeWidth={2} />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <div>
-                  <p className="text-xs text-foreground-light">Foreign key relation:</p>
-                  <div className="flex items-center space-x-1">
-                    <p className="text-xs text-foreground">{name}</p>
-                    <IconArrowRight size="tiny" strokeWidth={1.5} />
-                    <p className="text-xs text-foreground">
-                      {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
-                      {foreignKey?.targetColumnName}
-                    </p>
-                  </div>
-                  {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
-                    <p className="text-xs text-foreground mt-1">
-                      On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
-                    </p>
-                  )}
-                </div>
+        <Tooltip>
+          <TooltipTrigger>
+            <Link size={14} strokeWidth={2} />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <div className="font-normal">
+              <p className="text-xs text-foreground-light">Foreign key relation:</p>
+              <div className="flex items-center space-x-1">
+                <p className="text-xs !text-foreground">{name}</p>
+                <ArrowRight size={14} strokeWidth={1.5} className="!text-foreground-light" />
+                <p className="text-xs !text-foreground">
+                  {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
+                  {foreignKey?.targetColumnName}
+                </p>
               </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+              {foreignKey?.updateAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+                <p className="text-xs !text-foreground mt-1">
+                  On update: {getForeignKeyCascadeAction(foreignKey?.updateAction)}
+                </p>
+              )}
+              {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+                <p className="text-xs !text-foreground mt-1">
+                  On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
+                </p>
+              )}
+            </div>
+          </TooltipContent>
+        </Tooltip>
       )
     default:
       return null

@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { ExternalLink } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 
@@ -8,16 +9,16 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import classNames from 'classnames'
+import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { useTheme } from 'next-themes'
-import classNames from 'classnames'
+import { Accordion, Badge } from 'ui'
 import { SITE_ORIGIN } from '~/lib/constants'
-import { Accordion, Badge, IconExternalLink } from 'ui'
-import { WeekDayProps } from './types6'
+import type { WeekDayProps } from '~/types/launch-week-6'
 
-import styleUtils from './styles/utils6.module.css'
 import styles from './styles/launchWeek6.module.css'
+import styleUtils from './styles/utils6.module.css'
 
 const days = _days as WeekDayProps[]
 const constellation = [
@@ -247,12 +248,7 @@ export default function launchweek() {
           <div className="border border-[#2E2E2E] rounded-2xl text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
             <div className="relative flex items-center mb-4 sm:mb-0">
               <div className="flex min-w-[150px]">
-                <img
-                  // src={`/images/launchweek/${isDarkMode ? 'outro.svg' : 'outro-light.svg'}`}
-                  src={`/images/launchweek/outro.svg`}
-                  width={110}
-                  height={80}
-                ></img>
+                <img src={`/images/launchweek/outro.svg`} width={110} height={80}></img>
               </div>
               <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                 <span className="text-white mr-2">Wrap Up</span>
@@ -930,7 +926,7 @@ export default function launchweek() {
                     className="text-brand flex items-center"
                     target="_blank"
                   >
-                    Join our Discord <IconExternalLink size="small" className="inline-block ml-2" />
+                    Join our Discord <ExternalLink size="small" className="inline-block ml-2" />
                   </a>
                 </div>
               </div>
@@ -982,7 +978,7 @@ export default function launchweek() {
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
-                  ></img>
+                  />
                   <h3 className="text-white">Super UI</h3>
                   <p className="text-slate-1000 text-xs">Previous Best Overall Project Runner Up</p>
                 </div>
@@ -1071,24 +1067,21 @@ export default function launchweek() {
             })}
           </div>
           <div className="flex-1">
-            <Badge
-              className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#DFFFF1] !border-[#DFFFF1] h-fit relative mb-4 ${
-                true
-                  ? 'after:absolute after:rounded-full after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br  text-transparent !border-[#163837] after:from-[#14292c] after:to-[#141516] after:border-[#1f3536] after:-z-10'
-                  : ''
-              }`}
-            >
+            <Badge className="!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#DFFFF1] h-fit relative mb-4 after:absolute after:rounded-full after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br !border-[#163837] after:from-[#14292c] after:to-[#141516] after:border-[#1f3536] after:-z-10">
               Shipped
             </Badge>
             <h2 className="text-3xl text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
               We worked with more than 30 content creators from around the world to drop a mountain
               of content simultaneously!
-              <a rel="noopener" target="_blank" href="/blog/the-supabase-content-storm">
-                <div className="text-brand flex items-center mt-2">
-                  See all the content
-                  <IconExternalLink size="small" className="inline-block ml-1" />
-                </div>
+              <a
+                rel="noopener"
+                target="_blank"
+                href="/blog/the-supabase-content-storm"
+                className="text-brand flex items-center mt-2"
+              >
+                See all the content
+                <ExternalLink size="small" className="inline-block ml-1" />
               </a>
             </p>
             {activeCreator !== null && (
@@ -1105,7 +1098,7 @@ export default function launchweek() {
                   <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
                     <span>
                       {creators[activeCreator].link_title}
-                      <IconExternalLink size="small" className="inline-block ml-2" />
+                      <ExternalLink size="small" className="inline-block ml-2" />
                     </span>
                   </a>
                 </p>

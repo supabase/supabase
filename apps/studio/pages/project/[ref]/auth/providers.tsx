@@ -1,28 +1,26 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AuthProvidersForm } from 'components/interfaces/Auth/AuthProvidersForm/AuthProvidersForm'
+import { BasicAuthSettingsForm } from 'components/interfaces/Auth/BasicAuthSettingsForm/BasicAuthSettingsForm'
+import { AuthProvidersLayout } from 'components/layouts/AuthLayout/AuthProvidersLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from 'types'
 
-import { AuthProvidersForm } from 'components/interfaces'
-import { AuthLayout } from 'components/layouts'
-import { FormsContainer } from 'components/ui/Forms'
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
-import { NextPageWithLayout } from 'types'
+const ProvidersPage: NextPageWithLayout = () => {
+  const showProviders = useIsFeatureEnabled('authentication:show_providers')
 
-const PageLayout: NextPageWithLayout = () => {
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-
-  if (!canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
-  } else {
-    return (
-      <FormsContainer>
-        <AuthProvidersForm />
-      </FormsContainer>
-    )
-  }
+  return (
+    <ScaffoldContainer>
+      <BasicAuthSettingsForm />
+      {showProviders && <AuthProvidersForm />}
+    </ScaffoldContainer>
+  )
 }
 
-PageLayout.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
-}
+ProvidersPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthProvidersLayout>{page}</AuthProvidersLayout>
+  </DefaultLayout>
+)
 
-export default PageLayout
+export default ProvidersPage

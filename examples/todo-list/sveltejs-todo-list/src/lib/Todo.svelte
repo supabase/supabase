@@ -25,7 +25,7 @@
 </script>
 
 <li
-  class="w-full block cursor-pointer hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition duration-150 ease-in-out"
+  class="w-full block cursor-pointer hover:bg-200 focus:outline-none focus:bg-200 transition duration-150 ease-in-out"
 >
   <div class="flex items-center px-4 py-4 sm:px-6">
     <div class="min-w-0 flex-1 flex items-center">

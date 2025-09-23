@@ -1,47 +1,40 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { PostgresRole } from '@supabase/postgres-meta'
+import pgMeta from '@supabase/pg-meta'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { z } from 'zod'
 
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { databaseRolesKeys } from './keys'
+import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { databaseRoleKeys } from './keys'
 
 export type DatabaseRolesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
+
+export type PgRole = z.infer<typeof pgMeta.roles.zod>
+
+const pgMetaRolesList = pgMeta.roles.list()
 
 export async function getDatabaseRoles(
   { projectRef, connectionString }: DatabaseRolesVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) throw new Error('projectRef is required')
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql: pgMetaRolesList.sql, queryKey: ['database-roles'] },
+    signal
+  )
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/roles', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-    },
-    headers,
-    signal,
-  })
-
-  if (error) throw error
-  return data as PostgresRole[]
+  return result as PgRole[]
 }
 
-export type DatabaseRolesData = Awaited<ReturnType<typeof getDatabaseRoles>>
-export type DatabaseRolesError = ResponseError
+export type DatabaseRolesData = z.infer<typeof pgMetaRolesList.zod>
+export type DatabaseRolesError = ExecuteSqlError
 
 export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
   { projectRef, connectionString }: DatabaseRolesVariables,
   { enabled = true, ...options }: UseQueryOptions<DatabaseRolesData, DatabaseRolesError, TData> = {}
 ) =>
   useQuery<DatabaseRolesData, DatabaseRolesError, TData>(
-    databaseRolesKeys.list(projectRef),
+    databaseRoleKeys.databaseRoles(projectRef),
     ({ signal }) => getDatabaseRoles({ projectRef, connectionString }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
@@ -49,14 +42,6 @@ export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
     }
   )
 
-export const useDatabaseRolesPrefetch = ({ projectRef }: DatabaseRolesVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseRolesKeys.list(projectRef), ({ signal }) =>
-        getDatabaseRoles({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
+export function invalidateRolesQuery(client: QueryClient, projectRef: string | undefined) {
+  return client.invalidateQueries(databaseRoleKeys.databaseRoles(projectRef))
 }

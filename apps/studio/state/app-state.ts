@@ -1,26 +1,25 @@
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
-const EMPTY_DASHBOARD_HISTORY: {
-  sql?: string
-  editor?: string
-} = {
-  sql: undefined,
-  editor: undefined,
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+
+const getInitialState = () => {
+  return {
+    activeDocsSection: ['introduction'],
+    docsLanguage: 'js',
+    showProjectApiDocs: false,
+    showCreateBranchModal: false,
+    showAiSettingsModal: false,
+    showConnectDialog: false,
+    ongoingQueriesPanelOpen: false,
+    mobileMenuOpen: false,
+    showSidebar: true,
+    showEditorPanel: false,
+    lastRouteBeforeVisitingAccountPage: '',
+  }
 }
 
 export const appState = proxy({
-  // [Joshen] Last visited "entity" for any page that we wanna track
-  dashboardHistory: EMPTY_DASHBOARD_HISTORY,
-  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string) => {
-    if (appState.dashboardHistory[key] !== id) {
-      appState.dashboardHistory[key] = id
-      localStorage.setItem(
-        LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref),
-        JSON.stringify(appState.dashboardHistory)
-      )
-    }
-  },
+  ...getInitialState(),
 
   activeDocsSection: ['introduction'],
   docsLanguage: 'js' as 'js' | 'bash',
@@ -36,23 +35,46 @@ export const appState = proxy({
   },
 
   isOptedInTelemetry: false,
-  setIsOptedInTelemetry: (value: boolean) => {
-    appState.isOptedInTelemetry = value
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+  setIsOptedInTelemetry: (value: boolean | null) => {
+    appState.isOptedInTelemetry = value === null ? false : value
+    if (typeof window !== 'undefined' && value !== null) {
+      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
   },
-  showEnableBranchingModal: false,
-  setShowEnableBranchingModal: (value: boolean) => {
-    appState.showEnableBranchingModal = value
+
+  isMfaEnforced: false,
+  setIsMfaEnforced: (value: boolean) => {
+    appState.isMfaEnforced = value
   },
-  showFeaturePreviewModal: false,
-  setShowFeaturePreviewModal: (value: boolean) => {
-    appState.showFeaturePreviewModal = value
+
+  showCreateBranchModal: false,
+  setShowCreateBranchModal: (value: boolean) => {
+    appState.showCreateBranchModal = value
   },
+
   showAiSettingsModal: false,
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
+  },
+
+  showSidebar: true,
+  setShowSidebar: (value: boolean) => {
+    appState.showSidebar = value
+  },
+
+  showOngoingQueriesPanelOpen: false,
+  setOnGoingQueriesPanelOpen: (value: boolean) => {
+    appState.ongoingQueriesPanelOpen = value
+  },
+
+  mobileMenuOpen: false,
+  setMobileMenuOpen: (value: boolean) => {
+    appState.mobileMenuOpen = value
+  },
+
+  lastRouteBeforeVisitingAccountPage: '',
+  setLastRouteBeforeVisitingAccountPage: (value: string) => {
+    appState.lastRouteBeforeVisitingAccountPage = value
   },
 })
 

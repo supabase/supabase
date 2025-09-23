@@ -1,11 +1,12 @@
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { IconChevronUp, cn } from 'ui'
+import { ChevronUp } from 'lucide-react'
+import { cn } from 'ui'
 
 export interface RoleRowSkeletonProps {
   index?: number
 }
 
-const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
+export const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
   return (
     <div
       className={cn([
@@ -22,7 +23,7 @@ const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
     >
       <div className="flex w-full items-center justify-between rounded py-3 px-6 text-foreground">
         <div className="flex items-start space-x-3">
-          <IconChevronUp
+          <ChevronUp
             id="collapsible-trigger"
             className="text-border-stronger rotate-180"
             strokeWidth={2}
@@ -39,5 +40,3 @@ const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
     </div>
   )
 }
-
-export default RoleRowSkeleton

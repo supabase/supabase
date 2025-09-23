@@ -1,0 +1,313 @@
+---
+id: 'resumable-uploads'
+title: 'Resumable Uploads'
+description: 'Learn how to upload files to Supabase Storage.'
+subtitle: 'Learn how to upload files to Supabase Storage.'
+sidebar_label: 'Uploads'
+---
+
+The resumable upload method is recommended when:
+
+- Uploading large files that may exceed 6MB in size
+- Network stability is a concern
+- You want to have progress events for your uploads
+
+Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the [`tus-js-client`](https://github.com/tus/tus-js-client) library, or other client-side libraries like [Uppy](https://uppy.io/docs/tus/) that support the TUS protocol.
+
+<Admonition type="note">
+
+For optimal performance when uploading large files you should always use the direct storage hostname. This provides several performance enhancements that will greatly improve performance when uploading large files.
+
+Instead of `https://project-id.supabase.co` use `https://project-id.storage.supabase.co`
+
+</Admonition>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+
+    Here's an example of how to upload a file using `tus-js-client`:
+
+    ```javascript
+    const tus = require('tus-js-client')
+
+    const projectId = ''
+
+    async function uploadFile(bucketName, fileName, file) {
+        const { data: { session } } = await supabase.auth.getSession()
+
+        return new Promise((resolve, reject) => {
+            var upload = new tus.Upload(file, {
+                // Supabase TUS endpoint (with direct storage hostname)
+                endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
+                retryDelays: [0, 3000, 5000, 10000, 20000],
+                headers: {
+                    authorization: `Bearer ${session.access_token}`,
+                    'x-upsert': 'true', // optionally set upsert to true to overwrite existing files
+                },
+                uploadDataDuringCreation: true,
+                removeFingerprintOnSuccess: true, // Important if you want to allow re-uploading the same file https://github.com/tus/tus-js-client/blob/main/docs/api.md#removefingerprintonsuccess
+                metadata: {
+                    bucketName: bucketName,
+                    objectName: fileName,
+                    contentType: 'image/png',
+                    cacheControl: 3600,
+                    metadata: JSON.stringify({ // custom metadata passed to the user_metadata column
+                       yourCustomMetadata: true,
+                    }),
+                },
+                chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB (for now) do not change it
+                onError: function (error) {
+                    console.log('Failed because: ' + error)
+                    reject(error)
+                },
+                onProgress: function (bytesUploaded, bytesTotal) {
+                    var percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2)
+                    console.log(bytesUploaded, bytesTotal, percentage + '%')
+                },
+                onSuccess: function () {
+                    console.log('Download %s from %s', upload.file.name, upload.url)
+                    resolve()
+                },
+            })
+
+
+            // Check if there are any previous uploads to continue.
+            return upload.findPreviousUploads().then(function (previousUploads) {
+                // Found previous uploads so we select the first one.
+                if (previousUploads.length) {
+                    upload.resumeFromPreviousUpload(previousUploads[0])
+                }
+
+                // Start the upload
+                upload.start()
+            })
+        })
+    }
+    ```
+
+  </TabPanel>
+  <TabPanel id="react" label="React">
+
+    Here's an example of how to upload a file using `@uppy/tus` with react:
+
+    ```javascript
+    import { useEffect, useState } from "react";
+    import { createClient } from "@supabase/supabase-js";
+    import Uppy from "@uppy/core";
+    import Tus from "@uppy/tus";
+    import Dashboard from "@uppy/dashboard";
+    import "@uppy/core/dist/style.min.css";
+    import "@uppy/dashboard/dist/style.min.css";
+
+    function App() {
+        // Initialize Uppy instance with the 'sample' bucket specified for uploads
+        const uppy = useUppyWithSupabase({ bucketName: "sample" });
+
+        useEffect(() => {
+            // Set up Uppy Dashboard to display as an inline component within a specified target
+            uppy.use(Dashboard, {
+                inline: true, // Ensures the dashboard is rendered inline
+                target: "#drag-drop-area", // HTML element where the dashboard renders
+                showProgressDetails: true, // Show progress details for file uploads
+            });
+        }, []);
+
+        return (
+            <div id="drag-drop-area">
+            </div>
+            {/* Target element for the Uppy Dashboard */}
+        );
+    }
+
+    export default App;
+
+    /**
+     * Custom hook for configuring Uppy with Supabase authentication and TUS resumable uploads
+     * @param {Object} options - Configuration options for the Uppy instance.
+     * @param {string} options.bucketName - The bucket name in Supabase where files are stored.
+     * @returns {Object} uppy - Uppy instance with configured upload settings.
+     */
+    export const useUppyWithSupabase = ({ bucketName }: { bucketName: string }) => {
+        // Initialize Uppy instance only once
+        const [uppy] = useState(() => new Uppy());
+        // Initialize Supabase client with project URL and anon key
+        const supabase = createClient(`https://${projectId}.supabase.co`, anonKey);
+
+        useEffect(() => {
+            const initializeUppy = async () => {
+            // Retrieve the current user's session for authentication
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            uppy.use(Tus, {
+                    // Supabase TUS endpoint (with direct storage hostname)
+                    endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
+                    retryDelays: [0, 3000, 5000, 10000, 20000], // Retry delays for resumable uploads
+                    headers: {
+                        authorization: `Bearer ${session?.access_token}`, // User session access token
+                        apikey: anonKey, // API key for Supabase
+                    },
+                    uploadDataDuringCreation: true, // Send metadata with file chunks
+                    removeFingerprintOnSuccess: true, // Remove fingerprint after successful upload
+                    chunkSize: 6 * 1024 * 1024, // Chunk size for TUS uploads (6MB)
+                    allowedMetaFields: [
+                        "bucketName",
+                        "objectName",
+                        "contentType",
+                        "cacheControl",
+                        "metadata",
+                    ], // Metadata fields allowed for the upload
+                    onError: (error) => console.error("Upload error:", error), // Error handling for uploads
+                }).on("file-added", (file) => {
+                    // Attach metadata to each file, including bucket name and content type
+                    file.meta = {
+                        ...file.meta,
+                        bucketName, // Bucket specified by the user of the hook
+                        objectName: file.name, // Use file name as object name
+                        contentType: file.type, // Set content type based on file MIME type
+                        metadata: JSON.stringify({ // custom metadata passed to the user_metadata column
+                            yourCustomMetadata: true,
+                        }),
+                    };
+                });
+            };
+
+            // Initialize Uppy with Supabase settings
+            initializeUppy();
+        }, [uppy, bucketName]);
+
+        // Return the configured Uppy instance
+        return uppy;
+    };
+
+    ```
+
+  </TabPanel>
+
+<$Show if="sdk:kotlin">
+
+  <TabPanel id="kotlin" label="Kotlin">
+
+    Kotlin supports resumable uploads natively for all targets:
+
+    ```kotlin
+    suspend fun uploadFile(file: File) {
+        val upload: ResumableUpload = supabase.storage.from("bucket_name")
+            .resumable.createOrContinueUpload("file_path", file)
+        upload.stateFlow
+            .onEach {
+                println(it.progress)
+            }
+            .launchIn(yourCoroutineScope)
+        upload.startOrResumeUploading()
+    }
+
+    // On other platforms you might have to give the bytes directly and specify a source if you want to continue it later:
+    suspend fun uploadData(bytes: ByteArray) {
+        val upload: ResumableUpload = supabase.storage.from("bucket_name")
+            .resumable.createOrContinueUpload(bytes, "source", "file_path")
+
+        upload.stateFlow
+            .onEach {
+                println(it.progress)
+            }
+            .launchIn(yourCoroutineScope)
+        upload.startOrResumeUploading()
+    }
+    ```
+
+  </TabPanel>
+  </$Show>
+
+<$Show if="sdk:python">
+
+  <TabPanel id="py" label="Python">
+
+    Here's an example of how to upload a file using [`tus-py-client`](https://github.com/tus/tus-py-client):
+
+    ```python
+    from io import BufferedReader
+    from tusclient import client
+    from supabase import create_client
+
+    def upload_file(
+        bucket_name: str, file_name: str, file: BufferedReader, access_token: str
+    ):
+        # create Tus client
+        my_client = client.TusClient(
+            f"{supabase_url}/storage/v1/upload/resumable",
+            headers={"Authorization": f"Bearer {access_token}", "x-upsert": "true"},
+        )
+        uploader = my_client.uploader(
+            file_stream=file,
+            chunk_size=(6 * 1024 * 1024),
+            metadata={
+                "bucketName": bucket_name,
+                "objectName": file_name,
+                "contentType": "image/png",
+                "cacheControl": "3600",
+            },
+        )
+        uploader.upload()
+
+    # create client and sign in
+    supabase = create_client(supabase_url, supabase_key)
+
+    # retrieve the current user's session for authentication
+    session = supabase.auth.get_session()
+
+    # open file and send file stream to upload
+    with open("./assets/40mb.jpg", "rb") as fs:
+        upload_file(
+            bucket_name="assets",
+            file_name="large_file",
+            file=fs,
+            access_token=session.access_token,
+        )
+    ```
+
+  </TabPanel>
+  </$Show>
+</Tabs>
+
+### Upload URL
+
+When uploading using the resumable upload endpoint, the storage server creates a unique URL for each upload, even for multiple uploads to the same path. All chunks will be uploaded to this URL using the `PATCH` method.
+
+This unique upload URL will be valid for **up to 24 hours**. If the upload is not completed within 24 hours, the URL will expire and you'll need to start the upload again. TUS client libraries typically create a new URL if the previous one expires.
+
+### Concurrency
+
+When two or more clients upload to the same upload URL only one of them will succeed. The other clients will receive a `409 Conflict` error. Only 1 client can upload to the same upload URL at a time which prevents data corruption.
+
+When two or more clients upload a file to the same path using different upload URLs, the first client to complete the upload will succeed and the other clients will receive a `409 Conflict` error.
+
+If you provide the `x-upsert` header the last client to complete the upload will succeed instead.
+
+### Uppy example
+
+You can check a [full example using Uppy](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy).
+
+Uppy has integrations with different frameworks:
+
+- [React](https://uppy.io/docs/react/)
+- [Svelte](https://uppy.io/docs/svelte/)
+- [Vue](https://uppy.io/docs/vue/)
+- [Angular](https://uppy.io/docs/angular/)
+
+## Overwriting files
+
+When uploading a file to a path that already exists, the default behavior is to return a `400 Asset Already Exists` error.
+If you want to overwrite a file on a specific path you can set the `x-upsert` header to `true`.
+
+We do advise against overwriting files when possible, as the CDN will take some time to propagate the changes to all the edge nodes leading to stale content.
+Uploading a file to a new path is the recommended way to avoid propagation delays and stale content.
+
+To learn more, see the [CDN](/docs/guides/storage/cdn/fundamentals) guide.

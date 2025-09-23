@@ -1,226 +1,141 @@
-import { observer } from 'mobx-react-lite'
-import { NextPageWithLayout } from 'types'
-import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
-import { ReportsLayout } from 'components/layouts'
-import {
-  PRESET_CONFIG,
-  REPORTS_DATEPICKER_HELPERS,
-} from 'components/interfaces/Reports/Reports.constants'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import {
-  TotalRequestsChartRenderer,
   ErrorCountsChartRenderer,
+  NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
-  NetworkTrafficRenderer,
+  TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import { useState, useEffect } from 'react'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import { useParams } from 'common'
-import { isEqual } from 'lodash'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
+import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { useApiReport } from 'data/reports/api-report-query'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { NextPageWithLayout } from 'types'
 
 export const ApiReport: NextPageWithLayout = () => {
-  const organization = useSelectedOrganization()
   const report = useApiReport()
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan
+  const {
+    data,
+    error,
+    filters,
+    isLoading,
+    params,
+    mergeParams,
+    removeFilters,
+    addFilter,
+    refresh,
+  } = report
 
-  const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
-    report.mergeParams({
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
-    })
+  const {
+    datePickerHelpers,
+    datePickerValue,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
+  const handleDatepickerChange = (vals: DatePickerValue) => {
+    const promptShown = handleDatePickerChangeFromHook(vals)
+    if (!promptShown) {
+      mergeParams({
+        iso_timestamp_start: vals.from || '',
+        iso_timestamp_end: vals.to || '',
+      })
+    }
   }
 
   return (
     <ReportPadding>
-      <ReportHeader title="API" isLoading={report.isLoading} onRefresh={report.refresh} />
-      <div className="w-full flex flex-col gap-1">
-        <ReportFilterBar
-          onRemoveFilters={report.removeFilters}
-          onDatepickerChange={handleDatepickerChange}
-          datepickerFrom={report.params.totalRequests.iso_timestamp_start}
-          datepickerTo={report.params.totalRequests.iso_timestamp_end}
-          onAddFilter={report.addFilter}
-          filters={report.filters}
-          datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-            ...helper,
-            disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
-          }))}
+      <ReportHeader title="API Gateway" showDatabaseSelector={false} />
+      <ReportStickyNav
+        content={
+          <div className="flex items-center gap-3">
+            <ReportFilterBar
+              onRemoveFilters={removeFilters}
+              onDatepickerChange={handleDatepickerChange}
+              datepickerFrom={params.totalRequests.iso_timestamp_start}
+              datepickerTo={params.totalRequests.iso_timestamp_end}
+              onAddFilter={addFilter}
+              onRefresh={refresh}
+              isLoading={isLoading}
+              filters={filters}
+              datepickerHelpers={datePickerHelpers}
+              initialDatePickerValue={datePickerValue}
+              className="w-full"
+              showDatabaseSelector={false}
+            />
+            <UpgradePrompt
+              show={showUpgradePrompt}
+              setShowUpgradePrompt={setShowUpgradePrompt}
+              title="Report date range"
+              description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+              source="apiReportDateRange"
+            />
+          </div>
+        }
+      >
+        <ReportWidget
+          isLoading={isLoading}
+          params={params.totalRequests}
+          title="Total Requests"
+          data={data.totalRequests || []}
+          error={error.totalRequest}
+          renderer={TotalRequestsChartRenderer}
+          append={TopApiRoutesRenderer}
+          appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
         />
-        <div className="h-2 w-full">
-          <ShimmerLine active={report.isLoading} />
-        </div>
-      </div>
+        <ReportWidget
+          isLoading={isLoading}
+          params={params.errorCounts}
+          title="Response Errors"
+          tooltip="Error responses with 4XX or 5XX status codes"
+          data={data.errorCounts || []}
+          error={error.errorCounts}
+          renderer={ErrorCountsChartRenderer}
+          appendProps={{
+            data: data.topErrorRoutes || [],
+            params: params.topErrorRoutes,
+          }}
+          append={TopApiRoutesRenderer}
+        />
+        <ReportWidget
+          isLoading={isLoading}
+          params={params.responseSpeed}
+          title="Response Speed"
+          tooltip="Average response speed of a request (in ms)"
+          data={data.responseSpeed || []}
+          error={error.responseSpeed}
+          renderer={ResponseSpeedChartRenderer}
+          appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
+          append={TopApiRoutesRenderer}
+        />
 
-      <ReportWidget
-        isLoading={report.isLoading}
-        params={report.params.totalRequests}
-        title="Total Requests"
-        data={report.data.totalRequests || []}
-        renderer={TotalRequestsChartRenderer}
-        append={TopApiRoutesRenderer}
-        appendProps={{ data: report.data.topRoutes || [], params: report.params.topRoutes }}
-      />
-      <ReportWidget
-        isLoading={report.isLoading}
-        params={report.params.errorCounts}
-        title="Response Errors"
-        tooltip="Error responses with 4XX or 5XX status codes"
-        data={report.data.errorCounts || []}
-        renderer={ErrorCountsChartRenderer}
-        appendProps={{
-          data: report.data.topErrorRoutes || [],
-          params: report.params.topErrorRoutes,
-        }}
-        append={TopApiRoutesRenderer}
-      />
-      <ReportWidget
-        isLoading={report.isLoading}
-        params={report.params.responseSpeed}
-        title="Response Speed"
-        tooltip="Average response speed (in miliseconds) of a request"
-        data={report.data.responseSpeed || []}
-        renderer={ResponseSpeedChartRenderer}
-        appendProps={{ data: report.data.topSlowRoutes || [], params: report.params.topSlowRoutes }}
-        append={TopApiRoutesRenderer}
-      />
-
-      <ReportWidget
-        isLoading={report.isLoading}
-        params={report.params.networkTraffic}
-        title="Network Traffic"
-        tooltip="Ingress and egress of requests and responses respectively"
-        data={report.data.networkTraffic || []}
-        renderer={NetworkTrafficRenderer}
-      />
+        <ReportWidget
+          isLoading={isLoading}
+          params={params.networkTraffic}
+          error={error.networkTraffic}
+          title="Network Traffic"
+          tooltip="Ingress and egress of requests and responses respectively"
+          data={data.networkTraffic || []}
+          renderer={NetworkTrafficRenderer}
+        />
+      </ReportStickyNav>
     </ReportPadding>
   )
 }
 
-// hook to fetch data
-const useApiReport = () => {
-  const { ref: projectRef } = useParams()
+ApiReport.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout>{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
-  const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
-    PRESET_CONFIG.api.queries,
-    projectRef ?? 'default'
-  )
-  const totalRequests = queryHooks.totalRequests()
-  const topRoutes = queryHooks.topRoutes()
-  const errorCounts = queryHooks.errorCounts()
-  const topErrorRoutes = queryHooks.topErrorRoutes()
-  const responseSpeed = queryHooks.responseSpeed()
-  const topSlowRoutes = queryHooks.topSlowRoutes()
-  const networkTraffic = queryHooks.networkTraffic()
-  const activeHooks = [
-    totalRequests,
-    topRoutes,
-    errorCounts,
-    topErrorRoutes,
-    responseSpeed,
-    topSlowRoutes,
-    networkTraffic,
-  ]
-  const [filters, setFilters] = useState<ReportFilterItem[]>([])
-  const addFilter = (filter: ReportFilterItem) => {
-    // use a deep equal when comparing objects.
-    if (filters.some((f) => isEqual(f, filter))) return
-    setFilters((prev) =>
-      [...prev, filter].sort((a, b) => {
-        const keyA = a.key.toLowerCase()
-        const keyB = b.key.toLowerCase()
-        if (keyA < keyB) {
-          return -1
-        }
-        if (keyA > keyB) {
-          return 1
-        }
-        return 0
-      })
-    )
-  }
-  const removeFilter = (filter: ReportFilterItem) => removeFilters([filter])
-  const removeFilters = (toRemove: ReportFilterItem[]) => {
-    setFilters((prev) => {
-      return prev.filter((f) => !toRemove.find((r) => isEqual(f, r)))
-    })
-  }
-
-  useEffect(() => {
-    // update sql for each query
-    if (totalRequests.changeQuery) {
-      totalRequests.changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(filters))
-    }
-    if (topRoutes.changeQuery) {
-      topRoutes.changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(filters))
-    }
-    if (errorCounts.changeQuery) {
-      errorCounts.changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
-    }
-
-    if (topErrorRoutes.changeQuery) {
-      topErrorRoutes.changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(filters))
-    }
-    if (responseSpeed.changeQuery) {
-      responseSpeed.changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
-    }
-
-    if (topSlowRoutes.changeQuery) {
-      topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
-    }
-
-    if (networkTraffic.changeQuery) {
-      networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(filters))
-    }
-  }, [JSON.stringify(filters)])
-
-  const handleRefresh = async () => {
-    activeHooks.forEach((hook) => hook.runQuery())
-  }
-  const handleSetParams = (params: Partial<LogsEndpointParams>) => {
-    activeHooks.forEach((hook) => {
-      hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
-    })
-  }
-  const isLoading = activeHooks.some((hook) => hook.isLoading)
-  return {
-    data: {
-      totalRequests: totalRequests.logData,
-      errorCounts: errorCounts.logData,
-      responseSpeed: responseSpeed.logData,
-      topRoutes: topRoutes.logData,
-      topErrorRoutes: topErrorRoutes.logData,
-      topSlowRoutes: topSlowRoutes.logData,
-      networkTraffic: networkTraffic.logData,
-    },
-    params: {
-      totalRequests: totalRequests.params,
-      errorCounts: errorCounts.params,
-      responseSpeed: responseSpeed.params,
-      topRoutes: topRoutes.params,
-      topErrorRoutes: topErrorRoutes.params,
-      topSlowRoutes: topSlowRoutes.params,
-      networkTraffic: networkTraffic.params,
-    },
-    mergeParams: handleSetParams,
-    filters,
-    addFilter,
-    removeFilter,
-    removeFilters,
-    isLoading,
-    refresh: handleRefresh,
-  }
-}
-
-ApiReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
-
-export default observer(ApiReport)
+export default ApiReport

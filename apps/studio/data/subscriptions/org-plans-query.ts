@@ -1,28 +1,23 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+
+import { get, handleError } from 'data/fetchers'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { subscriptionKeys } from './keys'
 
 export type OrgPlansVariables = {
   orgSlug?: string
 }
 
-export type OrgPlansResponse = {
-  id: 'free' | 'pro' | 'team' | 'enterprise'
-  name: string
-  price: number
-  is_current: boolean
-  change_type: 'downgrade' | 'upgrade' | 'none'
-  effective_at: string
-}[]
-
 export async function getOrgPlans({ orgSlug }: OrgPlansVariables, signal?: AbortSignal) {
   if (!orgSlug) throw new Error('orgSlug is required')
 
-  const response = await get(`${API_URL}/organizations/${orgSlug}/billing/plans`, { signal })
-  if (response.error) throw response.error
-
-  return response.plans as OrgPlansResponse
+  const { error, data } = await get('/platform/organizations/{slug}/billing/plans', {
+    params: { path: { slug: orgSlug } },
+    signal,
+  })
+  if (error) handleError(error)
+  return data
 }
 
 export type OrgPlansData = Awaited<ReturnType<typeof getOrgPlans>>
@@ -31,12 +26,18 @@ export type OrgPlansError = unknown
 export const useOrgPlansQuery = <TData = OrgPlansData>(
   { orgSlug }: OrgPlansVariables,
   { enabled = true, ...options }: UseQueryOptions<OrgPlansData, OrgPlansError, TData> = {}
-) =>
-  useQuery<OrgPlansData, OrgPlansError, TData>(
+) => {
+  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+
+  return useQuery<OrgPlansData, OrgPlansError, TData>(
     subscriptionKeys.orgPlans(orgSlug),
     ({ signal }) => getOrgPlans({ orgSlug }, signal),
     {
-      enabled: enabled && typeof orgSlug !== 'undefined',
+      enabled: enabled && typeof orgSlug !== 'undefined' && canReadSubscriptions,
       ...options,
     }
   )
+}

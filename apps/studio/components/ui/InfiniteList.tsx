@@ -1,11 +1,10 @@
-import { CSSProperties, memo } from 'react'
-import memoize from 'memoize-one'
-import { areEqual, VariableSizeList } from 'react-window'
-import AutoSizer from 'react-virtualized-auto-sizer'
-import InfiniteLoader from 'react-window-infinite-loader'
-
 import { propsAreEqual } from 'lib/helpers'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import memoize from 'memoize-one'
+import { CSSProperties, ComponentType, MutableRefObject, ReactNode, memo, useRef } from 'react'
+import AutoSizer from 'react-virtualized-auto-sizer'
+import { VariableSizeList, areEqual } from 'react-window'
+import InfiniteLoader from 'react-window-infinite-loader'
+import { Skeleton } from 'ui'
 
 /**
  * Note that the loading more logic of this component works best with a cursor-based
@@ -15,48 +14,89 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const createItemData = memoize((items, itemProps) => ({ items, ...itemProps }))
 
-export interface ItemProps {
-  data: any
+export type ItemRenderer<T, P> = ComponentType<
+  {
+    item: T
+    listRef: MutableRefObject<VariableSizeList<any> | null | undefined>
+    index: number
+  } & P
+>
+
+export interface ItemProps<T, P> {
+  data: {
+    items: T[]
+    itemProps: P
+    ItemComponent: ItemRenderer<T, P>
+    listRef: MutableRefObject<VariableSizeList<any> | null | undefined>
+    LoaderComponent?: ReactNode
+  }
   index: number
   style: CSSProperties
 }
 
-const Item = memo(({ data, index, style }: ItemProps) => {
-  const { items, itemProps, ItemComponent } = data
-  const item = index < items.length ? items[index] : undefined
-
-  return item ? (
-    <div style={style}>
-      <ItemComponent index={index} item={item} {...itemProps} />
-    </div>
-  ) : (
-    <div className="space-y-1 my-1" style={style}>
-      <ShimmeringLoader />
-      <ShimmeringLoader />
-      <ShimmeringLoader />
-    </div>
-  )
-}, areEqual)
-
-export interface InfiniteListProps<T> {
+export interface InfiniteListProps<T, P> {
   items?: T[]
-  itemProps?: any
+  itemProps?: P
   hasNextPage?: boolean
   isLoadingNextPage?: boolean
   getItemSize?: (index: number) => number
   onLoadNextPage?: () => void
-  ItemComponent?: any
+  ItemComponent?: ItemRenderer<T, P>
+  LoaderComponent?: ReactNode
 }
 
-function InfiniteList<T>({
+const Item = memo(<T, P>({ data, index, style }: ItemProps<T, P>) => {
+  const { items, itemProps, ItemComponent, listRef, LoaderComponent } = data
+  const item = index < items.length ? items[index] : undefined
+
+  return item ? (
+    <div style={style}>
+      <ItemComponent index={index} item={item} listRef={listRef} {...itemProps} />
+    </div>
+  ) : LoaderComponent !== undefined ? (
+    <div style={style}>{LoaderComponent}</div>
+  ) : (
+    <div className="space-y-1 my-1" style={style}>
+      <div className="flex flex-col gap-y-1">
+        <div className="flex flex-row h-6 px-4 items-center gap-2">
+          <Skeleton className="h-4 w-5" />
+          <Skeleton className="w-40 h-4" />
+        </div>
+        <div className="flex flex-row h-6 px-4 items-center gap-2">
+          <Skeleton className="h-4 w-5" />
+          <Skeleton className="w-32 h-4" />
+        </div>
+        <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-75">
+          <Skeleton className="h-4 w-5" />
+          <Skeleton className="w-20 h-4" />
+        </div>
+        <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-50">
+          <Skeleton className="h-4 w-5" />
+          <Skeleton className="w-40 h-4" />
+        </div>
+        <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-25">
+          <Skeleton className="h-4 w-5" />
+          <Skeleton className="w-20 h-4" />
+        </div>
+      </div>
+    </div>
+  )
+}, areEqual)
+
+Item.displayName = 'Item'
+
+function InfiniteList<T, P>({
   items = [],
-  itemProps = {},
+  itemProps,
   hasNextPage = false,
   isLoadingNextPage = false,
   getItemSize = () => 40,
   onLoadNextPage = () => {},
   ItemComponent = () => null,
-}: InfiniteListProps<T>) {
+  LoaderComponent,
+}: InfiniteListProps<T, P>) {
+  const listRef = useRef<VariableSizeList<any> | null>()
+
   // Only load 1 page of items at a time
   // Pass an empty callback to InfiniteLoader in case it asks to load more than once
   const loadMoreItems = isLoadingNextPage ? () => {} : onLoadNextPage
@@ -67,10 +107,10 @@ function InfiniteList<T>({
   }
 
   const itemCount = hasNextPage ? items.length + 1 : items.length
-  const itemData = createItemData(items, { itemProps, ItemComponent })
+  const itemData = createItemData(items, { itemProps, ItemComponent, LoaderComponent, listRef })
 
   return (
-    <div className="relative flex flex-col flex-grow">
+    <>
       <div className="flex-grow">
         <AutoSizer>
           {({ height, width }: { height: number; width: number }) => (
@@ -81,7 +121,10 @@ function InfiniteList<T>({
             >
               {({ onItemsRendered, ref }) => (
                 <VariableSizeList
-                  ref={ref}
+                  ref={(refy) => {
+                    ref(refy)
+                    listRef.current = refy
+                  }}
                   height={height ?? 0}
                   width={width ?? 0}
                   itemCount={itemCount}
@@ -106,8 +149,9 @@ function InfiniteList<T>({
           pointerEvents: 'none', //https://github.com/bvaughn/react-window/issues/455
         }}
       />
-    </div>
+    </>
   )
 }
 
-export default memo(InfiniteList, propsAreEqual)
+// memo erases generics so this magic is needed
+export default memo(InfiniteList, propsAreEqual) as typeof InfiniteList

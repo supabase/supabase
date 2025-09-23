@@ -1,17 +1,22 @@
 import { PropsWithChildren } from 'react'
+import { cn } from 'ui'
 
 interface ProductMenuBarProps {
   title: string
+  className?: string
 }
 
-const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarProps>) => {
+const ProductMenuBar = ({ title, children, className }: PropsWithChildren<ProductMenuBarProps>) => {
   return (
     <div
-      className={[
-        'hide-scrollbar flex w-64 flex-col border-r', // Layout
-        'bg-background',
-        'border-default ',
-      ].join(' ')}
+      /**
+       * id used in playwright-tests/tests/snapshot/spec/table-editor.spec.ts
+       * */
+      id="spec-click-target"
+      className={cn(
+        'flex flex-col w-full h-full', // Layout
+        'hide-scrollbar bg-dash-sidebar border-default'
+      )}
     >
       <div
         className="border-default flex max-h-12 items-center border-b px-6"
@@ -19,9 +24,7 @@ const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarPro
       >
         <h4 className="text-lg">{title}</h4>
       </div>
-      <div className="flex-grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 96px)' }}>
-        {children}
-      </div>
+      <div className={cn('flex-grow overflow-y-auto', className)}>{children}</div>
     </div>
   )
 }

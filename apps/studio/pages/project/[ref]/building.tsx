@@ -1,14 +1,17 @@
-import { ProjectLayoutWithAuth } from 'components/layouts'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectBuildingPage: NextPageWithLayout = () => {
   return <RedirectToDashboard />
 }
 
 ProjectBuildingPage.getLayout = (page) => (
-  <ProjectLayoutWithAuth title="Project Building">{page}</ProjectLayoutWithAuth>
+  <DefaultLayout>
+    <ProjectLayoutWithAuth title="Project Building">{page}</ProjectLayoutWithAuth>
+  </DefaultLayout>
 )
 
 export default ProjectBuildingPage

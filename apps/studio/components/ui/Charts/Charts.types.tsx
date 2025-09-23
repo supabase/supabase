@@ -1,5 +1,3 @@
-import { AreaProps } from 'recharts'
-
 export interface CommonChartProps<D>
   extends Pick<
     HeaderType<D>,
@@ -42,4 +40,26 @@ export type Datum = Record<string, string | number>
 
 export interface TimeseriesDatum extends Datum {
   timestamp: string
+}
+
+export interface ChartData {
+  format: string
+  yAxisLimit?: number
+  maximum?: number
+  total: number
+  totalGrouped: Attribute
+  data: DataPoint[]
+}
+
+type DataPoint = Timestamp | Attribute
+
+interface Timestamp {
+  // ISO formatted
+  period_start: string
+  // unix timestamp (ms)
+  timestamp: number
+}
+
+interface Attribute {
+  [attribute: string]: number
 }

@@ -1,4 +1,4 @@
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { DEFAULT_QUERY_PARAMS } from './Reports.constants'
 
 export enum Presets {
@@ -20,7 +20,12 @@ export type BaseQueries<Keys extends string> = Record<Keys, ReportQuery>
 
 export interface ReportQuery {
   queryType: ReportQueryType
-  sql: (filters: ReportFilterItem[]) => string
+  sql: (
+    filters: ReportFilterItem[],
+    where?: string,
+    orderBy?: string,
+    runIndexAdvisor?: boolean
+  ) => string
 }
 
 export type ReportQueryType = 'db' | 'logs'
@@ -44,5 +49,21 @@ export interface PathsDatum {
 export interface ReportFilterItem {
   key: string
   value: string | number
-  compare: 'matches' | 'is'
+  compare: 'matches' | 'is' | '>=' | '<=' | '>' | '<' | '!='
+  query?: string
+}
+
+export interface ReportFilterProperty {
+  label: string
+  name: string
+  type: 'string' | 'number'
+  options?: Array<{ label: string; value: string }>
+  operators: string[]
+  placeholder?: string
+}
+
+export interface ReportFilter {
+  propertyName: string | number
+  operator: string | number
+  value: string | number
 }

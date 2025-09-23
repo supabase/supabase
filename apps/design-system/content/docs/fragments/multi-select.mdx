@@ -1,0 +1,80 @@
+---
+title: Multi Select
+description: Multiple selection component.
+component: true
+fragment: true
+---
+
+<ComponentPreview name="multi-select-demo" description="" peekCode wide />
+
+## Usage
+
+```tsx
+import {
+  MultiSelector,
+  MultiSelectorTrigger,
+  MultiSelectorContent,
+  MultiSelectorItem,
+} from 'ui-patterns/multi-select'
+```
+
+```tsx
+<MultiSelector
+  open={open}
+  onOpenChange={setOpen}
+  selected={selected}
+  onSelectedChange={onSelectedChange}
+>
+  <MultiSelectorTrigger className="w-72" label="Fruits" />
+  <MultiSelectorContent sameWidthAsTrigger>
+    <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+    <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
+    <MultiSelectorItem value="Grape">Grape</MultiSelectorItem>
+    <MultiSelectorItem value="Strawberry">Strawberry</MultiSelectorItem>
+  </MultiSelectorContent>
+</MultiSelector>
+```
+
+## Examples
+
+### Disabled
+
+<ComponentPreview name="multi-select-disabled" />
+
+### Badge Combo Box
+
+Use `MultiSelectorInput`to add a search input.
+
+<ComponentPreview name="multi-select-combobox" />
+
+### Badge Combo Box with creatable selector
+
+creatable: `boolean`
+`creatable` prop on the `MultiSelectorList` component can be used to add a new option if no items match
+
+<ComponentPreview name="multi-select-combobox-creatable" />
+
+### Badge Limit
+
+badgeLimit: `number` | `"wrap"`.
+`badgeLimit` prop on the `MultiSelectorTrigger` component can be used to limit the number of badges displayed.
+
+<ComponentPreview name="multi-select-badge-limit" />
+
+### Badge Limit="wrap"
+
+`badgeLimit` prop can also be "wrap" to wrap the badges to the next line.
+
+<ComponentPreview name="multi-select-badge-limit-wrap" />
+
+### Deletable Badge
+
+Add the `deletableBadge` prop on the `MultiSelectorTrigger` component to enable badge removal directly from the badge.
+
+<ComponentPreview name="multi-select-deletable-badge" />
+
+### Inline search input
+
+Use `mode="inline-combobox"` on the `MultiSelectorTrigger` component to add an inline search input.
+
+<ComponentPreview name="multi-select-inline-search-input" />

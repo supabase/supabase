@@ -1,0 +1,144 @@
+---
+title: 'SSO and Social Login with WorkOS'
+---
+
+## Use Social Login with WorkOS
+
+### Step 1. Create a WorkOS organization
+
+Log in to the WorkOS dashboard and visit the Organizations tab to create an organization.
+![Create an Organization](/docs/img/guides/auth-workos/workos-create-organization.png)
+
+Alternatively, you can [create an organization via the WorkOS API](https://workos.com/docs/reference/organization/create).
+
+## Step 2. Obtain your `Client ID` and `WORKOS_API_KEY` values
+
+![Get your Environment's Client ID and Secret](/docs/img/guides/auth-workos/workos-dashboard-get-client-id-and-key.png)
+
+Visit the getting started page of the [WorkOS Dashboard](https://dashboard.workos.com/get-started). Copy the following values from the Quickstart panel:
+
+- `WORKOS_CLIENT_ID`
+- `WORKOS_API_KEY`
+
+<Admonition type="tip">
+
+You must be signed in to see these values.
+
+</Admonition>
+
+## Step 3. Add your WorkOS credentials to your Supabase project
+
+![Enter your WorkOS application details in your Supabase app's auth provider settings panel](/docs/img/guides/auth-workos/supabase-workos-configuration.png)
+
+1. Go to your Supabase Project Dashboard.
+1. In the left sidebar, click the Authentication icon (near the top).
+1. Click on Providers under the Configuration section.
+1. Click on WorkOS from the accordion list to expand.
+1. Toggle the `WorkOS Enabled` switch to ON.
+1. Enter `https://api.workos.com` in the WorkOS URL field.
+1. Enter your WorkOS Client ID and WorkOS Client Secret saved in the previous step.
+1. Copy the `Callback URL (for OAuth)` value from the form and save it somewhere handy.
+1. Click Save.
+
+You can also configure the WorkOS auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure WorkOS auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_workos_enabled": true,
+    "external_workos_url": "https://api.workos.com",
+    "external_workos_client_id": "your-workos-client-id",
+    "external_workos_secret": "your-workos-client-secret"
+  }'
+```
+
+## Step 4. Set your Supabase redirect URI in the WorkOS Dashboard
+
+Visit the WorkOS dashboard and click the redirects button in the left navigation panel.
+
+On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` which you saved in the previous step, as shown below:
+
+![Set your Supbase project redirect URL in the WorkOS dashboard](/docs/img/guides/auth-workos/workos-set-supabase-redirect.png)
+
+## Step 5. Add login code to your client app
+
+When a user signs in, call `signInWithOAuth` with `workos` as the provider.
+
+```javascript
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>');
+const redirect = (url: string) => {}
+
+// ---cut---
+async function signInWithWorkOS() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'workos',
+    options: {
+      redirectTo: 'http://example.com/auth/v1/callback', // Make sure your redirect URL is configured in the Supabase Dashboard Auth settings
+      queryParams: {
+        connection: '<connection_id>',
+      },
+    },
+  })
+
+  if (data.url) {
+    redirect(data.url) // use the redirect API for your server or framework
+  }
+}
+```
+
+<Admonition type="tip">
+
+You can find your `connection_id` in the WorkOS dashboard under the Organizations tab. Select your organization and then click View connection.
+
+</Admonition>
+
+Within your specified callback URL, you'll exchange the code for a logged-in user profile:
+
+```javascript auth/v1/callback/route.ts
+import { NextResponse } from 'next/server'
+import { createClient } from '@/utils/supabase/server'
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get('code')
+  // if "next" is in param, use it as the redirect URL
+  let next = searchParams.get('next') ?? '/'
+  if (!next.startsWith('/')) {
+    // if "next" is not a relative URL, use the default
+    next = '/'
+  }
+
+  if (code) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+      const isLocalEnv = process.env.NODE_ENV === 'development'
+      if (isLocalEnv) {
+        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
+        return NextResponse.redirect(`${origin}${next}`)
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+      } else {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+    }
+  }
+
+  // return the user to an error page with instructions
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+}
+
+```
+
+## Resources
+
+- [WorkOS Documentation](https://workos.com/docs/sso/guide)

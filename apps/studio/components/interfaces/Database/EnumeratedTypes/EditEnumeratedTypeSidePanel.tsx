@@ -1,8 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
+import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,19 +22,10 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
-  IconExternalLink,
-  IconPlus,
   Input_Shadcn_,
   SidePanel,
   cn,
 } from 'ui'
-import * as z from 'zod'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
-import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 
 interface EditEnumeratedTypeSidePanelProps {
@@ -42,7 +40,7 @@ const EditEnumeratedTypeSidePanel = ({
   onClose,
 }: EditEnumeratedTypeSidePanelProps) => {
   const submitRef = useRef<HTMLButtonElement>(null)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { mutate: updateEnumeratedType, isLoading: isCreating } = useEnumeratedTypeUpdateMutation({
     onSuccess: (_, vars) => {
       toast.success(`Successfully updated type "${vars.name.updated}"`)
@@ -108,7 +106,7 @@ const EditEnumeratedTypeSidePanel = ({
         .filter((x) => x.updatedValue.length !== 0)
         .map((x) => ({
           original: x.originalValue,
-          updated: x.updatedValue,
+          updated: x.updatedValue.trim(),
           isNew: x.isNew,
         })),
       ...(data.description !== selectedEnumeratedType.comment
@@ -128,6 +126,12 @@ const EditEnumeratedTypeSidePanel = ({
       form.reset({
         name: selectedEnumeratedType.name,
         description: selectedEnumeratedType.comment ?? '',
+        values: originalEnumeratedTypes,
+      })
+    }
+
+    if (selectedEnumeratedType == undefined) {
+      form.reset({
         values: originalEnumeratedTypes,
       })
     }
@@ -191,7 +195,7 @@ const EditEnumeratedTypeSidePanel = ({
                             </FormLabel_Shadcn_>
                             {index === 0 && (
                               <Alert_Shadcn_>
-                                <IconAlertCircle strokeWidth={1.5} />
+                                <AlertCircle strokeWidth={1.5} />
                                 <AlertTitle_Shadcn_>
                                   Existing values cannot be deleted or sorted
                                 </AlertTitle_Shadcn_>
@@ -203,7 +207,7 @@ const EditEnumeratedTypeSidePanel = ({
                                   <Button
                                     asChild
                                     type="default"
-                                    icon={<IconExternalLink strokeWidth={1.5} />}
+                                    icon={<ExternalLink strokeWidth={1.5} />}
                                     className="mt-2"
                                   >
                                     <Link
@@ -239,7 +243,7 @@ const EditEnumeratedTypeSidePanel = ({
 
             <Button
               type="default"
-              icon={<IconPlus strokeWidth={1.5} />}
+              icon={<Plus strokeWidth={1.5} />}
               onClick={() => append({ isNew: true, originalValue: '', updatedValue: '' })}
             >
               Add value

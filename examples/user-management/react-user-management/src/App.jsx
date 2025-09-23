@@ -12,9 +12,11 @@ function App() {
       setSession(session)
     })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
+
+    return () => data.subscription.unsubscribe();
   }, [])
 
   return (

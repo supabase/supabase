@@ -1,30 +1,35 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Download } from 'lucide-react'
 import Link from 'next/link'
-import { useParams } from 'common'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { Button, IconDownload, Modal } from 'ui'
-import { useState } from 'react'
-import { useStore } from 'hooks'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import NoPermission from 'components/ui/NoPermission'
 import { getDocument } from 'data/documents/document-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Button } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
-const SOC2 = () => {
-  const { slug } = useParams()
-  const { ui } = useStore()
-  const {
-    data: subscription,
-    error,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const currentPlan = subscription?.plan
+export const SOC2 = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  const slug = organization?.slug
+
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+
+  const currentPlan = organization?.plan
+
   const [isOpen, setIsOpen] = useState(false)
 
   const fetchSOC2 = async (orgSlug: string) => {
@@ -33,10 +38,7 @@ const SOC2 = () => {
       if (soc2Link?.fileUrl) window.open(soc2Link.fileUrl, '_blank')
       setIsOpen(false)
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to download SOC2 report: ${error.message}`,
-      })
+      toast.error(`Failed to download SOC2 report: ${error.message}`)
     }
   }
 
@@ -46,29 +48,36 @@ const SOC2 = () => {
         <p className="text-base m-0">SOC2 Type 2</p>
         <div className="space-y-2 text-sm text-foreground-light m-0">
           <p>
-            Organizations on Teams plan or above have access to our most recent SOC2 Type 2 report.
+            Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
           </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {isLoading && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
+        {isLoadingPermissions ? (
+          <div className="flex items-center justify-center h-full">
+            <ShimmeringLoader className="w-24" />
           </div>
-        )}
-
-        {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
-
-        {isSuccess && (
+        ) : !canReadSubscriptions ? (
+          <NoPermission resourceText="access our SOC2 Type 2 report" />
+        ) : (
           <div className="flex items-center justify-center h-full">
             {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-              <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                <Button type="default">Upgrade to Teams</Button>
+              <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
+                <Button type="default">Upgrade to Team</Button>
               </Link>
             ) : (
-              <Button type="default" iconRight={<IconDownload />} onClick={() => setIsOpen(true)}>
+              <Button
+                type="default"
+                icon={<Download />}
+                onClick={() => {
+                  sendEvent({
+                    action: 'document_view_button_clicked',
+                    properties: { documentName: 'SOC2' },
+                    groups: { organization: organization?.slug ?? 'Unknown' },
+                  })
+                  setIsOpen(true)
+                }}
+              >
                 Download SOC2 Type 2 Report
               </Button>
             )}
@@ -76,57 +85,48 @@ const SOC2 = () => {
         )}
         <ConfirmationModal
           visible={isOpen}
-          header="Non-Disclosure Agreement to access Supabase's SOC2 Report"
-          buttonLabel="I agree"
-          buttonLoadingLabel="Downloading"
-          onSelectCancel={() => setIsOpen(false)}
           size="large"
-          onSelectConfirm={() => {
+          title="Non-Disclosure Agreement to access Supabase's SOC2 Report"
+          confirmLabel="I agree"
+          confirmLabelLoading="Downloading"
+          onCancel={() => setIsOpen(false)}
+          onConfirm={() => {
             if (slug) fetchSOC2(slug)
           }}
         >
-          <Modal.Content>
-            <div className="py-4 text-sm text-foreground-light pl-30">
-              <ol className="list-decimal list-inside">
-                <li>The information that you are about to access is confidential.</li>
+          <ol className="list-decimal list-inside text-sm text-foreground-light pl-30">
+            <li>The information that you are about to access is confidential.</li>
+            <li>
+              Your access to our SOC 2 materials is governed by confidentiality obligations
+              contained in the agreement between Supabase, Inc ("Supabase", "we", "our" or "us") and
+              the Supabase customer that has authorized you to access our platform to obtain this
+              information (our "Customer").
+            </li>
+            <li>
+              You must ensure that you treat the information in our SOC 2 materials in accordance
+              with those confidentiality obligations, as communicated to you by the Customer.
+            </li>
+            <li>
+              By clicking "I agree" below or otherwise accessing our SOC 2 materials, you:
+              <ol className="list-[lower-roman] list-inside pl-4">
+                <li>acknowledge that you have read and understood this Confidentiality Notice;</li>
                 <li>
-                  Your access to our SOC 2 materials is governed by confidentiality obligations
-                  contained in the agreement between Supabase, Inc ("Supabase", "we", "our" or "us")
-                  and the Supabase customer that has authorized you to access our platform to obtain
-                  this information (our "Customer").
-                </li>
-                <li>
-                  You must ensure that you treat the information in our SOC 2 materials in
-                  accordance with those confidentiality obligations, as communicated to you by the
-                  Customer.
-                </li>
-                <li>
-                  By clicking "I agree" below or otherwise accessing our SOC 2 materials, you:
-                  <ol className="list-[lower-roman] list-inside pl-4">
-                    <li>
-                      acknowledge that you have read and understood this Confidentiality Notice;
-                    </li>
-                    <li>
-                      confirm that you have been authorized by the Customer to access this
-                      information, and your use of our SOC 2 materials is subject to the
-                      confidentiality obligations owed by the Customer to us.
-                    </li>
-                  </ol>
-                </li>
-                <li>
-                  This Confidentiality Notice does not substitute or supersede any agreement between
-                  us and the Customer, or any internal rules or policies that the Customer requires
-                  you to comply with in your access to and use of confidential information. However,
-                  your failure to comply with this Confidentiality Notice may be used to determine
-                  whether the Customer has complied with its confidentiality obligations to us.
+                  confirm that you have been authorized by the Customer to access this information,
+                  and your use of our SOC 2 materials is subject to the confidentiality obligations
+                  owed by the Customer to us.
                 </li>
               </ol>
-            </div>
-          </Modal.Content>
+            </li>
+            <li>
+              This Confidentiality Notice does not substitute or supersede any agreement between us
+              and the Customer, or any internal rules or policies that the Customer requires you to
+              comply with in your access to and use of confidential information. However, your
+              failure to comply with this Confidentiality Notice may be used to determine whether
+              the Customer has complied with its confidentiality obligations to us.
+            </li>
+          </ol>
         </ConfirmationModal>
       </ScaffoldSectionContent>
     </ScaffoldSection>
   )
 }
-
-export default SOC2

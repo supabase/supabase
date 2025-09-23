@@ -25,6 +25,16 @@ module.exports = [
     source: '/docs/:path*',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
   },
+
+  {
+    source: '/ui',
+    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}`,
+  },
+  {
+    source: '/ui/:path*',
+    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
+  },
+
   {
     source: '/new-docs',
     destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,
@@ -51,6 +61,14 @@ module.exports = [
   {
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
+  },
+  {
+    source: '/llms.txt',
+    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms.txt`,
+  },
+  {
+    source: '/llms/:path(.*\\.txt$)',
+    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms/:path`,
   },
   {
     source: '/feed.xml',

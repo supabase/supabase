@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
-import { cn } from '@ui/lib/utils'
+import { cn } from '../../../lib/utils/cn'
 
 // Ivan: replaced [&:has(svg)]:pl-14 with [&>svg~*]:pl-10 cause of github.com/shadcn-ui/ui/issues/998
 export const alertVariants = cva(
@@ -13,7 +13,7 @@ export const alertVariants = cva(
     variants: {
       variant: {
         default:
-          'text-foreground bg-alternative border-alternative [&>svg]:text-background [&>svg]:bg-foreground',
+          'text-foreground bg-alternative border [&>svg]:text-background [&>svg]:bg-foreground',
         destructive:
           'text border-destructive-400 bg-destructive-200 [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
         warning:
@@ -51,4 +51,4 @@ const AlertDescription = React.forwardRef<
 ))
 AlertDescription.displayName = 'AlertDescription'
 
-export { Alert, AlertTitle, AlertDescription }
+export { Alert, AlertDescription, AlertTitle }

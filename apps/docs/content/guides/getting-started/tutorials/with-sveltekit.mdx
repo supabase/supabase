@@ -1,0 +1,279 @@
+---
+title: 'Build a User Management App with SvelteKit'
+description: 'Learn how to use Supabase in your SvelteKit App.'
+---
+
+<$Partial path="quickstart_intro.mdx" />
+
+![Supabase User Management example](/docs/img/user-management-demo.png)
+
+<Admonition type="note">
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+
+</Admonition>
+
+<$Partial path="project_setup.mdx" />
+
+## Building the app
+
+Start building the Svelte app from scratch.
+
+### Initialize a Svelte app
+
+Use the [SvelteKit Skeleton Project](https://svelte.dev/docs/kit) to initialize an app called `supabase-sveltekit` (for this tutorial, select "SvelteKit minimal" and use TypeScript):
+
+```bash
+npx sv create supabase-sveltekit
+cd supabase-sveltekit
+npm install
+```
+
+Then install the Supabase client library: [supabase-js](https://github.com/supabase/supabase-js)
+
+```bash
+npm install @supabase/supabase-js
+```
+
+And finally, save the environment variables in a `.env` file.
+All you need are the `PUBLIC_SUPABASE_URL` and the key that you copied [earlier](#get-api-details).
+
+<$CodeTabs>
+
+```bash name=.env
+PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
+PUBLIC_SUPABASE_PUBLISHABLE_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY"
+```
+
+</$CodeTabs>
+
+### App styling (optional)
+
+An optional step is to update the CSS file `src/styles.css` to make the app look nice.
+You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
+
+### Creating a Supabase client for SSR
+
+The `ssr` package configures Supabase to use Cookies, which are required for server-side languages and frameworks.
+
+Install the SSR package:
+
+```bash
+npm install @supabase/ssr
+```
+
+Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means the user's session is available throughout the entire SvelteKit stack - page, layout, server, and hooks.
+
+Add the code below to a `src/hooks.server.ts` file to initialize the client on the server:
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/hooks.server.ts"
+lines={[[1, -1]]}
+meta="name=src/hooks.server.ts"
+/>
+
+</$CodeTabs>
+
+<$Partial path="get_session_warning.mdx" />
+{/* TODO: Change when adding JS autoconversion */}
+As this tutorial uses TypeScript the compiler complains about `event.locals.supabase` and `event.locals.safeGetSession`, you can fix this by updating the `src/app.d.ts` with the content below:
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/app.d.ts"
+lines={[[1, -1]]}
+meta="name=src/app.d.ts"
+/>
+
+</$CodeTabs>
+
+Create a new `src/routes/+layout.server.ts` file to handle the session on the server-side.
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/+layout.server.ts"
+lines={[[1, -1]]}
+meta="name=src/routes/+layout.server.ts"
+/>
+
+</$CodeTabs>
+
+<Admonition type="tip">
+
+Start the dev server (`npm run dev`) to generate the `./$types` files we are referencing in our project.
+
+</Admonition>
+
+Create a new `src/routes/+layout.ts` file to handle the session and the `supabase` object on the client-side.
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/+layout.ts"
+lines={[[1, -1]]}
+meta="name=src/routes/+layout.ts"
+/>
+
+</$CodeTabs>
+
+Create `src/routes/+layout.svelte`:
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/+layout.svelte"
+lines={[[1, -1]]}
+meta="name=src/routes/+layout.svelte"
+/>
+
+</$CodeTabs>
+
+## Set up a login page
+
+Create a magic link login/signup page for your application by updating the `routes/+page.svelte` file:
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/+page.svelte"
+lines={[[1, -1]]}
+meta="name=src/routes/+page.svelte"
+/>
+
+</$CodeTabs>
+
+Create a `src/routes/+page.server.ts` file that handles the magic link form when submitted.
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/+page.server.ts"
+lines={[[1, -1]]}
+meta="name=src/routes/+page.server.ts"
+/>
+
+</$CodeTabs>
+
+### Email template
+
+Change the email template to support a server-side authentication flow.
+
+Before we proceed, let's change the email template to support sending a token hash:
+
+- Go to the [**Auth** > **Emails**](/dashboard/project/_/auth/templates) page in the project dashboard.
+- Select the **Confirm signup** template.
+- Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+- Repeat the previous step for **Magic link** template.
+
+<Admonition type="tip">
+
+**Did you know?** You can also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+
+</Admonition>
+
+### Confirmation endpoint
+
+As this is a server-side rendering (SSR) environment, you need to create a server endpoint responsible for exchanging the `token_hash` for a session.
+
+The following code snippet performs the following steps:
+
+- Retrieves the `token_hash` sent back from the Supabase Auth server using the `token_hash` query parameter.
+- Exchanges this `token_hash` for a session, which you store in storage (in this case, cookies).
+- Finally, redirect the user to the `account` page or the `error` page.
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/auth/confirm/+server.ts"
+lines={[[1, -1]]}
+meta="name=src/routes/auth/confirm/+server.ts"
+/>
+
+</$CodeTabs>
+
+### Authentication error page
+
+If there is an error with confirming the token, redirect the user to an error page.
+
+<$CodeTabs>
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/auth/error/+page.svelte"
+lines={[[1, -1]]}
+meta="name=src/routes/auth/error/+page.svelte"
+/>
+
+</$CodeTabs>
+
+### Account page
+
+After a user signs in, they need to be able to edit their profile details page.
+Create a new `src/routes/account/+page.svelte` file with the content below.
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/account/+page.svelte"
+lines={[[1, 3],[6,12],[15,38],[47,-1]]}
+meta="name=src/routes/account/+page.svelte"
+/>
+
+</$CodeTabs>
+
+Now, create the associated `src/routes/account/+page.server.ts` file that handles loading data from the server through the `load` function
+and handle all form actions through the `actions` object.
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/+page.server.ts"
+lines={[[1, -1]]}
+meta="name=src/routes/+page.server.ts"
+/>
+
+### Launch!
+
+With all the pages in place, run this command in a terminal:
+
+```bash
+npm run dev
+```
+
+And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
+
+![Supabase Svelte](/docs/img/supabase-svelte-demo.png)
+
+## Bonus: Profile photos
+
+Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+
+### Create an upload widget
+
+Create an avatar for the user so that they can upload a profile photo. Start by creating a new component called `Avatar.svelte` in the `src/routes/account` directory:
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/account/Avatar.svelte"
+lines={[[1, -1]]}
+meta="name=src/routes/account/Avatar.svelte"
+/>
+
+</$CodeTabs>
+
+### Add the new widget
+
+Add the widget to the Account page:
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/sveltekit-user-management/src/routes/account/+page.svelte"
+lines={[[1, 1], [4,4], [31,31],[39,46],[82,82]]}
+meta="name=src/routes/account/+page.svelte"
+/>
+
+</$CodeTabs>
+
+At this stage you have a fully functional application!

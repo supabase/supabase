@@ -1,25 +1,25 @@
+import * as Accordion from '@radix-ui/react-accordion'
+import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React, { useEffect, useRef } from 'react'
-import { IconChevronLeft } from '~/../../packages/ui'
-import * as Accordion from '@radix-ui/react-accordion'
-import HomeMenuIconPicker from './HomeMenuIconPicker'
+
+import MenuIconPicker from './MenuIconPicker'
 
 const HeaderLink = React.memo(function HeaderLink(props: {
   title: string
   id: string
   url: string
 }) {
-  const router = useRouter()
+  const pathname = usePathname()
 
   return (
     <span
       className={[
         ' ',
         !props.title && 'capitalize',
-        props.url === router.asPath ? 'text-brand' : 'hover:text-brand text-foreground',
+        props.url === pathname ? 'text-brand-link' : 'hover:text-brand-link text-foreground',
       ].join(' ')}
     >
       {props.title ?? props.id}
@@ -28,14 +28,21 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 })
 
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
-  const router = useRouter()
+  const pathname = usePathname()
   const { resolvedTheme } = useTheme()
-  const activeItem = props.subItem.url === router.asPath
-  const activeItemRef = useRef(null)
+  const activeItem = props.subItem.url === pathname
+  const activeItemRef = useRef<HTMLLIElement>(null)
 
   const LinkContainer = (props) => {
+    const isExternal = props.url.startsWith('https://')
+
     return (
-      <Link href={props.url} className={props.className}>
+      <Link
+        href={props.url}
+        className={props.className}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+      >
         {props.children}
       </Link>
     )
@@ -68,18 +75,15 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               'flex items-center gap-2',
               'cursor-pointer transition text-sm',
               activeItem
-                ? 'text-brand font-medium'
+                ? 'text-brand-link font-medium'
                 : 'hover:text-foreground text-foreground-lighter',
             ].join(' ')}
             parent={props.subItem.parent}
           >
             {props.subItem.icon && (
               <Image
-                alt={props.subItem.name + router.basePath}
-                src={
-                  `${router.basePath}` +
-                  `${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`
-                }
+                alt={props.subItem.name}
+                src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
                 width={15}
                 height={15}
               />
@@ -90,23 +94,25 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
 
         {props.subItem.items && props.subItem.items.length > 0 && (
           <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-            {props.subItem.items.map((subSubItem) => {
-              return (
-                <li key={props.subItem.name}>
-                  <Link
-                    href={`${subSubItem.url}`}
-                    className={[
-                      'cursor-pointer transition text-sm',
-                      subSubItem.url === router.asPath
-                        ? 'text-brand'
-                        : 'hover:text-brand text-foreground-lighter',
-                    ].join(' ')}
-                  >
-                    {subSubItem.name}
-                  </Link>
-                </li>
-              )
-            })}
+            {props.subItem.items
+              .filter((subItem) => subItem.enabled !== false)
+              .map((subSubItem) => {
+                return (
+                  <li key={props.subItem.name}>
+                    <Link
+                      href={`${subSubItem.url}`}
+                      className={[
+                        'cursor-pointer transition text-sm',
+                        subSubItem.url === pathname
+                          ? 'text-brand-link'
+                          : 'hover:text-brand-link text-foreground-lighter',
+                      ].join(' ')}
+                    >
+                      {subSubItem.name}
+                    </Link>
+                  </li>
+                )
+              })}
           </Accordion.Content>
         )}
       </Accordion.Item>
@@ -115,7 +121,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
 })
 
 const ContentLink = React.memo(function ContentLink(props: any) {
-  const router = useRouter()
+  const pathname = usePathname()
 
   return (
     <li className="mb-1.5">
@@ -123,13 +129,13 @@ const ContentLink = React.memo(function ContentLink(props: any) {
         href={props.url}
         className={[
           'cursor-pointer transition text-sm',
-          props.url === router.asPath
+          props.url === pathname
             ? 'text-brand-link'
             : 'hover:text-foreground text-foreground-lighter',
         ].join(' ')}
       >
         {props.icon && (
-          <Image alt={props.icon} width={12} height={12} src={`${router.basePath}${props.icon}`} />
+          <Image alt={props.icon} width={12} height={12} src={`${pathname}${props.icon}`} />
         )}
         {props.name}
       </Link>
@@ -140,52 +146,45 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 const Content = (props) => {
   const { menu, id } = props
 
+  if (menu.enabled === false) {
+    return null
+  }
+
   return (
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
-      <Link
-        href={`${menu.parent ?? '/'}`}
-        className={[
-          'flex items-center gap-1 text-xs group mb-3',
-          'text-base transition-all duration-200 text-brand-link hover:text-brand-600 hover:cursor-pointer ',
-        ].join(' ')}
-      >
-        <div className="relative w-2">
-          <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-            <IconChevronLeft size={10} strokeWidth={3} />
-          </div>
-        </div>
-        <span>Back to Home</span>
-      </Link>
-
       <Link href={menu.url ?? ''}>
         <div className="flex items-center gap-3 my-3 text-brand-link">
-          <HomeMenuIconPicker icon={menu.icon} />
+          <MenuIconPicker icon={menu.icon} />
           <HeaderLink title={menu.title} url={menu.url} id={id} />
         </div>
       </Link>
 
-      {menu.items.map((x) => {
-        return (
-          <div key={x.name}>
-            {x.items && x.items.length > 0 ? (
-              <div className="flex flex-col gap-2.5">
-                {x.items.map((subItem, subItemIndex) => {
-                  return (
-                    <ContentAccordionLink
-                      key={subItem.name}
-                      subItem={subItem}
-                      subItemIndex={subItemIndex}
-                      parent={x}
-                    />
-                  )
-                })}
-              </div>
-            ) : (
-              <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
-            )}
-          </div>
-        )
-      })}
+      {menu.items
+        .filter((item) => item.enabled !== false)
+        .map((x) => {
+          return (
+            <div key={x.name}>
+              {x.items && x.items.length > 0 ? (
+                <div className="flex flex-col gap-2.5">
+                  {x.items
+                    .filter((item) => item.enabled !== false)
+                    .map((subItem, subItemIndex) => {
+                      return (
+                        <ContentAccordionLink
+                          key={subItem.name}
+                          subItem={subItem}
+                          subItemIndex={subItemIndex}
+                          parent={x}
+                        />
+                      )
+                    })}
+                </div>
+              ) : x.url ? (
+                <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
+              ) : null}
+            </div>
+          )
+        })}
     </ul>
   )
 }

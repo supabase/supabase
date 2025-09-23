@@ -1,162 +1,110 @@
-import { useEffect, useState } from 'react'
 import { NextSeo } from 'next-seo'
-import { GetStaticProps, GetStaticPaths } from 'next'
-import Link from 'next/link'
+import dayjs from 'dayjs'
 import Error from 'next/error'
-import dynamic from 'next/dynamic'
-import { useTheme } from 'next-themes'
-import { Session } from '@supabase/supabase-js'
-import { Button } from 'ui'
-import { SITE_URL } from '~/lib/constants'
-import supabase from '~/lib/supabaseMisc'
-
-import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import LWXBackground from '~/components/LaunchWeek/X/LWXBackground'
-
-const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
-const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/X/LaunchWeekPrizeSection')
-)
-const CTABanner = dynamic(() => import('~/components/CTABanner'))
+import { GetStaticPaths, GetStaticProps } from 'next'
+import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
+import { Lw15ConfDataProvider, UserTicketData } from 'components/LaunchWeek/15/hooks/use-conf-data'
+import { createClient } from '@supabase/supabase-js'
+import DefaultLayout from 'components/Layouts/Default'
+import LW15TicketPage from 'components/LaunchWeek/15/Ticketing/LW15TicketPage'
+import { useRouter } from 'next/router'
 
 interface Props {
-  user: UserData
-  users: UserData[]
+  user: UserTicketData
   ogImageUrl: string
 }
 
-export default function UsernamePage({ user, ogImageUrl }: Props) {
-  const { username, ticketNumber, name } = user
-
-  const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
-  const DESCRIPTION = `Claim and share your Supabase Launch Week X ticket for a chance to win Supabase swag.`
-  const OG_URL = `${SITE_URL}/tickets/${username}`
-
-  const [session, setSession] = useState<Session | null>(null)
-  const { resolvedTheme, setTheme } = useTheme()
-  const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
-
-  const [ticketState, setTicketState] = useState<TicketState>('ticket')
-
-  if (!ticketNumber) {
-    return <Error statusCode={404} />
+const Lw15Page = ({ user, ogImageUrl }: Props) => {
+  const username = user?.username
+  const TITLE = `${LW15_TITLE} | ${LW15_DATE}`
+  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 8AM PT.'
+  const PAGE_URL = `${LW15_URL}/tickets/${username}`
+  const { query } = useRouter()
+  const ticketNumber = query.ticketNumber?.toString()
+  const defaultUserData = {
+    id: query.id?.toString(),
+    ticket_number: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
+    name: query.name?.toString(),
+    username: query.username?.toString(),
+    platinum: !!query.platinum,
   }
 
-  useEffect(() => {
-    document.body.classList.add('bg-[#060809]')
-
-    return () => {
-      if (document.body.classList.contains('bg-[#060809]')) {
-        document.body.classList.remove('bg-[#060809]')
-      }
-    }
-  }, [])
+  if (!username) {
+    return <Error statusCode={404} />
+  }
 
   return (
     <>
       <NextSeo
         title={TITLE}
+        description={DESCRIPTION}
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: OG_URL,
+          url: PAGE_URL,
           images: [
             {
               url: ogImageUrl,
               width: 1200,
-              height: 630,
+              height: 628,
             },
           ],
         }}
       />
-      <FaviconImports />
-      <ConfDataContext.Provider
-        value={{
-          supabase,
-          session,
-          userData: user,
-          setUserData: () => null,
-          ticketState,
-          setTicketState,
-        }}
-      >
-        <DefaultLayout>
-          <div className="-mt-[65px]">
-            <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 md:gap-10 !px-2 !mx-auto md:min-h-[auto]">
-              <div className="w-full min-h-[400px] pt-24 flex items-center">
-                <LWXTicketContainer />
-              </div>
-              <div className="flex flex-col items-center justify-center text-center gap-2 max-w-lg">
-                <h1 className="text-2xl">
-                  {name}'s
-                  <br />
-                  Launch Week X Ticket
-                </h1>
-                <span className="text-foreground-lighter">
-                  Claim your own ticket and share it for a chance to win.
-                </span>
-              </div>
-              <Button type="secondary" asChild>
-                <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
-                  Join Launch Week X
-                </Link>
-              </Button>
-            </SectionContainer>
-            <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-20" />
+
+      <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
+        <DefaultLayout className="!min-h-fit !h-fit lg:!min-h-[calc(100dvh-66px)] lg:!h-full dark:bg-black">
+          <div
+            style={{
+              fontFamily:
+                "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+            }}
+            className="h-full"
+          >
+            <LW15TicketPage user={user} isSharePage />
           </div>
-          <SectionContainer className="!pt-4 !pb-0">
-            <LaunchWeekPrizeSection />
-          </SectionContainer>
-          <CTABanner className="!bg-[#060809] border-t-0" />
         </DefaultLayout>
-      </ConfDataContext.Provider>
+      </Lw15ConfDataProvider>
     </>
   )
 }
+
+export default Lw15Page
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
   let user
 
-  fetch(
-    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
-      username ?? ''
-    )}`
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
+
+  // fetch the normal ticket
+  // stores the og images in supabase storage
   fetch(
-    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
-      username ?? ''
-    )}`
+    // @ts-ignore
+    `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`
   )
 
   // fetch a specific user
   if (username) {
-    const { data } = await supabase!
-      .from('lwx_tickets_golden')
-      .select('name, username, ticketNumber, metadata, golden')
+    const { data, error } = await supabaseAdmin!
+      .from('tickets_view')
+      .select('name, username, ticket_number, metadata, role, company, location')
+      .eq('launch_week', 'lw15')
       .eq('username', username)
       .single()
 
     user = data
   }
 
-  const ticketType = user?.metadata?.hasSecretTicket
-    ? 'secret'
-    : user?.golden
-    ? 'platinum'
-    : 'regular'
-
-  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${ticketType}/${username}.png`
+  const ticketType = 'regular'
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw15/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {
     props: {
-      user: {
-        ...user,
-        username,
-      },
+      user,
       ogImageUrl,
       key: username,
     },

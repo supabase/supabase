@@ -1,36 +1,44 @@
-name: Check code with TypeScript
+name: Check code with TypeScript & Lint
 
 on:
   pull_request:
     branches:
       - 'master'
+  merge_group:
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   typecheck:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on: [larger-runner-4cpu]
-
-    strategy:
-      matrix:
-        node-version: [18.x]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install deps
-        run: npm ci
+        run: pnpm i
 
       - name: Run TypeScript type check
-        run: npx turbo run typecheck
+        run: pnpm exec turbo run typecheck
+
+      - name: Run Lint
+        run: pnpm exec turbo run lint

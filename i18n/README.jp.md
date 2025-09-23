@@ -58,7 +58,7 @@ Supabase は、オープンソースのツールを組み合わせてできて�
 Supabase は[ホスティングされたプラットフォーム](https://supabase.com/dashboard)です。登録するだけで、何もインストールせずに使い始めることができます。
 さらに、 [セルフホスティング](https://supabase.com/docs/guides/hosting/overview) や [ローカル開発](https://supabase.com/docs/guides/local-development)も可能です。
 
-![アーキテクチャー](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![アーキテクチャー](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/)は、30 年以上にわたって開発・改善されてきたオブジェクトリレーショナルデータベースシステムで、信頼性、機能の堅牢性、パフォーマンスの面で高い評価を得ています。
 - [Realtime](https://github.com/supabase/realtime)は、PostgreSQL の insert、update、delete の情報を WebSocket で受信できる Elixir サーバです。Supabase は Postgres に組み込まれたレプリケーション機能をリッスンし、レプリケーションのバイトストリームを JSON に変換し、その JSON を WebSocket でブロードキャストします。

@@ -1,7 +1,7 @@
 /* .sbui-toggle {
   @apply p-0 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer;
   @apply transition-colors ease-in-out duration-200;
-  @apply focus:outline-none bg-gray-200 dark:bg-gray-400;
+  @apply focus:outline-none bg-200 dark:bg-gray-400;
 }
 
 .sbui-toggle--active {

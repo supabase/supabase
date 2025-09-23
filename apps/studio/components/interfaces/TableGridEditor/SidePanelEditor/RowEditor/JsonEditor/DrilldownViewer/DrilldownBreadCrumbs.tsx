@@ -1,5 +1,5 @@
 import { last } from 'lodash'
-import { IconChevronRight, IconHome } from 'ui'
+import { Home, ChevronRight } from 'lucide-react'
 
 interface DrilldownBreadCrumbsProps {
   breadcrumbs: string[]
@@ -14,7 +14,7 @@ const DrilldownBreadCrumbs = ({
 }: DrilldownBreadCrumbsProps) => {
   return (
     <div className="flex items-center space-x-2">
-      <IconHome
+      <Home
         size={16}
         strokeWidth={2}
         onClick={() => resetBreadcrumbs()}
@@ -23,7 +23,7 @@ const DrilldownBreadCrumbs = ({
       {breadcrumbs.length > 0 &&
         breadcrumbs.map((crumb) => (
           <div className="flex items-center space-x-2" key={crumb}>
-            <IconChevronRight size={16} strokeWidth={2} />
+            <ChevronRight size={16} strokeWidth={2} />
             {crumb === last(breadcrumbs) ? (
               <p className="font-mono text-xs">{crumb}</p>
             ) : (

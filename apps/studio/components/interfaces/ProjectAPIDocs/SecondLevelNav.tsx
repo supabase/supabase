@@ -10,9 +10,6 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconChevronLeft,
-  IconCode,
-  IconExternalLink,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -25,6 +22,8 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
+import { ChevronLeft, Code, ExternalLink } from 'lucide-react'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const SecondLevelNav = () => {
   const { ref } = useParams()
@@ -79,7 +78,7 @@ const SecondLevelNav = () => {
         {isNewAPIDocsEnabled && (
           <Button
             type="text"
-            icon={<IconChevronLeft />}
+            icon={<ChevronLeft />}
             className="px-1"
             onClick={() => snap.setActiveDocsSection([snap.activeDocsSection[0]])}
           />
@@ -95,7 +94,7 @@ const SecondLevelNav = () => {
                 <div className="flex items-center justify-between w-full">
                   <p>{snap.activeDocsSection[1]}</p>
                   <div>
-                    <IconCode className="rotate-90" strokeWidth={1.5} size={12} />
+                    <Code className="rotate-90" strokeWidth={1.5} size={12} />
                   </div>
                 </div>
               </div>
@@ -157,17 +156,7 @@ const SecondLevelNav = () => {
             <p className="text-xs !leading-normal">
               Head over to our docs site for the full API documentation.
             </p>
-            <Button
-              asChild
-              className="!mt-2"
-              size="tiny"
-              type="default"
-              icon={<IconExternalLink strokeWidth={1.5} />}
-            >
-              <Link href={content[section].docsUrl} target="_blank" rel="noreferrer">
-                Documentation
-              </Link>
-            </Button>
+            <DocsButton className="!mt-2" href={content[section].docsUrl} />
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       </div>

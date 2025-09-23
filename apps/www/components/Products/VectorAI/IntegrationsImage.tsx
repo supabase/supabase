@@ -36,7 +36,9 @@ const IntegrationsImage = () => {
         animate={isInView ? animate : initial}
         className="relative w-full h-full"
       >
-        <ResolvedImage />
+        <div className="w-full aspect-[2/1] md:aspect-[3/1]">
+          <ResolvedImage />
+        </div>
       </m.div>
     </LazyMotion>
   )

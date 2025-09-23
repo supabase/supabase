@@ -1,118 +1,110 @@
 import { useParams } from 'common'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import LangSelector from 'components/interfaces/Docs/LangSelector'
-import { DocsLayout } from 'components/layouts'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
-
-const PageContext = createContext(null)
+import type { NextPageWithLayout } from 'types'
 
 const PageConfig: NextPageWithLayout = () => {
-  const PageState: any = useLocalObservable(() => ({
-    projectRef: '',
-    jsonSchema: {},
-    resources: {},
-    rpcs: {},
-    setJsonSchema(value: any) {
-      const { paths } = value || {}
-      const functionPath = 'rpc/'
-      let resources: any = {}
-      let rpcs: any = {}
-
-      Object.entries(paths || []).forEach(([name, val]) => {
-        let trimmed = name.slice(1)
-        let id = trimmed.replace(functionPath, '')
-        let displayName = id.replace(/_/g, ' ')
-        let camelCase = snakeToCamel(id)
-        let enriched = { id, displayName, camelCase }
-        if (!trimmed.length) return
-        else if (trimmed.includes(functionPath)) rpcs[id] = enriched
-        else resources[id] = enriched
-      })
-
-      PageState.jsonSchema = value
-      PageState.resources = resources
-      PageState.rpcs = rpcs
-    },
-  }))
-
-  const router = useRouter()
-  const { query } = router
-  PageState.projectRef = query.ref
-
-  return (
-    <PageContext.Provider value={PageState}>
-      <DocView />
-    </PageContext.Provider>
-  )
+  return <DocView />
 }
 
-PageConfig.getLayout = (page) => <DocsLayout title="API">{page}</DocsLayout>
+PageConfig.getLayout = (page) => (
+  <DefaultLayout>
+    <DocsLayout title="API">{page}</DocsLayout>
+  </DefaultLayout>
+)
 
-export default observer(PageConfig)
+export default PageConfig
 
-const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
+const DocView = () => {
+  const functionPath = 'rpc/'
+  const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
-const DocView = observer(() => {
-  const PageState: any = useContext(PageContext)
   const { ref: projectRef, page, resource, rpc } = useParams()
   const [selectedLang, setSelectedLang] = useState<any>('js')
-  const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
+  const [selectedApikey, setSelectedApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data, error } = useProjectApiQuery({
-    projectRef,
-  })
-
-  const apiService = data?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : undefined
-
+  const { data: settings, error: settingsError } = useProjectSettingsV2Query({ projectRef })
   const {
     data: jsonSchema,
     error: jsonSchemaError,
+    isLoading,
     refetch,
   } = useProjectJsonSchemaQuery({ projectRef })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
-  useEffect(() => {
-    PageState.setJsonSchema(jsonSchema)
-  }, [jsonSchema])
+  const refreshDocs = async () => await refetch()
 
-  const refreshDocs = async () => {
-    await refetch()
-  }
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint
+  const endpoint =
+    customDomainData?.customDomain?.status === 'active'
+      ? `https://${customDomainData.customDomain?.hostname}`
+      : `${protocol}://${hostEndpoint ?? '-'}`
 
-  if (error || jsonSchemaError)
+  const { paths } = jsonSchema || {}
+  const PAGE_KEY: any = resource || rpc || page || 'index'
+
+  const { resources, rpcs } = Object.entries(paths || {}).reduce(
+    (a, [name]) => {
+      const trimmedName = name.slice(1)
+      const id = trimmedName.replace(functionPath, '')
+
+      const displayName = id.replace(/_/g, ' ')
+      const camelCase = snakeToCamel(id)
+      const enriched = { id, displayName, camelCase }
+
+      if (!trimmedName.length) {
+        return a
+      }
+
+      return {
+        resources: {
+          ...a.resources,
+          ...(!trimmedName.includes(functionPath)
+            ? {
+                [id]: enriched,
+              }
+            : {}),
+        },
+        rpcs: {
+          ...a.rpcs,
+          ...(trimmedName.includes(functionPath)
+            ? {
+                [id]: enriched,
+              }
+            : {}),
+        },
+      }
+    },
+    { resources: {}, rpcs: {} }
+  )
+
+  if (settingsError || jsonSchemaError) {
     return (
       <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-foreground-light">
           <p>Error connecting to API</p>
-          <p>{`${error || jsonSchemaError}`}</p>
+          <p>{`${settingsError || jsonSchemaError}`}</p>
         </p>
       </div>
     )
-  if (!data || !jsonSchema || !PageState.jsonSchema)
+  }
+
+  if (isLoading || !settings || !jsonSchema) {
     return (
       <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <h3 className="text-xl">Building docs ...</h3>
       </div>
     )
-
-  // Data Loaded
-  const autoApiService = {
-    ...data.autoApiService,
-    endpoint: `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`,
   }
-
-  const { paths, definitions } = PageState.jsonSchema
-
-  const PAGE_KEY: any = resource || rpc || page || 'index'
 
   return (
     <div className="w-full h-full overflow-y-auto Docs Docs--api-page" key={PAGE_KEY}>
@@ -120,40 +112,34 @@ const DocView = observer(() => {
         <div className="sticky top-0 z-40 flex flex-row-reverse w-full ">
           <LangSelector
             selectedLang={selectedLang}
+            selectedApiKey={selectedApikey}
             setSelectedLang={setSelectedLang}
-            showApiKey={showApiKey}
-            setShowApiKey={setShowApiKey}
-            apiKey={anonKey}
-            autoApiService={autoApiService}
+            setSelectedApiKey={setSelectedApiKey}
           />
         </div>
-        <div className="">
+        <div>
           {resource ? (
             <ResourceContent
-              autoApiService={autoApiService}
+              apiEndpoint={endpoint}
               selectedLang={selectedLang}
               resourceId={resource}
-              resources={PageState.resources}
-              definitions={definitions}
-              paths={paths}
-              showApiKey={showApiKey.key}
+              resources={resources}
+              showApiKey={selectedApikey.key}
               refreshDocs={refreshDocs}
             />
           ) : rpc ? (
             <RpcContent
-              autoApiService={autoApiService}
               selectedLang={selectedLang}
               rpcId={rpc}
               paths={paths}
-              rpcs={PageState.rpcs}
-              showApiKey={showApiKey.key}
+              rpcs={rpcs}
+              showApiKey={selectedApikey.key}
               refreshDocs={refreshDocs}
             />
           ) : (
             <GeneralContent
-              autoApiService={autoApiService}
               selectedLang={selectedLang}
-              showApiKey={showApiKey.key}
+              showApiKey={selectedApikey.key}
               page={page}
             />
           )}
@@ -161,4 +147,4 @@ const DocView = observer(() => {
       </div>
     </div>
   )
-})
+}

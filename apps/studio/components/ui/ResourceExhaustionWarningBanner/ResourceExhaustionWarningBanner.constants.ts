@@ -1,4 +1,21 @@
-export const RESOURCE_WARNING_MESSAGES = {
+interface ResourceWarningMessage {
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
+  restrictToRoutes?: string[]
+
+  bannerContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  cardContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  docsUrl?: string
+  buttonText?: string
+  metric: string | null
+}
+
+export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
@@ -25,7 +42,7 @@ export const RESOURCE_WARNING_MESSAGES = {
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: 'View database settings',
+    buttonText: 'Learn more',
     metric: 'read_only',
   },
   disk_io_exhaustion: {
@@ -52,31 +69,31 @@ export const RESOURCE_WARNING_MESSAGES = {
         description: 'It may become unresponsive',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-disk-io',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-disk-io',
+    buttonText: 'Learn more',
     metric: 'disk_io',
   },
   disk_space_exhaustion: {
     bannerContent: {
       warning: {
         title:
-          'Your project is about to exhaust its disk space budget, and may become unresponsive once fully exhausted',
+          'Your project is about to exhaust its available disk space, and may become unresponsive once fully exhausted',
         description:
-          'You can opt to increase your disk size up to 200GB on the database settings page.',
+          'You can opt to increase your disk size up to 200GB on the Database Settings page.',
       },
       critical: {
-        title: 'Your project has exhausted its disk space budget, and may become unresponsive',
+        title: 'Your project has exhausted its available disk space, and may become unresponsive',
         description:
-          'You can opt to increase your disk size up to 200GB on the database settings page.',
+          'You can opt to increase your disk size up to 200GB on the Database Settings page.',
       },
     },
     cardContent: {
       warning: {
-        title: 'Project is exhausting disk space budget',
+        title: 'Project is exhausting its available disk space',
         description: 'It may become unresponsive if fully exhausted',
       },
       critical: {
-        title: 'Project has exhausted disk space budget',
+        title: 'Project has exhausted its available disk space',
         description: 'It may become unresponsive',
       },
     },
@@ -107,8 +124,8 @@ export const RESOURCE_WARNING_MESSAGES = {
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-cpu',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/high-cpu-usage',
+    buttonText: 'Learn more',
     metric: 'cpu',
   },
   memory_and_swap_exhaustion: {
@@ -135,9 +152,37 @@ export const RESOURCE_WARNING_MESSAGES = {
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-ram',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-ram',
+    buttonText: 'Learn more',
     metric: 'ram',
+  },
+  auth_rate_limit_exhaustion: {
+    // [Joel] There is no critical warning as there is no notion of critical rate limits for auth at the moment
+    bannerContent: {
+      warning: {
+        title:
+          'Your project has exceeded email rate limits in the past 24 hours and may not reliably send auth related emails to users',
+        description:
+          'Set up a custom SMTP and adjust rate limits where necessary to ensure that emails are sent out reliably.',
+      },
+      critical: {
+        title: undefined,
+        description: undefined,
+      },
+    },
+    cardContent: {
+      warning: {
+        title: 'Your project has exceeded email rate limits',
+        description: `You will need to set up a custom SMTP provider and adjust rate limits where necessary`,
+      },
+      critical: {
+        title: undefined,
+        description: undefined,
+      },
+    },
+    docsUrl: 'https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits',
+    buttonText: 'Enable Custom SMTP',
+    metric: 'auth_email_rate_limit',
   },
   multiple_resource_warnings: {
     bannerContent: {

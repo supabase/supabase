@@ -10,7 +10,6 @@ tags:
   - postgres
   - planetpg
 date: '2023-12-13'
-published_at: '2023-12-13:00:00.000-07:00'
 toc_depth: 3
 author: stas
 image: lwx-supavisor/supavisor-og.png
@@ -87,18 +86,18 @@ For the Supavisor rollout, we maintained consistent pooling settings between PgB
 
 Now, we're raising the client connection limit for smaller projects in Supavisor. Here are the updated default configurations:
 
-| Database Size | default_pool_size | max_connections | default_max_clients   |
-| ------------- | ----------------- | --------------- | --------------------- |
-| micro         | 15                | 60              | 200                   |
-| small         | 15                | 90              | 1000 (previously 200) |
-| medium        | 15                | 120             | 1000 (previously 200) |
-| large         | 15                | 160             | 1000 (previously 300) |
-| xl            | 20                | 240             | 1000 (previously 700) |
-| 2xl           | 25                | 380             | 1500                  |
-| 4xl           | 32                | 480             | 3000                  |
-| 8xl           | 64                | 490             | 6000                  |
-| 12xl          | 96                | 500             | 9000                  |
-| 16xl          | 128               | 500             | 12000                 |
+| Database Size | default_pool_size | max_connections | default_max_clients    |
+| ------------- | ----------------- | --------------- | ---------------------- |
+| Micro         | 15                | 60              | 200                    |
+| Small         | 15                | 90              | 400 (previously 200)   |
+| Medium        | 15                | 120             | 600 (previously 200)   |
+| Large         | 20                | 160             | 800 (previously 300)   |
+| XL            | 20                | 240             | 1,000 (previously 700) |
+| 2XL           | 25                | 380             | 1,500                  |
+| 4XL           | 32                | 480             | 3,000                  |
+| 8XL           | 64                | 490             | 6,000                  |
+| 12XL          | 96                | 500             | 9,000                  |
+| 16XL          | 128               | 500             | 12,000                 |
 
 In this table:
 
@@ -114,7 +113,7 @@ If you're using the PgBouncer connection string and haven't migrated to the new 
 
 ## Getting started
 
-If you're using the Supabase platform, you can already access the pooler URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database).
+If you're using the Supabase platform, you can already access the pooler URL in your [project connect page](https://supabase.com/dashboard/project/_?showConnect=true).
 
 If you're looking to self-host Supavisor, check out [GitHub repository](https://github.com/supabase/supavisor) and [documentation](https://supabase.github.io/supavisor/).
 

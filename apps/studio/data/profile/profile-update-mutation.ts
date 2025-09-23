@@ -1,26 +1,34 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
 
 export type ProfileUpdateVariables = {
   firstName: string
   lastName: string
+  username: string
+  primaryEmail: string
 }
 
-export async function updateProfile({ firstName, lastName }: ProfileUpdateVariables) {
-  const response = await patch(`${API_URL}/profile`, {
-    first_name: firstName,
-    last_name: lastName,
+export async function updateProfile({
+  firstName,
+  lastName,
+  username,
+  primaryEmail,
+}: ProfileUpdateVariables) {
+  const { data, error } = await patch('/platform/profile', {
+    body: {
+      first_name: firstName,
+      last_name: lastName,
+      username: username,
+      primary_email: primaryEmail,
+    },
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type ProfileUpdateData = Awaited<ReturnType<typeof updateProfile>>

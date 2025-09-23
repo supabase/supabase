@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Octokit } from 'octokit'
 import { cn } from 'ui'
-import LogoLoader from 'ui/src/components/LogoLoader'
+import { LogoLoader } from 'ui'
 
 import RepoCard from './RepoCard'
+import { Pencil, Users, Users2 } from 'lucide-react'
 
 interface TabProps {
   label: string
@@ -67,7 +67,6 @@ enum SWIPER_STATE {
 }
 
 const Repos = ({ tabs }: Props) => {
-  const octokit = new Octokit()
   const [repos, setRepos] = useState<any[] | null>(null)
   const [activeTab, setActiveTab] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
@@ -75,6 +74,8 @@ const Repos = ({ tabs }: Props) => {
 
   useEffect(() => {
     async function fetchOctoData() {
+      const { Octokit } = await import('@octokit/core')
+      const octokit = new Octokit()
       const res = await octokit.request('GET /orgs/{org}/repos', {
         org: 'supabase',
         type: 'public',
@@ -105,7 +106,7 @@ const Repos = ({ tabs }: Props) => {
 
   return (
     <div className="flex flex-col gap-8 xl:gap-10">
-      <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8">
+      <div className="flex flex-wrap mx-auto items-center justify-center gap-y-6 gap-x-8 text-sm">
         <Link
           href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md"
           className="text-foreground-lighter hover:underline flex gap-1 items-center"
@@ -121,6 +122,21 @@ const Repos = ({ tabs }: Props) => {
         >
           <GitHubIcon />
           Code of Conduct
+        </Link>
+        <Link
+          href="/open-source/contributing/supasquad"
+          className="text-foreground-lighter hover:underline flex gap-1.5 items-center"
+        >
+          <Users className="w-4 h-4" />
+          SupaSquad
+        </Link>
+        <Link
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfJoQ6_uWymc4DJok2YVY8K_jp27S6HrnOIKmtHuDhBCWetDg/viewform?pli=1"
+          className="text-foreground-lighter hover:underline flex gap-1.5 items-center"
+          target="_blank"
+        >
+          <Pencil className="w-4 h-4" />
+          Community Content Program
         </Link>
       </div>
       <div className="w-full gap-2 flex flex-col items-center">
@@ -138,11 +154,11 @@ const Repos = ({ tabs }: Props) => {
                 slider.isEnd
                   ? SWIPER_STATE.END
                   : slider.isBeginning
-                  ? SWIPER_STATE.START
-                  : SWIPER_STATE.MIDDLE
+                    ? SWIPER_STATE.START
+                    : SWIPER_STATE.MIDDLE
               )
             }
-            className="relative flex md:hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
+            className="relative flex md:!hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
           >
             <div
               className={cn(
@@ -181,7 +197,7 @@ const Repos = ({ tabs }: Props) => {
         </div>
       </div>
       <div className="relative w-full h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           {repos === null ? (
             <div className="col-span-full flex justify-center items-center min-h-[300px]">
               <LogoLoader />
@@ -209,7 +225,7 @@ const GitHubIcon = () => (
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className="fill-foreground-lighter grouopp-hover:fill-foreground"
+    className="fill-foreground-lighter grouop-hover:fill-foreground w-4 h-4"
   >
     <path
       fillRule="evenodd"

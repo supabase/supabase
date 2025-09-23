@@ -1,49 +1,60 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+
 import { PostgresView } from '@supabase/postgres-meta'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { viewKeys } from './keys'
-import { View } from './view-query'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type ViewsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
+  schema?: string
 }
 
-export type ViewsResponse = View[] | { error?: any }
-
 export async function getViews(
-  { projectRef, connectionString }: ViewsVariables,
+  { projectRef, connectionString, schema }: ViewsVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await get(`${API_URL}/pg-meta/${projectRef}/views`, {
-    headers: Object.fromEntries(headers),
+  const { data, error } = await get('/platform/pg-meta/{ref}/views', {
+    params: {
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
+      path: { ref: projectRef },
+      query: {
+        included_schemas: schema || '',
+      } as any,
+    },
+    headers,
     signal,
-  })) as ViewsResponse
+  })
 
-  if (!Array.isArray(response) && response.error) {
-    throw response.error
-  }
-
-  return response as PostgresView[]
+  if (error) handleError(error)
+  return data as PostgresView[]
 }
 
 export type ViewsData = Awaited<ReturnType<typeof getViews>>
-export type ViewsError = unknown
+export type ViewsError = ResponseError
 
 export const useViewsQuery = <TData = ViewsData>(
-  { projectRef, connectionString }: ViewsVariables,
+  { projectRef, connectionString, schema }: ViewsVariables,
   { enabled = true, ...options }: UseQueryOptions<ViewsData, ViewsError, TData> = {}
 ) =>
   useQuery<ViewsData, ViewsError, TData>(
-    viewKeys.list(projectRef),
-    ({ signal }) => getViews({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef),
+    ({ signal }) => getViews({ projectRef, connectionString, schema }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      // We're using a staleTime of 0 here because the only way to create a
+      // view is via SQL, which we don't know about
+      staleTime: 0,
+      ...options,
+    }
   )

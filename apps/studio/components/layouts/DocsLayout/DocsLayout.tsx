@@ -1,21 +1,22 @@
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Error from 'components/ui/Error'
-import ProductMenu from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
-import ProjectLayout from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
   const { ref } = useParams()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
   const { data, isLoading, error } = useOpenAPISpecQuery(
@@ -31,9 +32,9 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const getPage = () => {
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
 
-    const { page, resource } = router.query
-    if (!page && !resource) return 'introduction'
-    return (page || resource || '') as string
+    const { page, rpc, resource } = router.query
+    if (!page && !resource && !rpc) return 'introduction'
+    return (page || rpc || resource || '') as string
   }
 
   if (error) {
@@ -67,4 +68,4 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   )
 }
 
-export default withAuth(observer(DocsLayout))
+export default withAuth(DocsLayout)

@@ -1,0 +1,247 @@
+---
+title: Streaming Speech with ElevenLabs
+subtitle: Generate and stream speech through Supabase Edge Functions. Store speech in Supabase Storage and cache responses via built-in CDN.
+tocVideo: '4Roog4PAmZ8'
+---
+
+## Introduction
+
+In this tutorial you will learn how to build an edge API to generate, stream, store, and cache speech using Supabase Edge Functions, Supabase Storage, and [ElevenLabs text to speech API](https://elevenlabs.io/text-to-speech).
+
+<Admonition type="tip">
+
+Find the [example project on GitHub](https://github.com/elevenlabs/elevenlabs-examples/tree/main/examples/text-to-speech/supabase/stream-and-cache-storage).
+
+</Admonition>
+
+## Requirements
+
+- An ElevenLabs account with an [API key](/app/settings/api-keys).
+- A [Supabase](https://supabase.com) account (you can sign up for a free account via [database.new](https://database.new)).
+- The [Supabase CLI](/docs/guides/local-development) installed on your machine.
+- The [Deno runtime](https://docs.deno.com/runtime/getting_started/installation/) installed on your machine and optionally [setup in your favourite IDE](https://docs.deno.com/runtime/getting_started/setup_your_environment).
+
+## Setup
+
+### Create a Supabase project locally
+
+After installing the [Supabase CLI](/docs/guides/local-development), run the following command to create a new Supabase project locally:
+
+```bash
+supabase init
+```
+
+### Configure the storage bucket
+
+You can configure the Supabase CLI to automatically generate a storage bucket by adding this configuration in the `config.toml` file:
+
+```toml ./supabase/config.toml
+[storage.buckets.audio]
+public = false
+file_size_limit = "50MiB"
+allowed_mime_types = ["audio/mp3"]
+objects_path = "./audio"
+```
+
+<Admonition type="tip">
+
+Upon running `supabase start` this will create a new storage bucket in your local Supabase project. Should you want to push this to your hosted Supabase project, you can run `supabase seed buckets --linked`.
+
+</Admonition>
+
+### Configure background tasks for Supabase Edge Functions
+
+To use background tasks in Supabase Edge Functions when developing locally, you need to add the following configuration in the `config.toml` file:
+
+```toml ./supabase/config.toml
+[edge_runtime]
+policy = "per_worker"
+```
+
+<Admonition type="tip">
+
+When running with `per_worker` policy, Function won't auto-reload on edits. You will need to manually restart it by running `supabase functions serve`.
+
+</Admonition>
+
+### Create a Supabase Edge Function for speech generation
+
+Create a new Edge Function by running the following command:
+
+```bash
+supabase functions new text-to-speech
+```
+
+If you're using VS Code or Cursor, select `y` when the CLI prompts "Generate VS Code settings for Deno? [y/N]"!
+
+### Set up the environment variables
+
+Within the `supabase/functions` directory, create a new `.env` file and add the following variables:
+
+```env supabase/functions/.env
+# Find / create an API key at https://elevenlabs.io/app/settings/api-keys
+ELEVENLABS_API_KEY=your_api_key
+```
+
+### Dependencies
+
+The project uses a couple of dependencies:
+
+- The [@supabase/supabase-js](/docs/reference/javascript) library to interact with the Supabase database.
+- The ElevenLabs [JavaScript SDK](/docs/quickstart) to interact with the text-to-speech API.
+- The open-source [object-hash](https://www.npmjs.com/package/object-hash) to generate a hash from the request parameters.
+
+Since Supabase Edge Function uses the [Deno runtime](https://deno.land/), you don't need to install the dependencies, rather you can [import](https://docs.deno.com/examples/npm/) them via the `npm:` prefix.
+
+## Code the Supabase Edge Function
+
+In your newly created `supabase/functions/text-to-speech/index.ts` file, add the following code:
+
+```ts supabase/functions/text-to-speech/index.ts
+// Setup type definitions for built-in Supabase Runtime APIs
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+import { createClient } from 'npm:@supabase/supabase-js@2'
+import { ElevenLabsClient } from 'npm:elevenlabs@1.52.0'
+import * as hash from 'npm:object-hash'
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+)
+
+const client = new ElevenLabsClient({
+  apiKey: Deno.env.get('ELEVENLABS_API_KEY'),
+})
+
+// Upload audio to Supabase Storage in a background task
+async function uploadAudioToStorage(stream: ReadableStream, requestHash: string) {
+  const { data, error } = await supabase.storage
+    .from('audio')
+    .upload(`${requestHash}.mp3`, stream, {
+      contentType: 'audio/mp3',
+    })
+
+  console.log('Storage upload result', { data, error })
+}
+
+Deno.serve(async (req) => {
+  // To secure your function for production, you can for example validate the request origin,
+  // or append a user access token and validate it with Supabase Auth.
+  console.log('Request origin', req.headers.get('host'))
+  const url = new URL(req.url)
+  const params = new URLSearchParams(url.search)
+  const text = params.get('text')
+  const voiceId = params.get('voiceId') ?? 'JBFqnCBsd6RMkjVDRZzb'
+
+  const requestHash = hash.MD5({ text, voiceId })
+  console.log('Request hash', requestHash)
+
+  // Check storage for existing audio file
+  const { data } = await supabase.storage.from('audio').createSignedUrl(`${requestHash}.mp3`, 60)
+
+  if (data) {
+    console.log('Audio file found in storage', data)
+    const storageRes = await fetch(data.signedUrl)
+    if (storageRes.ok) return storageRes
+  }
+
+  if (!text) {
+    return new Response(JSON.stringify({ error: 'Text parameter is required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  try {
+    console.log('ElevenLabs API call')
+    const response = await client.textToSpeech.convertAsStream(voiceId, {
+      output_format: 'mp3_44100_128',
+      model_id: 'eleven_multilingual_v2',
+      text,
+    })
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of response) {
+          controller.enqueue(chunk)
+        }
+        controller.close()
+      },
+    })
+
+    // Branch stream to Supabase Storage
+    const [browserStream, storageStream] = stream.tee()
+
+    // Upload to Supabase Storage in the background
+    EdgeRuntime.waitUntil(uploadAudioToStorage(storageStream, requestHash))
+
+    // Return the streaming response immediately
+    return new Response(browserStream, {
+      headers: {
+        'Content-Type': 'audio/mpeg',
+      },
+    })
+  } catch (error) {
+    console.log('error', { error })
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+})
+```
+
+## Run locally
+
+To run the function locally, run the following commands:
+
+```bash
+supabase start
+```
+
+Once the local Supabase stack is up and running, run the following command to start the function and observe the logs:
+
+```bash
+supabase functions serve
+```
+
+### Try it out
+
+Navigate to `http://127.0.0.1:54321/functions/v1/text-to-speech?text=hello%20world` to hear the function in action.
+
+Afterwards, navigate to `http://127.0.0.1:54323/project/default/storage/buckets/audio` to see the audio file in your local Supabase Storage bucket.
+
+## Deploy to Supabase
+
+If you haven't already, create a new Supabase account at [database.new](https://database.new) and link the local project to your Supabase account:
+
+```bash
+supabase link
+```
+
+Once done, run the following command to deploy the function:
+
+```bash
+supabase functions deploy
+```
+
+### Set the function secrets
+
+Now that you have all your secrets set locally, you can run the following command to set the secrets in your Supabase project:
+
+```bash
+supabase secrets set --env-file supabase/functions/.env
+```
+
+## Test the function
+
+The function is designed in a way that it can be used directly as a source for an `<audio>` element.
+
+```html
+<audio
+  src="https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/text-to-speech?text=Hello%2C%20world!&voiceId=JBFqnCBsd6RMkjVDRZzb"
+  controls
+/>
+```
+
+You can find an example frontend implementation in the complete code example on [GitHub](https://github.com/elevenlabs/elevenlabs-examples/tree/main/examples/text-to-speech/supabase/stream-and-cache-storage/src/pages/Index.tsx).

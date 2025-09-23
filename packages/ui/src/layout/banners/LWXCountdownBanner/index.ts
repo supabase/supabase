@@ -1,1 +1,0 @@
-export { LWXCountdownBanner } from './LWXCountdownBanner'

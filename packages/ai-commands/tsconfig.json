@@ -1,5 +1,9 @@
 {
   "extends": "tsconfig/react-library.json",
   "include": ["."],
-  "exclude": ["dist", "build", "node_modules"]
+  "exclude": ["dist", "build", "node_modules"],
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "types": ["./test/extensions.d.ts"]
+  }
 }

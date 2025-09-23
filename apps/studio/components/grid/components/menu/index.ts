@@ -1,6 +1,4 @@
-import ColumnMenu from './ColumnMenu'
-import RowContextMenu, { ROW_CONTEXT_MENU_ID } from './RowContextMenu'
+export { default as ColumnMenu } from './ColumnMenu'
+export { default as RowContextMenu } from './RowContextMenu'
 
-const MENU_IDS = { ROW_CONTEXT_MENU_ID }
-
-export { ColumnMenu, RowContextMenu, MENU_IDS }
+export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'

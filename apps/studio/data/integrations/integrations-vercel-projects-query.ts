@@ -1,7 +1,5 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { useCallback } from 'react'
-import { VercelFramework } from './integrations.types'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
 import { integrationKeys } from './keys'
 
 export type VercelProjectsVariables = {
@@ -24,17 +22,14 @@ export async function getVercelProjects(
         query: {
           // [Alaister]: setting a large limit here to avoid pagination
           // until we have merged the new shadcn listbox which will support it
-          limit: '1000',
+          limit: 1000,
         },
       },
       signal,
     }
   )
 
-  if (error) {
-    throw error
-  }
-
+  if (error) handleError(error)
   return data.projects
 }
 

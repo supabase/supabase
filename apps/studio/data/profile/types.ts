@@ -1,5 +1,5 @@
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
-export type Profile = components['schemas']['ProfileResponse']
-
-export type Feature = Profile['disabled_features'][number]
+export type Profile = components['schemas']['ProfileResponse'] & {
+  profileImageUrl?: string
+}

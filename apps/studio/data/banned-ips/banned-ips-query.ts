@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { BannedIPKeys } from './keys'
 
 export type BannedIPVariables = {
@@ -14,16 +15,11 @@ export async function getBannedIPs({ projectRef }: BannedIPVariables, signal?: A
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/network-bans/retrieve`, {
-    params: {
-      path: { ref: projectRef },
-    },
+    params: { path: { ref: projectRef } },
     signal,
   })
 
-  if (error) {
-    throw error
-  }
-
+  if (error) handleError(error)
   return data
 }
 

@@ -1,34 +1,33 @@
 import { useParams } from 'common'
-
-import { LogsTableName } from 'components/interfaces/Settings/Logs'
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { LogsLayout } from 'components/layouts'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { NextPageWithLayout } from 'types'
-import Connecting from 'components/ui/Loading/Loading'
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
+import { Loading } from 'components/ui/Loading'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
+import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data: poolingConfiguration, isLoading } = usePoolingConfigurationQuery({
-    projectRef: ref ?? 'default',
-  })
+  const { isLoading } = useSupavisorConfigurationQuery({ projectRef: ref ?? 'default' })
 
-  // this prevents initial load of pgbouncer logs before config has been retrieved
-  if (isLoading) {
-    return <Connecting />
-  }
-  const isSupavisorEnabled = poolingConfiguration?.supavisor_enabled ?? false
+  // this prevents initial load of pooler logs before config has been retrieved
+  if (isLoading) return <Loading />
 
   return (
     <LogsPreviewer
       projectRef={ref as string}
       condensedLayout={true}
-      tableName={isSupavisorEnabled ? LogsTableName.SUPAVISOR : LogsTableName.PGBOUNCER}
-      queryType={isSupavisorEnabled ? 'supavisor' : 'pgbouncer'}
+      tableName={LogsTableName.SUPAVISOR}
+      queryType={'supavisor'}
     />
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Database">{page}</LogsLayout>
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Pooler Logs">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

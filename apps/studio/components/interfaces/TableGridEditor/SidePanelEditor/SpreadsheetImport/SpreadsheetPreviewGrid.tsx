@@ -1,5 +1,5 @@
 import DataGrid from 'react-data-grid'
-import clsx from 'clsx'
+import { cn } from 'ui'
 
 const MAX_ROWS = 20
 const MAX_HEADERS = 20
@@ -23,24 +23,25 @@ const SpreadsheetPreviewGrid = ({
       columns={previewHeaders.map((header) => {
         const columnValues = previewRows.map((row) => row[header]?.toString() ?? '')
         const maxLength = Math.max(...columnValues.map((el) => el.length))
-        const maxWidth = maxLength > 20 ? 200 : maxLength * 10
+        const columnNameLength = header.length
+
+        const charLength = Math.max(maxLength, columnNameLength)
+        const maxWidth = charLength > 20 ? 200 : charLength * 10
 
         return {
           key: header,
           name: header,
           width: maxWidth,
           resizable: true,
-          headerRenderer: () => (
+          renderHeaderCell: () => (
             <div className="flex items-center justify-center h-full">
               <p className="text-xs">{header}</p>
             </div>
           ),
-          formatter: ({ row }: { row: any }) => {
+          renderCell: ({ row }: { row: any }) => {
             const isEmpty = !row[header]
             return (
-              <span
-                className={clsx('text-sm flex items-center', isEmpty && 'text-foreground-light')}
-              >
+              <span className={cn('text-sm flex items-center', isEmpty && 'text-foreground-light')}>
                 {isEmpty ? 'NULL' : row[header]}
               </span>
             )

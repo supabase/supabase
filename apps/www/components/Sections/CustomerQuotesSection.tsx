@@ -1,10 +1,10 @@
-import { useRef } from 'react'
+import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
-import { IconArrowUpRight } from 'ui'
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import { useRef } from 'react'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import CustomersVisual from '~/components/Products/VectorAI/CustomersVisual'
@@ -76,9 +76,9 @@ const CustomerQuotesSection = (props: Props) => {
             {customer.author}, {customer.role}
           </p>
           {customer.url && (
-            <div className="text-brand border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
+            <div className="text-brand-link border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
               <span>Read Customer Story</span>
-              <IconArrowUpRight />
+              <ArrowUpRight />
             </div>
           )}
         </div>

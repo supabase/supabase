@@ -1,7 +1,8 @@
-import { Collapsible, IconChevronUp } from 'ui'
 import classNames from 'classnames'
 import { Fragment, useMemo, useState } from 'react'
+import { Collapsible } from 'ui'
 import { Check } from './PricingIcons'
+import { ChevronUp } from 'lucide-react'
 
 interface PricingAddOnTableProps {
   pricing: {
@@ -63,7 +64,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
             </div>
 
             <div className="flex items-center gap-2 self-center p-3">
-              <IconChevronUp className="data-open-parent:rotate-0 data-closed-parent:rotate-180 h-8 w-8 transition" />
+              <ChevronUp className="data-open-parent:rotate-0 data-closed-parent:rotate-180 h-8 w-8 transition" />
             </div>
           </button>
         </Collapsible.Trigger>

@@ -1,22 +1,23 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { get, handleError, isValidConnString } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
-import { components } from 'data/api'
 
 export type ProjectDetailVariables = { ref?: string }
 
 export type ProjectMinimal = components['schemas']['ProjectInfo']
 export type ProjectDetail = components['schemas']['ProjectDetailResponse']
 
-export interface Project extends ProjectDetail {
+export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
    * postgrestStatus is available on client side only.
    * We use this status to check if a project instance is HEALTHY or not
    * If not we will show ConnectingState and run a polling until it's back online
    */
   postgrestStatus?: 'ONLINE' | 'OFFLINE'
+  status: components['schemas']['ProjectDetailResponse']['status']
 }
 
 export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {
@@ -27,7 +28,7 @@ export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?:
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data as unknown as Project
 }
 
@@ -44,6 +45,21 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
     {
       enabled: enabled && typeof ref !== 'undefined',
       staleTime: 30 * 1000, // 30 seconds
+      refetchInterval(data) {
+        const result = data && (data as unknown as ProjectDetailData)
+        const status = result && result.status
+        const connectionString = result && result.connectionString
+
+        if (
+          status === 'COMING_UP' ||
+          status === 'UNKNOWN' ||
+          !isValidConnString(connectionString)
+        ) {
+          return 5 * 1000 // 5 seconds
+        }
+
+        return false
+      },
       ...options,
     }
   )
@@ -52,15 +68,8 @@ export function invalidateProjectDetailsQuery(client: QueryClient, ref: string) 
   return client.invalidateQueries(projectKeys.detail(ref))
 }
 
-// get the cached value or fallback to fetching it
-export async function getCachedProjectDetail(
-  client: QueryClient,
-  ref: string | undefined
-): Promise<ProjectDetailData | undefined> {
-  if (!ref) return undefined
-
-  const cached = client.getQueryData<ProjectDetailData>(projectKeys.detail(ref))
-  if (cached) return cached
-
-  return await client.fetchQuery<ProjectDetailData, ProjectDetailError>(projectKeys.detail(ref))
+export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
+  return client.fetchQuery(projectKeys.detail(ref), ({ signal }) =>
+    getProjectDetail({ ref }, signal)
+  )
 }

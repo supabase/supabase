@@ -1,11 +1,11 @@
-import { useParams } from 'common'
+import { AlertCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import { AlertCircleIcon } from 'lucide-react'
+import { useParams } from 'common'
 import { useAppStateSnapshot } from 'state/app-state'
 
-const BranchingPostgresVersionNotice = () => {
+export const BranchingPostgresVersionNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
@@ -23,7 +23,7 @@ const BranchingPostgresVersionNotice = () => {
         <Button size="tiny" type="default" className="mt-4">
           <Link
             href={`/project/${ref}/settings/infrastructure`}
-            onClick={() => snap.setShowEnableBranchingModal(false)}
+            onClick={() => snap.setShowCreateBranchModal(false)}
           >
             Head to project settings
           </Link>
@@ -32,5 +32,3 @@ const BranchingPostgresVersionNotice = () => {
     </Alert_Shadcn_>
   )
 }
-
-export default BranchingPostgresVersionNotice

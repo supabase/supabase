@@ -75,7 +75,7 @@ If you install pgsodium locally the default is to generate a random root key fro
 Installing the `vault` extension is the same as any other Postgres extension:
 
 ```sql
-create extension vault with schema vault;
+create extension supabase_vault with schema vault;
 ```
 
 Once enabled, you can insert secrets into the `vault.secrets` table:

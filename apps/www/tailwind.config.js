@@ -2,13 +2,14 @@ const config = require('config/tailwind.config')
 
 module.exports = config({
   content: [
-    '../../packages/ui/src/**/*.{tsx,ts,js}',
-    './pages/**/*.{tsx,mdx}',
-    './lib/mdx/mdxComponents.tsx',
-    './components/**/*.tsx',
-    './layouts/**/*.tsx',
-    './src/**/*.{ts,tsx,mdx}',
     './_blog/*.mdx',
+    './components/**/*.tsx',
+    './data/**/*.tsx',
+    './layouts/**/*.tsx',
+    './lib/mdx/mdxComponents.tsx',
+    './pages/**/*.{tsx,mdx}',
+    './../../packages/ui/src/**/*.{tsx,ts,js}',
+    './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
   theme: {
     extend: {
@@ -18,10 +19,8 @@ module.exports = config({
           '100%': { backgroundColor: 'transparent' },
         },
         slideIn: {
-          '0%, 100%': { transform: 'translate3d(0,0,0)' },
-        },
-        slideIn: {
-          '0%, 100%': { transform: 'translate3d(0,0,0)' },
+          '0%': { transform: 'translate3d(0,-100%,0)' },
+          '100%': { transform: 'translate3d(0,0,0)' },
         },
         spinner: {
           '0%': {
@@ -35,6 +34,14 @@ module.exports = config({
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-100%)' },
         },
+        'marquee-reverse': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0%)' },
+        },
+        'marquee-vertical': {
+          '0%': { transform: 'translateY(0%)' },
+          '100%': { transform: 'translateY(-100%)' },
+        },
         'pulse-radar': {
           '0%': { transform: 'scale(0)', opacity: 0 },
           '50%': { opacity: 0.8 },
@@ -46,7 +53,13 @@ module.exports = config({
         'flash-code-slow': 'flash-code 2s forwards',
         spinner: 'spinner 1s both infinite',
         marquee: 'marquee 35s linear infinite',
+        'marquee-vertical': 'marquee-vertical 180s linear infinite both',
         'pulse-radar': 'pulse-radar 3s linear infinite',
+        'slide-in': 'slideIn 250ms ease-in both',
+      },
+      transitionDelay: {
+        1200: '1200ms',
+        1500: '1500ms',
       },
     },
   },

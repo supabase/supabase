@@ -1,299 +1,276 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { partition } from 'lodash'
-import { useMemo, useState } from 'react'
+import { Filter, Plus } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { useParams } from 'common'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { ExportDialog } from 'components/grid/components/header/ExportDialog'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { SupaTable } from 'components/grid/types'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useSchemasQuery } from 'data/database/schemas-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  IconChevronsDown,
-  IconEdit,
-  IconLoader,
-  IconRefreshCw,
-  IconSearch,
-  IconX,
-  Input,
+  Checkbox_Shadcn_,
+  Label_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
 } from 'ui'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import {
+  InnerSideBarEmptyPanel,
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
+  InnerSideBarFilters,
+} from 'ui-patterns/InnerSideMenu'
+import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
+import { TableMenuEmptyState } from './TableMenuEmptyState'
 
-const TableEditorMenu = () => {
-  const { id } = useParams()
+export const TableEditorMenu = () => {
+  const { id: _id, ref: projectRef } = useParams()
+  const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isMobile = useBreakpoint()
 
-  const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
+  const [tableToExport, setTableToExport] = useState<SupaTable>()
+  const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
     'alphabetical'
   )
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data,
     isLoading,
     isSuccess,
     isError,
     error,
-    refetch,
-    isRefetching,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-    isPreviousData: isSearching,
   } = useEntityTypesQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
-      search: searchText || undefined,
+      schemas: [selectedSchema],
+      search: searchText.trim() || undefined,
       sort,
+      filterTypes: visibleTypes,
     },
     {
-      keepPreviousData: true,
+      keepPreviousData: Boolean(searchText),
     }
   )
 
-  const totalCount = data?.pages?.[0].data.count
   const entityTypes = useMemo(
     () => data?.pages.flatMap((page) => page.data.entities),
     [data?.pages]
   )
 
-  const { data: schemas } = useSchemasQuery({
+  const { can: canCreateTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    id,
   })
 
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
-  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-
-  const refreshTables = async () => {
-    await refetch()
+  if (selectedTable?.schema && !selectedSchema) {
+    setSelectedSchema(selectedTable.schema)
   }
 
-  const [protectedSchemas] = partition(
-    (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
-    (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
+
+  const onSelectExportCLI = async (id: number) => {
+    const table = await getTableEditor({
+      id: id,
+      projectRef,
+      connectionString: project?.connectionString,
+    })
+    const supaTable = table && parseSupaTable(table)
+    setTableToExport(supaTable)
+  }
+
+  useEffect(() => {
+    // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
+    if (entityTypes && !searchText) {
+      tableEditorTabsCleanUp({ schemas: [selectedSchema], entities: entityTypes })
+    }
+  }, [entityTypes, searchText, selectedSchema, tableEditorTabsCleanUp])
 
   return (
     <>
-      <div
-        className="pt-5 flex flex-col flex-grow space-y-4 h-full"
-        style={{ maxHeight: 'calc(100vh - 48px)' }}
-      >
-        <SchemaSelector
-          className="mx-4"
-          selectedSchemaName={snap.selectedSchemaName}
-          onSelectSchema={(name: string) => {
-            setSearchText('')
-            snap.setSelectedSchemaName(name)
-          }}
-          onSelectCreateSchema={() => snap.onAddSchema()}
-        />
+      <div className="flex flex-col flex-grow gap-5 pt-5 h-full">
+        <div className="flex flex-col gap-y-1.5">
+          <SchemaSelector
+            className="mx-4"
+            selectedSchemaName={selectedSchema}
+            onSelectSchema={(name: string) => {
+              setSearchText('')
+              setSelectedSchema(name)
+            }}
+            onSelectCreateSchema={() => snap.onAddSchema()}
+            portal={!isMobile}
+          />
 
-        <div className="space-y-1 mx-4">
-          {!isLocked ? (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
-                <Button
-                  asChild
-                  block
-                  disabled={!canCreateTables}
-                  size="tiny"
-                  icon={
-                    <div className="text-foreground-lighter">
-                      <IconEdit size={14} strokeWidth={1.5} />
-                    </div>
-                  }
-                  type="default"
-                  style={{ justifyContent: 'start' }}
-                  onClick={snap.onAddTable}
-                >
-                  <span>New table</span>
-                </Button>
-              </Tooltip.Trigger>
-              {!canCreateTables && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to create tables
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-          ) : (
-            <Alert_Shadcn_>
-              <AlertTitle_Shadcn_ className="text-xs tracking-normal">
-                Viewing protected schema
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="text-xs">
-                <p className="mb-2">
-                  This schema is managed by Supabase and is read-only through the table editor
-                </p>
-                <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
-                  Learn more
-                </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          )}
-
-          {/* Table search input */}
-          <div className="mb-2 block">
-            <Input
-              className="table-editor-search border-none"
-              icon={
-                isSearching ? (
-                  <IconLoader
-                    className="animate-spin text-foreground-lighter"
-                    size={12}
-                    strokeWidth={1.5}
-                  />
-                ) : (
-                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
-                )
-              }
-              placeholder="Search tables"
-              onChange={(e) => setSearchText(e.target.value.trim())}
-              value={searchText}
-              size="tiny"
-              actions={
-                searchText && (
-                  <Button size="tiny" type="text" onClick={() => setSearchText('')}>
-                    <IconX size={12} strokeWidth={2} />
-                  </Button>
-                )
-              }
-            />
+          <div className="grid gap-3 mx-4">
+            {!isSchemaLocked ? (
+              <ButtonTooltip
+                block
+                title="Create a new table"
+                name="New table"
+                disabled={!canCreateTables}
+                size="tiny"
+                icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
+                type="default"
+                className="justify-start"
+                onClick={snap.onAddTable}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canCreateTables
+                      ? 'You need additional permissions to create tables'
+                      : undefined,
+                  },
+                }}
+              >
+                New table
+              </ButtonTooltip>
+            ) : (
+              <ProtectedSchemaWarning size="sm" schema={selectedSchema} entity="table" />
+            )}
           </div>
         </div>
-
-        <nav className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <div className="flex items-center justify-between w-full px-3">
-            <div className="flex items-center gap-1 text-sm text-foreground-lighter">
-              <p>Tables</p>
-              {totalCount !== undefined && (
-                <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
-              )}
-            </div>
-
-            <div className="flex gap-3 items-center">
-              <DropdownMenu>
-                <Tooltip.Root delayDuration={0}>
-                  <DropdownMenuTrigger asChild>
-                    <Tooltip.Trigger>
-                      <div className="text-foreground-lighter transition-colors hover:text-foreground">
-                        <IconChevronsDown size={18} strokeWidth={1} />
-                      </div>
-                    </Tooltip.Trigger>
-                  </DropdownMenuTrigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs">Sort By</span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-
-                <DropdownMenuContent side="bottom" align="start" className="w-48">
-                  <DropdownMenuRadioGroup
-                    value={sort}
-                    onValueChange={(value: any) => setSort(value)}
-                  >
-                    <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
-                      Alphabetical
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem key="grouped-alphabetical" value="grouped-alphabetical">
-                      Entity Type
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <button
-                className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
-                onClick={refreshTables}
+        <div className="flex flex-auto flex-col gap-2 pb-4">
+          <InnerSideBarFilters className="mx-2">
+            <InnerSideBarFilterSearchInput
+              autoFocus={!isMobile}
+              name="search-tables"
+              value={searchText}
+              placeholder="Search tables..."
+              aria-labelledby="Search tables"
+              onChange={(e) => setSearchText(e.target.value)}
+            >
+              <InnerSideBarFilterSortDropdown
+                value={sort}
+                onValueChange={(value: any) => setSort(value)}
               >
-                <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-              </button>
-            </div>
-          </div>
+                <InnerSideBarFilterSortDropdownItem
+                  key="alphabetical"
+                  value="alphabetical"
+                  className="flex gap-2"
+                >
+                  Alphabetical
+                </InnerSideBarFilterSortDropdownItem>
+                <InnerSideBarFilterSortDropdownItem
+                  key="grouped-alphabetical"
+                  value="grouped-alphabetical"
+                >
+                  Entity Type
+                </InnerSideBarFilterSortDropdownItem>
+              </InnerSideBarFilterSortDropdown>
+            </InnerSideBarFilterSearchInput>
+            <Popover_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                  className="h-[32px] md:h-[28px] px-1.5"
+                  icon={<Filter />}
+                />
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+                <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
+                  <p className="text-xs">Show entity types</p>
+                  <div className="flex flex-col">
+                    {Object.entries(ENTITY_TYPE).map(([key, value]) => (
+                      <div key={key} className="group flex items-center justify-between py-0.5">
+                        <div className="flex items-center gap-x-2">
+                          <Checkbox_Shadcn_
+                            id={key}
+                            name={key}
+                            checked={visibleTypes.includes(value)}
+                            onCheckedChange={() => {
+                              if (visibleTypes.includes(value)) {
+                                setVisibleTypes(visibleTypes.filter((y) => y !== value))
+                              } else {
+                                setVisibleTypes(visibleTypes.concat([value]))
+                              }
+                            }}
+                          />
+                          <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                            {key.toLowerCase().replace('_', ' ')}
+                          </Label_Shadcn_>
+                        </div>
+                        <Button
+                          size="tiny"
+                          type="default"
+                          onClick={() => setVisibleTypes([value])}
+                          className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
+                        >
+                          Select only
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          </InnerSideBarFilters>
 
-          {isLoading && (
-            <div className="flex flex-col px-2 gap-1 pb-4">
-              <ShimmeringLoader className="w-full h-7 rounded-md" delayIndex={0} />
-              <ShimmeringLoader className="w-full h-7 rounded-md" delayIndex={1} />
-              <ShimmeringLoader className="w-full h-7 rounded-md" delayIndex={2} />
-            </div>
-          )}
+          {isLoading && <EditorMenuListSkeleton />}
 
           {isError && (
-            <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
+            <div className="mx-4">
+              <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
+            </div>
           )}
 
           {isSuccess && (
             <>
               {searchText.length === 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <div className="mx-2 my-2 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
-                  <p className="text-xs">No entities available</p>
-                  <p className="text-xs text-foreground-light">
-                    This schema has no entities available yet
-                  </p>
-                </div>
+                <TableMenuEmptyState />
               )}
               {searchText.length > 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <div className="mx-2 my-2 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
-                  <p className="text-xs">No results found</p>
-                  <p className="text-xs text-foreground-light">
-                    Your search for "{searchText}" did not return any results
-                  </p>
-                </div>
+                <InnerSideBarEmptyPanel
+                  className="mx-2"
+                  title="No results found"
+                  description={`Your search for "${searchText}" did not return any results`}
+                />
               )}
-
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1">
+                <div className="flex flex-1 flex-grow" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
+                    // @ts-expect-error
                     ItemComponent={EntityListItem}
                     itemProps={{
-                      projectRef: project?.ref,
+                      projectRef: project?.ref!,
                       id: Number(id),
+                      isSchemaLocked,
+                      onExportCLI: () => onSelectExportCLI(Number(id)),
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
@@ -304,12 +281,17 @@ const TableEditorMenu = () => {
               )}
             </>
           )}
-        </nav>
+        </div>
       </div>
 
-      <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
+      <ExportDialog
+        ignoreRoleImpersonation
+        table={tableToExport}
+        open={!!tableToExport}
+        onOpenChange={(open) => {
+          if (!open) setTableToExport(undefined)
+        }}
+      />
     </>
   )
 }
-
-export default TableEditorMenu

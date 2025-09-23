@@ -1,6 +1,7 @@
-const notDefault = (value, defaultValue) => (value !== defaultValue) ? value : ''
+const notDefault = (value, defaultValue) => (value !== defaultValue ? value : '')
 
-const fontFamily = ({ fontFamily }, { fontFamilies } = {}) => fontFamilies && fontFamilies[fontFamily] ? fontFamilies[fontFamily] : fontFamily
+const fontFamily = ({ fontFamily }, { fontFamilies } = {}) =>
+  fontFamilies && fontFamilies[fontFamily] ? fontFamilies[fontFamily] : fontFamily
 
 module.exports = {
   type: 'value',
@@ -10,5 +11,5 @@ module.exports = {
   transformer: function ({ value: font }, { options }) {
     // font: font-style font-variant font-weight font-size/line-height font-family;
     return `${notDefault(font.fontStretch, 'normal')} ${notDefault(font.fontStyle, 'normal')} ${font.fontWeight} ${font.fontSize}/${font.lineHeight} ${fontFamily(font, options)}`.trim()
-  }
+  },
 }

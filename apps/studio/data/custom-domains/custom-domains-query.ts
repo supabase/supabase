@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainsVariables = {
@@ -19,7 +20,7 @@ type Ssl = {
   id: string
   type: string
   method: string
-  status: 'pending_validation' | 'pending_deployment' | 'validation_timed_out'
+  status: 'pending_validation' | 'pending_deployment' | 'validation_timed_out' | 'initializing'
   txt_name?: string
   txt_value?: string
   settings: Settings
@@ -64,16 +65,10 @@ export async function getCustomDomains(
   { projectRef }: CustomDomainsVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error: _error } = await get('/v1/projects/{ref}/custom-hostname', {
-    params: {
-      path: {
-        ref: projectRef,
-      },
-    },
+    params: { path: { ref: projectRef } },
     signal,
   })
 
@@ -99,7 +94,7 @@ export async function getCustomDomains(
       } as const
     }
 
-    throw error
+    handleError(error)
   }
 
   return { customDomain: data.data.result as CustomDomainResponse, status: data.status }
@@ -111,9 +106,16 @@ export type CustomDomainsError = ResponseError
 export const useCustomDomainsQuery = <TData = CustomDomainsData>(
   { projectRef }: CustomDomainsVariables,
   { enabled = true, ...options }: UseQueryOptions<CustomDomainsData, CustomDomainsError, TData> = {}
-) =>
-  useQuery<CustomDomainsData, CustomDomainsError, TData>(
+) => {
+  const { data } = useProjectAddonsQuery({ projectRef })
+  const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
+
+  return useQuery<CustomDomainsData, CustomDomainsError, TData>(
     customDomainKeys.list(projectRef),
     ({ signal }) => getCustomDomains({ projectRef }, signal),
-    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
+    {
+      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && hasCustomDomainsAddon,
+      ...options,
+    }
   )
+}

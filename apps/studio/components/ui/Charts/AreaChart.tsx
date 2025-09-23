@@ -1,13 +1,13 @@
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useState } from 'react'
 import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
-import ChartHeader from './ChartHeader'
-import { CommonChartProps, Datum } from './Charts.types'
+import { useChartHoverState } from './useChartHoverState'
+
+import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
+import { ChartHeader } from './ChartHeader'
+import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import ChartNoData from './NoDataPlaceholder'
-dayjs.extend(utc)
+import NoDataPlaceholder from './NoDataPlaceholder'
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -15,6 +15,7 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   format?: string
   customDateFormat?: string
   displayDateInUtc?: boolean
+  syncId?: string
 }
 
 const AreaChart = ({
@@ -31,11 +32,13 @@ const AreaChart = ({
   className = '',
   valuePrecision,
   size = 'normal',
+  syncId,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
-
-  if (data.length === 0) return <ChartNoData size={size} className={className} />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
   const resolvedHighlightedLabel =
@@ -47,6 +50,18 @@ const AreaChart = ({
 
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
+
+  if (data.length === 0) {
+    return (
+      <NoDataPlaceholder
+        description="It may take up to 24 hours for data to refresh"
+        size={size}
+        className={className}
+        attribute={title}
+        format={format}
+      />
+    )
+  }
 
   return (
     <div className={['flex flex-col gap-3', className].join(' ')}>
@@ -61,6 +76,14 @@ const AreaChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
+        syncId={syncId}
+        data={data}
+        xAxisKey={xAxisKey}
+        yAxisKey={yAxisKey}
+        xAxisIsDate={true}
+        displayDateInUtc={displayDateInUtc}
+        valuePrecision={valuePrecision}
+        attributes={[]}
       />
       <Container>
         <RechartAreaChart
@@ -72,13 +95,18 @@ const AreaChart = ({
             bottom: 0,
           }}
           className="overflow-visible"
-          //   mouse hover focusing logic
           onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
+
+            setHover(e.activeTooltipIndex)
           }}
-          onMouseLeave={() => setFocusDataIndex(null)}
+          onMouseLeave={() => {
+            setFocusDataIndex(null)
+
+            clearHover()
+          }}
         >
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -96,7 +124,21 @@ const AreaChart = ({
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
-          <Tooltip content={() => null} />
+          <Tooltip
+            content={(props) =>
+              syncId && syncTooltip && hoveredIndex !== null ? (
+                <div className="bg-black/90 text-white p-2 rounded text-xs">
+                  <div className="font-medium">
+                    {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
+                  </div>
+                  <div>
+                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
+                    {format}
+                  </div>
+                </div>
+              ) : null
+            }
+          />
           <Area
             type="monotone"
             dataKey={yAxisKey}
@@ -107,7 +149,7 @@ const AreaChart = ({
         </RechartAreaChart>
       </Container>
       {data && (
-        <div className="text-foreground-lighter -mt-2 flex items-center justify-between text-xs">
+        <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-xs">
           <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
           <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>

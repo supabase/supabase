@@ -1,18 +1,27 @@
 # Developing Supabase
 
-1. [Getting started](#getting-started)
-   - [Install dependencies](#install-dependencies)
-2. [Local development](#local-development)
-   - [Fork the repo](#fork-the-repo)
-   - [Clone the repo](#clone-the-repo)
-   - [Running turborepo](#running-turborepo)
-     - [Shared components](#shared-components)
-     - [Installing packages](#installing-packages)
-   - [New Supabase docs](#new-supabase-docs)
-3. [Create a pull request](#create-a-pull-request)
+- [Developing Supabase](#developing-supabase)
 
-- [Common tasks](#common-tasks)
-  - [Add a redirect](#add-a-redirect)
+  - [Getting started](#getting-started)
+    - [Install dependencies](#install-dependencies)
+  - [Local development](#local-development)
+    - [Fork the repo](#fork-the-repo)
+    - [Clone the repo](#clone-the-repo)
+    - [Install dependencies](#install-dependencies-1)
+      - [Running sites individually](#running-sites-individually)
+      - [Shared components](#shared-components)
+      - [Installing packages](#installing-packages)
+  - [Running Docker for Supabase Studio](#running-docker-for-supabase-studio)
+    - [Prerequisites](#prerequisites)
+    - [Get Started](#get-started)
+  - [Create a pull request](#create-a-pull-request)
+  - [Issue assignment](#issue-assignment)
+  - [Common tasks](#common-tasks)
+    - [Add a redirect](#add-a-redirect)
+    - [Federated docs](#federated-docs)
+  - [Community channels](#community-channels)
+  - [Contributors](#contributors)
+
 - [Community channels](#community-channels)
 
 ## Getting started
@@ -25,9 +34,10 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
-- [Git](http://git-scm.com/)
-- [Node.js v18.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 9.x.x
+- [Git](https://git-scm.com/)
+- [Node.js v22.x or higher](https://nodejs.org)
+- [pnpm](https://pnpm.io/) version 9.x.x or higher
+- [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
 - [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
 
 ## Local development
@@ -55,15 +65,21 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 ### Install dependencies
 
-1. Install the dependencies in the root of the repo.
+1. Install the dependencies in the root of the repo:
 
    ```sh
-   npm install # install dependencies
+   pnpm install # install dependencies
    ```
 
-2. After that you can run the apps simultaneously with the following.
+2. Copy the example `.env.local.example` to `.env.local`
+
    ```sh
-   npm run dev # start all the applications
+   cp apps/www/.env.local.example apps/www/.env.local
+   ```
+
+3. After that you can run the apps simultaneously with the following:
+   ```sh
+   pnpm dev # start all the applications
    ```
 
 Then visit, and edit, any of the following sites:
@@ -79,31 +95,31 @@ Then visit, and edit, any of the following sites:
 You can run any of the sites individually by using the scope name. For example:
 
 ```sh
-npm run dev:www
+pnpm dev:www
 ```
+
+Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
 
 #### Shared components
 
 The monorepo has a set of shared components under `/packages`:
 
-- `/packages/common`: Common React components, shared between all sites.
+- `/packages/ai-commands`: Helpers/Commands for AI related functions
+- `/packages/common`: Common React components, shared between all sites
 - `/packages/config`: All shared config
-- `/packages/spec`: Generates documentation using spec files.
+- `/packages/shared-data`: Shared data that can be used across all apps
 - `/packages/tsconfig`: Shared Typescript settings
+- `/packages/ui`: Common UI components
 
 #### Installing packages
 
-Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into. Do not install dependencies in their local folder, install them from the route using the `-w` flag.
-
-The format is: `npm install <package name> -w=<workspace to install in>`.
+Installing a package in a specific workspace requires you to move to the workspace and then run the install command.
 
 For example:
 
-- `npm install react -w common`: installs into `./packages/common`
-- `npm install react -w www`: installs into `./apps/www`
-- `npm install react -w studio`: installs into `./apps/studio`
+1. `cd apps/studio`: move to the `studio` workspace.
+2. `pnpm add react`: installs `react` into `studio` workspace.
 
-You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
 ---
 
@@ -111,7 +127,7 @@ You do not need to install `devDependencies` in each workspace. These can all be
 
 To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
 
-#### Prerequsites
+#### Prerequisites
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
@@ -129,7 +145,7 @@ First, make sure you have the Docker installed on your device. You can download 
    cp .env.example .env
    ```
 
-3. Run docker
+3. Run docker:
 
    ```sh
    docker compose up
@@ -170,9 +186,9 @@ Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/
 We support "federating" docs, meaning doc content can come directly from external repos other than [`supabase/supabase`](https://github.com/supabase/supabase).
 
 - It's great for things like client libs who have their own set of docs that we don't want to duplicate on the official Supabase docs (eg. [`supabase/vecs`](https://github.com/supabase/vecs)).
-- No duplication or manual steps required - fetches and generates automatically as part of the docs build pipeline
-- It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native
-- If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate
+- No duplication or manual steps required - fetches and generates automatically as part of the docs build pipeline.
+- It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native.
+- If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate.
 
 Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
 
@@ -187,7 +203,7 @@ Some things to consider:
 
 ## Community channels
 
-If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [GitHub Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
 
 ## Contributors
 

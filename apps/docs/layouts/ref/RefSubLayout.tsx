@@ -1,10 +1,12 @@
 import { useInView } from 'react-intersection-observer'
 import { FC, PropsWithChildren } from 'react'
-import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
-import { useRouter } from 'next/router'
+import { highlightSelectedNavItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
+import { useRouter } from 'next/compat/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
 import Image from 'next/legacy/image'
+import { cn } from 'ui'
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 interface ISectionContainer {
   id: string
@@ -66,7 +68,7 @@ const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
       key={props.id + 'section'}
       className={[
         props.singleColumn ? 'prose w-full' : 'w-full',
-        'py-16 lg:py-32 first:pt-8 last:pb-8',
+        'py-16 first:pt-8 last:pb-8',
       ].join(' ')}
     >
       <StickyHeader {...props} />
@@ -88,7 +90,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
 
   // we're serving search bots a different file (/crawlers/[...slug])
   // and need to modify content to suit that
-  const isCrawlerPage = router.route.includes('/crawlers/[...slug]')
+  const isCrawlerPage = router?.route.includes('/crawlers/[...slug]') || false
 
   const { ref } = useInView({
     threshold: 1,
@@ -96,7 +98,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
     onChange: (inView, entry) => {
       if (inView && window) highlightSelectedNavItem(entry.target.attributes['data-ref-id'].value)
       if (inView && props.scrollSpyHeader) {
-        window.history.replaceState(null, '', entry.target.id)
+        safeHistoryReplaceState(entry.target.id)
         // if (setActiveRefItem) setActiveRefItem(entry.target.attributes['data-ref-id'].value)
         menuState.setMenuActiveRefId(entry.target.attributes['data-ref-id'].value)
         // router.push(`/reference/javascript/${entry.target.attributes['data-ref-id'].value}`, null, {
@@ -120,11 +122,11 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
           ref={ref}
           id={props.slug}
           data-ref-id={props.id}
-          className={[
-            'text-2xl font-medium text-foreground scroll-mt-24',
+          className={cn(
+            'text-2xl font-medium text-foreground scroll-mt-[calc(32px+2rem)] lg:scroll-mt-[calc(var(--header-height)+1px+4rem)]',
             !icon && 'mb-8',
-            props.monoFont && 'font-mono',
-          ].join(' ')}
+            props.monoFont && 'font-mono'
+          )}
         >
           {props.title && <span className="max-w-xl">{props.title}</span>}
         </h2>
@@ -134,13 +136,21 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
 }
 
 const Details: FC<PropsWithChildren<ISectionDetails>> = (props) => {
-  return <div className="relative w-full">{props.children}</div>
+  /**
+   * `min-w` is necessary because these are used as grid children, which have
+   * default `min-w-auto`
+   */
+  return <div className="relative w-full min-w-full">{props.children}</div>
 }
 
 const Examples: FC<PropsWithChildren<ISectionExamples>> = (props) => {
+  /**
+   * `min-w` is necessary because these are used as grid children, which have
+   * default `min-w-auto`
+   */
   return (
-    <div className="w-full">
-      <div className="sticky top-24">{props.children}</div>
+    <div className="w-full min-w-full">
+      <div className="sticky top-32">{props.children}</div>
     </div>
   )
 }
@@ -161,7 +171,7 @@ const EducationSection: FC<PropsWithChildren<IEducationSection>> = ({
   return (
     <article
       key={props.id + 'education'}
-      className={'prose max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
+      className={'prose max-w-none py-16 first:pb-8 first:pt-0 last:pb-8'}
     >
       {!hideTitle && <StickyHeader {...props} icon={icon} />}
       {props.children}

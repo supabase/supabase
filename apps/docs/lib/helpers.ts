@@ -1,4 +1,8 @@
-import { ICommonBase, ICommonItem, ICommonSection } from '../components/reference/Reference.types'
+import type {
+  ICommonBase,
+  ICommonItem,
+  ICommonSection,
+} from '../components/reference/Reference.types'
 
 // menus to render in the SideBar.js (Ref Nav.constants.ts)
 export function getPageType(asPath: string) {

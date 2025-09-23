@@ -1,19 +1,21 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { entityTypeKeys } from 'data/entity-types/keys'
+import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
-import { useStore } from 'hooks'
-import { ResponseError } from 'types'
+import { vaultSecretsKeys } from 'data/vault/keys'
+import type { ResponseError } from 'types'
 import { getCreateFDWSql } from './fdw-create-mutation'
 import { getDeleteFDWSql } from './fdw-delete-mutation'
 import { FDW } from './fdws-query'
+import { fdwKeys } from './keys'
 
 export type FDWUpdateVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   wrapper: FDW
   wrapperMeta: WrapperMeta
   formState: {
@@ -29,7 +31,14 @@ export const getUpdateFDWSql = ({
   tables,
 }: Pick<FDWUpdateVariables, 'wrapper' | 'wrapperMeta' | 'formState' | 'tables'>) => {
   const deleteWrapperSql = getDeleteFDWSql({ wrapper, wrapperMeta })
-  const createWrapperSql = getCreateFDWSql({ wrapperMeta, formState, tables })
+  const createWrapperSql = getCreateFDWSql({
+    wrapperMeta,
+    formState,
+    tables,
+    mode: 'tables',
+    sourceSchema: '',
+    targetSchema: '',
+  })
 
   const sql = /* SQL */ `
     ${deleteWrapperSql}
@@ -64,15 +73,16 @@ export const useFDWUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const { vault } = useStore()
 
   return useMutation<FDWUpdateData, ResponseError, FDWUpdateVariables>((vars) => updateFDW(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
-        vault.load(),
+        queryClient.invalidateQueries(fdwKeys.list(projectRef), { refetchType: 'all' }),
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+        queryClient.invalidateQueries(foreignTableKeys.list(projectRef)),
+        queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
       ])
 
       await onSuccess?.(data, variables, context)

@@ -42,7 +42,6 @@ export interface StepProps {
   className?: string
   hideInBlog?: boolean
   bg_layers?: {
-    lottie?: any
     img?: string
     mobileImg?: string
   }[]

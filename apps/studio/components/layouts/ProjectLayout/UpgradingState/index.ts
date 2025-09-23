@@ -1,2 +1,1 @@
-import UpgradingState from './UpgradingState'
-export default UpgradingState
+export { default as UpgradingState } from './UpgradingState'

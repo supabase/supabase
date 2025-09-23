@@ -24,8 +24,9 @@ const LWArchive = () => {
             <Image
               src="/images/launchweek/archive/lw6.jpg"
               alt="Launch Week 6"
-              layout="fill"
-              objectFit="cover"
+              fill
+              sizes="100%"
+              className="object-cover"
             />
           </div>
         </a>
@@ -40,8 +41,9 @@ const LWArchive = () => {
             <Image
               src="/images/launchweek/archive/lw7.jpg"
               alt="Launch Week 7"
-              layout="fill"
-              objectFit="cover"
+              fill
+              sizes="100%"
+              className="object-cover"
             />
           </div>
         </a>

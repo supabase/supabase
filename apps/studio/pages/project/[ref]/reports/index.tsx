@@ -1,79 +1,88 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { useParams } from 'common/hooks'
-import { ReportsLayout } from 'components/layouts'
+import { useParams } from 'common'
+import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
-import Loading from 'components/ui/Loading'
-import { useCheckPermissions, useStore } from 'hooks'
+import { Loading } from 'components/ui/Loading'
+import { useContentQuery } from 'data/content/content-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
-import { useProjectContentStore } from 'stores/projectContentStore'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 export const UserReportPage: NextPageWithLayout = () => {
-  const [loading, setLoading] = useState(true)
-
   const router = useRouter()
   const { ref } = useParams()
 
   const { profile } = useProfile()
-  const { ui } = useStore()
+  const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
-  const contentStore = useProjectContentStore(ref)
-  const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
-
-  async function loadReports() {
-    await contentStore.load()
-    const reports = contentStore.reports()
-
-    if (reports.length >= 1) {
-      router.push(`/project/${ref}/reports/${reports[0].id}`)
-    } else {
-      setLoading(false)
+  const { isLoading } = useContentQuery(
+    {
+      projectRef: ref,
+      type: 'report',
+    },
+    {
+      onSuccess: (data) => {
+        const reports = data.content
+          .filter((x) => x.type === 'report')
+          .sort((a, b) => a.name.localeCompare(b.name))
+        if (reports.length >= 1) router.push(`/project/${ref}/reports/${reports[0].id}`)
+        if (reports.length === 0) router.push(`/project/${ref}/reports/api-overview`)
+      },
     }
-  }
+  )
 
-  useEffect(() => {
-    loadReports()
-  }, [ref])
+  const { can: canCreateReport } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'report', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   return (
-    <div className="mx-auto my-32 w-full max-w-7xl flex-grow space-y-16">
-      {loading ? (
+    <div className="h-full w-full">
+      {isLoading ? (
         <Loading />
       ) : (
-        <ProductEmptyState
-          title="Reports"
-          ctaButtonLabel="Create report"
-          onClickCta={() => {
-            try {
-              createReport({ router })
-            } catch (error: any) {
-              ui.setNotification({
-                category: 'error',
-                message: `Failed to create report: ${error.message}`,
-              })
-            }
-          }}
-          disabled={!canCreateReport}
-          disabledMessage="You need additional permissions to create a report"
-        >
-          <p className="text-foreground-light text-sm">Create custom reports for your projects.</p>
-          <p className="text-foreground-light text-sm">
-            Get a high level overview of your network traffic, user actions, and infrastructure
-            health.
-          </p>
-        </ProductEmptyState>
+        <>
+          <ProductEmptyState
+            title="Reports"
+            ctaButtonLabel="New custom report"
+            onClickCta={() => {
+              setShowCreateReportModal(true)
+            }}
+            disabled={!canCreateReport}
+            disabledMessage="You need additional permissions to create a report"
+          >
+            <p className="text-foreground-light text-sm">
+              Create custom reports for your projects.
+            </p>
+            <p className="text-foreground-light text-sm">
+              Get a high level overview of your network traffic, user actions, and infrastructure
+              health.
+            </p>
+          </ProductEmptyState>
+          <CreateReportModal
+            visible={showCreateReportModal}
+            onCancel={() => setShowCreateReportModal(false)}
+            afterSubmit={() => setShowCreateReportModal(false)}
+          />
+        </>
       )}
     </div>
   )
 }
 
-UserReportPage.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+UserReportPage.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout>{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
 export default UserReportPage

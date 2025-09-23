@@ -11,7 +11,7 @@
 .rdg-cell {
   @apply flex;
   @apply text-grid;
-  @apply border-default border-r border-b;
+  @apply border-secondary border-r border-b;
   @apply text-foreground;
   white-space: nowrap;
   overflow: hidden;
@@ -29,7 +29,7 @@
 }
 
 .rdg-cell-frozen-last {
-  @apply border-default border-r-4 shadow-none;
+  @apply border-secondary border-r-2 shadow-none;
 }
 
 .rdg-cell[aria-selected='true'] {
@@ -37,8 +37,8 @@
 }
 
 .rdg {
-  @apply box-border select-none overflow-x-auto overflow-y-scroll bg-transparent;
-  @apply border-default border-t border-b border-r-0 border-l-0;
+  @apply box-border select-none overflow-x-auto overflow-y-scroll bg-dash-canvas;
+  @apply border-t border-r-0 border-l-0;
   contain: strict;
   -webkit-user-select: none;
   font-size: 14px;
@@ -114,16 +114,16 @@
 */
 
 .rdg-row {
-  @apply bg-table-body-light [[data-theme*=dark]_&]:bg-table-body-dark transition-colors;
-  @apply hover:bg-table-header-light [[data-theme*=dark]_&]:hover:bg-table-header-dark;
+  @apply bg-dash-sidebar transition-colors;
+  @apply hover:bg-surface-200;
 }
 
 /* edit button */
 .rdg-row__select-column__edit-action {
-  opacity: 0;
+  @apply opacity-0;
 }
 .rdg-row:hover .rdg-row__select-column__edit-action {
-  opacity: 0.5;
+  @apply opacity-100;
 }
 
 .rdg-row__select-column__edit-action:hover {
@@ -132,8 +132,7 @@
 
 /* select row */
 .rdg-row[aria-selected='true'] {
-  @apply bg-surface-100;
-  @apply hover:bg-surface-100;
+  @apply bg-surface-200;
 }
 
 .tab-cursor {
@@ -170,27 +169,34 @@
   }
 
   [type='checkbox']:checked {
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+    @apply bg-foreground;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 100%)'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E") !important;
   }
 
-  [type='checkbox']:checked {
-    @apply bg-brand;
-    border-color: transparent;
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
+  [type='checkbox']:indeterminate {
+    @apply bg-foreground;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 100%)'%3E%3Crect x='3' y='7' width='10' height='2'/%3E%3C/svg%3E") !important;
+
+    [data-theme='dark'] & {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 0%)'%3E%3Crect x='3' y='7' width='10' height='2'/%3E%3C/svg%3E") !important;
+    }
   }
 
   [type='checkbox'] {
     @apply cursor-pointer rounded border border-solid;
 
-    @apply text-brand-600 border-default transition-all;
-    @apply hover:border-brand focus:ring-brand-300 focus:outline-none;
+    @apply text-foreground border-strong transition-all;
+    @apply hover:border-foreground focus:ring-0 focus:outline-none;
 
-    @apply bg-transparent;
+    @apply bg-control;
 
     margin-top: 2px;
   }
+}
+
+/* Dark mode */
+[data-theme='dark'] .sb-grid [type='checkbox']:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 0%)'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E") !important;
 }
 
 /*
@@ -228,13 +234,6 @@
 .react-contexify__submenu-arrow {
   margin-left: auto;
   font-size: 12px;
-}
-.react-contexify__separator {
-  width: 100%;
-  height: 1px;
-  cursor: default;
-  margin: 4px 0;
-  background-color: rgba(0, 0, 0, 0.2);
 }
 .react-contexify__will-leave--disabled {
   pointer-events: none;
@@ -348,22 +347,6 @@
 }
 
 /*
-  DateEditor
-*/
-
-.sb-grid-date-editor {
-  @apply h-full w-full px-2;
-}
-
-/*
-  DateTimeEditor
-*/
-
-.sb-grid-datetime-editor {
-  @apply h-full w-full px-2;
-}
-
-/*
   JsonEditor
 */
 
@@ -407,26 +390,6 @@
 }
 
 /*
-  Pagination
-*/
-
-.sb-grid-pagination {
-  @apply flex items-center space-x-2;
-}
-
-.sb-grid-pagination-input-container {
-  @apply w-12;
-}
-.sb-grid-pagination-input {
-  @apply block w-12;
-}
-
-.sb-grid-pagination-input .sbui-inputnumber {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-/*
   Footer
 */
 
@@ -448,14 +411,6 @@
 
 .sb-grid-foreign-key-formatter__text {
   @apply m-0 flex-grow overflow-hidden overflow-ellipsis;
-}
-
-/*
-  AddColumn
-*/
-
-.sb-grid-add-column {
-  @apply flex h-full w-full py-1.5;
 }
 
 /*
@@ -567,30 +522,6 @@
 
 .sb-grid-empty-value {
   @apply block;
-}
-
-/*
-  header/filter/FilterDropdown
-*/
-
-.sb-grid-filter-popover {
-  @apply overflow-visible;
-}
-
-.sb-grid-filter-popover__misc {
-  @apply py-2;
-}
-
-.sb-grid-filter-popover__misc__text {
-  @apply block;
-}
-
-/*
-header/filter/FilterRow
-*/
-
-.sb-grid-filter-row {
-  @apply flex w-full items-center justify-between space-x-1;
 }
 
 /*

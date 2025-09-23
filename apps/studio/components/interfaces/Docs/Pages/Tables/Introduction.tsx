@@ -3,23 +3,35 @@ import Link from 'next/link'
 
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import PublicSchemaNotEnabledAlert from '../../PublicSchemaNotEnabledAlert'
 
 interface IntroductionProps {
   selectedLang: 'bash' | 'js'
 }
 
 const Introduction = ({ selectedLang }: IntroductionProps) => {
-  const { ref } = useParams()
+  const { ref: projectRef } = useParams()
+
+  const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
+
+  const isPublicSchemaEnabled = config?.db_schema
+    .split(',')
+    .map((name) => name.trim())
+    .includes('public')
 
   return (
     <>
       <h2 className="doc-heading">Introduction</h2>
       <div className="doc-section">
-        <article className="code-column text-foreground">
+        <article className="code-column text-foreground flex flex-col gap-y-2">
           <p>
             All views and tables in the <code>public</code> schema and accessible by the active
             database role for a request are available for querying.
           </p>
+        </article>
+        <article className="code">
+          {isSuccess && !isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
         </article>
       </div>
 
@@ -56,7 +68,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
             If you still want to use GraphQL, you can. Supabase provides you with a full Postgres
             database, so as long as your middleware can connect to the database then you can still
             use the tools you love. You can find the database connection details{' '}
-            <Link href={`/project/${ref}/settings/database`}>in the settings.</Link>
+            <Link href={`/project/${projectRef}/database/settings`}>in the settings.</Link>
           </p>
         </article>
         <article className="code">

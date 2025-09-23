@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { serviceStatusKeys } from './keys'
 
 export type ProjectServiceStatusVariables = {
@@ -18,17 +18,18 @@ export async function getProjectServiceStatus(
     params: {
       path: { ref: projectRef },
       query: {
-        services: ['auth', 'realtime', 'rest', 'storage'],
+        services: ['auth', 'realtime', 'rest', 'storage', 'db'],
       },
     },
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
 export type ProjectServiceStatusData = Awaited<ReturnType<typeof getProjectServiceStatus>>
+export type ProjectServiceStatus = ProjectServiceStatusData[0]['status']
 export type ProjectServiceStatusError = ResponseError
 
 export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(

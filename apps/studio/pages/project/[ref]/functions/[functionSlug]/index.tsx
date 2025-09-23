@@ -1,46 +1,54 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common/hooks'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { isUnixMicro, unixMicroToIsoTimestamp } from 'components/interfaces/Settings/Logs'
-import FunctionsLayout from 'components/layouts/FunctionsLayout'
-import AreaChart from 'components/ui/Charts/AreaChart'
-import BarChart from 'components/ui/Charts/BarChart'
-import StackedBarChart from 'components/ui/Charts/StackedBarChart'
-import NoPermission from 'components/ui/NoPermission'
-import { useFunctionsInvStatsQuery } from 'data/analytics/functions-inv-stats-query'
-import { useFunctionsReqStatsQuery } from 'data/analytics/functions-req-stats-query'
-import { useFunctionsResourceUsageQuery } from 'data/analytics/functions-resource-usage-query'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useParams } from 'common'
 import dayjs, { Dayjs } from 'dayjs'
-import { useCheckPermissions, useFlag } from 'hooks'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import sumBy from 'lodash/sumBy'
+import maxBy from 'lodash/maxBy'
 import meanBy from 'lodash/meanBy'
-import { observer } from 'mobx-react-lite'
+import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { ChartIntervals, NextPageWithLayout } from 'types'
-import { Button } from 'ui'
+
+import { useFlag } from 'common'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
+import AreaChart from 'components/ui/Charts/AreaChart'
+import StackedBarChart from 'components/ui/Charts/StackedBarChart'
+import NoPermission from 'components/ui/NoPermission'
+import {
+  FunctionsCombinedStatsVariables,
+  useFunctionsCombinedStatsQuery,
+} from 'data/analytics/functions-combined-stats-query'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { ChartIntervals, NextPageWithLayout } from 'types'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 const CHART_INTERVALS: ChartIntervals[] = [
-  {
-    key: '5min',
-    label: '5 min',
-    startValue: 5,
-    startUnit: 'minute',
-    format: 'MMM D, h:mm:ssa',
-  },
   {
     key: '15min',
     label: '15 min',
     startValue: 15,
     startUnit: 'minute',
-    format: 'MMM D, h:mma',
+    format: 'MMM D, h:mm:ssa',
   },
   {
     key: '1hr',
     label: '1 hour',
     startValue: 1,
+    startUnit: 'hour',
+    format: 'MMM D, h:mma',
+  },
+  {
+    key: '3hr',
+    label: '3 hours',
+    startValue: 3,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
   },
@@ -51,18 +59,12 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startUnit: 'hour',
     format: 'MMM D, h:mma',
   },
-  {
-    key: '7day',
-    label: '7 days',
-    startValue: 7,
-    startUnit: 'day',
-    format: 'MMM D',
-  },
 ]
 
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
+  const newChartsEnabled = useFlag('newEdgeFunctionOverviewCharts')
   const [interval, setInterval] = useState<string>('15min')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const { data: selectedFunction } = useEdgeFunctionQuery({
@@ -70,45 +72,16 @@ const PageLayout: NextPageWithLayout = () => {
     slug: functionSlug,
   })
   const id = selectedFunction?.id
-  const resourceUsageMetricsEnabled = useFlag('enableResourceUsageMetricsForEdgeFunctions')
+  const combinedStatsResults = useFunctionsCombinedStatsQuery({
+    projectRef,
+    functionId: id,
+    interval: selectedInterval.key as FunctionsCombinedStatsVariables['interval'],
+  })
 
-  const invStatsResult = useFunctionsInvStatsQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: !resourceUsageMetricsEnabled }
-  )
-
-  const reqStatsResult = useFunctionsReqStatsQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: resourceUsageMetricsEnabled }
-  )
-
-  const resourceUsageResult = useFunctionsResourceUsageQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: resourceUsageMetricsEnabled }
-  )
-
-  const reqStatsData = useMemo(() => {
-    const result = resourceUsageMetricsEnabled
-      ? reqStatsResult.data?.result
-      : invStatsResult.data?.result
+  const combinedStatsData = useMemo(() => {
+    const result = combinedStatsResults.data?.result
     return result || []
-  }, [invStatsResult.data, reqStatsResult.data, resourceUsageMetricsEnabled])
-
-  const resourceUsageData = useMemo(() => {
-    return resourceUsageResult.data?.result || []
-  }, [resourceUsageResult.data])
+  }, [combinedStatsResults.data])
 
   const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(() => {
     const start = dayjs()
@@ -119,179 +92,244 @@ const PageLayout: NextPageWithLayout = () => {
     return [start, end]
   }, [selectedInterval])
 
-  const execTimeChartData = useFillTimeseriesSorted(
-    reqStatsData,
+  const {
+    data: combinedStatsChartData,
+    error: combinedStatsError,
+    isError: isErrorCombinedStats,
+  } = useFillTimeseriesSorted(
+    combinedStatsData,
     'timestamp',
-    ['avg_execution_time'],
+    [
+      'requests_count',
+      'log_count',
+      'log_info_count',
+      'log_warn_count',
+      'log_error_count',
+      'success_count',
+      'redirect_count',
+      'client_err_count',
+      'server_err_count',
+      'avg_cpu_time_used',
+      'avg_memory_used',
+      'avg_execution_time',
+      'max_execution_time',
+      'avg_heap_memory_used',
+      'avg_external_memory_used',
+      'max_cpu_time_used',
+    ],
     0,
     startDate.toISOString(),
     endDate.toISOString()
   )
 
-  const invocationsChartData = useFillTimeseriesSorted(
-    reqStatsData,
-    'timestamp',
-    ['count', 'success_count', 'redirect_count', 'client_err_count', 'server_err_count'],
-    0,
-    startDate.toISOString(),
-    endDate.toISOString()
-  )
-
-  const resourceUsageChartData = useFillTimeseriesSorted(
-    resourceUsageData,
-    'timestamp',
-    ['avg_cpu_time_used', 'avg_memory_used'],
-    0,
-    startDate.toISOString(),
-    endDate.toISOString()
-  )
-
-  const canReadFunction = useCheckPermissions(
+  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     functionSlug as string
   )
-  if (!canReadFunction) {
+  if (!canReadFunction && !permissionsLoading) {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }
+
   return (
-    <div className="space-y-6 py-2">
-      <div className="flex flex-row items-center gap-2">
-        <div className="flex items-center">
-          {CHART_INTERVALS.map((item, i) => {
-            const classes = []
+    <div className="px-6 w-full py-6">
+      <div className="space-y-6">
+        <div className="flex flex-row items-center gap-2">
+          <div className="flex items-center">
+            {CHART_INTERVALS.map((item, i) => {
+              const classes = []
 
-            if (i === 0) {
-              classes.push('rounded-tr-none rounded-br-none')
-            } else if (i === CHART_INTERVALS.length - 1) {
-              classes.push('rounded-tl-none rounded-bl-none')
-            } else {
-              classes.push('rounded-none')
-            }
+              if (i === 0) {
+                classes.push('rounded-tr-none rounded-br-none')
+              } else if (i === CHART_INTERVALS.length - 1) {
+                classes.push('rounded-tl-none rounded-bl-none')
+              } else {
+                classes.push('rounded-none')
+              }
 
-            return (
-              <Button
-                key={`function-filter-${i}`}
-                type={interval === item.key ? 'secondary' : 'default'}
-                onClick={() => setInterval(item.key)}
-                className={classes.join(' ')}
-              >
-                {item.label}
-              </Button>
-            )
-          })}
-        </div>
-
-        <span className="text-xs text-foreground-light">
-          Statistics for past {selectedInterval.label}
-        </span>
-      </div>
-      <div className="">
-        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
-          <ReportWidget
-            title="Execution time"
-            tooltip="Average execution time of function invocations"
-            data={execTimeChartData}
-            isLoading={
-              resourceUsageMetricsEnabled ? reqStatsResult.isLoading : invStatsResult.isLoading
-            }
-            renderer={(props) => {
               return (
-                <AreaChart
-                  className="w-full"
-                  xAxisKey="timestamp"
-                  customDateFormat={selectedInterval.format}
-                  yAxisKey="avg_execution_time"
-                  data={props.data}
-                  format="ms"
-                  highlightedValue={meanBy(props.data, 'avg_execution_time')}
-                />
+                <Button
+                  key={`function-filter-${i}`}
+                  type={interval === item.key ? 'secondary' : 'default'}
+                  onClick={() => setInterval(item.key)}
+                  className={classes.join(' ')}
+                >
+                  {item.label}
+                </Button>
               )
-            }}
-          />
-          {resourceUsageMetricsEnabled ? (
-            <ReportWidget
-              title="Invocations"
-              data={invocationsChartData}
-              isLoading={reqStatsResult.isLoading}
-              renderer={(props) => {
-                const data = props.data
-                  .map((d: any) => [
-                    {
-                      status: '2xx',
-                      count: d.success_count,
-                      timestamp: d.timestamp,
-                    },
-                    {
-                      status: '3xx',
-                      count: d.redirect_count,
-                      timestamp: d.timestamp,
-                    },
-                    {
-                      status: '4xx',
-                      count: d.client_err_count,
-                      timestamp: d.timestamp,
-                    },
-                    {
-                      status: '5xx',
-                      count: d.server_err_count,
-                      timestamp: d.timestamp,
-                    },
-                  ])
-                  .flat()
+            })}
+          </div>
 
-                return (
-                  <StackedBarChart
-                    className="w-full"
-                    xAxisKey="timestamp"
-                    yAxisKey="count"
-                    stackKey="status"
-                    data={data}
-                    highlightedValue={sumBy(data, 'count')}
-                    customDateFormat={selectedInterval.format}
-                    stackColors={['brand', 'slate', 'yellow', 'red']}
-                    onBarClick={() => {
-                      router.push(
-                        `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}`
-                      )
-                    }}
-                  />
+          <span className="text-xs text-foreground-light">
+            Statistics for past {selectedInterval.label}
+          </span>
+        </div>
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
+            <ReportWidget
+              title="Execution time"
+              tooltip="Average execution time of function invocations"
+              data={combinedStatsChartData}
+              isLoading={combinedStatsResults.isLoading}
+              renderer={(props) => {
+                return isErrorCombinedStats ? (
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>Failed to reterieve execution time</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {combinedStatsError.message}
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                ) : (
+                  <div className="space-y-8">
+                    <AreaChart
+                      title="Average execution time"
+                      className="w-full"
+                      xAxisKey="timestamp"
+                      customDateFormat={selectedInterval.format}
+                      yAxisKey="avg_execution_time"
+                      data={props.data}
+                      format="ms"
+                      highlightedValue={meanBy(props.data, 'avg_execution_time')}
+                    />
+                    {newChartsEnabled && (
+                      <AreaChart
+                        title="Max execution time"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        customDateFormat={selectedInterval.format}
+                        yAxisKey="max_execution_time"
+                        data={props.data}
+                        format="ms"
+                        highlightedValue={
+                          maxBy(props.data, 'max_execution_time')?.max_execution_time
+                        }
+                      />
+                    )}
+                  </div>
                 )
               }}
             />
-          ) : (
             <ReportWidget
               title="Invocations"
-              data={invocationsChartData}
-              isLoading={invStatsResult.isLoading}
-              renderer={(props) => (
-                <BarChart
-                  className="w-full"
-                  xAxisKey="timestamp"
-                  yAxisKey="count"
-                  data={props.data}
-                  highlightedValue={sumBy(props.data, 'count')}
-                  customDateFormat={selectedInterval.format}
-                  onBarClick={(v) => {
-                    router.push(
-                      `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}&ite=${
-                        v.timestamp
-                      }`
-                    )
-                  }}
-                />
-              )}
-            />
-          )}
-          {resourceUsageMetricsEnabled && (
-            <>
-              <ReportWidget
-                title="CPU time"
-                tooltip="Average CPU time usage for the function"
-                data={resourceUsageChartData}
-                isLoading={resourceUsageResult.isLoading}
-                renderer={(props) => {
+              tooltip="Requests made to a function are considered invocations, and each invocation may have worker logs."
+              data={combinedStatsChartData}
+              isLoading={combinedStatsResults.isLoading}
+              renderer={(props) => {
+                if (isErrorCombinedStats) {
                   return (
+                    <Alert_Shadcn_ variant="warning">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>Failed to reterieve invocations</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        {combinedStatsError.message}
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )
+                } else {
+                  const requestData = props.data
+                    .map((d: any) => [
+                      {
+                        status: '2xx',
+                        count: d.success_count,
+                        timestamp: d.timestamp,
+                      },
+                      {
+                        status: '3xx',
+                        count: d.redirect_count,
+                        timestamp: d.timestamp,
+                      },
+                      {
+                        status: '4xx',
+                        count: d.client_err_count,
+                        timestamp: d.timestamp,
+                      },
+                      {
+                        status: '5xx',
+                        count: d.server_err_count,
+                        timestamp: d.timestamp,
+                      },
+                    ])
+                    .flat()
+
+                  const logsData = props.data
+                    .map((d: any) => [
+                      {
+                        status: 'error',
+                        count: d.log_error_count,
+                        timestamp: d.timestamp,
+                      },
+                      {
+                        status: 'info',
+                        count: d.log_info_count,
+                        timestamp: d.timestamp,
+                      },
+                      {
+                        status: 'warn',
+                        count: d.log_warn_count,
+                        timestamp: d.timestamp,
+                      },
+                    ])
+                    .flat()
+
+                  return (
+                    <div className="space-y-8">
+                      <StackedBarChart
+                        title="Invocation Requests"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        yAxisKey="count"
+                        stackKey="status"
+                        data={requestData}
+                        highlightedValue={sumBy(requestData, 'count')}
+                        customDateFormat={selectedInterval.format}
+                        stackColors={['brand', 'slate', 'yellow', 'red']}
+                        onBarClick={() => {
+                          router.push(
+                            `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}`
+                          )
+                        }}
+                      />
+                      {newChartsEnabled && (
+                        <StackedBarChart
+                          title="Worker Logs"
+                          className="w-full"
+                          xAxisKey="timestamp"
+                          yAxisKey="count"
+                          stackKey="status"
+                          data={logsData}
+                          highlightedValue={sumBy(logsData, 'count')}
+                          customDateFormat={selectedInterval.format}
+                          stackColors={['red', 'brand', 'yellow']}
+                          onBarClick={() => {
+                            router.push(
+                              `/project/${projectRef}/functions/${functionSlug}/logs?its=${startDate.toISOString()}`
+                            )
+                          }}
+                        />
+                      )}
+                    </div>
+                  )
+                }
+              }}
+            />
+            <ReportWidget
+              title="CPU time"
+              tooltip="Average CPU time usage for the function"
+              data={combinedStatsChartData}
+              isLoading={combinedStatsResults.isLoading}
+              renderer={(props) => {
+                return isErrorCombinedStats ? (
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>Failed to retrieve CPU time</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {combinedStatsError.message}
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                ) : (
+                  <div className="space-y-8">
                     <AreaChart
+                      title="Average CPU Time"
                       className="w-full"
                       xAxisKey="timestamp"
                       customDateFormat={selectedInterval.format}
@@ -300,17 +338,59 @@ const PageLayout: NextPageWithLayout = () => {
                       format="ms"
                       highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
                     />
-                  )
-                }}
-              />
-              <ReportWidget
-                title="Memory"
-                tooltip="Average memory usage for the function"
-                data={resourceUsageChartData}
-                isLoading={resourceUsageResult.isLoading}
-                renderer={(props) => {
+                    {newChartsEnabled && (
+                      <AreaChart
+                        title="Max CPU Time"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        customDateFormat={selectedInterval.format}
+                        yAxisKey="max_cpu_time_used"
+                        data={props.data}
+                        format="ms"
+                        highlightedValue={maxBy(props.data, 'max_cpu_time_used')?.max_cpu_time_used}
+                      />
+                    )}
+                  </div>
+                )
+              }}
+            />
+            <ReportWidget
+              title="Memory"
+              tooltip="Average memory usage for the function"
+              data={combinedStatsChartData}
+              isLoading={combinedStatsResults.isLoading}
+              renderer={(props) => {
+                if (isErrorCombinedStats) {
                   return (
+                    <Alert_Shadcn_ variant="warning">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        {combinedStatsError.message}
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )
+                }
+
+                const memoryData = props.data
+                  .map((d: any) => [
+                    {
+                      type: 'heap',
+                      count: d.avg_heap_memory_used,
+                      timestamp: d.timestamp,
+                    },
+                    {
+                      type: 'external',
+                      count: d.avg_external_memory_used,
+                      timestamp: d.timestamp,
+                    },
+                  ])
+                  .flat()
+
+                return (
+                  <div className="space-y-8">
                     <AreaChart
+                      title="Average Memory Usage"
                       className="w-full"
                       xAxisKey="timestamp"
                       customDateFormat={selectedInterval.format}
@@ -319,17 +399,35 @@ const PageLayout: NextPageWithLayout = () => {
                       format="MB"
                       highlightedValue={meanBy(props.data, 'avg_memory_used')}
                     />
-                  )
-                }}
-              />
-            </>
-          )}
+                    {newChartsEnabled && (
+                      <StackedBarChart
+                        title="Average Memory Usage by Type"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        yAxisKey="count"
+                        stackKey="type"
+                        format="MB"
+                        data={memoryData}
+                        highlightedValue={sumBy(memoryData, 'count')}
+                        customDateFormat={selectedInterval.format}
+                        stackColors={['blue', 'brand']}
+                      />
+                    )}
+                  </div>
+                )
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <EdgeFunctionDetailsLayout>{page}</EdgeFunctionDetailsLayout>
+  </DefaultLayout>
+)
 
-export default observer(PageLayout)
+export default PageLayout

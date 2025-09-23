@@ -19,9 +19,14 @@
   - [x] 데이터베이스 함수. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] 엣지 기능 [문서](https://supabase.com/docs/guides/functions)
 - [x] 파일 스토리지. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + 벡터/임베딩스 툴킷. [Docs](https://supabase.com/docs/guides/ai)
 - [x] 대시보드
 
-![슈퍼베이스 대시보드](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+
+주요 업데이트에 대한 알림을 받으려면 이 리포지토리의 "릴리즈"를 살펴보세요.
+
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ## 문서
 
@@ -36,17 +41,6 @@
 - [이메일 지원](https://supabase.com/docs/support#business-support). 최상의 대상: 데이터베이스 또는 인프라 문제.
 - [디스코드](https://discord.supabase.com). 최고의 용도: 애플리케이션 공유 및 커뮤니티와의 교류.
 
-## 상태
-
-- [x] 알파: 비공개 고객들을 대상으로 Supabase를 테스트 중입니다
-- [x] 공개 알파: 누구나 [supabase.com/dashboard](https://supabase.com/dashboard)에서 가입할 수 있습니다. 하지만 몇 가지 불편한 점이 있습니다
-- [x] 공개 베타: 대부분의 비기업용 사용 사례에 충분히 안정적입니다
-- [ ] 공개: 일반 사용 가능 [[상태](https://supabase.com/docs/guides/getting-started/features#feature-status)]
-
-현재 공개 베타 버전입니다. 주요 업데이트에 대한 알림을 받으려면 이 리포지토리의 "릴리즈"를 살펴보세요.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
-
 ---
 
 ## 작동 방식
@@ -56,17 +50,17 @@ Supabase는 오픈 소스 도구의 조합입니다. 저희는 엔터프라이�
 **아키텍처**
 
 Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
-자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
+[자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
 
-![아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/)은 30년 이상 활발하게 개발되어 안정성, 기능 견고성 및 성능에 대한 높은 평판을 얻고 있는 객체 관계형 데이터베이스 시스템입니다.
 - [Realtime](https://github.com/supabase/realtime)은 웹소켓을 사용하여 PostgreSQL 삽입, 업데이트, 삭제를 수신할 수 있는 Elixir 서버입니다. Realtime은 데이터베이스 변경 사항에 대해 Postgres의 기본 제공 복제 기능을 폴링하고, 변경 사항을 JSON으로 변환한 다음, 웹 소켓을 통해 승인된 클라이언트에 JSON을 브로드캐스트합니다.
-- [PostgREST](http://postgrest.org/)는 PostgreSQL 데이터베이스를 RESTful API로 직접 전환하는 웹 서버입니다
-- [pg_graphql](http://github.com/supabase/pg_graphql/)은 GraphQL API를 노출하는 PostgreSQL 확장입니다
-- [스토리지](https://github.com/supabase/storage-api) - Postgres를 사용하여 권한을 관리하기 위해 S3에 저장된 파일을 관리하기 위한 RESTful 인터페이스를 제공합니다.
-- [postgres-meta](https://github.com/supabase/postgres-meta)는 Postgres를 관리하기 위한 RESTful API로, 테이블 가져오기, 역할 추가, 쿼리 실행 등을 할 수 있습니다.
+- [PostgREST](http://postgrest.org/)는 PostgreSQL 데이터베이스를 RESTful API로 직접 전환하는 웹 서버입니다.
 - [GoTrue](https://github.com/netlify/gotrue)는 사용자를 관리하고 SWT 토큰을 발행하기 위한 SWT 기반 API입니다.
+- [스토리지](https://github.com/supabase/storage-api)는 Postgres를 사용하여 권한을 관리하고 S3에 저장된 파일을 관리하기 위한 RESTful 인터페이스를 제공합니다.
+- [pg_graphql](http://github.com/supabase/pg_graphql/)은 GraphQL API를 노출하는 PostgreSQL 확장입니다.
+- [postgres-meta](https://github.com/supabase/postgres-meta)는 테이블 가져오기, 역할 추가, 쿼리 실행 등을 할 수 있는 Postgres 관리용 RESTful API입니다.
 - [콩](https://github.com/Kong/kong)은 클라우드 네이티브 API 게이트웨이입니다.
 
 #### 클라이언트 라이브러리
@@ -121,6 +115,24 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
+  <tr>
+    <td>Swift</td>
+    <td><a href="https://github.com/supabase/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
+    <td><a href="https://github.com/supabase/supabase-swift/tree/main/Sources/PostgREST" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
+    <td><a href="https://github.com/supabase/supabase-swift/tree/main/Sources/Auth" target="_blank" rel="noopener noreferrer">auth-swift</a></td>
+    <td><a href="https://github.com/supabase/supabase-swift/tree/main/Sources/Realtime" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
+    <td><a href="https://github.com/supabase/supabase-swift/tree/main/Sources/Storage" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
+    <td><a href="https://github.com/supabase/supabase-swift/tree/main/Sources/Functions" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
+  </tr>
+  <tr>
+    <td>Python</td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
+    <td><a href="https://github.com/supabase/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
+    <td><a href="https://github.com/supabase/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
+    <td><a href="https://github.com/supabase/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
+    <td><a href="https://github.com/supabase/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
+  </tr>
   
   <th colspan="7">💚 커뮤니티 💚</th>
   
@@ -155,19 +167,10 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
     <td>Kotlin</td>
     <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Auth" target="_blank" rel="noopener noreferrer">auth-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
-  </tr>
-  <tr>
-    <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
-    <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
-    <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
     <td>Ruby</td>
@@ -188,15 +191,6 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
     <td>-</td>
   </tr>
   <tr>
-    <td>Swift</td>
-    <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
-    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
-  </tr>
-  <tr>
     <td>Godot Engine (GDScript)</td>
     <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
@@ -211,50 +205,87 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
+## Badges (배지)
+
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase-dark.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
 ## 번역
 
-- [아랍어 | 아랍어](/i18n/README.ar.md)
-- [알바니아어 / 쉬킵어](/i18n/README.sq.md)
+- [아랍어 | العربية](/i18n/README.ar.md)
+- [알바니아어 / Shqip](/i18n/README.sq.md)
 - [방글라데시어 / বাংলা](/i18n/README.bn.md)
 - [불가리아어 / Български](/i18n/README.bg.md)
-- [카탈루냐어 / 카탈루냐어](/i18n/README.ca.md)
+- [카탈루냐어 / Català](/i18n/README.ca.md)
+- [체코어 / čeština](/i18n/README.cs.md)
 - [덴마크어 / Dansk](/i18n/README.da.md)
-- [네덜란드어 / 네덜란드어](/i18n/README.nl.md)
-- [영어](https://github.com/supabase/supabase)
-- [핀란드어 / 수오말라이넨](/i18n/README.fi.md)
-- [프랑스어 / 프랑스어](/i18n/README.fr.md)
+- [네덜란드어 / Nederlands](/i18n/README.nl.md)
+- [영어 / English](https://github.com/supabase/supabase)
+- [에스토니아어 / eesti keel](/i18n/README.et.md)
+- [핀란드어 / Suomalainen](/i18n/README.fi.md)
+- [프랑스어 / Français](/i18n/README.fr.md)
 - [독일어 / Deutsch](/i18n/README.de.md)
-- [그리스어 / Ελληνικά](/i18n/README.gr.md)
+- [그리스어 / Ελληνικά](/i18n/README.el.md)
+- [구자라트어 / ગુજરાતી](/i18n/README.gu.md)
 - [히브리어 / עברית](/i18n/README.he.md)
 - [힌디어 / हिंदी](/i18n/README.hi.md)
-- [헝가리어 / 마자르어](/i18n/README.hu.md)
+- [헝가리어 / Magyar](/i18n/README.hu.md)
 - [네팔어 / नेपाली](/i18n/README.ne.md)
-- [인도네시아어 / 바하사 인도네시아](/i18n/README.id.md)
-- [이탈리아어 / Italiano](/i18n/README.it.md)
+- [인도네시아어 / Bahasa Indonesia](/i18n/README.id.md)
+- [이탈리아어 / Italian](/i18n/README.it.md)
 - [일본어 / 日本語](/i18n/README.jp.md)
-- [한국어 / 한국어](/i18n/README.ko.md)
-- [말레이어 / 바하사 말레이시아](/i18n/README.ms.md)
-- [노르웨이어(복말) / 노르웨이어(복말)](/i18n/README.nb-no.md)
+- [한국어](/i18n/README.ko.md)
+- [리투아니아어 / lietuvių](/i18n/README.lt.md)
+- [라트비아어 / latviski](/i18n/README.lv.md)
+- [말레이어 / Bahasa Malaysia](/i18n/README.ms.md)
+- [노르웨이어(복말) / Norsk (Bokmål)](/i18n/README.nb.md)
 - [페르시아어 / فارسی](/i18n/README.fa.md)
 - [폴란드어 / Polski](/i18n/README.pl.md)
-- [포르투갈어 / 포르투갈어](/i18n/README.pt.md)
-- [포르투갈어(브라질어) / 포르투갈어 브라질](/i18n/README.pt-br.md)
-- [루마니아어 / 루마니아어](/i18n/README.ro.md)
+- [포르투갈어 / Português](/i18n/README.pt.md)
+- [포르투갈어(브라질) / Português Brasileiro](/i18n/README.pt-br.md)
+- [루마니아어 / Română](/i18n/README.ro.md)
 - [러시아어 / Pусский](/i18n/README.ru.md)
 - [세르비아어 / Srpski](/i18n/README.sr.md)
 - [신할라어 / සිංහල](/i18n/README.si.md)
-- [스페인어 / 에스파냐어](/i18n/README.es.md)
+- [슬로바키아어 / slovenský](/i18n/README.sk.md)
+- [슬로베니아어 / Slovenščina](/i18n/README.sl.md)
+- [스페인어 / Español](/i18n/README.es.md)
 - [중국어 간체 / 简体中文](/i18n/README.zh-cn.md)
-- [스웨덴어 / 스벤스카르어](/i18n/README.sv.md)
+- [스웨덴어 / Svenska](/i18n/README.sv.md)
 - [태국어 / ไทย](/i18n/README.th.md)
 - [중국어 번체 / 繁體中文](/i18n/README.zh-tw.md)
 - [터키어 / Türkçe](/i18n/README.tr.md)
 - [우크라이나어 / Українська](/i18n/README.uk.md)
 - [베트남어 / Tiếng Việt](/i18n/README.vi-vn.md)
 - [번역 목록](/i18n/languages.md) <!--- Keep only this -->
-
----
-
-## 스폰서
-
-[![신규 스폰서](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
