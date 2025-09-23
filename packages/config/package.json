@@ -19,6 +19,6 @@
   "devDependencies": {
     "tailwindcss": "catalog:",
     "tailwindcss-animate": "^1.0.6",
-    "typescript": "~5.5.0"
+    "typescript": "catalog:"
   }
 }
