@@ -12,6 +12,7 @@ import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
@@ -53,7 +54,7 @@ const SqlEditor: NextPageWithLayout = () => {
   useEffect(() => {
     if (ref && data && project) {
       // [Joshen] Check if snippet belongs to the current project
-      if (data.project_id === project.id) {
+      if (!IS_PLATFORM || data.project_id === project.id) {
         snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
       } else {
         setLastVisitedSnippet(undefined)
