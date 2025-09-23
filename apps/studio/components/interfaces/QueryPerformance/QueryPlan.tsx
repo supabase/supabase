@@ -145,7 +145,14 @@ export const QueryPlan = ({ query }: { query: string }) => {
         </p>
         {explainError && (
           <WarningMessage title={explainError.title || 'Failed to run EXPLAIN'}>
-            {explainError.message}
+            <div className="space-y-3">
+              <div className="whitespace-pre-wrap">{explainError.message}</div>
+              <Button asChild type="default" size="tiny">
+                <Link href="/support/new" target="_blank" rel="noreferrer">
+                  Contact support
+                </Link>
+              </Button>
+            </div>
           </WarningMessage>
         )}
         {isFetching && <GenericSkeletonLoader />}
