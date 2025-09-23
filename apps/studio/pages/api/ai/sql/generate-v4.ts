@@ -72,26 +72,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
 
-  // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
-  // Results property is used to cache results client-side after queries are run
-  // Tool results will still be included in history sent to model
-  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
-    if (msg && msg.role === 'assistant' && 'results' in msg) {
-      const cleanedMsg = { ...msg }
-      delete cleanedMsg.results
-      return cleanedMsg
-    }
-    // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
-    // this happens when a user stops the assistant response while the tool is being called
-    if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts.filter((part: any) => {
-        return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
-      })
-      return { ...msg, parts: cleanedParts }
-    }
-    return msg
-  })
-
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
 
@@ -117,7 +97,39 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const { model, error: modelError, supportsCachePoint } = await getModel(projectRef, isLimited) // use project ref as routing key
+  // Only returns last 7 messages
+  // Filters out tools with invalid states
+  // Filters out tool outputs based on opt-in level using renderingToolOutputParser
+  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
+    if (msg && msg.role === 'assistant' && 'results' in msg) {
+      const cleanedMsg = { ...msg }
+      delete cleanedMsg.results
+      return cleanedMsg
+    }
+    if (msg && msg.role === 'assistant' && msg.parts) {
+      const cleanedParts = msg.parts.filter((part: any) => {
+        if (part.type.startsWith('tool-')) {
+          const invalidStates = ['input-streaming', 'input-available', 'output-error']
+          return !invalidStates.includes(part.state)
+        }
+        return true
+      })
+      return { ...msg, parts: cleanedParts }
+    }
+    return msg
+  })
+
+  const {
+    model,
+    error: modelError,
+    promptProviderOptions,
+    providerOptions,
+  } = await getModel({
+    provider: 'openai',
+    model: 'gpt-5',
+    routingKey: projectRef,
+    isLimited,
+  })
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -165,14 +177,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        ...(supportsCachePoint && {
-          providerOptions: {
-            bedrock: {
-              // Always cache the system prompt (must not contain dynamic content)
-              cachePoint: { type: 'default' },
-            },
-          },
-        }),
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
       },
       {
         role: 'assistant',
@@ -199,11 +204,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
+      ...(providerOptions && { providerOptions }),
       tools,
       abortSignal: abortController.signal,
     })
 
     result.pipeUIMessageStreamToResponse(res, {
+      sendReasoning: true,
       onError: (error) => {
         if (error == null) {
           return 'unknown error'

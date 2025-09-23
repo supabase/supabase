@@ -4,7 +4,7 @@ Before you start building you need to set up the Database and API. You can do th
 
 ### Create a project
 
-1. [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+1. [Create a new project](/dashboard) in the Supabase Dashboard.
 2. Enter your project details.
 3. Wait for the new database to launch.
 
@@ -21,7 +21,7 @@ Now set up the database schema. You can use the "User Management Starter" quicks
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [SQL Editor](https://supabase.com/dashboard/project/_/sql) page in the Dashboard.
+1. Go to the [SQL Editor](/dashboard/project/_/sql) page in the Dashboard.
 2. Click **User Management Starter** under the **Community > Quickstarts** tab.
 3. Click **Run**.
 
@@ -55,11 +55,4 @@ supabase migration new user_management_starter
 </TabPanel>
 </Tabs>
 
-### Get the API keys
-
-Now that you've created some database tables, you are ready to insert data using the auto-generated API.
-
-To do this, you need to get the Project URL and `anon` key from the API settings.
-
-1. Go to the [API Settings](https://supabase.com/dashboard/project/_/settings/api) page in the Dashboard.
-2. Find your Project `URL`, `anon`, and `service_role` keys on this page.
+<$Partial path="api_settings.mdx" />

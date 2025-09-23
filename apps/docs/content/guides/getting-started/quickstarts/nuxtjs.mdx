@@ -56,7 +56,7 @@ hideToc: true
     Create a `.env` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishableKey" />
 
     </StepHikeCompact.Details>
 
@@ -74,7 +74,7 @@ hideToc: true
           runtimeConfig: {
             public: {
               supabaseUrl: process.env.SUPABASE_URL,
-              supabaseAnonKey: process.env.SUPABASE_PUBLISHABLE_KEY,
+              supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY,
             },
           },
         });
@@ -99,7 +99,7 @@ hideToc: true
       <script setup>
       import { createClient } from '@supabase/supabase-js'
       const config = useRuntimeConfig()
-      const supabase = createClient(config.public.supabaseUrl, config.public.supabaseAnonKey)
+      const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
       const instruments = ref([])
 
       async function getInstruments() {

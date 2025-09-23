@@ -31,7 +31,7 @@ For security purposes, passwords for custom roles are not backed up and, followi
 In-place upgrades uses `pg_upgrade`. For projects larger than 1GB, this method is generally faster than a pause and restore cycle, and the speed advantage grows with the size of the database.
 
 1. Plan for an appropriate downtime window, and ensure you have reviewed the [caveats](#caveats) section of this document before executing the upgrade.
-1. Use the "Upgrade project" button on the [Infrastructure](https://supabase.com/dashboard/project/_/settings/infrastructure) section of your dashboard.
+1. Use the "Upgrade project" button on the [Infrastructure](/dashboard/project/_/settings/infrastructure) section of your dashboard.
 
 Additionally, if the upgrade should fail, your original database would be brought back up online and be able to service requests.
 
@@ -47,7 +47,7 @@ We recommend using the In-place upgrade method, as it is faster, and more reliab
 
 When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
 
-1. On the [General Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
+1. On the [General Settings](/dashboard/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
 1. After your project is paused, click **Restore project**. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
 
 Note that a pause + restore upgrade involves tearing down your project's resources before bringing them back up again. If the restore process should fail, manual intervention from Supabase support will be required to bring your project back online.
@@ -62,7 +62,7 @@ If you are using logical replication, the replication slots will not be preserve
 
 ### Breaking changes
 
-Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](https://supabase.com/dashboard/project/_/settings/infrastructure).
+Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](/dashboard/project/_/settings/infrastructure).
 
 Breaking changes are generally only present in major version upgrades of Postgres and PostgREST. You can find their respective release notes at:
 
@@ -77,7 +77,7 @@ Starting from 2024-06-24, when a project is paused, users then have a 90-day win
 
 The 90-day window allows Supabase to introduce platform changes that may not be backwards compatible with older backups. Unlike active projects, static backups can't be updated to accommodate such changes.
 
-During the 90-day restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](https://supabase.com/dashboard/projects).
+During the 90-day restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](/dashboard/projects).
 
 <Image
   zoomable
@@ -166,6 +166,8 @@ In projects using Postgres 17, the following extensions are deprecated:
 - `timescaledb`
 - `pgjwt`
 
-Existing projects on lower versions of Postgres are not impacted, and the extensions will continue to be supported on projects using Postgres 15, until the end of life of Postgres 15 on the Supabase platform.
+Projects planning to upgrade from Postgres 15 to Postgres 17 need to first disable these extensions in the [Supabase Dashboard](/dashboard/project/_/database/extensions).
 
-Projects planning to upgrade from Postgres 15 to Postgres 17 need to drop the extensions by [disabling them in the Supabase Dashboard](/dashboard/project/_/database/extensions).
+`pgjwt` was enabled by default on every Supabase project up until Postgres 17. If you weren’t explicitly using `pgjwt` in your project, it’s most likely safe to disable.
+
+Existing projects on lower versions of Postgres are not impacted, and the extensions will continue to be supported on projects using Postgres 15, until the end of life of Postgres 15 on the Supabase platform.

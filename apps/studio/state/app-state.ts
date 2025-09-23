@@ -1,19 +1,9 @@
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
-type DashboardHistoryType = {
-  sql?: string
-  editor?: string
-}
-
-const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
-  sql: undefined,
-  editor: undefined,
-}
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 
 const getInitialState = () => {
   return {
-    dashboardHistory: EMPTY_DASHBOARD_HISTORY,
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
@@ -30,16 +20,6 @@ const getInitialState = () => {
 
 export const appState = proxy({
   ...getInitialState(),
-
-  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string | undefined) => {
-    if (appState.dashboardHistory[key] !== id) {
-      appState.dashboardHistory[key] = id
-      localStorage.setItem(
-        LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref),
-        JSON.stringify(appState.dashboardHistory)
-      )
-    }
-  },
 
   activeDocsSection: ['introduction'],
   docsLanguage: 'js' as 'js' | 'bash',

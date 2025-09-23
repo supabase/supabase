@@ -3,7 +3,7 @@ import { Clipboard, Download, Edit, Trash2 } from 'lucide-react'
 import { Item, Menu, Separator } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { copyPathToFolder } from './StorageExplorer.utils'
 
@@ -11,10 +11,10 @@ interface FolderContextMenuProps {
   id: string
 }
 
-const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
+export const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
   const { openedFolders, downloadFolder, setSelectedItemToRename, setSelectedItemsToDelete } =
     useStorageExplorerStateSnapshot()
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   return (
     <Menu id={id} animation="fade">
@@ -42,5 +42,3 @@ const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
     </Menu>
   )
 }
-
-export default FolderContextMenu

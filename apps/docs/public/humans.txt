@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Aaron Byrne
 Alaister Young
+Alan De Los Santos
 Aleksi Immonen
 Alexander Korotkov
 Amy Q
@@ -31,6 +32,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Craig Cannon
+Cuong Do
 Danny White
 Darren Cunningham
 Dave Wilson
@@ -48,6 +50,7 @@ Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
 Fabrizio Fenoglio
+Fady A
 Felipe Stival
 Francesco Sansalvadore
 Greg Kress
@@ -61,6 +64,7 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jeff Smick
 Jenny Kibiri
 Jess Shears
 Jim Chanco Jr
@@ -111,6 +115,7 @@ Riccardo Busetti
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
+Sam Meech-Ward
 Sam Rose
 Sean Oliver
 Sergio Cioban Filho
@@ -128,11 +133,13 @@ Thor Schaeff
 Timothy Lim
 Tom Ashley
 Tom G
+Tomás Pozo
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
+Yuliya Marinova
 Yuri Santana
 ____________
 

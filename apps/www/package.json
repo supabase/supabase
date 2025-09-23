@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "clean": "rimraf node_modules",
+    "pretypecheck": "next typegen",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "node scripts/generateStaticContent.mjs",
     "prettier": "prettier --cache --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
@@ -98,7 +99,7 @@
     "react-hook-form": "^7.45.0",
     "tsconfig": "workspace:*",
     "uuid": "^9.0.1",
-    "zod": "^3.25.76"
+    "zod": "catalog:"
   },
   "license": "MIT"
 }

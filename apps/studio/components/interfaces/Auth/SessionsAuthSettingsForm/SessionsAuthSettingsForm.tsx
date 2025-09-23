@@ -11,7 +11,7 @@ import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
@@ -44,10 +44,7 @@ function HoursOrNeverText({ value }: { value: number }) {
 
 const RefreshTokenSchema = z.object({
   REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce
-    .number()
-    .positive()
-    .min(0, 'Must be a value more than 0'),
+  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
 })
 
 const UserSessionsSchema = z.object({
@@ -59,7 +56,7 @@ const UserSessionsSchema = z.object({
   SESSIONS_SINGLE_PER_USER: z.boolean(),
 })
 
-const SessionsAuthSettingsForm = () => {
+export const SessionsAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
@@ -68,11 +65,11 @@ const SessionsAuthSettingsForm = () => {
   const [isUpdatingRefreshTokens, setIsUpdatingRefreshTokens] = useState(false)
   const [isUpdatingUserSessions, setIsUpdatingUserSessions] = useState(false)
 
-  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -202,32 +199,30 @@ const SessionsAuthSettingsForm = () => {
                   )}
                 />
               </CardContent>
-              {refreshTokenForm.watch('REFRESH_TOKEN_ROTATION_ENABLED') && (
-                <CardContent>
-                  <FormField_Shadcn_
-                    control={refreshTokenForm.control}
-                    name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Refresh token reuse interval"
-                        description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
-                      >
-                        <FormControl_Shadcn_>
-                          <PrePostTab postTab="seconds">
-                            <Input_Shadcn_
-                              type="number"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig}
-                            />
-                          </PrePostTab>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-              )}
+              <CardContent>
+                <FormField_Shadcn_
+                  control={refreshTokenForm.control}
+                  name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Refresh token reuse interval"
+                      description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
+                    >
+                      <FormControl_Shadcn_>
+                        <PrePostTab postTab="seconds">
+                          <Input_Shadcn_
+                            type="number"
+                            min={0}
+                            {...field}
+                            disabled={!canUpdateConfig}
+                          />
+                        </PrePostTab>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
               <CardFooter className="justify-end space-x-2">
                 {refreshTokenForm.formState.isDirty && (
                   <Button type="default" onClick={() => refreshTokenForm.reset()}>
@@ -370,5 +365,3 @@ const SessionsAuthSettingsForm = () => {
     </>
   )
 }
-
-export default SessionsAuthSettingsForm

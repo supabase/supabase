@@ -13,7 +13,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   AlertDescription_Shadcn_,
@@ -41,7 +41,7 @@ const schema = object({
   SITE_URL: string().required('Must have a Site URL'),
 })
 
-const BasicAuthSettingsForm = () => {
+export const BasicAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const showManualLinking = useIsFeatureEnabled('authentication:show_manual_linking')
 
@@ -54,11 +54,11 @@ const BasicAuthSettingsForm = () => {
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -333,5 +333,3 @@ const BasicAuthSettingsForm = () => {
     </ScaffoldSection>
   )
 }
-
-export default BasicAuthSettingsForm

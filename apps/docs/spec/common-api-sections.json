@@ -29,6 +29,12 @@
     "title": "Analytics",
     "items": [
       {
+        "id": "v1-get-project-function-combined-stats",
+        "title": "Get project function combined stats",
+        "slug": "v1-get-project-function-combined-stats",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-logs",
         "title": "Get project logs",
         "slug": "v1-get-project-logs",
@@ -197,6 +203,30 @@
         "type": "operation"
       },
       {
+        "id": "v1-authorize-jit-access",
+        "title": "Authorize jit access",
+        "slug": "v1-authorize-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-login-role",
+        "title": "Create login role",
+        "slug": "v1-create-login-role",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-jit-access",
+        "title": "Delete jit access",
+        "slug": "v1-delete-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-login-roles",
+        "title": "Delete login roles",
+        "slug": "v1-delete-login-roles",
+        "type": "operation"
+      },
+      {
         "id": "v1-disable-readonly-mode-temporarily",
         "title": "Disable readonly mode temporarily",
         "slug": "v1-disable-readonly-mode-temporarily",
@@ -224,6 +254,12 @@
         "id": "v1-get-database-metadata",
         "title": "Get database metadata",
         "slug": "v1-get-database-metadata",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-jit-access",
+        "title": "Get jit access",
+        "slug": "v1-get-jit-access",
         "type": "operation"
       },
       {
@@ -269,6 +305,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-list-jit-access",
+        "title": "List jit access",
+        "slug": "v1-list-jit-access",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-migration-history",
         "title": "List migration history",
         "slug": "v1-list-migration-history",
@@ -296,6 +338,12 @@
         "id": "v1-setup-a-read-replica",
         "title": "Setup a read replica",
         "slug": "v1-setup-a-read-replica",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-jit-access",
+        "title": "Update jit access",
+        "slug": "v1-update-jit-access",
         "type": "operation"
       },
       {
@@ -638,6 +686,12 @@
         "id": "v1-list-available-restore-versions",
         "title": "List available restore versions",
         "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-patch-network-restrictions",
+        "title": "Patch network restrictions",
+        "slug": "v1-patch-network-restrictions",
         "type": "operation"
       },
       {

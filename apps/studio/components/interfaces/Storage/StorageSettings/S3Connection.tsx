@@ -22,7 +22,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
@@ -54,8 +54,14 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
-  const canReadS3Credentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_READ,
+    '*'
+  )
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const {
@@ -170,7 +176,7 @@ export const S3Connection = () => {
                   </div>
                 </CardContent>
 
-                {!canUpdateStorageSettings && (
+                {!isLoadingPermissions && !canUpdateStorageSettings && (
                   <CardContent>
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update storage settings
@@ -216,6 +222,7 @@ export const S3Connection = () => {
           </form>
         </Form_Shadcn_>
       </ScaffoldSection>
+
       <ScaffoldSection isFullWidth>
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -227,10 +234,10 @@ export const S3Connection = () => {
           <CreateCredentialModal visible={openCreateCred} onOpenChange={setOpenCreateCred} />
         </div>
 
-        {!canReadS3Credentials ? (
-          <NoPermission resourceText="view this project's S3 access keys" />
-        ) : projectIsLoading ? (
+        {projectIsLoading || isLoadingPermissions ? (
           <GenericSkeletonLoader />
+        ) : !canReadS3Credentials ? (
+          <NoPermission resourceText="view this project's S3 access keys" />
         ) : !isProjectActive ? (
           <Alert_Shadcn_ variant="warning">
             <WarningIcon />

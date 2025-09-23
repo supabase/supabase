@@ -6,7 +6,7 @@ import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchUpdateVariables = {
-  id: string
+  branchRef: string
   projectRef: string
   branchName?: string
   gitBranch?: string
@@ -15,15 +15,15 @@ export type BranchUpdateVariables = {
 }
 
 export async function updateBranch({
-  id,
+  branchRef,
   branchName,
   gitBranch,
   persistent,
   requestReview,
 }: BranchUpdateVariables) {
-  const { data, error } = await patch('/v1/branches/{branch_id}', {
+  const { data, error } = await patch('/v1/branches/{branch_id_or_ref}', {
     params: {
-      path: { branch_id: id },
+      path: { branch_id_or_ref: branchRef },
     },
     body: {
       branch_name: branchName,
