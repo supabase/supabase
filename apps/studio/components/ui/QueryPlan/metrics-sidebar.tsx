@@ -4,10 +4,11 @@ import type { Edge, Node } from 'reactflow'
 import type { PlanMeta, PlanNodeData } from './types'
 import { Button, ResizablePanel, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { formatMs, formatNumber, blocksToBytes } from './utils/formats'
+import { MetricBar, SegmentedBar, type SegmentedBarSegment } from './components/metric-bars'
+import { MetricLegend } from './components/metric-legend'
 import {
   computeBufferBreakdown,
   getTreeGuidePrefix,
-  type LegendItem,
   type MetricStats,
   type SidebarMetricKey,
   useMetricsSidebarData,
@@ -30,96 +31,6 @@ type MetricRenderResult = {
 }
 
 type MetricRenderer = (data: PlanNodeData, stats: MetricStats) => MetricRenderResult
-
-// This stole the style from SparkBar. SPark bar isn't available in this use case.
-const MetricBar = ({
-  percent,
-  secondaryPercent = 0,
-  color = 'bg-foreground',
-  secondaryColor = 'bg-foreground-muted',
-}: {
-  percent: number
-  secondaryPercent?: number
-  color?: string
-  secondaryColor?: string
-}) => {
-  const primaryWidth = Math.max(Math.min(percent, 100), 0)
-  const secondaryWidth = Math.max(Math.min(secondaryPercent, 100 - primaryWidth), 0)
-
-  return (
-    <div className="relative flex h-1 w-full overflow-hidden rounded bg-surface-400 border border-transparent">
-      <div
-        className={cn(
-          'h-full rounded-l transition-[width] duration-300',
-          color,
-          secondaryWidth <= 0 && 'rounded-r'
-        )}
-        style={{ width: `${primaryWidth}%` }}
-      />
-      {secondaryWidth > 0 ? (
-        <div
-          className={cn(
-            'h-full rounded-r transition-[width] duration-300 opacity-80',
-            secondaryColor
-          )}
-          style={{ width: `${secondaryWidth}%` }}
-        />
-      ) : null}
-    </div>
-  )
-}
-
-type SegmentedBarSegment = {
-  id: string
-  percent: number
-  color: string
-}
-
-const SegmentedBar = ({ segments }: { segments: SegmentedBarSegment[] }) => {
-  let remaining = 100
-  const normalizedSegments: (SegmentedBarSegment & { width: number })[] = []
-
-  segments.forEach((segment) => {
-    const width = Math.max(Math.min(segment.percent, remaining), 0)
-    remaining = Math.max(remaining - width, 0)
-
-    if (width > 0) {
-      normalizedSegments.push({ ...segment, width })
-    }
-  })
-
-  return (
-    <div className="relative flex h-1 w-full overflow-hidden rounded bg-surface-400 border border-transparent">
-      {normalizedSegments.map((segment, idx) => (
-        <div
-          key={segment.id}
-          className={cn(
-            'h-full transition-[width] duration-300',
-            segment.color,
-            idx === 0 && 'rounded-l',
-            idx === normalizedSegments.length - 1 && 'rounded-r'
-          )}
-          style={{ width: `${segment.width}%` }}
-        />
-      ))}
-    </div>
-  )
-}
-
-const MetricLegend = ({ items }: { items: LegendItem[] }) => {
-  if (!items.length) return null
-
-  return (
-    <ul className="mb-3 flex items-center justify-center gap-x-3 text-[11px] text-foreground-light">
-      {items.map((item) => (
-        <li key={item.id} className="inline-flex items-center gap-1 whitespace-nowrap">
-          <span className={cn('h-2.5 w-2.5 rounded-full', item.color)} />
-          <span>{item.label}</span>
-        </li>
-      ))}
-    </ul>
-  )
-}
 
 const renderTimeMetric: MetricRenderer = (data, stats) => {
   const exclusive = data.exclusiveTimeMs ?? 0
