@@ -37,7 +37,7 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
         attributes: [{ key: 'max_cpu_usage', color: 'white' }],
         name: 'CPU',
         unit: 'percentage',
-        description: 'Max CPU usage of your server',
+        description: 'Max CPU usage of your server.',
         chartDescription: '',
         links: [
           {

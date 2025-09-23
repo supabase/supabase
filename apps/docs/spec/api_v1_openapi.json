@@ -449,7 +449,10 @@
             "required": false,
             "in": "query",
             "description": "Resource indicator for MCP (Model Context Protocol) clients",
-            "schema": { "type": "string", "enum": ["https://api.supabase.io/mcp"] }
+            "schema": {
+              "type": "string",
+              "enum": ["https://api.supabase.com/mcp", "https://mcp.supabase.com/mcp"]
+            }
           }
         ],
         "responses": { "204": { "description": "" } },
@@ -4790,7 +4793,7 @@
           "refresh_token": { "type": "string" },
           "resource": {
             "type": "string",
-            "enum": ["https://api.supabase.io/mcp"],
+            "enum": ["https://api.supabase.com/mcp", "https://mcp.supabase.com/mcp"],
             "description": "Resource indicator for MCP (Model Context Protocol) clients"
           }
         },
@@ -5615,7 +5618,17 @@
               {
                 "type": "object",
                 "properties": {
+                  "kid": { "type": "string", "format": "uuid" },
+                  "use": { "type": "string", "enum": ["sig"] },
+                  "key_ops": {
+                    "type": "array",
+                    "items": { "type": "string", "enum": ["sign", "verify"] },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "ext": { "type": "boolean", "enum": [true] },
                   "kty": { "type": "string", "enum": ["RSA"] },
+                  "alg": { "type": "string", "enum": ["RS256"] },
                   "n": { "type": "string" },
                   "e": { "type": "string", "enum": ["AQAB"] },
                   "d": { "type": "string" },
@@ -5631,7 +5644,17 @@
               {
                 "type": "object",
                 "properties": {
+                  "kid": { "type": "string", "format": "uuid" },
+                  "use": { "type": "string", "enum": ["sig"] },
+                  "key_ops": {
+                    "type": "array",
+                    "items": { "type": "string", "enum": ["sign", "verify"] },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "ext": { "type": "boolean", "enum": [true] },
                   "kty": { "type": "string", "enum": ["EC"] },
+                  "alg": { "type": "string", "enum": ["ES256"] },
                   "crv": { "type": "string", "enum": ["P-256"] },
                   "x": { "type": "string" },
                   "y": { "type": "string" },
@@ -5643,7 +5666,17 @@
               {
                 "type": "object",
                 "properties": {
+                  "kid": { "type": "string", "format": "uuid" },
+                  "use": { "type": "string", "enum": ["sig"] },
+                  "key_ops": {
+                    "type": "array",
+                    "items": { "type": "string", "enum": ["sign", "verify"] },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "ext": { "type": "boolean", "enum": [true] },
                   "kty": { "type": "string", "enum": ["OKP"] },
+                  "alg": { "type": "string", "enum": ["EdDSA"] },
                   "crv": { "type": "string", "enum": ["Ed25519"] },
                   "x": { "type": "string" },
                   "d": { "type": "string" }
@@ -5654,7 +5687,17 @@
               {
                 "type": "object",
                 "properties": {
+                  "kid": { "type": "string", "format": "uuid" },
+                  "use": { "type": "string", "enum": ["sig"] },
+                  "key_ops": {
+                    "type": "array",
+                    "items": { "type": "string", "enum": ["sign", "verify"] },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "ext": { "type": "boolean", "enum": [true] },
                   "kty": { "type": "string", "enum": ["oct"] },
+                  "alg": { "type": "string", "enum": ["HS256"] },
                   "k": { "type": "string", "minLength": 16 }
                 },
                 "required": ["kty", "k"],
