@@ -278,6 +278,7 @@ allow_list = [
     "TextLocal",
     "TimescaleDB",
     "Transformers.js",
+    "[Tt]unneled",
     "Twilio",
     "Undici",
     "UnionPay",
