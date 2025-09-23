@@ -32,7 +32,7 @@ export function usePlanGraph(json: string): {
             ...meta,
             errorMessage: 'Invalid EXPLAIN JSON: Plan node not found.',
             errorDetail:
-              'Provide output from EXPLAIN (FORMAT JSON) or EXPLAIN (ANALYZE, FORMAT JSON). The root should be an array and its first element must contain a "Plan" object.',
+              'The EXPLAIN (FORMAT JSON) result was invalid. The root should be an array and its first element must contain a "Plan" object.',
           },
         }
       }
@@ -47,10 +47,10 @@ export function usePlanGraph(json: string): {
         nodes: [],
         edges: [],
         meta: {
-          errorMessage: 'Failed to parse JSON',
+          errorMessage: 'Failed to parse EXPLAIN JSON',
           errorDetail: (e as Error)?.message
-            ? `${(e as Error).message}\nPaste valid JSON from EXPLAIN (FORMAT JSON).`
-            : 'Paste valid JSON from EXPLAIN (FORMAT JSON).',
+            ? `${(e as Error).message}\nThe EXPLAIN (FORMAT JSON) result was not valid JSON.`
+            : 'The EXPLAIN (FORMAT JSON) result was not valid JSON.',
         },
       }
     }
