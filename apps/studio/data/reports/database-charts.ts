@@ -4,18 +4,9 @@ import { formatBytes } from 'lib/helpers'
 import { Organization } from 'types'
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
-import { PgbouncerConfigData } from '../database/pgbouncer-config-query'
 import { Project } from '../projects/project-detail-query'
 
-export const getReportAttributes = (
-  org: Organization,
-  project: Project,
-  diskConfig?: DiskAttributesData,
-  maxConnections?: MaxConnectionsData,
-  poolerConfig?: PgbouncerConfigData
-): ReportAttributes[] => {
-  const computeSize = project?.infra_compute_size || 'medium'
-
+export const getReportAttributes = (diskConfig?: DiskAttributesData): ReportAttributes[] => {
   return [
     {
       id: 'ram-usage',
@@ -224,10 +215,9 @@ export const getReportAttributesV2: (
   project: Project,
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
-  poolerConfig?: PgbouncerConfigData
-) => ReportAttributes[] = (org, project, diskConfig, maxConnections, poolerConfig) => {
+  pgBouncerMaxConnections?: number
+) => ReportAttributes[] = (org, project, diskConfig, maxConnections, pgBouncerMaxConnections) => {
   const isFreePlan = org?.plan?.id === 'free'
-  const computeSize = project?.infra_compute_size || 'medium'
   const isSpendCapEnabled =
     org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
 
@@ -507,7 +497,7 @@ export const getReportAttributesV2: (
           attribute: 'pg_pooler_max_connections',
           provider: 'reference-line',
           label: 'Max pooler connections',
-          value: poolerConfig?.max_client_conn,
+          value: pgBouncerMaxConnections,
           tooltip: 'Maximum allowed pooler connections for your current compute size',
           isMaxValue: true,
         },
