@@ -6,12 +6,14 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
   type Node,
+  type OnSelectionChangeParams,
   type ReactFlowInstance,
 } from 'reactflow'
 import { BookOpen, Minimize2 } from 'lucide-react'
@@ -72,6 +74,7 @@ export const QueryPlanVisualizer = ({
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
   const [panelNode, setPanelNode] = useState<Node<PlanNodeData> | null>(null)
+  const selectionSuppressedRef = useRef(false)
   const layout = useDagreLayout(nodes, edges, metricsVisibility, heatmapMode)
 
   useEffect(() => {
@@ -119,6 +122,18 @@ export const QueryPlanVisualizer = ({
 
   const handleSelectNode = useCallback((node: Node<PlanNodeData>) => {
     setSelectedNodeId(node.id)
+  }, [])
+
+  const handleSelectionChange = useCallback(({ nodes }: OnSelectionChangeParams) => {
+    if (selectionSuppressedRef.current) return
+
+    if (nodes.length === 0) {
+      setSelectedNodeId(null)
+      return
+    }
+
+    const last = nodes[nodes.length - 1]
+    setSelectedNodeId(last.id)
   }, [])
 
   useEffect(() => {
@@ -206,6 +221,37 @@ export const QueryPlanVisualizer = ({
   const clearSelection = useCallback(() => {
     setSelectedNodeId(null)
   }, [])
+
+  const handleNodeDragStart = useCallback(
+    (_event: unknown, _node: Node<PlanNodeData>) => {
+      selectionSuppressedRef.current = true
+      clearSelection()
+    },
+    [clearSelection]
+  )
+
+  const handleNodeDragStop = useCallback(
+    (_event: unknown, node: Node<PlanNodeData>) => {
+      if (rfInstance) {
+        rfInstance.setNodes((nodes) =>
+          nodes.map((current) =>
+            current.id === node.id ? { ...current, selected: false } : current
+          )
+        )
+      }
+
+      const release = () => {
+        selectionSuppressedRef.current = false
+      }
+
+      if (typeof window !== 'undefined') {
+        window.requestAnimationFrame(release)
+      } else {
+        release()
+      }
+    },
+    [rfInstance]
+  )
 
   const handleDetailPanelAfterLeave = useCallback(() => {
     if (!selectedNode) {
@@ -368,7 +414,10 @@ export const QueryPlanVisualizer = ({
               maxZoom={1.8}
               proOptions={{ hideAttribution: true }}
               onNodeClick={(_event, node) => handleSelectNode(node)}
+              onSelectionChange={handleSelectionChange}
               onPaneClick={clearSelection}
+              onNodeDragStart={handleNodeDragStart}
+              onNodeDragStop={handleNodeDragStop}
               onInit={(instance) => setRfInstance(instance)}
             >
               <Background

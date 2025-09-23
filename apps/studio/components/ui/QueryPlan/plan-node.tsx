@@ -350,19 +350,20 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
   ]
 }
 
-export const PlanNode = ({ data, selected }: NodeProps<PlanNodeData>) => {
+export const PlanNode = ({ data, selected, dragging }: NodeProps<PlanNodeData>) => {
   const vis = useContext(MetricsVisibilityContext)
   const heat = useContext(HeatmapContext)
   const headerLines = computeHeaderLines(data)
   const hints = buildHints(data)
   const isNeverExecuted = !!data.neverExecuted
+  const isHighlighted = selected || dragging
 
   return (
     <div
       style={{ width: `${DEFAULT_NODE_WIDTH}px` }}
       className={cn(
         'border overflow-hidden rounded-[4px] shadow-sm bg-background transition-all',
-        selected
+        isHighlighted
           ? 'border-foreground-muted/70 ring ring-foreground-muted/40 ring-offset-[3px] ring-offset-background'
           : 'border-border',
         isNeverExecuted && 'border-dashed opacity-70'
