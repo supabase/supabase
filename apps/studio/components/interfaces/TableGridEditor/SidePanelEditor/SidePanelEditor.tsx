@@ -23,6 +23,7 @@ import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -74,6 +75,7 @@ const SidePanelEditor = ({
 
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
@@ -400,6 +402,7 @@ const SidePanelEditor = ({
       isDuplicateRows: boolean
       existingForeignKeyRelations: ForeignKeyConstraint[]
       primaryKey?: Constraint
+      quickstartMetadata?: { templateName?: string; source?: string } | null
     },
     resolve: any
   ) => {
@@ -412,6 +415,7 @@ const SidePanelEditor = ({
       isDuplicateRows,
       existingForeignKeyRelations,
       primaryKey,
+      quickstartMetadata,
     } = configuration
 
     try {
@@ -463,6 +467,24 @@ const SidePanelEditor = ({
         ])
 
         toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+
+        // Track table creation event
+        sendEvent({
+          action: 'tableeditor_table_created' as any,
+          properties: {
+            tableName: table.name,
+            source: quickstartMetadata ? 'quickstart' :
+                    importContent ? 'import' :
+                    isDuplicateRows ? 'duplicate' :
+                    'manual',
+            quickstartTemplate: quickstartMetadata?.templateName,
+            quickstartSource: quickstartMetadata?.source,
+            columnsCount: columns.length,
+            hasRLS: isRLSEnabled,
+            hasRealtimeEnabled: isRealtimeEnabled
+          }
+        })
+
         onTableCreated(table)
       } else if (selectedTable) {
         toastId = toast.loading(`Updating table: ${selectedTable?.name}...`)

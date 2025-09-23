@@ -1463,6 +1463,95 @@ export interface HipaaRequestButtonClickedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
+export interface TableEditorQuickstartViewedEvent {
+  action: 'tableeditor_quickstart_viewed'
+  properties?: {
+    variant?: string
+  }
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorQuickstartTemplateSelectedEvent {
+  action: 'tableeditor_quickstart_template_selected'
+  properties: {
+    templateName: string
+    source?: string
+  }
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorQuickstartAbandonedEvent {
+  action: 'tableeditor_quickstart_abandoned'
+  properties: {
+    stage: 'initial' | 'ai_input' | 'category_selection' | 'template_preview' | 'results'
+    timeSpentSeconds?: number
+    hadInteraction?: boolean
+  }
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorQuickstartCategorySelectedEvent {
+  action: 'tableeditor_quickstart_category_selected'
+  properties: {
+    category: string
+  }
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorQuickstartAISelectedEvent {
+  action: 'tableeditor_quickstart_ai_selected'
+  properties: {}
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorQuickstartAIGenerationStartedEvent {
+  action: 'tableeditor_quickstart_ai_generation_started'
+  properties: {
+    promptLength: number
+  }
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorQuickstartAIGenerationSucceededEvent {
+  action: 'tableeditor_quickstart_ai_generation_succeeded'
+  properties: {
+    tablesGenerated: number
+    promptLength: number
+  }
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorQuickstartAIGenerationFailedEvent {
+  action: 'tableeditor_quickstart_ai_generation_failed'
+  properties: {
+    promptLength: number
+    errorMessage?: string
+  }
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorQuickstartQuickIdeaSelectedEvent {
+  action: 'tableeditor_quickstart_quick_idea_selected'
+  properties: {
+    idea: string
+  }
+  groups?: TelemetryGroups
+}
+
+export interface TableEditorTableCreatedEvent {
+  action: 'tableeditor_table_created'
+  properties: {
+    tableName: string
+    source: 'quickstart' | 'import' | 'duplicate' | 'manual'
+    quickstartTemplate?: string
+    quickstartSource?: string
+    columnsCount: number
+    hasRLS: boolean
+    hasRealtimeEnabled: boolean
+  }
+  groups?: TelemetryGroups
+}
+
 /**
  * @hidden
  */
@@ -1558,3 +1647,13 @@ export type TelemetryEvent =
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
+  | TableEditorQuickstartViewedEvent
+  | TableEditorQuickstartTemplateSelectedEvent
+  | TableEditorQuickstartAbandonedEvent
+  | TableEditorQuickstartCategorySelectedEvent
+  | TableEditorQuickstartAISelectedEvent
+  | TableEditorQuickstartAIGenerationStartedEvent
+  | TableEditorQuickstartAIGenerationSucceededEvent
+  | TableEditorQuickstartAIGenerationFailedEvent
+  | TableEditorQuickstartQuickIdeaSelectedEvent
+  | TableEditorTableCreatedEvent
