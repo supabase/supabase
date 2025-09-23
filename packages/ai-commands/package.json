@@ -34,7 +34,7 @@
     "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.0",
     "tsconfig": "workspace:*",
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "^3.0.5"
   }
