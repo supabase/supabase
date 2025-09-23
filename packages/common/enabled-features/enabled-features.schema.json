@@ -116,21 +116,33 @@
       "description": "Enable the database roles page"
     },
 
-    "docs:auth": {
+    "docs:auth_architecture": {
       "type": "boolean",
-      "description": "Enable auth docs"
+      "description": "Enable docs on Auth architecture"
     },
-    "docs:contribution": {
+    "docs:auth_configuration": {
       "type": "boolean",
-      "description": "Enable documentation on contribution"
+      "description": "Enable auth configuration docs"
+    },
+    "docs:auth_flows": {
+      "type": "boolean",
+      "description": "Enable docs on auth flows"
+    },
+    "docs:auth_full_security": {
+      "type": "boolean",
+      "description": "Full auth security docs enabled"
+    },
+    "docs:auth_troubleshooting": {
+      "type": "boolean",
+      "description": "Enable auth troubleshooting docs"
     },
     "docs:compliance": {
       "type": "boolean",
       "description": "Enable documentation on compliance"
     },
-    "docs:self-hosting": {
+    "docs:contribution": {
       "type": "boolean",
-      "description": "Enable documentation for self-hosting"
+      "description": "Enable documentation on contribution"
     },
     "docs:framework_quickstarts": {
       "type": "boolean",
@@ -148,6 +160,10 @@
       "type": "boolean",
       "description": "Hide docs on CLI profiles"
     },
+    "docs:local_development": {
+      "type": "boolean",
+      "description": "Enable local development documentation"
+    },
     "docs:mobile_tutorials": {
       "type": "boolean",
       "description": "Enable mobile tutorials getting started documentation"
@@ -160,10 +176,15 @@
       "type": "boolean",
       "description": "Enable production checklist"
     },
+    "docs:self-hosting": {
+      "type": "boolean",
+      "description": "Enable documentation for self-hosting"
+    },
     "docs:web_apps": {
       "type": "boolean",
       "description": "Enable web apps getting started documentation"
     },
+
     "feedback:docs": {
       "type": "boolean",
       "description": "Enable feedback submission for docs site"
@@ -284,6 +305,10 @@
       "description": "Enable the project reports page"
     },
 
+    "sdk:auth": {
+      "type": "boolean",
+      "description": "Enable Auth SDK docs"
+    },
     "sdk:csharp": {
       "type": "boolean",
       "description": "Enable the C# SDK"
@@ -336,13 +361,18 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
-    "docs:auth",
+    "docs:auth_architecture",
+    "docs:auth_configuration",
+    "docs:auth_flows",
+    "docs:auth_full_security",
+    "docs:auth_troubleshooting",
     "docs:compliance",
     "docs:contribution",
     "docs:framework_quickstarts",
     "docs:full_getting_started",
     "docs:full_platform",
     "docs:hide_cli_profiles",
+    "docs:local_development",
     "docs:mobile_tutorials",
     "docs:pgtap",
     "docs:production_checklist",
@@ -375,6 +405,7 @@
     "project_connection:show_orms",
     "quickstarts:hide_nimbus",
     "reports:all",
+    "sdk:auth",
     "sdk:csharp",
     "sdk:dart",
     "sdk:kotlin",
