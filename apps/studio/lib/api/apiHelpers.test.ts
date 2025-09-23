@@ -1,7 +1,9 @@
+import type { IncomingHttpHeaders } from 'node:http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   commaSeparatedStringIntoArray,
   constructHeaders,
+  fromNodeHeaders,
   toSnakeCase,
   zBooleanString,
 } from './apiHelpers'
@@ -201,6 +203,57 @@ describe('apiHelpers', () => {
     it('should handle string with only commas', () => {
       const result = commaSeparatedStringIntoArray(',,,')
       expect(result).toEqual([])
+    })
+  })
+
+  describe('fromNodeHeaders', () => {
+    it('should convert simple node headers to fetch headers', () => {
+      const nodeHeaders: IncomingHttpHeaders = {
+        'content-type': 'application/json',
+        authorization: 'Bearer token',
+      }
+
+      const result = fromNodeHeaders(nodeHeaders)
+
+      expect(result.get('content-type')).toBe('application/json')
+      expect(result.get('authorization')).toBe('Bearer token')
+    })
+
+    it('should skip undefined values', () => {
+      const nodeHeaders: IncomingHttpHeaders = {
+        'content-type': 'application/json',
+        authorization: undefined,
+        accept: 'application/json',
+      }
+
+      const result = fromNodeHeaders(nodeHeaders)
+
+      expect(result.get('content-type')).toBe('application/json')
+      expect(result.get('authorization')).toBeNull()
+      expect(result.get('accept')).toBe('application/json')
+    })
+
+    it('should handle empty headers object', () => {
+      const nodeHeaders: IncomingHttpHeaders = {}
+      const result = fromNodeHeaders(nodeHeaders)
+
+      expect(Array.from(result.keys())).toEqual([])
+    })
+
+    it('should handle mixed array and string values', () => {
+      const nodeHeaders: IncomingHttpHeaders = {
+        'content-type': 'application/json',
+        'x-custom': ['value1', 'value2'],
+        authorization: 'Bearer token',
+        'x-empty': undefined,
+      }
+
+      const result = fromNodeHeaders(nodeHeaders)
+
+      expect(result.get('content-type')).toBe('application/json')
+      expect(result.get('authorization')).toBe('Bearer token')
+      expect(result.get('x-empty')).toBeNull()
+      expect(result.get('x-custom')).toBe('value1, value2')
     })
   })
 })

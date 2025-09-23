@@ -1,6 +1,5 @@
 import { source } from 'common-tags'
 import { makeRandomString } from 'lib/helpers'
-import type { IncomingHttpHeaders } from 'node:http'
 import { executeQuery } from './query'
 
 const listMigrationVersionsQuery = () =>
@@ -38,7 +37,7 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
 }
 
 export type ListMigrationVersionsOptions = {
-  headers?: IncomingHttpHeaders
+  headers?: HeadersInit
 }
 
 export async function listMigrationVersions({ headers }: ListMigrationVersionsOptions) {
@@ -48,7 +47,7 @@ export async function listMigrationVersions({ headers }: ListMigrationVersionsOp
 export type ApplyAndTrackMigrationsOptions = {
   query: string
   name?: string
-  headers?: IncomingHttpHeaders
+  headers?: HeadersInit
 }
 
 export async function applyAndTrackMigrations({
@@ -56,7 +55,10 @@ export async function applyAndTrackMigrations({
   name,
   headers,
 }: ApplyAndTrackMigrationsOptions) {
-  const initializeResponse = await executeQuery({ query: initializeHistoryTableQuery(), headers })
+  const initializeResponse = await executeQuery<void>({
+    query: initializeHistoryTableQuery(),
+    headers,
+  })
 
   if (initializeResponse.error) {
     return initializeResponse

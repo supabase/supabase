@@ -1,8 +1,8 @@
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 import { createSupabaseMcpServer, SupabasePlatform } from '@supabase/mcp-server-supabase'
 import { stripIndent } from 'common-tags'
-import { commaSeparatedStringIntoArray, constructHeaders } from 'lib/api/apiHelpers'
-import { getDatabaseOperations } from 'lib/api/local/mcp'
+import { commaSeparatedStringIntoArray, fromNodeHeaders } from 'lib/api/apiHelpers'
+import { getDatabaseOperations } from 'lib/api/self-hosted/mcp'
 import { DEFAULT_PROJECT } from 'lib/constants/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -42,7 +42,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const { features } = data
-  const headers = constructHeaders(req.headers)
+  const headers = fromNodeHeaders(req.headers)
 
   const platform: SupabasePlatform = {
     database: getDatabaseOperations({ headers }),

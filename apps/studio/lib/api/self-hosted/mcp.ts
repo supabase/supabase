@@ -3,12 +3,11 @@ import {
   DatabaseOperations,
   ExecuteSqlOptions,
 } from '@supabase/mcp-server-supabase/platform'
-import type { IncomingHttpHeaders } from 'node:http'
 import { executeQuery } from './query'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 
 export type GetDatabaseOperationsOptions = {
-  headers?: IncomingHttpHeaders
+  headers?: HeadersInit
 }
 
 export function getDatabaseOperations({

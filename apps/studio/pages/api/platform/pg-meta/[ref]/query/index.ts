@@ -1,6 +1,6 @@
 import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
-import { executeQuery } from 'lib/api/local/query'
+import { executeQuery } from 'lib/api/self-hosted/query'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
@@ -21,12 +21,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
-  const response = await executeQuery({ query, headers })
+  const { data, error } = await executeQuery({ query, headers })
 
-  if (response.error) {
-    const { code, message } = response.error
-    return res.status(code).json({ message, formattedError: message })
+  if (error) {
+    const { code, message } = error
+    return res.status(code ?? 500).json({ message, formattedError: message })
   } else {
-    return res.status(200).json(response)
+    return res.status(200).json(data)
   }
 }
