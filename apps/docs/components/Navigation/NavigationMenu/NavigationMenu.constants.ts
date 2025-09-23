@@ -3219,6 +3219,7 @@ export const ui: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Quickstart', url: '/guides/ui/quickstart' },
+        { name: 'FAQ', url: '/guides/ui/faq' },
       ],
     }
   ],
