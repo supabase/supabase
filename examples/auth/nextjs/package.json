@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@supabase/ssr": "latest",
-    "@supabase/supabase-js": "latest",
+    "@supabase/supabase-js": "2.71.2-canary.28",
     "autoprefixer": "10.4.17",
     "geist": "^1.2.1",
     "next": "latest",

@@ -20,7 +20,7 @@ catalog:
   'vite': '^6.2.7'
   'zod': '^3.25.76'
 
-minimumReleaseAge: 10080
+
 minimumReleaseAgeExclude:
   - 'ai'
   - '@ai-sdk/*'
