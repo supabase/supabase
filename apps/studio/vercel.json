@@ -1,4 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm typecheck --filter studio && pnpm build,"
+  "buildCommand": "pnpm typecheck --filter studio && pnpm build"
 }
