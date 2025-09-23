@@ -6,7 +6,7 @@ export type Org = OrganizationsData[number]
 export type Project = ProjectsData[number]
 export type Branch = BranchesData[number]
 
-export type Variable = 'url' | 'publishableKey' | 'sessionPooler'
+export type Variable = 'url' | 'publishable' | 'anon' | 'sessionPooler'
 
 function removeDoubleQuotes(str: string) {
   return str.replaceAll('"', '')

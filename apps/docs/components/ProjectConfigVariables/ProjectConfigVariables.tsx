@@ -38,6 +38,7 @@ import { useProjectApiQuery } from '~/lib/fetch/projectApi'
 import { isProjectPaused, useProjectsQuery } from '~/lib/fetch/projects'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
+import { isAuthApiError } from '@supabase/supabase-js'
 
 type ProjectOrgDataState =
   | 'userLoading'
@@ -274,7 +275,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
 
-  const needsApiQuery = variable === 'publishableKey' || variable === 'url'
+  const needsApiQuery = variable === 'publishable' || variable === 'anon' || variable === 'url'
   const needsSupavisorQuery = variable === 'sessionPooler'
 
   const {
@@ -300,15 +301,24 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   )
 
   function isInvalidApiData(apiData: ProjectApiData) {
+    console.log(variable)
     switch (variable) {
       case 'url':
         return !apiData.app_config?.endpoint
-      case 'publishableKey':
-        return !apiData.service_api_keys?.some((key) => key.tags === 'anon')
+      case 'publishable':
+        console.log(apiData)
+        return !apiData.api_key?.some((key) => key.type === 'publishable')
+        
+        // service_api_keys?.some((key) => key.tags === 'publishable')
+    
+      case 'anon':
+        console.log(!apiData.api_key?.some((key) => key.type === 'legacy'))
+        return !apiData.api_key?.some((key) => key.type === 'legacy')
     }
   }
 
   function isInvalidSupavisorData(supavisorData: SupavisorConfigData) {
+    console.log(supavisorData)
     return supavisorData.length === 0
   }
 
@@ -324,30 +334,39 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             ? 'loggedIn.selectedProject.dataPending'
             : (
                   needsApiQuery
-                    ? isApiError || isInvalidApiData(apiData!)
+                    ? isAuthApiError
                     : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
                 )
               ? 'loggedIn.selectedProject.dataError'
               : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = ''
+  console.log(stateSummary)
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
+                    console.log("I made it")
+
     switch (variable) {
       case 'url':
         variableValue = `https://${apiData?.app_config?.endpoint}`
         break
-      case 'publishableKey':
+      case 'anon':
         variableValue = apiData?.service_api_keys?.find((key) => key.tags === 'anon')?.api_key || ''
+        break
+              case 'publishable':
+                console.log("I made it")
+        variableValue = apiData?.service_api_keys?.find((key) => key.tags === 'publishable')?.api_key || ''
         break
       case 'sessionPooler':
         variableValue = supavisorConfig?.[0]?.connection_string || ''
     }
+    console.log(variableValue)
   }
 
   const { copied, handleCopy } = useCopy()
 
   return (
     <>
+
       <div className={cn('flex items-center gap-2', className)}>
         <Input
           disabled
@@ -390,6 +409,8 @@ function VariableView({ variable, className }: { variable: Variable; className?:
           .
         </p>
       )}
+
+      
     </>
   )
 }
