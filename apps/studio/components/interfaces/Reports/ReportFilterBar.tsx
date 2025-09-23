@@ -115,14 +115,14 @@ const ReportFilterBar = ({
   >(null)
   const [addFilterValues, setAddFilterValues] = useState<ReportFilterItem>({
     key: filterKeys[0],
-    compare: 'matches',
+    compare: 'is',
     value: '',
   })
 
   const resetFilterValues = () => {
     setAddFilterValues({
       key: filterKeys[0],
-      compare: 'matches',
+      compare: 'is',
       value: '',
     })
   }
@@ -322,7 +322,7 @@ const ReportFilterBar = ({
                 label="Comparison"
                 className="gap-[2px]"
               >
-                {['matches', 'is'].map((value) => (
+                {['is', 'matches'].map((value) => (
                   <Select.Option key={value} value={value}>
                     {value}
                   </Select.Option>
