@@ -120,7 +120,7 @@ export function GettingStartedSection({
               className="text-xs gap-2 h-auto"
             >
               <Table2 size={16} strokeWidth={1.5} />
-              Code
+              No-code
             </ToggleGroupItem>
             <ToggleGroupItem
               value="code"
@@ -129,7 +129,7 @@ export function GettingStartedSection({
               className="text-xs gap-2 h-auto"
             >
               <Code size={16} strokeWidth={1.5} />
-              No-code
+              Code
             </ToggleGroupItem>
           </ToggleGroup>
           <Button size="tiny" type="outline" onClick={() => onChange('hidden')}>
