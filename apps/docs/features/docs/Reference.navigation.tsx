@@ -1,7 +1,7 @@
 import { isFeatureEnabled } from 'common'
 import { Fragment, type PropsWithChildren } from 'react'
 
-import { cn } from 'ui'
+import { cn, Separator } from 'ui'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import RefVersionDropdown from '~/components/RefVersionDropdown'
@@ -74,7 +74,7 @@ function RefCategory({
 
   return (
     <>
-      <Divider />
+      <Separator className="w-full h-px my-3 bg-control border-t" />
       {'title' in section && <SideMenuTitle className="py-2">{section.title}</SideMenuTitle>}
       <ul className="space-y-2">
         {section.items?.map((item) => (
@@ -85,10 +85,6 @@ function RefCategory({
       </ul>
     </>
   )
-}
-
-function Divider() {
-  return <hr className="w-full h-px my-3 bg-control" />
 }
 
 function SideMenuTitle({ children, className }: PropsWithChildren<{ className?: string }>) {
