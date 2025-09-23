@@ -166,7 +166,12 @@ const LinterDataGrid = ({
       {selectedLint !== null && (
         <>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={30} maxSize={45} minSize={30} className="bg-studio border-t">
+          <ResizablePanel
+            defaultSize={30}
+            maxSize={45}
+            minSize={30}
+            className="bg-studio border-t flex flex-col h-full"
+          >
             <div className="flex items-center justify-between w-full border-b py-3 px-6">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm m-0">
@@ -176,7 +181,7 @@ const LinterDataGrid = ({
               </div>
               <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
             </div>
-            <div className="p-6">
+            <div className="p-6 flex-grow min-h-0 overflow-y-auto">
               <LintDetail lint={selectedLint} projectRef={ref!} />
             </div>
           </ResizablePanel>

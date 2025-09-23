@@ -148,9 +148,11 @@ const HomePageCover = (props) => {
             </p>
           </div>
         </div>
-        <div className="w-full xl:max-w-[440px] -mb-40">
-          <GettingStarted />
-        </div>
+        {isFeatureEnabled('docs:full_getting_started') && (
+          <div className="w-full xl:max-w-[440px] -mb-40">
+            <GettingStarted />
+          </div>
+        )}
       </div>
     </div>
   )
