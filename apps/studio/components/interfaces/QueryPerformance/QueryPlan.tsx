@@ -134,7 +134,12 @@ export const QueryPlan = ({ query }: { query: string }) => {
           <TooltipContent>What is a query plan?</TooltipContent>
         </Tooltip>
       </div>
-      <div className="h-[120px] overflow-hidden pb-0 z-0 relative transition-all duration-300">
+      <div
+        className={cn(
+          'overflow-hidden pb-0 z-0 relative transition-all duration-300',
+          !explainError && 'h-[120px]'
+        )}
+      >
         <p className="text-xs text-foreground-light mb-4">
           Visualize how Postgres executes your SQL so you can pinpoint costly steps faster.
         </p>
@@ -178,22 +183,26 @@ export const QueryPlan = ({ query }: { query: string }) => {
           </Dialog>
         )}
       </div>
-      <div
-        className={cn(
-          'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/30 to-transparent h-24 transition-opacity duration-300',
-          isQueryPlanVisualizerExpanded && 'opacity-0 pointer-events-none'
-        )}
-      />
-      <div className="absolute -bottom-[13px] left-0 right-0 w-full flex items-center justify-center z-10">
-        <Button
-          type="default"
-          className="rounded-full"
-          icon={<ChevronsUpDown />}
-          onClick={() => setIsQueryPlanVisualizerExpanded((prev) => !prev)}
-        >
-          {isQueryPlanVisualizerExpanded ? 'Collapse' : 'Expand'}
-        </Button>
-      </div>
+      {!explainError && (
+        <>
+          <div
+            className={cn(
+              'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/30 to-transparent h-24 transition-opacity duration-300',
+              isQueryPlanVisualizerExpanded && 'opacity-0 pointer-events-none'
+            )}
+          />
+          <div className="absolute -bottom-[13px] left-0 right-0 w-full flex items-center justify-center z-10">
+            <Button
+              type="default"
+              className="rounded-full"
+              icon={<ChevronsUpDown />}
+              onClick={() => setIsQueryPlanVisualizerExpanded((prev) => !prev)}
+            >
+              {isQueryPlanVisualizerExpanded ? 'Collapse' : 'Expand'}
+            </Button>
+          </div>
+        </>
+      )}
     </QueryPanelSection>
   )
 }
