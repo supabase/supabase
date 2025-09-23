@@ -18,7 +18,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { isAtBottom } from 'lib/helpers'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { formatCronJobColumns } from './CronJobs.utils'
@@ -279,6 +279,7 @@ export const CronjobsTab = () => {
               setIsClosingCreateCronJobSheet(false)
               setCronJobForEditing(undefined)
               setCreateCronJobSheetShown(false)
+              cleanPointerEventsNoneOnBody(500)
             }}
             isClosing={isClosingCreateCronJobSheet}
             setIsClosing={setIsClosingCreateCronJobSheet}

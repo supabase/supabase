@@ -2,9 +2,9 @@ import { numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { formatBytes } from 'lib/helpers'
 import { Organization } from 'types'
-import { Project } from '../projects/project-detail-query'
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
+import { Project } from '../projects/project-detail-query'
 
 export const getReportAttributes = (diskConfig?: DiskAttributesData): ReportAttributes[] => {
   return [
@@ -102,14 +102,14 @@ export const getReportAttributes = (diskConfig?: DiskAttributesData): ReportAttr
         {
           attribute: 'disk_iops_write',
           provider: 'infra-monitoring',
-          label: 'write IOPS',
+          label: 'Write IOPS',
           tooltip:
             'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
         },
         {
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
-          label: 'read IOPS',
+          label: 'Read IOPS',
           tooltip:
             'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
         },
@@ -251,7 +251,7 @@ export const getReportAttributesV2: (
         {
           attribute: 'ram_usage_cache_and_buffers',
           provider: 'infra-monitoring',
-          label: 'Cache + buffers',
+          label: 'Cache + Buffers',
           tooltip:
             'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
         },
@@ -356,14 +356,14 @@ export const getReportAttributesV2: (
         {
           attribute: 'disk_iops_write',
           provider: 'infra-monitoring',
-          label: 'write IOPS',
+          label: 'Write IOPS',
           tooltip:
             'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
         },
         {
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
-          label: 'read IOPS',
+          label: 'Read IOPS',
           tooltip:
             'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
         },
