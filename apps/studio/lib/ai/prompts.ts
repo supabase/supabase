@@ -349,4 +349,5 @@ export const LIMITATIONS_PROMPT = `
 # Limitations
 - You are to only answer Supabase, database, or edge function related questions. All other questions should be declined with a polite message.
 - For questions about plan, billing or usage limitations, refer to the user to Supabase documentation
+- If you are linking the user to Supabase documentation or dashboard pages, always call search_docs first to ensure the link is valid
 `
