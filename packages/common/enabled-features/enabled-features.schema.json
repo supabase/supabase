@@ -115,6 +115,7 @@
       "type": "boolean",
       "description": "Enable the database roles page"
     },
+
     "docs:auth": {
       "type": "boolean",
       "description": "Enable auth docs"
@@ -142,6 +143,10 @@
     "docs:full_platform": {
       "type": "boolean",
       "description": "Enable full platform documentation"
+    },
+    "docs:hide_cli_profiles": {
+      "type": "boolean",
+      "description": "Hide docs on CLI profiles"
     },
     "docs:mobile_tutorials": {
       "type": "boolean",
@@ -269,6 +274,11 @@
       "description": "Enable the log drains page in project settings"
     },
 
+    "quickstarts:hide_nimbus": {
+      "type": "boolean",
+      "description": "Whether to show the Nimbus quickstart"
+    },
+
     "reports:all": {
       "type": "boolean",
       "description": "Enable the project reports page"
@@ -332,6 +342,7 @@
     "docs:framework_quickstarts",
     "docs:full_getting_started",
     "docs:full_platform",
+    "docs:hide_cli_profiles",
     "docs:mobile_tutorials",
     "docs:pgtap",
     "docs:production_checklist",
@@ -362,6 +373,7 @@
     "project_connection:show_app_frameworks",
     "project_connection:show_mobile_frameworks",
     "project_connection:show_orms",
+    "quickstarts:hide_nimbus",
     "reports:all",
     "sdk:csharp",
     "sdk:dart",
