@@ -5,6 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { IS_PLATFORM } from 'common'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
@@ -52,7 +53,7 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
     organizationKeys.customerProfile(slug),
     ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
     {
-      enabled: enabled && canReadCustomerProfile && typeof slug !== 'undefined',
+      enabled: IS_PLATFORM && enabled && canReadCustomerProfile && typeof slug !== 'undefined',
       ...options,
     }
   )

@@ -57,7 +57,7 @@ export function ReportChartUpsell({
           onMouseLeave={() => setIsHoveringUpgrade(false)}
           className="mt-4"
         >
-          <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=reports`}>
+          <Link href={`/org/${orgSlug || '_'}/billing?panel=subscriptionPlan&source=reports`}>
             Upgrade to{' '}
             <span className="capitalize">
               {!!report.availableIn?.length ? report.availableIn[0] : 'Pro'}
