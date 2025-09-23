@@ -109,7 +109,7 @@
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "tsx": "^4.19.3",
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "vite": "catalog:"
   }
 }
