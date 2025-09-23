@@ -8,7 +8,7 @@ type MetricBarProps = {
 }
 
 /**
- * Mirrors SparkBar styling without bringing its deps.
+ * Mirrors SparkBar styling
  */
 export const MetricBar = ({
   percent,
