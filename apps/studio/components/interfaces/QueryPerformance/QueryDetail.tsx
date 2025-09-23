@@ -1,11 +1,10 @@
-import { Lightbulb, ChevronsUpDown, Expand } from 'lucide-react'
+import { Lightbulb, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
 
 import { formatSql } from 'lib/formatSql'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_COLUMNS,
@@ -25,6 +24,18 @@ const SqlMonacoBlock = dynamic(
     ssr: false,
   }
 )
+
+const QueryDetailMetricBlock = ({ title, value }: { title: string; value: string }) => {
+  return (
+    <div className="flex items-center gap-x-4">
+      <div className="flex h-12 w-12 bg-surface-100 rounded-lg items-center justify-center border"></div>
+      <div className="flex flex-col">
+        <p className="text-foreground">{value}</p>
+        <p className="text-foreground-lighter">{title}</p>
+      </div>
+    </div>
+  )
+}
 
 export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
@@ -59,6 +70,20 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
 
   return (
     <QueryPanelContainer>
+      <QueryPanelSection className="pt-2 border-b relative">
+        <div className="grid grid-cols-2 gap-5 pb-6">
+          <QueryDetailMetricBlock title="Score" value="0" />
+          <QueryDetailMetricBlock
+            title="Time consumed"
+            value={`${((selectedRow?.prop_total_time / selectedRow?.total_time) * 100).toFixed(1)}%`}
+          />
+          <QueryDetailMetricBlock
+            title="Total time"
+            value={formatDuration(selectedRow?.prop_total_time / 1000)}
+          />
+          <QueryDetailMetricBlock title="Count" value={selectedRow?.calls?.toLocaleString()} />
+        </div>
+      </QueryPanelSection>
       <QueryPanelSection className="pt-2 border-b relative">
         <h4 className="mb-4">Query pattern</h4>
         <div
