@@ -134,17 +134,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [snap]
   )
 
-  // Sanitize messages to remove Valtio proxy wrappers that can't be cloned
-  const sanitizedMessages = useMemo(() => {
-    if (!snap.activeChat?.messages) return undefined
-
-    return snap.activeChat.messages.map((msg: any) => {
-      // Convert proxy objects to plain objects
-      const plainMessage = JSON.parse(JSON.stringify(msg))
-      return plainMessage
-    })
-  }, [snap.activeChat?.messages])
-
   // TODO(refactor): This useChat hook should be moved down into each chat session.
   // That way we won't have to disable switching chats while the chat is loading,
   // and don't run the risk of messages getting mixed up between chats.
