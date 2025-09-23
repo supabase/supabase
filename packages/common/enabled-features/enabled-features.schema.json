@@ -148,6 +148,10 @@
       "type": "boolean",
       "description": "Hide docs on CLI profiles"
     },
+    "docs:local_development": {
+      "type": "boolean",
+      "description": "Enable local development documentation"
+    },
     "docs:mobile_tutorials": {
       "type": "boolean",
       "description": "Enable mobile tutorials getting started documentation"

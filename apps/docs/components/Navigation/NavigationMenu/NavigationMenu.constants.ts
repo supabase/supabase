@@ -13,6 +13,7 @@ const {
   'docsSelf-hosting': selfHostingEnabled,
   docsFrameworkQuickstarts: frameworkQuickstartsEnabled,
   docsFullPlatform: fullPlatformEnabled,
+  docsLocalDevelopment: localDevelopmentEnabled,
   docsMobileTutorials: mobileTutorialsEnabled,
   docsPgtap: pgTapEnabled,
   docsProductionChecklist: productionChecklistEnabled,
@@ -32,6 +33,7 @@ const {
   'docs:self-hosting',
   'docs:framework_quickstarts',
   'docs:full_platform',
+  'docs:local_development',
   'docs:mobile_tutorials',
   'docs:pgtap',
   'docs:production_checklist',
@@ -72,7 +74,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'auth',
             href: '/guides/auth' as `/${string}`,
             level: 'auth',
-            enabled: authEnabled,
           },
           {
             label: 'Storage',
@@ -127,6 +128,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'dev-cli',
             href: '/guides/local-development' as `/${string}`,
             level: 'local_development',
+            enabled: localDevelopmentEnabled,
           },
           {
             label: 'Deployment',
@@ -638,7 +640,6 @@ export const PhoneLoginsItems = [
 export const auth: NavMenuConstant = {
   icon: 'auth',
   title: 'Auth',
-  enabled: authEnabled,
   items: [
     {
       name: 'Overview',
@@ -647,9 +648,11 @@ export const auth: NavMenuConstant = {
     {
       name: 'Architecture',
       url: '/guides/auth/architecture',
+      enabled: authEnabled,
     },
     {
       name: 'Getting Started',
+      enabled: authEnabled,
       items: [
         {
           name: 'Next.js',
@@ -684,6 +687,7 @@ export const auth: NavMenuConstant = {
     },
     {
       name: 'Flows (How-tos)',
+      enabled: authEnabled,
       items: [
         {
           name: 'Server-Side Rendering',
@@ -773,7 +777,7 @@ export const auth: NavMenuConstant = {
       name: 'Debugging',
       items: [
         { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
-        { name: 'Troubleshooting', url: '/guides/auth/troubleshooting' },
+        { name: 'Troubleshooting', url: '/guides/auth/troubleshooting', enabled: authEnabled },
       ],
     },
     {
@@ -790,6 +794,7 @@ export const auth: NavMenuConstant = {
     },
     {
       name: 'Configuration',
+      enabled: authEnabled,
       items: [
         {
           name: 'General Configuration',
@@ -837,16 +842,17 @@ export const auth: NavMenuConstant = {
     {
       name: 'Security',
       items: [
-        { name: 'Password Security', url: '/guides/auth/password-security' },
-        { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
-        { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
-        { name: 'Audit Logs', url: '/guides/auth/audit-logs' },
+        { name: 'Password Security', url: '/guides/auth/password-security', enabled: authEnabled },
+        { name: 'Rate Limits', url: '/guides/auth/rate-limits', enabled: authEnabled },
+        { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha', enabled: authEnabled },
+        { name: 'Audit Logs', url: '/guides/auth/audit-logs', enabled: authEnabled },
         {
           name: 'JSON Web Tokens (JWT)',
+          enabled: authEnabled,
           url: '/guides/auth/jwts',
           items: [{ name: 'Claims Reference', url: '/guides/auth/jwt-fields' }],
         },
-        { name: 'JWT Signing Keys', url: '/guides/auth/signing-keys' },
+        { name: 'JWT Signing Keys', url: '/guides/auth/signing-keys', enabled: authEnabled },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         {
           name: 'Column Level Security',

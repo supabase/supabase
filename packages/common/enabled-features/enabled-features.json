@@ -14,7 +14,7 @@
   "authentication:attack_protection": true,
   "authentication:advanced": true,
 
-  "authentication:show_providers": true,
+  "authentication:show_providers": false,
   "authentication:show_manual_linking": true,
   "authentication:show_send_invitation": true,
   "authentication:show_provider_filter": true,
@@ -22,7 +22,7 @@
   "authentication:show_sort_by_phone": true,
   "authentication:show_user_type_filter": true,
 
-  "billing:all": true,
+  "billing:all": false,
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,
@@ -33,9 +33,10 @@
   "database:replication": true,
   "database:roles": true,
 
-  "docs:auth": true,
+  "docs:auth": false,
   "docs:compliance": true,
   "docs:contribution": true,
+  "docs:local_development": false,
   "docs:self-hosting": true,
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,
