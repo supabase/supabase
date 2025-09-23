@@ -1,21 +1,6 @@
 import Link from 'next/link'
-import {
-  type ReactNode,
-  Fragment,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-import ReactFlow, {
-  Background,
-  BackgroundVariant,
-  type Node,
-  type OnSelectionChangeParams,
-  type ReactFlowInstance,
-} from 'reactflow'
+import { type ReactNode, Fragment, SetStateAction, useMemo, useState } from 'react'
+import ReactFlow, { Background, BackgroundVariant } from 'reactflow'
 import { BookOpen, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 import { Transition } from '@headlessui/react'
@@ -33,7 +18,7 @@ import {
 } from 'ui'
 import { MetaOverlay } from './meta-overlay'
 import { ControlsOverlay } from './controls-overlay'
-import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, NODE_TYPE } from './constants'
+import { NODE_TYPE } from './constants'
 import {
   MetricsVisibilityContext,
   HeatmapContext,
@@ -48,6 +33,7 @@ import { usePlanGraph } from './hooks/use-plan-graph'
 import { useDagreLayout } from './hooks/use-dagre-layout'
 import { MetricsSidebar } from './metrics-sidebar'
 import { NodeDetailsPanel } from './node-details-panel'
+import { usePlanLayoutState } from './hooks/use-plan-layout-state'
 
 export const QueryPlanVisualizer = ({
   json,
@@ -71,193 +57,25 @@ export const QueryPlanVisualizer = ({
   const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>(defaultHeatmapMeta.mode)
   const heatMax = useHeatmapMax(nodes)
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
-  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
-  const [panelNode, setPanelNode] = useState<Node<PlanNodeData> | null>(null)
-  const selectionSuppressedRef = useRef(false)
   const layout = useDagreLayout(nodes, edges, metricsVisibility, heatmapMode)
-
-  useEffect(() => {
-    if (!isExpanded || !rfInstance) return
-
-    let frameId: number | null = null
-    let secondFrameId: number | null = null
-
-    // Delay fitView until after the layout has settled with the detail panel width.
-    frameId = requestAnimationFrame(() => {
-      secondFrameId = requestAnimationFrame(() => {
-        rfInstance.fitView()
-      })
-    })
-
-    return () => {
-      if (frameId) cancelAnimationFrame(frameId)
-      if (secondFrameId) cancelAnimationFrame(secondFrameId)
-    }
-  }, [isExpanded, rfInstance])
-
-  const centerNodeInView = useCallback(
-    (nodeId: string) => {
-      if (!rfInstance) return
-
-      const node = rfInstance.getNode(nodeId)
-      if (!node) return
-
-      const position = node.positionAbsolute ?? node.position
-      const nodeWidth = node.width ?? DEFAULT_NODE_WIDTH
-      const nodeHeight = node.height ?? DEFAULT_NODE_HEIGHT
-      const centerX = position.x + nodeWidth / 2
-      const centerY = position.y + nodeHeight / 2
-
-      const currentZoom = rfInstance.getZoom()
-      const targetZoom = currentZoom < 1 ? 1 : currentZoom
-
-      rfInstance.setCenter(centerX, centerY, {
-        zoom: targetZoom,
-        duration: 400,
-      })
-    },
-    [rfInstance]
-  )
-
-  const handleSelectNode = useCallback((node: Node<PlanNodeData>) => {
-    setSelectedNodeId(node.id)
-  }, [])
-
-  const handleSelectionChange = useCallback(({ nodes }: OnSelectionChangeParams) => {
-    if (selectionSuppressedRef.current) return
-
-    if (nodes.length === 0) {
-      setSelectedNodeId(null)
-      return
-    }
-
-    const last = nodes[nodes.length - 1]
-    setSelectedNodeId(last.id)
-  }, [])
-
-  useEffect(() => {
-    if (!selectedNodeId) return
-
-    const match = layout.nodes.find((node) => node.id === selectedNodeId)
-    if (!match) {
-      setSelectedNodeId(null)
-    }
-  }, [layout.nodes, selectedNodeId])
-
-  const nodesWithSelection = useMemo(
-    () =>
-      layout.nodes.map((node) => ({
-        ...node,
-        selected: node.id === selectedNodeId,
-      })),
-    [layout.nodes, selectedNodeId]
-  )
-
-  const selectedNode = useMemo(
-    () => layout.nodes.find((node) => node.id === selectedNodeId) ?? null,
-    [layout.nodes, selectedNodeId]
-  )
-
-  useEffect(() => {
-    if (selectedNode) {
-      setPanelNode(selectedNode)
-    }
-  }, [selectedNode])
-
-  useEffect(() => {
-    if (!selectedNodeId || !rfInstance) return
-
-    let frameId: number | null = null
-    let secondFrameId: number | null = null
-
-    // Wait an extra frame so React Flow recalculates node positions after sidebar resizing.
-    frameId = requestAnimationFrame(() => {
-      secondFrameId = requestAnimationFrame(() => {
-        centerNodeInView(selectedNodeId)
-      })
-    })
-
-    return () => {
-      if (frameId !== null) cancelAnimationFrame(frameId)
-      if (secondFrameId !== null) cancelAnimationFrame(secondFrameId)
-    }
-  }, [centerNodeInView, rfInstance, selectedNodeId])
-
-  useEffect(() => {
-    if (!isExpanded || typeof document === 'undefined') return
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-    }
-  }, [isExpanded])
-
-  useEffect(() => {
-    if (!isExpanded) return
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-
-      // prevent Query Details sheet from closing
-      event.stopPropagation()
-      event.preventDefault()
-
-      setIsExpanded(false)
-    }
-
-    window.addEventListener('keydown', handleKeyDown, true)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown, true)
-    }
-  }, [isExpanded, setIsExpanded])
-
-  const toggleExpanded = useCallback(() => {
-    setIsExpanded((prev: boolean) => !prev)
-  }, [setIsExpanded])
-
-  const clearSelection = useCallback(() => {
-    setSelectedNodeId(null)
-  }, [])
-
-  const handleNodeDragStart = useCallback(
-    (_event: unknown, _node: Node<PlanNodeData>) => {
-      selectionSuppressedRef.current = true
-      clearSelection()
-    },
-    [clearSelection]
-  )
-
-  const handleNodeDragStop = useCallback(
-    (_event: unknown, node: Node<PlanNodeData>) => {
-      if (rfInstance) {
-        rfInstance.setNodes((nodes) =>
-          nodes.map((current) =>
-            current.id === node.id ? { ...current, selected: false } : current
-          )
-        )
-      }
-
-      const release = () => {
-        selectionSuppressedRef.current = false
-      }
-
-      if (typeof window !== 'undefined') {
-        window.requestAnimationFrame(release)
-      } else {
-        release()
-      }
-    },
-    [rfInstance]
-  )
-
-  const handleDetailPanelAfterLeave = useCallback(() => {
-    if (!selectedNode) {
-      setPanelNode(null)
-    }
-  }, [selectedNode])
+  const {
+    selectedNodeId,
+    selectedNode,
+    panelNode,
+    nodesWithSelection,
+    setRfInstance,
+    clearSelection,
+    handleSelectNode,
+    handleSelectionChange,
+    handleNodeDragStart,
+    handleNodeDragStop,
+    handleDetailPanelAfterLeave,
+    toggleExpanded,
+  } = usePlanLayoutState({
+    layoutNodes: layout.nodes,
+    isExpanded,
+    setIsExpanded,
+  })
 
   const nodeTypes = useMemo(
     () => ({
