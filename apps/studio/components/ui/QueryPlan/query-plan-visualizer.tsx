@@ -32,6 +32,52 @@ import { NodeDetailsPanel } from './node-details-panel'
 import { usePlanLayoutState } from './hooks/use-plan-layout-state'
 import { PlanViewport } from './plan-viewport'
 
+type ExpandedLayoutProps = {
+  containerClass: string
+  sidebar: ReactNode | null
+  planPanel: ReactNode
+  detailPanel: ReactNode | null
+}
+
+const ExpandedLayout = ({
+  containerClass,
+  sidebar,
+  planPanel,
+  detailPanel,
+}: ExpandedLayoutProps) => {
+  const mainContent = sidebar ? (
+    <ResizablePanelGroup direction="horizontal" className="flex h-full flex-1">
+      {sidebar}
+      <ResizableHandle withHandle className="hidden lg:flex" />
+      <ResizablePanel defaultSize={80} minSize={45} className="flex flex-1">
+        {planPanel}
+      </ResizablePanel>
+    </ResizablePanelGroup>
+  ) : (
+    <div className="flex flex-1">{planPanel}</div>
+  )
+
+  return (
+    <div className={containerClass}>
+      <div className="flex h-full">
+        {mainContent}
+        {detailPanel}
+      </div>
+    </div>
+  )
+}
+
+type CollapsedLayoutProps = {
+  containerClass: string
+  planPanel: ReactNode
+}
+
+const CollapsedLayout = ({ containerClass, planPanel }: CollapsedLayoutProps) => (
+  <div className={containerClass}>
+    <div className="flex h-full">{planPanel}</div>
+  </div>
+)
+
 export const QueryPlanVisualizer = ({
   json,
   className,
@@ -248,37 +294,17 @@ export const QueryPlanVisualizer = ({
     }
 
     if (isExpanded) {
-      const mainContent = sidebarElement ? (
-        <ResizablePanelGroup direction="horizontal" className="flex h-full flex-1">
-          {sidebarElement}
-          <ResizableHandle withHandle className="hidden lg:flex" />
-          <ResizablePanel defaultSize={80} minSize={45} className="flex flex-1">
-            {planPanel}
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      ) : (
-        <div className="flex flex-1">{planPanel}</div>
-      )
-
       return (
-        <>
-          <div className={containerClass}>
-            <div className="flex h-full">
-              {mainContent}
-              {detailPanelExpanded}
-            </div>
-          </div>
-        </>
+        <ExpandedLayout
+          containerClass={containerClass}
+          sidebar={sidebarElement}
+          planPanel={planPanel}
+          detailPanel={detailPanelExpanded}
+        />
       )
     }
 
-    return (
-      <>
-        <div className={containerClass}>
-          <div className="flex h-full">{planPanel}</div>
-        </div>
-      </>
-    )
+    return <CollapsedLayout containerClass={containerClass} planPanel={planPanel} />
   }
 
   const expandedContent = isExpanded ? (
