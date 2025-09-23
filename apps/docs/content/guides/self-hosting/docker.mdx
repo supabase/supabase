@@ -98,9 +98,57 @@ docker compose up -d
 
 <Admonition type="tip">
 
-If you are using rootless docker, edit `.env` and set `DOCKER_SOCKET_LOCATION` to your docker socket location. For example: `/run/user/1000/docker.sock`. Otherwise, you will see an error like `container supabase-vector exited (0)`.
+If you are using rootless docker, edit `.env` and set `DOCKER_SOCKET_LOCATION` to your docker socket location. For example: `/run/user/1000/docker.sock`. Otherwise, you will see an error like `container supabase-vector exited (0)`. 
 
 </Admonition>
+
+<Admonition type="tip">
+If you face errors like `container supabase-db exited (1)` or issues after restarting Docker, try:
+
+### Step 1: Stop all containers and remove volumes
+```sh
+docker compose down -v
+```
+
+Step 2: Make sure the database data directory is empty
+```sh
+rm -rf volumes/db/data/
+```
+
+Step 3: Restart the services
+```sh
+docker compose up -d
+```
+
+This resolves leftover data and volume conflicts.
+</Admonition>
+
+
+<Admonition type="tip"> By default, Supabase uses insecure credentials. Immediately update your `.env` file:
+
+POSTGRES_PASSWORD
+
+JWT_SECRET
+
+DASHBOARD_USERNAME & DASHBOARD_PASSWORD
+
+This prevents unauthorized access and keeps your self-hosted setup secure.
+</Admonition>
+
+<Admonition type="tip"> Always check if your services are running healthy:
+
+Check status
+```sh
+docker compose ps
+```
+If any service shows created or exited, restart it manually:
+```sh
+docker compose start <service-name>
+```
+This helps avoid silent failures before you start using Supabase Studio.
+</Admonition>
+
+
 
 After all the services have started you can see them running in the background:
 
@@ -487,3 +535,5 @@ A minimal setup working on Ubuntu, hosted on DigitalOcean.
 1. A DigitalOcean Droplet with 1 GB memory and 25 GB solid-state drive (SSD) is sufficient to start
 2. To access the Dashboard, use the ipv4 IP address of your Droplet.
 3. If you're unable to access Dashboard, run `docker compose ps` to see if the Studio service is running and healthy.
+
+
