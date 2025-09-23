@@ -1,18 +1,45 @@
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 
-import { cn, Button, Card, CardContent, CardHeader, CardTitle, Badge } from 'ui'
-
-import { GettingStartedStep } from './GettingStartedSection'
-import Image from 'next/image'
 import { BASE_PATH } from 'lib/constants'
+import { Badge, Button, Card, CardContent, cn } from 'ui'
+import { GettingStartedAction, GettingStartedStep } from './GettingStartedSection'
+
+// Determine action type for tracking
+const getActionType = (action: GettingStartedAction): 'primary' | 'ai_assist' | 'external_link' => {
+  // Check if it's an AI assist action (has AiIconAnimation or "Do it for me"/"Generate" labels)
+  if (
+    action.label?.toLowerCase().includes('do it for me') ||
+    action.label?.toLowerCase().includes('generate') ||
+    action.label?.toLowerCase().includes('create policies for me')
+  ) {
+    return 'ai_assist'
+  }
+  // Check if it's an external link (href that doesn't start with /project/)
+  if (action.href && !action.href.startsWith('/project/')) {
+    return 'external_link'
+  }
+  return 'primary'
+}
 
 export interface GettingStartedProps {
   steps: GettingStartedStep[]
+  onStepClick: ({
+    stepIndex,
+    stepTitle,
+    actionType,
+    wasCompleted,
+  }: {
+    stepIndex: number
+    stepTitle: string
+    actionType: 'primary' | 'ai_assist' | 'external_link'
+    wasCompleted: boolean
+  }) => void
 }
 
-export function GettingStarted({ steps }: GettingStartedProps) {
+export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
   const [activeStepKey, setActiveStepKey] = useState<string | null>(steps[0]?.key ?? null)
 
   useEffect(() => {
@@ -172,6 +199,8 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                   return <div key={`${activeStep.key}-action-${i}`}>{action.component}</div>
                 }
 
+                const actionType = getActionType(action)
+
                 if (action.href) {
                   return (
                     <Button
@@ -181,7 +210,19 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                       icon={action.icon}
                       className="text-foreground-light hover:text-foreground"
                     >
-                      <Link href={action.href}>{action.label}</Link>
+                      <Link
+                        href={action.href}
+                        onClick={() => {
+                          onStepClick({
+                            stepIndex: activeStepIndex,
+                            stepTitle: activeStep.title,
+                            actionType,
+                            wasCompleted: activeStep.status === 'complete',
+                          })
+                        }}
+                      >
+                        {action.label}
+                      </Link>
                     </Button>
                   )
                 }
@@ -191,7 +232,16 @@ export function GettingStarted({ steps }: GettingStartedProps) {
                     key={`${activeStep.key}-action-${i}`}
                     type={action.variant ?? 'default'}
                     icon={action.icon}
-                    onClick={action.onClick}
+                    onClick={() => {
+                      action.onClick?.()
+                      onStepClick({
+                        stepIndex: activeStepIndex,
+                        stepTitle: activeStep.title,
+                        actionType,
+                        wasCompleted: activeStep.status === 'complete',
+                      })
+                    }}
+                    className="text-foreground-light hover:text-foreground"
                   >
                     {action.label}
                   </Button>
