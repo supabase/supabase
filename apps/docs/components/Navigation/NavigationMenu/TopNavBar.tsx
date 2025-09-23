@@ -84,12 +84,7 @@ const TopNavBar: FC = () => {
           <div className="hidden lg:flex items-center justify-end gap-3">
             {!isUserLoading && (
               <Button asChild>
-                <a
-                  href="https://supabase.com/dashboard"
-                  className="h-[30px]"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
+                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
                   {isLoggedIn ? 'Dashboard' : 'Sign up'}
                 </a>
               </Button>

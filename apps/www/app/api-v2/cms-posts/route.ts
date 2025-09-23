@@ -6,10 +6,14 @@ import { generateReadingTime } from '~/lib/helpers'
 // Lightweight runtime for better performance
 export const runtime = 'edge'
 
-// CORS headers for cross-origin requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+const cfHeaders = {
+  'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID ?? '',
+  'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET ?? '',
 }
 
 // Lightweight TOC generation for edge runtime
@@ -159,6 +163,7 @@ export async function GET(request: NextRequest) {
           headers: {
             'Content-Type': 'application/json',
             ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+            ...cfHeaders,
           },
           cache: 'no-store',
         })
@@ -250,6 +255,7 @@ export async function GET(request: NextRequest) {
           headers: {
             'Content-Type': 'application/json',
             ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+            ...cfHeaders,
           },
           cache: 'no-store', // Never cache draft content
         })
@@ -329,6 +335,7 @@ export async function GET(request: NextRequest) {
           headers: {
             'Content-Type': 'application/json',
             ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+            ...cfHeaders,
           },
           cache: 'no-store',
         })
@@ -409,6 +416,7 @@ export async function GET(request: NextRequest) {
         headers: {
           'Content-Type': 'application/json',
           ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+          ...cfHeaders,
         },
         // For published posts: allow caching with revalidation
         next: { revalidate: 60 }, // 1 minute
@@ -503,6 +511,7 @@ export async function GET(request: NextRequest) {
         headers: {
           'Content-Type': 'application/json',
           ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+          ...cfHeaders,
         },
         next: { revalidate: 60 }, // 1 minute for published posts
       })
@@ -524,6 +533,7 @@ export async function GET(request: NextRequest) {
             headers: {
               'Content-Type': 'application/json',
               ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+              ...cfHeaders,
             },
             next: { revalidate: 60 }, // 1 minute for published posts
           })
@@ -617,6 +627,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+        ...cfHeaders,
       },
       // For individual post requests, don't cache to ensure fresh data
       cache: slug ? 'no-store' : 'default',

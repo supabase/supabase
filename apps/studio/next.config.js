@@ -387,6 +387,11 @@ const nextConfig = {
         destination: '/organizations',
         permanent: false,
       },
+      {
+        source: '/project/:ref/settings/auth',
+        destination: '/project/:ref/auth',
+        permanent: false,
+      },
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
@@ -526,8 +531,7 @@ const nextConfig = {
     pagesBufferLength: 100,
   },
   typescript: {
-    // WARNING: production builds can successfully complete even there are type errors
-    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    // Typechecking is run via GitHub Action only for efficiency.
     ignoreBuildErrors: true,
   },
   eslint: {

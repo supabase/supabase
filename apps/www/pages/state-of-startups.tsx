@@ -9,10 +9,11 @@ import { Button, cn } from 'ui'
 
 import { useFlag } from 'common'
 import DefaultLayout from '~/components/Layouts/Default'
-import { DecorativeProgressBar } from '~/components/SurveyResults/DecorativeProgressBar'
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
+import { StateOfStartupsHeader } from '~/components/SurveyResults/StateOfStartupsHeader'
+import SupabaseSelectPromo from '~/components/SupabaseSelectPromo'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
@@ -206,66 +207,32 @@ function StateOfStartupsPage() {
         <FloatingTableOfContents />
         {/* Intro section */}
         <section ref={heroRef} className="w-full">
-          {/* Text contents */}
-          <header className="w-full flex flex-col md:flex-col">
-            <div className="flex flex-col md:flex-row">
-              {/* Intro area */}
-              <div
-                style={
-                  {
-                    '--left-width': 'calc((50% - 60rem / 2) + (60rem * 1/3))',
-                  } as React.CSSProperties
-                }
-                className="md:border-r border-muted border-opacity-50 md:text-right flex-1 md:max-w-[var(--left-width)]"
-              >
-                <DecorativeProgressBar />
-
-                <p className="text-brand-link text-sm font-mono uppercase px-8 pt-12 text-balance">
-                  Supabase presents the 2025
-                </p>
-              </div>
-
-              {/* Headline area */}
-              <div
-                className="px-8 pt-10 pb-16 md:pt-36 md:pb-28 flex-1"
-                style={{
-                  background: `radial-gradient(ellipse at -35% 215%, hsl(var(--brand-400)), transparent 70%)`,
-                }}
-              >
-                <h1 className="text-7xl sm:text-8xl lg:text-9xl tracking-tight">
-                  State of
-                  <br /> Startups
-                </h1>
-              </div>
+          <StateOfStartupsHeader />
+          <SurveySectionBreak className="hidden md:block" />
+          <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
+            {/* Intro text */}
+            <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
+              <p>{pageData.heroSection.subheader}</p>
+              <p>{pageData.heroSection.cta}</p>
             </div>
 
-            <SurveySectionBreak className="hidden md:block" />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
-              {/* Intro text */}
-              <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
-                <p>{pageData.heroSection.subheader}</p>
-                <p>{pageData.heroSection.cta}</p>
-              </div>
-
-              {/* Table of contents */}
-              <ol className="flex flex-col py-5">
-                {pageData.pageChapters.map((chapter, chapterIndex) => (
-                  <li key={chapterIndex + 1}>
-                    <Link
-                      href={`#chapter-${chapterIndex + 1}`}
-                      className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
-                    >
-                      <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
-                        {chapterIndex + 1}
-                      </span>{' '}
-                      {chapter.shortTitle}
-                    </Link>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </header>
+            {/* Table of contents */}
+            <ol className="flex flex-col py-5">
+              {pageData.pageChapters.map((chapter, chapterIndex) => (
+                <li key={chapterIndex + 1}>
+                  <Link
+                    href={`#chapter-${chapterIndex + 1}`}
+                    className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
+                  >
+                    <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
+                      {chapterIndex + 1}
+                    </span>{' '}
+                    {chapter.shortTitle}
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </div>
 
           <SurveySectionBreak />
         </section>
@@ -295,6 +262,7 @@ function StateOfStartupsPage() {
         ))}
         <CTABanner ref={ctaBannerRef} />
         <ParticipantsList />
+        <SupabaseSelectPromo />
       </DefaultLayout>
     </>
   )

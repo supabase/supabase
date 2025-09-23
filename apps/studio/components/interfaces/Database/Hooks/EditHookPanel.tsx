@@ -44,6 +44,7 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
   // hence why this external state as a temporary workaround
   const [events, setEvents] = useState<string[]>(selectedHook?.events ?? [])
   const [eventsError, setEventsError] = useState<string>()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // For HTTP request
   const [httpHeaders, setHttpHeaders] = useState<HTTPArgument[]>(() => {
@@ -65,6 +66,7 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       value,
     }))
   })
+
   const [httpParameters, setHttpParameters] = useState<HTTPArgument[]>(() => {
     if (typeof selectedHook === `undefined`) {
       return [{ id: uuidv4(), name: '', value: '' }]
@@ -90,7 +92,7 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const { mutate: createDatabaseTrigger } = useDatabaseTriggerCreateMutation({
     onSuccess: (res) => {
       toast.success(`Successfully created new webhook "${res.name}"`)
@@ -102,6 +104,7 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       toast.error(`Failed to create webhook: ${error.message}`)
     },
   })
+
   const { mutate: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation({
     onSuccess: (res) => {
       setIsSubmitting(false)
@@ -131,13 +134,6 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       : 'http_request',
     timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
   }
-
-  useEffect(() => {
-    if (visible) {
-      setIsEdited(false)
-      setIsClosingPanel(false)
-    }
-  }, [visible])
 
   const onClosePanel = () => {
     if (isEdited) setIsClosingPanel(true)
@@ -261,6 +257,13 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       })
     }
   }
+
+  useEffect(() => {
+    if (visible) {
+      setIsEdited(false)
+      setIsClosingPanel(false)
+    }
+  }, [visible])
 
   return (
     <>

@@ -33,13 +33,24 @@
   "database:replication": true,
   "database:roles": true,
 
+  "docs:auth": true,
   "docs:compliance": true,
+  "docs:contribution": true,
   "docs:self-hosting": true,
+  "docs:framework_quickstarts": true,
+  "docs:full_getting_started": true,
+  "docs:full_platform": true,
+  "docs:hide_cli_profiles": true,
+  "docs:mobile_tutorials": true,
+  "docs:pgtap": true,
+  "docs:production_checklist": true,
+  "docs:web_apps": true,
 
   "feedback:docs": true,
 
-  "integrations:vercel": true,
+  "integrations:partners": true,
   "integrations:show_stripe_wrapper": true,
+  "integrations:vercel": true,
 
   "logs:templates": true,
   "logs:collections": true,
@@ -70,11 +81,15 @@
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
 
+  "quickstarts:hide_nimbus": true,
+
   "reports:all": true,
 
   "sdk:csharp": true,
   "sdk:dart": true,
   "sdk:kotlin": true,
   "sdk:python": true,
-  "sdk:swift": true
+  "sdk:swift": true,
+
+  "search:fullIndex": true
 }

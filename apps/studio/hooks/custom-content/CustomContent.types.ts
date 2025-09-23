@@ -28,6 +28,7 @@ export type CustomContentTypes = {
   logsDefaultQuery: string
 
   infraCloudProviders: CloudProvider[]
+  infraAwsNimbusLabel: string
 
   sslCertificateUrl: string
 }

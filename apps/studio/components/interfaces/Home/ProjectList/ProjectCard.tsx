@@ -7,6 +7,7 @@ import type { IntegrationProjectConnection } from 'data/integrations/integration
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { OrgProject } from 'data/projects/projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { inferProjectStatus } from './ProjectCard.utils'
@@ -28,7 +29,12 @@ export const ProjectCard = ({
   resourceWarnings,
 }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
-  const desc = `${project.cloud_provider} | ${project.region}`
+
+  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
+  const providerLabel =
+    project.cloud_provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : project.cloud_provider
+
+  const desc = `${providerLabel} | ${project.region}`
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
@@ -47,7 +53,7 @@ export const ProjectCard = ({
         title={
           <div className="w-full justify-between space-y-1.5 px-5">
             <p className="flex-shrink truncate text-sm pr-4">{name}</p>
-            <span className="text-sm lowercase text-foreground-light">{desc}</span>
+            <span className="text-sm text-foreground-light">{desc}</span>
             <div className="flex items-center gap-x-1.5">
               {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
                 <ComputeBadgeWrapper project={project} />

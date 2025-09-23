@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
-import { GitBranch } from 'lucide-react'
-import Link from 'next/link'
+import { Archive, Database, GitBranch } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { useParams } from 'common'
+import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useMigrationsQuery } from 'data/database/migrations-query'
@@ -55,17 +55,19 @@ export const ActivityStats = () => {
 
   return (
     <div className="@container">
-      <div className="grid grid-cols-2 xl:flex xl:gap-10 gap-4 flex-wrap">
-        <div className="block">
-          <p className="heading-meta text-foreground-light mb-1">Status</p>
-          <ServiceStatus />
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-6 flex-wrap">
+        <ServiceStatus />
 
-        <Link className="block" href={`/project/${ref}/database/migrations`}>
-          <h4 className="heading-meta text-foreground-light mb-1">Last migration</h4>
-
-          <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
-            {isLoadingMigrations ? (
+        <SingleStat
+          href={`/project/${ref}/database/migrations`}
+          icon={<Database size={18} strokeWidth={1.5} className="text-foreground" />}
+          label={<span>Last migration</span>}
+          trackingProperties={{
+            stat_type: 'migrations',
+            stat_value: migrationsData?.length ?? 0,
+          }}
+          value={
+            isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
             ) : latestMigration ? (
               <TimestampInfo
@@ -75,45 +77,56 @@ export const ActivityStats = () => {
               />
             ) : (
               <p className="text-foreground-lighter">No migrations</p>
-            )}
-          </div>
-        </Link>
+            )
+          }
+        />
 
-        <Link className="block" href={`/project/${ref}/database/backups/scheduled`}>
-          <h4 className="heading-meta text-foreground-light mb-1">Last backup</h4>
-
-          <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
-            {isLoadingBackups ? (
+        <SingleStat
+          href={`/project/${ref}/database/backups/scheduled`}
+          icon={<Archive size={18} strokeWidth={1.5} className="text-foreground" />}
+          label={<span>Last backup</span>}
+          trackingProperties={{
+            stat_type: 'backups',
+            stat_value: backupsData?.backups?.length ?? 0,
+          }}
+          value={
+            isLoadingBackups ? (
               <Skeleton className="h-6 w-24" />
             ) : backupsData?.pitr_enabled ? (
               <p>PITR enabled</p>
             ) : latestBackup ? (
               <TimestampInfo
                 className="text-base"
+                displayAs="utc"
                 label={dayjs(latestBackup.inserted_at).fromNow()}
                 utcTimestamp={latestBackup.inserted_at}
               />
             ) : (
               <p className="text-foreground-lighter">No backups</p>
-            )}
-          </div>
-        </Link>
+            )
+          }
+        />
 
-        <Link className="block" href={`/project/${ref}/branches`}>
-          <h4 className="heading-meta text-foreground-light mb-1">
-            {isDefaultProject ? 'Recent branch' : 'Branch Created'}
-          </h4>
-
-          <div className="text-foreground truncate h-[34px] flex items-center capitalize-sentence">
-            {isLoadingBranches ? (
+        <SingleStat
+          href={`/project/${ref}/branches`}
+          icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
+          label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
+          trackingProperties={{
+            stat_type: 'branches',
+            stat_value: branchesData?.length ?? 0,
+          }}
+          value={
+            isLoadingBranches ? (
               <Skeleton className="h-6 w-24" />
             ) : isDefaultProject ? (
-              <div className="flex items-center gap-2">
-                <GitBranch size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                <p className={cn('truncate', !latestNonDefaultBranch && 'text-foreground-lighter')}>
-                  {latestNonDefaultBranch?.name ?? 'No branches'}
-                </p>
-              </div>
+              <p
+                className={cn(
+                  'truncate',
+                  !latestNonDefaultBranch && 'text-foreground-lighter truncate'
+                )}
+              >
+                {latestNonDefaultBranch?.name ?? 'No branches'}
+              </p>
             ) : currentBranch?.created_at ? (
               <TimestampInfo
                 className="text-base"
@@ -122,9 +135,9 @@ export const ActivityStats = () => {
               />
             ) : (
               <p className="text-foreground-lighter">Unknown</p>
-            )}
-          </div>
-        </Link>
+            )
+          }
+        />
       </div>
     </div>
   )

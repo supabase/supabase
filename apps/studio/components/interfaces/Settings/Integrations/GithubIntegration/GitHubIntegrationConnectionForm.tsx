@@ -242,7 +242,7 @@ const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    if (!prodBranch?.id) {
+    if (!prodBranch) {
       createBranch({
         projectRef: selectedProject.ref,
         branchName: 'main',
@@ -251,7 +251,7 @@ const GitHubIntegrationConnectionForm = ({
       })
     } else {
       updateBranch({
-        id: prodBranch.id,
+        branchRef: prodBranch.project_ref,
         projectRef: selectedProject.ref,
         gitBranch: data.branchName,
       })
@@ -291,9 +291,9 @@ const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    if (prodBranch?.id) {
+    if (prodBranch) {
       updateBranch({
-        id: prodBranch.id,
+        branchRef: prodBranch.project_ref,
         projectRef: selectedProject.ref,
         gitBranch: data.enableProductionSync ? data.branchName : '',
         branchName: data.branchName || 'main',
