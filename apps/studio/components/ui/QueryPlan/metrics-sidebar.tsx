@@ -1,20 +1,17 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { Edge, Node } from 'reactflow'
 
 import type { PlanMeta, PlanNodeData } from './types'
 import { Button, ResizablePanel, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { formatMs, formatNumber, blocksToBytes } from './utils/formats'
-
-type SidebarMetricKey = 'time' | 'rows' | 'cost' | 'buffers' | 'io'
-
-type SidebarRow = {
-  id: string
-  node: Node<PlanNodeData>
-  depth: number
-  index: number
-  isLast: boolean
-  branchTrail: boolean[]
-}
+import {
+  computeBufferBreakdown,
+  getTreeGuidePrefix,
+  type LegendItem,
+  type MetricStats,
+  type SidebarMetricKey,
+  useMetricsSidebarData,
+} from './hooks/use-metrics-sidebar-data'
 
 type MetricsSidebarProps = {
   nodes: Node<PlanNodeData>[]
@@ -27,184 +24,12 @@ type MetricsSidebarProps = {
   maxSize?: number
 }
 
-type MetricStats = {
-  totalTime: number
-  maxRows: number
-  maxExclusiveCost: number
-  maxBufferTotal: number
-  maxIO: number
-}
-
-type BufferBreakdown = {
-  shared: number
-  temp: number
-  local: number
-  total: number
-}
-
 type MetricRenderResult = {
   visual: ReactNode | null
   tooltip: ReactNode | null
 }
 
 type MetricRenderer = (data: PlanNodeData, stats: MetricStats) => MetricRenderResult
-
-const METRIC_OPTIONS: { key: SidebarMetricKey; label: string; description: string }[] = [
-  {
-    key: 'time',
-    label: 'Time',
-    description:
-      'Shows how long each plan step took. The first bar segment is time spent in this step; the second segment adds time from its child steps.',
-  },
-  {
-    key: 'rows',
-    label: 'Rows',
-    description: 'Shows how many rows the step actually produced versus what the planner expected.',
-  },
-  {
-    key: 'cost',
-    label: 'Cost',
-    description:
-      "Shows the planner's cost estimate for each step. Useful for spotting operations the planner thinks are expensive.",
-  },
-  {
-    key: 'buffers',
-    label: 'Buffers',
-    description:
-      'Shows how many data blocks the step touched, split across shared cache, temp spill, and local buffers.',
-  },
-  {
-    key: 'io',
-    label: 'IO',
-    description: 'Shows how much time the step spent waiting on storage reads and writes.',
-  },
-]
-
-const parsePath = (id: string): number[] => {
-  if (id === 'root') return []
-  return id
-    .split('-')
-    .slice(1)
-    .map((part) => {
-      const parsed = Number(part)
-      return Number.isNaN(parsed) ? 0 : parsed
-    })
-}
-
-const comparePath = (a: string, b: string) => {
-  const pa = parsePath(a)
-  const pb = parsePath(b)
-  const len = Math.max(pa.length, pb.length)
-  for (let i = 0; i < len; i++) {
-    const va = pa[i] ?? -1
-    const vb = pb[i] ?? -1
-    if (va !== vb) return va - vb
-  }
-  return 0
-}
-
-const computeRows = (nodes: Node<PlanNodeData>[], edges: Edge[]): SidebarRow[] => {
-  if (!nodes.length) return []
-
-  const nodeMap = new Map(nodes.map((node) => [node.id, node]))
-  const childrenMap = new Map<string, string[]>()
-  edges.forEach((edge) => {
-    if (!edge.source || !edge.target) return
-    if (!childrenMap.has(edge.source)) childrenMap.set(edge.source, [])
-    childrenMap.get(edge.source)!.push(edge.target)
-  })
-  childrenMap.forEach((list, key) => {
-    list.sort(comparePath)
-    childrenMap.set(key, list)
-  })
-
-  const root = nodeMap.get('root') ?? nodes[0]
-  const rows: SidebarRow[] = []
-  let counter = 0
-
-  const traverse = (id: string, depth: number, branchTrail: boolean[], isLast: boolean) => {
-    const node = nodeMap.get(id)
-    if (!node) return
-
-    rows.push({
-      id,
-      node,
-      depth,
-      index: ++counter,
-      isLast,
-      branchTrail,
-    })
-
-    const childIds = childrenMap.get(id) ?? []
-    const nextTrail = [...branchTrail, !isLast]
-    childIds.forEach((childId, idx) => {
-      const childIsLast = idx === childIds.length - 1
-      traverse(childId, depth + 1, nextTrail, childIsLast)
-    })
-  }
-
-  traverse(root.id, 0, [], true)
-
-  return rows
-}
-
-const computeStats = (nodes: Node<PlanNodeData>[], meta?: PlanMeta): MetricStats => {
-  let totalTime = meta?.executionTime ?? 0
-  let maxRows = 0
-  let maxExclusiveCost = 0
-  let maxBufferTotal = 0
-  let maxIO = 0
-
-  nodes.forEach((node) => {
-    const data = node.data
-    const exclusiveTime = data.exclusiveTimeMs ?? 0
-    if (!meta?.executionTime) {
-      totalTime += exclusiveTime
-    }
-
-    const actualTotalRows =
-      data.estActualTotalRows ?? (data.actualRows ?? 0) * (data.actualLoops ?? 1)
-    if (actualTotalRows > maxRows) maxRows = actualTotalRows
-
-    const exclusiveCost = data.exclusiveCost ?? 0
-    if (exclusiveCost > maxExclusiveCost) maxExclusiveCost = exclusiveCost
-
-    const bufferBreakdown = computeBufferBreakdown(data)
-    if (bufferBreakdown.total > maxBufferTotal) maxBufferTotal = bufferBreakdown.total
-
-    const ioTotal = (data.ioReadTime ?? 0) + (data.ioWriteTime ?? 0)
-    if (ioTotal > maxIO) maxIO = ioTotal
-  })
-
-  if (totalTime <= 0) {
-    totalTime = nodes.reduce((sum, node) => sum + (node.data.exclusiveTimeMs ?? 0), 0)
-  }
-
-  return {
-    totalTime,
-    maxRows,
-    maxExclusiveCost,
-    maxBufferTotal,
-    maxIO,
-  }
-}
-
-const computeBufferBreakdown = (data: PlanNodeData): BufferBreakdown => {
-  const shared =
-    (data.exSharedHit ?? 0) +
-    (data.exSharedRead ?? 0) +
-    (data.exSharedDirtied ?? 0) +
-    (data.exSharedWritten ?? 0)
-  const temp = (data.exTempRead ?? 0) + (data.exTempWritten ?? 0)
-  const local =
-    (data.exLocalHit ?? 0) +
-    (data.exLocalRead ?? 0) +
-    (data.exLocalDirtied ?? 0) +
-    (data.exLocalWritten ?? 0)
-  const total = shared + temp + local
-
-  return { shared, temp, local, total }
-}
 
 // This stole the style from SparkBar. SPark bar isn't available in this use case.
 const MetricBar = ({
@@ -281,12 +106,6 @@ const SegmentedBar = ({ segments }: { segments: SegmentedBarSegment[] }) => {
   )
 }
 
-type LegendItem = {
-  id: string
-  label: string
-  color: string
-}
-
 const MetricLegend = ({ items }: { items: LegendItem[] }) => {
   if (!items.length) return null
 
@@ -300,35 +119,6 @@ const MetricLegend = ({ items }: { items: LegendItem[] }) => {
       ))}
     </ul>
   )
-}
-
-const METRIC_LEGENDS = {
-  time: null,
-  rows: null,
-  cost: null,
-  buffers: {
-    items: [
-      { id: 'buffers-shared', label: 'Shared', color: 'bg-foreground' },
-      { id: 'buffers-temp', label: 'Temp', color: 'bg-warning' },
-      { id: 'buffers-local', label: 'Local', color: 'bg-brand-400 dark:bg-brand-500' },
-    ],
-  },
-  io: {
-    items: [
-      { id: 'io-read', label: 'Read', color: 'bg-foreground' },
-      { id: 'io-write', label: 'Write', color: 'bg-warning' },
-    ],
-  },
-}
-
-const getTreeGuidePrefix = (branchTrail: boolean[], isLast: boolean): string => {
-  if (branchTrail.length === 0) return ''
-
-  const ancestors = branchTrail.slice(0, -1)
-  const connector = isLast ? '└─' : '├─'
-  const prefix = `${ancestors.map((hasNext) => (hasNext ? '│ ' : '  ')).join('')}${connector} `
-
-  return prefix.replace(/ /g, '\u00A0')
 }
 
 const renderTimeMetric: MetricRenderer = (data, stats) => {
@@ -549,9 +339,12 @@ export const MetricsSidebar = ({
 }: MetricsSidebarProps) => {
   const [activeMetric, setActiveMetric] = useState<SidebarMetricKey>('time')
 
-  const rows = useMemo(() => computeRows(nodes, edges), [nodes, edges])
-  const stats = useMemo(() => computeStats(nodes, meta), [nodes, meta])
-  const legend = METRIC_LEGENDS[activeMetric]
+  const { rows, stats, legend, metricOptions } = useMetricsSidebarData({
+    nodes,
+    edges,
+    meta,
+    activeMetric,
+  })
 
   if (!rows.length) return null
 
@@ -571,7 +364,7 @@ export const MetricsSidebar = ({
       </div>
       <div className="px-3 py-2 border-b overflow-x-auto">
         <div className="flex gap-2 justify-between max-w-[320px] mx-auto">
-          {METRIC_OPTIONS.map((option) => (
+          {metricOptions.map((option) => (
             <Tooltip key={option.key}>
               <TooltipTrigger asChild>
                 <Button
