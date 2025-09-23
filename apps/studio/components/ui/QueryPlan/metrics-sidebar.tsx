@@ -72,19 +72,19 @@ const renderTimeMetric: MetricRenderer = (data, stats) => {
           <span className="text-foreground">
             {formattedTotalPerLoop ? `${formattedTotalPerLoop} ms` : '0 ms'}
           </span>
-          {formattedLoops ? (
+          {formattedLoops && (
             <>
               {' '}
               per loop · ran <span className="text-foreground">{formattedLoops} loops</span>
             </>
-          ) : null}
+          )}
         </li>
-        {formattedLoops && formattedTotalCombined ? (
+        {formattedLoops && formattedTotalCombined && (
           <li>
             <span className="font-medium">All loops combined:</span>{' '}
             <span className="text-foreground">{formattedTotalCombined} ms</span>
           </li>
-        ) : null}
+        )}
       </ul>
     ),
   }
@@ -106,12 +106,12 @@ const renderRowsMetric: MetricRenderer = (data, stats) => {
           <span className="font-medium">Rows produced by this step:</span>{' '}
           <span className="text-foreground">{formattedActualRows}</span>
         </li>
-        {formattedPlanRows ? (
+        {formattedPlanRows && (
           <li>
             <span className="font-medium">Planner expected:</span>{' '}
             <span className="text-foreground">{formattedPlanRows}</span>
           </li>
-        ) : null}
+        )}
       </ul>
     ),
   }
@@ -319,14 +319,14 @@ export const MetricsSidebar = ({
               >
                 <div className="grid h-[24px] w-full grid-cols-[minmax(0,1fr),120px] items-center gap-x-2">
                   <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-[11px]">
-                    {treePrefix ? (
+                    {treePrefix && (
                       <span aria-hidden className="font-mono text-foreground-lighter">
                         {treePrefix}
                       </span>
-                    ) : null}
+                    )}
                     <span className="font-medium text-foreground">{data.label}</span>
                   </span>
-                  {visual ? <div className="w-[120px]">{visual}</div> : null}
+                  {visual && <div className="w-[120px]">{visual}</div>}
                 </div>
               </Button>
             )

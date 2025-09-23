@@ -228,9 +228,9 @@ const RowsSection = ({
     <div className="flex text-xs justify-between">
       <div className="text-foreground-light">Actual rows</div>
       <div>
-        {actualRows ?? '—'}
+        <span className="font-medium">{actualRows ?? '—'}</span>
         {data.planRows !== undefined && (
-          <span className="ml-1 text-foreground-lighter">
+          <span className="ml-1 text-foreground-light">
             (estimated {formatNumber(data.planRows)})
           </span>
         )}
@@ -240,19 +240,19 @@ const RowsSection = ({
     {data.rowsRemovedByFilter !== undefined && (
       <div>
         WHERE / filter removed {formatOrDash(data.rowsRemovedByFilter)} rows
-        {filteredPercent !== undefined ? ` (${filteredPercent}%)` : ''}
+        {filteredPercent !== undefined && ` (${filteredPercent}%)`}
       </div>
     )}
     {data.rowsRemovedByJoinFilter !== undefined && (
       <div>
         Join filter removed {formatOrDash(data.rowsRemovedByJoinFilter)} rows
-        {joinFilteredPercent !== undefined ? ` (${joinFilteredPercent}%)` : ''}
+        {joinFilteredPercent !== undefined && ` (${joinFilteredPercent}%)`}
       </div>
     )}
     {data.rowsRemovedByIndexRecheck !== undefined && (
       <div>
         Index recheck removed {formatOrDash(data.rowsRemovedByIndexRecheck)} rows
-        {recheckPercent !== undefined ? ` (${recheckPercent}%)` : ''}
+        {recheckPercent !== undefined && ` (${recheckPercent}%)`}
       </div>
     )}
     {data.heapFetches !== undefined && <div>Heap Fetches: {formatOrDash(data.heapFetches)}</div>}

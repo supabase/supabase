@@ -137,10 +137,8 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
           <span>{rowsSeenDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{actualRows !== undefined ? actualRows : '-'}</span>
-            {estimatedRows !== undefined ? (
+            {estimatedRows !== undefined && (
               <span className="text-foreground-light">(expected {estimatedRows})</span>
-            ) : (
-              ''
             )}
           </span>
         </>
@@ -156,10 +154,8 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
           <span>{rowsFilteredDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{formatOrDash(data.rowsRemovedByFilter)}</span>
-            {filterPercent !== undefined ? (
+            {filterPercent !== undefined && (
               <span className="text-foreground-light">({filterPercent}%)</span>
-            ) : (
-              ''
             )}
           </span>
         </>
@@ -175,10 +171,8 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
           <span>{rowsJoinFilterDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{formatOrDash(data.rowsRemovedByJoinFilter)}</span>
-            {joinFilterPercent !== undefined ? (
+            {joinFilterPercent !== undefined && (
               <span className="text-foreground-light">({joinFilterPercent}%)</span>
-            ) : (
-              ''
             )}
           </span>
         </>
@@ -194,10 +188,8 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
           <span>{rowsIndexRecheckDef.label}</span>
           <span className="flex items-center gap-x-1 ml-auto">
             <span>{formatOrDash(data.rowsRemovedByIndexRecheck)}</span>
-            {recheckPercent !== undefined ? (
+            {recheckPercent !== undefined && (
               <span className="text-foreground-light">({recheckPercent}%)</span>
-            ) : (
-              ''
             )}
           </span>
         </>
@@ -341,7 +333,7 @@ const metricsListData = (data: PlanNodeData, metricsVisibility: MetricsVisibilit
         <>
           <span>{ioTimeDef.label}</span>
           <span className="ml-auto">
-            {data.ioReadTime !== undefined ? `read ${data.ioReadTime}ms` : ''}
+            {data.ioReadTime !== undefined && `read ${data.ioReadTime}ms`}
             {data.ioWriteTime !== undefined
               ? `${data.ioReadTime !== undefined ? ' · ' : ''}write ${data.ioWriteTime}ms`
               : ''}

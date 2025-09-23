@@ -29,7 +29,7 @@ export const MetricBar = ({
         )}
         style={{ width: `${primaryWidth}%` }}
       />
-      {secondaryWidth > 0 ? (
+      {secondaryWidth > 0 && (
         <div
           className={cn(
             'h-full rounded-r transition-[width] duration-300 opacity-80',
@@ -37,7 +37,7 @@ export const MetricBar = ({
           )}
           style={{ width: `${secondaryWidth}%` }}
         />
-      ) : null}
+      )}
     </div>
   )
 }

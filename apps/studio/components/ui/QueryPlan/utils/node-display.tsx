@@ -69,12 +69,12 @@ export function computeHeaderLines(d: PlanNodeData): ReactNode[] {
     lines.push(
       <>
         <span className="text-foreground-light">on</span> {d.relationName}
-        {d.alias ? (
+        {d.alias && (
           <>
             {' '}
             <span className="text-foreground-light">as</span> {d.alias}
           </>
-        ) : null}
+        )}
       </>
     )
   }
