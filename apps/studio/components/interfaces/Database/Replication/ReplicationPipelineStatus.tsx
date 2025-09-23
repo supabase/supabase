@@ -17,6 +17,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { formatBytes } from 'lib/helpers'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
@@ -39,9 +40,89 @@ import {
 } from './Pipeline.utils'
 import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
-import { TableState } from './ReplicationPipelineStatus.types'
+import { SlotLagMetrics, TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
+
+type SlotLagMetricKey = keyof SlotLagMetrics
+
+const SLOT_LAG_FIELDS: { key: SlotLagMetricKey; label: string; type: 'bytes' | 'duration' }[] = [
+  { key: 'confirmed_flush_lsn_bytes', label: 'WAL Flush lag', type: 'bytes' },
+  { key: 'flush_lag', label: 'Flush lag', type: 'duration' },
+  { key: 'safe_wal_size_bytes', label: 'Remaining WAL size', type: 'bytes' },
+]
+
+const formatLagBytesValue = (value?: number) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return '—'
+  if (value === 0) return '0 bytes'
+
+  const abs = Math.abs(value)
+  const decimals = abs < 1024 ? 0 : abs < 1024 * 1024 ? 1 : 2
+
+  return formatBytes(value, decimals)
+}
+
+const formatLagDurationValue = (value?: number) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return '—'
+  const abs = Math.abs(value)
+
+  if (abs < 1000) {
+    return `${value} ms`
+  }
+
+  const seconds = abs / 1000
+  if (seconds < 60) {
+    const decimals = seconds >= 10 ? 1 : 2
+    return `${value < 0 ? '-' : ''}${seconds.toFixed(decimals)} s`
+  }
+
+  const minutes = seconds / 60
+  if (minutes < 60) {
+    const decimals = minutes >= 10 ? 1 : 2
+    return `${value < 0 ? '-' : ''}${minutes.toFixed(decimals)} min`
+  }
+
+  const hours = minutes / 60
+  const decimals = hours >= 10 ? 1 : 2
+  return `${value < 0 ? '-' : ''}${hours.toFixed(decimals)} h`
+}
+
+const getFormattedLagValue = (type: 'bytes' | 'duration', value?: number) =>
+  type === 'bytes' ? formatLagBytesValue(value) : formatLagDurationValue(value)
+
+const SlotLagMetricsList = ({
+  metrics,
+  size = 'default',
+}: {
+  metrics: SlotLagMetrics
+  size?: 'default' | 'compact'
+}) => {
+  const gridClasses =
+    size === 'default'
+      ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-4 gap-x-6'
+      : 'grid-cols-2 gap-y-2 gap-x-4'
+
+  const labelClasses =
+    size === 'default'
+      ? 'text-xs text-foreground-light'
+      : 'text-[11px] text-foreground-lighter'
+
+  const valueClasses =
+    size === 'default'
+      ? 'text-sm font-medium text-foreground'
+      : 'text-xs font-medium text-foreground'
+
+  return (
+    <dl className={`grid ${gridClasses}`}>
+      {SLOT_LAG_FIELDS.map(({ key, label, type }) => (
+        <div key={key} className="flex flex-col gap-0.5">
+          <dt className={labelClasses}>{label}</dt>
+          <dd className={valueClasses}>{getFormattedLagValue(type, metrics[key])}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -107,6 +188,7 @@ export const ReplicationPipelineStatus = () => {
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
   const tableStatuses = replicationStatusData?.table_statuses || []
+  const applyLagMetrics = replicationStatusData?.apply_lag
   const filteredTableStatuses =
     filterString.length === 0
       ? tableStatuses
@@ -121,6 +203,10 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
+  const refreshIntervalLabel =
+    STATUS_REFRESH_FREQUENCY_MS >= 1000
+      ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
+      : `${STATUS_REFRESH_FREQUENCY_MS}ms`
 
   const logsUrl = `/project/${projectRef}/logs/etl-replication-logs${
     pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
@@ -256,6 +342,21 @@ export const ReplicationPipelineStatus = () => {
           />
         )}
 
+        {applyLagMetrics && !isStatusError && (
+          <div className="border border-default rounded-lg bg-surface-100 p-4 space-y-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-y-1">
+              <div>
+                <h4 className="text-sm font-semibold text-foreground">Replication lag</h4>
+                <p className="text-xs text-foreground-light">
+                  Snapshot of how far this pipeline is trailing behind right now.
+                </p>
+              </div>
+              <p className="text-xs text-foreground-lighter">Updates every {refreshIntervalLabel}</p>
+            </div>
+            <SlotLagMetricsList metrics={applyLagMetrics} />
+          </div>
+        )}
+
         {hasTableData && (
           <div className="flex flex-col gap-y-4">
             {showDisabledState && (
@@ -342,10 +443,21 @@ export const ReplicationPipelineStatus = () => {
                                 Status unavailable while pipeline is {config.badge.toLowerCase()}
                               </p>
                             ) : (
-                              <div className="space-y-1">
+                              <div className="space-y-3">
                                 <div className="text-sm text-foreground">
                                   {statusConfig.description}
                                 </div>
+                                {table.table_sync_lag && (
+                                  <div className="rounded-md border border-default/60 bg-surface-100 p-3">
+                                    <p className="mb-2 text-xs font-medium text-foreground">
+                                      Individual table replication lag
+                                    </p>
+                                    <SlotLagMetricsList
+                                      metrics={table.table_sync_lag}
+                                      size="compact"
+                                    />
+                                  </div>
+                                )}
                                 {table.state.name === 'error' && (
                                   <ErroredTableDetails
                                     state={table.state}
