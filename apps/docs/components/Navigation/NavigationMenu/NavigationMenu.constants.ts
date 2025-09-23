@@ -1392,7 +1392,10 @@ export const queues: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Quickstart', url: '/guides/queues/quickstart' },
-        { name: 'Consuming Messages with Edge Functions', url: '/guides/queues/consuming-messages-with-edge-functions' },
+        {
+          name: 'Consuming Messages with Edge Functions',
+          url: '/guides/queues/consuming-messages-with-edge-functions',
+        },
       ],
     },
     {

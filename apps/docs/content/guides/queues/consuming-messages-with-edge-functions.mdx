@@ -15,8 +15,8 @@ Supabase Queues is a pull-based Message Queue consisting of three main component
 This is a Supabase Edge Function that will read 5 messages off the queue, process each of them, and delete each message when it is done.
 
 ```tsx
-import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const supabaseUrl = 'supabaseURL'
 const supabaseKey = 'supabaseKey'
@@ -26,65 +26,61 @@ const queueName = 'your_queue_name'
 
 // Type definition for queue messages
 interface QueueMessage {
-  msg_id: bigint;
-  read_ct: number;
-  vt: string;
-  enqueued_at: string;
-  message: any;
+  msg_id: bigint
+  read_ct: number
+  vt: string
+  enqueued_at: string
+  message: any
 }
 
-async function processMessage (message: QueueMessage) {
+async function processMessage(message: QueueMessage) {
   //
   // Do whatever logic you need to with the message content
   //
   // Delete the message from the queue
-  const { error: deleteError } = await supabase
-    .schema('pgmq_public')
-    .rpc('delete', {
-      queue_name: queueName,
-      msg_id: message.msg_id,
-    });
+  const { error: deleteError } = await supabase.schema('pgmq_public').rpc('delete', {
+    queue_name: queueName,
+    msg_id: message.msg_id,
+  })
 
   if (deleteError) {
-    console.error(`Failed to delete message ${message.msg_id}:`, deleteError);
+    console.error(`Failed to delete message ${message.msg_id}:`, deleteError)
   } else {
-    console.log(`Message ${message.msg_id} deleted from queue`);
+    console.log(`Message ${message.msg_id} deleted from queue`)
   }
 }
 
 Deno.serve(async (req) => {
-  const { data: messages, error } = await supabase
-    .schema('pgmq_public')
-    .rpc('read', {
-      queue_name: queueName,
-      sleep_seconds: 0, // Don't wait if queue is empty
-      n: 5, // Read 5 messages off the queue
-    });
+  const { data: messages, error } = await supabase.schema('pgmq_public').rpc('read', {
+    queue_name: queueName,
+    sleep_seconds: 0, // Don't wait if queue is empty
+    n: 5, // Read 5 messages off the queue
+  })
 
   if (error) {
-    console.error(`Error reading from ${queueName} queue:`, error);
+    console.error(`Error reading from ${queueName} queue:`, error)
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
-    });
+    })
   }
 
   if (!messages || messages.length === 0) {
-    console.log('No messages in workflow_messages queue');
+    console.log('No messages in workflow_messages queue')
     return new Response(JSON.stringify({ message: 'No messages in queue' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
-    });
+    })
   }
 
-  console.log(`Found ${messages.length} messages to process`);
+  console.log(`Found ${messages.length} messages to process`)
 
   // Process each message that was read off the queue
   for (const message of messages) {
     try {
-      await processMessage(message as QueueMessage);
+      await processMessage(message as QueueMessage)
     } catch (error) {
-      console.error(`Error processing message ${message.msg_id}:`, error);
+      console.error(`Error processing message ${message.msg_id}:`, error)
     }
   }
 
@@ -98,8 +94,8 @@ Deno.serve(async (req) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     }
-  );
-});
+  )
+})
 ```
 
 Every time this Edge Function is run it will:
