@@ -3,12 +3,13 @@
 import React, { useState } from 'react'
 import { cn, Separator } from 'ui'
 
+import { IS_PLATFORM } from 'common'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { FEATURE_GROUPS, MCP_CLIENTS } from './constants'
-import { getMcpUrl } from './utils/getMcpUrl'
+import { FEATURE_GROUPS_PLATFORM, FEATURE_GROUPS_NON_PLATFORM, MCP_CLIENTS } from './constants'
 import type { McpClient } from './types'
+import { getMcpUrl } from './utils/getMcpUrl'
 
 export interface McpConfigPanelProps {
   basePath: string
@@ -64,7 +65,7 @@ export function McpConfigPanel({
           onReadonlyChange={setReadonly}
           selectedFeatures={selectedFeatures}
           onFeaturesChange={setSelectedFeatures}
-          featureGroups={FEATURE_GROUPS}
+          featureGroups={IS_PLATFORM ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM}
         />
       </div>
       <div className="flex flex-col gap-y-3">

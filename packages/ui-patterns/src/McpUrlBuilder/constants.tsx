@@ -8,7 +8,7 @@ import type {
   WindsurfMcpConfig,
 } from './types'
 
-export const FEATURE_GROUPS: McpFeatureGroup[] = [
+export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
   {
     id: 'docs',
     name: 'Documentation',
@@ -50,6 +50,10 @@ export const FEATURE_GROUPS: McpFeatureGroup[] = [
     description: 'Manage files and storage buckets',
   },
 ]
+
+export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group) =>
+  ['docs', 'database'].includes(group.id)
+)
 
 export const MCP_CLIENTS: McpClient[] = [
   {
