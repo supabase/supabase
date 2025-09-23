@@ -1,11 +1,9 @@
 import Link from 'next/link'
 import { type ReactNode, Fragment, SetStateAction, useMemo, useState } from 'react'
-import ReactFlow, { Background, BackgroundVariant } from 'reactflow'
 import { BookOpen, Minimize2 } from 'lucide-react'
 import 'reactflow/dist/style.css'
 import { Transition } from '@headlessui/react'
 
-import type { PlanNodeData } from './types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -20,8 +18,6 @@ import { MetaOverlay } from './meta-overlay'
 import { ControlsOverlay } from './controls-overlay'
 import { NODE_TYPE } from './constants'
 import {
-  MetricsVisibilityContext,
-  HeatmapContext,
   defaultMetricsVisibility,
   defaultHeatmapMeta,
   type MetricsVisibility,
@@ -34,6 +30,7 @@ import { useDagreLayout } from './hooks/use-dagre-layout'
 import { MetricsSidebar } from './metrics-sidebar'
 import { NodeDetailsPanel } from './node-details-panel'
 import { usePlanLayoutState } from './hooks/use-plan-layout-state'
+import { PlanViewport } from './plan-viewport'
 
 export const QueryPlanVisualizer = ({
   json,
@@ -201,52 +198,20 @@ export const QueryPlanVisualizer = ({
           </div>
         )}
 
-        <MetricsVisibilityContext.Provider value={metricsVisibility}>
-          <HeatmapContext.Provider
-            value={{
-              mode: heatmapMode,
-              maxTime: heatMax.maxTime,
-              maxRows: heatMax.maxRows,
-              maxCost: heatMax.maxCost,
-            }}
-          >
-            <ReactFlow
-              className="rounded-md"
-              defaultNodes={[]}
-              defaultEdges={[]}
-              nodesConnectable={false}
-              defaultEdgeOptions={{
-                type: 'smoothstep',
-                animated: true,
-                deletable: false,
-                style: {
-                  stroke: 'hsl(var(--border-stronger))',
-                  strokeWidth: 1,
-                },
-              }}
-              fitView
-              nodeTypes={nodeTypes}
-              nodes={nodesWithSelection}
-              edges={layout.edges}
-              minZoom={0.8}
-              maxZoom={1.8}
-              proOptions={{ hideAttribution: true }}
-              onNodeClick={(_event, node) => handleSelectNode(node)}
-              onSelectionChange={handleSelectionChange}
-              onPaneClick={clearSelection}
-              onNodeDragStart={handleNodeDragStart}
-              onNodeDragStop={handleNodeDragStop}
-              onInit={(instance) => setRfInstance(instance)}
-            >
-              <Background
-                gap={16}
-                className="opacity-[25%] [&>*]:stroke-foreground-muted"
-                variant={BackgroundVariant.Dots}
-                color="inherit"
-              />
-            </ReactFlow>
-          </HeatmapContext.Provider>
-        </MetricsVisibilityContext.Provider>
+        <PlanViewport
+          nodes={nodesWithSelection}
+          edges={layout.edges}
+          metricsVisibility={metricsVisibility}
+          heatmapMode={heatmapMode}
+          heatmapExtents={heatMax}
+          nodeTypes={nodeTypes}
+          onNodeClick={handleSelectNode}
+          onSelectionChange={handleSelectionChange}
+          onPaneClick={clearSelection}
+          onNodeDragStart={handleNodeDragStart}
+          onNodeDragStop={handleNodeDragStop}
+          onInit={setRfInstance}
+        />
         {detailPanelOverlay}
       </div>
     )
