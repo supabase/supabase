@@ -34,19 +34,16 @@ You can use the client in your Vue component like following:
 
 ```vue
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { createClient } from './lib/supabase/client';
+import { onMounted, ref } from 'vue'
+import { createClient } from './lib/supabase/client'
 
-const profile = ref(null);
+const profile = ref(null)
 
 onMounted(async () => {
-  const { data, error } = await createClient
-    .from('profiles')
-    .select('*')
-    .single()
+  const { data, error } = await createClient.from('profiles').select('*').single()
 
   if (!error) profile.value = data
-});
+})
 </script>
 
 <template>
