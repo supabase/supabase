@@ -137,7 +137,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
       <div
         className={cn(
           'overflow-hidden pb-0 z-0 relative transition-all duration-300',
-          !explainError && 'h-[120px]'
+          !explainError && 'h-[200px]'
         )}
       >
         <p className="text-xs text-foreground-light mb-4">
@@ -194,7 +194,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
         <>
           <div
             className={cn(
-              'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/30 to-transparent h-24 transition-opacity duration-300',
+              'absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/30 to-transparent h-44 transition-opacity duration-300',
               isQueryPlanVisualizerExpanded && 'opacity-0 pointer-events-none'
             )}
           />
