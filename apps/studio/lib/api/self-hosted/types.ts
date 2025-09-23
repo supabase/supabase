@@ -7,14 +7,17 @@ export type WrappedResult<R> = WrappedSuccessResult<R> | WrappedErrorResult
 export const databaseErrorSchema = z.object({
   message: z.string(),
   code: z.string(),
+  formattedError: z.string(),
 })
 
-export class DatabaseError extends Error {
+export class PgMetaDatabaseError extends Error {
   constructor(
     message: string,
-    public code: string
+    public code: string,
+    public statusCode: number,
+    public formattedError: string
   ) {
     super(message)
-    this.name = 'DatabaseError'
+    this.name = 'PgMetaDatabaseError'
   }
 }

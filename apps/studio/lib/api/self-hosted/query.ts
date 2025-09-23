@@ -1,6 +1,6 @@
 import { PG_META_URL } from 'lib/constants/index'
 import { constructHeaders } from '../apiHelpers'
-import { DatabaseError, databaseErrorSchema, WrappedResult } from './types'
+import { PgMetaDatabaseError, databaseErrorSchema, WrappedResult } from './types'
 import { assertSelfHosted } from './util'
 
 export type QueryOptions = {
@@ -32,8 +32,8 @@ export async function executeQuery<T = unknown>({
     const result = await response.json()
 
     if (!response.ok) {
-      const { message, code } = databaseErrorSchema.parse(result)
-      const error = new DatabaseError(message, code)
+      const { message, code, formattedError } = databaseErrorSchema.parse(result)
+      const error = new PgMetaDatabaseError(message, code, response.status, formattedError)
       return { data: undefined, error }
     }
 

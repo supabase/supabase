@@ -1,7 +1,7 @@
 import { source } from 'common-tags'
 import { makeRandomString } from 'lib/helpers'
 import { executeQuery } from './query'
-import { DatabaseError, WrappedResult } from './types'
+import { PgMetaDatabaseError, WrappedResult } from './types'
 import { assertSelfHosted } from './util'
 
 export type ListMigrationsResult = {
@@ -64,7 +64,7 @@ export async function listMigrationVersions({
 
   if (error) {
     // Return empty list if the migrations table doesn't exist
-    if (error instanceof DatabaseError && error.code === '42P01') {
+    if (error instanceof PgMetaDatabaseError && error.code === '42P01') {
       return { data: [], error: undefined }
     }
 
