@@ -111,7 +111,7 @@ export const TableTemplateSelector = ({
 
   // Focus management
   useEffect(() => {
-    if (viewState.mode === ViewMode.AI_INPUT && inputRef.current) {
+    if (viewState.mode === ViewMode.AI_INPUT) {
       inputRef.current?.focus()
     }
   }, [viewState.mode])
