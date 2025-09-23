@@ -114,7 +114,7 @@ const CodePage = () => {
             ? newImportMapPath
             : fallbackImportMapPath(),
           static_patterns: files
-            .filter(({ name }) => !name.match(/\.(js|ts|jsx|tsx)$/i))
+            .filter(({ name }) => !name.match(/\.(js|ts|jsx|tsx|json)$/i))
             .map(({ name }) => name),
         },
         files: files.map(({ name, content }) => ({ name, content })),
