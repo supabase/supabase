@@ -1,4 +1,4 @@
-import { Lightbulb, ChevronsUpDown } from 'lucide-react'
+import { Lightbulb, ChevronsUpDown, Hourglass, Hash, Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
@@ -25,12 +25,22 @@ const SqlMonacoBlock = dynamic(
   }
 )
 
-const QueryDetailMetricBlock = ({ title, value }: { title: string; value: string }) => {
+const QueryDetailMetricBlock = ({
+  title,
+  value,
+  icon,
+}: {
+  title: string
+  value: string
+  icon: React.ReactNode
+}) => {
   return (
     <div className="flex items-center gap-x-4">
-      <div className="flex h-12 w-12 bg-surface-100 rounded-lg items-center justify-center border"></div>
+      <div className="flex h-12 w-12 bg-surface-100 rounded-[13px] items-center justify-center border text-foreground-lighter shadow-sm">
+        {icon}
+      </div>
       <div className="flex flex-col">
-        <p className="text-foreground">{value}</p>
+        <p className="text-foreground tabular-nums">{value}</p>
         <p className="text-foreground-lighter">{title}</p>
       </div>
     </div>
@@ -70,21 +80,31 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
 
   return (
     <QueryPanelContainer>
-      <QueryPanelSection className="pt-2 border-b relative">
+      <QueryPanelSection className="pt-2 border-b relative bg-gradient-to-t to-background-studio from-background-surface-100/30">
         <div className="grid grid-cols-2 gap-5 pb-6">
-          <QueryDetailMetricBlock title="Score" value="0" />
+          <QueryDetailMetricBlock
+            title="Score"
+            value="0"
+            icon={<div className="text-lg">C+</div>}
+          />
           <QueryDetailMetricBlock
             title="Time consumed"
-            value={`${((selectedRow?.prop_total_time / selectedRow?.total_time) * 100).toFixed(1)}%`}
+            value={`${(selectedRow?.prop_total_time || 0).toFixed(1)}%`}
+            icon={<Hourglass size={20} strokeWidth={1.5} />}
           />
           <QueryDetailMetricBlock
             title="Total time"
-            value={formatDuration(selectedRow?.prop_total_time / 1000)}
+            value={formatDuration((selectedRow?.total_time || 0) / 1000)}
+            icon={<Clock size={20} strokeWidth={1.5} />}
           />
-          <QueryDetailMetricBlock title="Count" value={selectedRow?.calls?.toLocaleString()} />
+          <QueryDetailMetricBlock
+            title="Count"
+            value={selectedRow?.calls?.toLocaleString()}
+            icon={<Hash size={20} strokeWidth={1.5} />}
+          />
         </div>
       </QueryPanelSection>
-      <QueryPanelSection className="pt-2 border-b relative">
+      <QueryPanelSection className="pt-5 border-b relative">
         <h4 className="mb-4">Query pattern</h4>
         <div
           className={cn(
