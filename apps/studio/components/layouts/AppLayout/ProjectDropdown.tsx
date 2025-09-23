@@ -73,7 +73,9 @@ export const ProjectDropdown = () => {
         setOpen={setOpen}
         selectedRef={ref}
         onSelect={(project) => {
-          router.push(`/project/${project.ref}`)
+          const sanitizedRoute = sanitizeRoute(router.route, router.query)
+          const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+          router.push(href)
         }}
         renderTrigger={() => (
           <Button
@@ -87,11 +89,14 @@ export const ProjectDropdown = () => {
           // [Joshen] Temp while we're interim between v1 and v2 billing
           const sanitizedRoute = sanitizeRoute(router.route, router.query)
           const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+          const isSelected = project.ref === ref
 
           return (
             <Link href={href} className="w-full flex items-center justify-between">
-              {project.name}
-              {project.ref === ref && <Check size={16} />}
+              <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
+                {project.name}
+              </span>
+              {isSelected && <Check size={16} />}
             </Link>
           )
         }}
