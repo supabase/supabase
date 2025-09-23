@@ -7,7 +7,7 @@ ETL simplifies the process of syncing your data to an external destination. This
 
 <Admonition type="caution">
 
-`ETL` is currently in alpha.
+`ETL` is currently in private alpha.
 
 </Admonition>
 
@@ -88,10 +88,19 @@ After setting up replication, data begins flowing within a few minutes. You can 
 ## Limitations
 
 - Large values stored as [TOASTed values](https://www.postgresql.org/docs/current/storage-toast.html) are replicated, but limited to 10MB.
+
+  <Admonition type="note" label="Set replica identity to full for tables with TOAST columns">
+
+  This limitation is due to the underlying [replica identity](https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-REPLICA-IDENTITY). In most cases the default replica identity works, but Postgres doesn't send TOAST column values if they haven't changed. This makes it hard for downstream systems to apply the update.
+
+  To workaround this limitation, we set the table's replica identity to full (all columns), forcing Postgres to send the TOAST columns in the CDC stream and helping downstream systems apply the update event.
+
+  </Admonition>
+
 - Custom data types are not supported.
 - No support for picking event types to replicate. ETL needs all insert, update and delete events.
 - No column lists and row filter conditions support.
 - No partitioned tables support.
 - No generated columns support.
 - No support for changing schema in the source.
-- Tables should have a primary key set.
+- Tables should have a primary key set. Tables without a primary key will not be replicated. You can see in the sources list which tables don't have a primary key.
