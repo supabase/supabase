@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { ArrowRight, SearchIcon } from 'lucide-react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
+
 import {
   cn,
   DropdownMenu,
@@ -23,9 +24,9 @@ export type ChartHighlightActionContext = {
 export type ChartHighlightAction = {
   id: string
   label: string | ((ctx: ChartHighlightActionContext) => string)
-  icon?: React.ReactNode
+  icon?: ReactNode
   isDisabled?: (ctx: ChartHighlightActionContext) => boolean
-  rightSlot?: React.ReactNode | ((ctx: ChartHighlightActionContext) => React.ReactNode)
+  rightSlot?: ReactNode | ((ctx: ChartHighlightActionContext) => ReactNode)
   onSelect: (ctx: ChartHighlightActionContext) => void
 }
 
@@ -85,7 +86,7 @@ export const ChartHighlightActions = ({
         }}
       />
       <DropdownMenuContent className="flex flex-col gap-1 p-1 w-fit text-left">
-        <DropdownMenuLabel className="flex items-center justify-center text-foreground-lighter font-mono gap-1 text-xs">
+        <DropdownMenuLabel className="flex items-center justify-center text-foreground-light font-mono gap-x-2 text-xs">
           <span>{dayjs(selectedRangeStart).format('MMM D, H:mm')}</span>
           <ArrowRight size={10} />
           <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
@@ -93,30 +94,27 @@ export const ChartHighlightActions = ({
         <DropdownMenuSeparator className="my-0" />
         {allActions.map((action) => {
           const disabled = ctx && action.isDisabled ? action.isDisabled(ctx) : false
-          let labelNode: React.ReactNode = null
+          let labelNode: ReactNode = null
           if (typeof action.label === 'function') {
             labelNode = ctx ? action.label(ctx) : null
           } else {
             labelNode = action.label
           }
-          let rightNode: React.ReactNode = null
+          let rightNode: ReactNode = null
           if (typeof action.rightSlot === 'function') {
             rightNode = ctx ? action.rightSlot(ctx) : null
           } else {
             rightNode = action.rightSlot ?? null
           }
           return (
-            <DropdownMenuItem
-              key={action.id}
-              className={cn('group', disabled && '!bg-transparent')}
-            >
+            <DropdownMenuItem asChild key={action.id} disabled={disabled} className={cn('group')}>
               <button
                 disabled={disabled}
                 onClick={() => ctx && action.onSelect(ctx)}
                 className="w-full flex items-center gap-1.5"
               >
                 {action.icon}
-                <span className="flex-grow text-left text-foreground-light">{labelNode}</span>
+                <span className="flex-grow text-left">{labelNode}</span>
                 {rightNode}
               </button>
             </DropdownMenuItem>
