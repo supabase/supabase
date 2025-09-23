@@ -3,6 +3,7 @@ import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'a
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
+import { z as z3 } from 'zod/v3'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -11,7 +12,6 @@ import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
 import {
   CHAT_PROMPT,
@@ -21,6 +21,7 @@ import {
   RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
+import { executeQuery } from 'lib/api/self-hosted/query'
 
 export const maxDuration = 120
 
@@ -138,10 +139,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     // Get a list of all schemas to add to context
     const pgMetaSchemasList = pgMeta.schemas.list()
+    type Schemas = z3.infer<(typeof pgMetaSchemasList)['zod']>
 
     const { result: schemas } =
       aiOptInLevel !== 'disabled'
-        ? await executeSql(
+        ? await executeSql<Schemas>(
             {
               projectRef,
               connectionString,
@@ -152,7 +154,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
               'Content-Type': 'application/json',
               ...(authorization && { Authorization: authorization }),
             },
-            IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+            IS_PLATFORM ? undefined : executeQuery
           )
         : { result: [] }
 
