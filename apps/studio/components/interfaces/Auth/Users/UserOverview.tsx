@@ -12,6 +12,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
+import { useUserResendConfirmationMutation } from 'data/auth/user-resend-confirmation-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
@@ -94,6 +95,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const { data } = useAuthConfigQuery({ projectRef })
 
   const mailerOtpExpiry = data?.MAILER_OTP_EXP ?? 0
+  const requiresEmailConfirmation = data ? !data.MAILER_AUTOCONFIRM : false
   const minutes = Math.floor(mailerOtpExpiry / 60)
   const seconds = Math.floor(mailerOtpExpiry % 60)
   const formattedExpiry = `${mailerOtpExpiry > 60 ? `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds > 0 ? 'and' : ''} ` : ''}${seconds > 0 ? `${seconds} second${seconds > 1 ? 's' : ''}` : ''}`
@@ -116,6 +118,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send magic link: ${err.message}`)
     },
   })
+  const { mutate: resendConfirmation, isLoading: isResendingConfirmation } =
+    useUserResendConfirmationMutation({
+      onSuccess: (_, vars) => {
+        toast.success(`Resent confirmation to ${vars.user.email}`)
+      },
+      onError: (err) => {
+        toast.error(`Failed to resend confirmation: ${err.message}`)
+      },
+    })
   const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_otp')
@@ -293,27 +304,43 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     : undefined
                 }
               />
-              <RowAction
-                title="Send magic link"
-                description="Passwordless login via email for the user"
-                button={{
-                  icon: <Mail />,
-                  text: 'Send magic link',
-                  isLoading: isSendingMagicLink,
-                  disabled: !canSendMagicLink,
-                  onClick: () => {
-                    if (projectRef) sendMagicLink({ projectRef, user })
-                  },
-                }}
-                success={
-                  successAction === 'send_magic_link'
-                    ? {
-                        title: 'Magic link sent',
-                        description: `The link in the email is valid for ${formattedExpiry}`,
-                      }
-                    : undefined
-                }
-              />
+              {requiresEmailConfirmation && user.confirmed_at === null ? (
+                <RowAction
+                  title="Resend confirmation email"
+                  description="User must confirm their email before first sign-in"
+                  button={{
+                    icon: <Mail />,
+                    text: 'Resend confirmation',
+                    isLoading: isResendingConfirmation,
+                    disabled: !canSendMagicLink,
+                    onClick: () => {
+                      if (projectRef) resendConfirmation({ projectRef, user })
+                    },
+                  }}
+                />
+              ) : (
+                <RowAction
+                  title="Send magic link"
+                  description="Passwordless login via email for the user"
+                  button={{
+                    icon: <Mail />,
+                    text: 'Send magic link',
+                    isLoading: isSendingMagicLink,
+                    disabled: !canSendMagicLink,
+                    onClick: () => {
+                      if (projectRef) sendMagicLink({ projectRef, user })
+                    },
+                  }}
+                  success={
+                    successAction === 'send_magic_link'
+                      ? {
+                          title: 'Magic link sent',
+                          description: `The link in the email is valid for ${formattedExpiry}`,
+                        }
+                      : undefined
+                  }
+                />
+              )}
             </>
           )}
           {isPhoneAuth && (
