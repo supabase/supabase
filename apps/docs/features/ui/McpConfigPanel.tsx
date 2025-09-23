@@ -3,6 +3,7 @@
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
@@ -41,29 +42,36 @@ function ProjectSelector({
         <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
           Project
         </span>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            size="small"
-            type="default"
-            className="gap-0 rounded-l-none"
-            iconRight={
-              <ChevronDown
-                strokeWidth={1.5}
-                className={cn('transition-transform duration-200', open && 'rotate-180')}
-              />
-            }
-          >
-            <div className="flex items-center gap-2">
-              {isUserLoading || isLoading
-                ? 'Loading projects...'
-                : !isLoggedIn
-                  ? 'Log in to choose a project'
+
+        {!isUserLoading && !isLoggedIn ? (
+          <Button size="small" type="default" className="gap-0 rounded-l-none" asChild>
+            <Link href="https://supabase.com/dashboard" rel="noreferrer noopener" target="_blank">
+              <div className="flex items-center gap-2">Log in to choose a project</div>
+            </Link>
+          </Button>
+        ) : (
+          <PopoverTrigger_Shadcn_ asChild disabled={isUserLoading || isLoading || isError}>
+            <Button
+              size="small"
+              type="default"
+              className="gap-0 rounded-l-none"
+              iconRight={
+                <ChevronDown
+                  strokeWidth={1.5}
+                  className={cn('transition-transform duration-200', open && 'rotate-180')}
+                />
+              }
+            >
+              <div className="flex items-center gap-2">
+                {isUserLoading || isLoading
+                  ? 'Loading projects...'
                   : isError
                     ? 'Error fetching projects'
                     : selectedProject?.name ?? 'Select a project'}
-            </div>
-          </Button>
-        </PopoverTrigger_Shadcn_>
+              </div>
+            </Button>
+          </PopoverTrigger_Shadcn_>
+        )}
       </div>
       <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
         <Command_Shadcn_>
