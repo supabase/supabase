@@ -535,7 +535,7 @@ const nextConfig = {
     // For all other apps except studio, we turn it on to prevent errors from conflicting PRs getting into
     // But studio's build occasionally runs into Type instantiation errors somehow, hence we're using merge
     // queues on GH to mitigate that by running the final type check within GH instead of Vercel
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: true,
   },
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
