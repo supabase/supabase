@@ -234,7 +234,7 @@ importers:
         version: 15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       next-contentlayer2:
         specifier: 0.4.6
-        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
+        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -766,8 +766,8 @@ importers:
         specifier: ^3.1.1
         version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
       '@modelcontextprotocol/sdk':
-        specifier: ^1.17.5
-        version: 1.17.5(supports-color@8.1.1)
+        specifier: ^1.18.0
+        version: 1.18.0(supports-color@8.1.1)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.52.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -803,7 +803,7 @@ importers:
         version: 2.72.0-rc.11
       '@supabase/mcp-server-supabase':
         specifier: ^0.5.4
-        version: 0.5.4(supports-color@8.1.1)
+        version: 0.5.5(supports-color@8.1.1)
       '@supabase/mcp-utils':
         specifier: ^0.2.0
         version: 0.2.1(supports-color@8.1.1)
@@ -1374,7 +1374,7 @@ importers:
         version: 15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       next-contentlayer2:
         specifier: 0.4.6
-        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
+        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -4499,8 +4499,8 @@ packages:
   '@mjackson/node-fetch-server@0.2.0':
     resolution: {integrity: sha512-EMlH1e30yzmTpGLQjlFmaDAjyOeZhng1/XCd7DExR8PNAnG/G1tyruZxEoUe11ClnwGhGrtsdnyyUx1frSzjng==}
 
-  '@modelcontextprotocol/sdk@1.17.5':
-    resolution: {integrity: sha512-QakrKIGniGuRVfWBdMsDea/dx1PNE739QJ7gCM41s9q+qaCYTHCdsIBXQVVXry3mfWAiaM9kT22Hyz53Uw8mfg==}
+  '@modelcontextprotocol/sdk@1.18.0':
+    resolution: {integrity: sha512-JvKyB6YwS3quM+88JPR0axeRgvdDu3Pv6mdZUy+w4qVkCzGgumb9bXG/TmtDRQv+671yaofVfXSQmFLlWU5qPQ==}
     engines: {node: '>=18'}
 
   '@monaco-editor/loader@1.4.0':
@@ -8112,12 +8112,15 @@ packages:
   '@supabase/functions-js@2.4.4':
     resolution: {integrity: sha512-WL2p6r4AXNGwop7iwvul2BvOtuJ1YQy8EbOd0dhG1oN1q8el/BIRSFCFnWAMM/vJJlHWLi4ad22sKbKr9mvjoA==}
 
-  '@supabase/mcp-server-supabase@0.5.4':
-    resolution: {integrity: sha512-2ZyTWD18QS4S675L7YDNe9uezM6ZYbBP72ksy/CC6IwOyV8fQxJxxeSrtSCsgLv6UNde6ITeEHvQWungD8FHCw==}
+  '@supabase/mcp-server-supabase@0.5.5':
+    resolution: {integrity: sha512-te1XM2i+h3NBUgJ/8z9PkNCKaJ268VzFI3Qx5RA97s8eGtH94NyPy3lOIZAh3BFAOFHDpcB7Mn1b0oCTGFxg5g==}
     hasBin: true
 
   '@supabase/mcp-utils@0.2.1':
     resolution: {integrity: sha512-T3LEAEKXOxHGVzhPvxqbAYbxluUKNxQpFnYVyRIazQJOQzZ03tCg+pp3LUYQi0HkWPIo+u+AgtULJVEvgeNr/Q==}
+
+  '@supabase/mcp-utils@0.2.2':
+    resolution: {integrity: sha512-hg4IR1iw2k3zdCiB5abvROSsVK/rOdUoyai3N97uG7c3NSQjWp0M6xPJEoH4TJE63pwY0oTc4eQAjXSmTlNK4Q==}
 
   '@supabase/node-fetch@2.6.15':
     resolution: {integrity: sha512-1ibVeYUacxWYi9i0cf5efil6adJ9WRyZBLivgjs+AUpewx1F3xPi7gLgaASI2SmIQxPoCEjAsLAzKPgMJVgOUQ==}
@@ -16294,6 +16297,11 @@ packages:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
 
+  semver@7.6.3:
+    resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   semver@7.7.1:
     resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
     engines: {node: '>=10'}
@@ -21710,14 +21718,14 @@ snapshots:
 
   '@mapbox/node-pre-gyp@1.0.11(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
-      detect-libc: 2.0.4
+      detect-libc: 2.0.3
       https-proxy-agent: 5.0.1(supports-color@8.1.1)
       make-dir: 3.1.0
       node-fetch: 2.7.0(encoding@0.1.13)
       nopt: 5.0.0
       npmlog: 5.0.1
       rimraf: 3.0.2
-      semver: 7.7.2
+      semver: 7.6.3
       tar: 6.2.1
     transitivePeerDependencies:
       - encoding
@@ -21726,11 +21734,11 @@ snapshots:
   '@mapbox/node-pre-gyp@2.0.0(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
       consola: 3.4.2
-      detect-libc: 2.0.4
+      detect-libc: 2.0.3
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
       node-fetch: 2.7.0(encoding@0.1.13)
       nopt: 8.1.0
-      semver: 7.7.2
+      semver: 7.7.1
       tar: 7.4.3
     transitivePeerDependencies:
       - encoding
@@ -21826,14 +21834,14 @@ snapshots:
 
   '@mjackson/node-fetch-server@0.2.0': {}
 
-  '@modelcontextprotocol/sdk@1.17.5(supports-color@8.1.1)':
+  '@modelcontextprotocol/sdk@1.18.0(supports-color@8.1.1)':
     dependencies:
       ajv: 6.12.6
       content-type: 1.0.5
       cors: 2.8.5
       cross-spawn: 7.0.6
       eventsource: 3.0.7
-      eventsource-parser: 3.0.3
+      eventsource-parser: 3.0.6
       express: 5.1.0(supports-color@8.1.1)
       express-rate-limit: 7.5.0(express@5.1.0(supports-color@8.1.1))
       pkce-challenge: 5.0.0
@@ -21998,11 +22006,11 @@ snapshots:
   '@npmcli/fs@1.1.1':
     dependencies:
       '@gar/promisify': 1.1.3
-      semver: 7.7.2
+      semver: 7.7.1
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.1
 
   '@npmcli/git@4.1.0':
     dependencies:
@@ -22012,7 +22020,7 @@ snapshots:
       proc-log: 3.0.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.7.2
+      semver: 7.7.1
       which: 3.0.1
     transitivePeerDependencies:
       - bluebird
@@ -22030,7 +22038,7 @@ snapshots:
       json-parse-even-better-errors: 3.0.2
       normalize-package-data: 5.0.0
       proc-log: 3.0.0
-      semver: 7.7.2
+      semver: 7.7.1
     transitivePeerDependencies:
       - bluebird
 
@@ -22437,7 +22445,7 @@ snapshots:
       '@types/shimmer': 1.2.0
       import-in-the-middle: 1.14.2
       require-in-the-middle: 7.5.2(supports-color@8.1.1)
-      semver: 7.7.2
+      semver: 7.7.1
       shimmer: 1.2.1
     transitivePeerDependencies:
       - supports-color
@@ -22591,7 +22599,7 @@ snapshots:
       '@opentelemetry/propagator-b3': 1.24.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/propagator-jaeger': 1.24.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.24.1(@opentelemetry/api@1.9.0)
-      semver: 7.7.2
+      semver: 7.7.1
 
   '@opentelemetry/sdk-trace-node@1.26.0(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -22601,7 +22609,7 @@ snapshots:
       '@opentelemetry/propagator-b3': 1.26.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/propagator-jaeger': 1.26.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.26.0(@opentelemetry/api@1.9.0)
-      semver: 7.7.2
+      semver: 7.7.1
 
   '@opentelemetry/semantic-conventions@1.24.1': {}
 
@@ -26206,11 +26214,11 @@ snapshots:
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
-  '@supabase/mcp-server-supabase@0.5.4(supports-color@8.1.1)':
+  '@supabase/mcp-server-supabase@0.5.5(supports-color@8.1.1)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
-      '@modelcontextprotocol/sdk': 1.17.5(supports-color@8.1.1)
-      '@supabase/mcp-utils': 0.2.1(supports-color@8.1.1)
+      '@modelcontextprotocol/sdk': 1.18.0(supports-color@8.1.1)
+      '@supabase/mcp-utils': 0.2.2(supports-color@8.1.1)
       common-tags: 1.8.2
       graphql: 16.11.0
       openapi-fetch: 0.13.8
@@ -26220,7 +26228,15 @@ snapshots:
 
   '@supabase/mcp-utils@0.2.1(supports-color@8.1.1)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.17.5(supports-color@8.1.1)
+      '@modelcontextprotocol/sdk': 1.18.0(supports-color@8.1.1)
+      zod: 3.25.76
+      zod-to-json-schema: 3.24.5(zod@3.25.76)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@supabase/mcp-utils@0.2.2(supports-color@8.1.1)':
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.18.0(supports-color@8.1.1)
       zod: 3.25.76
       zod-to-json-schema: 3.24.5(zod@3.25.76)
     transitivePeerDependencies:
@@ -27644,7 +27660,7 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.3
-      semver: 7.7.2
+      semver: 7.7.1
       ts-api-utils: 1.0.3(typescript@5.5.2)
     optionalDependencies:
       typescript: 5.5.2
@@ -27661,7 +27677,7 @@ snapshots:
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
-      semver: 7.7.2
+      semver: 7.7.1
       ts-api-utils: 2.1.0(typescript@5.5.2)
       typescript: 5.5.2
     transitivePeerDependencies:
@@ -29593,7 +29609,8 @@ snapshots:
 
   detect-libc@2.0.3: {}
 
-  detect-libc@2.0.4: {}
+  detect-libc@2.0.4:
+    optional: true
 
   detect-node-es@1.1.0: {}
 
@@ -30622,7 +30639,7 @@ snapshots:
       proxy-addr: 2.0.7
       rfdc: 1.4.1
       secure-json-parse: 2.7.0
-      semver: 7.7.2
+      semver: 7.7.1
       toad-cache: 3.7.0
 
   fastq@1.18.0:
@@ -32769,7 +32786,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.1
 
   make-error@1.3.6:
     optional: true
@@ -34118,7 +34135,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next-contentlayer2@0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1):
+  next-contentlayer2@0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1):
     dependencies:
       '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.4.3
@@ -34250,7 +34267,7 @@ snapshots:
       rollup: 4.38.0
       rollup-plugin-visualizer: 5.14.0(rollup@4.38.0)
       scule: 1.3.0
-      semver: 7.7.2
+      semver: 7.7.1
       serve-placeholder: 2.0.2
       serve-static: 1.16.2(supports-color@8.1.1)
       source-map: 0.7.4
@@ -34302,7 +34319,7 @@ snapshots:
 
   node-abi@3.75.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.1
 
   node-addon-api@1.7.2: {}
 
@@ -34347,7 +34364,7 @@ snapshots:
       make-fetch-happen: 13.0.1(supports-color@8.1.1)
       nopt: 7.2.1
       proc-log: 3.0.0
-      semver: 7.7.2
+      semver: 7.6.3
       tar: 6.2.1
       which: 4.0.0
     transitivePeerDependencies:
@@ -34362,7 +34379,7 @@ snapshots:
       nopt: 5.0.0
       npmlog: 6.0.2
       rimraf: 3.0.2
-      semver: 7.7.2
+      semver: 7.7.1
       tar: 6.2.1
       which: 2.0.2
     transitivePeerDependencies:
@@ -34428,7 +34445,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       is-core-module: 2.16.1
-      semver: 7.7.2
+      semver: 7.7.1
       validate-npm-package-license: 3.0.4
 
   normalize-path@2.1.1:
@@ -34441,7 +34458,7 @@ snapshots:
 
   npm-install-checks@6.3.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.1
 
   npm-normalize-package-bin@3.0.1: {}
 
@@ -34449,7 +34466,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       proc-log: 3.0.0
-      semver: 7.7.2
+      semver: 7.7.1
       validate-npm-package-name: 5.0.1
 
   npm-pick-manifest@8.0.2:
@@ -34457,7 +34474,7 @@ snapshots:
       npm-install-checks: 6.3.0
       npm-normalize-package-bin: 3.0.1
       npm-package-arg: 10.1.0
-      semver: 7.7.2
+      semver: 7.7.1
 
   npm-run-all@4.1.5:
     dependencies:
@@ -36685,9 +36702,12 @@ snapshots:
 
   semver@6.3.1: {}
 
+  semver@7.6.3: {}
+
   semver@7.7.1: {}
 
-  semver@7.7.2: {}
+  semver@7.7.2:
+    optional: true
 
   send@0.19.0(supports-color@8.1.1):
     dependencies:
@@ -36804,7 +36824,7 @@ snapshots:
       '@babel/core': 7.26.10(supports-color@8.1.1)
       '@babel/parser': 7.27.0
       '@babel/plugin-transform-typescript': 7.27.0(@babel/core@7.26.10(supports-color@8.1.1))(supports-color@8.1.1)
-      '@modelcontextprotocol/sdk': 1.17.5(supports-color@8.1.1)
+      '@modelcontextprotocol/sdk': 1.18.0(supports-color@8.1.1)
       commander: 10.0.1
       cosmiconfig: 8.3.6(typescript@5.5.2)
       deepmerge: 4.3.1
