@@ -178,9 +178,12 @@ const computeStats = (nodes: Node<PlanNodeData>[], meta?: PlanMeta): MetricStats
       totalTime += exclusiveTime
     }
 
-    const actualTotalRows =
-      data.estActualTotalRows ?? (data.actualRows ?? 0) * (data.actualLoops ?? 1)
+    const loops = Math.max(data.actualLoops ?? 1, 1)
+    const actualTotalRows = data.estActualTotalRows ?? (data.actualRows ?? 0) * loops
     if (actualTotalRows > maxRows) maxRows = actualTotalRows
+
+    const planTotalRows = (data.planRows ?? 0) * loops
+    if (planTotalRows > maxRows) maxRows = planTotalRows
 
     const exclusiveCost = data.exclusiveCost ?? 0
     if (exclusiveCost > maxExclusiveCost) maxExclusiveCost = exclusiveCost

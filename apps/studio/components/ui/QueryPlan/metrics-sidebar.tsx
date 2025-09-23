@@ -91,15 +91,25 @@ const renderTimeMetric: MetricRenderer = (data, stats) => {
 }
 
 const renderRowsMetric: MetricRenderer = (data, stats) => {
-  const actualTotalRows =
-    data.estActualTotalRows ?? (data.actualRows ?? 0) * (data.actualLoops ?? 1)
+  const loops = Math.max(data.actualLoops ?? 1, 1)
+  const actualTotalRows = data.estActualTotalRows ?? (data.actualRows ?? 0) * loops
   const percent = stats.maxRows > 0 ? (actualTotalRows / stats.maxRows) * 100 : 0
+  const planTotalRows = (data.planRows ?? 0) * loops
+  const planPercent = stats.maxRows > 0 ? (planTotalRows / stats.maxRows) * 100 : 0
+  const secondaryPercent = Math.max(planPercent - percent, 0)
   const formattedActualRows = formatNumber(actualTotalRows) ?? '0'
   const formattedPlanRows =
     data.planRows !== undefined ? formatNumber(data.planRows) ?? `${data.planRows}` : undefined
 
   return {
-    visual: <MetricBar percent={percent} />,
+    visual: (
+      <MetricBar
+        percent={percent}
+        secondaryPercent={secondaryPercent}
+        color="bg-foreground"
+        secondaryColor="bg-foreground-muted"
+      />
+    ),
     tooltip: (
       <ul className="list-disc -space-y-0.5 pl-4 text-foreground-lighter">
         <li>
