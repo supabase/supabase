@@ -4,6 +4,7 @@ import {
   Ban,
   ChevronLeft,
   ExternalLink,
+  Info,
   Pause,
   Play,
   RotateCcw,
@@ -29,7 +30,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, cn } from 'ui'
+import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ErroredTableDetails } from './ErroredTableDetails'
@@ -342,6 +343,30 @@ export const ReplicationPipelineStatus = () => {
           />
         )}
 
+        {showDisabledState && (
+          <div
+            className={cn(
+              'p-4 border border-default rounded-lg flex items-center justify-between',
+              config.colors.bg
+            )}
+          >
+            <div className="flex items-center gap-x-3">
+              <div
+                className={cn(
+                  'w-10 h-10 rounded-full flex items-center justify-center',
+                  config.colors.iconBg
+                )}
+              >
+                <div className={config.colors.icon}>{config.icon}</div>
+              </div>
+              <div className="flex-1">
+                <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
+                <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {applyLagMetrics && !isStatusError && (
           <div className="border border-default rounded-lg bg-surface-100 p-4 space-y-4">
             <div className="flex flex-wrap items-baseline justify-between gap-y-1">
@@ -359,30 +384,6 @@ export const ReplicationPipelineStatus = () => {
 
         {hasTableData && (
           <div className="flex flex-col gap-y-4">
-            {showDisabledState && (
-              <div
-                className={cn(
-                  'p-4 border border-default rounded-lg flex items-center justify-between',
-                  config.colors.bg
-                )}
-              >
-                <div className="flex items-center gap-x-3">
-                  <div
-                    className={cn(
-                      'w-10 h-10 rounded-full flex items-center justify-center',
-                      config.colors.iconBg
-                    )}
-                  >
-                    <div className={config.colors.icon}>{config.icon}</div>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
-                    <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className="w-full overflow-hidden overflow-x-auto">
               {/* [Joshen] Should update to use new Table components next time */}
               <Table
@@ -444,20 +445,35 @@ export const ReplicationPipelineStatus = () => {
                               </p>
                             ) : (
                               <div className="space-y-3">
-                                <div className="text-sm text-foreground">
-                                  {statusConfig.description}
-                                </div>
-                                {table.table_sync_lag && (
-                                  <div className="rounded-md border border-default/60 bg-surface-100 p-3">
-                                    <p className="mb-2 text-xs font-medium text-foreground">
-                                      Individual table replication lag
-                                    </p>
-                                    <SlotLagMetricsList
-                                      metrics={table.table_sync_lag}
-                                      size="compact"
-                                    />
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="text-sm text-foreground flex-1 min-w-0">
+                                    {statusConfig.description}
                                   </div>
-                                )}
+                                  {table.table_sync_lag && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <button
+                                          type="button"
+                                          aria-label="View lag details"
+                                          className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-surface-200 text-foreground transition-colors hover:bg-surface-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                                        >
+                                          <Info size={12} />
+                                        </button>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="p-0" side="top" align="end">
+                                        <div className="w-64 space-y-3 rounded-md border border-default bg-surface-100 p-3">
+                                          <p className="text-[11px] font-medium text-foreground">
+                                            Individual table replication lag
+                                          </p>
+                                          <SlotLagMetricsList
+                                            metrics={table.table_sync_lag}
+                                            size="compact"
+                                          />
+                                        </div>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                </div>
                                 {table.state.name === 'error' && (
                                   <ErroredTableDetails
                                     state={table.state}
