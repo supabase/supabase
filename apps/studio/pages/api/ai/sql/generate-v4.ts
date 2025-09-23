@@ -17,11 +17,6 @@ import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-import { initLogger, BraintrustMiddleware } from 'braintrust'
-
-initLogger({
-  projectName: process.env.BRAINTRUST_PROJECT_NAME,
-})
 
 import {
   CHAT_PROMPT,
@@ -162,11 +157,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: modelError.message })
   }
 
-  const wrappedModel = wrapLanguageModel({
-    model,
-    middleware: BraintrustMiddleware({ debug: true }),
-  })
-
   try {
     // Get a list of all schemas to add to context
     const pgMetaSchemasList = pgMeta.schemas.list()
@@ -233,7 +223,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const result = streamText({
-      model: wrappedModel,
+      model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
