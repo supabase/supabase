@@ -1,9 +1,9 @@
 import Link from 'next/link'
 
+import { ChevronLeft } from 'lucide-react'
 import { BASE_PATH } from '~/lib/constants'
 import clientLibsCommon from '~/spec/common-cli.yml' with { type: 'yml' }
 import * as NavItems from './NavigationMenu.constants'
-import { ChevronLeft } from 'lucide-react'
 
 const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   const menu = NavItems[id]
@@ -111,7 +111,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
         </Link>
         <div className="flex items-center gap-3 my-3">
           <img
-            src={`${BASE_PATH}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+            src={`${BASE_PATH}` + (menu.icon ?? `/img/icons/menu/${id}.svg`)}
             className="w-5 rounded"
           />
 
