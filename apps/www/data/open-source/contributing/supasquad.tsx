@@ -168,7 +168,7 @@ export const data = {
           </div>
         ),
         subheading:
-          "Help our users who are building with AI + Supabase. If you've vibed a bunch of projects but understand what's happening under the hood, we'd love to talke with you .",
+          "Help our users who are building with AI + Supabase. If you've vibed a bunch of projects but understand what's happening under the hood, we'd love to talk with you.",
       },
 
       {
