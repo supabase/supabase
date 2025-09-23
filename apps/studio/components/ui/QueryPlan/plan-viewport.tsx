@@ -4,6 +4,7 @@ import ReactFlow, {
   BackgroundVariant,
   type Edge,
   type Node,
+  type NodeChange,
   type OnSelectionChangeParams,
   type ReactFlowInstance,
 } from 'reactflow'
@@ -32,6 +33,7 @@ type PlanViewportProps = PropsWithChildren<{
   nodeTypes: NonNullable<Parameters<typeof ReactFlow>[0]['nodeTypes']>
   onNodeClick: (node: Node<PlanNodeData>) => void
   onSelectionChange: (params: OnSelectionChangeParams) => void
+  onNodesChange: (changes: NodeChange[]) => void
   onPaneClick: () => void
   onNodeDragStart: (event: unknown, node: Node<PlanNodeData>) => void
   onNodeDragStop: (event: unknown, node: Node<PlanNodeData>) => void
@@ -50,6 +52,7 @@ export const PlanViewport = ({
   nodeTypes,
   onNodeClick,
   onSelectionChange,
+  onNodesChange,
   onPaneClick,
   onNodeDragStart,
   onNodeDragStop,
@@ -92,6 +95,7 @@ export const PlanViewport = ({
           proOptions={{ hideAttribution: true }}
           onNodeClick={(_event, node) => onNodeClick(node)}
           onSelectionChange={onSelectionChange}
+          onNodesChange={onNodesChange}
           onPaneClick={onPaneClick}
           onNodeDragStart={onNodeDragStart}
           onNodeDragStop={onNodeDragStop}

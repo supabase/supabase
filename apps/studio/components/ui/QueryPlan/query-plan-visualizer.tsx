@@ -118,6 +118,7 @@ const VisualizerBody = ({
     clearSelection,
     handleSelectNode,
     handleSelectionChange,
+    handleNodesChange,
     handleNodeDragStart,
     handleNodeDragStop,
     handleDetailPanelAfterLeave,
@@ -248,6 +249,7 @@ const VisualizerBody = ({
         nodeTypes={nodeTypes}
         onNodeClick={handleSelectNode}
         onSelectionChange={handleSelectionChange}
+        onNodesChange={handleNodesChange}
         onPaneClick={clearSelection}
         onNodeDragStart={handleNodeDragStart}
         onNodeDragStop={handleNodeDragStop}
