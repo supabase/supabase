@@ -3,8 +3,8 @@ import {
   DatabaseOperations,
   ExecuteSqlOptions,
 } from '@supabase/mcp-server-supabase/platform'
-import { executeQuery } from './query'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
+import { executeQuery } from './query'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -16,35 +16,30 @@ export function getDatabaseOperations({
   return {
     async executeSql<T>(_projectRef: string, options: ExecuteSqlOptions) {
       const { query } = options
-      const response = await executeQuery({ query, headers })
+      const { data, error } = await executeQuery<T>({ query, headers })
 
-      if (response.error) {
-        const { code, message } = response.error
-        throw new Error(`Error executing SQL: ${message} (code: ${code})`)
+      if (error) {
+        throw error
       }
 
-      return response as T
+      return data
     },
     async listMigrations() {
-      const response = await listMigrationVersions({ headers })
+      const { data, error } = await listMigrationVersions({ headers })
 
-      if (response.error) {
-        const { code, message } = response.error
-        throw new Error(`Error listing migrations: ${message} (code: ${code})`)
+      if (error) {
+        throw error
       }
 
-      return response as any
+      return data
     },
-    async applyMigration<T>(_projectRef: string, options: ApplyMigrationOptions) {
+    async applyMigration(_projectRef: string, options: ApplyMigrationOptions) {
       const { query, name } = options
-      const response = await applyAndTrackMigrations({ query, name, headers })
+      const { error } = await applyAndTrackMigrations({ query, name, headers })
 
-      if (response.error) {
-        const { code, message } = response.error
-        throw new Error(`Error applying migration: ${message} (code: ${code})`)
+      if (error) {
+        throw error
       }
-
-      return response as T
     },
   }
 }
