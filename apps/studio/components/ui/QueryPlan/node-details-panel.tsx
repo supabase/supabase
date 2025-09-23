@@ -225,37 +225,59 @@ const RowsSection = ({
     title="Rows & filters"
     tooltip="Actual versus estimated rows and how many were removed by filters at this step."
   >
-    <div className="flex text-xs justify-between">
-      <div className="text-foreground-light">Actual rows</div>
-      <div>
-        <span className="font-medium">{actualRows ?? '—'}</span>
-        {data.planRows !== undefined && (
-          <span className="ml-1 text-foreground-light">
-            (estimated {formatNumber(data.planRows)})
-          </span>
-        )}
-      </div>
-    </div>
+    <ul className="flex flex-col gap-y-3 divide-y divide-dashed text-xs">
+      <li className="flex items-center justify-between">
+        <div className="text-foreground-light">Actual rows</div>
+        <div>
+          <span className="font-medium">{actualRows ?? '—'}</span>
+          {data.planRows !== undefined && (
+            <span className="ml-1 text-foreground-light">
+              (estimated {formatNumber(data.planRows)})
+            </span>
+          )}
+        </div>
+      </li>
 
-    {data.rowsRemovedByFilter !== undefined && (
-      <div>
-        WHERE / filter removed {formatOrDash(data.rowsRemovedByFilter)} rows
-        {filteredPercent !== undefined && ` (${filteredPercent}%)`}
-      </div>
-    )}
-    {data.rowsRemovedByJoinFilter !== undefined && (
-      <div>
-        Join filter removed {formatOrDash(data.rowsRemovedByJoinFilter)} rows
-        {joinFilteredPercent !== undefined && ` (${joinFilteredPercent}%)`}
-      </div>
-    )}
-    {data.rowsRemovedByIndexRecheck !== undefined && (
-      <div>
-        Index recheck removed {formatOrDash(data.rowsRemovedByIndexRecheck)} rows
-        {recheckPercent !== undefined && ` (${recheckPercent}%)`}
-      </div>
-    )}
-    {data.heapFetches !== undefined && <div>Heap Fetches: {formatOrDash(data.heapFetches)}</div>}
+      {data.rowsRemovedByFilter !== undefined && (
+        <li className="flex items-center justify-between pt-3">
+          <div className="text-foreground-light">Rows removed by WHERE filter</div>
+          <div>
+            <span className="font-medium">{formatOrDash(data.rowsRemovedByFilter)} rows</span>
+            <span className="text-foreground-light">
+              {filteredPercent !== undefined && ` (${filteredPercent}%)`}
+            </span>
+          </div>
+        </li>
+      )}
+      {data.rowsRemovedByJoinFilter !== undefined && (
+        <li className="flex items-center justify-between pt-3">
+          <div className="text-foreground-light">Rows removed by Join filter</div>
+          <div>
+            <span className="font-medium">{formatOrDash(data.rowsRemovedByJoinFilter)} rows</span>
+            <span className="text-foreground-light">
+              {joinFilteredPercent !== undefined && ` (${joinFilteredPercent}%)`}
+            </span>
+          </div>
+        </li>
+      )}
+      {data.rowsRemovedByIndexRecheck !== undefined && (
+        <li className="flex items-center justify-between pt-3">
+          <div className="text-foreground-light">Rows removed by Index recheck</div>
+          <div>
+            <span className="font-medium">{formatOrDash(data.rowsRemovedByIndexRecheck)} rows</span>
+            <span className="text-foreground-light">
+              {recheckPercent !== undefined && ` (${recheckPercent}%)`}
+            </span>
+          </div>
+        </li>
+      )}
+      {data.heapFetches !== undefined && (
+        <li className="flex items-center justify-between pt-3">
+          <div className="text-foreground-light">Heap fetches</div>
+          <div className="font-medium">{formatOrDash(data.heapFetches)}</div>
+        </li>
+      )}
+    </ul>
   </Section>
 )
 
