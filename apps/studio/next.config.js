@@ -532,9 +532,10 @@ const nextConfig = {
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency
-    // On production, we turn it on to prevent errors from conflicting PRs getting into
-    // prod
-    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
+    // For all other apps except studio, we turn it on to prevent errors from conflicting PRs getting into
+    // But studio's build occasionally runs into Type instantiation errors somehow, hence we're using merge
+    // queues on GH to mitigate that by running the final type check within GH instead of Vercel
+    ignoreBuildErrors: false,
   },
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
