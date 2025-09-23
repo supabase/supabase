@@ -194,7 +194,6 @@ const VisualizerBody = ({
             setMetricsVisibility={setMetricsVisibility}
             heatmapMode={heatmapMode}
             setHeatmapMode={setHeatmapMode}
-            variant="toolbar"
             portal={false}
             className="shrink-0"
           />

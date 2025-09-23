@@ -23,7 +23,6 @@ type Props = {
   setMetricsVisibility: (value: SetStateAction<MetricsVisibility>) => void
   heatmapMode: HeatmapMode
   setHeatmapMode: (value: SetStateAction<HeatmapMode>) => void
-  variant?: 'overlay' | 'toolbar'
   className?: string
   portal?: boolean
 }
@@ -33,7 +32,6 @@ export const ControlsOverlay = ({
   setMetricsVisibility,
   heatmapMode,
   setHeatmapMode,
-  variant = 'overlay',
   className,
   portal = true,
 }: Props) => {
@@ -41,13 +39,7 @@ export const ControlsOverlay = ({
   const metricKeys = Object.keys(defaultMetricsVisibility) as (keyof MetricsVisibility)[]
 
   return (
-    <div
-      className={cn(
-        'text-xs',
-        variant === 'overlay' ? 'px-2 py-1 bg-alternative border rounded-md' : null,
-        className
-      )}
-    >
+    <div className={cn('text-xs', className)}>
       <div className="flex flex-wrap gap-2 items-center">
         <div className="flex items-center gap-x-1 text-xs">
           <Popover_Shadcn_
