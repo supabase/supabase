@@ -133,11 +133,22 @@ To do this now, you should use the new `Max Affected` instead.
 
 PostgREST now validates the JWT `kid` claim. If your JWT contains a Key ID (`kid`), it will try to match this with one of the `kid`'s in the configured JSON Web Key Set. Check the [official docs](https://docs.postgrest.org/en/v13/references/auth.html#jwk-kid-validation) for more details.
 
-If you use Supabase Auth or the CLI to create JSON Web Keys, you shouldn’t worry about this change. For users that integrate with other Auth systems, check that both your JWT and JWKS follow the above rules.
+If you use Supabase Auth or the CLI to create JSON Web Keys, you shouldn’t worry about this change as both systems will ensure `kid`'s are present in the JSON Web Key Set.
+
+For users that integrate with other Auth systems, make sure that both your JWT and JWKS follow the above rules.
 
 ### Schema validation in PostgREST search path
 
-The schemas inside `db-schemas` and `db-extra-search-path` are now validated. This means you cannot put a nonexistent schema there, if you do PostgREST will faill with an error message.
+The schemas inside `db-schemas` and `db-extra-search-path` are now validated. This means you cannot put a nonexistent schema there, if you do PostgREST will fail with an error message.
+
+If you drop a schema during a migration, you should make sure this is synced with the PostgREST search path, which is possible thanks to postgres transactional DDL:
+
+```sql
+begin;
+drop schema old_schema;
+alter role authenticator set pgrst.db_schemas = 'public, pg_graphql, others'; -- make sure old_schema is not present here
+commit;
+```
 
 ## Try it out
 
