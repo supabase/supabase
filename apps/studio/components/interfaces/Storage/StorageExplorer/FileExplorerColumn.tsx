@@ -34,26 +34,26 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop }: DragOverOverlayProps) 
     <Transition
       show={isOpen}
       enter="transition ease-out duration-100"
-      enterFrom="transform opacity-0"
-      enterTo="transform opacity-100"
+      enterFrom="transform opacity-0 backdrop-blur-none"
+      enterTo="transform opacity-100 backdrop-blur-[1px]"
       leave="transition ease-in duration-75"
-      leaveFrom="transform opacity-100"
-      leaveTo="transform opacity-0"
+      leaveFrom="transform opacity-100 backdrop-blur-[1px]"
+      leaveTo="transform opacity-0 backdrop-blur-none"
       className="h-full w-full absolute top-0 pointer-events-none"
     >
       <div
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className="absolute top-0 flex h-full w-full items-center justify-center pointer-events-auto"
+        className="absolute top-0 flex h-full w-full items-center justify-center pointer-events-auto px-4"
         style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
       >
         <div
-          className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
-          style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+          className="w-full h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
         >
           <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
-          <p className="text-center text-sm  text-white mt-2 pointer-events-none">
-            Drop your files to upload to this folder
+          <p className="text-center text-sm text-white mt-2 pointer-events-none">
+            Drop to upload your files
           </p>
         </div>
       </div>
@@ -110,7 +110,7 @@ export const FileExplorerColumn = ({
   }
 
   // Drop target for column background
-  const [dropProps, drop] = useDrop({
+  const [_, drop] = useDrop({
     accept: 'storage-item',
     canDrop: (draggedItem, monitor) => {
       // Only allow drops when we're actually hovering over the column background
@@ -324,8 +324,7 @@ export const FileExplorerColumn = ({
       className={cn(
         fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
         snap.view === STORAGE_VIEWS.LIST && 'h-full',
-        'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto',
-        (dropProps.isOver || isDraggedOver) && 'bg-selection/10'
+        'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
       )}
       onContextMenu={displayMenu}
       onDragOver={onDragOver}
@@ -438,12 +437,8 @@ export const FileExplorerColumn = ({
       {/* Drag drop upload CTA for when column has files */}
       <DragOverOverlay
         isOpen={isDraggedOver}
-        onDragLeave={() => {
-          setIsDraggedOver(false)
-        }}
-        onDrop={() => {
-          setIsDraggedOver(false)
-        }}
+        onDragLeave={() => setIsDraggedOver(false)}
+        onDrop={() => setIsDraggedOver(false)}
       />
 
       {/* List interface footer */}
