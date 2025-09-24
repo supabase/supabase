@@ -9,16 +9,17 @@ import {
   Play,
   RotateCcw,
   Search,
+  WifiOff,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { formatBytes } from 'lib/helpers'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
@@ -44,48 +45,90 @@ import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { SlotLagMetrics, TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
+import { formatBytes } from 'lib/helpers'
 
 type SlotLagMetricKey = keyof SlotLagMetrics
 
-const SLOT_LAG_FIELDS: { key: SlotLagMetricKey; label: string; type: 'bytes' | 'duration' }[] = [
-  { key: 'confirmed_flush_lsn_bytes', label: 'WAL Flush lag', type: 'bytes' },
-  { key: 'flush_lag', label: 'Flush lag', type: 'duration' },
-  { key: 'safe_wal_size_bytes', label: 'Remaining WAL size', type: 'bytes' },
+const SLOT_LAG_FIELDS: {
+  key: SlotLagMetricKey
+  label: string
+  type: 'bytes' | 'duration'
+  description: string
+}[] = [
+  {
+    key: 'confirmed_flush_lsn_bytes',
+    label: 'WAL Flush lag',
+    type: 'bytes',
+    description:
+      'Bytes between the newest WAL record applied locally and the latest flushed WAL record acknowledged by ETL.',
+  },
+  {
+    key: 'flush_lag',
+    label: 'Flush lag',
+    type: 'duration',
+    description:
+      'Time between flushing recent WAL locally and receiving notification that ETL has written and flushed it.',
+  },
+  {
+    key: 'safe_wal_size_bytes',
+    label: 'Remaining WAL size',
+    type: 'bytes',
+    description:
+      'Bytes still available to write to WAL before this slot risks entering the "lost" state.',
+  },
 ]
 
+const numberFormatter = new Intl.NumberFormat()
+
 const formatLagBytesValue = (value?: number) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) return '—'
-  if (value === 0) return '0 bytes'
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return { display: '—', detail: undefined }
+  }
 
-  const abs = Math.abs(value)
-  const decimals = abs < 1024 ? 0 : abs < 1024 * 1024 ? 1 : 2
+  const decimals = value < 1024 ? 0 : value < 1024 * 1024 ? 1 : 2
+  const display = formatBytes(value, decimals)
+  const detail = `${numberFormatter.format(value)} bytes`
 
-  return formatBytes(value, decimals)
+  return { display, detail }
 }
 
 const formatLagDurationValue = (value?: number) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) return '—'
-  const abs = Math.abs(value)
-
-  if (abs < 1000) {
-    return `${value} ms`
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return { display: '—', detail: undefined }
   }
 
-  const seconds = abs / 1000
+  const sign = value < 0 ? '-' : ''
+  const absMilliseconds = Math.abs(value)
+  const duration = dayjs.duration(absMilliseconds, 'milliseconds')
+
+  if (absMilliseconds < 1000) {
+    return { display: `${value} ms`, detail: undefined }
+  }
+
+  const seconds = duration.asSeconds()
   if (seconds < 60) {
     const decimals = seconds >= 10 ? 1 : 2
-    return `${value < 0 ? '-' : ''}${seconds.toFixed(decimals)} s`
+    return {
+      display: `${sign}${seconds.toFixed(decimals)} s`,
+      detail: `${numberFormatter.format(value)} ms`,
+    }
   }
 
-  const minutes = seconds / 60
+  const minutes = duration.asMinutes()
   if (minutes < 60) {
-    const decimals = minutes >= 10 ? 1 : 2
-    return `${value < 0 ? '-' : ''}${minutes.toFixed(decimals)} min`
+    const roundedSeconds = Math.round(seconds)
+    return {
+      display: `${sign}${minutes.toFixed(minutes >= 10 ? 1 : 2)} min`,
+      detail: `${numberFormatter.format(roundedSeconds)} s`,
+    }
   }
 
-  const hours = minutes / 60
-  const decimals = hours >= 10 ? 1 : 2
-  return `${value < 0 ? '-' : ''}${hours.toFixed(decimals)} h`
+  const hours = duration.asHours()
+  const roundedMinutes = Math.round(minutes)
+  return {
+    display: `${sign}${hours.toFixed(hours >= 10 ? 1 : 2)} h`,
+    detail: `${numberFormatter.format(roundedMinutes)} min`,
+  }
 }
 
 const getFormattedLagValue = (type: 'bytes' | 'duration', value?: number) =>
@@ -115,10 +158,36 @@ const SlotLagMetricsList = ({
 
   return (
     <dl className={`grid ${gridClasses}`}>
-      {SLOT_LAG_FIELDS.map(({ key, label, type }) => (
+      {SLOT_LAG_FIELDS.map(({ key, label, type, description }) => (
         <div key={key} className="flex flex-col gap-0.5">
-          <dt className={labelClasses}>{label}</dt>
-          <dd className={valueClasses}>{getFormattedLagValue(type, metrics[key])}</dd>
+          <dt className={labelClasses}>
+            <span className="inline-flex items-center gap-1">
+              {label}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={`What is ${label}`}
+                    className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                  >
+                    <Info size={12} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="start" className="max-w-xs text-xs">
+                  {description}
+                </TooltipContent>
+              </Tooltip>
+            </span>
+          </dt>
+          {(() => {
+            const { display, detail } = getFormattedLagValue(type, metrics[key])
+            return (
+              <dd className={`flex flex-col ${valueClasses}`}>
+                <span>{display}</span>
+                {detail && <span className="text-[11px] text-foreground-lighter">{detail}</span>}
+              </dd>
+            )
+          })()}
         </div>
       ))}
     </dl>
@@ -133,6 +202,7 @@ export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [filterString, setFilterString] = useState<string>('')
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
+  const [isRetryingStatus, setIsRetryingStatus] = useState(false)
 
   const pipelineId = Number(_pipelineId)
   const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
@@ -154,6 +224,7 @@ export const ReplicationPipelineStatus = () => {
     isLoading: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
+    refetch: refetchPipelineStatus,
   } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId },
     {
@@ -167,6 +238,7 @@ export const ReplicationPipelineStatus = () => {
     error: statusError,
     isLoading: isStatusLoading,
     isError: isStatusError,
+    refetch: refetchReplicationStatus,
   } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId },
     {
@@ -209,6 +281,17 @@ export const ReplicationPipelineStatus = () => {
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
       : `${STATUS_REFRESH_FREQUENCY_MS}ms`
 
+  const lastStatusRefreshRaw =
+    (pipelineStatusData?.status as { updated_at?: string | number } | undefined)?.updated_at
+  const lastStatusRefreshLabel = lastStatusRefreshRaw
+    ? (() => {
+        const parsed = dayjs(lastStatusRefreshRaw)
+        return parsed.isValid()
+          ? parsed.format('MMM D, YYYY • h:mm:ss A')
+          : String(lastStatusRefreshRaw)
+      })()
+    : 'Just before connection dropped'
+
   const logsUrl = `/project/${projectRef}/logs/etl-replication-logs${
     pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
   }`
@@ -250,6 +333,15 @@ export const ReplicationPipelineStatus = () => {
       }
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+    }
+  }
+
+  const onRetryStatusFetch = async () => {
+    setIsRetryingStatus(true)
+    try {
+      await Promise.allSettled([refetchReplicationStatus(), refetchPipelineStatus()])
+    } finally {
+      setIsRetryingStatus(false)
     }
   }
 
@@ -329,18 +421,43 @@ export const ReplicationPipelineStatus = () => {
             </Button>
           </div>
         </div>
-
-        {(isPipelineLoading || isStatusLoading) && <GenericSkeletonLoader />}
-
         {isPipelineError && (
           <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
         )}
 
         {isStatusError && (
-          <AlertError
-            error={statusError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_REPLICATION_STATUS}
-          />
+          <div className="rounded-lg border border-warning-400 bg-warning-50 p-4">
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-warning-200 p-2 text-warning-800">
+                <WifiOff size={16} />
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="space-y-1">
+                  <p className="font-medium text-warning-900">Live updates are paused</p>
+                  <p className="text-warning-800">
+                    We couldn’t refresh the replication status. We’ll keep trying automatically, but
+                    the numbers below may be out of date.
+                  </p>
+                  {statusError?.message && (
+                    <p className="text-xs text-warning-700">{statusError.message}</p>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="default"
+                    size="tiny"
+                    onClick={onRetryStatusFetch}
+                    loading={isRetryingStatus}
+                  >
+                    Try again now
+                  </Button>
+                  <p className="text-xs text-warning-700">
+                    Last update: {lastStatusRefreshLabel}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {showDisabledState && (
@@ -367,7 +484,17 @@ export const ReplicationPipelineStatus = () => {
           </div>
         )}
 
-        {applyLagMetrics && !isStatusError && (
+        {(isPipelineLoading || isStatusLoading) && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-x-3">
+              <div className="h-6 w-40 rounded bg-surface-200" />
+              <div className="h-5 w-24 rounded bg-surface-200" />
+            </div>
+            <GenericSkeletonLoader />
+          </div>
+        )}
+
+        {applyLagMetrics && (
           <div className="border border-default rounded-lg bg-surface-100 p-4 space-y-4">
             <div className="flex flex-wrap items-baseline justify-between gap-y-1">
               <div>
@@ -378,6 +505,11 @@ export const ReplicationPipelineStatus = () => {
               </div>
               <p className="text-xs text-foreground-lighter">Updates every {refreshIntervalLabel}</p>
             </div>
+            {isStatusError && (
+              <p className="text-xs text-warning-700">
+                Unable to refresh data. Showing the last values we received.
+              </p>
+            )}
             <SlotLagMetricsList metrics={applyLagMetrics} />
           </div>
         )}
