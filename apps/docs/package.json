@@ -165,5 +165,6 @@
     "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^3.0.5"
-  }
+  },
+    "packageManager": "pnpm@10.16.1"
 }
