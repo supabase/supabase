@@ -387,6 +387,11 @@ const nextConfig = {
         destination: '/organizations',
         permanent: false,
       },
+      {
+        source: '/project/:ref/settings/auth',
+        destination: '/project/:ref/auth',
+        permanent: false,
+      },
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
@@ -527,8 +532,7 @@ const nextConfig = {
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency
-    // On production, we turn it on to prevent errors from conflicting PRs getting into
-    // prod
+    // On production, we turn it on to catch errors from typecheck due to conflicting PRs getting into prod
     ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
   eslint: {

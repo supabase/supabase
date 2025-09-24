@@ -67,7 +67,7 @@ export function Command({ name, highlight }: CommandCopyProps) {
             <TabsContent_Shadcn_ key={manager} value={manager} className="m-0">
               <div className="flex items-center">
                 <div className="flex-1 font-mono text-sm text-foreground relative z-10">
-                  <span className="mr-2 text-[#888]">$</span>
+                  <span className="mr-2 text-[#888] select-none">$</span>
                   {commands[manager]}
                 </div>
                 <div className="relative z-10">
