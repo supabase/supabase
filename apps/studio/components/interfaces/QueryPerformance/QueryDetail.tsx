@@ -1,4 +1,4 @@
-import { Lightbulb, ChevronsUpDown, Expand } from 'lucide-react'
+import { Lightbulb, ChevronsUpDown, Expand, Map } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
@@ -286,16 +286,38 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
         </ul>
       </QueryPanelSection>
       <QueryPanelSection className="py-6 border-t">
-        <h4 className="mb-4">Analysis</h4>
+        <div className="flex justify-between items-center mb-4">
+          <h4>Analysis</h4>
+          {analysisText && (
+            <Button
+              type="default"
+              onClick={() => console.log('visualise')}
+              icon={<Map strokeWidth={1.5} size={16} />}
+            >
+              Visualise query
+            </Button>
+          )}
+        </div>
         {!analysisText && (
-          <Button
-            type="default"
-            loading={isAnalyzing}
-            onClick={runExplainAnalyze}
-            icon={<AiIconAnimation />}
-          >
-            Analyze this query
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button
+              type="default"
+              loading={isAnalyzing}
+              onClick={runExplainAnalyze}
+              className="flex-1"
+              icon={<AiIconAnimation />}
+            >
+              Analyze query
+            </Button>
+            <Button
+              type="default"
+              onClick={() => console.log('visualise')}
+              className="flex-1"
+              icon={<Map strokeWidth={1.5} size={16} />}
+            >
+              Visualise query
+            </Button>
+          </div>
         )}
         {analysisError && (
           <p className="mt-3 text-destructive text-sm">
@@ -305,7 +327,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
           </p>
         )}
         {analysisText && (
-          <div className="mt-4 relative">
+          <div className="relative">
             <div
               className={cn(
                 'overflow-hidden pb-0 z-0 relative transition-all duration-300 rounded-md border bg-surface-100 p-4',

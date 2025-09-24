@@ -58,25 +58,25 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         - Interpret the following EXPLAIN or EXPLAIN ANALYZE output in plain, non-technical language.
         - Explain what the database is doing to execute this query, using simple analogies when helpful.
         - Focus on performance issues that matter: slow operations, inefficient data access patterns, and resource usage.
-        - Provide actionable recommendations that a developer can implement, with clear explanations of why each suggestion helps.
         - If this is EXPLAIN only (without ANALYZE), note that recommendations are based on database estimates, not actual performance.
         - Keep explanations and the length of the response as concise as possible without losing any action items
 
         Output format requirements (Markdown):
         - Write in simple, jargon-free language. When you must use database terms, explain them briefly (e.g., "Sequential Scan - reading every row in the table").
+        - You are providing a single answer only, there will be no follow up questions
         - Structure your response with these sections:
           ### What your query is doing
-          Brief explanation of the database's approach to answering your query.
+          - Single paragraph explanation of the database's approach to answering your query.
           
           ### Performance observations
           Key findings about speed, efficiency, and resource usage.
           
           ### Recommended improvements
-          Specific, actionable steps to make the query faster, with explanations of why each helps.
-        
-        - For any suggested code changes, use fenced code blocks with the sql language hint.
-        - Prioritize suggestions by potential impact.
-        - You are providing a single answer only, there will be no follow up questions
+          - Specific, actionable steps to make the query faster, with explanations of why each helps.
+          - Keep concise and to the point and focus on steps that are actionable
+          - You can rewrite the query to make it faster if improvements can be made to the query itself
+          - Prioritize suggestions by potential impact.
+          - For any suggested code changes, use fenced code blocks with the sql language hint.
 
         ${query ? source`Original query:\n${query}` : ''}
         Plan output:
