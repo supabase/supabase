@@ -62,6 +62,7 @@
     "ai-commands": "workspace:*",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
+    "ui-library": "workspace:*",
     "config": "workspace:*",
     "eslint-config-supabase": "workspace:*",
     "framer-motion": "^11.0.3",

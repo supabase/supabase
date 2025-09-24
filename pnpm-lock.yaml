@@ -578,6 +578,9 @@ importers:
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
+      ui-library:
+        specifier: workspace:*
+        version: link:../ui-library
       ui-patterns:
         specifier: workspace:*
         version: link:../../packages/ui-patterns
