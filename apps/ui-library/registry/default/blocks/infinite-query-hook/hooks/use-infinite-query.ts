@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '@/registry/default/fixtures/lib/supabase/client'
+import { createClient } from '../../../fixtures/lib/supabase/client'
 import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { useEffect, useRef, useSyncExternalStore } from 'react'
@@ -16,18 +16,18 @@ type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
 // Extracts the database type from the supabase client. If the supabase client doesn't have a type, it will fallback properly.
 type Database =
   SupabaseClientType extends SupabaseClient<infer U>
-    ? IfAny<
-        U,
-        {
-          public: {
-            Tables: Record<string, any>
-            Views: Record<string, any>
-            Functions: Record<string, any>
-          }
-        },
-        U
-      >
-    : never
+  ? IfAny<
+    U,
+    {
+      public: {
+        Tables: Record<string, any>
+        Views: Record<string, any>
+        Functions: Record<string, any>
+      }
+    },
+    U
+  >
+  : never
 
 // Change this to the database schema you want to use
 type DatabaseSchema = Database['public']

@@ -4,8 +4,8 @@ import {
   Dropzone,
   DropzoneContent,
   DropzoneEmptyState,
-} from '@/registry/default/blocks/dropzone/components/dropzone'
-import { useSupabaseUpload } from '@/registry/default/blocks/dropzone/hooks/use-supabase-upload'
+} from '../blocks/dropzone/components/dropzone';//'@/registry/default/blocks/dropzone/components/dropzone'
+import { useSupabaseUpload } from '../blocks/dropzone/hooks/use-supabase-upload';//'@/registry/default/blocks/dropzone/hooks/use-supabase-upload'
 
 const FileUploadDemo = () => {
   const props = useSupabaseUpload({

@@ -3036,7 +3036,8 @@ export const ui: NavMenuConstant = {
       name: 'Blocks',
       url: undefined,
       items: [
-        { name: 'Client', url: '/guides/ui/blocks/client' }
+        { name: 'Client', url: '/guides/ui/blocks/client' },
+        { name: 'Password-based Authentication', url: '/guides/ui/blocks/password-based-auth' },
       ]
     },
     {

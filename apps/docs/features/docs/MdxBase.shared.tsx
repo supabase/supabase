@@ -31,6 +31,9 @@ import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ErrorCodes } from '../ui/ErrorCodes'
 
 import { RegistryBlock } from 'ui-library/components/registry-block';
+import { BlockPreview } from 'ui-library/components/block-preview';
+import { BlockItem } from 'ui-library/components/block-item';
+import { ComponentPreview } from 'ui-library/components/component-preview';
 
 
 const components = {
@@ -87,6 +90,9 @@ const components = {
   Price,
   // UI Library
   RegistryBlock,
+  BlockItem,
+  BlockPreview,
+  ComponentPreview,
 }
 
 export { components }

@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '../lib/utils'
 import { Button_Shadcn_ } from 'ui'
 
 export function OpenInV0Button({
