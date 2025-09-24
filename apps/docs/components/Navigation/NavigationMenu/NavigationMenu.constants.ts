@@ -3221,6 +3221,13 @@ export const ui: NavMenuConstant = {
         { name: 'Quickstart', url: '/guides/ui/quickstart' },
         { name: 'FAQ', url: '/guides/ui/faq' },
       ],
+    },
+    {
+      name: 'Platform',
+      url: undefined,
+      items: [
+        { name: 'Platform Kit', url: '/guides/ui/platform-kit' }
+      ]
     }
   ],
 }

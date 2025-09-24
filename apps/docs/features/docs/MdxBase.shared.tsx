@@ -31,6 +31,9 @@ import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
+import { RegistryBlock } from 'ui-library/components/registry-block';
+
+
 const components = {
   Accordion,
   AccordionItem,
@@ -85,6 +88,8 @@ const components = {
   ),
   pre: CodeBlock,
   Price,
+  // UI Library
+  RegistryBlock,
 }
 
 export { components }
