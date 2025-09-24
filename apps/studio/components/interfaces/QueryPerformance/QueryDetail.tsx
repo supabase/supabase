@@ -21,11 +21,11 @@ import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { useSqlExplainAnalyzeFromQueryMutation } from 'data/ai/sql-explain-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { analyzeSqlExplain } from 'data/ai/sql-explain-mutation'
+import { toast } from 'sonner'
 // Avoid importing MessageMarkdown components to prevent circular deps
 
 interface QueryDetailProps {
@@ -56,10 +56,19 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
   }, [selectedRow])
 
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisText, setAnalysisText] = useState<string | null>(null)
-  const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [isAnalysisExpanded, setIsAnalysisExpanded] = useState(false)
+
+  const [analysisText, setAnalysisText] = useState<string | null>(null)
+  const {
+    mutate: analyzePlan,
+    error: analysisError,
+    isLoading: isAnalyzing,
+  } = useSqlExplainAnalyzeFromQueryMutation({
+    onSuccess: (text) => {
+      setAnalysisText(text)
+      setIsAnalysisExpanded(false)
+    },
+  })
 
   const { data: project } = useSelectedProjectQuery()
   const dbSelector = useDatabaseSelectorStateSnapshot()
@@ -68,106 +77,25 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
     (db) => db.identifier === dbSelector.selectedDatabaseId
   )?.connectionString
 
-  // Heuristics to support EXPLAIN for parameterized queries taken from common patterns.
-  // If we cannot confidently infer a type, we default to text with safe placeholder values.
-  const extractParameterIndexes = (sql: string): number[] => {
-    const indexes = new Set<number>()
-    const regex = /\$(\d+)/g
-    let match: RegExpExecArray | null
-    while ((match = regex.exec(sql)) !== null) {
-      const idx = Number(match[1])
-      if (!isNaN(idx)) indexes.add(idx)
-    }
-    return Array.from(indexes).sort((a, b) => a - b)
-  }
+  // Normalize possible null from replica connection strings to undefined for typing
+  const resolvedConnectionString: string | undefined =
+    typeof connectionString === 'string'
+      ? connectionString
+      : typeof project?.connectionString === 'string'
+        ? project?.connectionString
+        : undefined
 
-  const sqlQuoteLiteral = (val: string) => `'${val.replace(/'/g, "''")}'`
-
-  const inferParamBinding = (sql: string, index: number): { pgType: string; valueSql: string } => {
-    const i = index
-    const likeCtx = new RegExp(`\\b(?:ilike|like)\\s*\\$${i}\\b`, 'i')
-    const limitCtx = new RegExp(`\\blimit\\s*\\$${i}\\b`, 'i')
-    const sleepCtx = new RegExp(`pg_sleep\\s*\\(\\s*\\$${i}\\s*\\)`, 'i')
-    const toCharCtx = new RegExp(`to_char\\s*\\([^)]*?\\$${i}[^)]*?\\)`, 'i')
-    const jsonKeyCtx = new RegExp(`->>\\s*\\$${i}`, 'i')
-    const boolCtx = new RegExp(`\\b(?:on|where)\\s*\\$${i}\\b`, 'i')
-
-    if (sleepCtx.test(sql)) {
-      return { pgType: 'double precision', valueSql: '0' }
-    }
-    if (limitCtx.test(sql)) {
-      // Small limit to keep ANALYZE fast, but non-zero to keep plan shape reasonable
-      return { pgType: 'int', valueSql: '100' }
-    }
-    if (likeCtx.test(sql)) {
-      return { pgType: 'text', valueSql: sqlQuoteLiteral('%%') }
-    }
-    if (toCharCtx.test(sql)) {
-      return { pgType: 'text', valueSql: sqlQuoteLiteral('YYYY-MM-DD') }
-    }
-    if (jsonKeyCtx.test(sql)) {
-      return { pgType: 'text', valueSql: sqlQuoteLiteral('key') }
-    }
-    if (boolCtx.test(sql)) {
-      return { pgType: 'boolean', valueSql: 'true' }
-    }
-
-    // Equality or catch-all: default to text
-    return { pgType: 'text', valueSql: sqlQuoteLiteral('value') }
-  }
+  // EXPLAIN SQL building now centralized in execute-sql-mutation.ts
 
   const runExplainAnalyze = useCallback(async () => {
     if (!query) return
-    setIsAnalyzing(true)
-    setAnalysisError(null)
-    setAnalysisText(null)
-
     try {
       const originalQuery = query as string
-
-      // Detect parameters like $1, $2 ... and build a PREPARE/EXECUTE EXPLAIN if present
-      const params = extractParameterIndexes(originalQuery)
-
-      let explainSql: string
-      if (params.length === 0) {
-        explainSql =
-          `BEGIN;\n` +
-          `EXPLAIN (ANALYZE, BUFFERS, VERBOSE, WAL, SETTINGS, FORMAT JSON) ${originalQuery};\n` +
-          `ROLLBACK;`
-      } else {
-        // Generic plan path inspired by PREPARE with unknown + NULLs
-        const maxParam = Math.max(...params)
-        const unknowns = Array(maxParam).fill('unknown').join(', ')
-        const nulls = Array(maxParam).fill('NULL').join(', ')
-        const stmtName = '__qp_stmt__'
-        explainSql =
-          `BEGIN;\n` +
-          `SET LOCAL plan_cache_mode = force_generic_plan;\n` +
-          `PREPARE ${stmtName}(${unknowns}) AS ${originalQuery};\n` +
-          `EXPLAIN (VERBOSE, SETTINGS, FORMAT JSON) EXECUTE ${stmtName}(${nulls});\n` +
-          `DEALLOCATE ${stmtName};\n` +
-          `ROLLBACK;`
-      }
-
-      let result: any[]
-      try {
-        const exec = await executeSql<any[]>({
-          projectRef: project?.ref,
-          connectionString: connectionString || project?.connectionString,
-          sql: explainSql,
-        })
-        result = exec.result
-      } catch (err: any) {
-        throw err
-      }
-
-      const text: string = await analyzeSqlExplain({
-        plan: JSON.stringify(result),
-        query: originalQuery,
+      analyzePlan({
+        projectRef: project?.ref,
+        connectionString: resolvedConnectionString,
+        sql: originalQuery,
       })
-      console.log('text', text)
-      setAnalysisText(text)
-      setIsAnalysisExpanded(false)
     } catch (e: any) {
       const message =
         typeof e?.message === 'string' ? e.message : 'Unexpected error while analyzing the query'
@@ -175,11 +103,10 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
       const hint = /parameter|\$\d+/.test(message.toLowerCase())
         ? ' This query appears to be parameterized. We attempted to bind safe defaults. You can refine the plan by providing representative values in the SQL.'
         : ''
-      setAnalysisError(message + hint)
-    } finally {
-      setIsAnalyzing(false)
+      toast.error(message + hint)
     }
-  }, [project?.ref, connectionString, project?.connectionString, query])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project?.ref, resolvedConnectionString, query])
 
   // Use shared markdownComponents from ui to render analysis
 
@@ -370,7 +297,13 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
             Analyze this query
           </Button>
         )}
-        {analysisError && <p className="mt-3 text-destructive text-sm">{analysisError}</p>}
+        {analysisError && (
+          <p className="mt-3 text-destructive text-sm">
+            {typeof (analysisError as any)?.message === 'string'
+              ? (analysisError as any).message
+              : String(analysisError)}
+          </p>
+        )}
         {analysisText && (
           <div className="mt-4 relative">
             <div

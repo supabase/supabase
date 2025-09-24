@@ -62,3 +62,50 @@ export const useExecuteSqlMutation = ({
     }
   )
 }
+
+// Utilities for building EXPLAIN/EXPLAIN ANALYZE statements
+
+/**
+ * Extracts 1-based parameter indexes like $1, $2 from a SQL string.
+ */
+export const extractParameterIndexes = (sql: string): number[] => {
+  const indexes = new Set<number>()
+  const regex = /\$(\d+)/g
+  let match: RegExpExecArray | null
+  while ((match = regex.exec(sql)) !== null) {
+    const idx = Number(match[1])
+    if (!isNaN(idx)) indexes.add(idx)
+  }
+  return Array.from(indexes).sort((a, b) => a - b)
+}
+
+/**
+ * Builds an EXPLAIN statement for the provided SQL.
+ * - If the query is not parameterized, runs EXPLAIN ANALYZE JSON inside a transaction (rolled back).
+ * - If parameterized ($1, $2 ...), forces a generic plan via PREPARE with unknowns and EXPLAIN JSON of EXECUTE with NULLs.
+ */
+export const buildExplainSqlForQuery = (originalQuery: string): string => {
+  const params = extractParameterIndexes(originalQuery)
+
+  if (params.length === 0) {
+    return (
+      `BEGIN;\n` +
+      `EXPLAIN (ANALYZE, BUFFERS, VERBOSE, WAL, SETTINGS, FORMAT JSON) ${originalQuery};\n` +
+      `ROLLBACK;`
+    )
+  }
+
+  const maxParam = Math.max(...params)
+  const unknowns = Array(maxParam).fill('unknown').join(', ')
+  const nulls = Array(maxParam).fill('NULL').join(', ')
+  const stmtName = '__qp_stmt__'
+
+  return (
+    `BEGIN;\n` +
+    `SET LOCAL plan_cache_mode = force_generic_plan;\n` +
+    `PREPARE ${stmtName}(${unknowns}) AS ${originalQuery};\n` +
+    `EXPLAIN (VERBOSE, SETTINGS, FORMAT JSON) EXECUTE ${stmtName}(${nulls});\n` +
+    `DEALLOCATE ${stmtName};\n` +
+    `ROLLBACK;`
+  )
+}
