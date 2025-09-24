@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react'
 import { X } from 'lucide-react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -9,13 +9,13 @@ import { DEFAULT_CHART_CONFIG, QueryBlock } from 'components/ui/QueryBlock/Query
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
-import { useExecuteSqlMutation, type QueryResponseError } from 'data/sql/execute-sql-mutation'
-import { useChanged } from 'hooks/misc/useChanged'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useChangedSync } from 'hooks/misc/useChanged'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Dashboards, SqlSnippets } from 'types'
+import type { Dashboards, SqlSnippets } from 'types'
+import { DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
-import { DEPRECATED_REPORTS } from '../Reports.constants'
 
 interface ReportBlockProps {
   item: Dashboards.Chart
@@ -131,8 +131,8 @@ export const ReportBlock = ({
     [projectRef, readOnlyConnectionString, postgresConnectionString, executeSql]
   )
 
-  const sqlHasChanged = useChanged(sql)
-  const isRefreshingChanged = useChanged(isRefreshing)
+  const sqlHasChanged = useChangedSync(sql)
+  const isRefreshingChanged = useChangedSync(isRefreshing)
   if (sqlHasChanged || (isRefreshingChanged && isRefreshing)) {
     runQuery('select', sql)
   }
