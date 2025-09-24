@@ -531,9 +531,9 @@ const nextConfig = {
     pagesBufferLength: 100,
   },
   typescript: {
-    // On previews, typechecking is run via GitHub Action only for efficiency
-    // On production, we turn it on to catch errors from typecheck due to conflicting PRs getting into prod
-    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
+    // Typechecking is run via GitHub Action only for efficiency
+    // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
+    ignoreBuildErrors: true,
   },
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
