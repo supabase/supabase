@@ -323,16 +323,6 @@ export const ReplicationPipelineStatus = () => {
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
       : `${STATUS_REFRESH_FREQUENCY_MS}ms`
 
-  const lastStatusRefreshRaw =
-    (pipelineStatusData?.status as { updated_at?: string | number } | undefined)?.updated_at
-  const lastStatusRefreshLabel = lastStatusRefreshRaw
-    ? (() => {
-        const parsed = dayjs(lastStatusRefreshRaw)
-        return parsed.isValid()
-          ? parsed.format('MMM D, YYYY • h:mm:ss A')
-          : String(lastStatusRefreshRaw)
-      })()
-    : 'Just before connection dropped'
 
   const logsUrl = `/project/${projectRef}/logs/etl-replication-logs${
     pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
@@ -471,16 +461,7 @@ export const ReplicationPipelineStatus = () => {
           <div className="flex items-center gap-2 rounded-lg border border-warning-400 bg-warning-50 px-3 py-2 text-xs text-warning-800">
             <WifiOff size={14} />
             <span className="font-medium">Live updates paused</span>
-            <span className="text-warning-700">Last refresh {lastStatusRefreshLabel}</span>
-            <Button
-              type="default"
-              size="tiny"
-              onClick={onRetryStatusFetch}
-              loading={isRetryingStatus}
-              className="ml-auto"
-            >
-              Retry
-            </Button>
+            <span className="text-warning-700">Retrying automatically</span>
           </div>
         )}
 
