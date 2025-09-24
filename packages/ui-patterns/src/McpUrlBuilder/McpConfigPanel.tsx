@@ -9,7 +9,6 @@ import { McpConfigurationOptions } from './components/McpConfigurationOptions'
 import { FEATURE_GROUPS_PLATFORM, FEATURE_GROUPS_NON_PLATFORM, MCP_CLIENTS } from './constants'
 import type { McpClient } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
-import { getMcpBaseUrl } from './utils/getMcpBaseUrl'
 
 export interface McpConfigPanelProps {
   basePath: string
