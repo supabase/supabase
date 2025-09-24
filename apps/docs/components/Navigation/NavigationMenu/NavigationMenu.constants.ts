@@ -261,6 +261,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/reference/api/introduction' as `/${string}`,
             level: 'reference_javascript',
           },
+          {
+            label: 'UI Library',
+            icon: 'ui',
+            href: 'https://supabase.com/ui' as `/${string}`,
+            level: 'ui',
+          },
         ],
         [
           { label: 'Data API' },
