@@ -334,7 +334,8 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             ? 'loggedIn.selectedProject.dataPending'
             : (
                   needsApiQuery
-                    ? isAuthApiError
+                  ? isApiError
+
                     : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
                 )
               ? 'loggedIn.selectedProject.dataError'
