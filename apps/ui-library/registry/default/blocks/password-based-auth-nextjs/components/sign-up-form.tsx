@@ -1,18 +1,18 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
-import { Button } from '@/registry/default/components/ui/button'
+import { cn } from '../../../../../lib/utils'
+import { createClient } from '../../../clients/nextjs/lib/supabase/client'
+import { Button } from '../../../components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/registry/default/components/ui/card'
-import { Input } from '@/registry/default/components/ui/input'
-import { Label } from '@/registry/default/components/ui/label'
-import { Link } from '@/registry/default/components/ui/link'
+} from '../../../components/ui/card'
+import { Input } from '../../../components/ui/input'
+import { Label } from '../../../components/ui/label'
+import { Link } from '../../../components/ui/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 

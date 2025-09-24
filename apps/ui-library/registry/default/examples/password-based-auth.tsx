@@ -1,4 +1,4 @@
-import { SignUpForm } from '@/registry/default/blocks/password-based-auth-nextjs/components/sign-up-form'
+import { SignUpForm } from '../blocks/password-based-auth-nextjs/components/sign-up-form'
 
 const PasswordBasedAuthDemo = () => {
   return (
