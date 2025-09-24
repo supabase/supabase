@@ -2,7 +2,13 @@ export { ClientSelectDropdown } from './components/ClientSelectDropdown'
 export { ConnectionIcon } from './components/ConnectionIcon'
 export { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 export { McpConfigurationOptions } from './components/McpConfigurationOptions'
-export { MCP_URL, FEATURE_GROUPS, MCP_CLIENTS } from './constants'
+export {
+  DEFAULT_MCP_URL_PLATFORM,
+  DEFAULT_MCP_URL_NON_PLATFORM,
+  FEATURE_GROUPS_PLATFORM,
+  FEATURE_GROUPS_NON_PLATFORM,
+  MCP_CLIENTS,
+} from './constants'
 export { getMcpUrl } from './utils/getMcpUrl'
 export { McpConfigPanel, type McpConfigPanelProps } from './McpConfigPanel'
 export type {

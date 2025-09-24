@@ -201,4 +201,5 @@ export const MCP_CLIENTS: McpClient[] = [
   },
 ]
 
-export const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL ?? 'http://localhost:8080/mcp'
+export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
+export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'

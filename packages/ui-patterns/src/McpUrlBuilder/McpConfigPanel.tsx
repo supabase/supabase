@@ -1,15 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { cn, Separator } from 'ui'
 
-import { IS_PLATFORM } from 'common'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
 import { FEATURE_GROUPS_PLATFORM, FEATURE_GROUPS_NON_PLATFORM, MCP_CLIENTS } from './constants'
 import type { McpClient } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
+import { getMcpBaseUrl } from './utils/getMcpBaseUrl'
 
 export interface McpConfigPanelProps {
   basePath: string
@@ -19,26 +19,34 @@ export interface McpConfigPanelProps {
   onClientSelect?: (client: McpClient) => void
   theme?: 'light' | 'dark'
   className?: string
+  isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
 }
 
 export function McpConfigPanel({
   basePath,
-  baseUrl,
   projectRef,
   initialSelectedClient,
   onClientSelect,
   className,
   theme = 'dark',
+  isPlatform,
 }: McpConfigPanelProps) {
   const [readonly, setReadonly] = useState(false)
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
 
+  const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
+  const selectedFeaturesSupported = useMemo(() => {
+    return selectedFeatures.filter((feature) =>
+      supportedFeatures.some((group) => group.id === feature)
+    )
+  }, [selectedFeatures, supportedFeatures])
+
   const { clientConfig } = getMcpUrl({
-    baseUrl,
+    baseUrl: getMcpBaseUrl(isPlatform),
     projectRef,
     readonly,
-    features: selectedFeatures,
+    features: selectedFeaturesSupported,
     selectedClient,
   })
 
@@ -63,9 +71,9 @@ export function McpConfigPanel({
           className={innerPanelSpacing}
           readonly={readonly}
           onReadonlyChange={setReadonly}
-          selectedFeatures={selectedFeatures}
+          selectedFeatures={selectedFeaturesSupported}
           onFeaturesChange={setSelectedFeatures}
-          featureGroups={IS_PLATFORM ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM}
+          featureGroups={isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM}
         />
       </div>
       <div className="flex flex-col gap-y-3">

@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
@@ -36,6 +36,7 @@ const McpTabContentInnerLoaded = ({ projectRef }: { projectRef: string }) => {
       basePath={BASE_PATH}
       projectRef={projectRef}
       theme={resolvedTheme as 'light' | 'dark'}
+      isPlatform={IS_PLATFORM}
     />
   )
 }

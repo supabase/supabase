@@ -1,9 +1,8 @@
-import { MCP_URL } from '../constants'
 import type { McpClient, McpClientConfig } from '../types'
 
 interface GetMcpUrlOptions {
   projectRef?: string
-  baseUrl?: string
+  baseUrl: string
   readonly?: boolean
   features?: string[]
   selectedClient?: McpClient
@@ -16,7 +15,7 @@ interface GetMcpUrlReturn {
 
 export function getMcpUrl({
   projectRef,
-  baseUrl = MCP_URL,
+  baseUrl,
   readonly = false,
   features = [],
   selectedClient,
