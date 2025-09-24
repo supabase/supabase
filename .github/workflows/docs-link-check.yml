@@ -44,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lychee-report
-          path: .lychee/report.json
+          path: ./report.json
