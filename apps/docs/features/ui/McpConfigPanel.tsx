@@ -121,7 +121,7 @@ function PlatformSelector({
 
   const platforms = [
     { value: 'hosted', label: 'Hosted' },
-    { value: 'local', label: 'CLI or Self-hosted' },
+    { value: 'local', label: 'CLI or self-hosted' },
   ]
 
   return (
