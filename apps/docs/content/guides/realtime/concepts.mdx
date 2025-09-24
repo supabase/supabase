@@ -47,22 +47,22 @@ The connections include:
   - **Subscription cleanup**: To cleanup the subscribers to Postgres Changes
   - **WAL pull**: To pull the changes from the database
 
-The number of connections varies based on your compute add-on size and configuration. The following table shows the default connection pool sizes for different compute addon variants:
+The number of connections varies based on your compute add-on size and configuration. The following table shows the default connection pool sizes for different compute add-on variants:
 
-| Compute Addon | Broadcast from database | Database Pool Size | Subscription management | Subscription cleanup | WAL pull |
-| ------------- | ----------------------- | ------------------ | ----------------------- | -------------------- | -------- |
-| Nano          | 1                       | 2                  | 2                       | 2                    | 2        |
-| Micro         | 1                       | 2                  | 2                       | 2                    | 2        |
-| Small         | 1                       | 5                  | 4                       | 4                    | 4        |
-| Medium        | 1                       | 5                  | 4                       | 4                    | 4        |
-| Large         | 1                       | 5                  | 4                       | 4                    | 4        |
-| XL            | 1                       | 10                 | 7                       | 7                    | 7        |
-| 2XL           | 1                       | 10                 | 7                       | 7                    | 7        |
-| 4XL           | 1                       | 10                 | 7                       | 7                    | 7        |
-| 8XL           | 1                       | 15                 | 9                       | 9                    | 9        |
-| 12XL          | 1                       | 15                 | 9                       | 9                    | 9        |
-| 16XL          | 1                       | 15                 | 9                       | 9                    | 9        |
-| >16XL         | 1                       | 15                 | 9                       | 9                    | 9        |
+| Compute Add-on | Broadcast from database | Authorization Pool Size | Subscription management | Subscription cleanup | WAL pull |
+| -------------- | ----------------------- | ----------------------- | ----------------------- | -------------------- | -------- |
+| Nano           | 1                       | 2                       | 2                       | 2                    | 2        |
+| Micro          | 1                       | 2                       | 2                       | 2                    | 2        |
+| Small          | 1                       | 5                       | 4                       | 4                    | 4        |
+| Medium         | 1                       | 5                       | 4                       | 4                    | 4        |
+| Large          | 1                       | 5                       | 4                       | 4                    | 4        |
+| XL             | 1                       | 10                      | 7                       | 7                    | 7        |
+| 2XL            | 1                       | 10                      | 7                       | 7                    | 7        |
+| 4XL            | 1                       | 10                      | 7                       | 7                    | 7        |
+| 8XL            | 1                       | 15                      | 9                       | 9                    | 9        |
+| 12XL           | 1                       | 15                      | 9                       | 9                    | 9        |
+| 16XL           | 1                       | 15                      | 9                       | 9                    | 9        |
+| >16XL          | 1                       | 15                      | 9                       | 9                    | 9        |
 
 <Admonition type="note">
 
