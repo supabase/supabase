@@ -1,21 +1,5 @@
 import { tool } from 'ai'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { z } from 'zod'
-
-export const renderingToolOutputParser = {
-  execute_sql: (output: any, optInLevel: AiOptInLevel) => {
-    if (optInLevel !== 'schema_and_log_and_data') {
-      if (Array.isArray(output)) {
-        return 'The query was executed but the result is not shared due to permission level'
-      }
-      return output
-    }
-    return output
-  },
-  deploy_edge_function: (output: any, optInLevel: AiOptInLevel) => {
-    return output
-  },
-}
 
 export const getRenderingTools = () => ({
   execute_sql: tool({
