@@ -62,6 +62,11 @@ export const appState = proxy({
     appState.showSidebar = value
   },
 
+  showTabs: true,
+  setShowTabs: (value: boolean) => {
+    appState.showTabs = value
+  },
+
   showOngoingQueriesPanelOpen: false,
   setOnGoingQueriesPanelOpen: (value: boolean) => {
     appState.ongoingQueriesPanelOpen = value
