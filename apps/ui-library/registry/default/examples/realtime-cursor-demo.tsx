@@ -1,8 +1,8 @@
 'use client'
 
-import { RealtimeCursors } from '@/registry/default/blocks/realtime-cursor/components/realtime-cursors'
-import { Input } from '@/registry/default/components/ui/input'
-import { Label } from '@/registry/default/components/ui/label'
+import { RealtimeCursors } from '../blocks/realtime-cursor/components/realtime-cursors'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
 import { Button } from '@ui/components/shadcn/ui/button'
 import { RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
