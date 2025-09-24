@@ -1,19 +1,9 @@
-import { createServerClient } from '@supabase/ssr'
-import { createError, defineEventHandler, getCookie, setCookie } from 'h3';
+import { createError, defineEventHandler } from 'h3';
+import { createSupabaseServerClient } from '../supabase/client';
 
 export default defineEventHandler(async (event) => {
   // Create Supabase SSR client
-  const supabase = createServerClient(
-    process.env.NUXT_PUBLIC_SUPABASE_URL!,
-    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
-    {
-      cookies: {
-        get: (key) => getCookie(event, key),
-        set: (key, value, options) => setCookie(event, key, JSON.stringify(options)),
-        remove: (key, options) => setCookie(event, key, '', { ...options, maxAge: -1 }),
-      },
-    }
-  );
+  const supabase = createSupabaseServerClient(event)
 
   // Example: get user session
   const {

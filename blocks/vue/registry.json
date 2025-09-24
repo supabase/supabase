@@ -22,14 +22,19 @@
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/nuxtjs/lib/middleware/is-authenticated.ts",
+          "path": "registry/default/clients/nuxtjs/server/middleware/is-authenticated.ts",
           "type": "registry:file",
-          "target": "app/middleware/is-authenticated.ts"
+          "target": "server/middleware/is-authenticated.ts"
         },
         {
           "path": "registry/default/clients/nuxtjs/server/api/profile.get.ts",
           "type": "registry:file",
           "target": "server/api/profile.get.ts"
+        },
+        {
+          "path": "registry/default/clients/nuxtjs/server/supabase/client.ts",
+          "type": "registry:file",
+          "target": "server/supabase/client.ts"
         }
       ]
     },
