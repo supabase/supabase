@@ -310,7 +310,7 @@ const HomePage = () => (
                   href={resource.href}
                   className="col-span-12 md:col-span-6 lg:col-span-3"
                   passHref
-                  target={resource.external && '_blank'}
+                  target={resource.external ? '_blank' : undefined}
                 >
                   <GlassPanelWithIconPicker {...resource} background={false}>
                     {resource.description}
