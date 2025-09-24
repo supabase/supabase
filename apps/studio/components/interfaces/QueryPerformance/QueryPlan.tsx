@@ -180,7 +180,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
                       })
                     }}
                     tabIndex={-1}
-                    className="flex h-[92vh] max-h-[96vh] w-[96vw] !max-w-[96vw] flex-col overflow-hidden border bg-background p-0 shadow-2xl focus:outline-none"
+                    className="rounded-lg flex h-[92vh] max-h-[96vh] w-[96vw] !max-w-[96vw] flex-col overflow-hidden border bg-background p-0 shadow-2xl focus:outline-none"
                   >
                     {content}
                   </DialogContent>
