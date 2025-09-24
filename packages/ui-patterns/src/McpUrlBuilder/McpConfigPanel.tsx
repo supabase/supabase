@@ -20,6 +20,7 @@ export interface McpConfigPanelProps {
   theme?: 'light' | 'dark'
   className?: string
   isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
+  apiUrl: string | null
 }
 
 export function McpConfigPanel({
@@ -30,6 +31,7 @@ export function McpConfigPanel({
   className,
   theme = 'dark',
   isPlatform,
+  apiUrl,
 }: McpConfigPanelProps) {
   const [readonly, setReadonly] = useState(false)
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
@@ -43,8 +45,9 @@ export function McpConfigPanel({
   }, [selectedFeatures, supportedFeatures])
 
   const { clientConfig } = getMcpUrl({
-    baseUrl: getMcpBaseUrl(isPlatform),
     projectRef,
+    isPlatform,
+    apiUrl,
     readonly,
     features: selectedFeaturesSupported,
     selectedClient,

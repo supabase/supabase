@@ -19,6 +19,7 @@ import {
   PopoverTrigger_Shadcn_,
 } from 'ui'
 import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
+import { API_URL } from '~/lib/constants'
 import { useProjectsQuery } from '~/lib/fetch/projects'
 
 function ProjectSelector({
@@ -212,6 +213,7 @@ export function McpConfigPanel() {
         projectRef={project?.ref}
         theme={theme as 'light' | 'dark'}
         isPlatform={isPlatform}
+        apiUrl={API_URL}
       />
     </div>
   )

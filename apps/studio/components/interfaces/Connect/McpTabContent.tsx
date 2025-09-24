@@ -4,14 +4,15 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import { McpConfigPanel } from 'ui-patterns/McpUrlBuilder'
+import type { projectKeys } from './Connect.types'
 
-export const McpTabContent = () => {
+export const McpTabContent = ({ projectKeys }: { projectKeys: projectKeys }) => {
   const { ref: projectRef } = useParams()
 
   return (
     <Panel className="bg-inherit border-none shadow-none">
       {projectRef ? (
-        <McpTabContentInnerLoaded projectRef={projectRef} />
+        <McpTabContentInnerLoaded projectRef={projectRef} projectKeys={projectKeys} />
       ) : (
         <McpTabContentInnerLoading />
       )}
@@ -28,7 +29,13 @@ const McpTabContentInnerLoading = () => {
   )
 }
 
-const McpTabContentInnerLoaded = ({ projectRef }: { projectRef: string }) => {
+const McpTabContentInnerLoaded = ({
+  projectRef,
+  projectKeys,
+}: {
+  projectRef: string
+  projectKeys: projectKeys
+}) => {
   const { resolvedTheme } = useTheme()
 
   return (
@@ -37,6 +44,7 @@ const McpTabContentInnerLoaded = ({ projectRef }: { projectRef: string }) => {
       projectRef={projectRef}
       theme={resolvedTheme as 'light' | 'dark'}
       isPlatform={IS_PLATFORM}
+      apiUrl={projectKeys.apiUrl}
     />
   )
 }
