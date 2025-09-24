@@ -31,7 +31,14 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import {
+  Badge,
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ErroredTableDetails } from './ErroredTableDetails'
@@ -134,12 +141,44 @@ const formatLagDurationValue = (value?: number) => {
 const getFormattedLagValue = (type: 'bytes' | 'duration', value?: number) =>
   type === 'bytes' ? formatLagBytesValue(value) : formatLagDurationValue(value)
 
+const SlotLagMetricsInline = ({
+  tableName,
+  metrics,
+}: {
+  tableName: string
+  metrics: SlotLagMetrics
+}) => {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-foreground">
+      <span className="truncate font-medium" title={tableName}>
+        {tableName}
+      </span>
+      <span className="text-foreground-lighter">•</span>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-foreground-light">
+        {SLOT_LAG_FIELDS.map(({ key, label, type }) => {
+          const { display } = getFormattedLagValue(type, metrics[key])
+          return (
+            <span key={`${tableName}-${key}`} className="flex items-center gap-1">
+              <span className="uppercase tracking-wide text-[10px] text-foreground-lighter">
+                {label}
+              </span>
+              <span className="text-foreground">{display}</span>
+            </span>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 const SlotLagMetricsList = ({
   metrics,
   size = 'default',
+  showMetricInfo = true,
 }: {
   metrics: SlotLagMetrics
   size?: 'default' | 'compact'
+  showMetricInfo?: boolean
 }) => {
   const gridClasses =
     size === 'default'
@@ -163,20 +202,22 @@ const SlotLagMetricsList = ({
           <dt className={labelClasses}>
             <span className="inline-flex items-center gap-1">
               {label}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label={`What is ${label}`}
-                    className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
-                  >
-                    <Info size={12} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" align="start" className="max-w-xs text-xs">
-                  {description}
-                </TooltipContent>
-              </Tooltip>
+              {showMetricInfo && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label={`What is ${label}`}
+                      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                    >
+                      <Info size={12} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" align="start" className="max-w-xs text-xs">
+                    {description}
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </span>
           </dt>
           {(() => {
@@ -268,6 +309,7 @@ export const ReplicationPipelineStatus = () => {
       : tableStatuses.filter((table: TableState) =>
           table.table_name.toLowerCase().includes(filterString.toLowerCase())
         )
+  const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
 
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
@@ -426,37 +468,19 @@ export const ReplicationPipelineStatus = () => {
         )}
 
         {isStatusError && (
-          <div className="rounded-lg border border-warning-400 bg-warning-50 p-4">
-            <div className="flex items-start gap-3">
-              <div className="rounded-full bg-warning-200 p-2 text-warning-800">
-                <WifiOff size={16} />
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="space-y-1">
-                  <p className="font-medium text-warning-900">Live updates are paused</p>
-                  <p className="text-warning-800">
-                    We couldn’t refresh the replication status. We’ll keep trying automatically, but
-                    the numbers below may be out of date.
-                  </p>
-                  {statusError?.message && (
-                    <p className="text-xs text-warning-700">{statusError.message}</p>
-                  )}
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    type="default"
-                    size="tiny"
-                    onClick={onRetryStatusFetch}
-                    loading={isRetryingStatus}
-                  >
-                    Try again now
-                  </Button>
-                  <p className="text-xs text-warning-700">
-                    Last update: {lastStatusRefreshLabel}
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center gap-2 rounded-lg border border-warning-400 bg-warning-50 px-3 py-2 text-xs text-warning-800">
+            <WifiOff size={14} />
+            <span className="font-medium">Live updates paused</span>
+            <span className="text-warning-700">Last refresh {lastStatusRefreshLabel}</span>
+            <Button
+              type="default"
+              size="tiny"
+              onClick={onRetryStatusFetch}
+              loading={isRetryingStatus}
+              className="ml-auto"
+            >
+              Retry
+            </Button>
           </div>
         )}
 
@@ -495,7 +519,7 @@ export const ReplicationPipelineStatus = () => {
         )}
 
         {applyLagMetrics && (
-          <div className="border border-default rounded-lg bg-surface-100 p-4 space-y-4">
+          <div className="border border-default rounded-lg bg-surface-100 px-4 py-4 space-y-3">
             <div className="flex flex-wrap items-baseline justify-between gap-y-1">
               <div>
                 <h4 className="text-sm font-semibold text-foreground">Replication lag</h4>
@@ -511,11 +535,34 @@ export const ReplicationPipelineStatus = () => {
               </p>
             )}
             <SlotLagMetricsList metrics={applyLagMetrics} />
+            {tablesWithLag.length > 0 && (
+              <>
+                <div className="border-t border-default/40" />
+                <div className="space-y-2 text-xs text-foreground">
+                  <p className="pt-2 text-foreground-light">
+                    During initial sync, tables can copy and stream independently before reconciling with the overall pipeline.
+                  </p>
+                  <div className="space-y-2">
+                    {tablesWithLag.map((table) => (
+                      <div
+                        key={`${table.table_id}-${table.table_name}`}
+                        className="rounded border border-default/40 bg-surface-200/60 px-3 py-2"
+                      >
+                        <SlotLagMetricsInline
+                          tableName={table.table_name}
+                          metrics={table.table_sync_lag as SlotLagMetrics}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
         {hasTableData && (
-          <div className="flex flex-col gap-y-4">
+          <div className="flex flex-col gap-y-3">
             <div className="w-full overflow-hidden overflow-x-auto">
               {/* [Joshen] Should update to use new Table components next time */}
               <Table
@@ -577,35 +624,7 @@ export const ReplicationPipelineStatus = () => {
                               </p>
                             ) : (
                               <div className="space-y-3">
-                                <div className="flex items-start justify-between gap-2">
-                                  <div className="text-sm text-foreground flex-1 min-w-0">
-                                    {statusConfig.description}
-                                  </div>
-                                  {table.table_sync_lag && (
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <button
-                                          type="button"
-                                          aria-label="View lag details"
-                                          className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-surface-200 text-foreground transition-colors hover:bg-surface-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
-                                        >
-                                          <Info size={12} />
-                                        </button>
-                                      </TooltipTrigger>
-                                      <TooltipContent className="p-0" side="top" align="end">
-                                        <div className="w-64 space-y-3 rounded-md border border-default bg-surface-100 p-3">
-                                          <p className="text-[11px] font-medium text-foreground">
-                                            Individual table replication lag
-                                          </p>
-                                          <SlotLagMetricsList
-                                            metrics={table.table_sync_lag}
-                                            size="compact"
-                                          />
-                                        </div>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  )}
-                                </div>
+                                <div className="text-sm text-foreground">{statusConfig.description}</div>
                                 {table.state.name === 'error' && (
                                   <ErroredTableDetails
                                     state={table.state}
