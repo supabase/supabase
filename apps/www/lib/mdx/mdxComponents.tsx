@@ -19,6 +19,10 @@ import type { ImageProps } from 'ui/src/components/Image/Image'
 const Avatar = dynamic(() => import('~/components/Avatar'))
 const Chart = dynamic(() => import('~/components/Charts/PGCharts'))
 const CodeBlock = dynamic(() => import('~/components/CodeBlock/CodeBlock'))
+const CodeTabs = dynamic(
+  () => import('~/components/CodeBlock/CodeBlock').then((mod) => ({ default: mod.CodeTabs })),
+  { ssr: false }
+)
 const ImageFadeStack = dynamic(() => import('~/components/ImageFadeStack'))
 const ImageGrid = dynamic(() => import('~/components/ImageGrid'))
 const InlineCodeTag = dynamic(() => import('~/components/InlineCode'))
@@ -73,6 +77,9 @@ const BlogCollapsible = ({
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
+    CodeTabs: (props: any) => (
+      <CodeTabs {...props} {...(type === 'blog' ? { theme: 'code-hike' } : {})} />
+    ),
     CH,
     h1: (props: any) => <Heading {...props} tag="h1" />,
     h2: (props: any) => <Heading {...props} tag="h2" />,
