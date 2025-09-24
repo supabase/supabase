@@ -1,0 +1,22 @@
+accept = [403, 429]
+
+retry_wait = 3
+max_retries = 3
+timeout = 20
+
+exclude = [
+  "^file://",
+  # (auth-walled)
+  "^https://app\\.supabase\\.com/",
+  "^https://portal\\.azure\\.com/",
+  "^https://dashboard\\.clerk\\.com/",
+  "^https://dashboard\\.nexmo\\.com/",
+  "^https://marketplace\\.zoom\\.us/",
+]
+
+headers = [
+  "User-Agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari",
+]
+
+cache = true
+max_cache_age = "1d"
