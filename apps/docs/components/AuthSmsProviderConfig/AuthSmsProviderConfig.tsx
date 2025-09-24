@@ -8,6 +8,7 @@ import MessageBird from './MessageBirdConfig.mdx'
 import Twilio from './TwilioConfig.mdx'
 import Vonage from './VonageConfig.mdx'
 import TextLocal from './TextLocalConfig.mdx'
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 const reducer = (_, action: (typeof PhoneLoginsItems)[number] | undefined) => {
   const url = new URL(document.location.href)
@@ -16,7 +17,7 @@ const reducer = (_, action: (typeof PhoneLoginsItems)[number] | undefined) => {
   } else {
     url.searchParams.delete('showSmsProvider')
   }
-  window.history.replaceState(null, '', url)
+  safeHistoryReplaceState(url.toString())
   return action
 }
 
