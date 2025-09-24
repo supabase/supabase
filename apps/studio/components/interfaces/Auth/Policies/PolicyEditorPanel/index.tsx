@@ -374,6 +374,9 @@ export const PolicyEditorPanel = memo(function ({
                         <p className="font-mono tracking-tighter">
                           {showCheckBlock ? (
                             <>
+                              {supportWithCheck && showCheckBlock && (
+                                <span className="text-[#ffd700]">) </span>
+                              )}
                               <span className="text-[#569cd6]">with check</span>{' '}
                               <span className="text-[#ffd700]">(</span>
                             </>
