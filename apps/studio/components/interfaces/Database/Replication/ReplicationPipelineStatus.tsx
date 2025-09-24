@@ -512,10 +512,13 @@ export const ReplicationPipelineStatus = () => {
               <>
                 <div className="border-t border-default/40" />
                 <div className="space-y-3 text-xs text-foreground">
-                  <p className="pt-2 text-foreground-light">
-                    During initial sync, tables can copy and stream independently before reconciling
-                    with the overall pipeline.
-                  </p>
+                  <div className="flex items-start gap-2 rounded-md border border-default/50 bg-surface-200/60 px-3 py-2 text-foreground-light">
+                    <Info size={14} className="mt-0.5" />
+                    <span>
+                      During initial sync, tables can copy and stream independently before reconciling
+                      with the overall pipeline.
+                    </span>
+                  </div>
                   <div className="rounded border border-default/50 bg-surface-200/40">
                     <ul className="divide-y divide-default/40">
                       {tablesWithLag.map((table) => (
