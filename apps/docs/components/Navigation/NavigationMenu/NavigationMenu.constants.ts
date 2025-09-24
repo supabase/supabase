@@ -3168,6 +3168,13 @@ export const ui: NavMenuConstant = {
       ],
     },
     {
+      name: 'Blocks',
+      url: undefined,
+      items: [
+        { name: 'Client', url: '/guides/ui/blocks/client' }
+      ]
+    },
+    {
       name: 'Platform',
       url: undefined,
       items: [
