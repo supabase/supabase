@@ -1,9 +1,10 @@
 import { Code } from 'lucide-react'
 import Link from 'next/link'
-import { DragEvent, ReactNode } from 'react'
+import type { DragEvent, ReactNode } from 'react'
+// End of third-party imports
 
 import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { Button, cn, CodeBlock, CodeBlockLang } from 'ui'
+import { Button, CodeBlock, type CodeBlockLang, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 interface EdgeFunctionBlockProps {

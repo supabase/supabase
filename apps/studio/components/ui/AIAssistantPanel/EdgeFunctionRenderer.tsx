@@ -1,5 +1,6 @@
-import { PropsWithChildren, useMemo, useState } from 'react'
+import { type PropsWithChildren, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+// End of third-party imports
 
 import { useParams } from 'common'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -100,7 +101,10 @@ export const EdgeFunctionRenderer = ({
     sendEvent({
       action: 'edge_function_deploy_button_clicked',
       properties: { origin: 'functions_ai_assistant' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
 
     setShowReplaceWarning(false)
@@ -134,6 +138,7 @@ export const EdgeFunctionRenderer = ({
         onCancelReplace={() => setShowReplaceWarning(false)}
         onConfirmReplace={() => void performDeploy()}
         onDeploy={handleDeploy}
+        hideDeployButton={showConfirmFooter}
       />
       {showConfirmFooter && (
         <div className="mx-4">
