@@ -11,6 +11,8 @@ module.exports = config({
     './pages/**/*.{tsx,mdx}',
     './../../packages/ui/src/**/*.{tsx,ts,js}',
     './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
+    './../ui-library/components/**/*.{tsx,ts,js}',
+    './../ui-library/registry/**/*.{tsx,ts,js}',
   ],
   plugins: [
     function ({ addUtilities, addVariant }) {
