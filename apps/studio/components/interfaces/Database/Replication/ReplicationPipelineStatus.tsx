@@ -511,23 +511,22 @@ export const ReplicationPipelineStatus = () => {
             {tablesWithLag.length > 0 && (
               <>
                 <div className="border-t border-default/40" />
-                <div className="space-y-2 text-xs text-foreground">
+                <div className="space-y-3 text-xs text-foreground">
                   <p className="pt-2 text-foreground-light">
                     During initial sync, tables can copy and stream independently before reconciling
                     with the overall pipeline.
                   </p>
-                  <div className="space-y-2">
-                    {tablesWithLag.map((table) => (
-                      <div
-                        key={`${table.table_id}-${table.table_name}`}
-                        className="rounded border border-default/40 bg-surface-200/60 px-3 py-2"
-                      >
-                        <SlotLagMetricsInline
-                          tableName={table.table_name}
-                          metrics={table.table_sync_lag as SlotLagMetrics}
-                        />
-                      </div>
-                    ))}
+                  <div className="rounded border border-default/50 bg-surface-200/40">
+                    <ul className="divide-y divide-default/40">
+                      {tablesWithLag.map((table) => (
+                        <li key={`${table.table_id}-${table.table_name}`} className="px-3 py-2">
+                          <SlotLagMetricsInline
+                            tableName={table.table_name}
+                            metrics={table.table_sync_lag as SlotLagMetrics}
+                          />
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </>
