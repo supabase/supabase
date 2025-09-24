@@ -18,7 +18,7 @@
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "@react-oauth/google": "^0.12.2",
-    "@supabase/supabase-js": "2.71.2-canary.28",
+    "@supabase/supabase-js": "2.72.1-canary.2",
     "expo-apple-authentication": "~7.2.4",
     "expo-blur": "~14.1.5",
     "expo-constants": "~18.0.8",
