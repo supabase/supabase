@@ -33,7 +33,11 @@
   "database:replication": true,
   "database:roles": true,
 
-  "docs:auth": true,
+  "docs:auth_architecture": true,
+  "docs:auth_configuration": true,
+  "docs:auth_flows": true,
+  "docs:auth_full_security": true,
+  "docs:auth_troubleshooting": true,
   "docs:compliance": true,
   "docs:contribution": true,
   "docs:self-hosting": true,
@@ -41,6 +45,7 @@
   "docs:full_getting_started": true,
   "docs:full_platform": true,
   "docs:hide_cli_profiles": true,
+  "docs:local_development": true,
   "docs:mobile_tutorials": true,
   "docs:pgtap": true,
   "docs:production_checklist": true,
@@ -85,6 +90,7 @@
 
   "reports:all": true,
 
+  "sdk:auth": true,
   "sdk:csharp": true,
   "sdk:dart": true,
   "sdk:kotlin": true,
