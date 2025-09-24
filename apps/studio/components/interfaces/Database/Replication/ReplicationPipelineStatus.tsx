@@ -31,14 +31,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import {
-  Badge,
-  Button,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  cn,
-} from 'ui'
+import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ErroredTableDetails } from './ErroredTableDetails'
@@ -186,9 +179,7 @@ const SlotLagMetricsList = ({
       : 'grid-cols-2 gap-y-2 gap-x-4'
 
   const labelClasses =
-    size === 'default'
-      ? 'text-xs text-foreground-light'
-      : 'text-[11px] text-foreground-lighter'
+    size === 'default' ? 'text-xs text-foreground-light' : 'text-[11px] text-foreground-lighter'
 
   const valueClasses =
     size === 'default'
@@ -322,7 +313,6 @@ export const ReplicationPipelineStatus = () => {
     STATUS_REFRESH_FREQUENCY_MS >= 1000
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
       : `${STATUS_REFRESH_FREQUENCY_MS}ms`
-
 
   const logsUrl = `/project/${projectRef}/logs/etl-replication-logs${
     pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
@@ -508,7 +498,9 @@ export const ReplicationPipelineStatus = () => {
                   Snapshot of how far this pipeline is trailing behind right now.
                 </p>
               </div>
-              <p className="text-xs text-foreground-lighter">Updates every {refreshIntervalLabel}</p>
+              <p className="text-xs text-foreground-lighter">
+                Updates every {refreshIntervalLabel}
+              </p>
             </div>
             {isStatusError && (
               <p className="text-xs text-warning-700">
@@ -521,7 +513,8 @@ export const ReplicationPipelineStatus = () => {
                 <div className="border-t border-default/40" />
                 <div className="space-y-2 text-xs text-foreground">
                   <p className="pt-2 text-foreground-light">
-                    During initial sync, tables can copy and stream independently before reconciling with the overall pipeline.
+                    During initial sync, tables can copy and stream independently before reconciling
+                    with the overall pipeline.
                   </p>
                   <div className="space-y-2">
                     {tablesWithLag.map((table) => (
@@ -605,7 +598,9 @@ export const ReplicationPipelineStatus = () => {
                               </p>
                             ) : (
                               <div className="space-y-3">
-                                <div className="text-sm text-foreground">{statusConfig.description}</div>
+                                <div className="text-sm text-foreground">
+                                  {statusConfig.description}
+                                </div>
                                 {table.state.name === 'error' && (
                                   <ErroredTableDetails
                                     state={table.state}
