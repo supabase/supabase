@@ -32,6 +32,8 @@ interface FileExplorerAndEditorProps {
   }
 }
 
+const denoJsonDefaultContent = JSON.stringify({ imports: {} }, null, '\t')
+
 const getLanguageFromFileName = (fileName: string): string => {
   const extension = fileName.split('.').pop()?.toLowerCase()
   switch (extension) {
@@ -99,7 +101,15 @@ const FileExplorerAndEditor = ({
 
   const handleFileNameChange = (id: number, newName: string) => {
     if (!newName.trim()) return // Don't allow empty names
-    const updatedFiles = files.map((file) => (file.id === id ? { ...file, name: newName } : file))
+    const updatedFiles = files.map((file) =>
+      file.id === id
+        ? {
+            ...file,
+            name: newName,
+            content: newName === 'deno.json' && file.content === '' ? denoJsonDefaultContent : '',
+          }
+        : file
+    )
     onFilesChange(updatedFiles)
   }
 
