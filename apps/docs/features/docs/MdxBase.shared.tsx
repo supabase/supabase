@@ -30,6 +30,9 @@ import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ErrorCodes } from '../ui/ErrorCodes'
 
+import { RegistryBlock } from 'ui-library/components/registry-block';
+
+
 const components = {
   Accordion,
   AccordionItem,
@@ -82,6 +85,8 @@ const components = {
   ),
   pre: CodeBlock,
   Price,
+  // UI Library
+  RegistryBlock,
 }
 
 export { components }
