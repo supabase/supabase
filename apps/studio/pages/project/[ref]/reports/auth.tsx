@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -24,6 +24,15 @@ import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
 import { useRouter } from 'next/router'
+import {
+  ReportsNumericFilter,
+  numericFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { useQueryState, parseAsJson } from 'nuqs'
+import {
+  ReportModeSelector,
+  useReportModeState,
+} from 'components/interfaces/Reports/v2/ReportModeSelector'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -76,12 +85,19 @@ const AuthUsage = () => {
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
+  const [statusCodeFilter, setStatusCodeFilter] = useQueryState(
+    'status_code',
+    parseAsJson(numericFilterSchema.parse)
+  )
+
+  const { value: modeFilter, setValue: setModeFilter } = useReportModeState()
+
   const authReportConfig = createAuthReportConfig({
     projectRef: ref || '',
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
-    filters: { status_code: null },
+    filters: { status_code: statusCodeFilter },
   })
 
   const onRefreshReport = async () => {
@@ -121,17 +137,17 @@ const AuthUsage = () => {
       <ReportHeader title="Auth" showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <>
-            <ButtonTooltip
-              type="default"
-              disabled={isRefreshing}
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
-            <ReportSettings chartId={chartSyncId} />
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <ButtonTooltip
+                type="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+                onClick={onRefreshReport}
+              />
+              <ReportSettings chartId={chartSyncId} />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -158,46 +174,71 @@ const AuthUsage = () => {
                 </div>
               )}
             </div>
-          </>
+            <div className="w-full flex items-center gap-2 flex-wrap">
+              <ReportModeSelector value={modeFilter} onChange={setModeFilter} />
+              <ReportsNumericFilter
+                label="Status Code"
+                value={statusCodeFilter}
+                onChange={setStatusCodeFilter}
+                defaultOperator="="
+                isLoading={isRefreshing}
+              />
+            </div>
+          </div>
         }
       >
-        {authReportConfig.map((metric, i) => (
-          <ReportChartV2
-            key={`${metric.id}`}
-            report={metric}
-            projectRef={ref!}
-            interval={selectedDateRange.interval}
-            startDate={selectedDateRange?.period_start?.date}
-            endDate={selectedDateRange?.period_end?.date}
-            updateDateRange={updateDateRange}
-            syncId={chartSyncId}
-            filters={{
-              status_code: null,
-            }}
-            highlightActions={highlightActions}
-          />
-        ))}
-        <div>
-          <div className="mb-4">
-            <h5 className="text-foreground mb-2">Auth API Gateway</h5>
-            <ReportFilterBar
-              filters={filters}
-              onAddFilter={addFilter}
-              onRemoveFilters={removeFilters}
-              isLoading={isLoadingData || isRefetching}
-              hideDatepicker={true}
-              datepickerHelpers={datePickerHelpers}
-              selectedProduct={'auth'}
-              showDatabaseSelector={false}
+        <div className="mt-8 flex flex-col gap-4 pb-24">
+          {(() => {
+            const metrics = Array.isArray(authReportConfig) ? authReportConfig : []
+            if (modeFilter === 'debug') {
+              return metrics.filter((m) => m.id.includes('error'))
+            }
+            if (modeFilter === 'usage') {
+              const usageIds = new Set([
+                'active-user',
+                'sign-in-attempts',
+                'signups',
+                'password-reset-requests',
+              ])
+              return metrics.filter((m) => usageIds.has(m.id))
+            }
+            return metrics
+          })().map((metric, i) => (
+            <ReportChartV2
+              key={`${metric.id}`}
+              report={metric}
+              projectRef={ref!}
+              interval={selectedDateRange.interval}
+              startDate={selectedDateRange?.period_start?.date}
+              endDate={selectedDateRange?.period_end?.date}
+              updateDateRange={updateDateRange}
+              syncId={chartSyncId}
+              filters={{ status_code: statusCodeFilter }}
+              highlightActions={highlightActions}
+            />
+          ))}
+          <div>
+            <div className="mb-4">
+              <h5 className="text-foreground mb-2">Auth API Gateway</h5>
+              <ReportFilterBar
+                filters={filters}
+                onAddFilter={addFilter}
+                onRemoveFilters={removeFilters}
+                isLoading={isLoadingData || isRefetching}
+                hideDatepicker={true}
+                datepickerHelpers={datePickerHelpers}
+                selectedProduct={'auth'}
+                showDatabaseSelector={false}
+              />
+            </div>
+            <SharedAPIReport
+              data={data}
+              error={error}
+              isLoading={isLoading}
+              isRefetching={isRefetching}
+              sql={sql}
             />
           </div>
-          <SharedAPIReport
-            data={data}
-            error={error}
-            isLoading={isLoading}
-            isRefetching={isRefetching}
-            sql={sql}
-          />
         </div>
       </ReportStickyNav>
     </>

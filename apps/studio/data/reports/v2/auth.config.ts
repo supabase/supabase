@@ -5,6 +5,13 @@ import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
 import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { fetchLogs } from 'data/reports/report.utils'
 import z from 'zod'
+import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
+import {
+  extractStatusCodesFromData,
+  generateStatusCodeAttributes,
+  transformStatusCodeData,
+} from 'components/interfaces/Reports/Reports.utils'
+import { AUTH_ERROR_CODES } from 'pages/project/[ref]/reports/auth.utils'
 
 const METRIC_KEYS = [
   'ActiveUsers',
@@ -14,6 +21,7 @@ const METRIC_KEYS = [
   'SignInLatency',
   'SignUpLatency',
   'ErrorsByStatus',
+  'ErrorsByAuthCode',
 ]
 
 type MetricKey = (typeof METRIC_KEYS)[number]
@@ -22,7 +30,7 @@ const AUTH_REPORT_SQL: Record<
   MetricKey,
   (interval: AnalyticsInterval, filters?: AuthReportFilters) => string
 > = {
-  ActiveUsers: (interval) => {
+  ActiveUsers: (interval, _filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
         --active-users
@@ -38,7 +46,7 @@ const AUTH_REPORT_SQL: Record<
         order by timestamp desc
       `
   },
-  SignInAttempts: (interval) => {
+  SignInAttempts: (interval, _filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
         --sign-in-attempts
@@ -67,7 +75,7 @@ const AUTH_REPORT_SQL: Record<
           timestamp desc, login_type_provider
       `
   },
-  PasswordResetRequests: (interval) => {
+  PasswordResetRequests: (interval, _filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
         --password-reset-requests
@@ -80,7 +88,7 @@ const AUTH_REPORT_SQL: Record<
         order by timestamp desc
       `
   },
-  TotalSignUps: (interval) => {
+  TotalSignUps: (interval, _filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
         --total-signups
@@ -93,7 +101,7 @@ const AUTH_REPORT_SQL: Record<
         order by timestamp desc
       `
   },
-  SignInLatency: (interval) => {
+  SignInLatency: (interval, _filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
         --signin-latency
@@ -112,7 +120,7 @@ const AUTH_REPORT_SQL: Record<
         order by timestamp desc
       `
   },
-  SignUpLatency: (interval) => {
+  SignUpLatency: (interval, _filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
         --signup-latency
@@ -131,8 +139,9 @@ const AUTH_REPORT_SQL: Record<
         order by timestamp desc
       `
   },
-  ErrorsByStatus: (interval) => {
+  ErrorsByStatus: (interval, filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
+    const whereClause = edgeLogsFilterToWhereClause(filters)
     return `
         --auth-errors-by-status
   select 
@@ -143,9 +152,32 @@ const AUTH_REPORT_SQL: Record<
     cross join unnest(metadata) as m
     cross join unnest(m.request) as request
     cross join unnest(m.response) as response
+    cross join unnest(response.headers) as h
   where path like '%auth/v1%'
     and response.status_code >= 400 and response.status_code <= 599
+    ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
   group by timestamp, status_code
+  order by timestamp desc
+      `
+  },
+  ErrorsByAuthCode: (interval, filters) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    const whereClause = edgeLogsFilterToWhereClause(filters)
+    return `
+        --auth-errors-by-code
+  select 
+    timestamp_trunc(timestamp, ${granularity}) as timestamp,
+    count(*) as count,
+    h.x_sb_error_code as error_code
+  from edge_logs
+    cross join unnest(metadata) as m
+    cross join unnest(m.request) as request
+    cross join unnest(m.response) as response
+    cross join unnest(response.headers) as h
+  where path like '%auth/v1%'
+    and response.status_code >= 400 and response.status_code <= 599
+    ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
+  group by timestamp, error_code
   order by timestamp desc
       `
   },
@@ -156,9 +188,114 @@ type AuthReportFilters = {
 }
 
 function filterToWhereClause(filters?: AuthReportFilters): string {
-  if (!filters) return ''
-  return ``
+  const whereClauses: string[] = []
+
+  if (filters?.status_code) {
+    whereClauses.push(
+      `response.status_code ${filters.status_code.operator} ${filters.status_code.value}`
+    )
+  }
+
+  return whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
 }
+
+function edgeLogsFilterToWhereClause(filters?: AuthReportFilters): string {
+  const whereClauses: string[] = []
+
+  if (filters?.status_code) {
+    whereClauses.push(
+      `response.status_code ${filters.status_code.operator} ${filters.status_code.value}`
+    )
+  }
+
+  return whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
+}
+
+export const AUTH_ERROR_CODE_VALUES: string[] = [
+  'anonymous_provider_disabled',
+  'bad_code_verifier',
+  'bad_json',
+  'bad_jwt',
+  'bad_oauth_callback',
+  'bad_oauth_state',
+  'captcha_failed',
+  'conflict',
+  'email_address_invalid',
+  'email_address_not_authorized',
+  'email_conflict_identity_not_deletable',
+  'email_exists',
+  'email_not_confirmed',
+  'email_provider_disabled',
+  'flow_state_expired',
+  'flow_state_not_found',
+  'hook_payload_invalid_content_type',
+  'hook_payload_over_size_limit',
+  'hook_timeout',
+  'hook_timeout_after_retry',
+  'identity_already_exists',
+  'identity_not_found',
+  'insufficient_aal',
+  'invalid_credentials',
+  'invite_not_found',
+  'manual_linking_disabled',
+  'mfa_challenge_expired',
+  'mfa_factor_name_conflict',
+  'mfa_factor_not_found',
+  'mfa_ip_address_mismatch',
+  'mfa_phone_enroll_not_enabled',
+  'mfa_phone_verify_not_enabled',
+  'mfa_totp_enroll_not_enabled',
+  'mfa_totp_verify_not_enabled',
+  'mfa_verification_failed',
+  'mfa_verification_rejected',
+  'mfa_verified_factor_exists',
+  'mfa_web_authn_enroll_not_enabled',
+  'mfa_web_authn_verify_not_enabled',
+  'no_authorization',
+  'not_admin',
+  'oauth_provider_not_supported',
+  'otp_disabled',
+  'otp_expired',
+  'over_email_send_rate_limit',
+  'over_request_rate_limit',
+  'over_sms_send_rate_limit',
+  'phone_exists',
+  'phone_not_confirmed',
+  'phone_provider_disabled',
+  'provider_disabled',
+  'provider_email_needs_verification',
+  'reauthentication_needed',
+  'reauthentication_not_valid',
+  'refresh_token_already_used',
+  'refresh_token_not_found',
+  'request_timeout',
+  'same_password',
+  'saml_assertion_no_email',
+  'saml_assertion_no_user_id',
+  'saml_entity_id_mismatch',
+  'saml_idp_already_exists',
+  'saml_idp_not_found',
+  'saml_metadata_fetch_failed',
+  'saml_provider_disabled',
+  'saml_relay_state_expired',
+  'saml_relay_state_not_found',
+  'session_expired',
+  'session_not_found',
+  'signup_disabled',
+  'single_identity_not_deletable',
+  'sms_send_failed',
+  'sso_domain_already_exists',
+  'sso_provider_not_found',
+  'too_many_enrolled_mfa_factors',
+  'unexpected_audience',
+  'unexpected_failure',
+  'user_already_exists',
+  'user_banned',
+  'user_not_found',
+  'user_sso_managed',
+  'validation_failed',
+  'weak_password',
+]
 
 /**
  * Transforms raw analytics data into a chart-ready format by ensuring data consistency and completeness.
@@ -356,26 +493,67 @@ export const createAuthReportConfig = ({
     valuePrecision: 0,
     hide: false,
     showTooltip: true,
-    showLegend: false,
+    showLegend: true,
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of auth errors by status code from the API Gateway.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async () => {
-      const attributes = [
-        {
-          attribute: 'ErrorsByStatus',
-          provider: 'logs',
-          label: 'Auth Errors',
-        },
-      ]
-
       const sql = AUTH_REPORT_SQL.ErrorsByStatus(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-      const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
-      return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
+      if (!rawData?.result) return { data: [] }
+
+      const statusCodes = extractStatusCodesFromData(rawData.result)
+      const attributes = generateStatusCodeAttributes(statusCodes)
+      const data = transformStatusCodeData(rawData.result, statusCodes)
+
+      return { data, attributes, query: sql }
+    },
+  },
+  {
+    id: 'auth-errors-by-code',
+    label: 'Auth Errors by Code',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'line',
+    titleTooltip:
+      'The total number of auth errors by Supabase Auth error code from the API Gateway.',
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    dataProvider: async () => {
+      const sql = AUTH_REPORT_SQL.ErrorsByAuthCode(interval, filters)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+
+      if (!rawData?.result) return { data: [] }
+
+      const categories = rawData.result
+        .map((r: any) => r.error_code)
+        .filter((v: any) => v !== null && v !== undefined)
+      const distinct = Array.from(new Set(categories)).sort()
+
+      const attributes = distinct.map((c: string) => ({
+        attribute: c,
+        label: c,
+        tooltip: AUTH_ERROR_CODES.find((e) => e.key === c)?.description,
+      }))
+
+      const data = rawData.result.map((point: any) => ({
+        ...point,
+        timestamp: point.timestamp,
+      }))
+
+      // Reuse the status-code pivot util by category name
+      const { transformCategoricalCountData } = await import(
+        'components/interfaces/Reports/Reports.utils'
+      )
+      const pivoted = transformCategoricalCountData(rawData.result, 'error_code', distinct)
+
+      return { data: pivoted, attributes, query: sql }
     },
   },
   {
