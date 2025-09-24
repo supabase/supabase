@@ -64,14 +64,14 @@ const SLOT_LAG_FIELDS: {
 }[] = [
   {
     key: 'confirmed_flush_lsn_bytes',
-    label: 'WAL Flush lag',
+    label: 'WAL Flush lag (size)',
     type: 'bytes',
     description:
       'Bytes between the newest WAL record applied locally and the latest flushed WAL record acknowledged by ETL.',
   },
   {
     key: 'flush_lag',
-    label: 'Flush lag',
+    label: 'WAL Flush lag (time)',
     type: 'duration',
     description:
       'Time between flushing recent WAL locally and receiving notification that ETL has written and flushed it.',
