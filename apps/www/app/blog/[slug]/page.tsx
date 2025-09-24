@@ -39,11 +39,7 @@ async function getCMSPostFromAPI(
     const response = await fetch(url.toString(), fetchOptions)
 
     if (!response.ok) {
-      console.warn(
-        `[getCMSPostFromAPI] Non-OK response for ${slug}:`,
-        response.status,
-        response.statusText
-      )
+      console.warn('[getCMSPostFromAPI] Non-OK response:', response.status)
       return null
     }
 
@@ -51,7 +47,7 @@ async function getCMSPostFromAPI(
 
     return data.success ? data.post : null
   } catch (error) {
-    console.warn(`[getCMSPostFromAPI] Error fetching ${slug}:`, error)
+    console.warn('[getCMSPostFromAPI] Error:', error)
     return null
   }
 }
@@ -121,19 +117,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   // Try to fetch CMS post for metadata
-  let cmsPost = null
-  try {
-    cmsPost = await getCMSPostFromAPI(slug, 'preview', isDraft)
-  } catch (error) {
-    console.warn(`Failed to fetch CMS post metadata for ${slug}:`, error)
-  }
+  let cmsPost = await getCMSPostFromAPI(slug, 'preview', isDraft)
 
   if (!cmsPost) {
-    try {
-      cmsPost = await getCMSPostBySlug(slug, isDraft)
-    } catch (error) {
-      console.warn(`Failed to fetch CMS post by slug for ${slug}:`, error)
-    }
+    cmsPost = await getCMSPostBySlug(slug, isDraft)
   }
 
   if (!cmsPost) {
@@ -205,7 +192,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   const matter = (await import('gray-matter')).default
   const { mdxSerialize } = await import('lib/mdx/mdxSerialize')
 
-  // First, try to get static markdown post
   try {
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
@@ -252,49 +238,25 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     }
 
     return <BlogPostClient {...props} />
-  } catch (error) {
-    console.warn(`[Static MDX] Static blog post ${slug} not found or failed to process:`, error)
-    // Fall through to try CMS post
-  }
+  } catch {}
 
   // Try to fetch CMS post using our new unified API first
-  let cmsPost = null
-  try {
-    cmsPost = await getCMSPostFromAPI(slug, 'full', isDraft)
-  } catch (error) {
-    console.warn(`Failed to fetch CMS post for ${slug}:`, error)
-  }
+  let cmsPost = await getCMSPostFromAPI(slug, 'full', isDraft)
 
   // Fallback to the original method if the API doesn't return the post
   if (!cmsPost) {
-    try {
-      cmsPost = await getCMSPostBySlug(slug, isDraft)
-    } catch (error) {
-      console.warn(`Failed to fetch CMS post by slug for ${slug}:`, error)
-    }
+    cmsPost = await getCMSPostBySlug(slug, isDraft)
   }
 
   if (!cmsPost) {
     if (isDraft) {
       // Try to fetch published version for draft mode
-      let publishedPost = null
-      try {
-        publishedPost = await getCMSPostFromAPI(slug, 'full', false)
-      } catch (error) {
-        console.warn(`Failed to fetch published CMS post for ${slug}:`, error)
+      let publishedPost = await getCMSPostFromAPI(slug, 'full', false)
+      if (!publishedPost) {
+        publishedPost = await getCMSPostBySlug(slug, false)
       }
 
-      if (!publishedPost) {
-        try {
-          publishedPost = await getCMSPostBySlug(slug, false)
-        } catch (error) {
-          console.warn(`Failed to fetch published CMS post by slug for ${slug}:`, error)
-        }
-      }
-
-      if (!publishedPost) {
-        throw new Error(`Blog post with slug "${slug}" not found in static files or CMS`)
-      }
+      if (!publishedPost) return null
 
       const mdxSource = await mdxSerialize(publishedPost.content || '', {
         tocDepth: publishedPost.toc_depth || 3,
@@ -322,8 +284,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       }
       return <BlogPostClient {...props} />
     }
-    // Not found and not in draft mode
-    throw new Error(`Blog post with slug "${slug}" not found in static files or CMS`)
+    return null
   }
 
   const tocDepth = cmsPost.toc_depth || 3
@@ -334,7 +295,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   try {
     processedContent = await processCMSContent(cmsPost.richContent || cmsPost.content, tocDepth)
   } catch (error) {
-    console.error('Error processing CMS content, falling back to legacy processing:', error)
+    console.warn('Error processing CMS content, falling back to legacy processing:', error)
     // Fallback to legacy processing
     const mdxSource = await mdxSerialize(cmsPost.content || '', { tocDepth })
     processedContent = {
