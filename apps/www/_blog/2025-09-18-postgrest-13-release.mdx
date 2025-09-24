@@ -43,33 +43,24 @@ For example, if you have database similar to IMDB and you’d like to represent 
 
 You can now do it this way:
 
-<CodeTabs
-  defaultTab="js"
-  tabs={[
-    {
-      id: 'js',
-      label: 'JavaScript',
-      lang: 'js',
-      content: `const { data, error } = await supabase.from('titles').select(${'`
-          title:primary_title,
-          ...people(actors:primary_name),
-          ...genres(genres:name)
-        `'})
-      `,
-      showLineNumbers: true,
-    },
-    {
-      id: 'bash',
-      label: 'cUrl',
-      lang: 'bash',
-      content: `curl 'https://your-project.supabase.co/rest/v1/titles'
+<$CodeTabs>
+
+```js name=JavaScript
+const { data, error } = await supabase.from('titles').select(${'`
+  title:primary_title,
+  ...people(actors:primary_name),
+  ...genres(genres:name)
+`'})
+```
+
+```bash name=Bash
+curl 'https://your-project.supabase.co/rest/v1/titles'
   -d "select=title:primary_title,...people(actors:primary_name),...genres(genres:name)"
   -H "apikey: YOUR_ANON_KEY"
-  -H "Authorization: Bearer YOUR_ANON_KEY",
-      showLineNumbers: true,
-    },
-  ]}
-/>
+  -H "Authorization: Bearer YOUR_ANON_KEY"
+```
+
+</$CodeTabs>
 
 The above `...people` is “spreading” the many-to-many relationship between `titles` and `people`, forming a flat array only consisting of the `primary_name` column. This flat array is then renamed to `actors`. We do a similar process for `genres` , which also forms a many-to-many relationship with `people`.
 

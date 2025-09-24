@@ -39,7 +39,11 @@ async function getCMSPostFromAPI(
     const response = await fetch(url.toString(), fetchOptions)
 
     if (!response.ok) {
-      console.error('[getCMSPostFromAPI] Non-OK response:', response.status)
+      console.warn(
+        `[getCMSPostFromAPI] Non-OK response for ${slug}:`,
+        response.status,
+        response.statusText
+      )
       return null
     }
 
@@ -47,7 +51,7 @@ async function getCMSPostFromAPI(
 
     return data.success ? data.post : null
   } catch (error) {
-    console.error('[getCMSPostFromAPI] Error:', error)
+    console.warn(`[getCMSPostFromAPI] Error fetching ${slug}:`, error)
     return null
   }
 }
@@ -117,10 +121,19 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   // Try to fetch CMS post for metadata
-  let cmsPost = await getCMSPostFromAPI(slug, 'preview', isDraft)
+  let cmsPost = null
+  try {
+    cmsPost = await getCMSPostFromAPI(slug, 'preview', isDraft)
+  } catch (error) {
+    console.warn(`Failed to fetch CMS post metadata for ${slug}:`, error)
+  }
 
   if (!cmsPost) {
-    cmsPost = await getCMSPostBySlug(slug, isDraft)
+    try {
+      cmsPost = await getCMSPostBySlug(slug, isDraft)
+    } catch (error) {
+      console.warn(`Failed to fetch CMS post by slug for ${slug}:`, error)
+    }
   }
 
   if (!cmsPost) {
@@ -192,6 +205,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   const matter = (await import('gray-matter')).default
   const { mdxSerialize } = await import('lib/mdx/mdxSerialize')
 
+  // First, try to get static markdown post
   try {
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
@@ -238,25 +252,49 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     }
 
     return <BlogPostClient {...props} />
-  } catch {}
+  } catch (error) {
+    console.warn(`[Static MDX] Static blog post ${slug} not found or failed to process:`, error)
+    // Fall through to try CMS post
+  }
 
   // Try to fetch CMS post using our new unified API first
-  let cmsPost = await getCMSPostFromAPI(slug, 'full', isDraft)
+  let cmsPost = null
+  try {
+    cmsPost = await getCMSPostFromAPI(slug, 'full', isDraft)
+  } catch (error) {
+    console.warn(`Failed to fetch CMS post for ${slug}:`, error)
+  }
 
   // Fallback to the original method if the API doesn't return the post
   if (!cmsPost) {
-    cmsPost = await getCMSPostBySlug(slug, isDraft)
+    try {
+      cmsPost = await getCMSPostBySlug(slug, isDraft)
+    } catch (error) {
+      console.warn(`Failed to fetch CMS post by slug for ${slug}:`, error)
+    }
   }
 
   if (!cmsPost) {
     if (isDraft) {
       // Try to fetch published version for draft mode
-      let publishedPost = await getCMSPostFromAPI(slug, 'full', false)
-      if (!publishedPost) {
-        publishedPost = await getCMSPostBySlug(slug, false)
+      let publishedPost = null
+      try {
+        publishedPost = await getCMSPostFromAPI(slug, 'full', false)
+      } catch (error) {
+        console.warn(`Failed to fetch published CMS post for ${slug}:`, error)
       }
 
-      if (!publishedPost) return null
+      if (!publishedPost) {
+        try {
+          publishedPost = await getCMSPostBySlug(slug, false)
+        } catch (error) {
+          console.warn(`Failed to fetch published CMS post by slug for ${slug}:`, error)
+        }
+      }
+
+      if (!publishedPost) {
+        throw new Error(`Blog post with slug "${slug}" not found in static files or CMS`)
+      }
 
       const mdxSource = await mdxSerialize(publishedPost.content || '', {
         tocDepth: publishedPost.toc_depth || 3,
@@ -284,7 +322,8 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       }
       return <BlogPostClient {...props} />
     }
-    return null
+    // Not found and not in draft mode
+    throw new Error(`Blog post with slug "${slug}" not found in static files or CMS`)
   }
 
   const tocDepth = cmsPost.toc_depth || 3

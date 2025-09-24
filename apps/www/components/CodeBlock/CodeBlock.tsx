@@ -12,27 +12,10 @@ import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
-import {
-  Button,
-  cn,
-  Tabs_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  TabsContent_Shadcn_,
-} from 'ui'
+import { Button, cn } from 'ui'
 import monokaiCustomTheme, { codeHikeTheme } from './CodeBlock.utils'
 
 export type LANG = 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin' | 'yaml' | 'json'
-
-export interface CodeTab {
-  id: string
-  label: string
-  lang: LANG
-  content: string
-  filename?: string
-  showLineNumbers?: boolean
-  hideCopy?: boolean
-}
 
 export interface CodeBlockProps {
   lang: LANG
@@ -47,17 +30,9 @@ export interface CodeBlockProps {
   theme?: 'monokai' | 'code-hike'
 }
 
-export interface CodeTabsProps {
-  tabs: CodeTab[]
-  defaultTab?: string
-  className?: string
-  size?: 'small' | 'medium' | 'large'
-  theme?: 'monokai' | 'code-hike'
-}
-
 function CodeBlock(props: CodeBlockProps) {
   const { resolvedTheme } = useTheme()
-  const isDarkTheme = resolvedTheme?.includes('dark')!
+  const isDarkTheme = resolvedTheme?.includes('dark') ?? false
   const [copied, setCopied] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -204,82 +179,4 @@ function CodeBlock(props: CodeBlockProps) {
   )
 }
 
-/**
- * CodeTabs component for displaying multiple code snippets in tabs
- * Uses CodeHike theme by default for consistent styling with MDX content
- *
- * @example
- * ```tsx
- * const tabs = [
- *   {
- *     id: 'js',
- *     label: 'JavaScript',
- *     lang: 'js',
- *     content: 'console.log("Hello World")',
- *     filename: 'index.js'
- *   },
- *   {
- *     id: 'py',
- *     label: 'Python',
- *     lang: 'py',
- *     content: 'print("Hello World")',
- *     filename: 'main.py'
- *   }
- * ]
- *
- * // With CodeHike theme (default)
- * <CodeTabs tabs={tabs} defaultTab="js" />
- *
- * // With Monokai theme
- * <CodeTabs tabs={tabs} defaultTab="js" theme="monokai" />
- * ```
- */
-function CodeTabs({
-  tabs,
-  defaultTab,
-  className,
-  size = 'medium',
-  theme = 'code-hike',
-}: CodeTabsProps) {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
-
-  if (tabs.length === 0) return null
-
-  const activeTab = defaultTab || tabs[0]?.id
-
-  return (
-    <div className={cn('not-prose', className)}>
-      <Tabs_Shadcn_ defaultValue={activeTab} className="w-full flex flex-col gap-4">
-        <TabsList_Shadcn_ className="shiki-wrapper flex">
-          {tabs.map((tab) => (
-            <TabsTrigger_Shadcn_ key={tab.id} value={tab.id} className="text-xs px-2.5">
-              {tab.label}
-            </TabsTrigger_Shadcn_>
-          ))}
-        </TabsList_Shadcn_>
-        {tabs.map((tab) => (
-          <TabsContent_Shadcn_ key={tab.id} value={tab.id} className="mt-0">
-            <CodeBlock
-              lang={tab.lang}
-              children={tab.content}
-              filename={tab.filename}
-              showLineNumbers={tab.showLineNumbers}
-              hideCopy={tab.hideCopy}
-              size={size}
-              theme={theme}
-            />
-          </TabsContent_Shadcn_>
-        ))}
-      </Tabs_Shadcn_>
-    </div>
-  )
-}
-
 export default CodeBlock
-export { CodeTabs }
