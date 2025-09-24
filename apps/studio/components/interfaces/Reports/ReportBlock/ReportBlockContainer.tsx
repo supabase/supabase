@@ -54,7 +54,12 @@ export const ReportBlockContainer = ({
             ) : (
               <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <div className="flex items-center gap-2 flex-1">
+            <div
+              className={cn(
+                'flex items-center gap-2 flex-1 transition-opacity',
+                showDragHandle && 'group-hover:opacity-25'
+              )}
+            >
               <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>
