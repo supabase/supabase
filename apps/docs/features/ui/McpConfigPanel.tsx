@@ -121,7 +121,7 @@ function PlatformSelector({
 
   const platforms = [
     { value: 'hosted', label: 'Hosted' },
-    { value: 'local', label: 'Local' },
+    { value: 'local', label: 'CLI or Self-hosted' },
   ]
 
   return (
@@ -198,12 +198,13 @@ export function McpConfigPanel() {
           onPlatformSelect={setSelectedPlatform}
         />
         {isPlatform && (
-          <ProjectSelector selectedProject={selectedProject} onProjectSelect={setSelectedProject} />
+          <ProjectSelector selectedProject={project} onProjectSelect={setSelectedProject} />
         )}
       </div>
       <p className="text-xs text-foreground-lighter">
-        Scope the MCP server to a project and platform. If no project is selected, all projects will
-        be accessible. Platform selection determines available features.
+        {isPlatform
+          ? 'Scope the MCP server to a project. If no project is selected, all projects will be accessible.'
+          : 'Project selection is only available for hosted platform.'}
       </p>
       <McpConfigPanelBase
         basePath="/docs"
