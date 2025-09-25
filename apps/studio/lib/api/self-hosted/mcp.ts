@@ -1,7 +1,9 @@
 import {
   ApplyMigrationOptions,
   DatabaseOperations,
+  DevelopmentOperations,
   ExecuteSqlOptions,
+  GenerateTypescriptTypesResult,
 } from '@supabase/mcp-server-supabase/platform'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
@@ -40,6 +42,20 @@ export function getDatabaseOperations({
       if (error) {
         throw error
       }
+    },
+  }
+}
+
+export function getDevelopmentOperations(): DevelopmentOperations {
+  return {
+    getProjectUrl: function (_projectRef) {
+      throw new Error('Function not implemented.')
+    },
+    getAnonKey: function (_projectRef) {
+      throw new Error('Function not implemented.')
+    },
+    generateTypescriptTypes: function (_projectRef) {
+      throw new Error('Function not implemented.')
     },
   }
 }
