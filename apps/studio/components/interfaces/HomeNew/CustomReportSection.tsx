@@ -80,13 +80,7 @@ export function CustomReportSection() {
       if (!ref || !homeReport) return
       upsertContent({
         projectRef: ref,
-        payload: {
-          ...homeReport,
-          content: updated,
-          // [Joshen Clean Up] Temp API type fix - content.controller returns favorite as boolean | null | undefined
-          // But upsert content controller expectes favorite as boolean | undefined
-          favorite: homeReport.favorite === null ? undefined : homeReport.favorite,
-        },
+        payload: { ...homeReport, content: updated },
       })
     },
     [homeReport, ref, upsertContent]

@@ -236,9 +236,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         payload: {
           ...query,
           content: { ...(query.content as LogSqlSnippets.Content), sql: editorValue },
-          // [Joshen Clean Up] Temp API type fix - content.controller returns favorite as boolean | null | undefined
-          // But upsert content controller expectes favorite as boolean | undefined
-          favorite: query.favorite === null ? undefined : query.favorite,
         },
       })
 

@@ -52,9 +52,6 @@ export const ShareSnippetModal = ({
           visibility: 'project',
           folder_id: null,
           content: snippetContent,
-          // [Joshen Clean Up] Temp API type fix - content.controller returns favorite as boolean | null | undefined
-          // But upsert content controller expectes favorite as boolean | undefined
-          favorite: snippet.favorite === null ? undefined : snippet.favorite,
         },
       },
       {

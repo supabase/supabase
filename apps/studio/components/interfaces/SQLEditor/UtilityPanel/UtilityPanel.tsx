@@ -105,9 +105,6 @@ const UtilityPanel = ({
           content_id: id,
           chart: config,
         },
-        // [Joshen Clean Up] Temp API type fix - content.controller returns favorite as boolean | null | undefined
-        // But upsert content controller expectes favorite as boolean | undefined
-        favorite: snippet.favorite === null ? undefined : snippet.favorite,
       },
     })
   }
