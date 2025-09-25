@@ -1,0 +1,674 @@
+// =============================================
+// CONFIGURATION SUPABASE COMPLÈTE
+// =============================================
+
+// .env.local (Développement)
+/*
+NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-clé-anonyme
+SUPABASE_SERVICE_ROLE_KEY=votre-clé-service-role
+SUPABASE_JWT_SECRET=votre-jwt-secret
+*/
+
+// .env.production (Production)
+/*
+NEXT_PUBLIC_SUPABASE_URL=https://votre-projet-prod.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-clé-anonyme-prod
+SUPABASE_SERVICE_ROLE_KEY=votre-clé-service-role-prod
+SUPABASE_JWT_SECRET=votre-jwt-secret-prod
+*/
+
+import { createClient } from '@supabase/supabase-js';
+import { Database } from './types/database.types';
+
+// Configuration client-side (utilisateur)
+export const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+        auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true,
+            flowType: 'pkce'
+        },
+        realtime: {
+            params: {
+                eventsPerSecond: 10
+            }
+        }
+    }
+);
+
+// Configuration admin/service (côté serveur)
+export const supabaseAdmin = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
+        }
+    }
+);
+
+// =============================================
+// TYPES TYPESCRIPT (database.types.ts)
+// =============================================
+
+export interface Database {
+    public: {
+        Tables: {
+            user_profiles: {
+                Row: {
+                    id: string;
+                    email: string;
+                    first_name: string | null;
+                    last_name: string | null;
+                    phone: string | null;
+                    date_of_birth: string | null;
+                    gender: 'homme' | 'femme' | 'autre' | 'non_specifie' | null;
+                    province: string;
+                    city: string | null;
+                    postal_code: string | null;
+                    annual_income: number | null;
+                    employment_status: string | null;
+                    marital_status: string | null;
+                    number_of_children: number | null;
+                    children_ages: number[] | null;
+                    is_indigenous: boolean | null;
+                    is_veteran: boolean | null;
+                    is_student: boolean | null;
+                    is_senior: boolean | null;
+                    has_disability: boolean | null;
+                    language_preference: 'fr' | 'en' | null;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id: string;
+                    email: string;
+                    first_name?: string | null;
+                    last_name?: string | null;
+                    phone?: string | null;
+                    date_of_birth?: string | null;
+                    gender?: 'homme' | 'femme' | 'autre' | 'non_specifie' | null;
+                    province: string;
+                    city?: string | null;
+                    postal_code?: string | null;
+                    annual_income?: number | null;
+                    employment_status?: string | null;
+                    marital_status?: string | null;
+                    number_of_children?: number | null;
+                    children_ages?: number[] | null;
+                    is_indigenous?: boolean | null;
+                    is_veteran?: boolean | null;
+                    is_student?: boolean | null;
+                    is_senior?: boolean | null;
+                    has_disability?: boolean | null;
+                    language_preference?: 'fr' | 'en' | null;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    email?: string;
+                    first_name?: string | null;
+                    last_name?: string | null;
+                    phone?: string | null;
+                    date_of_birth?: string | null;
+                    gender?: 'homme' | 'femme' | 'autre' | 'non_specifie' | null;
+                    province?: string;
+                    city?: string | null;
+                    postal_code?: string | null;
+                    annual_income?: number | null;
+                    employment_status?: string | null;
+                    marital_status?: string | null;
+                    number_of_children?: number | null;
+                    children_ages?: number[] | null;
+                    is_indigenous?: boolean | null;
+                    is_veteran?: boolean | null;
+                    is_student?: boolean | null;
+                    is_senior?: boolean | null;
+                    has_disability?: boolean | null;
+                    language_preference?: 'fr' | 'en' | null;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+            };
+            government_aids: {
+                Row: {
+                    id: string;
+                    name_fr: string;
+                    name_en: string;
+                    description_fr: string | null;
+                    description_en: string | null;
+                    summary_fr: string | null;
+                    summary_en: string | null;
+                    category_id: string | null;
+                    subcategory: string | null;
+                    government_level: 'federal' | 'provincial' | 'municipal';
+                    province: string | null;
+                    responsible_department_fr: string | null;
+                    responsible_department_en: string | null;
+                    eligibility_criteria: any;
+                    amount_type: 'fixe' | 'variable' | 'pourcentage' | 'remboursement' | null;
+                    min_amount: number | null;
+                    max_amount: number | null;
+                    duration_months: number | null;
+                    application_start_date: string | null;
+                    application_end_date: string | null;
+                    program_start_date: string | null;
+                    program_end_date: string | null;
+                    application_method: string[] | null;
+                    application_url_fr: string | null;
+                    application_url_en: string | null;
+                    required_documents: string[] | null;
+                    processing_time_days: number | null;
+                    status: 'active' | 'inactive' | 'archived' | 'coming_soon';
+                    search_keywords_fr: string[] | null;
+                    search_keywords_en: string[] | null;
+                    popularity_score: number | null;
+                    success_rate: number | null;
+                    created_at: string;
+                    updated_at: string;
+                    created_by: string | null;
+                    last_updated_by: string | null;
+                };
+                Insert: Omit<Database['public']['Tables']['government_aids']['Row'], 'id' | 'created_at' | 'updated_at'>;
+                Update: Partial<Database['public']['Tables']['government_aids']['Insert']>;
+            };
+            // Autres tables...
+        };
+        Views: {
+            [_ in never]: never;
+        };
+        Functions: {
+            search_aids: {
+                Args: {
+                    search_text: string;
+                    user_province?: string;
+                    category_filter?: string;
+                    max_results?: number;
+                };
+                Returns: {
+                    aid_id: string;
+                    relevance_score: number;
+                    aid_data: any;
+                }[];
+            };
+            update_popularity_scores: {
+                Args: {};
+                Returns: void;
+            };
+        };
+        Enums: {
+            [_ in never]: never;
+        };
+    };
+}
+
+// =============================================
+// MIDDLEWARE D'AUTHENTIFICATION
+// =============================================
+
+// middleware.ts (Next.js)
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export async function middleware(req: NextRequest) {
+    const res = NextResponse.next();
+    const supabase = createMiddlewareClient({ req, res });
+
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+
+    // Routes protégées
+    const protectedPaths = ['/dashboard', '/profile', '/applications', '/recommendations'];
+    const isProtectedPath = protectedPaths.some(path => req.nextUrl.pathname.startsWith(path));
+
+    if (isProtectedPath && !session) {
+        return NextResponse.redirect(new URL('/auth/login', req.url));
+    }
+
+    // Routes d'authentification
+    const authPaths = ['/auth/login', '/auth/register'];
+    const isAuthPath = authPaths.some(path => req.nextUrl.pathname.startsWith(path));
+
+    if (isAuthPath && session) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+
+    return res;
+}
+
+export const config = {
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+};
+
+// =============================================
+// HOOKS PERSONNALISÉS
+// =============================================
+
+// hooks/useAuth.ts
+import { useEffect, useState } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
+
+interface AuthState {
+    user: User | null;
+    session: Session | null;
+    loading: boolean;
+}
+
+export function useAuth() {
+    const [authState, setAuthState] = useState<AuthState>({
+        user: null,
+        session: null,
+        loading: true
+    });
+
+    useEffect(() => {
+        // Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setAuthState({
+                user: session?.user || null,
+                session,
+                loading: false
+            });
+        });
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            async (event, session) => {
+                setAuthState({
+                    user: session?.user || null,
+                    session,
+                    loading: false
+                });
+            }
+        );
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    return authState;
+}
+
+// hooks/useUserProfile.ts
+import { useEffect, useState } from 'react';
+import { useAuth } from './useAuth';
+import { getUserProfile, createOrUpdateUserProfile } from '../lib/api';
+
+export function useUserProfile() {
+    const { user } = useAuth();
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (user) {
+            loadProfile();
+        } else {
+            setProfile(null);
+            setLoading(false);
+        }
+    }, [user]);
+
+    const loadProfile = async () => {
+        try {
+            setLoading(true);
+            const result = await getUserProfile(user.id);
+            
+            if (result.success) {
+                setProfile(result.data);
+            } else if (result.error === 'No rows found') {
+                // Profile doesn't exist, create one
+                const createResult = await createOrUpdateUserProfile(user.id, {
+                    email: user.email,
+                    province: 'QC' // Default
+                });
+                
+                if (createResult.success) {
+                    setProfile(createResult.data);
+                }
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateProfile = async (updates) => {
+        try {
+            const result = await createOrUpdateUserProfile(user.id, updates);
+            if (result.success) {
+                setProfile(result.data);
+                return result;
+            }
+            throw new Error(result.error);
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        }
+    };
+
+    return {
+        profile,
+        loading,
+        error,
+        updateProfile,
+        refetch: loadProfile
+    };
+}
+
+// hooks/useRecommendations.ts
+import { useEffect, useState } from 'react';
+import { useAuth } from './useAuth';
+import { getUserRecommendations } from '../lib/api';
+
+export function useRecommendations() {
+    const { user } = useAuth();
+    const [recommendations, setRecommendations] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (user) {
+            loadRecommendations();
+        }
+    }, [user]);
+
+    const loadRecommendations = async () => {
+        try {
+            setLoading(true);
+            const result = await getUserRecommendations(user.id);
+            
+            if (result.success) {
+                setRecommendations(result.data);
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        recommendations,
+        loading,
+        error,
+        refetch: loadRecommendations
+    };
+}
+
+// =============================================
+// CONFIGURATION EDGE FUNCTIONS
+// =============================================
+
+// supabase/functions/generate-recommendations/index.ts
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+    if (req.method === 'OPTIONS') {
+        return new Response('ok', { headers: corsHeaders });
+    }
+
+    try {
+        const { user_id } = await req.json();
+
+        const supabaseClient = createClient(
+            Deno.env.get('SUPABASE_URL') ?? '',
+            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        );
+
+        // Appel à la fonction de génération de recommandations
+        // (Logique de génération ici)
+
+        return new Response(
+            JSON.stringify({ success: true, message: 'Recommendations generated' }),
+            {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 200,
+            }
+        );
+    } catch (error) {
+        return new Response(
+            JSON.stringify({ error: error.message }),
+            {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 400,
+            }
+        );
+    }
+});
+
+// =============================================
+// CONFIGURATION STORAGE
+// =============================================
+
+// Configuration des buckets de stockage
+export const storageConfig = {
+    userDocuments: {
+        name: 'user-documents',
+        public: false,
+        allowedMimeTypes: [
+            'application/pdf',
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ],
+        fileSizeLimit: '10MB'
+    },
+    avatars: {
+        name: 'avatars',
+        public: true,
+        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        fileSizeLimit: '2MB'
+    },
+    aidDocuments: {
+        name: 'aid-documents',
+        public: true,
+        allowedMimeTypes: ['application/pdf', 'image/jpeg', 'image/png'],
+        fileSizeLimit: '50MB'
+    }
+};
+
+// Fonction pour configurer les buckets
+export async function setupStorageBuckets() {
+    console.log('Configuration des buckets de stockage...');
+
+    try {
+        for (const [key, config] of Object.entries(storageConfig)) {
+            const { data, error } = await supabaseAdmin.storage
+                .createBucket(config.name, {
+                    public: config.public,
+                    allowedMimeTypes: config.allowedMimeTypes,
+                    fileSizeLimit: config.fileSizeLimit
+                });
+
+            if (error && !error.message.includes('already exists')) {
+                throw error;
+            }
+
+            console.log(`✅ Bucket ${config.name} configuré`);
+        }
+
+        // Configurer les politiques RLS pour les buckets
+        await setupStoragePolicies();
+
+    } catch (error) {
+        console.error('Erreur configuration buckets:', error);
+        throw error;
+    }
+}
+
+// Politiques de sécurité pour le stockage
+async function setupStoragePolicies() {
+    const policies = [
+        // Politique pour user-documents
+        `
+        CREATE POLICY "Users can upload their own documents" ON storage.objects
+        FOR INSERT WITH CHECK (
+            bucket_id = 'user-documents' 
+            AND (storage.foldername(name))[1] = auth.uid()::text
+        );
+        `,
+        `
+        CREATE POLICY "Users can view their own documents" ON storage.objects
+        FOR SELECT USING (
+            bucket_id = 'user-documents' 
+            AND (storage.foldername(name))[1] = auth.uid()::text
+        );
+        `,
+        
+        // Politique pour avatars
+        `
+        CREATE POLICY "Users can upload their own avatar" ON storage.objects
+        FOR INSERT WITH CHECK (
+            bucket_id = 'avatars' 
+            AND (storage.foldername(name))[1] = auth.uid()::text
+        );
+        `,
+        `
+        CREATE POLICY "Anyone can view avatars" ON storage.objects
+        FOR SELECT USING (bucket_id = 'avatars');
+        `
+    ];
+
+    for (const policy of policies) {
+        try {
+            await supabaseAdmin.rpc('exec_sql', { sql: policy });
+        } catch (error) {
+            // Ignorer si la politique existe déjà
+            if (!error.message.includes('already exists')) {
+                console.error('Erreur création politique:', error);
+            }
+        }
+    }
+}
+
+// =============================================
+// FONCTIONS UTILITAIRES
+// =============================================
+
+// lib/utils.ts
+export function formatCurrency(amount: number, currency = 'CAD'): string {
+    return new Intl.NumberFormat('fr-CA', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+export function formatDate(date: string | Date, locale = 'fr-CA'): string {
+    return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    }).format(new Date(date));
+}
+
+export function calculateAge(birthDate: string): number {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    
+    return age;
+}
+
+export function getProvinceLabel(code: string, language = 'fr'): string {
+    const provinces = {
+        'AB': { fr: 'Alberta', en: 'Alberta' },
+        'BC': { fr: 'Colombie-Britannique', en: 'British Columbia' },
+        'MB': { fr: 'Manitoba', en: 'Manitoba' },
+        'NB': { fr: 'Nouveau-Brunswick', en: 'New Brunswick' },
+        'NL': { fr: 'Terre-Neuve-et-Labrador', en: 'Newfoundland and Labrador' },
+        'NS': { fr: 'Nouvelle-Écosse', en: 'Nova Scotia' },
+        'NT': { fr: 'Territoires du Nord-Ouest', en: 'Northwest Territories' },
+        'NU': { fr: 'Nunavut', en: 'Nunavut' },
+        'ON': { fr: 'Ontario', en: 'Ontario' },
+        'PE': { fr: 'Île-du-Prince-Édouard', en: 'Prince Edward Island' },
+        'QC': { fr: 'Québec', en: 'Quebec' },
+        'SK': { fr: 'Saskatchewan', en: 'Saskatchewan' },
+        'YT': { fr: 'Yukon', en: 'Yukon' }
+    };
+
+    return provinces[code]?.[language] || code;
+}
+
+// =============================================
+// SCRIPTS DE DÉPLOIEMENT
+// =============================================
+
+// scripts/deploy.js
+import { execSync } from 'child_process';
+import { config } from 'dotenv';
+
+config();
+
+const SUPABASE_PROJECT_ID = process.env.SUPABASE_PROJECT_ID;
+const ENVIRONMENT = process.argv[2] || 'development';
+
+console.log(`🚀 Déploiement vers ${ENVIRONMENT}...`);
+
+try {
+    // 1. Déployer les migrations
+    console.log('📦 Déploiement des migrations...');
+    execSync(`supabase db push --project-id ${SUPABASE_PROJECT_ID}`, { stdio: 'inherit' });
+
+    // 2. Déployer les Edge Functions
+    console.log('⚡ Déploiement des Edge Functions...');
+    execSync(`supabase functions deploy --project-id ${SUPABASE_PROJECT_ID}`, { stdio: 'inherit' });
+
+    // 3. Synchroniser les types
+    console.log('🔧 Génération des types TypeScript...');
+    execSync(`supabase gen types typescript --project-id ${SUPABASE_PROJECT_ID} > types/database.types.ts`, { stdio: 'inherit' });
+
+    console.log('✅ Déploiement terminé avec succès!');
+
+} catch (error) {
+    console.error('❌ Erreur lors du déploiement:', error.message);
+    process.exit(1);
+}
+
+// package.json scripts
+/*
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:reset": "supabase db reset",
+    "supabase:generate-types": "supabase gen types typescript --local > types/database.types.ts",
+    "import:data": "node scripts/import-data.js all",
+    "import:aids": "node scripts/import-data.js import",
+    "update:data": "node scripts/import-data.js update",
+    "deploy:dev": "node scripts/deploy.js development",
+    "deploy:prod": "node scripts/deploy.js production"
+  }
+}
+*/
+
+console.log('Configuration Supabase créée avec succès!');
