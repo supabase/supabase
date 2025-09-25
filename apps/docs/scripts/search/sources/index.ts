@@ -1,5 +1,5 @@
-import { sep } from 'node:path'
-
+import { type GuideModel } from '../../../resources/guide/guideModel.js'
+import { GuideModelLoader } from '../../../resources/guide/guideModelLoader.js'
 import {
   GitHubDiscussionLoader,
   type GitHubDiscussionSource,
@@ -16,9 +16,6 @@ import {
   OpenApiReferenceLoader,
   type OpenApiReferenceSource,
 } from './reference-doc.js'
-import { walk } from './util.js'
-
-const ignoredFiles = ['pages/404.mdx']
 
 export type SearchSource =
   | MarkdownSource
@@ -30,18 +27,9 @@ export type SearchSource =
   | LintWarningsGuideSource
 
 export async function fetchGuideSources() {
-  return (
-    await Promise.all(
-      (await walk('content/guides'))
-        .filter(
-          ({ path }) =>
-            /\.mdx?$/.test(path) &&
-            !ignoredFiles.includes(path) &&
-            !path.split(sep).some((part) => part.startsWith('_'))
-        )
-        .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
-    )
-  ).flat()
+  const guides = (await GuideModelLoader.allFromFs()).unwrapLeft()
+
+  return guides.map((guide: GuideModel) => MarkdownLoader.fromGuideModel('guide', guide))
 }
 
 export async function fetchOpenApiReferenceSource() {
@@ -138,27 +126,29 @@ export async function fetchLintWarningsGuideSources() {
 /**
  * Fetches all the sources we want to index for search
  */
-export async function fetchAllSources() {
+export async function fetchAllSources(fullIndex: boolean) {
   const guideSources = fetchGuideSources()
   const lintWarningsGuideSources = fetchLintWarningsGuideSources()
   const openApiReferenceSource = fetchOpenApiReferenceSource()
   const jsLibReferenceSource = fetchJsLibReferenceSource()
-  const dartLibReferenceSource = fetchDartLibReferenceSource()
-  const pythonLibReferenceSource = fetchPythonLibReferenceSource()
-  const cSharpLibReferenceSource = fetchCSharpLibReferenceSource()
-  const swiftLibReferenceSource = fetchSwiftLibReferenceSource()
-  const ktLibReferenceSource = fetchKtLibReferenceSource()
-  const cliReferenceSource = fetchCliLibReferenceSource()
+  const dartLibReferenceSource = fullIndex ? fetchDartLibReferenceSource() : []
+  const pythonLibReferenceSource = fullIndex ? fetchPythonLibReferenceSource() : []
+  const cSharpLibReferenceSource = fullIndex ? fetchCSharpLibReferenceSource() : []
+  const swiftLibReferenceSource = fullIndex ? fetchSwiftLibReferenceSource() : []
+  const ktLibReferenceSource = fullIndex ? fetchKtLibReferenceSource() : []
+  const cliReferenceSource = fullIndex ? fetchCliLibReferenceSource() : []
 
-  const partnerIntegrationSources = fetchPartners()
-    .then((partners) =>
-      partners
-        ? Promise.all(
-            partners.map((partner) => new IntegrationLoader(partner.slug, partner).load())
-          )
-        : []
-    )
-    .then((data) => data.flat())
+  const partnerIntegrationSources = fullIndex
+    ? fetchPartners()
+        .then((partners) =>
+          partners
+            ? Promise.all(
+                partners.map((partner) => new IntegrationLoader(partner.slug, partner).load())
+              )
+            : []
+        )
+        .then((data) => data.flat())
+    : []
 
   const githubDiscussionSources = fetchDiscussions(
     'supabase',

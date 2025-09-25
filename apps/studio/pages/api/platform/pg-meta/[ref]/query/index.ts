@@ -1,7 +1,7 @@
 import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
-import { post } from 'lib/common/fetch'
-import { PG_META_URL } from 'lib/constants'
+import { executeQuery } from 'lib/api/self-hosted/query'
+import { PgMetaDatabaseError } from 'lib/api/self-hosted/types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
@@ -22,11 +22,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
-  const response = await post(`${PG_META_URL}/query`, { query }, { headers })
+  const { data, error } = await executeQuery({ query, headers })
 
-  if (response.error) {
-    return res.status(400).json(response.error)
+  if (error) {
+    if (error instanceof PgMetaDatabaseError) {
+      const { statusCode, message, formattedError } = error
+      return res.status(statusCode).json({ message, formattedError })
+    }
+    const { message } = error
+    return res.status(500).json({ message, formattedError: message })
   } else {
-    return res.status(200).json(response)
+    return res.status(200).json(data)
   }
 }

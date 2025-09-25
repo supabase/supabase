@@ -1,13 +1,12 @@
 import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
 import Link from 'next/link'
 
-import Table from 'components/to-be-cleaned/Table'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
 import {
@@ -16,6 +15,8 @@ import {
   HoverCardTrigger_Shadcn_,
   HoverCard_Shadcn_,
   ScrollArea,
+  TableCell,
+  TableRow,
   cn,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -32,9 +33,10 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 
 export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { data: projects } = useProjectsQuery()
+  const { data } = useProjectsQuery()
+  const projects = data?.projects ?? []
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
@@ -68,8 +70,8 @@ export const MemberRow = ({ member }: MemberRowProps) => {
     }).length > 0
 
   return (
-    <Table.tr>
-      <Table.td>
+    <TableRow>
+      <TableCell>
         <div className="flex items-center gap-x-4">
           <ProfileImage
             alt={member.primary_email ?? member.username ?? ''}
@@ -88,7 +90,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
           />
           <div className="flex item-center gap-x-2">
             <p className="text-foreground-light truncate">{member.primary_email}</p>
-            {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
+            {member.gotrue_id === profile?.gotrue_id && <Badge color="scale">You</Badge>}
           </div>
 
           {(member.metadata as any)?.origin && (
@@ -103,18 +105,18 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             />
           )}
         </div>
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         {isInvitedUser && member.invited_at && (
           <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
             {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
           </Badge>
         )}
         {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         <div className="flex items-center justify-center">
           {member.mfa_enabled ? (
             <Check className="text-brand" strokeWidth={2} size={20} />
@@ -122,9 +124,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             <X className="text-foreground-light" strokeWidth={1.5} size={20} />
           )}
         </div>
-      </Table.td>
+      </TableCell>
 
-      <Table.td className="max-w-64">
+      <TableCell className="max-w-64">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
         ) : isObfuscated ? (
@@ -201,11 +203,11 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             )
           })
         )}
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         <MemberActions member={member} />
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }

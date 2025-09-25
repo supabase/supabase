@@ -18,9 +18,10 @@ import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
@@ -30,16 +31,21 @@ const BranchesPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
-  const project = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
+  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'preview_branches'
+  )
 
   const {
     data: connections,
@@ -87,14 +93,26 @@ const BranchesPage: NextPageWithLayout = () => {
 
   const onConfirmDeleteBranch = () => {
     if (selectedBranchToDelete == undefined) return console.error('No branch selected')
-    if (projectRef == undefined) return console.error('Project ref is required')
+    const { project_ref: branchRef, parent_project_ref: projectRef } = selectedBranchToDelete
     deleteBranch(
-      { id: selectedBranchToDelete?.id, projectRef },
+      { branchRef, projectRef },
       {
         onSuccess: () => {
-          if (selectedBranchToDelete.project_ref === ref) {
-            router.push(`/project/${selectedBranchToDelete.parent_project_ref}/branches`)
+          if (branchRef === ref) {
+            router.push(`/project/${projectRef}/branches`)
           }
+          // Track delete button click
+          sendEvent({
+            action: 'branch_delete_button_clicked',
+            properties: {
+              branchType: selectedBranchToDelete.persistent ? 'persistent' : 'preview',
+              origin: 'branches_page',
+            },
+            groups: {
+              project: projectRef ?? 'Unknown',
+              organization: selectedOrg?.slug ?? 'Unknown',
+            },
+          })
         },
       }
     )
@@ -106,7 +124,7 @@ const BranchesPage: NextPageWithLayout = () => {
         <ScaffoldSection>
           <div className="col-span-12">
             <div className="space-y-4">
-              {!canReadBranches ? (
+              {isPermissionsLoaded && !canReadBranches ? (
                 <NoPermission resourceText="view this project's branches" />
               ) : (
                 <>
@@ -168,9 +186,13 @@ const BranchesPage: NextPageWithLayout = () => {
 BranchesPage.getLayout = (page) => {
   const BranchesPageWrapper = () => {
     const snap = useAppStateSnapshot()
-    const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
-      resource: { is_default: false },
-    })
+    const { can: canCreateBranches } = useAsyncCheckPermissions(
+      PermissionAction.CREATE,
+      'preview_branches',
+      {
+        resource: { is_default: false },
+      }
+    )
 
     const primaryActions = (
       <ButtonTooltip

@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -24,14 +23,8 @@ import {
   Textarea,
 } from 'ui'
 
-dayjs.extend(relativeTime)
-
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']
-const ALLOWED_JWK_PROPERTIES = new Set([
-  ...RSA_JWK_REQUIRED_PROPERTIES,
-  ...EC_JWK_REQUIRED_PROPERTIES,
-])
 
 export const CreateKeyDialog = ({
   projectRef,
@@ -148,11 +141,7 @@ export const CreateKeyDialog = ({
                     .replace(/=/g, '')
                 : stringToBase64URL(privateKey),
             }
-          : Object.fromEntries(
-              Object.entries(JSON.parse(privateKey)).filter(([prop]) =>
-                ALLOWED_JWK_PROPERTIES.has(prop)
-              )
-            )
+          : JSON.parse(privateKey)
         : null,
     })
   }

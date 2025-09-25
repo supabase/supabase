@@ -1,6 +1,6 @@
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PROJECT_ANALYTICS_URL } from 'pages/api/constants'
+import { PROJECT_ANALYTICS_URL } from 'lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -30,14 +30,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const proxyRequest = async (req: NextApiRequest) => {
-  const { name, ...toForward } = req.query
-  const project_tier = 'ENTERPRISE'
+  const { name, ref: project, ...toForward } = req.query
 
   if (req.method === 'GET') {
-    const payload = { ...toForward, project_tier }
+    const payload = { ...toForward, project }
     return retrieveAnalyticsData(name as string, payload)
   } else if (req.method === 'POST') {
-    const payload = { ...req.body, project_tier }
+    const payload = { ...req.body, project }
     return retrieveAnalyticsData(name as string, payload)
   }
 }

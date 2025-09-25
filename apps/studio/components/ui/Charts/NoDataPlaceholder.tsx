@@ -1,7 +1,7 @@
 import { BarChart2 } from 'lucide-react'
 
 import { cn } from 'ui'
-import ChartHeader from './ChartHeader'
+import { ChartHeader } from './ChartHeader'
 import { useChartSize } from './Charts.utils'
 
 interface NoDataPlaceholderProps {
@@ -12,6 +12,7 @@ interface NoDataPlaceholderProps {
   description?: string
   className?: string
   size: Parameters<typeof useChartSize>[0]
+  isFullHeight?: boolean
 }
 const NoDataPlaceholder = ({
   attribute,
@@ -20,17 +21,19 @@ const NoDataPlaceholder = ({
   format,
   className = '',
   size,
+  isFullHeight = false,
 }: NoDataPlaceholderProps) => {
   const { minHeight } = useChartSize(size)
 
   return (
-    <div>
+    <div className={cn(isFullHeight && 'h-full')}>
       {attribute !== undefined && (
         <ChartHeader title={attribute} format={format} highlightedValue={0} />
       )}
       <div
         className={cn(
           'border-control flex flex-grow w-full flex-col items-center justify-center space-y-2 border border-dashed text-center',
+          isFullHeight && 'h-full',
           className
         )}
         // extra 20 px for the x ticks

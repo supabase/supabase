@@ -8,8 +8,8 @@ import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-tog
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +25,7 @@ import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
@@ -35,8 +35,10 @@ export const ToggleLegacyApiKeysPanel = () => {
 
   const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery({ projectRef })
 
-  const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } =
-    useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, '*')
+  const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_WRITE,
+    '*'
+  )
 
   const { data: authorizedApps = [], isSuccess: isAuthorizedAppsSuccess } = useAuthorizedAppsQuery({
     slug: org?.slug,

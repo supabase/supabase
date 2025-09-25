@@ -7,7 +7,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
 import { cn } from 'ui'
 import { getAddons } from '../Billing/Subscription/Subscription.utils'
@@ -27,10 +27,10 @@ interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   }
 }
 
-const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
+export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
   ({ projectKeys, filePath, ...props }, ref) => {
     const { ref: projectRef } = useParams()
-    const selectedOrg = useSelectedOrganization()
+    const { data: selectedOrg } = useSelectedOrganizationQuery()
     const allowPgBouncerSelection = useMemo(() => selectedOrg?.plan.id !== 'free', [selectedOrg])
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -102,5 +102,3 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
 )
 
 ConnectTabContent.displayName = 'ConnectTabContent'
-
-export default ConnectTabContent

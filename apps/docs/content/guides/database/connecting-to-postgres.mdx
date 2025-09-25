@@ -77,7 +77,7 @@ The connection string looks like this:
 postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/postgres
 ```
 
-Get your project's direct connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+Get your project's direct connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
 ## Shared pooler
 
@@ -93,7 +93,7 @@ The connection string looks like this:
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
-Get your project's Session pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+Get your project's Session pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
 ### Supavisor transaction mode
 
@@ -111,7 +111,7 @@ The connection string looks like this:
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
-Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
 ## Dedicated pooler
 
@@ -119,7 +119,7 @@ For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.p
 
 The Dedicated Pooler ensures best performance and latency, while using up more of your project's compute resources. If your network supports IPv6 or you have the IPv4 add-on, we encourage you to use the Dedicated Pooler over the Shared Pooler.
 
-Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
 <Admonition type="note">
 
@@ -186,24 +186,120 @@ This error occurs when your credentials are incorrect. Double-check your usernam
 
 Supabase’s default direct connection supports IPv6 only. To connect over IPv4, consider using the Supavisor session or transaction modes, or a connection pooler (shared or dedicated), which support both IPv4 and IPv6.
 
-### How do you choose a connection method?
-
-- Direct connection: Persistent backend services (IPv6 only)
-- Supavisor session mode: Persistent backend needing IPv4
-- Supavisor transaction mode: Serverless functions
-- Shared pooler: General-purpose connections with IPv4 and IPv6
-- Dedicated pooler: High-performance apps requiring dedicated resources (paid tier)
-
 ### Where is the Postgres connection string in Supabase?
 
-Your connection string is located in the Supabase Dashboard. Click the "Connect" button at the top of the page.
+Your connection string is located in the Supabase Dashboard. Click the [Connect](/dashboard/project/_?showConnect=true) button at the top of the page.
 
-### Can you use `psql` with a Supabase database?
+### Can you use Supavisor and PgBouncer together?
 
-Yes. Use the following command structure, replacing `your_connection_string` with the string from your Supabase dashboard:
+You can technically use both, but it’s not recommended unless you’re specifically trying to increase the total number of concurrent client connections. In most cases, it is better to choose either PgBouncer or Supavisor for pooled or transaction-based traffic. Direct connections remain the best choice for long-lived sessions, and, if IPv4 is required for those sessions, Supavisor session mode can be used as an alternative. Running both poolers simultaneously increases the risk of hitting your database’s maximum connection limit on smaller compute tiers.
+
+### How does the default pool size work?
+
+Supavisor and PgBouncer work independently, but both reference the same pool size setting. For example, if you set the pool size to 30, Supavisor can open up to 30 server-side connections to Postgres each for its session mode port (5432) and transaction mode port (6543), and PgBouncer can also open up to 30. If both poolers are active and reach their roles/modes limits at the same time, you could have as many as 60 backend connections hitting your database, in addition to any direct connections. You can adjust the pool size in [Database settings](/dashboard/project/_/database/settings) in the dashboard.
+
+### What is the difference between client connections and backend connections?
+
+There are two different limits to understand when working with poolers. The first is client connections, which refers to how many clients can connect to a pooler at the same time. This number is capped by your [compute tier’s “max pooler clients” limit](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections), and it applies independently to Supavisor and PgBouncer. The second is backend connections, which is the number of active connections a pooler opens to Postgres. This number is set by the pool size for that pooler.
 
 ```
-psql "your_connection_string"
+Total backend load on Postgres =
+ Direct connections +
+ Supavisor backend connections (≤ supavisor_pool_size) +
+ PgBouncer backend connections (≤ pgbouncer_pool_size)
+≤ Postgres max connections for your compute instance
 ```
 
-Ensure you have `psql` installed locally before running this command.
+### What is the max pooler clients limit?
+
+The “max pooler clients” limit for your compute tier applies separately to Supavisor and PgBouncer. One pooler reaching its client limit does not affect the other. When a pooler reaches this limit, it stops accepting new client connections until existing ones are closed, but the other pooler remains unaffected. You can check your tier’s connection limits in the [compute and disk limits documentation](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections).
+
+### Where can you see current connection usage?
+
+You can track connection usage from the [Reports](/dashboard/project/_/reports/database) section in your project dashboard. There are three key reports:
+
+- **Database Connections:** shows total active connections by role (this includes direct and pooled connections).
+- **Dedicated Pooler Client Connections:** shows the number of active client connections to PgBouncer.
+- **Shared Pooler (Supavisor) Client Connections:** shows the number of active client connections to Supavisor.
+
+Keep in mind that the Roles page is not real-time, it shows the connection count from the last refresh. If you need up-to-the-second data, set up Grafana or run the query against `pg_stat_activity` directly in SQL Editor. We have a few helpful queries for checking connections.
+
+```sql
+-- Count connections by application and user name
+select
+  count(usename),
+  count(application_name),
+  application_name,
+  usename
+from
+  pg_stat_ssl
+  join pg_stat_activity on pg_stat_ssl.pid = pg_stat_activity.pid
+group by usename, application_name;
+```
+
+```sql
+-- View all connections
+ SELECT
+   pg_stat_activity.pid,
+   ssl AS ssl_connection,
+   datname AS database,
+   usename AS connected_role,
+   application_name,
+   client_addr,
+   query,
+   query_start,
+   state,
+   backend_start
+FROM pg_stat_ssl
+JOIN pg_stat_activity
+ ON pg_stat_ssl.pid = pg_stat_activity.pid;
+```
+
+### Why are there active connections when the app is idle?
+
+Even if your application isn’t making queries, some Supabase services keep persistent connections to your database. For example, Storage, PostgREST, and our health checker all maintain long-lived connections. You usually see a small baseline of active connections from these services.
+
+### Why do connection strings have different ports?
+
+Different modes use different ports:
+
+- Direct connection: `5432` (database server)
+- PgBouncer: `6543` (database server)
+- Supavisor transaction mode: `6543` (separate server)
+- Supavisor session mode: `5432` (separate server)
+
+The port helps route the connection to the right pooler/mode.
+
+### Does connection pooling affect latency?
+
+Because the dedicated pooler is hosted on the same machine as your database, it connects with lower latency than the shared pooler, which is hosted on a separate server. Direct connections have no pooler overhead but require IPv6 unless you have the IPv4 add-on.
+
+### How to choose the right connection method?
+
+**Direct connection:**
+
+- Best for: persistent backend services
+- Limitation: IPv6 only
+
+**Shared pooler:**
+
+- Best for: general-purpose connections (supports IPv4 and IPv6)
+  - Supavisor session mode → persistent backend that require IPv4
+  - Supavisor transaction mode → serverless functions or short-lived tasks
+
+**Dedicated pooler (paid tier):**
+
+- Best for: high-performance apps that need dedicated resources
+- Uses PgBouncer
+
+You can follow the decision flow in the connection method diagram to quickly choose the right option for your environment.
+
+<Image
+  alt="Decision tree diagram showing when to connect directly to Postgres or use a connection pooler."
+  src={{
+    dark: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree.svg',
+    light: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree-light.svg',
+  }}
+  caption="Choosing between direct Postgres connections and connection pooling"
+  zoomable
+/>

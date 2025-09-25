@@ -2,10 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useFlag } from 'common'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn } from 'ui'
 import { ButtonTooltip } from './ButtonTooltip'
 
@@ -17,6 +17,7 @@ interface UpgradeToProProps {
   buttonText?: string
   source?: string
   disabled?: boolean
+  fullWidth?: boolean
 }
 
 const UpgradeToPro = ({
@@ -27,12 +28,13 @@ const UpgradeToPro = ({
   buttonText,
   source = 'upgrade',
   disabled = false,
+  fullWidth = false,
 }: UpgradeToProProps) => {
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan?.id
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -41,8 +43,8 @@ const UpgradeToPro = ({
   return (
     <div
       className={cn(
-        'block w-full rounded border border-opacity-20 py-4 px-6',
-        'border-overlay bg-surface-200'
+        'block w-full py-4 px-6 bg-surface-200',
+        fullWidth ? 'border-b' : 'border border-opacity-20 border-overlay rounded'
       )}
     >
       <div className="flex gap-x-3">
@@ -69,7 +71,7 @@ const UpgradeToPro = ({
                 },
               }}
             >
-              Reset database password
+              {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
             </ButtonTooltip>
           ) : (
             <Button
@@ -81,7 +83,9 @@ const UpgradeToPro = ({
                 href={
                   plan === 'free'
                     ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
-                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
+                    : addon == null
+                      ? `/org/${organization?.slug ?? '_'}/billing?panel=costControl&source=${source}`
+                      : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
                 }
               >
                 {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}

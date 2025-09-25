@@ -2,7 +2,8 @@ import Link from 'next/link'
 
 import SidePanelVercelProjectLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
-import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 import GitHubSection from './GithubIntegration/GithubSection'
@@ -19,9 +20,11 @@ export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' 
 }
 
 const IntegrationSettings = () => {
-  const project = useSelectedProject()
-  const parentProject = useProjectByRef(project?.parent_project_ref)
+  const { data: project } = useSelectedProjectQuery()
+  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
   const isBranch = project?.parent_project_ref !== undefined
+
+  const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
 
   return (
     <>
@@ -43,9 +46,13 @@ const IntegrationSettings = () => {
         </ScaffoldContainer>
       )}
       <GitHubSection />
-      <ScaffoldDivider />
-      <VercelSection isProjectScoped={true} />
-      <SidePanelVercelProjectLinker />
+      {showVercelIntegration && (
+        <>
+          <ScaffoldDivider />
+          <VercelSection isProjectScoped={true} />
+          <SidePanelVercelProjectLinker />
+        </>
+      )}
     </>
   )
 }

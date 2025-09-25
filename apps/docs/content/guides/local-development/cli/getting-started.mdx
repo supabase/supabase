@@ -142,6 +142,12 @@ supabase stop --no-backup
 
 </Admonition>
 
+<$Show if="!docs:hide_cli_profiles">
+
+<$Partial path="cli_profiles.mdx" />
+
+</$Show>
+
 ## Running Supabase locally
 
 The Supabase CLI uses Docker containers to manage the local development stack. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop):
@@ -217,7 +223,7 @@ Started supabase local development setup.
          API URL: http://localhost:54321
           DB URL: postgresql://postgres:postgres@localhost:54322/postgres
       Studio URL: http://localhost:54323
-    Inbucket URL: http://localhost:54324
+     Mailpit URL: http://localhost:54324
         anon key: eyJh......
 service_role key: eyJh......
 

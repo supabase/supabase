@@ -10,15 +10,8 @@ export const FEATURE_PREVIEWS = [
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
-    name: 'Branching 2.0',
+    name: 'Branching via dashboard',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
-    isNew: true,
-    isPlatformOnly: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
-    name: 'Realtime settings',
-    discussionsUrl: undefined,
     isNew: true,
     isPlatformOnly: true,
   },
