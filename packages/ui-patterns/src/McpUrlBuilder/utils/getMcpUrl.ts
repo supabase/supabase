@@ -25,7 +25,7 @@ export function getMcpUrl({
 }: GetMcpUrlOptions): GetMcpUrlReturn {
   // Generate the MCP URL based on current configuration
   const url = new URL(getMcpUrlBase({ isPlatform, apiUrl }))
-  if (projectRef) {
+  if (projectRef && isPlatform) {
     url.searchParams.set('project_ref', projectRef)
   }
   if (readonly) {
