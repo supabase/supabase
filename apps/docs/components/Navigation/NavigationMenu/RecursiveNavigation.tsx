@@ -14,8 +14,7 @@ interface RecursiveNavItemProps {
   item: NavMenuSection
   depth?: number
   path?: string
-  toggleItem: (path: string) => void
-  isItemOpen: (path: string) => boolean
+  autoExpandedItems: Set<string>
 }
 
 interface RecursiveNavigationProps {
@@ -24,95 +23,48 @@ interface RecursiveNavigationProps {
 }
 
 const ICON_SIZE = 16
-const NAV_STATE_COOKIE_NAME = 'supabase-docs-nav-state'
+const NAV_EXPANSION_PREFIX = 'nav-expansion-'
 
-// Helper function to set cookie
-const setCookie = (name: string, value: string, days = 30) => {
-  if (typeof document === 'undefined') return
-  
-  const expires = new Date()
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000)
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`
-}
+// Individual item expansion state hook (following the reference pattern)
+const usePersistedExpansionState = (itemName: string) => {
+  const [isExpanded, setIsExpanded] = React.useState(false)
 
-// Helper function to get cookie
-const getCookie = (name: string): string | null => {
-  if (typeof document === 'undefined') return null
-  
-  const value = `; ${document.cookie}`
-  const parts = value.split(`; ${name}=`)
-  if (parts.length === 2) {
-    return parts.pop()?.split(';').shift() || null
-  }
-  return null
-}
-
-// Custom hook for persisted accordion state using cookies
-const usePersistedAccordionState = (items: NavMenuSection[], pathname: string) => {
-  const [openItems, setOpenItems] = React.useState<Set<string>>(new Set())
-  const [isInitialized, setIsInitialized] = React.useState(false)
-
-  // Load persisted state from cookies on mount
   React.useEffect(() => {
     try {
-      const stored = getCookie(NAV_STATE_COOKIE_NAME)
-      if (stored) {
-        const parsedState = JSON.parse(stored)
-        setOpenItems(new Set(parsedState))
+      const stored = sessionStorage.getItem(`${NAV_EXPANSION_PREFIX}${itemName}`)
+      if (stored !== null) {
+        setIsExpanded(JSON.parse(stored))
       }
-    } catch (error) {
-      console.warn('Failed to load navigation state from cookie:', error)
-    } finally {
-      setIsInitialized(true)
+    } catch (_error) {
+      // Silently handle errors
     }
-  }, [])
+  }, [itemName])
 
-  // Auto-expand sections containing active path (only after initialization)
+  const setPersistedExpansion = React.useCallback((expanded: boolean) => {
+    setIsExpanded(expanded)
+    try {
+      sessionStorage.setItem(`${NAV_EXPANSION_PREFIX}${itemName}`, JSON.stringify(expanded))
+    } catch (_error) {
+      // Silently handle errors
+    }
+  }, [itemName])
+
+  return [isExpanded, setPersistedExpansion] as const
+}
+
+// Custom hook for managing accordion state with auto-expansion
+const useAccordionState = (items: NavMenuSection[], pathname: string) => {
+  const [autoExpandedItems, setAutoExpandedItems] = React.useState<Set<string>>(new Set())
+
+  // Auto-expand sections containing active path
   React.useEffect(() => {
-    if (!isInitialized) return
-    
     const pathsToExpand = getPathsContainingActivePage(items, pathname)
     if (pathsToExpand.length > 0) {
-      setOpenItems(prev => {
-        const newSet = new Set(prev)
-        pathsToExpand.forEach(path => newSet.add(path))
-        return newSet
-      })
+      setAutoExpandedItems(new Set(pathsToExpand))
     }
-  }, [pathname, items, isInitialized])
+  }, [pathname, items])
 
-  // Persist state to cookies whenever it changes (debounced)
-  React.useEffect(() => {
-    if (!isInitialized) return
-    
-    try {
-      const timeoutId = setTimeout(() => {
-        setCookie(NAV_STATE_COOKIE_NAME, JSON.stringify(Array.from(openItems)))
-      }, 300) // Debounce for 300ms
-      
-      return () => clearTimeout(timeoutId)
-    } catch (error) {
-      console.warn('Failed to save navigation state to cookie:', error)
-    }
-  }, [openItems, isInitialized])
-
-  const toggleItem = React.useCallback((itemPath: string) => {
-    setOpenItems(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(itemPath)) {
-        newSet.delete(itemPath)
-      } else {
-        newSet.add(itemPath)
-      }
-      return newSet
-    })
-  }, [])
-
-  const isItemOpen = React.useCallback((itemPath: string) => {
-    return openItems.has(itemPath)
-  }, [openItems])
-
-  return { toggleItem, isItemOpen, isInitialized }
+  return { autoExpandedItems }
 }
 
 const containsActivePath = (item: NavMenuSection, pathname: string): boolean => {
@@ -163,13 +115,20 @@ const NavIcon = React.memo(
 
 NavIcon.displayName = 'NavIcon'
 
-const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, path = '', toggleItem, isItemOpen }) => {
+const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, path = '', autoExpandedItems }) => {
   const pathname = usePathname()
-
   const itemPath = path ? `${path}.${item.name}` : item.name
   const isActive = item.url === pathname
   const hasChildren = item.items && item.items.length > 0
-  const isOpen = isItemOpen(itemPath)
+  
+  // Use individual item persistence hook
+  const [isExpanded, setPersistedExpansion] = usePersistedExpansionState(itemPath)
+  
+  // Check if this item should be auto-expanded due to active path
+  const shouldAutoExpand = autoExpandedItems.has(itemPath)
+  
+  // Determine if item should be open (persisted state OR auto-expansion)
+  const isOpen = isExpanded || shouldAutoExpand
 
   if (item.enabled === false) {
     return null
@@ -179,7 +138,7 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
     return (
       <div className={cn('w-full', depth > 0 && 'ml-2')}>
         <button
-          onClick={() => toggleItem(itemPath)}
+          onClick={() => setPersistedExpansion(!isExpanded)}
           className={cn(
             'flex items-center justify-between w-full py-2 px-3 rounded-md',
             'text-sm transition-colors hover:bg-surface-100',
@@ -211,8 +170,7 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
                   item={child as NavMenuSection}
                   depth={depth + 1}
                   path={itemPath}
-                  toggleItem={toggleItem}
-                  isItemOpen={isItemOpen}
+                  autoExpandedItems={autoExpandedItems}
                 />
               ))}
             </div>
@@ -242,7 +200,7 @@ RecursiveNavItem.displayName = 'RecursiveNavItem'
 
 const RecursiveNavigation: React.FC<RecursiveNavigationProps> = ({ items, className }) => {
   const pathname = usePathname()
-  const { toggleItem, isItemOpen } = usePersistedAccordionState(items, pathname)
+  const { autoExpandedItems } = useAccordionState(items, pathname)
 
   return (
     <nav className={cn('w-full space-y-1', className)}>
@@ -250,8 +208,7 @@ const RecursiveNavigation: React.FC<RecursiveNavigationProps> = ({ items, classN
         <RecursiveNavItem
           key={item.url || `${item.name}-${index}`}
           item={item}
-          toggleItem={toggleItem}
-          isItemOpen={isItemOpen}
+          autoExpandedItems={autoExpandedItems}
         />
       ))}
     </nav>
