@@ -27,7 +27,10 @@ catalog:
   'valtio': '^1.12.0'
   'vite': '^6.2.7'
   'zod': '^3.25.76'
-
+  
+onlyBuiltDependencies:
+ - supabase
+ 
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - 'ai'

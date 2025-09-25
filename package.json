@@ -62,9 +62,6 @@
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
   },
-  "pnpm": {
-    "neverBuiltDependencies": ["libpg-query"]
-  },
   "engines": {
     "pnpm": ">=10.16",
     "node": ">=22"
