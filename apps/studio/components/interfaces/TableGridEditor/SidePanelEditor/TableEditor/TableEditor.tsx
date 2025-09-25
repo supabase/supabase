@@ -187,6 +187,10 @@ export const TableEditor = ({
   const onSaveChanges = (resolve: any) => {
     if (tableFields) {
       const errors: any = validateFields(tableFields)
+      if (errors.name) {
+        toast.error(errors.name)
+      }
+
       if (errors.columns) {
         toast.error(errors.columns)
       }

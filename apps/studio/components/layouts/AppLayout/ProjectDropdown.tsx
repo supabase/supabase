@@ -5,35 +5,14 @@ import { ParsedUrlQuery } from 'querystring'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import type { Organization } from 'types'
-import {
-  Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ScrollArea,
-  cn,
-} from 'ui'
-
-// [Fran] the idea is to let users change projects without losing the current page,
-// but at the same time we need to redirect correctly between urls that might be
-// unique to a project e.g. '/project/projectRef/editor/tableId'
-// Right now, I'm gonna assume that any router query after the projectId,
-// is a unique project id/marker so we'll redirect the user to the
-// highest common route with just projectRef in the router queries.
+import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
 
 export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   const queryArray = Object.entries(routerQueries)
@@ -51,40 +30,6 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   } else {
     return route
   }
-}
-
-const ProjectLink = ({
-  project,
-  setOpen,
-}: {
-  project: ProjectInfo
-  organization?: Organization
-  setOpen: (value: boolean) => void
-}) => {
-  const router = useRouter()
-  const { ref } = useParams()
-  const sanitizedRoute = sanitizeRoute(router.route, router.query)
-
-  // [Joshen] Temp while we're interim between v1 and v2 billing
-  let href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-
-  return (
-    <CommandItem_Shadcn_
-      key={project.ref}
-      value={`${project.name.replaceAll('"', '')}-${project.ref}`}
-      className="cursor-pointer w-full"
-      onSelect={() => {
-        router.push(href)
-        setOpen(false)
-      }}
-      onClick={() => setOpen(false)}
-    >
-      <Link href={href} className="w-full flex items-center justify-between">
-        {project.name}
-        {project.ref === ref && <Check size={16} />}
-      </Link>
-    </CommandItem_Shadcn_>
-  )
 }
 
 export const ProjectDropdown = () => {
@@ -122,57 +67,67 @@ export const ProjectDropdown = () => {
           {selectedProject?.name}
         </span>
       </Link>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
+
+      <OrganizationProjectSelector
+        open={open}
+        setOpen={setOpen}
+        selectedRef={ref}
+        onSelect={(project) => {
+          const sanitizedRoute = sanitizeRoute(router.route, router.query)
+          const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+          router.push(href)
+        }}
+        renderTrigger={() => (
           <Button
             type="text"
             size="tiny"
             className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
             iconRight={<ChevronsUpDown strokeWidth={1.5} />}
           />
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Find project..." />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
+        )}
+        renderRow={(project) => {
+          // [Joshen] Temp while we're interim between v1 and v2 billing
+          const sanitizedRoute = sanitizeRoute(router.route, router.query)
+          const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+          const isSelected = project.ref === ref
+
+          return (
+            <Link href={href} className="w-full flex items-center justify-between">
+              <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
+                {project.name}
+              </span>
+              {isSelected && <Check size={16} />}
+            </Link>
+          )
+        }}
+        renderActions={() => {
+          return (
+            projectCreationEnabled && (
               <CommandGroup_Shadcn_>
-                <ScrollArea className={(projects || []).length > 7 ? 'h-[210px]' : ''}>
-                  {projects?.map((project) => (
-                    <ProjectLink key={project.ref} project={project} setOpen={setOpen} />
-                  ))}
-                </ScrollArea>
+                <CommandItem_Shadcn_
+                  className="cursor-pointer w-full"
+                  onSelect={() => {
+                    setOpen(false)
+                    router.push(`/new/${selectedOrganization?.slug}`)
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  <Link
+                    href={`/new/${selectedOrganization?.slug}`}
+                    onClick={() => {
+                      setOpen(false)
+                    }}
+                    className="w-full flex items-center gap-2"
+                  >
+                    <Plus size={14} strokeWidth={1.5} />
+                    <p>New project</p>
+                  </Link>
+                </CommandItem_Shadcn_>
               </CommandGroup_Shadcn_>
-              {projectCreationEnabled && (
-                <>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer w-full"
-                      onSelect={() => {
-                        setOpen(false)
-                        router.push(`/new/${selectedOrganization?.slug}`)
-                      }}
-                      onClick={() => setOpen(false)}
-                    >
-                      <Link
-                        href={`/new/${selectedOrganization?.slug}`}
-                        onClick={() => {
-                          setOpen(false)
-                        }}
-                        className="w-full flex items-center gap-2"
-                      >
-                        <Plus size={14} strokeWidth={1.5} />
-                        <p>New project</p>
-                      </Link>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </>
-              )}
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+            )
+          )
+        }}
+      />
     </>
   ) : (
     <Button type="text">

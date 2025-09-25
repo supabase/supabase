@@ -669,5 +669,12 @@
     "position": "CTO and Co-Founder Mobbin",
     "author_url": "https://github.com/liaujianjie",
     "author_image_url": "https://avatars.githubusercontent.com/u/3143132?v=4"
+  },
+  {
+    "author_id": "bilharmer",
+    "author": "Bil Harmer",
+    "position": "CSO",
+    "author_url": "#",
+    "author_image_url": "/images/blog/avatars/bilharmer.jpg"
   }
 ]

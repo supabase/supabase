@@ -69,6 +69,8 @@ export async function getFlags(userEmail: string = '', customAttributes?: Record
       new configcat.User(userEmail, undefined, undefined, customAttributes)
     )
   } else {
-    return client.getAllValuesAsync()
+    return client.getAllValuesAsync(
+      new configcat.User('anonymous', undefined, undefined, customAttributes)
+    )
   }
 }

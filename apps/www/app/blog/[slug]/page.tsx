@@ -28,7 +28,7 @@ async function getCMSPostFromAPI(
     const fetchOptions = isDraft
       ? {
           // For draft mode: always fresh data, no caching
-          cache: 'no-store' as const,
+          // cache: 'no-store' as const,
           next: { revalidate: 0 },
         }
       : {
@@ -198,7 +198,11 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     const content = parsedContent.content
     const tocDepth = (parsedContent.data as any)?.toc_depth ?? 3
     const mdxSource = await mdxSerialize(content, { tocDepth })
-    const blogPost = { ...parsedContent.data }
+    const { generateReadingTime } = await import('lib/helpers')
+    const blogPost = {
+      ...parsedContent.data,
+      readingTime: generateReadingTime(content),
+    }
 
     const allStaticPosts = getSortedPosts({ directory: '_blog' })
     const allPosts = [...allStaticPosts].sort((a, b) => {

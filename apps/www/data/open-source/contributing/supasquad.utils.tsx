@@ -3,6 +3,34 @@ import { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { ComponentType, SVGProps } from 'react'
 import { cn } from 'ui'
+import z from 'zod'
+
+export const supaSquadApplicationSchema = z.object({
+  first_name: z.string().min(1, 'First name is required'),
+  last_name: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Please enter a valid email address'),
+  tracks: z
+    .array(
+      z.object({
+        heading: z.string(),
+        description: z.string(),
+      })
+    )
+    .min(1, 'Select at least 1 track'),
+  areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
+  why_you_want_to_join: z.string().min(1, 'This is required'),
+  monthly_commitment: z.string().optional(),
+  languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
+  skills: z.string().optional(),
+  city: z.string().min(1, 'Specify your city'),
+  country: z.string().min(1, 'Specify your country'),
+  github: z.string().optional(),
+  twitter: z.string().optional(),
+  discord: z.string().optional(),
+  contributions: z.string().optional(),
+})
+
+export type SupaSquadApplication = z.infer<typeof supaSquadApplicationSchema>
 
 export type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>
 export type IconType = LucideIcon | HeroIcon

@@ -5,7 +5,7 @@ import { Edit, MoreVertical, Trash } from 'lucide-react'
 
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
@@ -37,7 +37,7 @@ export const PolicyRow = ({
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
-  const { can: canUpdatePolicies } = useAsyncCheckProjectPermissions(
+  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'policies'
   )

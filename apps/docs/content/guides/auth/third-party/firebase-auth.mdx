@@ -9,7 +9,7 @@ Firebase Auth can be used as a third-party authentication provider alongside Sup
 ## Getting started
 
 1. First you need to add an integration to connect your Supabase project with your Firebase project. You will need to get the Project ID in the [Firebase Console](https://console.firebase.google.com/u/0/project/_/settings/general).
-2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/auth/third-party).
 3. If you are using Third Party Auth when self hosting, create and attach restrictive RLS policies to all tables in your public schema, Storage and Realtime to **prevent unauthorized access from unrelated Firebase projects**.
 4. Assign the `role: 'authenticated'` [custom user claim](https://firebase.google.com/docs/auth/admin/custom-claims) to all your users.
 5. Finally set up the Supabase client in your application.
@@ -143,7 +143,7 @@ val supabase = createSupabaseClient(
 
 ## Add a new Third-Party Auth integration to your project
 
-In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
 In the CLI add the following config to your `supabase/config.toml` file:
 

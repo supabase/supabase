@@ -50,6 +50,7 @@ Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
 Fabrizio Fenoglio
+Fady A
 Felipe Stival
 Francesco Sansalvadore
 Greg Kress
@@ -63,6 +64,7 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jeff Smick
 Jenny Kibiri
 Jess Shears
 Jim Chanco Jr
@@ -131,11 +133,13 @@ Thor Schaeff
 Timothy Lim
 Tom Ashley
 Tom G
+Tomás Pozo
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
+Yuliya Marinova
 Yuri Santana
 ____________
 
