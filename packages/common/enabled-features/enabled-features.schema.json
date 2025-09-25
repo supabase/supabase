@@ -144,6 +144,14 @@
       "type": "boolean",
       "description": "Enable documentation on contribution"
     },
+    "docs:fdw": {
+      "type": "boolean",
+      "description": "Enable documentation on foreign data wrappers"
+    },
+    "docs:footer": {
+      "type": "boolean",
+      "description": "Enable footer on docs site"
+    },
     "docs:framework_quickstarts": {
       "type": "boolean",
       "description": "Enable framework quickstarts documentation"
@@ -373,6 +381,8 @@
     "docs:auth_troubleshooting",
     "docs:compliance",
     "docs:contribution",
+    "docs:fdw",
+    "docs:footer",
     "docs:framework_quickstarts",
     "docs:full_getting_started",
     "docs:full_platform",
