@@ -1,6 +1,6 @@
-import { Smartphone } from 'lucide-react'
+import { Fingerprint, Smartphone } from 'lucide-react'
 
-import { TOTPFactors } from 'components/interfaces/Account'
+import { TOTPFactors, WebAuthnFactors } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -44,28 +44,60 @@ const Security: NextPageWithLayout = () => {
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer bottomPadding>
-        <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
-          <CollapsibleTrigger_Shadcn_ asChild>
-            <button
-              type="button"
-              className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
-            >
-              <div className="flex flex-row gap-4 items-center py-1">
-                <Smartphone strokeWidth={1.5} />
-                <span className="text-sm">Authenticator app</span>
-              </div>
+        <div className="space-y-4">
+          <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
+            <CollapsibleTrigger_Shadcn_ asChild>
+              <button
+                type="button"
+                className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+              >
+                <div className="flex flex-row gap-4 items-center py-1">
+                  <Smartphone strokeWidth={1.5} />
+                  <span className="text-sm">Authenticator app</span>
+                </div>
 
-              {data ? (
-                <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
-                  {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
-                </Badge>
-              ) : null}
-            </button>
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
-            <TOTPFactors />
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+                {data ? (
+                  <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
+                    {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
+                  </Badge>
+                ) : null}
+              </button>
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+              <TOTPFactors />
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
+
+          <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
+            <CollapsibleTrigger_Shadcn_ asChild>
+              <button
+                type="button"
+                className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+              >
+                <div className="flex flex-row gap-4 items-center py-1">
+                  <Fingerprint strokeWidth={1.5} />
+                  <span className="text-sm">WehAuthn</span>
+                </div>
+
+                {data
+                  ? (() => {
+                      const webauthnCount = data.all.filter(
+                        (factor) => factor.factor_type === 'webauthn'
+                      ).length
+                      return (
+                        <Badge variant={webauthnCount === 0 ? 'default' : 'brand'}>
+                          {webauthnCount} key{webauthnCount === 1 ? '' : 's'} configured
+                        </Badge>
+                      )
+                    })()
+                  : null}
+              </button>
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+              <WebAuthnFactors />
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
+        </div>
       </ScaffoldContainer>
     </>
   )

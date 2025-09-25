@@ -1762,64 +1762,82 @@ export interface components {
       external_anonymous_users_enabled: boolean | null
       external_apple_additional_client_ids: string | null
       external_apple_client_id: string | null
+      external_apple_email_optional: boolean | null
       external_apple_enabled: boolean | null
       external_apple_secret: string | null
       external_azure_client_id: string | null
+      external_azure_email_optional: boolean | null
       external_azure_enabled: boolean | null
       external_azure_secret: string | null
       external_azure_url: string | null
       external_bitbucket_client_id: string | null
+      external_bitbucket_email_optional: boolean | null
       external_bitbucket_enabled: boolean | null
       external_bitbucket_secret: string | null
       external_discord_client_id: string | null
+      external_discord_email_optional: boolean | null
       external_discord_enabled: boolean | null
       external_discord_secret: string | null
       external_email_enabled: boolean | null
       external_facebook_client_id: string | null
+      external_facebook_email_optional: boolean | null
       external_facebook_enabled: boolean | null
       external_facebook_secret: string | null
       external_figma_client_id: string | null
+      external_figma_email_optional: boolean | null
       external_figma_enabled: boolean | null
       external_figma_secret: string | null
       external_github_client_id: string | null
+      external_github_email_optional: boolean | null
       external_github_enabled: boolean | null
       external_github_secret: string | null
       external_gitlab_client_id: string | null
+      external_gitlab_email_optional: boolean | null
       external_gitlab_enabled: boolean | null
       external_gitlab_secret: string | null
       external_gitlab_url: string | null
       external_google_additional_client_ids: string | null
       external_google_client_id: string | null
+      external_google_email_optional: boolean | null
       external_google_enabled: boolean | null
       external_google_secret: string | null
       external_google_skip_nonce_check: boolean | null
       external_kakao_client_id: string | null
+      external_kakao_email_optional: boolean | null
       external_kakao_enabled: boolean | null
       external_kakao_secret: string | null
       external_keycloak_client_id: string | null
+      external_keycloak_email_optional: boolean | null
       external_keycloak_enabled: boolean | null
       external_keycloak_secret: string | null
       external_keycloak_url: string | null
       external_linkedin_oidc_client_id: string | null
+      external_linkedin_oidc_email_optional: boolean | null
       external_linkedin_oidc_enabled: boolean | null
       external_linkedin_oidc_secret: string | null
       external_notion_client_id: string | null
+      external_notion_email_optional: boolean | null
       external_notion_enabled: boolean | null
       external_notion_secret: string | null
       external_phone_enabled: boolean | null
       external_slack_client_id: string | null
+      external_slack_email_optional: boolean | null
       external_slack_enabled: boolean | null
       external_slack_oidc_client_id: string | null
+      external_slack_oidc_email_optional: boolean | null
       external_slack_oidc_enabled: boolean | null
       external_slack_oidc_secret: string | null
       external_slack_secret: string | null
       external_spotify_client_id: string | null
+      external_spotify_email_optional: boolean | null
       external_spotify_enabled: boolean | null
       external_spotify_secret: string | null
       external_twitch_client_id: string | null
+      external_twitch_email_optional: boolean | null
       external_twitch_enabled: boolean | null
       external_twitch_secret: string | null
       external_twitter_client_id: string | null
+      external_twitter_email_optional: boolean | null
       external_twitter_enabled: boolean | null
       external_twitter_secret: string | null
       external_web3_ethereum_enabled: boolean | null
@@ -1829,6 +1847,7 @@ export interface components {
       external_workos_secret: string | null
       external_workos_url: string | null
       external_zoom_client_id: string | null
+      external_zoom_email_optional: boolean | null
       external_zoom_enabled: boolean | null
       external_zoom_secret: string | null
       hook_before_user_created_enabled: boolean | null
@@ -1879,6 +1898,7 @@ export interface components {
       mfa_web_authn_verify_enabled: boolean | null
       nimbus_oauth_client_id: string | null
       nimbus_oauth_client_secret: string | null
+      nimbus_oauth_email_optional: boolean | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       /** @enum {string|null} */
@@ -3085,64 +3105,82 @@ export interface components {
       external_anonymous_users_enabled?: boolean | null
       external_apple_additional_client_ids?: string | null
       external_apple_client_id?: string | null
+      external_apple_email_optional?: boolean | null
       external_apple_enabled?: boolean | null
       external_apple_secret?: string | null
       external_azure_client_id?: string | null
+      external_azure_email_optional?: boolean | null
       external_azure_enabled?: boolean | null
       external_azure_secret?: string | null
       external_azure_url?: string | null
       external_bitbucket_client_id?: string | null
+      external_bitbucket_email_optional?: boolean | null
       external_bitbucket_enabled?: boolean | null
       external_bitbucket_secret?: string | null
       external_discord_client_id?: string | null
+      external_discord_email_optional?: boolean | null
       external_discord_enabled?: boolean | null
       external_discord_secret?: string | null
       external_email_enabled?: boolean | null
       external_facebook_client_id?: string | null
+      external_facebook_email_optional?: boolean | null
       external_facebook_enabled?: boolean | null
       external_facebook_secret?: string | null
       external_figma_client_id?: string | null
+      external_figma_email_optional?: boolean | null
       external_figma_enabled?: boolean | null
       external_figma_secret?: string | null
       external_github_client_id?: string | null
+      external_github_email_optional?: boolean | null
       external_github_enabled?: boolean | null
       external_github_secret?: string | null
       external_gitlab_client_id?: string | null
+      external_gitlab_email_optional?: boolean | null
       external_gitlab_enabled?: boolean | null
       external_gitlab_secret?: string | null
       external_gitlab_url?: string | null
       external_google_additional_client_ids?: string | null
       external_google_client_id?: string | null
+      external_google_email_optional?: boolean | null
       external_google_enabled?: boolean | null
       external_google_secret?: string | null
       external_google_skip_nonce_check?: boolean | null
       external_kakao_client_id?: string | null
+      external_kakao_email_optional?: boolean | null
       external_kakao_enabled?: boolean | null
       external_kakao_secret?: string | null
       external_keycloak_client_id?: string | null
+      external_keycloak_email_optional?: boolean | null
       external_keycloak_enabled?: boolean | null
       external_keycloak_secret?: string | null
       external_keycloak_url?: string | null
       external_linkedin_oidc_client_id?: string | null
+      external_linkedin_oidc_email_optional?: boolean | null
       external_linkedin_oidc_enabled?: boolean | null
       external_linkedin_oidc_secret?: string | null
       external_notion_client_id?: string | null
+      external_notion_email_optional?: boolean | null
       external_notion_enabled?: boolean | null
       external_notion_secret?: string | null
       external_phone_enabled?: boolean | null
       external_slack_client_id?: string | null
+      external_slack_email_optional?: boolean | null
       external_slack_enabled?: boolean | null
       external_slack_oidc_client_id?: string | null
+      external_slack_oidc_email_optional?: boolean | null
       external_slack_oidc_enabled?: boolean | null
       external_slack_oidc_secret?: string | null
       external_slack_secret?: string | null
       external_spotify_client_id?: string | null
+      external_spotify_email_optional?: boolean | null
       external_spotify_enabled?: boolean | null
       external_spotify_secret?: string | null
       external_twitch_client_id?: string | null
+      external_twitch_email_optional?: boolean | null
       external_twitch_enabled?: boolean | null
       external_twitch_secret?: string | null
       external_twitter_client_id?: string | null
+      external_twitter_email_optional?: boolean | null
       external_twitter_enabled?: boolean | null
       external_twitter_secret?: string | null
       external_web3_ethereum_enabled?: boolean | null
@@ -3152,6 +3190,7 @@ export interface components {
       external_workos_secret?: string | null
       external_workos_url?: string | null
       external_zoom_client_id?: string | null
+      external_zoom_email_optional?: boolean | null
       external_zoom_enabled?: boolean | null
       external_zoom_secret?: string | null
       hook_before_user_created_enabled?: boolean | null

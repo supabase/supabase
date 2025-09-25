@@ -5887,6 +5887,7 @@ export interface components {
     GetProjectLogsBody: {
       iso_timestamp_end?: string
       iso_timestamp_start?: string
+      lql?: string
       sql?: string
     }
     GetProjectVercelConnectionsResponse: {
@@ -6256,73 +6257,91 @@ export interface components {
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string
       EXTERNAL_APPLE_CLIENT_ID: string
+      EXTERNAL_APPLE_EMAIL_OPTIONAL: boolean
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_SECRET: string
       EXTERNAL_AZURE_CLIENT_ID: string
+      EXTERNAL_AZURE_EMAIL_OPTIONAL: boolean
       EXTERNAL_AZURE_ENABLED: boolean
       EXTERNAL_AZURE_SECRET: string
       EXTERNAL_AZURE_URL: string
       EXTERNAL_BITBUCKET_CLIENT_ID: string
+      EXTERNAL_BITBUCKET_EMAIL_OPTIONAL: boolean
       EXTERNAL_BITBUCKET_ENABLED: boolean
       EXTERNAL_BITBUCKET_SECRET: string
       EXTERNAL_DISCORD_CLIENT_ID: string
+      EXTERNAL_DISCORD_EMAIL_OPTIONAL: boolean
       EXTERNAL_DISCORD_ENABLED: boolean
       EXTERNAL_DISCORD_SECRET: string
       EXTERNAL_EMAIL_ENABLED: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID: string
+      EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: boolean
       EXTERNAL_FACEBOOK_ENABLED: boolean
       EXTERNAL_FACEBOOK_SECRET: string
       EXTERNAL_FIGMA_CLIENT_ID: string
+      EXTERNAL_FIGMA_EMAIL_OPTIONAL: boolean
       EXTERNAL_FIGMA_ENABLED: boolean
       EXTERNAL_FIGMA_SECRET: string
       EXTERNAL_GITHUB_CLIENT_ID: string
+      EXTERNAL_GITHUB_EMAIL_OPTIONAL: boolean
       EXTERNAL_GITHUB_ENABLED: boolean
       EXTERNAL_GITHUB_SECRET: string
       EXTERNAL_GITLAB_CLIENT_ID: string
+      EXTERNAL_GITLAB_EMAIL_OPTIONAL: boolean
       EXTERNAL_GITLAB_ENABLED: boolean
       EXTERNAL_GITLAB_SECRET: string
       EXTERNAL_GITLAB_URL: string
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string
       EXTERNAL_GOOGLE_CLIENT_ID: string
+      EXTERNAL_GOOGLE_EMAIL_OPTIONAL: boolean
       EXTERNAL_GOOGLE_ENABLED: boolean
       EXTERNAL_GOOGLE_SECRET: string
       EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean
       EXTERNAL_KAKAO_CLIENT_ID: string
+      EXTERNAL_KAKAO_EMAIL_OPTIONAL: boolean
       EXTERNAL_KAKAO_ENABLED: boolean
       EXTERNAL_KAKAO_SECRET: string
       EXTERNAL_KEYCLOAK_CLIENT_ID: string
+      EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: boolean
       EXTERNAL_KEYCLOAK_ENABLED: boolean
       EXTERNAL_KEYCLOAK_SECRET: string
       EXTERNAL_KEYCLOAK_URL: string
       EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string
+      EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: boolean
       EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean
       EXTERNAL_LINKEDIN_OIDC_SECRET: string
       EXTERNAL_NOTION_CLIENT_ID: string
+      EXTERNAL_NOTION_EMAIL_OPTIONAL: boolean
       EXTERNAL_NOTION_ENABLED: boolean
       EXTERNAL_NOTION_SECRET: string
       EXTERNAL_PHONE_ENABLED: boolean
       EXTERNAL_SLACK_CLIENT_ID: string
+      EXTERNAL_SLACK_EMAIL_OPTIONAL: boolean
       EXTERNAL_SLACK_ENABLED: boolean
       EXTERNAL_SLACK_OIDC_CLIENT_ID: string
+      EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: boolean
       EXTERNAL_SLACK_OIDC_ENABLED: boolean
       EXTERNAL_SLACK_OIDC_SECRET: string
       EXTERNAL_SLACK_SECRET: string
       EXTERNAL_SPOTIFY_CLIENT_ID: string
+      EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: boolean
       EXTERNAL_SPOTIFY_ENABLED: boolean
       EXTERNAL_SPOTIFY_SECRET: string
       EXTERNAL_TWITCH_CLIENT_ID: string
+      EXTERNAL_TWITCH_EMAIL_OPTIONAL: boolean
       EXTERNAL_TWITCH_ENABLED: boolean
       EXTERNAL_TWITCH_SECRET: string
       EXTERNAL_TWITTER_CLIENT_ID: string
+      EXTERNAL_TWITTER_EMAIL_OPTIONAL: boolean
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
       EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean
       EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
-      EXTERNAL_WORKOS_ENABLED: boolean
       EXTERNAL_WORKOS_SECRET: string
       EXTERNAL_WORKOS_URL: string
       EXTERNAL_ZOOM_CLIENT_ID: string
+      EXTERNAL_ZOOM_EMAIL_OPTIONAL: boolean
       EXTERNAL_ZOOM_ENABLED: boolean
       EXTERNAL_ZOOM_SECRET: string
       HOOK_BEFORE_USER_CREATED_ENABLED: boolean
@@ -7946,6 +7965,34 @@ export interface components {
       }[]
     }
     ReplicationPipelineReplicationStatusResponse: {
+      /** @description Stats about apply worker lag */
+      apply_lag?: {
+        /**
+         * @description Bytes between the current WAL location and the confirmed flush LSN.
+         * @example 2048
+         */
+        confirmed_flush_lsn_bytes: number
+        /**
+         * @description Flush lag expressed in milliseconds.
+         * @example 1200
+         */
+        flush_lag?: number
+        /**
+         * @description Bytes between the current WAL location and the slot restart LSN.
+         * @example 1024
+         */
+        restart_lsn_bytes: number
+        /**
+         * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+         * @example 8192
+         */
+        safe_wal_size_bytes: number
+        /**
+         * @description Write lag expressed in milliseconds.
+         * @example 1500
+         */
+        write_lag?: number
+      }
       /**
        * @description Pipeline id
        * @example 1012
@@ -7968,7 +8015,6 @@ export interface components {
               name: 'copied_table'
             }
           | {
-              lag: number
               /** @enum {string} */
               name: 'following_wal'
             }
@@ -8006,6 +8052,34 @@ export interface components {
          * @example public.orders
          */
         table_name: string
+        /** @description Stats about table sync worker lag */
+        table_sync_lag?: {
+          /**
+           * @description Bytes between the current WAL location and the confirmed flush LSN.
+           * @example 2048
+           */
+          confirmed_flush_lsn_bytes: number
+          /**
+           * @description Flush lag expressed in milliseconds.
+           * @example 1200
+           */
+          flush_lag?: number
+          /**
+           * @description Bytes between the current WAL location and the slot restart LSN.
+           * @example 1024
+           */
+          restart_lsn_bytes: number
+          /**
+           * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+           * @example 8192
+           */
+          safe_wal_size_bytes: number
+          /**
+           * @description Write lag expressed in milliseconds.
+           * @example 1500
+           */
+          write_lag?: number
+        }
       }[]
     }
     /** @description Pipeline */
@@ -8342,7 +8416,6 @@ export interface components {
             name: 'copied_table'
           }
         | {
-            lag: number
             /** @enum {string} */
             name: 'following_wal'
           }
@@ -8980,64 +9053,82 @@ export interface components {
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string | null
       EXTERNAL_APPLE_CLIENT_ID?: string | null
+      EXTERNAL_APPLE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_APPLE_ENABLED?: boolean | null
       EXTERNAL_APPLE_SECRET?: string | null
       EXTERNAL_AZURE_CLIENT_ID?: string | null
+      EXTERNAL_AZURE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_AZURE_ENABLED?: boolean | null
       EXTERNAL_AZURE_SECRET?: string | null
       EXTERNAL_AZURE_URL?: string | null
       EXTERNAL_BITBUCKET_CLIENT_ID?: string | null
+      EXTERNAL_BITBUCKET_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_BITBUCKET_ENABLED?: boolean | null
       EXTERNAL_BITBUCKET_SECRET?: string | null
       EXTERNAL_DISCORD_CLIENT_ID?: string | null
+      EXTERNAL_DISCORD_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_DISCORD_ENABLED?: boolean | null
       EXTERNAL_DISCORD_SECRET?: string | null
       EXTERNAL_EMAIL_ENABLED?: boolean | null
       EXTERNAL_FACEBOOK_CLIENT_ID?: string | null
+      EXTERNAL_FACEBOOK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_FACEBOOK_ENABLED?: boolean | null
       EXTERNAL_FACEBOOK_SECRET?: string | null
       EXTERNAL_FIGMA_CLIENT_ID?: string | null
+      EXTERNAL_FIGMA_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_FIGMA_ENABLED?: boolean | null
       EXTERNAL_FIGMA_SECRET?: string | null
       EXTERNAL_GITHUB_CLIENT_ID?: string | null
+      EXTERNAL_GITHUB_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GITHUB_ENABLED?: boolean | null
       EXTERNAL_GITHUB_SECRET?: string | null
       EXTERNAL_GITLAB_CLIENT_ID?: string | null
+      EXTERNAL_GITLAB_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GITLAB_ENABLED?: boolean | null
       EXTERNAL_GITLAB_SECRET?: string | null
       EXTERNAL_GITLAB_URL?: string | null
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string | null
       EXTERNAL_GOOGLE_CLIENT_ID?: string | null
+      EXTERNAL_GOOGLE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GOOGLE_ENABLED?: boolean | null
       EXTERNAL_GOOGLE_SECRET?: string | null
       EXTERNAL_GOOGLE_SKIP_NONCE_CHECK?: boolean | null
       EXTERNAL_KAKAO_CLIENT_ID?: string | null
+      EXTERNAL_KAKAO_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_KAKAO_ENABLED?: boolean | null
       EXTERNAL_KAKAO_SECRET?: string | null
       EXTERNAL_KEYCLOAK_CLIENT_ID?: string | null
+      EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_KEYCLOAK_ENABLED?: boolean | null
       EXTERNAL_KEYCLOAK_SECRET?: string | null
       EXTERNAL_KEYCLOAK_URL?: string | null
       EXTERNAL_LINKEDIN_OIDC_CLIENT_ID?: string | null
+      EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_LINKEDIN_OIDC_ENABLED?: boolean | null
       EXTERNAL_LINKEDIN_OIDC_SECRET?: string | null
       EXTERNAL_NOTION_CLIENT_ID?: string | null
+      EXTERNAL_NOTION_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_NOTION_ENABLED?: boolean | null
       EXTERNAL_NOTION_SECRET?: string | null
       EXTERNAL_PHONE_ENABLED?: boolean | null
       EXTERNAL_SLACK_CLIENT_ID?: string | null
+      EXTERNAL_SLACK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SLACK_ENABLED?: boolean | null
       EXTERNAL_SLACK_OIDC_CLIENT_ID?: string | null
+      EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SLACK_OIDC_ENABLED?: boolean | null
       EXTERNAL_SLACK_OIDC_SECRET?: string | null
       EXTERNAL_SLACK_SECRET?: string | null
       EXTERNAL_SPOTIFY_CLIENT_ID?: string | null
+      EXTERNAL_SPOTIFY_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SPOTIFY_ENABLED?: boolean | null
       EXTERNAL_SPOTIFY_SECRET?: string | null
       EXTERNAL_TWITCH_CLIENT_ID?: string | null
+      EXTERNAL_TWITCH_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_TWITCH_ENABLED?: boolean | null
       EXTERNAL_TWITCH_SECRET?: string | null
       EXTERNAL_TWITTER_CLIENT_ID?: string | null
+      EXTERNAL_TWITTER_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_TWITTER_ENABLED?: boolean | null
       EXTERNAL_TWITTER_SECRET?: string | null
       EXTERNAL_WEB3_ETHEREUM_ENABLED?: boolean | null
@@ -9047,6 +9138,7 @@ export interface components {
       EXTERNAL_WORKOS_SECRET?: string | null
       EXTERNAL_WORKOS_URL?: string | null
       EXTERNAL_ZOOM_CLIENT_ID?: string | null
+      EXTERNAL_ZOOM_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_ZOOM_ENABLED?: boolean | null
       EXTERNAL_ZOOM_SECRET?: string | null
       HOOK_BEFORE_USER_CREATED_ENABLED?: boolean | null
@@ -18454,6 +18546,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
+        lql?: string
         sql?: string
       }
       header?: never
