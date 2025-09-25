@@ -129,6 +129,8 @@ const { data, error } = await supabase
   .update({ primary_name: 'Marlon Brando Jr.' })
   .eq('nconst', 'nm0000008')
   .maxAffected(1)
+
+// This is only available starting from supabase-js version 2.56.0
 ```
 
 ```bash name=Bash
@@ -149,6 +151,8 @@ try await supabase
   .eq("nconst", value: "nm0000008")
   .maxAffected(1)
   .execute()
+
+// This is only available starting from supabase-swift version 2.33.0
 ```
 
 </$CodeTabs>
