@@ -19,7 +19,6 @@ import {
   PopoverTrigger_Shadcn_,
 } from 'ui'
 import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
-import { API_URL } from '~/lib/constants'
 import { useProjectsQuery } from '~/lib/fetch/projects'
 
 function ProjectSelector({
@@ -122,7 +121,7 @@ function PlatformSelector({
 
   const platforms = [
     { value: 'hosted', label: 'Hosted' },
-    { value: 'local', label: 'CLI or self-hosted' },
+    { value: 'local', label: 'CLI' },
   ]
 
   return (
@@ -205,7 +204,7 @@ export function McpConfigPanel() {
       <p className="text-xs text-foreground-lighter">
         {isPlatform
           ? 'Scope the MCP server to a project. If no project is selected, all projects will be accessible.'
-          : 'Project selection is only available for hosted platform.'}
+          : 'Project selection is only available for the hosted platform.'}
       </p>
       <McpConfigPanelBase
         basePath="/docs"
