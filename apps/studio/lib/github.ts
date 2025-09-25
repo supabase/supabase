@@ -43,7 +43,7 @@ export function openInstallGitHubIntegrationWindow(
   let windowUrl: string | undefined
   if (type === 'install') {
     windowUrl = GITHUB_INTEGRATION_INSTALLATION_URL
-  } else if (type === 'authorize') {
+  } else {
     const state = makeRandomString(32)
     localStorage.setItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE, state)
     windowUrl = `${GITHUB_INTEGRATION_AUTHORIZATION_URL}&state=${state}`
