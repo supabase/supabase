@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PgMetaDatabaseError } from 'lib/api/self-hosted/types'
 import { generateTypescriptTypes } from 'lib/api/self-hosted/generate-types'
 import { ResponseError } from 'types'
 
