@@ -664,7 +664,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get project api keys",
@@ -701,7 +703,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates a new API key for the project",
@@ -729,7 +733,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -762,7 +768,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -807,7 +815,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates an API key for the project",
@@ -844,7 +854,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get API key",
@@ -889,7 +901,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Deletes an API key for the project",
@@ -921,7 +935,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
         "security": [{ "bearer": [] }],
@@ -953,7 +969,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -974,7 +992,9 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to disable preview branching" }
         },
         "security": [{ "bearer": [] }],
@@ -1003,7 +1023,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -1032,7 +1054,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's custom hostname config" }
         },
         "security": [{ "bearer": [] }],
@@ -1052,7 +1076,9 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete project custom hostname configuration" }
         },
         "security": [{ "bearer": [] }],
@@ -1089,7 +1115,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project custom hostname configuration" }
         },
         "security": [{ "bearer": [] }],
@@ -1118,7 +1146,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to verify project custom hostname configuration" }
         },
         "security": [{ "bearer": [] }],
@@ -1147,7 +1177,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to activate project custom hostname configuration" }
         },
         "security": [{ "bearer": [] }],
@@ -1176,7 +1208,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's network bans" }
         },
         "security": [{ "bearer": [] }],
@@ -1205,7 +1239,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's enriched network bans" }
         },
         "security": [{ "bearer": [] }],
@@ -1235,7 +1271,9 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove network bans." }
         },
         "security": [{ "bearer": [] }],
@@ -1264,7 +1302,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's network restrictions" }
         },
         "security": [{ "bearer": [] }],
@@ -1299,7 +1339,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project network restrictions" }
         },
         "security": [{ "bearer": [] }],
@@ -1336,7 +1378,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project network restrictions" }
         },
         "security": [{ "bearer": [] }],
@@ -1365,7 +1409,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's pgsodium config" }
         },
         "security": [{ "bearer": [] }],
@@ -1400,7 +1446,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's pgsodium config" }
         },
         "security": [{ "bearer": [] }],
@@ -1429,7 +1477,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's postgrest config" }
         },
         "security": [{ "bearer": [] }],
@@ -1464,7 +1514,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's postgrest config" }
         },
         "security": [{ "bearer": [] }],
@@ -1493,7 +1545,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project" }
         },
         "security": [{ "bearer": [] }],
@@ -1520,7 +1574,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Deletes the given project",
@@ -1552,7 +1608,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's secrets" }
         },
         "security": [{ "bearer": [] }],
@@ -1579,7 +1637,9 @@
         },
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create project's secrets" }
         },
         "security": [{ "bearer": [] }],
@@ -1606,7 +1666,9 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete secrets with given names" }
         },
         "security": [{ "bearer": [] }],
@@ -1635,7 +1697,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's SSL enforcement config" }
         },
         "security": [{ "bearer": [] }],
@@ -1670,7 +1734,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's SSL enforcement configuration." }
         },
         "security": [{ "bearer": [] }],
@@ -1706,7 +1772,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to generate TypeScript types" }
         },
         "security": [{ "bearer": [] }],
@@ -1735,7 +1803,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project vanity subdomain configuration" }
         },
         "security": [{ "bearer": [] }],
@@ -1755,7 +1825,9 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete project vanity subdomain configuration" }
         },
         "security": [{ "bearer": [] }],
@@ -1790,7 +1862,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to check project vanity subdomain configuration" }
         },
         "security": [{ "bearer": [] }],
@@ -1825,7 +1899,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to activate project vanity subdomain configuration" }
         },
         "security": [{ "bearer": [] }],
@@ -1860,7 +1936,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to initiate project upgrade" }
         },
         "security": [{ "bearer": [] }],
@@ -1889,7 +1967,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to determine project upgrade eligibility" }
         },
         "security": [{ "bearer": [] }],
@@ -1924,7 +2004,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project upgrade status" }
         },
         "security": [{ "bearer": [] }],
@@ -1953,7 +2035,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project readonly mode status" }
         },
         "security": [{ "bearer": [] }],
@@ -1975,7 +2059,9 @@
         ],
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to disable project's readonly mode" }
         },
         "security": [{ "bearer": [] }],
@@ -2005,7 +2091,9 @@
         },
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to set up read replica" }
         },
         "security": [{ "bearer": [] }],
@@ -2035,7 +2123,9 @@
         },
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove read replica" }
         },
         "security": [{ "bearer": [] }],
@@ -2094,7 +2184,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's service health status" }
         },
         "security": [{ "bearer": [] }],
@@ -2123,7 +2215,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Set up the project's existing JWT secret as an in_use JWT signing key. This endpoint will be removed in the future always check for HTTP 404 Not Found.",
@@ -2149,7 +2243,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get the signing key information for the JWT secret imported as signing key for this project. This endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -2185,7 +2281,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Create a new signing key for the project in standby status",
@@ -2211,7 +2309,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List all signing keys for the project",
@@ -2245,7 +2345,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get information about a signing key",
@@ -2277,7 +2379,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Remove a signing key from a project. Only possible if the key has been in revoked status for a while.",
@@ -2317,7 +2421,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Update a signing key, mainly its status",
@@ -2345,7 +2451,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's storage config" }
         },
         "security": [{ "bearer": [] }],
@@ -2373,7 +2481,9 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's storage config" }
         },
         "security": [{ "bearer": [] }],
@@ -2402,7 +2512,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's Postgres config" }
         },
         "security": [{ "bearer": [] }],
@@ -2437,7 +2549,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's Postgres config" }
         },
         "security": [{ "bearer": [] }],
@@ -2466,7 +2580,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's pgbouncer config" }
         },
         "summary": "Get project's pgbouncer config",
@@ -2497,7 +2613,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's supavisor config" }
         },
         "security": [{ "bearer": [] }],
@@ -2532,7 +2650,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's supavisor config" }
         },
         "security": [{ "bearer": [] }],
@@ -2561,7 +2681,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's auth config" }
         },
         "security": [{ "bearer": [] }],
@@ -2596,7 +2718,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's auth config" }
         },
         "security": [{ "bearer": [] }],
@@ -2631,7 +2755,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates a new third-party auth integration",
@@ -2660,7 +2786,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists all third-party auth integrations",
@@ -2692,7 +2820,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Removes a third-party auth integration",
@@ -2722,7 +2852,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get a third-party integration",
@@ -2741,7 +2873,12 @@
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
-        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Pauses the given project",
         "tags": ["Projects"]
@@ -2770,7 +2907,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists available restore versions for the given project",
@@ -2787,7 +2926,12 @@
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
-        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Restores the given project",
         "tags": ["Projects"]
@@ -2805,7 +2949,12 @@
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
-        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Cancels the given project restoration",
         "tags": ["Projects"]
@@ -2813,6 +2962,7 @@
     },
     "/v1/projects/{ref}/billing/addons": {
       "get": {
+        "description": "Returns the billing addons that are currently applied, including the active compute instance size, and lists every addon option that can be provisioned with pricing metadata.",
         "operationId": "v1-list-project-addons",
         "parameters": [
           {
@@ -2832,14 +2982,17 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list project addons" }
         },
         "security": [{ "bearer": [] }],
-        "summary": "Lists project addons",
+        "summary": "List billing addons and compute instance selections",
         "tags": ["Billing"]
       },
       "patch": {
+        "description": "Selects an addon variant, for example scaling the project’s compute instance up or down, and applies it to the project.",
         "operationId": "v1-apply-project-addon",
         "parameters": [
           {
@@ -2860,16 +3013,19 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to apply project addon" }
         },
         "security": [{ "bearer": [] }],
-        "summary": "Applies project addon",
+        "summary": "Apply or update billing addons, including compute instance size",
         "tags": ["Billing"]
       }
     },
     "/v1/projects/{ref}/billing/addons/{addon_variant}": {
       "delete": {
+        "description": "Disables the selected addon variant, including rolling the compute instance back to its previous size.",
         "operationId": "v1-remove-project-addon",
         "parameters": [
           {
@@ -2917,11 +3073,13 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove project addon" }
         },
         "security": [{ "bearer": [] }],
-        "summary": "Removes project addon",
+        "summary": "Remove billing addons or revert compute instance sizing",
         "tags": ["Billing"]
       }
     },
@@ -2946,7 +3104,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project claim token",
@@ -2973,7 +3133,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates project claim token",
@@ -2991,7 +3153,12 @@
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
-        "responses": { "204": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
@@ -3021,7 +3188,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project performance advisors.",
@@ -3057,7 +3226,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project security advisors.",
@@ -3097,7 +3268,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's logs",
@@ -3134,7 +3307,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's usage api counts" }
         },
         "security": [{ "bearer": [] }],
@@ -3163,7 +3338,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's usage api requests count" }
         },
         "security": [{ "bearer": [] }],
@@ -3197,7 +3374,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's function combined statistics" }
         },
         "security": [{ "bearer": [] }],
@@ -3232,7 +3411,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create login role" }
         },
         "security": [{ "bearer": [] }],
@@ -3259,7 +3440,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete login roles" }
         },
         "security": [{ "bearer": [] }],
@@ -3289,7 +3472,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database migrations" }
         },
         "security": [{ "bearer": [] }],
@@ -3325,7 +3510,9 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to apply database migration" }
         },
         "security": [{ "bearer": [] }],
@@ -3361,7 +3548,9 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to upsert database migration" }
         },
         "security": [{ "bearer": [] }],
@@ -3389,7 +3578,9 @@
         },
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to run sql query" }
         },
         "security": [{ "bearer": [] }],
@@ -3411,7 +3602,9 @@
         ],
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to enable Database Webhooks on the project" }
         },
         "security": [{ "bearer": [] }],
@@ -3442,7 +3635,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets database metadata for the given project.",
@@ -3469,7 +3664,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database jit access" }
         },
         "security": [{ "bearer": [] }],
@@ -3505,7 +3702,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to authorize database jit access" }
         },
         "security": [{ "bearer": [] }],
@@ -3537,7 +3736,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to upsert database migration" }
         },
         "security": [{ "bearer": [] }],
@@ -3567,7 +3768,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database jit access" }
         },
         "security": [{ "bearer": [] }],
@@ -3596,7 +3799,9 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove JIT access" }
         },
         "security": [{ "bearer": [] }],
@@ -3629,7 +3834,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's functions" }
         },
         "security": [{ "bearer": [] }],
@@ -3706,8 +3913,10 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
             }
           },
+          "401": { "description": "Unauthorized" },
           "402": { "description": "Maximum number of functions reached for Plan" },
-          "403": { "description": "" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create project's function" }
         },
         "security": [{ "bearer": [] }],
@@ -3743,8 +3952,10 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
           "402": { "description": "Maximum number of functions reached for Plan" },
-          "403": { "description": "" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update functions" }
         },
         "security": [{ "bearer": [] }],
@@ -3795,8 +4006,10 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
           "402": { "description": "Maximum number of functions reached for Plan" },
-          "403": { "description": "" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to deploy function" }
         },
         "security": [{ "bearer": [] }],
@@ -3833,7 +4046,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve function with given slug" }
         },
         "security": [{ "bearer": [] }],
@@ -3916,7 +4131,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update function with given slug" }
         },
         "security": [{ "bearer": [] }],
@@ -3944,7 +4161,9 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete function with given slug" }
         },
         "security": [{ "bearer": [] }],
@@ -3979,7 +4198,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/StreamableFile" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve function body with given slug" }
         },
         "security": [{ "bearer": [] }],
@@ -4011,7 +4232,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get list of buckets" }
         },
         "security": [{ "bearer": [] }],
@@ -4046,8 +4269,10 @@
               }
             }
           },
-          "403": { "description": "" },
-          "404": { "description": "SAML 2.0 support is not enabled for this project" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "404": { "description": "SAML 2.0 support is not enabled for this project" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates a new SSO provider",
@@ -4073,8 +4298,10 @@
               }
             }
           },
-          "403": { "description": "" },
-          "404": { "description": "SAML 2.0 support is not enabled for this project" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "404": { "description": "SAML 2.0 support is not enabled for this project" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists all SSO providers",
@@ -4108,10 +4335,12 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
-          }
+          },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets a SSO provider by its UUID",
@@ -4149,10 +4378,12 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
-          }
+          },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates a SSO provider by its UUID",
@@ -4184,10 +4415,12 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
-          }
+          },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Removes a SSO provider by its UUID",
@@ -4213,7 +4446,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/V1BackupsResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get backups" }
         },
         "security": [{ "bearer": [] }],
@@ -4239,7 +4474,12 @@
             "application/json": { "schema": { "$ref": "#/components/schemas/V1RestorePitrBody" } }
           }
         },
-        "responses": { "201": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Restores a PITR backup for a database",
         "tags": ["Database"]
@@ -4274,7 +4514,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Initiates a creation of a restore point for a database",
@@ -4307,7 +4549,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get requested restore points" }
         },
         "security": [{ "bearer": [] }],
@@ -4334,7 +4578,12 @@
             "application/json": { "schema": { "$ref": "#/components/schemas/V1UndoBody" } }
           }
         },
-        "responses": { "201": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Initiates an undo to a given restore point",
         "tags": ["Database"],
@@ -4365,7 +4614,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List members of an organization",
@@ -4393,7 +4644,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets information about the organization",
@@ -4422,7 +4675,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project details for the specified organization and claim token",
@@ -4441,7 +4696,12 @@
           },
           { "name": "token", "required": true, "in": "path", "schema": { "type": "string" } }
         ],
-        "responses": { "204": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
