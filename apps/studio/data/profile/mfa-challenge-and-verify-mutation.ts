@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/supabase-js'
+import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/auth-js'
 import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
