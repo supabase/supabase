@@ -24,14 +24,11 @@ interface RecursiveNavigationProps {
 
 const ICON_SIZE = 16
 
-// Helper function to check if an item contains the active path (recursively)
 const containsActivePath = (item: NavMenuSection, pathname: string): boolean => {
-  // Check if this item is the active one
   if (item.url === pathname) {
     return true
   }
 
-  // Check if any child contains the active path
   if (item.items && item.items.length > 0) {
     return item.items.some((child) => containsActivePath(child as NavMenuSection, pathname))
   }
@@ -43,7 +40,6 @@ const NavIcon = React.memo(
   ({ icon, title, hasLightIcon }: { icon: string; title: string; hasLightIcon?: boolean }) => {
     const { resolvedTheme } = useTheme()
 
-    // Use existing logic from the original components
     const iconSrc = hasLightIcon
       ? `${icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`
       : `${icon}.svg`
