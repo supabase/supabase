@@ -7,6 +7,7 @@ import {
 } from '@supabase/mcp-server-supabase/platform'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
+import { getProjectSettings } from './settings'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -48,13 +49,14 @@ export function getDatabaseOperations({
 
 export function getDevelopmentOperations(): DevelopmentOperations {
   return {
-    getProjectUrl: function (_projectRef) {
+    async getProjectUrl(_projectRef) {
+      const settings = getProjectSettings()
+      return `${settings.app_config.protocol}://${settings.app_config.endpoint}`
+    },
+    async getAnonKey(_projectRef) {
       throw new Error('Function not implemented.')
     },
-    getAnonKey: function (_projectRef) {
-      throw new Error('Function not implemented.')
-    },
-    generateTypescriptTypes: function (_projectRef) {
+    async generateTypescriptTypes(_projectRef) {
       throw new Error('Function not implemented.')
     },
   }
