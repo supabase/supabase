@@ -44,6 +44,7 @@ export const UpdateCustomReportModal = ({
         id: selectedReport.id,
         name: newVals.name,
         description: newVals.description || '',
+        favorite: selectedReport.favorite === null ? undefined : selectedReport.favorite,
       },
     })
   }

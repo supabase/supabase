@@ -262,7 +262,13 @@ const Reports = () => {
     if (config === undefined) return console.error('Config is required')
     upsertContent({
       projectRef: ref,
-      payload: { ...currentReport, content: config },
+      // [Joshen Clean Up] Temp API type fix - content.controller returns favorite as boolean | null | undefined
+      // But upsert content controller expectes favorite as boolean | undefined
+      payload: {
+        ...currentReport,
+        content: config,
+        favorite: currentReport.favorite === null ? undefined : currentReport.favorite,
+      },
     })
   }
 

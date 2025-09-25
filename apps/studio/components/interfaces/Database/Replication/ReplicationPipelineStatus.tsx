@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import {
   Activity,
   ArrowUpCircle,
@@ -14,7 +15,6 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import dayjs from 'dayjs'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -27,6 +27,7 @@ import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-sta
 import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { formatBytes } from 'lib/helpers'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -45,7 +46,6 @@ import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { SlotLagMetrics, TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
-import { formatBytes } from 'lib/helpers'
 
 type SlotLagMetricKey = keyof SlotLagMetrics
 
@@ -297,7 +297,7 @@ export const ReplicationPipelineStatus = () => {
   const filteredTableStatuses =
     filterString.length === 0
       ? tableStatuses
-      : tableStatuses.filter((table: TableState) =>
+      : tableStatuses.filter((table) =>
           table.table_name.toLowerCase().includes(filterString.toLowerCase())
         )
   const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
@@ -515,8 +515,8 @@ export const ReplicationPipelineStatus = () => {
                   <div className="flex items-start gap-2 rounded-md border border-default/50 bg-surface-200/60 px-3 py-2 text-foreground-light">
                     <Info size={14} className="mt-0.5" />
                     <span>
-                      During initial sync, tables can copy and stream independently before reconciling
-                      with the overall pipeline.
+                      During initial sync, tables can copy and stream independently before
+                      reconciling with the overall pipeline.
                     </span>
                   </div>
                   <div className="rounded border border-default/50 bg-surface-200/40">
@@ -561,8 +561,8 @@ export const ReplicationPipelineStatus = () => {
                         </Table.td>
                       </Table.tr>
                     )}
-                    {filteredTableStatuses.map((table: TableState, index: number) => {
-                      const statusConfig = getStatusConfig(table.state)
+                    {filteredTableStatuses.map((table, index) => {
+                      const statusConfig = getStatusConfig(table.state as TableState['state'])
                       return (
                         <Table.tr key={`${table.table_name}-${index}`} className="border-t">
                           <Table.td className="align-top">
