@@ -64,6 +64,6 @@ export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
   },
   {
     name: 'pgbouncer',
-    description: 'PgBouncer is now deprecated. Use Supavisor instead.',
+    description: 'PgBouncer is a lightweight connection pooler for PostgreSQL. Paid plans only.',
   },
 ] as const
