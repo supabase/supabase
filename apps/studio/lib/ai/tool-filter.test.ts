@@ -8,7 +8,6 @@ import {
   filterToolsByOptInLevel,
   createPrivacyMessageTool,
   toolSetValidationSchema,
-  transformToolResult,
 } from './tool-filter'
 
 describe('TOOL_CATEGORY_MAP', () => {
@@ -35,6 +34,7 @@ describe('tool allowance by opt-in level', () => {
       list_policies: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Log tools
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+      get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
 
     const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any)
@@ -61,6 +61,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).not.toContain('list_extensions')
     expect(tools).not.toContain('list_edge_functions')
     expect(tools).not.toContain('list_branches')
+    expect(tools).not.toContain('get_logs')
     expect(tools).not.toContain('execute_sql')
   })
 
@@ -76,6 +77,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).not.toContain('get_advisors')
+    expect(tools).not.toContain('get_logs')
     expect(tools).not.toContain('execute_sql')
   })
 
@@ -91,6 +93,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
+    expect(tools).toContain('get_logs')
     expect(tools).not.toContain('execute_sql')
   })
 
@@ -106,6 +109,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
+    expect(tools).toContain('get_logs')
     expect(tools).not.toContain('execute_sql')
   })
 })
@@ -125,6 +129,7 @@ describe('filterToolsByOptInLevel', () => {
     search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Log tools
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+    get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Unknown tool - should be filtered out entirely
     some_other_tool: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
   } as unknown as ToolSet
@@ -180,6 +185,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_branches',
       'list_policies',
       'get_advisors',
+      'get_logs',
     ])
   })
 
@@ -193,13 +199,14 @@ describe('filterToolsByOptInLevel', () => {
       'list_branches',
       'list_policies',
       'get_advisors',
+      'get_logs',
     ])
   })
 
   it('should stub log tools for schema opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema')
 
-    await expectStubsFor(tools, ['get_advisors'])
+    await expectStubsFor(tools, ['get_advisors', 'get_logs'])
   })
 
   // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level
@@ -226,56 +233,6 @@ describe('createPrivacyMessageTool', () => {
 
     const result = await privacyTool.execute({}, {})
     expect(result.status).toContain("You don't have permission to use this tool")
-  })
-})
-
-describe('transformToolResult', () => {
-  it('should wrap a tool with a result transformation function', async () => {
-    const originalResult = { data: 'original' }
-
-    const mockTool = {
-      description: 'Test tool',
-      execute: vitest.fn().mockResolvedValue(originalResult),
-    } as unknown as Tool<any, typeof originalResult>
-
-    const transformFn = vitest.fn((result: typeof originalResult) => ({
-      data: `${result.data} - transformed`,
-    }))
-
-    const transformedTool = transformToolResult(mockTool, transformFn)
-
-    // Tool properties should be preserved
-    expect(transformedTool.description).toBe(mockTool.description)
-
-    // Execute the transformed tool
-    const args = { key: 'value' }
-    const options = {} as any
-
-    if (!transformedTool.execute) {
-      throw new Error('Transformed tool does not have an execute function')
-    }
-
-    const result = await transformedTool.execute(args, options)
-
-    // Original tool should have been called with the same arguments
-    expect(mockTool.execute).toHaveBeenCalledWith(args, options)
-
-    // Transform function should have been called with the original result
-    expect(transformFn).toHaveBeenCalledWith(originalResult)
-
-    // Final result should be the transformed value
-    expect(result).toEqual({ data: 'original - transformed' })
-  })
-
-  it('should throw an error if tool is null', () => {
-    expect(() => transformToolResult(null as any, () => ({}))).toThrow('Tool is required')
-  })
-
-  it('should throw an error if tool does not have an execute function', () => {
-    const invalidTool = { name: 'invalid' } as any
-    expect(() => transformToolResult(invalidTool, () => ({}))).toThrow(
-      'Tool does not have an execute function'
-    )
   })
 })
 

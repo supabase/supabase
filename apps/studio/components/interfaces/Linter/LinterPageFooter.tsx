@@ -1,3 +1,6 @@
+import { X } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { Button, cn } from 'ui'
 import { Markdown } from '../Markdown'
 
@@ -14,8 +17,25 @@ const LinterPageFooter = ({
   refetch,
   hideDbInspectCTA,
 }: LinterPageFooterProps) => {
+  const [showBottomSection, setShowBottomSection] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
+    true
+  )
+
+  if (!showBottomSection) {
+    return null
+  }
+
   return (
-    <div className="px-6 py-6 flex gap-x-4 border-t ">
+    <div className="px-6 py-6 flex gap-x-4 border-t relative">
+      <Button
+        className="absolute top-1.5 right-3 px-1.5"
+        type="text"
+        size="tiny"
+        onClick={() => setShowBottomSection(false)}
+      >
+        <X size="14" />
+      </Button>
       <div
         className={cn(hideDbInspectCTA ? 'w-[35%]' : 'w-[33%]', 'flex flex-col gap-y-1 text-sm')}
       >
@@ -64,4 +84,4 @@ const LinterPageFooter = ({
   )
 }
 
-export default LinterPageFooter
+export { LinterPageFooter }

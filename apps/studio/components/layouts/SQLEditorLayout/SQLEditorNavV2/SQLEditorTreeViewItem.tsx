@@ -21,7 +21,7 @@ import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLE
 import { getContentById } from 'data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
 import { Snippet } from 'data/content/sql-folders-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
@@ -106,7 +106,7 @@ export const SQLEditorTreeViewItem = ({
   const isEditing = status === 'editing'
   const isSaving = status === 'saving'
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckProjectPermissions(
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
     {

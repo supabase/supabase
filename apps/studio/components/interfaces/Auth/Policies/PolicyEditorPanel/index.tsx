@@ -15,7 +15,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -67,7 +67,7 @@ export const PolicyEditorPanel = memo(function ({
   const queryClient = useQueryClient()
   const { data: selectedProject } = useSelectedProjectQuery()
 
-  const { can: canUpdatePolicies } = useAsyncCheckProjectPermissions(
+  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
@@ -374,6 +374,9 @@ export const PolicyEditorPanel = memo(function ({
                         <p className="font-mono tracking-tighter">
                           {showCheckBlock ? (
                             <>
+                              {supportWithCheck && showCheckBlock && (
+                                <span className="text-[#ffd700]">) </span>
+                              )}
                               <span className="text-[#569cd6]">with check</span>{' '}
                               <span className="text-[#ffd700]">(</span>
                             </>

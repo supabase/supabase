@@ -26,6 +26,7 @@ import {
   default as python,
 } from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+import pgsql from 'react-syntax-highlighter/dist/cjs/languages/hljs/pgsql'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 
 export type CodeBlockLang =
@@ -44,6 +45,7 @@ export type CodeBlockLang =
   | 'php'
   | 'python'
   | 'go'
+  | 'pgsql'
 export interface CodeBlockProps {
   title?: ReactNode
   language?: CodeBlockLang
@@ -146,6 +148,7 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('php', php)
   SyntaxHighlighter.registerLanguage('python', python)
   SyntaxHighlighter.registerLanguage('go', go)
+  SyntaxHighlighter.registerLanguage('pgsql', pgsql)
 
   const large = false
   // don't show line numbers if bash == lang

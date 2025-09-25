@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.39.2
+  version: 2.45.5
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2253,7 +2253,7 @@ commands:
       - local-dev
     links: []
     subcommands:
-      - supabase-gen-keys
+      - supabase-gen-bearer-jwt
       - supabase-gen-signing-key
       - supabase-gen-types
     flags: []
@@ -2293,13 +2293,16 @@ commands:
         default_value: 'false'
       - id: postgrest-v9-compat
         name: --postgrest-v9-compat
-        description: |
-          Generate types compatible with PostgREST v9 and below. Only use together with --db-url.
+        description: Generate types compatible with PostgREST v9 and below.
         default_value: 'false'
       - id: project-id
         name: --project-id <string>
         description: Generate types from a project ID.
         default_value: ''
+      - id: query-timeout
+        name: --query-timeout <duration>
+        description: Maximum timeout allowed for the database query.
+        default_value: 15s
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
@@ -2344,27 +2347,31 @@ commands:
         name: --append
         description: Append new key to existing keys file instead of overwriting.
         default_value: 'false'
-  - id: supabase-gen-keys
-    title: supabase gen keys
-    summary: Generate keys for preview branch
+  - id: supabase-gen-bearer-jwt
+    title: supabase gen bearer-jwt
+    summary: Generate a Bearer Auth JWT for accessing Data API
     tags: []
     links: []
-    usage: supabase gen keys [flags]
+    usage: supabase gen bearer-jwt [flags]
     subcommands: []
     flags:
-      - id: override-name
-        name: --override-name <strings>
-        description: Override specific variable names.
-        default_value: '[]'
-      - id: project-ref
-        name: --project-ref <string>
-        description: Project ref of the Supabase project.
+      - id: exp
+        name: --exp <time>
+        description: Expiry timestamp for this token.
         default_value: ''
-      - id: experimental
-        name: --experimental
-        description: enable experimental features
+      - id: role
+        name: --role <string>
+        description: Postgres role to use.
         required: true
-        default_value: 'false'
+        default_value: ''
+      - id: sub
+        name: --sub <string>
+        description: User ID to impersonate.
+        default_value: anonymous
+      - id: valid-for
+        name: --valid-for <duration>
+        description: Validity duration for this token.
+        default_value: 30m0s
   - id: supabase-functions
     title: supabase functions
     summary: Manage Supabase Edge functions

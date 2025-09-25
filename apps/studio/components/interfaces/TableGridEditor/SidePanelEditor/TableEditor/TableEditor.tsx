@@ -30,7 +30,7 @@ import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import type { ColumnField } from '../SidePanelEditor.types'
-import SpreadsheetImport from '../SpreadsheetImport/SpreadsheetImport'
+import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import HeaderTitle from './HeaderTitle'
@@ -187,6 +187,10 @@ export const TableEditor = ({
   const onSaveChanges = (resolve: any) => {
     if (tableFields) {
       const errors: any = validateFields(tableFields)
+      if (errors.name) {
+        toast.error(errors.name)
+      }
+
       if (errors.columns) {
         toast.error(errors.columns)
       }

@@ -17,7 +17,7 @@ import {
   REALTIME_DEFAULT_CONFIG,
   useRealtimeConfigurationQuery,
 } from 'data/realtime/realtime-config-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
@@ -40,11 +40,12 @@ const formId = 'realtime-configuration-form'
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
-    PermissionAction.REALTIME_ADMIN_READ,
-    '*'
-  )
+  const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
+  const {
+    can: canUpdateConfig,
+    isLoading: isLoadingPermissions,
+    isSuccess: isPermissionsLoaded,
+  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
 
   const { data: maxConn } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -134,7 +135,11 @@ export const RealtimeSettings = () => {
                       className="!p-0 !pt-2"
                       header={<FormSectionLabel>Channel restrictions</FormSectionLabel>}
                     >
-                      <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent
+                        loaders={1}
+                        loading={isLoading || isLoadingPermissions}
+                        className="!gap-y-2"
+                      >
                         <FormItemLayout
                           layout="flex"
                           label="Allow public access"
@@ -249,7 +254,7 @@ export const RealtimeSettings = () => {
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
-                        {!isUsageBillingEnabled && (
+                        {isSuccessOrganization && !isUsageBillingEnabled && (
                           <Admonition
                             showIcon={false}
                             type="default"
@@ -429,7 +434,7 @@ export const RealtimeSettings = () => {
               </CardContent> */}
               <CardFooter className="justify-between">
                 <div>
-                  {!canUpdateConfig && (
+                  {isPermissionsLoaded && !canUpdateConfig && (
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update realtime settings
                     </p>

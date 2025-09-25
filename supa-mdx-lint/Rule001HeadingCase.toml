@@ -144,6 +144,7 @@ may_uppercase = [
     "OrbStack",
     "OrioleDB",
     "PGAudit",
+    "PgBouncer",
     "Phoenix",
     "Pro Plan",
     "Podman",

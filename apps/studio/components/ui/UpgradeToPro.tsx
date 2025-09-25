@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 
 import { useFlag } from 'common'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn } from 'ui'
@@ -34,7 +34,7 @@ const UpgradeToPro = ({
   const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan?.id
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

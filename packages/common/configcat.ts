@@ -27,17 +27,22 @@ export const fetchHandler: typeof fetch = async (input, init) => {
 }
 
 async function getClient() {
-  if (!process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL) {
-    console.error(
-      'Failed to get ConfigCat client: missing env var "NEXT_PUBLIC_CONFIGCAT_PROXY_URL"'
-    )
-  }
-
   if (client) return client
+
+  if (!process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY && !process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL) {
+    console.log('Skipping ConfigCat set up as env vars are not present')
+    return undefined
+  }
 
   const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
   const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
+
   if (response.status !== 200) {
+    if (!process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY) {
+      console.error('Failed to set up ConfigCat: SDK Key is missing')
+      return undefined
+    }
+
     // proxy is down, use default client
     client = configcat.getClient(
       process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
@@ -57,11 +62,15 @@ async function getClient() {
 export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
   const client = await getClient()
 
-  if (userEmail) {
+  if (!client) {
+    return []
+  } else if (userEmail) {
     return client.getAllValuesAsync(
       new configcat.User(userEmail, undefined, undefined, customAttributes)
     )
   } else {
-    return client.getAllValuesAsync()
+    return client.getAllValuesAsync(
+      new configcat.User('anonymous', undefined, undefined, customAttributes)
+    )
   }
 }

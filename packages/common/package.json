@@ -27,12 +27,13 @@
   },
   "devDependencies": {
     "@types/lodash": "4.17.5",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/coverage-v8": "^3.0.9",
     "@vitest/ui": "^3.0.0",
     "tsconfig": "workspace:*",
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
