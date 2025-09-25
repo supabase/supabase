@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+// End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'
 import type { IconPanel } from 'ui-patterns/IconPanel'
@@ -14,13 +15,14 @@ const {
   docsAuthTroubleshooting: authTroubleshootingEnabled,
   docsCompliance: complianceEnabled,
   docsContribution: contributionEnabled,
-  'docsSelf-hosting': selfHostingEnabled,
+  docsFdw: fdwEnabled,
   docsFrameworkQuickstarts: frameworkQuickstartsEnabled,
   docsFullPlatform: fullPlatformEnabled,
   docsLocalDevelopment: localDevelopmentEnabled,
   docsMobileTutorials: mobileTutorialsEnabled,
   docsPgtap: pgTapEnabled,
   docsProductionChecklist: productionChecklistEnabled,
+  'docsSelf-hosting': selfHostingEnabled,
   docsWebApps: webAppsEnabled,
   integrationsPartners: integrationsEnabled,
   sdkCsharp: sdkCsharpEnabled,
@@ -38,6 +40,7 @@ const {
   'docs:auth_troubleshooting',
   'docs:compliance',
   'docs:contribution',
+  'docs:fdw',
   'docs:self-hosting',
   'docs:framework_quickstarts',
   'docs:full_platform',
@@ -1260,6 +1263,7 @@ export const database: NavMenuConstant = {
     {
       name: 'Foreign Data Wrappers',
       url: undefined,
+      enabled: fdwEnabled,
       items: [
         {
           name: 'Overview',
