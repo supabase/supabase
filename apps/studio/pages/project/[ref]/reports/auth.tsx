@@ -5,6 +5,7 @@ import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
+import { ReportSectionHeader } from 'components/interfaces/Reports/v2/ReportSectionHeader'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
@@ -20,7 +21,11 @@ import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIRepor
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
-import { createAuthReportConfig } from 'data/reports/v2/auth.config'
+import {
+  createUsageReportConfig,
+  createErrorsReportConfig,
+  createLatencyReportConfig,
+} from 'data/reports/v2/auth.config'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
 import { useRouter } from 'next/router'
@@ -29,10 +34,6 @@ import {
   numericFilterSchema,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { useQueryState, parseAsJson } from 'nuqs'
-import {
-  ReportModeSelector,
-  useReportModeState,
-} from 'components/interfaces/Reports/v2/ReportModeSelector'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -90,9 +91,23 @@ const AuthUsage = () => {
     parseAsJson(numericFilterSchema.parse)
   )
 
-  const { value: modeFilter, setValue: setModeFilter } = useReportModeState()
+  const usageReportConfig = createUsageReportConfig({
+    projectRef: ref || '',
+    startDate: selectedDateRange?.period_start?.date,
+    endDate: selectedDateRange?.period_end?.date,
+    interval: selectedDateRange?.interval,
+    filters: { status_code: statusCodeFilter },
+  })
 
-  const authReportConfig = createAuthReportConfig({
+  const errorsReportConfig = createErrorsReportConfig({
+    projectRef: ref || '',
+    startDate: selectedDateRange?.period_start?.date,
+    endDate: selectedDateRange?.period_end?.date,
+    interval: selectedDateRange?.interval,
+    filters: { status_code: statusCodeFilter },
+  })
+
+  const latencyReportConfig = createLatencyReportConfig({
     projectRef: ref || '',
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
@@ -175,7 +190,6 @@ const AuthUsage = () => {
               )}
             </div>
             <div className="w-full flex items-center gap-2 flex-wrap">
-              <ReportModeSelector value={modeFilter} onChange={setModeFilter} />
               <ReportsNumericFilter
                 label="Status Code"
                 value={statusCodeFilter}
@@ -187,39 +201,87 @@ const AuthUsage = () => {
           </div>
         }
       >
-        <div className="mt-8 flex flex-col gap-4 pb-24">
-          {(() => {
-            const metrics = Array.isArray(authReportConfig) ? authReportConfig : []
-            if (modeFilter === 'debug') {
-              return metrics.filter((m) => m.id.includes('error'))
-            }
-            if (modeFilter === 'usage') {
-              const usageIds = new Set([
-                'active-user',
-                'sign-in-attempts',
-                'signups',
-                'password-reset-requests',
-              ])
-              return metrics.filter((m) => usageIds.has(m.id))
-            }
-            return metrics
-          })().map((metric, i) => (
-            <ReportChartV2
-              key={`${metric.id}`}
-              report={metric}
-              projectRef={ref!}
-              interval={selectedDateRange.interval}
-              startDate={selectedDateRange?.period_start?.date}
-              endDate={selectedDateRange?.period_end?.date}
-              updateDateRange={updateDateRange}
-              syncId={chartSyncId}
-              filters={{ status_code: statusCodeFilter }}
-              highlightActions={highlightActions}
+        <div className="mt-8 flex flex-col gap-8 pb-24">
+          <div className="flex flex-col gap-4" id="usage">
+            <ReportSectionHeader
+              id="usage"
+              title="Usage"
+              description="Monitor user activity, sign-ins, sign-ups, and password reset requests to understand how users interact with your authentication system."
             />
-          ))}
+            <div className="grid md:grid-cols-2 gap-4">
+              {usageReportConfig.map((metric) => (
+                <ReportChartV2
+                  key={`${metric.id}`}
+                  report={metric}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  syncId={chartSyncId}
+                  filters={{ status_code: statusCodeFilter }}
+                  highlightActions={highlightActions}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Errors Section */}
+          <div className="flex flex-col gap-4" id="errors">
+            <ReportSectionHeader
+              id="errors"
+              title="Errors"
+              description="Track authentication errors by status code and error type to identify issues and improve user experience."
+            />
+            <div className="grid md:grid-cols-2 gap-4">
+              {errorsReportConfig.map((metric) => (
+                <ReportChartV2
+                  key={`${metric.id}`}
+                  report={metric}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  syncId={chartSyncId}
+                  filters={{ status_code: statusCodeFilter }}
+                  highlightActions={highlightActions}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Latency Section */}
+          <div className="flex flex-col gap-4" id="latency">
+            <ReportSectionHeader
+              id="latency"
+              title="Latency"
+              description="Monitor sign-in and sign-up performance metrics including average, percentiles, and request counts to ensure optimal authentication speed."
+            />
+            <div className="grid md:grid-cols-2 gap-4">
+              {latencyReportConfig.map((metric) => (
+                <ReportChartV2
+                  key={`${metric.id}`}
+                  report={metric}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  syncId={chartSyncId}
+                  filters={{ status_code: statusCodeFilter }}
+                  highlightActions={highlightActions}
+                />
+              ))}
+            </div>
+          </div>
           <div>
-            <div className="mb-4">
-              <h5 className="text-foreground mb-2">Auth API Gateway</h5>
+            <div className="mb-4 space-y-4">
+              <ReportSectionHeader
+                id="auth-api-gateway"
+                title="Auth API Gateway"
+                description="Monitor user activity, sign-ins, sign-ups, and password reset requests to understand how users interact with your authentication system."
+              />
               <ReportFilterBar
                 filters={filters}
                 onAddFilter={addFilter}
