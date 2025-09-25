@@ -1,7 +1,7 @@
 import { fetchGet } from 'data/fetchers'
 import { PG_META_URL } from 'lib/constants'
-import { WrappedResult } from './types'
 import { assertSelfHosted } from './util'
+import { ResponseError } from 'types'
 
 export type GenerateTypescriptTypesOptions = {
   headers?: HeadersInit
@@ -18,7 +18,7 @@ type GenerateTypescriptTypesResult = {
  */
 export async function generateTypescriptTypes({
   headers,
-}: GenerateTypescriptTypesOptions): Promise<WrappedResult<GenerateTypescriptTypesResult>> {
+}: GenerateTypescriptTypesOptions): Promise<GenerateTypescriptTypesResult | ResponseError> {
   assertSelfHosted()
 
   const includedSchema = ['public', 'graphql_public', 'storage'].join(',')
@@ -39,14 +39,10 @@ export async function generateTypescriptTypes({
     '_realtime',
   ].join(',')
 
-  const response = await fetchGet(
+  const response = await fetchGet<GenerateTypescriptTypesResult>(
     `${PG_META_URL}/generators/typescript?included_schema=${includedSchema}&excluded_schemas=${excludedSchema}`,
     { headers }
   )
 
-  if (response.error) {
-    return { data: undefined, error: response.error }
-  } else {
-    return { data: response, error: undefined }
-  }
+  return response
 }

@@ -4,6 +4,7 @@ import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
 import { PgMetaDatabaseError } from 'lib/api/self-hosted/types'
 import { generateTypescriptTypes } from 'lib/api/self-hosted/typescript'
+import { ResponseError } from 'types'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -23,16 +24,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
 
-  const { data, error } = await generateTypescriptTypes({ headers })
+  const response = await generateTypescriptTypes({ headers })
 
-  if (error) {
-    if (error instanceof PgMetaDatabaseError) {
-      const { statusCode, message, formattedError } = error
-      return res.status(statusCode).json({ message, formattedError })
-    }
-    const { message } = error
-    return res.status(500).json({ message, formattedError: message })
-  } else {
-    return res.status(200).json(data)
+  if (response instanceof ResponseError) {
+    return res.status(response.code ?? 500).json({ message: response.message })
   }
+
+  return res.status(200).json(response)
 }

@@ -8,6 +8,7 @@ import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
 import { generateTypescriptTypes } from './typescript'
+import { ResponseError } from 'types'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -70,13 +71,13 @@ export function getDevelopmentOperations({
       return anonKey.api_key
     },
     async generateTypescriptTypes(_projectRef) {
-      const { data, error } = await generateTypescriptTypes({ headers })
+      const response = await generateTypescriptTypes({ headers })
 
-      if (error) {
-        throw error
+      if (response instanceof ResponseError) {
+        throw response
       }
 
-      return data
+      return response
     },
   }
 }
