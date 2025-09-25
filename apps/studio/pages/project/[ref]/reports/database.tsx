@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
-import { ReportChart } from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -43,6 +42,9 @@ import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { ReportChartUpsell } from 'components/interfaces/Reports/v2/ReportChartUpsell'
+import { POOLING_OPTIMIZATIONS } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -108,6 +110,16 @@ const DatabaseUsage = () => {
   })
   const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
 
+  // PGBouncer connections
+  const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
+  const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const poolingOptimizations =
+    POOLING_OPTIMIZATIONS[
+      (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
+        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
+    ]
+  const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
+
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -118,19 +130,13 @@ const DatabaseUsage = () => {
     }
   )
 
-  const REPORT_ATTRIBUTES = getReportAttributes(
-    org!,
-    project!,
-    diskConfig,
-    maxConnections,
-    poolerConfig
-  )
+  const REPORT_ATTRIBUTES = getReportAttributes(diskConfig)
   const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(
     org!,
     project!,
     diskConfig,
     maxConnections,
-    poolerConfig
+    defaultMaxClientConn
   )
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -308,13 +314,13 @@ const DatabaseUsage = () => {
                     }
                   />
                 ) : (
-                  <ReportChart
-                    key={`${chart.id}-${i}`}
-                    chart={chart}
-                    interval={selectedDateRange.interval}
-                    startDate={selectedDateRange?.period_start?.date}
-                    endDate={selectedDateRange?.period_end?.date}
-                    updateDateRange={updateDateRange}
+                  <ReportChartUpsell
+                    key={chart.id}
+                    report={{
+                      label: chart.label,
+                      availableIn: chart.availableIn ?? [],
+                    }}
+                    orgSlug={org?.slug ?? ''}
                   />
                 )
               ))}

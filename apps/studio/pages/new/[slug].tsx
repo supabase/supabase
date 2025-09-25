@@ -66,7 +66,7 @@ import {
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
-import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -159,6 +159,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
@@ -258,7 +259,9 @@ const Wizard: NextPageWithLayout = () => {
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
   const defaultRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
-    : _defaultRegion
+    : defaultProvider === 'AWS_NIMBUS'
+      ? AWS_REGIONS.EAST_US.displayName
+      : _defaultRegion
 
   const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 

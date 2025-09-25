@@ -31,9 +31,9 @@ export const TopSection = ({
 }: TopSectionProps) => {
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 py-16 md:p-0 w-full items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-0 w-full items-center">
         <div className="flex flex-col">
-          <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
+          <div className="flex flex-row flex-wrap items-center gap-4 w-full">
             <div>
               {!isMainBranch && (
                 <Link

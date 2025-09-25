@@ -7,7 +7,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { DATETIME_FORMAT } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import AddNewFactorModal from './AddNewFactorModal'
+import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
 
 const TOTPFactors = () => {
