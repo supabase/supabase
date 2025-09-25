@@ -7,7 +7,7 @@ import {
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
-import { generateTypescriptTypes } from './typescript'
+import { generateTypescriptTypes } from './generate-types'
 import { ResponseError } from 'types'
 
 export type GetDatabaseOperationsOptions = {
