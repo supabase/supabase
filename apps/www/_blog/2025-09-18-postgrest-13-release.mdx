@@ -52,9 +52,10 @@ const { data, error } = await supabase.from('titles').select(`
   ...genres(genres:name)
 `)
 
-// Note: to get typechecking for this feature, you need to create the supabase client like this:
+// To get typechecking for this feature, you need to create the supabase client like on the following snippet
+// This is only available starting from supabase-js version 2.56.0
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
+const supabase = createClient(''https://<your-domain>', '<YOUR_KEY>', {
   PostgrestVersion: '13'
 })
 ```
@@ -63,6 +64,14 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-
 curl 'https://<your-domain>/titles'
   -d "select=title:primary_title,...people(actors:primary_name),...genres(genres:name)"
   -H "Authorization: Bearer <YOUR_KEY>"
+```
+
+```swift name=Swift
+try await supabase.from("titles").select(`
+  title:primary_title,
+  ...people(actors:primary_name),
+  ...genres(genres:name)
+`)
 ```
 
 </$CodeTabs>
