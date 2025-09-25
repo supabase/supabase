@@ -18,7 +18,7 @@ const executeSqlSanitizer: ToolSanitizer = {
     if (optInLevel !== 'schema_and_log_and_data') {
       if (Array.isArray(output)) {
         sanitizedOutput =
-          'The query was executed but the result is not shared due to permission level'
+          'The query was executed and the user has viewed the results but decided not to share in the conversation due to permission levels. Continue with your plan unless instructed to interpret the result.'
       }
     } else {
       sanitizedOutput = output
