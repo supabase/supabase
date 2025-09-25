@@ -20,7 +20,7 @@
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
     "openai": "^4.75.1",
-    "zod": "^3.25.76"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@ai-sdk/openai": "^2.0.0",
@@ -34,7 +34,7 @@
     "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.0",
     "tsconfig": "workspace:*",
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "^3.0.5"
   }
