@@ -54,7 +54,14 @@ export function getDevelopmentOperations(): DevelopmentOperations {
       return `${settings.app_config.protocol}://${settings.app_config.endpoint}`
     },
     async getAnonKey(_projectRef) {
-      throw new Error('Function not implemented.')
+      const settings = getProjectSettings()
+      const anonKey = settings.service_api_keys.find((key) => key.name === 'anon key')
+
+      if (!anonKey) {
+        throw new Error('Anon key not found in project settings')
+      }
+
+      return anonKey.api_key
     },
     async generateTypescriptTypes(_projectRef) {
       throw new Error('Function not implemented.')
