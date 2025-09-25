@@ -17,7 +17,7 @@ catalog:
   tailwindcss: 3.4.1
   typescript: ~5.9.0
   valtio: ^1.12.0
-  vite: ^6.2.7
+  vite: ^6.3.6
   zod: ^3.25.76
 
 ignoredBuiltDependencies:
