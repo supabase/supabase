@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { MoreVertical, Trash } from 'lucide-react'
+import { MoreVertical, Redo2, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -16,7 +16,7 @@ import {
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
@@ -68,14 +68,20 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = member.role_ids.every((id) => rolesRemovable.includes(id))
-  const canResendInvite =
-    useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
-      resource: { role_id: roleId },
-    }) && hasOrgRole
-  const canRevokeInvite =
-    useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
-      resource: { role_id: roleId },
-    }) && hasOrgRole
+
+  const { can: canCreateUserInvites } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_invites',
+    { resource: { role_id: roleId } }
+  )
+  const canResendInvite = canCreateUserInvites && hasOrgRole
+
+  const { can: canDeleteUserInvites } = useAsyncCheckPermissions(
+    PermissionAction.DELETE,
+    'user_invites',
+    { resource: { role_id: roleId } }
+  )
+  const canRevokeInvite = canDeleteUserInvites && hasOrgRole
 
   const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
@@ -193,20 +199,6 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                 <>
                   <DropdownMenuItemTooltip
                     className="gap-x-2"
-                    disabled={!canRevokeInvite}
-                    onClick={() => handleRevokeInvitation(member)}
-                    tooltip={{
-                      content: {
-                        side: 'left',
-                        text: 'Additional permissions required to cancel invitation',
-                      },
-                    }}
-                  >
-                    <p>Cancel invitation</p>
-                  </DropdownMenuItemTooltip>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItemTooltip
-                    className="gap-x-2"
                     disabled={!canResendInvite}
                     onClick={() => handleResendInvite(member)}
                     tooltip={{
@@ -216,7 +208,25 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       },
                     }}
                   >
+                    <Redo2 size={14} />
                     <p>Resend invitation</p>
+                  </DropdownMenuItemTooltip>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItemTooltip
+                    className="gap-x-2"
+                    disabled={!canRevokeInvite}
+                    onClick={() => handleRevokeInvitation(member)}
+                    tooltip={{
+                      content: {
+                        side: 'left',
+                        text: 'Additional permissions required to cancel invitation',
+                      },
+                    }}
+                  >
+                    <Trash size={14} />
+                    <p>Cancel invitation</p>
                   </DropdownMenuItemTooltip>
                 </>
               ) : (

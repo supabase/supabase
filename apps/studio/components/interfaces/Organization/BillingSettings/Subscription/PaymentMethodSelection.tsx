@@ -28,7 +28,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
-} from '../PaymentMethods/NewPaymentMethodElement'
+} from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -63,8 +63,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     })
   const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
 
-  const hidePaymentMethodsWithoutAddress = useFlag('hidePaymentMethodsWithoutAddress')
-
   const { data: allPaymentMethods, isLoading } = useOrganizationPaymentMethodsQuery({ slug })
 
   const paymentMethods = useMemo(() => {
@@ -74,18 +72,16 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         defaultPaymentMethodId: null,
       }
 
-    const filtered = allPaymentMethods.data.filter(
-      (pm) => !hidePaymentMethodsWithoutAddress || pm.has_address
-    )
     return {
-      data: filtered,
+      // force customer to put down address via payment method creation flow if they don't have an address set
+      data: customerProfile?.address == null ? [] : allPaymentMethods.data,
       defaultPaymentMethodId: allPaymentMethods.data.some(
         (pm) => pm.id === allPaymentMethods.defaultPaymentMethodId
       )
         ? allPaymentMethods.defaultPaymentMethodId
         : null,
     }
-  }, [allPaymentMethods])
+  }, [allPaymentMethods, customerProfile])
 
   const captchaRefCallback = useCallback((node: any) => {
     setCaptchaRef(node)
@@ -223,7 +219,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
       />
 
       <div>
-        {isLoading ? (
+        {isLoading || isCustomerProfileLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
             <Loader className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>

@@ -12,18 +12,27 @@ import {
 } from 'ui'
 
 import SectionContainer from 'components/Layouts/SectionContainer'
-import { SolutionTypes, skillBasedSolutions, useCaseSolutions } from 'data/Solutions'
+import {
+  SolutionTypes,
+  skillBasedSolutions,
+  useCaseSolutions,
+  migrationSolutions,
+} from 'data/Solutions'
 
 interface Props {
   activeItem: SolutionTypes
   className?: string
-  type?: 'skill-based' | 'use-case'
+  type?: 'skill-based' | 'use-case' | 'migration'
 }
 
 function SolutionsStickyNav({ type, activeItem, className }: Props) {
   const router = useRouter()
   const solutions =
-    type === 'skill-based' ? skillBasedSolutions.solutions : useCaseSolutions.solutions
+    type === 'skill-based'
+      ? skillBasedSolutions.solutions
+      : type === 'use-case'
+        ? useCaseSolutions.solutions
+        : migrationSolutions.solutions
   const items = solutions.map((solution: any) => ({
     id: solution.id,
     name: solution.text,
@@ -35,7 +44,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
 
   return (
     <>
-      <div className="absolute inset-0 z-20 h-full w-full pointer-events-none">
+      <div className="absolute inset-0 z-30 h-full w-full pointer-events-none">
         <nav
           className={cn(
             'sticky z-30 flex items-center bg-background/90 w-full border-b backdrop-blur-sm pointer-events-auto top-[65px]',

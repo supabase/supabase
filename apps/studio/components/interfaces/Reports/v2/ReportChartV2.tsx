@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
+import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
@@ -10,6 +11,8 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Card, CardContent, cn } from 'ui'
 import { ReportChartUpsell } from './ReportChartUpsell'
+import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
+
 export interface ReportChartV2Props {
   report: ReportConfig
   projectRef: string
@@ -20,6 +23,7 @@ export interface ReportChartV2Props {
   className?: string
   syncId?: string
   filters?: any
+  highlightActions?: ChartHighlightAction[]
 }
 
 export const ReportChartV2 = ({
@@ -32,6 +36,7 @@ export const ReportChartV2 = ({
   className,
   syncId,
   filters,
+  highlightActions,
 }: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
@@ -40,7 +45,7 @@ export const ReportChartV2 = ({
   const isAvailable =
     report.availableIn === undefined || (orgPlanId && report.availableIn.includes(orgPlanId))
 
-  const canFetch = orgPlanId !== undefined
+  const canFetch = orgPlanId !== undefined && isAvailable
 
   const {
     data: queryResult,
@@ -58,7 +63,7 @@ export const ReportChartV2 = ({
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
     {
-      enabled: Boolean(projectRef && canFetch && isAvailable),
+      enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
       staleTime: 0,
     }
@@ -67,9 +72,15 @@ export const ReportChartV2 = ({
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
 
+  /**
+   * Depending on the source the timestamp key could be 'timestamp' or 'period_start'
+   */
+  const firstItem = chartData[0]
+  const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
+
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
     chartData,
-    'timestamp',
+    timestampKey,
     (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
     0,
     startDate,
@@ -78,17 +89,16 @@ export const ReportChartV2 = ({
     interval
   )
 
-  const finalChartData =
-    filledChartData && filledChartData.length > 0 && !isFillError ? filledChartData : chartData
-
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
+  const chartHighlight = useChartHighlight()
 
-  if (!isAvailable && !isLoadingChart) {
+  if (!isAvailable) {
     return <ReportChartUpsell report={report} orgSlug={org?.slug ?? ''} />
   }
 
   const isErrorState = error && !isLoadingChart
-  const showEmptyState = (!finalChartData || finalChartData.length === 0) && !isLoadingChart
+
+  if (report.hide) return null
 
   return (
     <Card id={report.id} className={cn('relative w-full overflow-hidden scroll-mt-16', className)}>
@@ -100,10 +110,6 @@ export const ReportChartV2 = ({
       >
         {isLoadingChart ? (
           <Loader2 className="size-5 animate-spin text-foreground-light" />
-        ) : showEmptyState ? (
-          <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
-            No data available for the selected time range and filters
-          </p>
         ) : isErrorState ? (
           <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
             Error loading chart data
@@ -112,15 +118,16 @@ export const ReportChartV2 = ({
           <div className="w-full">
             <ComposedChart
               attributes={dynamicAttributes}
-              data={finalChartData}
+              data={filledChartData}
               format={report.format ?? undefined}
               xAxisKey={report.xAxisKey ?? 'timestamp'}
               yAxisKey={report.yAxisKey ?? dynamicAttributes[0]?.attribute}
+              hideHighlightedValue={report.hideHighlightedValue}
               highlightedValue={0}
               title={report.label}
               customDateFormat={undefined}
-              chartHighlight={undefined}
               chartStyle={chartStyle}
+              chartHighlight={chartHighlight}
               showTooltip={report.showTooltip}
               showLegend={report.showLegend}
               showTotal={false}
@@ -132,6 +139,7 @@ export const ReportChartV2 = ({
               titleTooltip={report.titleTooltip}
               syncId={syncId}
               sql={queryResult?.query}
+              highlightActions={highlightActions}
             />
           </div>
         )}

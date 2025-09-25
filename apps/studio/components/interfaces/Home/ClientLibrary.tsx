@@ -7,7 +7,7 @@ interface ClientLibraryProps {
   language: string
   officialSupport?: boolean
   docsUrl?: string
-  gitUrl: string
+  gitUrl?: string
   altIconName?: string
 }
 
@@ -50,11 +50,13 @@ const ClientLibrary = ({
               </Button>
             </a>
           )}
-          <a href={gitUrl} target="_blank" rel="noreferrer">
-            <Button icon={<Github />} type="default">
-              <span className="hidden md:inline">See</span> GitHub
-            </Button>
-          </a>
+          {gitUrl && (
+            <a href={gitUrl} target="_blank" rel="noreferrer">
+              <Button icon={<Github />} type="default">
+                <span className="hidden md:inline">See</span> GitHub
+              </Button>
+            </a>
+          )}
         </div>
       </div>
     </div>

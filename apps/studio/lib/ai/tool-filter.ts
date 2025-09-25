@@ -25,6 +25,7 @@ export const toolSetValidationSchema = z.record(
     'list_branches',
     'search_docs',
     'get_advisors',
+    'get_logs',
 
     // Local tools
     'display_query',
@@ -40,31 +41,6 @@ export const toolSetValidationSchema = z.record(
   ]),
   basicToolSchema
 )
-
-/**
- * Transforms the result of a tool execution to a new output.
- */
-export function transformToolResult<OriginalResult, NewResult>(
-  tool: Tool<any, OriginalResult>,
-  execute: (result: OriginalResult) => NewResult
-): Tool<any, NewResult> {
-  if (!tool) {
-    throw new Error('Tool is required')
-  }
-
-  if (!tool.execute) {
-    throw new Error('Tool does not have an execute function')
-  }
-
-  // Intercept the tool to add a custom execute function
-  return {
-    ...tool,
-    execute: async (args: any, options: any) => {
-      const result = await tool.execute!(args, options)
-      return execute(result)
-    },
-  } as unknown as Tool<any, NewResult>
-}
 
 /**
  * Tool categories based on the data they access
@@ -105,6 +81,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
 
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
+  get_logs: TOOL_CATEGORIES.LOG,
 }
 
 /**

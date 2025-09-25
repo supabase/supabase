@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     env:
       DOCS_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
@@ -68,8 +68,12 @@ jobs:
         run: |
           pnpm run codegen:examples
           pnpm run embeddings
+          pnpm run embeddings:nimbus
 
       - name: Refresh embeddings
         working-directory: ./apps/docs
         if: ${{ inputs.refresh }}
-        run: pnpm run embeddings:refresh
+        run: |
+          pnpm run codegen:examples
+          pnpm run embeddings:refresh
+          pnpm run embeddings:nimbus:refresh

@@ -1,0 +1,5 @@
+# Add 'documentation' to any change in apps/docs
+# https://github.com/marketplace/actions/labeler
+documentation:
+- changed-files:
+  - any-glob-to-any-file: 'apps/docs/**/*'

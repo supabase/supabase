@@ -6,6 +6,11 @@
       "type": "string"
     },
 
+    "dashboard_auth:custom_provider": {
+      "type": ["string", "null"],
+      "description": "Show a custom provider on the sign in page (Continue with X)"
+    },
+
     "organization:legal_documents": {
       "type": ["array", "null"],
       "description": "Renders a provided set of documents under the organization legal documents page",
@@ -26,6 +31,22 @@
       }
     },
 
+    "project_homepage:client_libraries": {
+      "type": "array",
+      "description": "Renders a provided set of client libraries under the project's home page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "language": { "type": "string" },
+          "officialSupport": { "type": "boolean" },
+          "releaseState": { "type": "string" },
+          "docsUrl": { "type": "string" },
+          "gitUrl": { "type": "string" },
+          "altIconName": { "type": "string" }
+        },
+        "required": ["language", "officialSupport", "docsUrl"]
+      }
+    },
     "project_homepage:example_projects": {
       "type": ["array", "null"],
       "description": "Renders a provided set of example projects under the project's home page",
@@ -45,35 +66,6 @@
       "description": "Renders a default query when landing on the logs explorer"
     },
 
-    "connect:frameworks": {
-      "type": ["object", "null"],
-      "description": "Replaces the frameworks tab in the Connect modal when a defined set of frameworks",
-      "properties": {
-        "key": { "type": "string" },
-        "label": { "type": "string" },
-        "obj": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": { "type": "string" },
-              "icon": { "type": "string" },
-              "label": { "type": "string" },
-              "guideLink": { "type": "string" },
-              "children": { "type": "array" },
-              "files": {
-                "type": "array",
-                "properties": {
-                  "name": { "type": "string" },
-                  "content": { "type": "string" }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-
     "infra:cloud_providers": {
       "type": ["array"],
       "description": "Filters the valid cloud providers",
@@ -81,14 +73,25 @@
         "type": "string",
         "enum": ["AWS", "AWS_K8S", "AWS_NIMBUS", "FLY"]
       }
+    },
+    "infra:aws_nimbus_label": {
+      "type": "string",
+      "description": "The label of the AWS Nimbus provider"
+    },
+
+    "ssl:certificate_url": {
+      "type": "string",
+      "description": "The URL of the SSL certificate"
     }
   },
   "required": [
     "organization:legal_documents",
+    "project_homepage:client_libraries",
     "project_homepage:example_projects",
     "logs:default_query",
-    "connect:frameworks",
-    "infra:cloud_providers"
+    "infra:cloud_providers",
+    "infra:aws_nimbus_label",
+    "ssl:certificate_url"
   ],
   "additionalProperties": false
 }

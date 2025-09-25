@@ -19,7 +19,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
       className={[
         ' ',
         !props.title && 'capitalize',
-        props.url === pathname ? 'text-brand' : 'hover:text-brand text-foreground',
+        props.url === pathname ? 'text-brand-link' : 'hover:text-brand-link text-foreground',
       ].join(' ')}
     >
       {props.title ?? props.id}
@@ -75,7 +75,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               'flex items-center gap-2',
               'cursor-pointer transition text-sm',
               activeItem
-                ? 'text-brand font-medium'
+                ? 'text-brand-link font-medium'
                 : 'hover:text-foreground text-foreground-lighter',
             ].join(' ')}
             parent={props.subItem.parent}
@@ -104,8 +104,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                       className={[
                         'cursor-pointer transition text-sm',
                         subSubItem.url === pathname
-                          ? 'text-brand'
-                          : 'hover:text-brand text-foreground-lighter',
+                          ? 'text-brand-link'
+                          : 'hover:text-brand-link text-foreground-lighter',
                       ].join(' ')}
                     >
                       {subSubItem.name}
@@ -145,6 +145,10 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 
 const Content = (props) => {
   const { menu, id } = props
+
+  if (menu.enabled === false) {
+    return null
+  }
 
   return (
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>

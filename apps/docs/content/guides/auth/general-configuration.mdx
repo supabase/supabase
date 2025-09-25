@@ -4,13 +4,21 @@ title: 'General configuration'
 subtitle: 'General configuration options for Supabase Auth'
 ---
 
-This section covers the [general configuration options](/dashboard/project/_/settings/auth) for Supabase Auth. If you are looking for another type of configuration, you may be interested in one of the following sections:
+This section covers the [general configuration options](/dashboard/project/_/auth) for Supabase Auth. If you are looking for another type of configuration, you may be interested in one of the following sections:
 
-- [Provider-specific configuration](/dashboard/project/_/auth/providers)
-- [Rate limits](/dashboard/project/_/auth/rate-limits)
-- [Email Templates](/dashboard/project/_/auth/templates)
-- [Redirect URLs](/dashboard/project/_/auth/url-configuration)
-- [Auth Hooks](/dashboard/project/_/auth/hooks)
+- [Policies](/dashboard/project/_/auth/policies) to manage Row Level Security policies for your tables.
+- [Sign In / Providers](/dashboard/project/_/auth/providers) to configure authentication providers and login methods for your users.
+- [Third Party Auth](/dashboard/project/_/auth/third-party) to use third-party authentication (TPA) systems based on JWTs to access your project.
+- [Sessions](/dashboard/project/_/auth/sessions) to configure settings for user sessions and refresh tokens.
+- [Rate limits](/dashboard/project/_/auth/rate-limits) to safeguard against bursts of incoming traffic to prevent abuse and maximize stability.
+- [Email Templates](/dashboard/project/_/auth/templates) to configure what emails your users receive.
+- [Custom SMTP](/dashboard/project/_/auth/smtp) to configure how emails are sent.
+- [Multi-Factor](/dashboard/project/_/auth/mfa) to require users to provide additional verification factors to authenticate.
+- [URL Configuration](/dashboard/project/_/auth/url-configuration) to configure site URL and redirect URLs for authentication.
+- [Attack Protection](/dashboard/project/_/auth/protection) to configure security settings to protect your project from attacks.
+- [Auth Hooks (BETA)](/dashboard/project/_/auth/auth-hooks) to use Postgres functions or HTTP endpoints to customize the behavior of Supabase Auth to meet your needs.
+- [Audit Logs (BETA)](/dashboard/project/_/auth/audit-logs) to track and monitor auth events in your project.
+- [Advanced](/dashboard/project/_/auth/advanced) to configure advanced authentication server settings.
 
 Supabase Auth provides these [general configuration options](/dashboard/project/_/settings/auth) to control user access to your application:
 

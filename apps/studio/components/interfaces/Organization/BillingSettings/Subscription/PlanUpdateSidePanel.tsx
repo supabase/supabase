@@ -18,7 +18,7 @@ import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import type { OrgPlan } from 'data/subscriptions/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { formatCurrency } from 'lib/helpers'
@@ -60,7 +60,7 @@ const PlanUpdateSidePanel = () => {
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -87,8 +87,6 @@ const PlanUpdateSidePanel = () => {
   })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-
-  const billingPartner = subscription?.billing_partner
 
   const {
     data: subscriptionPreview,

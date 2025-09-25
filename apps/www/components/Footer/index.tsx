@@ -9,12 +9,12 @@ import { useEffect } from 'react'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import footerData from 'data/Footer'
+import { usePathname } from 'next/navigation'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
-import { usePathname } from 'next/navigation'
 
 interface Props {
   className?: string
@@ -58,7 +58,7 @@ const Footer = (props: Props) => {
         <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
-            <Link href="/security" className="text-brand hover:underline">
+            <Link href="/security" className="text-brand-link hover:underline">
               More on Security
             </Link>
           </div>

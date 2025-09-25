@@ -3,12 +3,12 @@ id: 'sveltekit'
 title: 'Supabase Auth with SvelteKit'
 description: 'Convenience helpers for implementing user authentication in SvelteKit.'
 sidebar_label: 'SvelteKit'
-sitemapPriority: 0.5
+sitemapPriority: 0.3
 ---
 
 <Admonition type="caution">
 
-We generally recommend using the new `@supabase/ssr` package instead of `auth-helpers`. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Check out the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
+The Auth helpers package is deprecated. Use the new `@supabase/ssr` package for Server Side Authentication. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Read the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
 
 </Admonition>
 
@@ -40,7 +40,7 @@ npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 
 ### Declare environment variables
 
-Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
 # Find these in your Supabase project settings https://supabase.com/dashboard/project/_/settings/api
@@ -161,7 +161,7 @@ Note that we are specifying `filterSerializedResponseHeaders` here. We need to t
 
 ### Code Exchange route
 
-The `Code Exchange` route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the SvelteKit Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The `Code Exchange` route is required for the [server-side auth flow](/docs/guides/auth/server-side-rendering) implemented by the SvelteKit Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
 
 <Tabs
   scrollable
@@ -213,7 +213,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
 ### Generate types from your database
 
-In order to get the most out of TypeScript and its IntelliSense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](https://supabase.com/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
+In order to get the most out of TypeScript and its IntelliSense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
 
 ```ts src/app.d.ts
 // src/app.d.ts
@@ -368,7 +368,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/typescript-support) and passed to `createSupabaseLoadClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createSupabaseLoadClient` to add type support to the Supabase client.
 
 </Admonition>
 
@@ -785,7 +785,7 @@ export const handle: Handle = sequence(supabase, authorization)
 
 ### Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/guides/database/postgres/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
+For [row level security](/docs/guides/database/postgres/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
 ```svelte src/routes/+page.svelte
 <script lang="ts">

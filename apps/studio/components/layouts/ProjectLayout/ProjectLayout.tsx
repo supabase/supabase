@@ -24,12 +24,12 @@ import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
-import PauseFailedState from './PauseFailedState'
+import { PauseFailedState } from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
-import RestoreFailedState from './RestoreFailedState'
+import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 
@@ -183,7 +183,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 className="hidden md:flex"
               />
             )}
-            <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
+            <ResizablePanel
+              defaultSize={1}
+              order={2}
+              id="panel-right"
+              className="h-full flex flex-col w-full"
+            >
               <ResizablePanelGroup
                 direction="horizontal"
                 className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
@@ -191,6 +196,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               >
                 <ResizablePanel
                   id="panel-content"
+                  defaultSize={1}
                   className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
                 >
                   <main
@@ -216,6 +222,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     <ResizableHandle withHandle />
                     <ResizablePanel
                       id="panel-assistant"
+                      defaultSize={30}
                       minSize={30}
                       maxSize={50}
                       className={cn(

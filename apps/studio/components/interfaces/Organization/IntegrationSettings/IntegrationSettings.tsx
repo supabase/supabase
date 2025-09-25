@@ -19,7 +19,7 @@ import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorizat
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
@@ -29,6 +29,7 @@ import {
 } from 'lib/github'
 import { useRouter } from 'next/router'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
@@ -48,15 +49,13 @@ const IntegrationSettings = () => {
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
 
-  const canReadGithubConnection = useCheckPermissions(
-    PermissionAction.READ,
-    'integrations.github_connections'
-  )
-  const canCreateGitHubConnection = useCheckPermissions(
+  const { can: canReadGithubConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
-  const canUpdateGitHubConnection = useCheckPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
@@ -121,7 +120,9 @@ The GitHub app will watch for changes in your repository such as file changes, b
           <IntegrationImageHandler title="github" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadGithubConnection ? (
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadGithubConnection ? (
             <NoPermission resourceText="view this organization's GitHub connections" />
           ) : (
             <>

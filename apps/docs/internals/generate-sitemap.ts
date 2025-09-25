@@ -25,7 +25,7 @@ async function generate() {
 
       return {
         link: filePath.replace(/^content\//, '').replace(/\.mdx$/, ''),
-        priority: sitemapPriority,
+        priority: sitemapPriority ?? 0.8,
       }
     })
   )
@@ -40,7 +40,7 @@ async function generate() {
     })
   )
 
-  const allPages = (contentPages as Array<{ link: string; priority?: number }>).concat(
+  const allPages = (contentPages as Array<{ link: string; priority: number }>).concat(
     troubleshootingPages,
     referencePages,
     cliPages
@@ -51,11 +51,12 @@ async function generate() {
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
         ${allPages
           .map(({ link, priority }) => {
+            const finalPriority = priority ?? 0.8
             return `
               <url>
                   <loc>${`https://supabase.com/docs/${link}`}</loc>
                   <changefreq>weekly</changefreq>
-                  ${priority ? `<priority>${priority}</priority>` : ''}
+                  <priority>${finalPriority}</priority>
               </url>
             `
           })
