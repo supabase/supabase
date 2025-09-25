@@ -46,7 +46,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const platform: SupabasePlatform = {
     database: getDatabaseOperations({ headers }),
-    development: getDevelopmentOperations(),
+    development: getDevelopmentOperations({ headers }),
   }
 
   try {

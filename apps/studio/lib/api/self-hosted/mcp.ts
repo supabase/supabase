@@ -3,13 +3,17 @@ import {
   DatabaseOperations,
   DevelopmentOperations,
   ExecuteSqlOptions,
-  GenerateTypescriptTypesResult,
 } from '@supabase/mcp-server-supabase/platform'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
+import { generateTypescriptTypes } from './typescript'
 
 export type GetDatabaseOperationsOptions = {
+  headers?: HeadersInit
+}
+
+export type GetDevelopmentOperationsOptions = {
   headers?: HeadersInit
 }
 
@@ -47,7 +51,9 @@ export function getDatabaseOperations({
   }
 }
 
-export function getDevelopmentOperations(): DevelopmentOperations {
+export function getDevelopmentOperations({
+  headers,
+}: GetDevelopmentOperationsOptions): DevelopmentOperations {
   return {
     async getProjectUrl(_projectRef) {
       const settings = getProjectSettings()
@@ -64,7 +70,13 @@ export function getDevelopmentOperations(): DevelopmentOperations {
       return anonKey.api_key
     },
     async generateTypescriptTypes(_projectRef) {
-      throw new Error('Function not implemented.')
+      const { data, error } = await generateTypescriptTypes({ headers })
+
+      if (error) {
+        throw error
+      }
+
+      return data
     },
   }
 }
