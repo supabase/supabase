@@ -531,7 +531,8 @@ const nextConfig = {
     pagesBufferLength: 100,
   },
   typescript: {
-    // Typechecking is run via GitHub Action only for efficiency.
+    // Typechecking is run via GitHub Action only for efficiency
+    // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
   },
   eslint: {

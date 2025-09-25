@@ -144,6 +144,14 @@
       "type": "boolean",
       "description": "Enable documentation on contribution"
     },
+    "docs:fdw": {
+      "type": "boolean",
+      "description": "Enable documentation on foreign data wrappers"
+    },
+    "docs:footer": {
+      "type": "boolean",
+      "description": "Enable footer on docs site"
+    },
     "docs:framework_quickstarts": {
       "type": "boolean",
       "description": "Enable framework quickstarts documentation"
@@ -183,6 +191,11 @@
     "docs:web_apps": {
       "type": "boolean",
       "description": "Enable web apps getting started documentation"
+    },
+
+    "edge_functions:show_stripe_example": {
+      "type": "boolean",
+      "description": "Show all the Stripe example in edge function templates in the edge functions page."
     },
 
     "feedback:docs": {
@@ -368,6 +381,8 @@
     "docs:auth_troubleshooting",
     "docs:compliance",
     "docs:contribution",
+    "docs:fdw",
+    "docs:footer",
     "docs:framework_quickstarts",
     "docs:full_getting_started",
     "docs:full_platform",
