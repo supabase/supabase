@@ -14,7 +14,7 @@ interface RecursiveNavItemProps {
   item: NavMenuSection
   depth?: number
   path?: string
-  autoExpandedItems: Set<string>
+  expandedSections: Set<string>
 }
 
 interface RecursiveNavigationProps {
@@ -23,48 +23,18 @@ interface RecursiveNavigationProps {
 }
 
 const ICON_SIZE = 16
-const NAV_EXPANSION_PREFIX = 'nav-expansion-'
 
-// Individual item expansion state hook (following the reference pattern)
-const usePersistedExpansionState = (itemName: string) => {
-  const [isExpanded, setIsExpanded] = React.useState(false)
+// URL-driven expansion state - determines which sections should be open based on current pathname
+const useUrlDrivenExpansion = (items: NavMenuSection[], pathname: string) => {
+  const [expandedSections, setExpandedSections] = React.useState<Set<string>>(new Set())
 
   React.useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem(`${NAV_EXPANSION_PREFIX}${itemName}`)
-      if (stored !== null) {
-        setIsExpanded(JSON.parse(stored))
-      }
-    } catch (_error) {
-      // Silently handle errors
-    }
-  }, [itemName])
-
-  const setPersistedExpansion = React.useCallback((expanded: boolean) => {
-    setIsExpanded(expanded)
-    try {
-      sessionStorage.setItem(`${NAV_EXPANSION_PREFIX}${itemName}`, JSON.stringify(expanded))
-    } catch (_error) {
-      // Silently handle errors
-    }
-  }, [itemName])
-
-  return [isExpanded, setPersistedExpansion] as const
-}
-
-// Custom hook for managing accordion state with auto-expansion
-const useAccordionState = (items: NavMenuSection[], pathname: string) => {
-  const [autoExpandedItems, setAutoExpandedItems] = React.useState<Set<string>>(new Set())
-
-  // Auto-expand sections containing active path
-  React.useEffect(() => {
-    const pathsToExpand = getPathsContainingActivePage(items, pathname)
-    if (pathsToExpand.length > 0) {
-      setAutoExpandedItems(new Set(pathsToExpand))
-    }
+    // Find all sections that should be expanded to show the current page
+    const sectionsToExpand = getSectionsContainingPath(items, pathname)
+    setExpandedSections(new Set(sectionsToExpand))
   }, [pathname, items])
 
-  return { autoExpandedItems }
+  return expandedSections
 }
 
 const containsActivePath = (item: NavMenuSection, pathname: string): boolean => {
@@ -79,26 +49,28 @@ const containsActivePath = (item: NavMenuSection, pathname: string): boolean => 
   return false
 }
 
-// Get all paths that should be expanded to show the active page
-const getPathsContainingActivePage = (items: NavMenuSection[], pathname: string): string[] => {
-  const paths: string[] = []
+// Get all sections that should be expanded to show the current pathname
+const getSectionsContainingPath = (items: NavMenuSection[], pathname: string): string[] => {
+  const sectionsToExpand: string[] = []
   
-  const findPaths = (items: NavMenuSection[], currentPath = '') => {
+  const findSections = (items: NavMenuSection[], currentPath = '') => {
     items.forEach(item => {
       const itemPath = currentPath ? `${currentPath}.${item.name}` : item.name
       
+      // If this item contains the active path, add it to expanded sections
       if (containsActivePath(item, pathname)) {
-        paths.push(itemPath)
+        sectionsToExpand.push(itemPath)
         
+        // Recursively check children
         if (item.items && item.items.length > 0) {
-          findPaths(item.items as NavMenuSection[], itemPath)
+          findSections(item.items as NavMenuSection[], itemPath)
         }
       }
     })
   }
   
-  findPaths(items)
-  return paths
+  findSections(items)
+  return sectionsToExpand
 }
 
 const NavIcon = React.memo(
@@ -115,20 +87,14 @@ const NavIcon = React.memo(
 
 NavIcon.displayName = 'NavIcon'
 
-const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, path = '', autoExpandedItems }) => {
+const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, path = '', expandedSections }) => {
   const pathname = usePathname()
   const itemPath = path ? `${path}.${item.name}` : item.name
   const isActive = item.url === pathname
   const hasChildren = item.items && item.items.length > 0
   
-  // Use individual item persistence hook
-  const [isExpanded, setPersistedExpansion] = usePersistedExpansionState(itemPath)
-  
-  // Check if this item should be auto-expanded due to active path
-  const shouldAutoExpand = autoExpandedItems.has(itemPath)
-  
-  // Determine if item should be open (persisted state OR auto-expansion)
-  const isOpen = isExpanded || shouldAutoExpand
+  // URL-driven expansion: section is open if it contains the current pathname
+  const isOpen = expandedSections.has(itemPath)
 
   if (item.enabled === false) {
     return null
@@ -137,11 +103,10 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
   if (hasChildren) {
     return (
       <div className={cn('w-full', depth > 0 && 'ml-2')}>
-        <button
-          onClick={() => setPersistedExpansion(!isExpanded)}
+        <div
           className={cn(
             'flex items-center justify-between w-full py-2 px-3 rounded-md',
-            'text-sm transition-colors hover:bg-surface-100',
+            'text-sm transition-colors',
             'group',
             isActive && 'bg-surface-200 text-brand-link font-medium'
           )}
@@ -159,7 +124,7 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
             )}
             aria-hidden="true"
           />
-        </button>
+        </div>
 
         {isOpen && (
           <div className="overflow-hidden transition-all duration-500 ease-in-out">
@@ -170,7 +135,7 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
                   item={child as NavMenuSection}
                   depth={depth + 1}
                   path={itemPath}
-                  autoExpandedItems={autoExpandedItems}
+                  expandedSections={expandedSections}
                 />
               ))}
             </div>
@@ -200,7 +165,7 @@ RecursiveNavItem.displayName = 'RecursiveNavItem'
 
 const RecursiveNavigation: React.FC<RecursiveNavigationProps> = ({ items, className }) => {
   const pathname = usePathname()
-  const { autoExpandedItems } = useAccordionState(items, pathname)
+  const expandedSections = useUrlDrivenExpansion(items, pathname)
 
   return (
     <nav className={cn('w-full space-y-1', className)}>
@@ -208,7 +173,7 @@ const RecursiveNavigation: React.FC<RecursiveNavigationProps> = ({ items, classN
         <RecursiveNavItem
           key={item.url || `${item.name}-${index}`}
           item={item}
-          autoExpandedItems={autoExpandedItems}
+          expandedSections={expandedSections}
         />
       ))}
     </nav>
