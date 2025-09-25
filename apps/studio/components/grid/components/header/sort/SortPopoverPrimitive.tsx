@@ -74,7 +74,7 @@ export const SortPopoverPrimitive = ({
   const columns = useMemo(() => {
     if (!snap?.table?.columns) return []
     return snap.table.columns.filter((x) => {
-      if (x.dataType === 'json' || x.dataType === 'jsonb') return false
+      // if (x.dataType === 'json' || x.dataType === 'jsonb') return false
       const found = localSorts.find((y) => y.column == x.name)
       return !found
     })
@@ -82,7 +82,18 @@ export const SortPopoverPrimitive = ({
 
   // Format the columns for the dropdown
   const dropdownOptions = useMemo(() => {
-    return columns?.map((x) => ({ value: x.name, label: x.name })) || []
+    return (
+      columns?.map((x) => ({
+        value: x.name,
+        label: x.name,
+        postLabel: x.dataType,
+        disabled: x.dataType === 'json' || x.dataType === 'jsonb',
+        tooltip:
+          x.dataType === 'json' || x.dataType === 'jsonb'
+            ? 'Sorting on JSON-based columns is currently not supported'
+            : '',
+      })) || []
+    )
   }, [columns])
 
   // Add a new sort

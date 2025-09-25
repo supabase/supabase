@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableSort } from 'components/grid/hooks/useTableSort'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -10,6 +11,7 @@ import { Admonition } from 'ui-patterns'
 
 export const GridError = ({ error }: { error?: any }) => {
   const { filters } = useTableFilter()
+  const { sorts } = useTableSort()
   const snap = useTableEditorTableStateSnapshot()
 
   const tableEntityType = snap.originalTable?.entity_type
@@ -21,10 +23,15 @@ export const GridError = ({ error }: { error?: any }) => {
   const isInvalidSyntaxError =
     filters.length > 0 && error?.message?.includes('invalid input syntax')
 
+  const isInvalidOrderingOperatorError =
+    sorts.length > 0 && error?.message?.includes('identify an ordering operator')
+
   if (isForeignTableMissingVaultKeyError) {
     return <ForeignTableMissingVaultKeyError />
   } else if (isInvalidSyntaxError) {
     return <InvalidSyntaxError error={error} />
+  } else if (isInvalidOrderingOperatorError) {
+    return <InvalidOrderingOperatorError error={error} />
   }
 
   return <GeneralError error={error} />
@@ -67,10 +74,10 @@ const InvalidSyntaxError = ({ error }: { error?: any }) => {
     <Admonition
       type="warning"
       className="pointer-events-auto"
-      title="Invalid input syntax provided in filter value"
+      title="Invalid input syntax provided in filter value(s)"
     >
       <p className="!mb-0">
-        Unable to retrieve results as the provided value in your filter doesn't match it's column
+        Unable to retrieve results as the provided value in your filter(s) doesn't match it's column
         data type.
       </p>
       <p className="!mb-2">
@@ -82,6 +89,39 @@ const InvalidSyntaxError = ({ error }: { error?: any }) => {
 
       <Button type="default" onClick={() => onApplyFilters([])}>
         Remove filters
+      </Button>
+    </Admonition>
+  )
+}
+
+const InvalidOrderingOperatorError = ({ error }: { error: any }) => {
+  const { sorts, onApplySorts } = useTableSort()
+  const invalidDataType = (error?.message ?? '').split('type ').pop()
+  const formattedInvalidDataType = invalidDataType.includes('json')
+    ? invalidDataType.toUpperCase()
+    : invalidDataType
+
+  return (
+    <Admonition
+      type="warning"
+      className="pointer-events-auto"
+      title={`Sorting is not supporting on ${sorts.length > 1 ? 'one of the selected columns' : 'the selected column'}`}
+    >
+      <p className="!mb-0">
+        Unable to retrieve results as sorting is not supported on{' '}
+        {sorts.length > 1 ? 'one of the selected columns' : 'the selected column'} due to its data
+        type. ({formattedInvalidDataType})
+      </p>
+      <p className="!mb-2">
+        Remove any sorts on columns with the data type {formattedInvalidDataType} applying the sorts
+        again.
+      </p>
+      <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
+        Error: <code className="text-xs">{error.message}</code>
+      </p>
+
+      <Button type="default" onClick={() => onApplySorts([])}>
+        Remove sorts
       </Button>
     </Admonition>
   )
