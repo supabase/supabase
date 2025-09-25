@@ -32,7 +32,7 @@ import {
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { formatDuration } from './QueryPerformans.utils'
+import { formatDuration } from './QueryPerformance.utils'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>

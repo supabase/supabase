@@ -11,7 +11,7 @@ import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
-import { formatDuration } from './QueryPerformans.utils'
+import { formatDuration } from './QueryPerformance.utils'
 
 interface QueryDetailProps {
   reportType: QUERY_PERFORMANCE_REPORT_TYPES
