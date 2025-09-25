@@ -70,7 +70,7 @@ const GitHubIntegrationConnectionForm = ({
   const [isConfirmingBranchChange, setIsConfirmingBranchChange] = useState(false)
   const [isConfirmingRepoChange, setIsConfirmingRepoChange] = useState(false)
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
-  const isParentProject = !Boolean(selectedProject?.parent_project_ref)
+  const isParentProject = !selectedProject?.parent_project_ref
 
   const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -81,13 +81,21 @@ const GitHubIntegrationConnectionForm = ({
     'integrations.github_connections'
   )
 
-  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
+  const { data: gitHubAuthorization, refetch: refetchGitHubAuthorization } =
+    useGitHubAuthorizationQuery()
 
-  const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
-    any[]
-  >({
+  const {
+    data: githubReposData,
+    isLoading: isLoadingGitHubRepos,
+    refetch: refetchGitHubRepositories,
+  } = useGitHubRepositoriesQuery({
     enabled: Boolean(gitHubAuthorization),
   })
+
+  const refetchGitHubAuthorizationAndRepositories = () => {
+    refetchGitHubAuthorization()
+    refetchGitHubRepositories()
+  }
 
   const { mutate: updateBranch } = useBranchUpdateMutation({
     onSuccess: () => {
@@ -130,7 +138,7 @@ const GitHubIntegrationConnectionForm = ({
 
   const githubRepos = useMemo(
     () =>
-      githubReposData?.map((repo: any) => ({
+      githubReposData?.map((repo) => ({
         id: repo.id.toString(),
         name: repo.name,
         installation_id: repo.installation_id,
@@ -161,7 +169,7 @@ const GitHubIntegrationConnectionForm = ({
               repositoryId: Number(repositoryId),
               branchName: val.branchName,
             })
-          } catch (error) {
+          } catch {
             const selectedRepo = githubRepos.find((repo) => repo.id === repositoryId)
             const repoName =
               selectedRepo?.name || connection?.repository.name || 'selected repository'
@@ -337,11 +345,11 @@ const GitHubIntegrationConnectionForm = ({
     const data = githubSettingsForm.getValues()
     const selectedRepo = githubRepos.find((repo) => repo.id === data.repositoryId)
 
-    if (!selectedRepo || !connection) return
+    if (!selectedRepo || !connection || !selectedOrganization?.id) return
 
     try {
       await deleteConnection({
-        organizationId: selectedOrganization!.id,
+        organizationId: selectedOrganization.id,
         connectionId: connection.id,
       })
 
@@ -390,7 +398,10 @@ const GitHubIntegrationConnectionForm = ({
           </p>
           <Button
             onClick={() => {
-              openInstallGitHubIntegrationWindow('authorize')
+              openInstallGitHubIntegrationWindow(
+                'authorize',
+                refetchGitHubAuthorizationAndRepositories
+              )
             }}
           >
             Authorize GitHub
@@ -482,7 +493,12 @@ const GitHubIntegrationConnectionForm = ({
                             <CommandGroup_Shadcn_>
                               <CommandItem_Shadcn_
                                 className="flex gap-2 items-center cursor-pointer"
-                                onSelect={() => openInstallGitHubIntegrationWindow('install')}
+                                onSelect={() =>
+                                  openInstallGitHubIntegrationWindow(
+                                    'install',
+                                    refetchGitHubAuthorizationAndRepositories
+                                  )
+                                }
                               >
                                 <PlusIcon size={16} />
                                 Add GitHub Repositories

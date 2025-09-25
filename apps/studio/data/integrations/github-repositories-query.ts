@@ -10,8 +10,7 @@ export async function getGitHubRepositories(signal?: AbortSignal) {
   })
 
   if (error) handleError(error)
-  // [Alaister]: temp fix until we have a proper response type
-  return (data as any).repositories
+  return data.repositories
 }
 
 export type GitHubRepositoriesData = Awaited<ReturnType<typeof getGitHubRepositories>>
