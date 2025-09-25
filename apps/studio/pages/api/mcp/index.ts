@@ -7,7 +7,7 @@ import { DEFAULT_PROJECT } from 'lib/constants/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-const supportedFeatureGroupSchema = z.enum(['docs', 'database'])
+const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development'])
 
 const mcpQuerySchema = z.object({
   features: z
