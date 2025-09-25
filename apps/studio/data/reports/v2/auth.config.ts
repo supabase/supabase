@@ -368,7 +368,7 @@ export function defaultAuthReportFormatter(
   return { data, chartAttributes }
 }
 
-export const createAuthReportConfig = ({
+export const createUsageReportConfig = ({
   projectRef,
   startDate,
   endDate,
@@ -488,6 +488,50 @@ export const createAuthReportConfig = ({
     },
   },
   {
+    id: 'password-reset-requests',
+    label: 'Password Reset Requests',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'line',
+    titleTooltip: 'The total number of password reset requests.',
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    dataProvider: async () => {
+      const attributes = [
+        {
+          attribute: 'PasswordResetRequests',
+          provider: 'logs',
+          label: 'Password Reset Requests',
+          enabled: true,
+        },
+      ]
+
+      const sql = AUTH_REPORT_SQL.PasswordResetRequests(interval, filters)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+      const transformedData = defaultAuthReportFormatter(rawData, attributes)
+
+      return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
+    },
+  },
+]
+
+export const createErrorsReportConfig = ({
+  projectRef,
+  startDate,
+  endDate,
+  interval,
+  filters,
+}: {
+  projectRef: string
+  startDate: string
+  endDate: string
+  interval: AnalyticsInterval
+  filters: AuthReportFilters
+}): ReportConfig<AuthReportFilters>[] => [
+  {
     id: 'auth-errors',
     label: 'API Gateway Auth Errors',
     valuePrecision: 0,
@@ -556,35 +600,21 @@ export const createAuthReportConfig = ({
       return { data: pivoted, attributes, query: sql }
     },
   },
-  {
-    id: 'password-reset-requests',
-    label: 'Password Reset Requests',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    titleTooltip: 'The total number of password reset requests.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
-    dataProvider: async () => {
-      const attributes = [
-        {
-          attribute: 'PasswordResetRequests',
-          provider: 'logs',
-          label: 'Password Reset Requests',
-          enabled: true,
-        },
-      ]
+]
 
-      const sql = AUTH_REPORT_SQL.PasswordResetRequests(interval, filters)
-      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-      const transformedData = defaultAuthReportFormatter(rawData, attributes)
-
-      return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
-    },
-  },
+export const createLatencyReportConfig = ({
+  projectRef,
+  startDate,
+  endDate,
+  interval,
+  filters,
+}: {
+  projectRef: string
+  startDate: string
+  endDate: string
+  interval: AnalyticsInterval
+  filters: AuthReportFilters
+}): ReportConfig<AuthReportFilters>[] => [
   {
     id: 'sign-in-latency',
     label: 'Sign In Latency',
@@ -689,4 +719,22 @@ export const createAuthReportConfig = ({
       return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
     },
   },
+]
+
+export const createAuthReportConfig = ({
+  projectRef,
+  startDate,
+  endDate,
+  interval,
+  filters,
+}: {
+  projectRef: string
+  startDate: string
+  endDate: string
+  interval: AnalyticsInterval
+  filters: AuthReportFilters
+}): ReportConfig<AuthReportFilters>[] => [
+  ...createUsageReportConfig({ projectRef, startDate, endDate, interval, filters }),
+  ...createErrorsReportConfig({ projectRef, startDate, endDate, interval, filters }),
+  ...createLatencyReportConfig({ projectRef, startDate, endDate, interval, filters }),
 ]
