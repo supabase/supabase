@@ -2544,27 +2544,27 @@ export const platform: NavMenuConstant = {
         },
         {
           name: 'AWS Marketplace',
-          url: '/guides/platform/aws-marketplace' as `/${string}`,
+          url: '/guides/platform/aws-marketplace',
           items: [
             {
               name: 'Getting Started',
-              url: '/guides/platform/aws-marketplace/getting-started' as `/${string}`,
+              url: '/guides/platform/aws-marketplace/getting-started',
             },
             {
               name: 'Account Setup',
-              url: '/guides/platform/aws-marketplace/account-setup' as `/${string}`,
+              url: '/guides/platform/aws-marketplace/account-setup',
             },
             {
               name: 'Manage your subscription',
-              url: '/guides/platform/aws-marketplace/manage-your-subscription' as `/${string}`,
+              url: '/guides/platform/aws-marketplace/manage-your-subscription',
             },
             {
               name: 'Invoices',
-              url: '/guides/platform/aws-marketplace/invoices' as `/${string}`,
+              url: '/guides/platform/aws-marketplace/invoices',
             },
             {
               name: 'FAQ',
-              url: '/guides/platform/aws-marketplace/faq' as `/${string}`,
+              url: '/guides/platform/aws-marketplace/faq',
             },
           ],
         },
