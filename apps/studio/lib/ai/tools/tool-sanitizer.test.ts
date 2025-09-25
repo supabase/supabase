@@ -8,7 +8,7 @@ import {
   createAssistantMessageWithMultipleTools,
   createLongConversation,
 } from '../test-fixtures'
-import { sanitizeMessagePart } from './tool-sanitizer'
+import { NO_DATA_PERMISSIONS, sanitizeMessagePart } from './tool-sanitizer'
 
 describe('messages are sanitized based on opt-in level', () => {
   test('messages are sanitized at disabled level', () => {
@@ -34,7 +34,7 @@ describe('messages are sanitized based on opt-in level', () => {
     })
 
     const output = (processedMessages[0].parts[1] as ToolUIPart).output
-    expect(output).toMatch(/result is not shared/)
+    expect(output).toMatch(NO_DATA_PERMISSIONS)
   })
 
   test('messages are sanitized at schema level', () => {
@@ -60,7 +60,7 @@ describe('messages are sanitized based on opt-in level', () => {
     })
 
     const output = (processedMessages[0].parts[1] as ToolUIPart).output
-    expect(output).toMatch(/result is not shared/)
+    expect(output).toMatch(NO_DATA_PERMISSIONS)
   })
 
   test('messages are sanitized at schema and log level', () => {
@@ -86,7 +86,7 @@ describe('messages are sanitized based on opt-in level', () => {
     })
 
     const output = (processedMessages[0].parts[1] as ToolUIPart).output
-    expect(output).toMatch(/result is not shared/)
+    expect(output).toMatch(NO_DATA_PERMISSIONS)
   })
 
   test('messages are not sanitized at data level', () => {
@@ -137,7 +137,7 @@ describe('messages are sanitized based on opt-in level', () => {
     parts.forEach((part) => {
       if (part.type.startsWith('tool')) {
         const tool = part as ToolUIPart
-        expect(tool.output).toMatch(/result is not shared/)
+        expect(tool.output).toMatch(NO_DATA_PERMISSIONS)
       }
     })
   })
@@ -166,7 +166,7 @@ describe('messages are sanitized based on opt-in level', () => {
         parts.forEach((part) => {
           if (part.type.startsWith('tool')) {
             const tool = part as ToolUIPart
-            expect(tool.output).toMatch(/result is not shared/)
+            expect(tool.output).toMatch(NO_DATA_PERMISSIONS)
           }
         })
       }
