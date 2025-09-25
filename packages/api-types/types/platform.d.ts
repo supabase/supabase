@@ -6116,7 +6116,7 @@ export interface components {
         [key: string]: unknown
       }
       description?: string
-      favorite: boolean | null
+      favorite: boolean
       folder_id?: string | null
       id: string
       inserted_at: string
@@ -6135,7 +6135,7 @@ export interface components {
       data: {
         contents: {
           description?: string
-          favorite?: boolean | null
+          favorite: boolean
           folder_id?: string | null
           id: string
           inserted_at: string
@@ -6165,7 +6165,7 @@ export interface components {
           [key: string]: unknown
         }
         description?: string
-        favorite?: boolean | null
+        favorite: boolean
         folder_id?: string | null
         id: string
         inserted_at: string
@@ -9818,7 +9818,7 @@ export interface components {
         [key: string]: unknown
       }
       description?: string
-      favorite?: boolean | null
+      favorite: boolean
       folder_id?: string | null
       id: string
       inserted_at: string
