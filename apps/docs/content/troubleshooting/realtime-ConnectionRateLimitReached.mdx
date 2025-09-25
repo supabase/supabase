@@ -1,0 +1,26 @@
+---
+title = "Realtime: ConnectionRateLimitReached"
+date_created = "2025-07-07T22:39:54+00:00"
+topics = [ "realtime" ]
+keywords = [ "ratelimits", "Realtime", "channels" ]
+---
+
+The error `ConnectionRateLimitReached` means that the number of simultaneous connections to Realtime has exceeded the limit for your plan.
+
+[Realtime Quotas](https://supabase.com/docs/guides/realtime/quotas):
+
+| Plan                  | Concurrent connections |
+|-----------------------|------------------------|
+| Free                  | 200                    |
+| Pro                   | 500                    |
+| Pro (no spend cap)    | 10,000                 |
+| Team                  | 10,000                 |
+| Enterprise            | 10,000+                |
+
+
+### Example:
+On the Free plan, if you reach 200 channel subscriptions, whether from 200 users on one channel or 200 in total spread across multiple channels, adding a 201st will trigger a ConnectionRateLimitReached error.
+
+### How to fix it
+
+Upgrade your plan to allow more concurrent connections or pace the rate that individual users can join channels.
