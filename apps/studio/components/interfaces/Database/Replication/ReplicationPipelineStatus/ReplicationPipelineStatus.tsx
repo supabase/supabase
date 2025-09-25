@@ -4,10 +4,12 @@ import {
   Ban,
   ChevronLeft,
   ExternalLink,
+  Info,
   Pause,
   Play,
   RotateCcw,
   Search,
+  WifiOff,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -31,17 +33,18 @@ import {
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { ErroredTableDetails } from './ErroredTableDetails'
+import { ErroredTableDetails } from '../ErroredTableDetails'
 import {
   PIPELINE_ACTIONABLE_STATES,
   PIPELINE_ERROR_MESSAGES,
   getStatusName,
-} from './Pipeline.utils'
-import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
-import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
-import { TableState } from './ReplicationPipelineStatus.types'
+} from '../Pipeline.utils'
+import { PipelineStatus, PipelineStatusName } from '../PipelineStatus'
+import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import { UpdateVersionModal } from '../UpdateVersionModal'
+import { SlotLagMetrics, TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
-import { UpdateVersionModal } from './UpdateVersionModal'
+import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -82,7 +85,6 @@ export const ReplicationPipelineStatus = () => {
 
   const {
     data: replicationStatusData,
-    error: statusError,
     isLoading: isStatusLoading,
     isError: isStatusError,
   } = useReplicationPipelineReplicationStatusQuery(
@@ -107,12 +109,14 @@ export const ReplicationPipelineStatus = () => {
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
   const tableStatuses = replicationStatusData?.table_statuses || []
+  const applyLagMetrics = replicationStatusData?.apply_lag
   const filteredTableStatuses =
     filterString.length === 0
       ? tableStatuses
-      : tableStatuses.filter((table: TableState) =>
+      : tableStatuses.filter((table) =>
           table.table_name.toLowerCase().includes(filterString.toLowerCase())
         )
+  const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
 
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
@@ -121,6 +125,10 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
+  const refreshIntervalLabel =
+    STATUS_REFRESH_FREQUENCY_MS >= 1000
+      ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
+      : `${STATUS_REFRESH_FREQUENCY_MS}ms`
 
   const logsUrl = `/project/${projectRef}/logs/etl-replication-logs${
     pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
@@ -242,46 +250,105 @@ export const ReplicationPipelineStatus = () => {
             </Button>
           </div>
         </div>
-
-        {(isPipelineLoading || isStatusLoading) && <GenericSkeletonLoader />}
-
         {isPipelineError && (
           <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
         )}
 
         {isStatusError && (
-          <AlertError
-            error={statusError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_REPLICATION_STATUS}
-          />
+          <div className="flex items-center gap-2 rounded-lg border border-warning-400 bg-warning-50 px-3 py-2 text-xs text-warning-800">
+            <WifiOff size={14} />
+            <span className="font-medium">Live updates paused</span>
+            <span className="text-warning-700">Retrying automatically</span>
+          </div>
+        )}
+
+        {showDisabledState && (
+          <div
+            className={cn(
+              'p-4 border border-default rounded-lg flex items-center justify-between',
+              config.colors.bg
+            )}
+          >
+            <div className="flex items-center gap-x-3">
+              <div
+                className={cn(
+                  'w-10 h-10 rounded-full flex items-center justify-center',
+                  config.colors.iconBg
+                )}
+              >
+                <div className={config.colors.icon}>{config.icon}</div>
+              </div>
+              <div className="flex-1">
+                <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
+                <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {(isPipelineLoading || isStatusLoading) && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-x-3">
+              <div className="h-6 w-40 rounded bg-surface-200" />
+              <div className="h-5 w-24 rounded bg-surface-200" />
+            </div>
+            <GenericSkeletonLoader />
+          </div>
+        )}
+
+        {applyLagMetrics && (
+          <div className="border border-default rounded-lg bg-surface-100 px-4 py-4 space-y-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-y-1">
+              <div>
+                <h4 className="text-sm font-semibold text-foreground">Replication lag</h4>
+                <p className="text-xs text-foreground-light">
+                  Snapshot of how far this pipeline is trailing behind right now.
+                </p>
+              </div>
+              <p className="text-xs text-foreground-lighter">
+                Updates every {refreshIntervalLabel}
+              </p>
+            </div>
+
+            {isStatusError && (
+              <p className="text-xs text-warning-700">
+                Unable to refresh data. Showing the last values we received.
+              </p>
+            )}
+
+            <SlotLagMetricsList metrics={applyLagMetrics} />
+
+            {tablesWithLag.length > 0 && (
+              <>
+                <div className="border-t border-default/40" />
+                <div className="space-y-3 text-xs text-foreground">
+                  <div className="flex items-start gap-2 rounded-md border border-default/50 bg-surface-200/60 px-3 py-2 text-foreground-light">
+                    <Info size={14} className="mt-0.5" />
+                    <span>
+                      During initial sync, tables can copy and stream independently before
+                      reconciling with the overall pipeline.
+                    </span>
+                  </div>
+                  <div className="rounded border border-default/50 bg-surface-200/40">
+                    <ul className="divide-y divide-default/40">
+                      {tablesWithLag.map((table) => (
+                        <li key={`${table.table_id}-${table.table_name}`} className="px-3 py-2">
+                          <SlotLagMetricsInline
+                            tableName={table.table_name}
+                            metrics={table.table_sync_lag as SlotLagMetrics}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         )}
 
         {hasTableData && (
-          <div className="flex flex-col gap-y-4">
-            {showDisabledState && (
-              <div
-                className={cn(
-                  'p-4 border border-default rounded-lg flex items-center justify-between',
-                  config.colors.bg
-                )}
-              >
-                <div className="flex items-center gap-x-3">
-                  <div
-                    className={cn(
-                      'w-10 h-10 rounded-full flex items-center justify-center',
-                      config.colors.iconBg
-                    )}
-                  >
-                    <div className={config.colors.icon}>{config.icon}</div>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
-                    <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
+          <div className="flex flex-col gap-y-3">
             <div className="w-full overflow-hidden overflow-x-auto">
               {/* [Joshen] Should update to use new Table components next time */}
               <Table
@@ -304,8 +371,8 @@ export const ReplicationPipelineStatus = () => {
                         </Table.td>
                       </Table.tr>
                     )}
-                    {filteredTableStatuses.map((table: TableState, index: number) => {
-                      const statusConfig = getStatusConfig(table.state)
+                    {filteredTableStatuses.map((table, index) => {
+                      const statusConfig = getStatusConfig(table.state as TableState['state'])
                       return (
                         <Table.tr key={`${table.table_name}-${index}`} className="border-t">
                           <Table.td className="align-top">
@@ -342,7 +409,7 @@ export const ReplicationPipelineStatus = () => {
                                 Status unavailable while pipeline is {config.badge.toLowerCase()}
                               </p>
                             ) : (
-                              <div className="space-y-1">
+                              <div className="space-y-3">
                                 <div className="text-sm text-foreground">
                                   {statusConfig.description}
                                 </div>
