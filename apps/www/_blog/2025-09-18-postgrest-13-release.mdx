@@ -113,20 +113,45 @@ This works because `text` and `json/jsonb` columns will be automatically convert
 To ensure this operation is fast, add an index:
 
 ```sql
-create index idx_titles on people using gin (to_tsvector('english', primary_name));
+create index idx_titles on people
+using gin (to_tsvector('english', primary_name));
 ```
 
 ## Max Affected
 
 You can now limit to the amount of rows affected by an `update` or `delete` operation with `maxAffected`:
 
-```js
+<$CodeTabs>
+
+```js name=JavaScript
 const { data, error } = await supabase
   .from('people')
   .update({ primary_name: 'Marlon Brando Jr.' })
   .eq('nconst', 'nm0000008')
   .maxAffected(1)
 ```
+
+```bash name=Bash
+curl -X PATCH 'https://<your-domain>/people' \
+  -d "nconst=eq.nm0000008" \
+  -H "Authorization: Bearer <YOUR_KEY>" \
+  -H "Prefer: handling=strict, max-affected=1" \
+  -H "Content-Type: application/json" \
+  -d @- <<JSON
+{ primary_name: 'Marlon Brando Jr.' }
+JSON
+```
+
+```swift name=Swift
+try await supabase
+  .from("people")
+  .update(["primary_name": "Marlon Brando Jr."])
+  .eq("nconst", value: "nm0000008")
+  .maxAffected(1)
+  .execute()
+```
+
+</$CodeTabs>
 
 If the rows affected by the operation surpass the limit in `maxAffected`, an error will be thrown.
 
