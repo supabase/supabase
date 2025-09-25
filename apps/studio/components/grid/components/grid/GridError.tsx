@@ -5,6 +5,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 export const GridError = ({ error }: { error?: any }) => {
@@ -60,6 +61,8 @@ const ForeignTableMissingVaultKeyError = () => {
 }
 
 const InvalidSyntaxError = ({ error }: { error?: any }) => {
+  const { onApplyFilters } = useTableFilter()
+
   return (
     <Admonition
       type="warning"
@@ -73,9 +76,13 @@ const InvalidSyntaxError = ({ error }: { error?: any }) => {
       <p className="!mb-2">
         Verify that your filter values are correct before applying the filters again.
       </p>
-      <p className="text-sm text-foreground-lighter prose max-w-full !mb-0">
+      <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
         Error: <code className="text-xs">{error.message}</code>
       </p>
+
+      <Button type="default" onClick={() => onApplyFilters([])}>
+        Remove filters
+      </Button>
     </Admonition>
   )
 }
