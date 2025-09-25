@@ -93,8 +93,10 @@ const GitHubIntegrationConnectionForm = ({
   })
 
   const refetchGitHubAuthorizationAndRepositories = () => {
-    refetchGitHubAuthorization()
-    refetchGitHubRepositories()
+    setTimeout(() => {
+      refetchGitHubAuthorization()
+      refetchGitHubRepositories()
+    }, 1000) // 1 second to delay to let github authorization and repositories to be updated
   }
 
   const { mutate: updateBranch } = useBranchUpdateMutation({
