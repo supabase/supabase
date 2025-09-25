@@ -1353,8 +1353,7 @@ const PROVIDER_SAML = {
   properties: {
     SAML_ENABLED: {
       title: 'Enable SAML 2.0 Single Sign-on',
-      description:
-        `You will need to use the [Supabase CLI](${DOCS_URL}/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it`,
+      description: `You will need to use the [Supabase CLI](${DOCS_URL}/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it`,
       type: 'boolean',
     },
     SAML_EXTERNAL_URL: {

@@ -60,10 +60,7 @@ const PolicyEditorModalTitle = ({
             Try Supabase Assistant
           </Button>
         )}
-        <DocsButton
-          className="mt-[-4px]"
-          href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`}
-        />
+        <DocsButton className="mt-[-4px]" href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
       </div>
     </div>
   )
