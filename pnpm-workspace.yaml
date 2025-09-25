@@ -33,7 +33,7 @@ ignoredBuiltDependencies:
   - protobufjs
   - sharp
 
-minimumReleaseAge: 10080
+minimumReleaseAge: 100
 
 minimumReleaseAgeExclude:
   - ai
