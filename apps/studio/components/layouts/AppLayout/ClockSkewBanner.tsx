@@ -1,5 +1,5 @@
 import { fetchHandler } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
@@ -47,7 +47,7 @@ export const ClockSkewBanner = () => {
         Your computer's clock appears to be inaccurate. This can cause issues with certain features.
       </p>
       <Button asChild type="text">
-        <a href="https://supabase.com/docs" target="_blank">
+        <a href={`${DOCS_URL}`} target="_blank">
           More information
         </a>
       </Button>

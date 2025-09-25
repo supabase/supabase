@@ -1,7 +1,6 @@
 import { Check } from 'lucide-react'
 import Image from 'next/image'
 
-import { useParams } from 'common'
 import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
 import { DOCS_URL } from 'lib/constants'
 import { Badge, Button } from 'ui'

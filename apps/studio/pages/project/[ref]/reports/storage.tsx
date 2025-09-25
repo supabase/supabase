@@ -25,10 +25,10 @@ import {
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
-import { DOCS_URL } from 'lib/constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useStorageReport } from 'data/reports/storage-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 export const StorageReport: NextPageWithLayout = () => {
@@ -166,10 +166,7 @@ export const StorageReport: NextPageWithLayout = () => {
                 The number of storage requests that are cached at the edge level. A higher number of
                 hits is better.{' '}
                 <span className="flex items-center gap-1 text-foreground-lighter">
-                  <Link
-                    href={`${DOCS_URL}/guides/storage/cdn/fundamentals`}
-                    target="_blank"
-                  >
+                  <Link href={`${DOCS_URL}/guides/storage/cdn/fundamentals`} target="_blank">
                     Read More
                   </Link>
                   <ExternalLinkIcon className="w-3 h-3" />

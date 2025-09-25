@@ -24,9 +24,7 @@ RealtimePoliciesPage.getLayout = (page) => (
       <PageLayout
         title="Policies"
         subtitle="Control access to your realtime channels"
-        primaryActions={
-          <DocsButton href={`${DOCS_URL}/guides/realtime/authorization`} />
-        }
+        primaryActions={<DocsButton href={`${DOCS_URL}/guides/realtime/authorization`} />}
         size="large"
       >
         {page}

@@ -15,7 +15,6 @@ import { BranchSelector } from 'components/interfaces/BranchManagement/BranchSel
 import { PullRequestsEmptyState } from 'components/interfaces/BranchManagement/EmptyStates'
 import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DOCS_URL } from 'lib/constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -28,6 +27,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,

@@ -8,7 +8,6 @@ import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { DOCS_URL } from 'lib/constants'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -21,6 +20,7 @@ import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-quer
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'

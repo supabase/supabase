@@ -15,9 +15,9 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { IS_PLATFORM, DOCS_URL } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { Button, Table, TableHead, TableRow, TableHeader, TableBody, Card } from 'ui'
+import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()

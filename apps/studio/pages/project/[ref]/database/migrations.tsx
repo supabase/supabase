@@ -1,19 +1,16 @@
-import { ExternalLink } from 'lucide-react'
-
 import Migrations from 'components/interfaces/Database/Migrations/Migrations'
-import { DOCS_URL } from 'lib/constants'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
 import { DocsButton } from 'components/ui/DocsButton'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DOCS_URL } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
 
 const MigrationsPage: NextPageWithLayout = () => {
   return (

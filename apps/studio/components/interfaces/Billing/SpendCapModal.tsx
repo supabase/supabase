@@ -1,6 +1,6 @@
 import { DocsButton } from 'components/ui/DocsButton'
-import { Button, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { DOCS_URL } from 'lib/constants'
+import { Button, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 interface SpendCapModalProps {
   visible: boolean

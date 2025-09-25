@@ -3,8 +3,8 @@ import { Check, Webhook } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import { Badge, Input, copyToClipboard } from 'ui'
 import { Hook } from './hooks.constants'
 

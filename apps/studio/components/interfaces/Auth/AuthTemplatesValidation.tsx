@@ -1,6 +1,7 @@
-import type { FormSchema } from 'types'
 import { object, string } from 'yup'
+
 import { DOCS_URL } from 'lib/constants'
+import type { FormSchema } from 'types'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 

@@ -1,5 +1,4 @@
 import { ExternalLink } from 'lucide-react'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 
 import { useParams } from 'common'
@@ -11,6 +10,7 @@ import {
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,

@@ -20,7 +20,7 @@ import { ReleaseChannel } from 'data/projects/new-project.constants'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -200,7 +200,7 @@ const ProjectUpgradeAlert = () => {
                       <div>
                         <Button size="tiny" type="default" asChild>
                           <Link
-                            href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                            href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
                             target="_blank"
                             rel="noreferrer"
                           >
@@ -242,7 +242,7 @@ const ProjectUpgradeAlert = () => {
                       <div>
                         <Button size="tiny" type="default" asChild>
                           <Link
-                            href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                            href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
                             target="_blank"
                             rel="noreferrer"
                           >

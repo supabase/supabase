@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -27,6 +28,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { DOCS_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
@@ -66,7 +68,6 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { useRouter } from 'next/router'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -598,9 +599,7 @@ export const SupportFormV2 = ({
                       )}
                       <a
                         href={
-                          page.type === 'github-discussions'
-                            ? page.path
-                            : `https://supabase.com/docs${page.path}`
+                          page.type === 'github-discussions' ? page.path : `${DOCS_URL}${page.path}`
                         }
                         target="_blank"
                         rel="noreferrer"

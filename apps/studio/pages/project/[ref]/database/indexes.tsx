@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 
 import Indexes from 'components/interfaces/Database/Indexes/Indexes'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,
@@ -13,7 +14,6 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const IndexesPage: NextPageWithLayout = () => {
   return (

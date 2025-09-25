@@ -3,10 +3,10 @@ import { useParams } from 'common'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { DOCS_URL } from 'lib/constants'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 /**

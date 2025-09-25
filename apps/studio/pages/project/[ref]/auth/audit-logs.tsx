@@ -4,7 +4,6 @@ import { useParams } from 'common'
 import { AuditLogsForm } from 'components/interfaces/Auth/AuditLogsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DOCS_URL } from 'lib/constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -12,6 +11,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const AuditLogsPage: NextPageWithLayout = () => {
@@ -39,9 +39,7 @@ const AuditLogsPage: NextPageWithLayout = () => {
   )
 }
 
-const secondaryActions = [
-  <DocsButton key="docs" href={`${DOCS_URL}/guides/auth/audit-logs`} />,
-]
+const secondaryActions = [<DocsButton key="docs" href={`${DOCS_URL}/guides/auth/audit-logs`} />]
 
 AuditLogsPage.getLayout = (page) => (
   <DefaultLayout>

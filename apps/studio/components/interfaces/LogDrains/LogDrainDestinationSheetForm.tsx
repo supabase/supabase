@@ -6,9 +6,9 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-
 import { DocsButton } from 'components/ui/DocsButton'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Form_Shadcn_,
@@ -533,7 +533,7 @@ export function LogDrainDestinationSheetForm({
                   <DocsButton
                     abbrev={false}
                     className="w-min"
-                    href="https://supabase.com/docs/guides/platform/log-drains"
+                    href={`${DOCS_URL}/guides/platform/log-drains`}
                   />
                 </div>
               }

@@ -11,7 +11,6 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useDeleteThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-delete-mutation'
 import {
@@ -19,6 +18,7 @@ import {
   useThirdPartyAuthIntegrationsQuery,
 } from 'data/third-party-auth/integrations-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
@@ -74,7 +74,9 @@ export const ThirdPartyAuthForm = () => {
             <br />
             Billing is based on the number of monthly active users (MAUs) requesting your API
             throughout the billing period. Refer to our{' '}
-            <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}>
+            <InlineLink
+              href={`${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}
+            >
               billing docs
             </InlineLink>{' '}
             for more information.

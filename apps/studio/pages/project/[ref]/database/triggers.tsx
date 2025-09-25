@@ -7,7 +7,6 @@ import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTri
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { generateTriggerCreateSQL } from 'components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
-import { DOCS_URL } from 'lib/constants'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -15,6 +14,7 @@ import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
