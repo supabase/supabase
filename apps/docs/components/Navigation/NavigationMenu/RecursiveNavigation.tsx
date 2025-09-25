@@ -9,48 +9,58 @@ import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { cn } from 'ui'
 
-interface MenuItem {
-  title: string
-  icon?: string
-  url?: string
-  type?: 'link' | 'category'
-  enabled?: boolean
-  children?: MenuItem[]
-}
+import type { NavMenuSection } from '../Navigation.types'
 
 interface RecursiveNavItemProps {
-  item: MenuItem
+  item: NavMenuSection
   depth?: number
   path?: string
 }
 
 interface RecursiveNavigationProps {
-  items: MenuItem[]
+  items: NavMenuSection[]
   className?: string
 }
 
 const ICON_SIZE = 16
 
-const NavIcon = React.memo(({ icon, title }: { icon: string; title: string }) => {
-  const { resolvedTheme } = useTheme()
-  return (
-    <Image
-      alt={title}
-      src={`${icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
-      width={ICON_SIZE}
-      height={ICON_SIZE}
-    />
-  )
-})
+// Helper function to check if an item contains the active path (recursively)
+const containsActivePath = (item: NavMenuSection, pathname: string): boolean => {
+  // Check if this item is the active one
+  if (item.url === pathname) {
+    return true
+  }
+
+  // Check if any child contains the active path
+  if (item.items && item.items.length > 0) {
+    return item.items.some((child) => containsActivePath(child as NavMenuSection, pathname))
+  }
+
+  return false
+}
+
+const NavIcon = React.memo(
+  ({ icon, title, hasLightIcon }: { icon: string; title: string; hasLightIcon?: boolean }) => {
+    const { resolvedTheme } = useTheme()
+
+    // Use existing logic from the original components
+    const iconSrc = hasLightIcon
+      ? `${icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`
+      : `${icon}.svg`
+
+    return <Image alt={title} src={iconSrc} width={ICON_SIZE} height={ICON_SIZE} />
+  }
+)
 
 NavIcon.displayName = 'NavIcon'
 
 const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, path = '' }) => {
   const pathname = usePathname()
 
-  const itemPath = path ? `${path}.${item.title}` : item.title
+  const itemPath = path ? `${path}.${item.name}` : item.name
   const isActive = item.url === pathname
-  const hasChildren = item.children && item.children.length > 0
+  const hasChildren = item.items && item.items.length > 0
+  const containsActive = containsActivePath(item, pathname)
 
   if (item.enabled === false) {
     return null
@@ -58,7 +68,12 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
 
   if (hasChildren) {
     return (
-      <Accordion.Root type="single" collapsible className={cn('w-full', depth > 0 && 'ml-2')}>
+      <Accordion.Root
+        type="single"
+        collapsible
+        className={cn('w-full', depth > 0 && 'ml-2')}
+        defaultValue={containsActive ? itemPath : undefined}
+      >
         <Accordion.Item value={itemPath}>
           <Accordion.Trigger
             className={cn(
@@ -69,8 +84,10 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
             )}
           >
             <div className="flex items-center gap-2">
-              {item.icon && <NavIcon icon={item.icon} title={item.title} />}
-              <span className={cn(depth === 0 && 'font-medium', 'text-left')}>{item.title}</span>
+              {item.icon && (
+                <NavIcon icon={item.icon} title={item.name} hasLightIcon={item.hasLightIcon} />
+              )}
+              <span className={cn(depth === 0 && 'font-medium', 'text-left')}>{item.name}</span>
             </div>
             <ChevronRight
               className="h-4 w-4 shrink-0 text-foreground-lighter transition-transform duration-200"
@@ -78,12 +95,12 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
             />
           </Accordion.Trigger>
 
-          <Accordion.Content className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+          <Accordion.Content className="overflow-hidden transition-all duration-500 ease-in-out data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
             <div className="pt-1 pb-2 pl-4 space-y-1 border-l border-border ml-2">
-              {item.children?.map((child, index) => (
+              {item.items?.map((child, index) => (
                 <RecursiveNavItem
-                  key={child.url || `${child.title}-${index}`}
-                  item={child}
+                  key={child.url || `${child.name}-${index}`}
+                  item={child as NavMenuSection}
                   depth={depth + 1}
                   path={itemPath}
                 />
@@ -105,8 +122,8 @@ const RecursiveNavItem = React.memo<RecursiveNavItemProps>(({ item, depth = 0, p
         isActive ? 'bg-surface-200 text-brand-link font-medium' : 'text-foreground-light'
       )}
     >
-      {item.icon && <NavIcon icon={item.icon} title={item.title} />}
-      <span>{item.title}</span>
+      {item.icon && <NavIcon icon={item.icon} title={item.name} hasLightIcon={item.hasLightIcon} />}
+      <span>{item.name}</span>
     </Link>
   )
 })
@@ -117,11 +134,11 @@ const RecursiveNavigation: React.FC<RecursiveNavigationProps> = ({ items, classN
   return (
     <nav className={cn('w-full space-y-1', className)}>
       {items.map((item, index) => (
-        <RecursiveNavItem key={item.url || `${item.title}-${index}`} item={item} />
+        <RecursiveNavItem key={item.url || `${item.name}-${index}`} item={item} />
       ))}
     </nav>
   )
 }
 
-export { RecursiveNavigation, type MenuItem }
+export { RecursiveNavigation, type NavMenuSection }
 export default RecursiveNavigation

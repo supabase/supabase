@@ -28,6 +28,41 @@ const HeaderLink = React.memo(function HeaderLink(props: {
   )
 })
 
+interface LinkContainerProps {
+  url: string
+  className: string
+  hasSubItems: boolean
+  children: React.ReactNode
+}
+
+const LinkContainer = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, LinkContainerProps>(
+  ({ url, className, hasSubItems, children }, ref) => {
+    const isExternal = url.startsWith('https://')
+
+    if (hasSubItems) {
+      return (
+        <Accordion.Trigger className={className} ref={ref as React.ForwardedRef<HTMLButtonElement>}>
+          {children}
+        </Accordion.Trigger>
+      )
+    }
+
+    return (
+      <Link
+        href={url}
+        className={className}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+        ref={ref as React.ForwardedRef<HTMLAnchorElement>}
+      >
+        {children}
+      </Link>
+    )
+  }
+)
+
+LinkContainer.displayName = 'LinkContainer'
+
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
@@ -51,37 +86,6 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     [activeItem]
   )
 
-  const LinkContainer = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, any>(
-    (props, ref) => {
-      const isExternal = props.url.startsWith('https://')
-
-      if (hasSubItems) {
-        return (
-          <Accordion.Trigger
-            className={props.className}
-            ref={ref as React.ForwardedRef<HTMLButtonElement>}
-          >
-            {props.children}
-          </Accordion.Trigger>
-        )
-      }
-
-      return (
-        <Link
-          href={props.url}
-          className={props.className}
-          target={isExternal ? '_blank' : undefined}
-          rel={isExternal ? 'noopener noreferrer' : undefined}
-          ref={ref as React.ForwardedRef<HTMLAnchorElement>}
-        >
-          {props.children}
-        </Link>
-      )
-    }
-  )
-
-  LinkContainer.displayName = 'LinkContainer'
-
   return (
     <>
       {props.subItemIndex === 0 && (
@@ -97,6 +101,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           <Accordion.Item key={props.subItem.url || props.subItem.name} value={props.subItem.url}>
             <LinkContainer
               url={props.subItem.url}
+              hasSubItems={hasSubItems}
               className={[
                 'flex items-center gap-2',
                 'cursor-pointer transition text-sm',
@@ -105,7 +110,6 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                   ? 'text-brand-link font-medium'
                   : 'hover:text-foreground text-foreground-lighter',
               ].join(' ')}
-              parent={props.subItem.parent}
               ref={setActiveItemRef}
             >
               <div className="flex items-center gap-2">
@@ -155,6 +159,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
       ) : (
         <LinkContainer
           url={props.subItem.url}
+          hasSubItems={hasSubItems}
           className={[
             'flex items-center gap-2',
             'cursor-pointer transition text-sm',
@@ -162,7 +167,6 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               ? 'text-brand-link font-medium'
               : 'hover:text-foreground text-foreground-lighter',
           ].join(' ')}
-          parent={props.subItem.parent}
           ref={setActiveItemRef}
         >
           <div className="flex items-center gap-2">

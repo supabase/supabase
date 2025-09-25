@@ -7,8 +7,10 @@ import * as Accordion from '@radix-ui/react-accordion'
 
 import { type NavMenuSection } from '../Navigation.types'
 import * as NavItems from './NavigationMenu.constants'
-import { transformNavMenuToMenuItems } from './navigationDataTransform'
-import RecursiveNavigation, { type MenuItem } from './RecursiveNavigation'
+import { transformNavMenuToNavSections } from './navigationDataTransform'
+import RecursiveNavigation, {
+  type NavMenuSection as RecursiveNavMenuSection,
+} from './RecursiveNavigation'
 import MenuIconPicker from './MenuIconPicker'
 import { MenuId } from './NavigationMenu'
 
@@ -40,7 +42,7 @@ const NavigationMenuGuideListRecursive = ({
     }
   }
 
-  const menuItems: MenuItem[] = transformNavMenuToMenuItems([
+  const menuItems: NavMenuSection[] = transformNavMenuToNavSections([
     {
       label: menu.title,
       items: menu.items.filter((item) => item.enabled !== false),
@@ -58,7 +60,7 @@ const NavigationMenuGuideListRecursive = ({
           </div>
         </Link>
 
-        <RecursiveNavigation items={menuItems[0].children || []} className="space-y-1" />
+        <RecursiveNavigation items={menuItems} className="space-y-1" />
       </div>
     </NavigationMenuGuideListWrapper>
   )
