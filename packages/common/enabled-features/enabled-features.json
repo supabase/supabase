@@ -51,6 +51,8 @@
   "docs:production_checklist": true,
   "docs:web_apps": true,
 
+  "edge_functions:show_stripe_example": true,
+
   "feedback:docs": true,
 
   "integrations:partners": true,
