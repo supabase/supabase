@@ -34,6 +34,32 @@ interface FileExplorerAndEditorProps {
 
 const denoJsonDefaultContent = JSON.stringify({ imports: {} }, null, '\t')
 
+const isBinaryFile = (fileName: string): boolean => {
+  const extension = fileName.split('.').pop()?.toLowerCase()
+  const binaryExtensions = [
+    'wasm',
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'bmp',
+    'ico',
+    'svg',
+    'mp3',
+    'mp4',
+    'avi',
+    'mov',
+    'zip',
+    'rar',
+    '7z',
+    'tar',
+    'gz',
+    'bz2',
+    'pdf',
+  ]
+  return binaryExtensions.includes(extension || '')
+}
+
 const getLanguageFromFileName = (fileName: string): string => {
   const extension = fileName.split('.').pop()?.toLowerCase()
   switch (extension) {
@@ -109,7 +135,16 @@ const FileExplorerAndEditor = ({
       const newId = Math.max(0, ...files.map((f) => f.id), ...newFiles.map((f) => f.id)) + 1
 
       try {
-        const content = await file.text()
+        let content: string
+        if (isBinaryFile(file.name)) {
+          // For binary files, read as ArrayBuffer and convert to base64 or keep as binary data
+          const arrayBuffer = await file.arrayBuffer()
+          const bytes = new Uint8Array(arrayBuffer)
+          content = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('')
+        } else {
+          content = await file.text()
+        }
+
         newFiles.push({
           id: newId,
           name: file.name,
@@ -321,23 +356,35 @@ const FileExplorerAndEditor = ({
         </div>
       </div>
       <div className="flex-1 min-h-0 relative px-3 bg-surface-200">
-        <AIEditor
-          language={getLanguageFromFileName(selectedFile?.name || 'index.ts')}
-          value={selectedFile?.content}
-          onChange={handleChange}
-          aiEndpoint={aiEndpoint}
-          aiMetadata={aiMetadata}
-          options={{
-            tabSize: 2,
-            fontSize: 13,
-            minimap: { enabled: false },
-            wordWrap: 'on',
-            lineNumbers: 'on',
-            folding: false,
-            padding: { top: 20, bottom: 20 },
-            lineNumbersMinChars: 3,
-          }}
-        />
+        {selectedFile && isBinaryFile(selectedFile.name) ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="text-foreground-light text-lg mb-2">Cannot Edit Selected File</div>
+              <div className="text-foreground-lighter text-sm">
+                Binary files like .{selectedFile.name.split('.').pop()} cannot be edited in the text
+                editor
+              </div>
+            </div>
+          </div>
+        ) : (
+          <AIEditor
+            language={getLanguageFromFileName(selectedFile?.name || 'index.ts')}
+            value={selectedFile?.content}
+            onChange={handleChange}
+            aiEndpoint={aiEndpoint}
+            aiMetadata={aiMetadata}
+            options={{
+              tabSize: 2,
+              fontSize: 13,
+              minimap: { enabled: false },
+              wordWrap: 'on',
+              lineNumbers: 'on',
+              folding: false,
+              padding: { top: 20, bottom: 20 },
+              lineNumbersMinChars: 3,
+            }}
+          />
+        )}
       </div>
     </div>
   )
