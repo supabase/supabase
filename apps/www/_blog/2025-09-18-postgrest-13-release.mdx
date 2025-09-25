@@ -67,11 +67,12 @@ curl 'https://<your-domain>/titles'
 ```
 
 ```swift name=Swift
-try await supabase.from("titles").select(`
+try await supabase.from("titles").select(
+"""
   title:primary_title,
   ...people(actors:primary_name),
   ...genres(genres:name)
-`)
+""")
 ```
 
 </$CodeTabs>
@@ -84,9 +85,26 @@ You can see the data model used for this example on this [gist](https://gist.git
 
 Previously you could only use the full text search operator on `tsvector` columns, now you can do it on `text` and `json/jsonb` columns too:
 
-```js
+<$CodeTabs>
+
+```js name=JavaScript
 const { data, error } = await supabase.from('titles').textSearch('primary_name', `'god' & 'father'`)
+`)
 ```
+
+```bash name=Bash
+curl 'https://<your-domain>/titles'
+  -d "primary_name=fts.'god'%26'father"
+  -H "Authorization: Bearer <YOUR_KEY>"
+```
+
+```swift name=Swift
+try await supabase
+  .from("titles")
+  .fts("primary_name",value: "'god' & 'father'")
+```
+
+</$CodeTabs>
 
 This works because `text` and `json/jsonb` columns will be automatically converted with `to_tsvector`.
 
