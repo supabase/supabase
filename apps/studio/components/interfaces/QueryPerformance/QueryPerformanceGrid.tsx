@@ -32,6 +32,7 @@ import {
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import { formatDuration } from './QueryPerformance.utils'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
@@ -141,30 +142,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           )
         }
 
-        if (col.id === 'prop_total_time') {
-          const percentage = props.row.prop_total_time || 0
-          const fillWidth = Math.min(percentage, 100)
-
-          return (
-            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
-              <div
-                className={`absolute inset-0 bg-foreground transition-all duration-200 z-0`}
-                style={{
-                  width: `${fillWidth}%`,
-                  opacity: 0.04,
-                }}
-              />
-              {value ? (
-                <p className={cn(value.toFixed(1) === '0.0' && 'text-foreground-lighter')}>
-                  {value.toFixed(1)}%
-                </p>
-              ) : (
-                <p className="text-muted">&ndash;</p>
-              )}
-            </div>
-          )
-        }
-
         const isTime = col.name.includes('time')
         const formattedValue =
           !!value && typeof value === 'number' && !isNaN(value) && isFinite(value)
@@ -173,19 +150,36 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               : value.toLocaleString()
             : ''
 
-        if (col.id === 'total_time') {
+        if (col.id === 'prop_total_time') {
+          const percentage = props.row.prop_total_time || 0
+          const totalTime = props.row.total_time || 0
+          const fillWidth = Math.min(percentage, 100)
+
           return (
             <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
-              {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
-                <p
-                  className={cn((value / 1000).toFixed(2) === '0.00' && 'text-foreground-lighter')}
-                >
-                  {(value / 1000).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                  s
-                </p>
+              <div
+                className="absolute inset-0 bg-foreground transition-all duration-200 z-0"
+                style={{
+                  width: `${fillWidth}%`,
+                  opacity: 0.04,
+                }}
+              />
+              {percentage && totalTime ? (
+                <span className="flex items-center justify-end gap-x-1.5">
+                  <span
+                    className={cn(percentage.toFixed(1) === '0.0' && 'text-foreground-lighter')}
+                  >
+                    {percentage.toFixed(1)}%
+                  </span>{' '}
+                  <span className="text-muted">/</span>
+                  <span
+                    className={cn(
+                      formatDuration(totalTime) === '0.00s' && 'text-foreground-lighter'
+                    )}
+                  >
+                    {formatDuration(totalTime)}
+                  </span>
+                </span>
               ) : (
                 <p className="text-muted">&ndash;</p>
               )}

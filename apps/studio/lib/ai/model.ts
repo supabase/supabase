@@ -100,7 +100,7 @@ export async function getModel({
       return { error: new Error('OPENAI_API_KEY not available') }
     }
     return {
-      model: openai.chat(chosenModelId as OpenAIModel),
+      model: openai(chosenModelId as OpenAIModel),
       promptProviderOptions: models[chosenModelId as OpenAIModel]?.promptProviderOptions,
       providerOptions: providerRegistry.providerOptions,
     }

@@ -142,6 +142,12 @@ supabase stop --no-backup
 
 </Admonition>
 
+<$Show if="!docs:hide_cli_profiles">
+
+<$Partial path="cli_profiles.mdx" />
+
+</$Show>
+
 ## Running Supabase locally
 
 The Supabase CLI uses Docker containers to manage the local development stack. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop):
