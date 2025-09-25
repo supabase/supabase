@@ -1,6 +1,5 @@
-/* no react imports to avoid type resolution issues here */
-
 import type { PropsWithChildren } from 'react'
+
 import {
   cn,
   Collapsible,

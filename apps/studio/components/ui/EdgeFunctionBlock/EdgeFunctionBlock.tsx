@@ -1,7 +1,6 @@
 import { Code } from 'lucide-react'
 import Link from 'next/link'
 import type { DragEvent, ReactNode } from 'react'
-// End of third-party imports
 
 import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { Button, CodeBlock, type CodeBlockLang, cn } from 'ui'
@@ -96,7 +95,7 @@ export const EdgeFunctionBlock = ({
               disabled={disabled || isDeploying}
               onClick={onDeploy}
             >
-              {isDeploying ? 'Deploying…' : 'Deploy'}
+              {isDeploying ? 'Deploying...' : 'Deploy'}
             </Button>
 
             {actions}

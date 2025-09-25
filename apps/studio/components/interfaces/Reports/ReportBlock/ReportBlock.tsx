@@ -141,6 +141,7 @@ export const ReportBlock = ({
     <>
       {isSnippet ? (
         <QueryBlock
+          blockWriteQueries
           id={item.id}
           label={item.label}
           chartConfig={chartConfig}
@@ -165,6 +166,7 @@ export const ReportBlock = ({
             runQuery(queryType, sql)
           }}
           onUpdateChartConfig={onUpdateChart}
+          onRemoveChart={() => onRemoveChart({ metric: { key: item.attribute } })}
           disabled={isLoading || snippetMissing || !sql}
         />
       ) : isDeprecatedChart ? (

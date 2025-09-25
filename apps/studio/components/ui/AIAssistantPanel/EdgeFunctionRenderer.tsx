@@ -1,6 +1,5 @@
 import { type PropsWithChildren, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-// End of third-party imports
 
 import { useParams } from 'common'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -143,9 +142,9 @@ export const EdgeFunctionRenderer = ({
       {showConfirmFooter && (
         <div className="mx-4">
           <ConfirmFooter
-            message="Assistant wants to deploy this EdgeFunction"
+            message="Assistant wants to deploy this Edge Function"
             cancelLabel="Skip"
-            confirmLabel={isDeploying ? 'Deploying…' : 'Deploy'}
+            confirmLabel={isDeploying ? 'Deploying...' : 'Deploy'}
             isLoading={isDeploying}
             onCancel={() => {
               onDeployed?.({ success: false, errorText: 'Skipped' })

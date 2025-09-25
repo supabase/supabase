@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Info, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-// End of third-party imports
 
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'

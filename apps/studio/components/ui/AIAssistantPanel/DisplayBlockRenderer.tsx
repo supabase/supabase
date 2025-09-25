@@ -238,7 +238,7 @@ export const DisplayBlockRenderer = ({
           <ConfirmFooter
             message="Assistant wants to run this query"
             cancelLabel="Skip"
-            confirmLabel={executeSqlLoading ? 'Running…' : 'Run Query'}
+            confirmLabel={executeSqlLoading ? 'Running...' : 'Run Query'}
             isLoading={executeSqlLoading}
             onCancel={async () => {
               onResults?.({ messageId, results: 'User skipped running the query' })

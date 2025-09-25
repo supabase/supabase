@@ -1,10 +1,10 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type PropsWithChildren } from 'react'
-import { cn } from 'ui'
 
 import { ProfileImage as ProfileImageDisplay } from 'components/ui/ProfileImage'
+import { useProfileNameAndPicture } from 'lib/profile'
+import { cn } from 'ui'
 import { useMessageInfoContext } from './Message.Context'
-import { useProfileNameAndPicture } from './Message.hooks'
 import { MessageMarkdown, MessagePartSwitcher } from './Message.Parts'
 
 function MessageDisplayProfileImage() {
