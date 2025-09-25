@@ -23,8 +23,5 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - 'ai'
   - '@ai-sdk/*'
-<<<<<<< HEAD
-=======
   - '@supabase/mcp-server-supabase'
   - '@supabase/mcp-utils'
->>>>>>> master
