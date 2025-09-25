@@ -4,6 +4,14 @@ packages:
   - 'blocks/*'
   - 'e2e/*'
 
+overrides:
+  "@supabase/supabase-js>@supabase/auth-js": "catalog:"
+  "@tanstack/directive-functions-plugin>vite": "catalog:"
+  "@tanstack/react-start-plugin>vite": "catalog:"
+  "esbuild": "^0.25.2"
+  "@redocly/respect-core>form-data": "^4.0.4"
+  "tmp": "^0.2.4"
+
 catalog:
   '@types/node': ^22.0.0
   '@types/react': '^18.3.0'

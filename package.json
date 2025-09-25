@@ -63,14 +63,6 @@
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "pnpm": {
-    "overrides": {
-      "@supabase/supabase-js>@supabase/auth-js": "catalog:",
-      "@tanstack/directive-functions-plugin>vite": "catalog:",
-      "@tanstack/react-start-plugin>vite": "catalog:",
-      "esbuild": "^0.25.2",
-      "@redocly/respect-core>form-data": "^4.0.4",
-      "tmp": "^0.2.4"
-    },
     "neverBuiltDependencies": ["libpg-query"]
   },
   "engines": {
