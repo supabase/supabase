@@ -7,7 +7,7 @@ import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobRunsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   jobId: number
 }
 
@@ -20,9 +20,9 @@ export type CronJobRun = {
   command: string
   // statuses https://github.com/citusdata/pg_cron/blob/f5d111117ddc0f4d83a1bad34d61b857681b6720/include/job_metadata.h#L20
   status: 'starting' | 'running' | 'sending' | 'connecting' | 'succeeded' | 'failed'
-  return_message: string
+  return_message: string | null
   start_time: string
-  end_time: string
+  end_time: string | null
 }
 
 export const CRON_JOB_RUNS_PAGE_SIZE = 30
@@ -51,17 +51,17 @@ export async function getDatabaseCronJobRuns({
   return result
 }
 
-export type DatabaseCronJobData = CronJobRun[]
-export type DatabaseCronJobError = ResponseError
+type DatabaseCronJobRunData = CronJobRun[]
+type DatabaseCronJobError = ResponseError
 
-export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobData>(
+export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
   { projectRef, connectionString, jobId }: DatabaseCronJobRunsVariables,
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
+  }: UseInfiniteQueryOptions<DatabaseCronJobRunData, DatabaseCronJobError, TData> = {}
 ) =>
-  useInfiniteQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
+  useInfiniteQuery<DatabaseCronJobRunData, DatabaseCronJobError, TData>(
     databaseCronJobsKeys.runsInfinite(projectRef, jobId, { status }),
     ({ pageParam }) => {
       return getDatabaseCronJobRuns({

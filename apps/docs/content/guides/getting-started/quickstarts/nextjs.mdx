@@ -9,7 +9,7 @@ hideToc: true
 
   <StepHikeCompact.Step step={1}>
 
-    <QuickstartDbSetup />
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -18,7 +18,7 @@ hideToc: true
     <StepHikeCompact.Details title="Create a Next.js app">
 
     Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with:
-    - [Cookie-based Auth](https://supabase.com/docs/guides/auth/auth-helpers/nextjs)
+    - [Cookie-based Auth](docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server)
     - [TypeScript](https://www.typescriptlang.org/)
     - [Tailwind CSS](https://tailwindcss.com/)
 
@@ -26,7 +26,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash
       npx create-next-app -e with-supabase
       ```
 
@@ -40,84 +40,107 @@ hideToc: true
     Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishableKey" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```text .env.local
-      NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-      NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
-      ```
+      <$CodeTabs>
+
+        ```text name=.env.local
+        NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        ```
+
+      </$CodeTabs>
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Query Supabase data from Next.js">
+<StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create Supabase client">
 
-    Create a new file at `app/instruments/page.tsx` and populate with the following.
+    Create a new file at `utils/supabase/server.ts` and populate with the following.
 
-    This will select all the rows from the `instruments` table in Supabase and render them on the page.
+    This creates a Supabase client, using the credentials from the `env.local` file.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-    <CH.Code className="min-h-[34rem]">
+    <$CodeTabs>
 
-      ```ts app/instruments/page.tsx
-        import { createClient } from '@/utils/supabase/server';
+      ```ts name=utils/supabase/server.ts
+      import { createServerClient } from '@supabase/ssr'
+      import { cookies } from 'next/headers'
 
-        export default async function Instruments() {
-          const supabase = await createClient();
-          const { data: instruments } = await supabase.from("instruments").select();
+      export async function createClient() {
+        const cookieStore = await cookies()
 
-          return <pre>{JSON.stringify(instruments, null, 2)}</pre>
-        }
-      ```
-
-      ```ts utils/supabase/server.ts
-        import { createServerClient } from '@supabase/ssr'
-        import { cookies } from 'next/headers'
-
-        export async function createClient() {
-          const cookieStore = await cookies()
-
-          return createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-              cookies: {
-                getAll() {
-                  return cookieStore.getAll()
-                },
-                setAll(cookiesToSet) {
-                  try {
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                      cookieStore.set(name, value, options)
-                    )
-                  } catch {
-                    // The `setAll` method was called from a Server Component.
-                    // This can be ignored if you have middleware refreshing
-                    // user sessions.
-                  }
-                },
+        return createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+          {
+            cookies: {
+              getAll() {
+                return cookieStore.getAll()
               },
-            }
-          )
-        }
+              setAll(cookiesToSet) {
+                try {
+                  cookiesToSet.forEach(({ name, value, options }) =>
+                    cookieStore.set(name, value, options)
+                  )
+                } catch {
+                  // The `setAll` method was called from a Server Component.
+                  // This can be ignored if you have middleware refreshing
+                  // user sessions.
+                }
+              },
+            },
+          }
+        )
+      }
       ```
 
-    </CH.Code>
+    </$CodeTabs>
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query Supabase data from Next.js">
+
+    Create a new file at `app/instruments/page.tsx` and populate with the following.
+
+    This selects all the rows from the `instruments` table in Supabase and render them on the page.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    <$CodeTabs>
+
+      ```ts name=app/instruments/page.tsx
+      import { createClient } from '@/utils/supabase/server';
+
+      export default async function Instruments() {
+        const supabase = await createClient();
+        const { data: instruments } = await supabase.from("instruments").select();
+
+        return <pre>{JSON.stringify(instruments, null, 2)}</pre>
+      }
+      ```
+
+    </$CodeTabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
     Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.

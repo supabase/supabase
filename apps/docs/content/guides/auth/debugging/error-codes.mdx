@@ -36,6 +36,7 @@ Error objects are split in a few classes:
 Errors originating from the server API classed as `AuthApiError` always have a `code` property that can be used to identify the error returned by the server. The `status` property is also present, encoding the HTTP status code received in the response.
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthException` class.
 
@@ -44,12 +45,16 @@ Error objects are split in a few classes. `AuthApiException` is an exception whi
 Errors originating from the server API classed as `AuthApiException` always have a `code` property that can be used to identify the error returned by the server. The `statusCode` property is also present, encoding the HTTP status code received in the response.
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 All errors originating from the `supabase.auth` namespace of the client library will be a case of the `AuthError` enum.
 
 The `api(message:errorCode:underlyingData:underlyingResponse:)` case is a special case for errors which originates from the Supabase Auth API, this error always have an `errorCode` property that can be used to identify the error returned by the server.
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthError` class.
 
@@ -58,6 +63,8 @@ Error objects are split in a few classes. `AuthApiError` is an error which origi
 Errors originating from the server API classed as `AuthApiError` always have a `code` property that can be used to identify the error returned by the server. The `status` property is also present, encoding the HTTP status code received in the response.
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 All exceptions originating from the `supabase.auth` namespace of the Kotlin client library will be a subclass of `RestException`.
 
@@ -70,6 +77,7 @@ Rest exceptions are split into a few classes:
 All instances and subclasses of a `AuthRestException` have a `errorCode` property that can be used to identify the error returned by the server.
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 
@@ -105,7 +113,7 @@ Sent out when a feature is not enabled on the Auth server, and you are trying to
 
 The following table provides a comprehensive list of error codes you may encounter when working with Supabase Auth. Each error code is associated with a specific issue and includes a description to help you understand and resolve the problem efficiently.
 
-<AuthErrorCodesTable />
+<ErrorCodes service="auth" />
 
 ## Best practices for error handling
 

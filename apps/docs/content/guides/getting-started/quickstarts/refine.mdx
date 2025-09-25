@@ -9,7 +9,7 @@ hideToc: true
 
   <StepHikeCompact.Step step={1}>
 
-    <QuickstartDbSetup />
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -25,7 +25,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm create refine-app@latest -- --preset refine-supabase my-app
       ```
 
@@ -42,7 +42,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app
       code .
       ```
@@ -60,7 +60,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 
@@ -78,13 +78,13 @@ hideToc: true
       You now have to update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API. The `supabaseClient` is used in auth provider and data provider methods that allow the refine app to connect to your Supabase backend.
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishableKey" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```ts src/utility/supabaseClient.ts
+      ```ts name=src/utility/supabaseClient.ts
       import { createClient } from "@refinedev/supabase";
 
       const SUPABASE_URL = YOUR_SUPABASE_URL;
@@ -128,7 +128,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run refine create-resource instruments
       ```
     </StepHikeCompact.Code>
@@ -149,7 +149,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```tsx src/App.tsx
+      ```tsx name=src/App.tsx
       import { Refine, WelcomePage } from "@refinedev/core";
       import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
       import routerBindings, {

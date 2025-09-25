@@ -6,13 +6,14 @@ import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchResetVariables = {
-  id: string
+  branchRef: string
   projectRef: string
 }
 
-export async function resetBranch({ id }: Pick<BranchResetVariables, 'id'>) {
-  const { data, error } = await post('/v1/branches/{branch_id}/reset', {
-    params: { path: { branch_id: id } },
+export async function resetBranch({ branchRef }: Pick<BranchResetVariables, 'branchRef'>) {
+  const { data, error } = await post('/v1/branches/{branch_id_or_ref}/reset', {
+    params: { path: { branch_id_or_ref: branchRef } },
+    body: {},
   })
 
   if (error) handleError(error)

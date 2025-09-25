@@ -15,7 +15,7 @@ If you are deploying to:
 - serverless functions
 - horizontally auto-scaling deployments
 
-It is recommended that you connect with the pooler in transaction mode (port 6543), which can be found in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database):
+It is recommended that you connect with the pooler in transaction mode (port 6543), which can be found on the dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
 ```sh
 # Example transaction mode string:
@@ -36,7 +36,7 @@ When relying on Supavisor, it's important to pick an adequate pool size. This gu
 
 ## Deploying to stationary servers
 
-For stationary servers, such as VMs and long-running containers, it is recommended to use your direct connection string, which can be found in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
+For stationary servers, such as VMs and long-running containers, it is recommended to use your direct connection string, which can be found on the dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
 ```
 # Example DB string:
@@ -65,7 +65,7 @@ If the command returns an IPv6 address, the network is IPv6 compatible.
 If your deployment environment is not IPv6 compatible, then consider:
 
 - Using the Supavisor pooler in session (port 5432)
-- Enabling the [IPv4 Add-On](https://supabase.com/dashboard/project/_/settings/addons) if you're on a pro or above plan
+- Enabling the [IPv4 Add-On](/dashboard/project/_/settings/addons) if you're on a pro or above plan
 
 ### Choosing an internal pool size
 

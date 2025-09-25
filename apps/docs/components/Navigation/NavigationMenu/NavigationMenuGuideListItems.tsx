@@ -19,7 +19,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
       className={[
         ' ',
         !props.title && 'capitalize',
-        props.url === pathname ? 'text-brand' : 'hover:text-brand text-foreground',
+        props.url === pathname ? 'text-brand-link' : 'hover:text-brand-link text-foreground',
       ].join(' ')}
     >
       {props.title ?? props.id}
@@ -75,7 +75,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               'flex items-center gap-2',
               'cursor-pointer transition text-sm',
               activeItem
-                ? 'text-brand font-medium'
+                ? 'text-brand-link font-medium'
                 : 'hover:text-foreground text-foreground-lighter',
             ].join(' ')}
             parent={props.subItem.parent}
@@ -94,23 +94,25 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
 
         {props.subItem.items && props.subItem.items.length > 0 && (
           <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-            {props.subItem.items.map((subSubItem) => {
-              return (
-                <li key={props.subItem.name}>
-                  <Link
-                    href={`${subSubItem.url}`}
-                    className={[
-                      'cursor-pointer transition text-sm',
-                      subSubItem.url === pathname
-                        ? 'text-brand'
-                        : 'hover:text-brand text-foreground-lighter',
-                    ].join(' ')}
-                  >
-                    {subSubItem.name}
-                  </Link>
-                </li>
-              )
-            })}
+            {props.subItem.items
+              .filter((subItem) => subItem.enabled !== false)
+              .map((subSubItem) => {
+                return (
+                  <li key={props.subItem.name}>
+                    <Link
+                      href={`${subSubItem.url}`}
+                      className={[
+                        'cursor-pointer transition text-sm',
+                        subSubItem.url === pathname
+                          ? 'text-brand-link'
+                          : 'hover:text-brand-link text-foreground-lighter',
+                      ].join(' ')}
+                    >
+                      {subSubItem.name}
+                    </Link>
+                  </li>
+                )
+              })}
           </Accordion.Content>
         )}
       </Accordion.Item>
@@ -144,6 +146,10 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 const Content = (props) => {
   const { menu, id } = props
 
+  if (menu.enabled === false) {
+    return null
+  }
+
   return (
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
       <Link href={menu.url ?? ''}>
@@ -153,28 +159,32 @@ const Content = (props) => {
         </div>
       </Link>
 
-      {menu.items.map((x) => {
-        return (
-          <div key={x.name}>
-            {x.items && x.items.length > 0 ? (
-              <div className="flex flex-col gap-2.5">
-                {x.items.map((subItem, subItemIndex) => {
-                  return (
-                    <ContentAccordionLink
-                      key={subItem.name}
-                      subItem={subItem}
-                      subItemIndex={subItemIndex}
-                      parent={x}
-                    />
-                  )
-                })}
-              </div>
-            ) : (
-              <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
-            )}
-          </div>
-        )
-      })}
+      {menu.items
+        .filter((item) => item.enabled !== false)
+        .map((x) => {
+          return (
+            <div key={x.name}>
+              {x.items && x.items.length > 0 ? (
+                <div className="flex flex-col gap-2.5">
+                  {x.items
+                    .filter((item) => item.enabled !== false)
+                    .map((subItem, subItemIndex) => {
+                      return (
+                        <ContentAccordionLink
+                          key={subItem.name}
+                          subItem={subItem}
+                          subItemIndex={subItemIndex}
+                          parent={x}
+                        />
+                      )
+                    })}
+                </div>
+              ) : x.url ? (
+                <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
+              ) : null}
+            </div>
+          )
+        })}
     </ul>
   )
 }

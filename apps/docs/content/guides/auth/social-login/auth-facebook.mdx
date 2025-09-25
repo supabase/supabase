@@ -11,7 +11,7 @@ To enable Facebook Auth for your project, you need to set up a Facebook OAuth ap
 Setting up Facebook logins for your application consists of 3 parts:
 
 - Create and configure a Facebook Application on the [Facebook Developers Site](https://developers.facebook.com)
-- Add your Facebook keys to your [Supabase Project](https://supabase.com/dashboard)
+- Add your Facebook keys to your [Supabase Project](/dashboard)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Access your Facebook Developer account
@@ -29,7 +29,7 @@ Setting up Facebook logins for your application consists of 3 parts:
 - Fill in your app information, then click `Create App`.
 - This should bring you to the screen: `Add Products to Your App`. (Alternatively you can click on `Add Product` in the left sidebar to get to this screen.)
 
-<SocialProviderSetup provider="Facebook" />
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "Facebook" }} />
 
 ## Set up Facebook login for your Facebook app
 
@@ -58,7 +58,25 @@ Under `Build Your App`, click on `Use Cases` screen. From there, do the followin
 
 ## Enter your Facebook app ID and secret into your Supabase project
 
-<SocialProviderSettingsSupabase provider="Facebook" />
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Facebook" }} />
+
+You can also configure the Facebook auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure Facebook auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_facebook_enabled": true,
+    "external_facebook_client_id": "your-facebook-app-id",
+    "external_facebook_secret": "your-facebook-app-secret"
+  }'
+```
 
 ## Add login code to your client app
 
@@ -71,11 +89,15 @@ Under `Build Your App`, click on `Use Cases` screen. From there, do the followin
 >
 <TabPanel id="js" label="JavaScript">
 
-<CreateClientSnippet />
+<$Partial path="create_client_snippet.mdx" />
 
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `facebook` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 async function signInWithFacebook() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'facebook',
@@ -99,7 +121,57 @@ Future<void> signInWithFacebook() async {
 }
 ```
 
+### Alternative: Using Facebook SDK with signInWithIdToken
+
+For more control over the Facebook authentication flow, you can use the Facebook SDK directly and then authenticate with Supabase using [`signInWithIdToken()`](/docs/reference/dart/auth-signinwithidtoken):
+
+First, add the Facebook SDK dependency to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter_facebook_auth: ^7.0.1
+```
+
+Then implement the Facebook authentication:
+
+```dart
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> signInWithFacebook() async {
+  try {
+    final LoginResult result = await FacebookAuth.instance.login(
+      permissions: ['public_profile', 'email'],
+    );
+
+    if (result.status == LoginStatus.success) {
+      final accessToken = result.accessToken!.tokenString;
+
+      await Supabase.instance.client.auth.signInWithIdToken(
+        provider: OAuthProvider.facebook,
+        idToken: accessToken,
+      );
+
+      // Authentication successful
+    } else {
+      // Handle login cancellation or failure
+      throw Exception('Facebook login failed: ${result.status}');
+    }
+  } catch (e) {
+    // Handle errors
+    throw Exception('Facebook authentication error: ${e.toString()}');
+  }
+}
+```
+
+<Admonition type="note">
+
+Make sure to configure your Facebook app properly and add the required permissions in the Facebook Developer Console. The `signInWithIdToken` method requires the Facebook access token to be valid and properly scoped.
+
+</Admonition>
+
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/swift/auth-signinwithoauth) with `facebook` as the `provider`:
@@ -120,6 +192,8 @@ func signInWithFacebook() async throws {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Facebook` as the `Provider`:
@@ -131,9 +205,10 @@ suspend fun signInWithFacebook() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
-<OAuthPkceFlow />
+<$Partial path="oauth_pkce_flow.mdx" />
 
 <Tabs
   scrollable
@@ -147,6 +222,10 @@ suspend fun signInWithFacebook() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
@@ -164,6 +243,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -175,6 +255,8 @@ func signOut() async throws {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -186,6 +268,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 Now, you should be able to login with Facebook and alert you to `Submit for Login Review` when users try to sign into your app. Follow the instructions there to make your app go live for full features and products.

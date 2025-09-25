@@ -1,7 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_ANALYTICS_URL } from 'pages/api/constants'
-import { get } from 'lib/common/fetch'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { PROJECT_ANALYTICS_URL } from 'lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -10,8 +9,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
+    case 'POST':
       const missingEnvVars = [
-        process.env.LOGFLARE_API_KEY ? null : 'LOGFLARE_API_KEY',
+        process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN ? null : 'LOGFLARE_PRIVATE_ACCESS_TOKEN',
         process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
       ].filter((v) => v)
       if (missingEnvVars.length == 0) {
@@ -24,23 +24,35 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
 
     default:
-      res.setHeader('Allow', ['GET'])
+      res.setHeader('Allow', ['GET', 'POST'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
 const proxyRequest = async (req: NextApiRequest) => {
-  const { name, ...toForward } = req.query
-  const payload = { ...toForward, project_tier: 'ENTERPRISE' }
-  const search = '?' + new URLSearchParams(payload as any).toString()
-  const apiKey = process.env.LOGFLARE_API_KEY
+  const { name, ref: project, ...toForward } = req.query
+
+  if (req.method === 'GET') {
+    const payload = { ...toForward, project }
+    return retrieveAnalyticsData(name as string, payload)
+  } else if (req.method === 'POST') {
+    const payload = { ...req.body, project }
+    return retrieveAnalyticsData(name as string, payload)
+  }
+}
+
+const retrieveAnalyticsData = async (name: string, payload: any) => {
+  const search = '?' + new URLSearchParams(payload).toString()
+  const apiKey = process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN
   const url = `${PROJECT_ANALYTICS_URL}endpoints/query/${name}${search}`
-  const result = await get(url, {
+  const result = await fetch(url, {
+    method: 'GET',
     headers: {
-      'x-api-key': apiKey,
+      'x-api-key': apiKey as string,
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-  })
+  }).then((res) => res.json())
+
   return result
 }

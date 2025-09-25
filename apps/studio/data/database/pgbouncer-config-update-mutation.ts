@@ -8,15 +8,16 @@ import { databaseKeys } from './keys'
 
 export type PgbouncerConfigurationUpdateVariables = {
   ref: string
-} & components['schemas']['UpdatePgbouncerConfigBody']
+} & Pick<
+  components['schemas']['UpdatePgbouncerConfigBody'],
+  'default_pool_size' | 'max_client_conn' | 'ignore_startup_parameters'
+>
 
 export async function updatePgbouncerConfiguration({
   ref,
-  pool_mode,
   default_pool_size,
-  pgbouncer_enabled,
-  ignore_startup_parameters,
   max_client_conn,
+  ignore_startup_parameters,
 }: PgbouncerConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
@@ -24,10 +25,8 @@ export async function updatePgbouncerConfiguration({
     params: { path: { ref } },
     body: {
       default_pool_size,
-      pool_mode,
-      pgbouncer_enabled,
-      ignore_startup_parameters,
       max_client_conn,
+      ignore_startup_parameters,
     },
   })
 

@@ -53,14 +53,14 @@ Storage Image Transformations are billed using Package pricing, with each packag
 
 ### Example
 
-For simplicity, let's assume a package size of 1,000 and a charge of $5 per package with no quota.
+For simplicity, let's assume a package size of 1,000 and a charge of <Price price="5" /> per package with no quota.
 
-| Origin Images | Packages Billed | Costs |
-| ------------- | --------------- | ----- |
-| 999           | 1               | $5    |
-| 1,000         | 1               | $5    |
-| 1,001         | 2               | $10   |
-| 1,500         | 2               | $10   |
+| Origin Images | Packages Billed | Costs                |
+| ------------- | --------------- | -------------------- |
+| 999           | 1               | <Price price="5" />  |
+| 1,000         | 1               | <Price price="5" />  |
+| 1,001         | 2               | <Price price="10" /> |
+| 1,500         | 2               | <Price price="10" /> |
 
 ### Usage on your invoice
 
@@ -68,7 +68,7 @@ Usage is shown as "Storage Image Transformations" on your invoice.
 
 ## Pricing
 
-<PricingStorageImageTransformations />
+<$Partial path="billing/pricing/pricing_storage_image_transformations.mdx" />
 
 ## Billing examples
 
@@ -76,31 +76,31 @@ Usage is shown as "Storage Image Transformations" on your invoice.
 
 The organization's number of origin images for the billing cycle is within the quota, so no charges apply.
 
-| Line Item             | Units            | Costs   |
-| --------------------- | ---------------- | ------- |
-| Pro Plan              | 1                | $25     |
-| Compute Hours Micro   | 744 hours        | $10     |
-| Image Transformations | 74 origin images | $0      |
-| **Subtotal**          |                  | **$35** |
-| Compute Credits       |                  | -$10    |
-| **Total**             |                  | **$25** |
+| Line Item             | Units            | Costs                    |
+| --------------------- | ---------------- | ------------------------ |
+| Pro Plan              | 1                | <Price price="25" />     |
+| Compute Hours Micro   | 744 hours        | <Price price="10" />     |
+| Image Transformations | 74 origin images | <Price price="0" />      |
+| **Subtotal**          |                  | **<Price price="35" />** |
+| Compute Credits       |                  | -<Price price="10" />    |
+| **Total**             |                  | **<Price price="25" />** |
 
 ### Exceeding quota
 
 The organization's number of origin images for the billing cycle exceeds the quota by 750, incurring charges for this additional usage.
 
-| Line Item             | Units             | Costs   |
-| --------------------- | ----------------- | ------- |
-| Pro Plan              | 1                 | $25     |
-| Compute Hours Micro   | 744 hours         | $10     |
-| Image Transformations | 850 origin images | $5      |
-| **Subtotal**          |                   | **$40** |
-| Compute Credits       |                   | -$10    |
-| **Total**             |                   | **$30** |
+| Line Item             | Units             | Costs                    |
+| --------------------- | ----------------- | ------------------------ |
+| Pro Plan              | 1                 | <Price price="25" />     |
+| Compute Hours Micro   | 744 hours         | <Price price="10" />     |
+| Image Transformations | 850 origin images | <Price price="5" />      |
+| **Subtotal**          |                   | **<Price price="40" />** |
+| Compute Credits       |                   | -<Price price="10" />    |
+| **Total**             |                   | **<Price price="30" />** |
 
 ## View usage
 
-You can view Storage Image Transformations usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+You can view Storage Image Transformations usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 
 <Image
   alt="Usage page navigation bar"

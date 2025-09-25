@@ -4,7 +4,7 @@ title: 'Logging'
 description: 'Getting started with Supabase Log Browser'
 ---
 
-The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
+The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](/pricing).
 
 ## Product logs
 
@@ -21,7 +21,7 @@ Supabase provides a logging interface specific to each product. You can use simp
 >
 <TabPanel id="api" label="API">
 
-[API logs](https://supabase.com/dashboard/project/_/logs/edge-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases as well as the [API Load Balancer](/docs/guides/platform/read-replicas#api-load-balancer) endpoint. Logs for a specific endpoint can be toggled with the `Source` button on the upper-right section of the dashboard.
+[API logs](/dashboard/project/_/logs/edge-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases as well as the [API Load Balancer](/docs/guides/platform/read-replicas#api-load-balancer) endpoint. Logs for a specific endpoint can be toggled with the `Source` button on the upper-right section of the dashboard.
 
 When viewing logs originating from the API Load Balancer endpoint, the upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
 
@@ -30,28 +30,28 @@ When viewing logs originating from the API Load Balancer endpoint, the upstream 
 </TabPanel>
 <TabPanel id="postgres" label="Postgres">
 
-[Postgres logs](https://supabase.com/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases. Logs for a specific database can be toggled with the `Source` button on the upper-right section of the dashboard.
+[Postgres logs](/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases. Logs for a specific database can be toggled with the `Source` button on the upper-right section of the dashboard.
 
 ![Postgres Logs](/docs/img/guides/platform/logs/logs-database.png)
 
 </TabPanel>
 <TabPanel id="auth" label="Auth">
 
-[Auth logs](https://supabase.com/dashboard/project/_/logs/auth-logs) show all server logs for your [Auth usage](../../guides/auth).
+[Auth logs](/dashboard/project/_/logs/auth-logs) show all server logs for your [Auth usage](../../guides/auth).
 
 ![Auth Logs](/docs/img/guides/platform/logs/logs-auth.png)
 
 </TabPanel>
 <TabPanel id="storage" label="Storage">
 
-[Storage logs](https://supabase.com/dashboard/project/_/logs/storage-logs) shows all server logs for your [Storage API](../../guides/storage).
+[Storage logs](/dashboard/project/_/logs/storage-logs) shows all server logs for your [Storage API](../../guides/storage).
 
 ![Storage Logs](/docs/img/guides/platform/logs/logs-storage.png)
 
 </TabPanel>
 <TabPanel id="realtime" label="Realtime">
 
-[Realtime logs](https://supabase.com/dashboard/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
+[Realtime logs](/dashboard/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
 
 <Admonition type="note">
 
@@ -64,7 +64,7 @@ Realtime connections are not logged by default. Turn on [Realtime connection log
 </TabPanel>
 <TabPanel id="functions" label="Edge Functions">
 
-For each [Edge Function](https://supabase.com/dashboard/project/_/functions), logs are available under the following tabs:
+For each [Edge Function](/dashboard/project/_/functions), logs are available under the following tabs:
 
 **Invocations**
 
@@ -89,7 +89,7 @@ Edge Function log messages have a max length of 10,000 characters. If you try to
 
 ## Working with API logs
 
-[API logs](https://supabase.com/dashboard/project/_/logs/edge-logs) run through the Cloudflare edge servers and will have attached Cloudflare metadata under the `metadata.request.cf.*` fields.
+[API logs](/dashboard/project/_/logs/edge-logs) run through the Cloudflare edge servers and will have attached Cloudflare metadata under the `metadata.request.cf.*` fields.
 
 ### Allowed headers
 
@@ -147,9 +147,9 @@ Do not log Personal Identifiable Information (PII) within the `User-Agent` heade
 
 To enable query logs for other categories of statements:
 
-1. [Enable the pgAudit extension](https://supabase.com/dashboard/project/_/database/extensions).
+1. [Enable the pgAudit extension](/dashboard/project/_/database/extensions).
 2. Configure `pgaudit.log` (see below). Perform a fast reboot if needed.
-3. View your query logs under [Logs > Postgres Logs](https://supabase.com/dashboard/project/_/logs/postgres-logs).
+3. View your query logs under [Logs > Postgres Logs](/dashboard/project/_/logs/postgres-logs).
 
 ### Configuring `pgaudit.log`
 
@@ -201,6 +201,18 @@ If any permission errors are encountered when executing `alter role postgres ...
 
 </Admonition>
 
+### `RAISE`d log messages in Postgres
+
+Messages that are manually logged via `RAISE INFO`, `RAISE NOTICE`, `RAISE WARNING`, and `RAISE LOG` are shown in Postgres Logs. Note that only messages at or above your logging level are shown. Syncing of messages to Postgres Logs may take a few minutes.
+
+If your logs aren't showing, check your logging level by running:
+
+```sql
+show log_min_messages;
+```
+
+Note that `LOG` is a higher level than `WARNING` and `ERROR`, so if your level is set to `LOG`, you will not see `WARNING` and `ERROR` messages.
+
 ## Logging realtime connections
 
 Realtime doesn't log new WebSocket connections or Channel joins by default. Enable connection logging per client by including an `info` `log_level` parameter when instantiating the Supabase client.
@@ -215,12 +227,12 @@ const options = {
     },
   },
 }
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', options)
 ```
 
 ## Logs Explorer
 
-The [Logs Explorer](https://supabase.com/dashboard/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
+The [Logs Explorer](/dashboard/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
 
 ![Logs Explorer](/docs/img/guides/platform/logs/logs-explorer.png)
 

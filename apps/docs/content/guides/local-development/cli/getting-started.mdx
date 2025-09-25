@@ -15,7 +15,7 @@ The Supabase CLI enables you to run the entire Supabase stack locally, on your m
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="macos"
+  defaultActiveId="npm"
   queryGroup="platform"
 >
 <TabPanel id="macos" label="macOS">
@@ -58,18 +58,12 @@ and run one of the following:
 - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
-<TabPanel id="npx" label="npm / Bun">
+<TabPanel id="npm" label="nodejs">
 
-Run the CLI by prefixing each command with `npx`:
-
-```sh
-npx supabase <command>
-```
-
-Or with `bunx`:
+Run the CLI by prefixing each command with `npx` or `bunx`:
 
 ```sh
-bunx supabase <command>
+npx supabase --help
 ```
 
 You can also install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
@@ -89,7 +83,7 @@ When a new [version](https://github.com/supabase/cli/releases) is released, you 
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="macos"
+  defaultActiveId="npm"
   queryGroup="platform"
 >
 <TabPanel id="macos" label="macOS">
@@ -123,7 +117,7 @@ brew upgrade supabase
    - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
-<TabPanel id="npm" label="npm / Bun">
+<TabPanel id="npm" label="nodejs">
 
 If you have installed the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase), you can update it with:
 
@@ -147,6 +141,12 @@ supabase stop --no-backup
 ```
 
 </Admonition>
+
+<$Show if="!docs:hide_cli_profiles">
+
+<$Partial path="cli_profiles.mdx" />
+
+</$Show>
 
 ## Running Supabase locally
 
@@ -223,7 +223,7 @@ Started supabase local development setup.
          API URL: http://localhost:54321
           DB URL: postgresql://postgres:postgres@localhost:54322/postgres
       Studio URL: http://localhost:54323
-    Inbucket URL: http://localhost:54324
+     Mailpit URL: http://localhost:54324
         anon key: eyJh......
 service_role key: eyJh......
 

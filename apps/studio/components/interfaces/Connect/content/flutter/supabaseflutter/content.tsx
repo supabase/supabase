@@ -6,7 +6,7 @@ import {
   ConnectTabTrigger,
   ConnectTabContent,
 } from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -24,7 +24,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   await Supabase.initialize(
     url: '${projectKeys.apiUrl ?? 'your-project-url'}',
-    anonKey: '${projectKeys.anonKey ?? 'your-anon-key'}',
+    anonKey: '${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile and desktop apps>'}',
   );
   runApp(MyApp());
 }

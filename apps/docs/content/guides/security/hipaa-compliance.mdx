@@ -8,6 +8,12 @@ The [Health Insurance Portability and Accountability Act (HIPAA)](https://www.hh
 
 Under HIPAA, both covered entities and business associates have distinct responsibilities to ensure the protection of PHI. Supabase acts as a business associate for customers (the covered entity) who wish to provide healthcare related services. As a business associate, Supabase has a number of obligations and has undergone auditing of the security and privacy controls that are in place to meet these. Supabase has signed a Business Associate Agreement (BAA) with all of our vendors who would have access to ePHI, such as AWS, and ensure that we follow their terms listed in the agreements. Similarly when a customer signs a BAA with us, they have some responsibilities they agree to when using Supabase to store PHI.
 
+<Admonition type="caution">
+
+The hosted Supabase platform has the necessary controls to meet HIPAA requirements. These controls are not supported out of the box in self-hosted Supabase. HIPAA controls extend further than the Supabase product, encompassing legal agreements (BAAs) with providers, operating controls and policies. Achieving HIPAA compliance with self-hosted Supabase is out of scope for this documentation and you should consult your auditor for further guidance.
+
+</Admonition>
+
 ### Customer responsibilities
 
 Covered entities (the customer) are organizations that directly handle PHI, such as health plans, healthcare clearinghouses, and healthcare providers that conduct certain electronic transactions.

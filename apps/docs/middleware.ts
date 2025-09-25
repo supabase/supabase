@@ -1,15 +1,13 @@
 import { isbot } from 'isbot'
-import type { NextRequest } from 'next/server'
-import { NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 import { clientSdkIds } from '~/content/navigation.references'
 import { BASE_PATH } from '~/lib/constants'
 
-const REFERENCE_PATH = `${(BASE_PATH ?? '') + '/'}reference`
+const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
-
   if (!url.pathname.startsWith(REFERENCE_PATH)) {
     return NextResponse.next()
   }
@@ -26,38 +24,37 @@ export function middleware(request: NextRequest) {
       if (slug.length > 0) {
         const rewriteUrl = new URL(url)
         rewriteUrl.pathname = (BASE_PATH ?? '') + '/api/crawlers'
-
         return NextResponse.rewrite(rewriteUrl)
       }
     }
-  } else {
-    const [, lib, maybeVersion] = url.pathname.replace(REFERENCE_PATH, '').split('/')
+  }
 
-    if (lib === 'cli') {
-      const rewritePath = [REFERENCE_PATH, 'cli'].join('/')
-      return NextResponse.rewrite(new URL(rewritePath, request.url))
-    }
+  const [, lib, maybeVersion] = url.pathname.replace(REFERENCE_PATH, '').split('/')
 
-    if (lib === 'api') {
-      const rewritePath = [REFERENCE_PATH, 'api'].join('/')
-      return NextResponse.rewrite(new URL(rewritePath, request.url))
-    }
+  if (lib === 'cli') {
+    const rewritePath = [REFERENCE_PATH, 'cli'].join('/')
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
+  }
 
-    if (lib?.startsWith('self-hosting-')) {
-      const rewritePath = [REFERENCE_PATH, lib].join('/')
-      return NextResponse.rewrite(new URL(rewritePath, request.url))
-    }
+  if (lib === 'api') {
+    const rewritePath = [REFERENCE_PATH, 'api'].join('/')
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
+  }
 
-    if (clientSdkIds.includes(lib)) {
-      const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
-      const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')
-      return NextResponse.rewrite(new URL(rewritePath, request.url))
-    }
+  if (lib?.startsWith('self-hosting-')) {
+    const rewritePath = [REFERENCE_PATH, lib].join('/')
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
+  }
+
+  if (clientSdkIds.includes(lib)) {
+    const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
+    const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: '/((?!api|_next|static|public|favicon.ico).*)',
+  matcher: '/reference/:path*',
 }

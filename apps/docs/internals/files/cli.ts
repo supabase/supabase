@@ -13,11 +13,11 @@ const cliSpec = yaml.load(fs.readFileSync(`spec/cli_v1_commands.yaml`, 'utf8')) 
  * @returns {Array<{link: string}>} - An array of CLI page links.
  */
 export function generateCLIPages() {
-  let cliPages = []
+  let cliPages: Array<{ link: string; priority: number }> = []
 
-  cliSpec.commands.map((section) => {
-    const slug = flatCLISections.find((item) => item.id === section.id)?.slug
-    if (slug) cliPages.push({ link: `reference/cli/${slug}` })
+  cliSpec.commands.map((section: any) => {
+    const slug = (flatCLISections as any[]).find((item: any) => item.id === section.id)?.slug
+    if (slug) cliPages.push({ link: `reference/cli/${slug}`, priority: 0.8 })
   })
   return cliPages
 }

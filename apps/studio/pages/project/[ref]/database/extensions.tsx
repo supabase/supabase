@@ -1,34 +1,36 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { Extensions } from 'components/interfaces/Database'
+import { Extensions } from 'components/interfaces/Database/Extensions/Extensions'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseExtensions: NextPageWithLayout = () => {
-  const canReadExtensions = useCheckPermissions(
+  const { can: canReadExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'extensions'
   )
-  const isPermissionsLoaded = usePermissionsLoaded()
 
   if (isPermissionsLoaded && !canReadExtensions) {
     return <NoPermission isFullPage resourceText="view database extensions" />
   }
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <FormHeader title="Database Extensions" />
+    <PageLayout
+      size="large"
+      title="Database Extensions"
+      subtitle="Manage what extensions are installed in your database"
+    >
+      <ScaffoldContainer size="large">
+        <ScaffoldSection isFullWidth>
           <Extensions />
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+        </ScaffoldSection>
+      </ScaffoldContainer>
+    </PageLayout>
   )
 }
 

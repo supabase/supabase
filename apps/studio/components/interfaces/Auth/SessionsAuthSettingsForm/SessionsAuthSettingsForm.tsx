@@ -1,9 +1,9 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { boolean, number, object } from 'yup'
+import * as z from 'zod'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -11,9 +11,8 @@ import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -43,41 +42,44 @@ function HoursOrNeverText({ value }: { value: number }) {
   }
 }
 
-const refreshTokenSchema = object({
-  REFRESH_TOKEN_ROTATION_ENABLED: boolean().required(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
-    .min(0, 'Must be a value more than 0')
-    .required('Must have a Reuse Interval value'),
+const RefreshTokenSchema = z.object({
+  REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
+  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
 })
 
-const userSessionsSchema = object({
-  SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
-  SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
-  SESSIONS_SINGLE_PER_USER: boolean(),
+const UserSessionsSchema = z.object({
+  SESSIONS_TIMEBOX: z.coerce.number().min(0, 'Must be a positive number'),
+  SESSIONS_INACTIVITY_TIMEOUT: z.coerce
+    .number()
+    .multipleOf(0.1)
+    .min(0, 'Must be a positive number'),
+  SESSIONS_SINGLE_PER_USER: z.boolean(),
 })
 
-const SessionsAuthSettingsForm = () => {
+export const SessionsAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
   const [isUpdatingRefreshTokens, setIsUpdatingRefreshTokens] = useState(false)
   const [isUpdatingUserSessions, setIsUpdatingUserSessions] = useState(false)
 
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canReadConfig } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
-  const organization = useSelectedOrganization()
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: organization?.slug,
-  })
-
-  const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
-  const refreshTokenForm = useForm({
-    resolver: yupResolver(refreshTokenSchema),
+  const refreshTokenForm = useForm<z.infer<typeof RefreshTokenSchema>>({
+    resolver: zodResolver(RefreshTokenSchema),
     defaultValues: {
       REFRESH_TOKEN_ROTATION_ENABLED: false,
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 0,
@@ -85,7 +87,7 @@ const SessionsAuthSettingsForm = () => {
   })
 
   const userSessionsForm = useForm({
-    resolver: yupResolver(userSessionsSchema),
+    resolver: zodResolver(UserSessionsSchema),
     defaultValues: {
       SESSIONS_TIMEBOX: 0,
       SESSIONS_INACTIVITY_TIMEOUT: 0,
@@ -197,32 +199,30 @@ const SessionsAuthSettingsForm = () => {
                   )}
                 />
               </CardContent>
-              {refreshTokenForm.watch('REFRESH_TOKEN_ROTATION_ENABLED') && (
-                <CardContent>
-                  <FormField_Shadcn_
-                    control={refreshTokenForm.control}
-                    name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Refresh token reuse interval"
-                        description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
-                      >
-                        <FormControl_Shadcn_>
-                          <PrePostTab postTab="seconds">
-                            <Input_Shadcn_
-                              type="number"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig}
-                            />
-                          </PrePostTab>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-              )}
+              <CardContent>
+                <FormField_Shadcn_
+                  control={refreshTokenForm.control}
+                  name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Refresh token reuse interval"
+                      description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
+                    >
+                      <FormControl_Shadcn_>
+                        <PrePostTab postTab="seconds">
+                          <Input_Shadcn_
+                            type="number"
+                            min={0}
+                            {...field}
+                            disabled={!canUpdateConfig}
+                          />
+                        </PrePostTab>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
               <CardFooter className="justify-end space-x-2">
                 {refreshTokenForm.formState.isDirty && (
                   <Button type="default" onClick={() => refreshTokenForm.reset()}>
@@ -329,7 +329,6 @@ const SessionsAuthSettingsForm = () => {
                           <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
                             <Input_Shadcn_
                               type="number"
-                              min={0}
                               {...field}
                               disabled={!canUpdateConfig || !isProPlanAndUp}
                             />
@@ -366,5 +365,3 @@ const SessionsAuthSettingsForm = () => {
     </>
   )
 }
-
-export default SessionsAuthSettingsForm

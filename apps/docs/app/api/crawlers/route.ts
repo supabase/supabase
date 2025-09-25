@@ -29,8 +29,8 @@ export async function GET(request: Request) {
     slug = maybeVersion
   }
 
-  let section: AbbrevApiReferenceSection
-  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }>
+  let section: AbbrevApiReferenceSection | undefined
+  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }> = []
   try {
     const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
     sectionsWithUrl = flattenedSections.map((section) => {
@@ -75,7 +75,7 @@ function htmlShell(
   body: string
 ) {
   const libraryName = REFERENCES[lib].name
-  let title = libraryName + ': ' + section.title ?? ''
+  let title = libraryName + ': ' + (section.title ?? '')
 
   return (
     '<!doctype html><html>' +
@@ -85,7 +85,6 @@ function htmlShell(
     `<meta name="og:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<meta name="twitter:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
-    (version ? '/' + version : '') +
     (slug ? '/' + slug : '') +
     `">` +
     '</head>' +
@@ -107,7 +106,7 @@ function libraryNav(sections: Array<AbbrevApiReferenceSection & { url: URL }>) {
 
 async function sectionDetails(lib: string, version: string, section: AbbrevApiReferenceSection) {
   const libraryName = REFERENCES[lib].name
-  let result = '<h1>' + (libraryName + ': ' + section.title ?? '') + '</h1>'
+  let result = '<h1>' + (libraryName + ': ' + (section.title ?? '')) + '</h1>'
 
   if (section.type === 'markdown') {
     result += await markdown(lib, version, section)
@@ -157,9 +156,7 @@ async function functionDetails(
   return fullDescription + parameters + examples
 }
 
-function mdxToHtml(markdownUnescaped: string): string {
-  const markdown = markdownUnescaped.replace(/(?<!\\)\{/g, '\\{').replace(/(?<!\\)\}/g, '\\}')
-
+function mdxToHtml(markdown: string): string {
   const mdast = fromMarkdown(markdown, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],

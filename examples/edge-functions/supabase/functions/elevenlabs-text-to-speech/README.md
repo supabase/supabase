@@ -7,7 +7,7 @@ Generate and stream speech through Supabase Edge Functions. Store speech in Supa
 - An ElevenLabs account with an [API key](/app/settings/api-keys).
 - A [Supabase](https://supabase.com) account (you can sign up for a free account via [database.new](https://database.new)).
 - The [Supabase CLI](https://supabase.com/docs/guides/local-development) installed on your machine.
-- The [Deno runtime](https://docs.deno.com/runtime/getting_started/installation/) installed on your machine and optionally [setup in your facourite IDE](https://docs.deno.com/runtime/getting_started/setup_your_environment).
+- The [Deno runtime](https://docs.deno.com/runtime/getting_started/installation/) installed on your machine and optionally [setup in your favourite IDE](https://docs.deno.com/runtime/getting_started/setup_your_environment).
 
 ## Setup
 

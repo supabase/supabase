@@ -114,7 +114,7 @@ const Hero = (props: Props) => {
     >
       <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-foreground-light lg:px-28">
         <div className="col-span-12 text-foreground md:col-span-9 lg:col-span-8 xl:col-span-6">
-          <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
+          <p className="mb-10 text-4xl">Supabase is the Postgres development platform.</p>
           <p className="text-2xl">
             Today, we're moving to <span className="text-brand">Beta</span>
           </p>

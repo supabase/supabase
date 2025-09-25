@@ -22,7 +22,7 @@ export const pricingTooltips: PricingTooltips = {
     main: 'Billing is based on the provisioned disk size. Paid plan projects get provisioned with 8 GB of disk by default and autoscale to 1.5x the size once you get close to the limit. The first 8 GB of disk per project comes with no additional fees.\nFree plan customers are limited to 500 MB database size per project.',
   },
   'database.advancedDiskConfig': {
-    main: 'Supabase databases are backed by high performance SSD disks. The disk can be scaled up to 60 TB, 80,000 IOPS and 4,000 Mbps throughput.',
+    main: 'Supabase databases are backed by high performance SSD disks. The disk can be scaled up to 60 TB, 80,000 IOPS and 4,000 MB/s throughput.',
   },
   'database.automaticBackups': {
     main: 'Backups are entire copies of your database that can be restored in the future.',
@@ -35,9 +35,11 @@ export const pricingTooltips: PricingTooltips = {
   'database.pausing': {
     main: 'Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard.',
   },
-
-  'database.bandwidth': {
-    main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period.',
+  'database.egress': {
+    main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
+  },
+  'database.cachedEgress': {
+    main: 'Billing is based on the total sum of any outgoing traffic (includes Database, Storage, API, Edge Functions) in GB throughout your billing period that is served from our CDN cache.',
   },
   'auth.totalUsers': {
     main: 'The maximum number of users your project can have',
@@ -84,7 +86,7 @@ export const pricingTooltips: PricingTooltips = {
     main: "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
   },
   'security.logDrain': {
-    main: 'Only events processed and sent to destinations are counted. Bandwidth required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
+    main: 'Only events processed and sent to destinations are counted. Egress required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
   },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
@@ -179,9 +181,12 @@ export const PricingTableRowDesktop = (props: any) => {
                           )}
                           {typeof planValue === 'string' ? planValue : planValue[0]}
                         </span>
-                        {typeof planValue !== 'string' && (
-                          <span className="text-lighter leading-4">{planValue[1]}</span>
-                        )}
+                        {Array.isArray(planValue) &&
+                          planValue.slice(1).map((val, idx) => (
+                            <span key={`planval_${i}_${idx}`} className="text-lighter leading-4">
+                              {val}
+                            </span>
+                          ))}
                       </div>
                     )}
                   </td>
@@ -246,9 +251,12 @@ export const PricingTableRowMobile = (props: any) => {
                         ? feat.plans[plan]
                         : feat.plans[plan][0]}
                     </span>
-                    {typeof feat.plans[plan] !== 'string' && (
-                      <span className="text-lighter leading-5">{feat.plans[plan][1]}</span>
-                    )}
+                    {Array.isArray(feat.plans[plan]) &&
+                      feat.plans[plan].slice(1).map((val, idx) => (
+                        <span key={`planval_mobile_${i}_${idx}`} className="text-lighter leading-5">
+                          {val}
+                        </span>
+                      ))}
                   </span>
                 )}
               </td>

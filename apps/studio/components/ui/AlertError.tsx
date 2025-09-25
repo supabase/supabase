@@ -1,6 +1,6 @@
 import Link from 'next/link'
+import { PropsWithChildren } from 'react'
 
-import type { ResponseError } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -19,13 +19,14 @@ export interface AlertErrorProps {
 
 // [Joshen] To standardize the language for all error UIs
 
-const AlertError = ({
+export const AlertError = ({
   projectRef,
   subject,
   error,
   className,
   showIcon = true,
-}: AlertErrorProps) => {
+  children,
+}: PropsWithChildren<AlertErrorProps>) => {
   const subjectString = subject?.replace(/ /g, '%20')
   let href = `/support/new?category=dashboard_bug`
 
@@ -45,15 +46,14 @@ const AlertError = ({
         <div>
           {error?.message && <p className="text-left">Error: {formattedErrorMessage}</p>}
           <p className="text-left">
-            Try refreshing your browser, but if the issue persists, please reach out to us via
-            support.
+            Try refreshing your browser, but if the issue persists for more than a few minutes,
+            please reach out to us via support.
           </p>
         </div>
-        <div>
-          <Button asChild type="warning">
-            <Link href={href}>Contact support</Link>
-          </Button>
-        </div>
+        {children}
+        <Button asChild type="warning" className="w-min">
+          <Link href={href}>Contact support</Link>
+        </Button>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

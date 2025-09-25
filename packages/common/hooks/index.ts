@@ -1,3 +1,5 @@
+'use client'
+
 export * from './useAnchorObserver'
 export * from './useBreakpoint'
 export * from './useConstant'

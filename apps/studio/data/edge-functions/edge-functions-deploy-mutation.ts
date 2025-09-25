@@ -8,19 +8,21 @@ import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsDeployVariables = {
   projectRef: string
-  metadata: components['schemas']['FunctionDeployMetadata']
+  slug: string
+  metadata: components['schemas']['FunctionDeployBody']['metadata']
   files: { name: string; content: string }[]
 }
 
 export async function deployEdgeFunction({
   projectRef,
+  slug,
   metadata,
   files,
 }: EdgeFunctionsDeployVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/functions/deploy`, {
-    params: { path: { ref: projectRef }, query: { slug: metadata.name } },
+    params: { path: { ref: projectRef }, query: { slug: slug } },
     body: {
       file: files as any,
       metadata,
@@ -30,7 +32,7 @@ export async function deployEdgeFunction({
 
       formData.append('metadata', JSON.stringify(body.metadata))
 
-      body.file.forEach((f: any) => {
+      body?.file?.forEach((f: any) => {
         const file = f as { name: string; content: string }
         const blob = new Blob([file.content], { type: 'text/plain' })
         formData.append('file', blob, file.name)
@@ -60,8 +62,11 @@ export const useEdgeFunctionDeployMutation = ({
     (vars) => deployEdgeFunction(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef))
+        const { projectRef, slug } = variables
+        await Promise.all([
+          queryClient.invalidateQueries(edgeFunctionsKeys.detail(projectRef, slug)),
+          queryClient.invalidateQueries(edgeFunctionsKeys.body(projectRef, slug)),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

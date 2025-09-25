@@ -1,35 +1,27 @@
-import { ExternalLink, X } from 'lucide-react'
-import Link from 'next/link'
+import { X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import ReactMarkdown from 'react-markdown'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { LintEntity, NoIssuesFound, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import {
+  LintCategoryBadge,
+  LintEntity,
+  NoIssuesFound,
+  lintInfoMap,
+} from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
-import {
-  AiIconAnimation,
-  Button,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
-} from 'ui'
+import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { EntityTypeIcon, LintCTA, LintCategoryBadge } from './Linter.utils'
+import { EntityTypeIcon } from './Linter.utils'
+import LintDetail from './LintDetail'
 
 interface LinterDataGridProps {
   isLoading: boolean
   filteredLints: Lint[]
   selectedLint: Lint | null
-  setSelectedLint: (value: Lint | null) => void
   currentTab: LINTER_LEVELS
 }
 
@@ -37,15 +29,11 @@ const LinterDataGrid = ({
   isLoading,
   filteredLints,
   selectedLint,
-  setSelectedLint,
   currentTab,
 }: LinterDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
   const router = useRouter()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
-
-  const [view, setView] = useState<'details' | 'suggestion'>('details')
 
   const lintCols = [
     {
@@ -121,7 +109,6 @@ const LinterDataGrid = ({
   })
 
   function handleSidepanelClose() {
-    setSelectedLint(null)
     const { id, ...otherParams } = router.query
     router.push({ query: otherParams })
   }
@@ -158,7 +145,6 @@ const LinterDataGrid = ({
                   {...props}
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0) {
-                      setSelectedLint(props.row)
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       const { id, ...rest } = router.query
                       router.push({ ...router, query: { ...rest, id: props.row.cache_key } })
@@ -180,109 +166,24 @@ const LinterDataGrid = ({
       {selectedLint !== null && (
         <>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={30} maxSize={45} minSize={30} className="bg-studio border-t">
-            <Button
-              type="text"
-              className="absolute top-3 right-3 px-1"
-              icon={<X />}
-              onClick={handleSidepanelClose}
-            />
-
-            <Tabs_Shadcn_
-              value={view}
-              className="flex flex-col h-full"
-              onValueChange={(value: any) => {
-                setView(value)
-              }}
-            >
-              <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
-                <TabsTrigger_Shadcn_
-                  value="details"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
-                >
-                  Overview
-                </TabsTrigger_Shadcn_>
-              </TabsList_Shadcn_>
-              <TabsContent_Shadcn_
-                value="details"
-                className="mt-0 flex-grow min-h-0 overflow-y-auto prose"
-              >
-                {selectedLint && (
-                  <div className="py-4 px-5">
-                    <div className="flex items-center gap-2 py-2">
-                      <h3 className="text-sm m-0">
-                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
-                      </h3>
-                      <LintCategoryBadge category={selectedLint.categories[0]} />
-                    </div>
-                    <div className="flex items-center gap-2 text-sm mt-4">
-                      <span>Entity</span>
-                      <div className="flex items-center gap-1 px-2 py-0.5 bg-surface-200 border rounded-lg ">
-                        <EntityTypeIcon type={selectedLint.metadata?.type} />
-                        <LintEntity metadata={selectedLint.metadata} />
-                      </div>
-                    </div>
-
-                    <div className="grid">
-                      <div>
-                        <h3 className="text-sm">Issue</h3>
-                        <ReactMarkdown className="leading-6 text-sm">
-                          {selectedLint.detail.replace(/\\`/g, '`')}
-                        </ReactMarkdown>
-                      </div>
-                      <div>
-                        <h3 className="text-sm">Description</h3>
-                        <ReactMarkdown className="text-sm">
-                          {selectedLint.description.replace(/\\`/g, '`')}
-                        </ReactMarkdown>
-                      </div>
-
-                      <div className="grid gap-2">
-                        <h3 className="text-sm">Resolve</h3>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
-                            onClick={() => {
-                              setAiAssistantPanel({
-                                open: true,
-                                initialInput: `Summarize the issue and suggest fixes: ${lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
-                                \nEntity: ${(selectedLint.metadata && (selectedLint.metadata.entity || (selectedLint.metadata.schema && selectedLint.metadata.name && `${selectedLint.metadata.schema}.${selectedLint.metadata.name}`))) ?? ''}
-                                \nSchema: ${selectedLint.metadata?.schema ?? ''}
-                                \nIssue: ${selectedLint.detail.replace(/\\`/g, '`')}
-                                \nDescription: ${selectedLint.description.replace(/\\`/g, '`')}\n`,
-                              })
-                            }}
-                          >
-                            Ask Assistant
-                          </Button>
-                          <LintCTA
-                            title={selectedLint.name}
-                            projectRef={ref!}
-                            metadata={selectedLint.metadata}
-                          />
-                          <Button asChild type="text">
-                            <Link
-                              href={
-                                lintInfoMap.find((item) => item.name === selectedLint.name)
-                                  ?.docsLink ||
-                                'https://supabase.com/docs/guides/database/database-linter'
-                              }
-                              target="_blank"
-                              rel="noreferrer"
-                              className="no-underline"
-                            >
-                              <span className="flex items-center gap-2">
-                                Learn more <ExternalLink size={14} />
-                              </span>
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </TabsContent_Shadcn_>
-            </Tabs_Shadcn_>
+          <ResizablePanel
+            defaultSize={30}
+            maxSize={45}
+            minSize={30}
+            className="bg-studio border-t flex flex-col h-full"
+          >
+            <div className="flex items-center justify-between w-full border-b py-3 px-6">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm m-0">
+                  {lintInfoMap.find((item) => item.name === selectedLint.name)?.title ?? 'Unknown'}
+                </h3>
+                <LintCategoryBadge category={selectedLint.categories[0]} />
+              </div>
+              <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
+            </div>
+            <div className="p-6 flex-grow min-h-0 overflow-y-auto">
+              <LintDetail lint={selectedLint} projectRef={ref!} />
+            </div>
           </ResizablePanel>
         </>
       )}

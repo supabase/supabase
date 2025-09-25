@@ -1,43 +1,45 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEmpty } from 'lodash'
-import { HelpCircle } from 'lucide-react'
-import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import PolicyTableRow, {
+import {
+  PolicyTableRow,
   PolicyTableRowProps,
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
-import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import InformationBox from 'components/ui/InformationBox'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Button, Card, CardContent } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
+  search?: string
   schema: string
   tables: PolicyTableRowProps['table'][]
   hasTables: boolean
   isLocked: boolean
   onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
+  onResetSearch?: () => void
 }
 
-const Policies = ({
+export const Policies = ({
+  search,
   schema,
   tables,
   hasTables,
   isLocked,
   onSelectCreatePolicy,
   onSelectEditPolicy: onSelectEditPolicyAI,
+  onResetSearch,
 }: PoliciesProps) => {
-  const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
     id: number
@@ -98,7 +100,8 @@ const Policies = ({
     updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      id: payload.id,
+      id: selectedTableToToggleRLS.id,
+      name: selectedTableToToggleRLS.name,
       schema: selectedTableToToggleRLS.schema,
       payload: payload,
     })
@@ -109,44 +112,25 @@ const Policies = ({
     deleteDatabasePolicy({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      id: selectedPolicyToDelete.id,
+      originalPolicy: selectedPolicyToDelete,
     })
   }
 
-  if (tables.length === 0) {
+  if (!hasTables) {
     return (
-      <div className="flex-grow flex items-center justify-center">
-        <ProductEmptyState
-          size="large"
-          title="Row-Level Security (RLS) Policies"
-          ctaButtonLabel="Create a table"
-          infoButtonLabel="What is RLS?"
-          infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
-          onClickCta={() => router.push(`/project/${ref}/editor`)}
-        >
-          <div className="space-y-4">
-            <InformationBox
-              title="What are policies?"
-              icon={<HelpCircle size={14} strokeWidth={2} />}
-              description={
-                <div className="space-y-2">
-                  <p className="text-sm">
-                    Policies restrict, on a per-user basis, which rows can be returned by normal
-                    queries, or inserted, updated, or deleted by data modification commands.
-                  </p>
-                  <p className="text-sm">
-                    This is also known as Row-Level Security (RLS). Each policy is attached to a
-                    table, and the policy is executed each time its accessed.
-                  </p>
-                </div>
-              }
-            />
-            <p className="text-sm text-foreground-light">
-              Create a table in this schema first before creating a policy.
-            </p>
-          </div>
-        </ProductEmptyState>
-      </div>
+      <Card className="w-full bg-transparent">
+        <CardContent className="flex flex-col items-center justify-center p-8">
+          <h2 className="heading-default">No tables to create policies for</h2>
+
+          <p className="text-sm text-foreground-light text-center mb-4">
+            RLS Policies control per-user access to table rows. Create a table in this schema first
+            before creating a policy.
+          </p>
+          <Button asChild type="default">
+            <Link href={`/project/${ref}/editor`}>Create a table</Link>
+          </Button>
+        </CardContent>
+      </Card>
     )
   }
 
@@ -168,7 +152,7 @@ const Policies = ({
             </section>
           ))
         ) : hasTables ? (
-          <NoSearchResults />
+          <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
         ) : null}
       </div>
 
@@ -200,5 +184,3 @@ const Policies = ({
     </>
   )
 }
-
-export default Policies

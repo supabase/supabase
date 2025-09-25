@@ -3,7 +3,7 @@ title: 'Build a User Management App with Ionic Vue'
 description: 'Learn how to use Supabase in your Ionic Vue App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -21,8 +21,7 @@ Let's start building the Vue app from scratch.
 
 ### Initialize an Ionic Vue app
 
-We can use the [Ionic CLI](https://ionicframework.com/docs/cli) to initialize
-an app called `supabase-ionic-vue`:
+We can use the [Ionic CLI](https://ionicframework.com/docs/cli) to initialize an app called `supabase-ionic-vue`:
 
 ```bash
 npm install -g @ionic/cli
@@ -37,30 +36,40 @@ npm install @supabase/supabase-js
 ```
 
 And finally we want to save the environment variables in a `.env`.
-All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
-```bash .env
-VUE_APP_SUPABASE_URL=YOUR_SUPABASE_URL
-VUE_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+All we need are the API URL and the key that you copied [earlier](#get-api-details).
+
+<$CodeTabs>
+
+```bash name=.env
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
-on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+</$CodeTabs>
 
-```js src/supabase.ts"
+Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+
+<$CodeTabs>
+
+```js name=src/supabase.ts
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.VUE_APP_SUPABASE_URL as string;
-const supabaseAnonKey = process.env.VUE_APP_SUPABASE_ANON_KEY as string;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabasePublishableKey);
 ```
+
+</$CodeTabs>
 
 ### Set up a login route
 
 Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```html /src/views/Login.vue
+<$CodeTabs>
+
+```html name=/src/views/Login.vue
 <template>
   <ion-page>
     <ion-header>
@@ -85,7 +94,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
           </div>
         </form>
       </ion-list>
-      <p>{{email}}</p>
+      <p>{{ email }}</p>
     </ion-content>
   </ion-page>
 </template>
@@ -130,7 +139,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 
         try {
           await loader.present()
-          const { error } = await supabase.auth.signIn({ email: email.value })
+          const { error } = await supabase.auth.signInWithOtp({ email: email.value })
 
           if (error) throw error
 
@@ -149,13 +158,17 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 </script>
 ```
 
+</$CodeTabs>
+
 ### Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 
 Let's create a new component for that called `Account.vue`.
 
-```html src/views/Account.vue
+<$CodeTabs>
+
+```html name=src/views/Account.vue
 <template>
   <ion-page>
     <ion-header>
@@ -169,21 +182,22 @@ Let's create a new component for that called `Account.vue`.
         <ion-item>
           <ion-label>
             <p>Email</p>
-            <p>{{ session?.user?.email }}</p>
+            <p>{{ user?.email }}</p>
           </ion-label>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Name</ion-label>
-          <ion-input type="text" name="username" v-model="profile.username"></ion-input>
+          <ion-input type="text" v-model="profile.username" />
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Website</ion-label>
-          <ion-input type="url" name="website" v-model="profile.website"></ion-input>
+          <ion-input type="url" v-model="profile.website" />
         </ion-item>
+
         <div class="ion-text-center">
-          <ion-button fill="clear" type="submit">Update Profile</ion-button>
+          <ion-button type="submit" fill="clear">Update Profile</ion-button>
         </div>
       </form>
 
@@ -195,59 +209,62 @@ Let's create a new component for that called `Account.vue`.
 </template>
 
 <script lang="ts">
-  import { store } from '@/store'
-  import { supabase } from '@/supabase'
   import {
-    IonContent,
-    IonHeader,
     IonPage,
-    IonTitle,
+    IonHeader,
     IonToolbar,
+    IonTitle,
+    IonContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonButton,
     toastController,
     loadingController,
-    IonInput,
-    IonItem,
-    IonButton,
-    IonLabel,
   } from '@ionic/vue'
-  import { User } from '@supabase/supabase-js'
   import { defineComponent, onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { supabase } from '@/supabase'
+  import type { User } from '@supabase/supabase-js'
+
   export default defineComponent({
     name: 'AccountPage',
     components: {
-      IonContent,
-      IonHeader,
       IonPage,
-      IonTitle,
+      IonHeader,
       IonToolbar,
-      IonInput,
+      IonTitle,
+      IonContent,
       IonItem,
-      IonButton,
       IonLabel,
+      IonInput,
+      IonButton,
     },
     setup() {
-      const session = ref(supabase.auth.session())
+      const router = useRouter()
+      const user = ref<User | null>(null)
+
       const profile = ref({
         username: '',
         website: '',
         avatar_url: '',
       })
-      const user = store.user as User
-      async function getProfile() {
-        const loader = await loadingController.create({})
+
+      const getProfile = async () => {
+        const loader = await loadingController.create()
         const toast = await toastController.create({ duration: 5000 })
         await loader.present()
+
         try {
           const { data, error, status } = await supabase
             .from('profiles')
-            .select(`username, website, avatar_url`)
-            .eq('id', user.id)
+            .select('username, website, avatar_url')
+            .eq('id', user.value?.id)
             .single()
 
           if (error && status !== 406) throw error
 
           if (data) {
-            console.log(data)
             profile.value = {
               username: data.username,
               website: data.website,
@@ -263,20 +280,21 @@ Let's create a new component for that called `Account.vue`.
       }
 
       const updateProfile = async () => {
-        const loader = await loadingController.create({})
+        const loader = await loadingController.create()
         const toast = await toastController.create({ duration: 5000 })
+        await loader.present()
+
         try {
-          await loader.present()
           const updates = {
-            id: user.id,
+            id: user.value?.id,
             ...profile.value,
             updated_at: new Date(),
           }
-          //
+
           const { error } = await supabase.from('profiles').upsert(updates, {
-            returning: 'minimal', // Don't return the value after inserting
+            returning: 'minimal',
           })
-          //
+
           if (error) throw error
         } catch (error: any) {
           toast.message = error.message
@@ -286,13 +304,15 @@ Let's create a new component for that called `Account.vue`.
         }
       }
 
-      async function signOut() {
-        const loader = await loadingController.create({})
+      const signOut = async () => {
+        const loader = await loadingController.create()
         const toast = await toastController.create({ duration: 5000 })
         await loader.present()
+
         try {
           const { error } = await supabase.auth.signOut()
           if (error) throw error
+          router.push('/')
         } catch (error: any) {
           toast.message = error.message
           await toast.present()
@@ -301,20 +321,42 @@ Let's create a new component for that called `Account.vue`.
         }
       }
 
-      onMounted(() => {
-        getProfile()
+      onMounted(async () => {
+        const loader = await loadingController.create()
+        await loader.present()
+
+        const { data } = await supabase.auth.getSession()
+        user.value = data.session?.user ?? null
+
+        if (!user.value) {
+          router.push('/')
+        } else {
+          await getProfile()
+        }
+
+        await loader.dismiss()
       })
-      return { signOut, profile, session, updateProfile }
+
+      return {
+        user,
+        profile,
+        updateProfile,
+        signOut,
+      }
     },
   })
 </script>
 ```
 
+</$CodeTabs>
+
 ### Launch!
 
 Now that we have all the components in place, let's update `App.vue` and our routes:
 
-```ts src/router.index.ts
+<$CodeTabs>
+
+```ts name=src/router.index.ts
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { RouteRecordRaw } from 'vue-router'
 import LoginPage from '../views/Login.vue'
@@ -333,14 +375,14 @@ const routes: Array<RouteRecordRaw> = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
 export default router
 ```
 
-```html src/App.vue
+```html name=src/App.vue
 <template>
   <ion-app>
     <ion-router-outlet />
@@ -349,9 +391,7 @@ export default router
 
 <script lang="ts">
   import { IonApp, IonRouterOutlet, useIonRouter } from '@ionic/vue'
-  import { defineComponent } from 'vue'
-
-  import { store } from './store'
+  import { defineComponent, ref, onMounted } from 'vue'
   import { supabase } from './supabase'
 
   export default defineComponent({
@@ -362,17 +402,30 @@ export default router
     },
     setup() {
       const router = useIonRouter()
-      store.user = supabase.auth.user() ?? {}
-      supabase.auth.onAuthStateChange((_, session) => {
-        store.user = session?.user ?? {}
-        if (session?.user) {
-          router.replace('/account')
-        }
+      const user = ref(null)
+
+      onMounted(() => {
+        supabase.auth
+          .getSession()
+          .then((resp) => {
+            user.value = resp.data.session?.user ?? null
+          })
+          .catch((err) => {
+            console.log('Error fetching session', err)
+          })
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+          user.value = session?.user ?? null
+        })
       })
+
+      return { user }
     },
   })
 </script>
 ```
+
+</$CodeTabs>
 
 Once that's done, run this in a terminal window:
 
@@ -402,7 +455,9 @@ Ionic PWA elements is a companion package that will polyfill certain browser API
 
 With those packages installed we can update our `main.ts` to include an additional bootstrapping call for the Ionic PWA Elements.
 
-```ts src/main.tsx"
+<$CodeTabs>
+
+```ts name=src/main.tsx
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -423,9 +478,13 @@ router.isReady().then(() => {
 })
 ```
 
+</$CodeTabs>
+
 Then create an `AvatarComponent`.
 
-```html src/components/Avatar.vue
+<$CodeTabs>
+
+```html name=src/components/Avatar.vue
 <template>
   <div class="avatar">
     <div class="avatar_wrapper" @click="uploadAvatar">
@@ -524,11 +583,15 @@ Then create an `AvatarComponent`.
 </style>
 ```
 
+</$CodeTabs>
+
 ### Add the new widget
 
 And then we can add the widget to the Account page:
 
-```html src/views/Account.vue
+<$CodeTabs>
+
+```html name=src/views/Account.vue
 <template>
   <ion-page>
     <ion-header>
@@ -552,5 +615,7 @@ export default defineComponent({
 
 </script>
 ```
+
+</$CodeTabs>
 
 At this stage you have a fully functional application!

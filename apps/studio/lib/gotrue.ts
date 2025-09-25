@@ -1,7 +1,27 @@
-import { getAccessToken, gotrueClient, type User } from 'common'
+import { getAccessToken, type User } from 'common/auth'
+import { gotrueClient } from 'common/gotrue'
 
 export const auth = gotrueClient
 export { getAccessToken }
+
+export const DEFAULT_FALLBACK_PATH = '/organizations'
+
+export const validateReturnTo = (
+  returnTo: string,
+  fallback: string = DEFAULT_FALLBACK_PATH
+): string => {
+  // Block protocol-relative URLs and external URLs
+  if (returnTo.startsWith('//') || returnTo.includes('://')) {
+    return fallback
+  }
+
+  // For internal paths:
+  // 1. Must start with /
+  // 2. Only allow alphanumeric chars, slashes, hyphens, underscores
+  // 3. For query params, also allow =, &, and ?
+  const safePathPattern = /^\/[a-zA-Z0-9/\-_]*(?:\?[a-zA-Z0-9\-_=&]*)?$/
+  return safePathPattern.test(returnTo) ? returnTo : fallback
+}
 
 export const getAuthUser = async (token: String): Promise<any> => {
   try {
@@ -52,7 +72,12 @@ export const buildPathWithParams = (pathname: string) => {
   return queryString ? `${basePath}?${queryString}` : basePath
 }
 
-export const getReturnToPath = (fallback = '/projects') => {
+export const getReturnToPath = (fallback = DEFAULT_FALLBACK_PATH) => {
+  // If we're in a server environment, return the fallback
+  if (typeof location === 'undefined') {
+    return fallback
+  }
+
   const searchParams = new URLSearchParams(location.search)
 
   let returnTo = searchParams.get('returnTo') ?? fallback
@@ -64,22 +89,7 @@ export const getReturnToPath = (fallback = '/projects') => {
   searchParams.delete('returnTo')
 
   const remainingSearchParams = searchParams.toString()
-
-  let validReturnTo
-
-  // only allow returning to internal pages. e.g. /projects
-  try {
-    // if returnTo is a relative path, this will throw an error
-    new URL(returnTo)
-    // if no error, returnTo is a valid URL and NOT an internal page
-    validReturnTo = fallback
-  } catch (_) {
-    // check returnTo doesn't try trick the browser to redirect
-    // don't try sanitize, it is a losing battle. Go to fallback
-    // disallow anything that starts with /non-word-char+/ or non-char+/
-    const pattern = /^\/?[\W]+\//
-    validReturnTo = pattern.test(returnTo) ? fallback : returnTo
-  }
+  const validReturnTo = validateReturnTo(returnTo, fallback)
 
   const [path, existingQuery] = validReturnTo.split('?')
 

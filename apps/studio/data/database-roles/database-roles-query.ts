@@ -7,7 +7,7 @@ import { databaseRoleKeys } from './keys'
 
 export type DatabaseRolesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type PgRole = z.infer<typeof pgMeta.roles.zod>

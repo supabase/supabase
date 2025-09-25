@@ -7,8 +7,10 @@ import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   query: string
+  searchTerm?: string
+  identifier?: string | number
 }
 
 export async function createDatabaseCronJob({
@@ -42,8 +44,15 @@ export const useDatabaseCronJobCreateMutation = ({
     (vars) => createDatabaseCronJob(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseCronJobsKeys.list(projectRef))
+        const { projectRef, searchTerm, identifier } = variables
+
+        await Promise.all([
+          queryClient.invalidateQueries(databaseCronJobsKeys.listInfinite(projectRef, searchTerm)),
+          ...(!!identifier
+            ? [queryClient.invalidateQueries(databaseCronJobsKeys.job(projectRef, identifier))]
+            : []),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "infinite-query-hook",
+  "type": "registry:block",
+  "title": "Infinite Query Hook",
+  "description": "React hook for infinite lists, fetching data from Supabase.",
+  "dependencies": ["@supabase/supabase-js", "@supabase/postgrest-js@*"],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/default/blocks/infinite-query-hook/hooks/use-infinite-query.ts",
+      "type": "registry:hook"
+    }
+  ]
+}

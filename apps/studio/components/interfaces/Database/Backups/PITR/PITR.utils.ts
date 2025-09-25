@@ -7,7 +7,7 @@ export const getPITRRetentionDuration = (addons: ProjectSelectedAddon[]) => {
   const pitrAddon = addons.find((addon) => addon.type === 'pitr')
   if (!pitrAddon) return 0
 
-  return pitrAddon.variant.meta?.backup_duration_days ?? 0
+  return (pitrAddon.variant.meta as any)?.backup_duration_days ?? 0
 }
 
 export const getDatesBetweenRange = (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs) => {

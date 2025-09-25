@@ -17,7 +17,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<KotlinProjectSetup />
+<$Partial path="kotlin_project_setup.mdx" />
 
 ## Building the app
 
@@ -36,7 +36,7 @@ Create or edit the `local.properties` file at the root (same level as `build.gra
 > **Note**: Do not commit this file to your source control, for example, by adding it to your `.gitignore` file!
 
 ```kotlin
-SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 SUPABASE_URL=YOUR_SUPABASE_URL
 ```
 
@@ -56,7 +56,7 @@ defaultConfig {
    // Set value part
    Properties properties = new Properties()
    properties.load(project.rootProject.file("local.properties").newDataInputStream())
-   buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties.getProperty("SUPABASE_ANON_KEY")}\"")
+   buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"${properties.getProperty("SUPABASE_PUBLISHABLE_KEY")}\"")
    buildConfigField("String", "SECRET", "\"${properties.getProperty("SECRET")}\"")
    buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
 }
@@ -68,7 +68,7 @@ Read the value from `BuildConfig`:
 
 ```kotlin
 val url = BuildConfig.SUPABASE_URL
-val apiKey = BuildConfig.SUPABASE_ANON_KEY
+val apiKey = BuildConfig.SUPABASE_PUBLISHABLE_KEY
 ```
 
 ### Set up Supabase dependencies
@@ -152,7 +152,7 @@ object SupabaseModule {
     fun provideSupabaseClient(): SupabaseClient {
         return createSupabaseClient(
             supabaseUrl = BuildConfig.SUPABASE_URL,
-            supabaseKey = BuildConfig.SUPABASE_ANON_KEY
+            supabaseKey = BuildConfig.SUPABASE_PUBLISHABLE_KEY
         ) {
             install(Postgrest)
             install(Auth) {

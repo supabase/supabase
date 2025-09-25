@@ -24,10 +24,42 @@ The templating system provides the following variables for use:
 | `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                                                |
 | `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration). |
 | `{{ .Data }}`            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.                                                                                                                                                                                         |
+| `{{ .Email }}`           | Contains the original email address of the user. Empty when when trying to [link an email address to an anonymous user](/docs/guides/auth/auth-anonymous#link-an-email--phone-identity).                                                                                              |
+| `{{ .NewEmail }}`        | Contains the new email address of the user. This variable is only supported in the "Change Email Address" template.                                                                                                                                                                   |
 
 ## Editing email templates
 
 On hosted Supabase projects, edit your email templates on the [Email Templates](/dashboard/project/_/auth/templates) page. On self-hosted projects or in local development, edit your [configuration files](/docs/guides/local-development/customizing-email-templates).
+
+You can also manage email templates using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get current email templates
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  | jq 'to_entries | map(select(.key | startswith("mailer_templates"))) | from_entries'
+
+# Update email templates
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+      "mailer_subjects_confirmation": "Confirm your signup",
+      "mailer_templates_confirmation_content": "<h2>Confirm your signup</h2><p>Follow this link to confirm your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm your email</a></p>",
+      "mailer_subjects_magic_link": "Your Magic Link",
+      "mailer_templates_magic_link_content": "<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href=\"{{ .ConfirmationURL }}\">Log In</a></p>",
+      "mailer_subjects_recovery": "Rest Your Password",
+      "mailer_templates_recovery_content": "<h2>Reset Password</h2><p>Follow this link to reset the password for your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Reset Password</a></p>",
+      "mailer_subjects_invite": "You have been invited",
+      "mailer_templates_invite_content": "<h2>You have been invited</h2><p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p><p><a href=\"{{ .ConfirmationURL }}\">Accept the invite</a></p>",
+      "mailer_subjects_email_change": "Confirm email change",
+      "mailer_templates_email_change_content": "<h2>Confirm email change</h2><p>Follow this link to confirm the update of your email:</p><p><a href=\"{{ .ConfirmationURL }}\">Change email</a></p>",
+  }'
+```
 
 ## Mobile deep linking
 
@@ -73,12 +105,19 @@ You can customize the email link in the email template to redirect the user to a
 
 When the user clicks on the link, the request will hit `https://api.example.com/v1/authenticate` and you can grab the `token_hash`, `type` and `redirect_to` query parameters from the URL. Then, you can call the [`verifyOtp`](/docs/reference/javascript/auth-verifyotp) method to get back an authenticated session before redirecting the user back to the client. Since the `verifyOtp` method makes a `POST` request to Supabase Auth to verify the user, the session will be returned in the response body, which can be read by the server. For example:
 
-```js
+```ts
+import { createClient, type EmailOtpType } from '@supabase/supabase-js'
+const supabase = createClient(
+  'https://your-project-id.supabase.co',
+  'sb_publishable_... or anon key'
+)
+
+// ---cut---
 const { token_hash, type } = Object.fromEntries(new URLSearchParams(window.location.search))
 const {
   data: { session },
   error,
-} = await supabase.auth.verifyOtp({ token_hash, type })
+} = await supabase.auth.verifyOtp({ token_hash, type: type as EmailOtpType })
 
 // subsequently redirect the user back to the client using the redirect_to param
 // ...

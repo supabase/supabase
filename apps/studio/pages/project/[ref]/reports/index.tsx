@@ -4,14 +4,14 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { Loading } from 'components/ui/Loading'
 import { useContentQuery } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -36,10 +36,14 @@ export const UserReportPage: NextPageWithLayout = () => {
     }
   )
 
-  const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateReport } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'report', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   return (
     <div className="h-full w-full">

@@ -3,7 +3,7 @@ title: 'Build a User Management App with Nuxt 3'
 description: 'Learn how to use Supabase in your Nuxt 3 App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -36,12 +36,16 @@ npm install @nuxtjs/supabase --save-dev
 ```
 
 And finally we want to save the environment variables in a `.env`.
-All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+All we need are the API URL and the key that you copied [earlier](#get-api-details).
 
-```bash .env
+<$CodeTabs>
+
+```bash name=.env
 SUPABASE_URL="YOUR_SUPABASE_URL"
-SUPABASE_KEY="YOUR_SUPABASE_ANON_KEY"
+SUPABASE_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY"
 ```
+
+</$CodeTabs>
 
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 Amazing thing about [Nuxt Supabase](https://supabase.nuxtjs.org/) is that setting environment variables is all we need to do in order to start using Supabase.
@@ -52,7 +56,9 @@ No need to initialize Supabase. The library will take care of it automatically.
 An optional step is to update the CSS file `assets/main.css` to make the app look nice.
 You can find the full contents of this file [here](https://github.com/supabase-community/nuxt3-quickstarter/blob/main/assets/main.css).
 
-```typescript nuxt.config.ts
+<$CodeTabs>
+
+```typescript name=nuxt.config.ts
 import { defineNuxtConfig } from 'nuxt'
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
@@ -62,11 +68,15 @@ export default defineNuxtConfig({
 })
 ```
 
+</$CodeTabs>
+
 ### Set up Auth component
 
 Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```vue /components/Auth.vue
+<$CodeTabs>
+
+```vue name=/components/Auth.vue
 <script setup>
 const supabase = useSupabaseClient()
 
@@ -108,16 +118,20 @@ const handleLogin = async () => {
 </template>
 ```
 
+</$CodeTabs>
+
 ### User state
 
-To access the user information, use the composable [`useSupabaseUser`](https://supabase.nuxtjs.org/usage/composables/usesupabaseuser) provided by the Supabase Nuxt module.
+To access the user information, use the composable [`useSupabaseUser`](https://supabase.nuxtjs.org/composables/usesupabaseuser) provided by the Supabase Nuxt module.
 
 ### Account component
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new component for that called `Account.vue`.
 
-```vue components/Account.vue
+<$CodeTabs>
+
+```vue name=components/Account.vue
 <script setup>
 const supabase = useSupabaseClient()
 
@@ -212,11 +226,15 @@ async function signOut() {
 </template>
 ```
 
+</$CodeTabs>
+
 ### Launch!
 
 Now that we have all the components in place, let's update `app.vue`:
 
-```vue app.vue
+<$CodeTabs>
+
+```vue name=app.vue
 <script setup>
 const user = useSupabaseUser()
 </script>
@@ -228,6 +246,8 @@ const user = useSupabaseUser()
   </div>
 </template>
 ```
+
+</$CodeTabs>
 
 Once that's done, run this in a terminal window:
 
@@ -247,7 +267,9 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
 
-```vue components/Avatar.vue
+<$CodeTabs>
+
+```vue name=components/Avatar.vue
 <script setup>
 const props = defineProps(['path'])
 const { path } = toRefs(props)
@@ -334,11 +356,15 @@ watch(path, () => {
 </template>
 ```
 
+</$CodeTabs>
+
 ### Add the new widget
 
 And then we can add the widget to the Account page:
 
-```vue components/Account.vue
+<$CodeTabs>
+
+```vue name=components/Account.vue
 <script setup>
 const supabase = useSupabaseClient()
 
@@ -433,5 +459,7 @@ async function signOut() {
   </form>
 </template>
 ```
+
+</$CodeTabs>
 
 That is it! You should now be able to upload a profile photo to Supabase Storage and you have a fully functional application.

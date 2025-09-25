@@ -1,25 +1,18 @@
-import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useDebounce } from '@uidotdev/usehooks'
+import { RefreshCw, Search, X } from 'lucide-react'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { ChangeEvent, useEffect, useState } from 'react'
 
-import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from 'ui'
-import { QueryPerformanceSort } from '../Reports/Reports.queries'
-import { TextSearchPopover } from './TextSearchPopover'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery,
@@ -28,28 +21,27 @@ export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery: DbQueryHook<any>
   onResetReportClick?: () => void
 }) => {
-  const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const { sort, clearSort } = useQueryPerformanceSort()
   const [showBottomSection] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
     true
   )
-  const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
-  const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
-  const defaultSortByValue = router.query.sort
-    ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
-    : undefined
 
-  const [searchInputVal, setSearchInputVal] = useState(defaultSearchQueryValue)
+  const [{ search: searchQuery, roles: defaultFilterRoles }, setSearchParams] = useQueryStates({
+    search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
+  })
+
+  const [inputValue, setInputValue] = useState(searchQuery)
+  const debouncedInputValue = useDebounce(inputValue, 500)
+  const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
+
   const [filters, setFilters] = useState<{ roles: string[]; query: string }>({
-    roles: typeof defaultFilterRoles === 'string' ? [defaultFilterRoles] : defaultFilterRoles,
+    roles: defaultFilterRoles,
     query: '',
   })
-  // [Joshen] This is for the old UI, can deprecated after
-  const [sortByValue, setSortByValue] = useState<QueryPerformanceSort>(
-    defaultSortByValue ?? { column: 'prop_total_time', order: 'desc' }
-  )
 
   const { isLoading, isRefetching } = queryPerformanceQuery
   const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
@@ -58,41 +50,47 @@ export const QueryPerformanceFilterBar = ({
   })
   const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
 
-  const onSearchQueryChange = (value: string) => {
-    setSearchInputVal(value)
-
-    if (!value || typeof value !== 'string') {
-      // if user has deleted the search query, remove it from the url
-      const { search, ...rest } = router.query
-      router.push({ ...router, query: { ...rest } })
-    } else {
-      router.push({ ...router, query: { ...router.query, search: value } })
-    }
-  }
-
   const onFilterRolesChange = (roles: string[]) => {
     setFilters({ ...filters, roles })
-    router.push({ ...router, query: { ...router.query, roles } })
+    setSearchParams({ roles })
   }
 
-  function getSortButtonLabel() {
-    if (sortByValue?.order === 'desc') {
-      return 'Sorted by latency - high to low'
-    } else {
-      return 'Sorted by latency - low to high'
-    }
+  const onSearchQueryChange = (value: string) => {
+    setSearchParams({ search: value || '' })
   }
 
-  const onSortChange = (order: 'asc' | 'desc') => {
-    setSortByValue({ column: 'prop_total_time', order })
-    router.push({ ...router, query: { ...router.query, sort: 'prop_total_time', order } })
-  }
+  useEffect(() => {
+    onSearchQueryChange(searchValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue])
 
   return (
-    <div className="px-6 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center">
+    <div className="px-4 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
-          <p className="text-xs prose">Filter by</p>
+          <Input
+            size="tiny"
+            autoComplete="off"
+            icon={<Search size={12} />}
+            value={inputValue}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+            name="keyword"
+            id="keyword"
+            placeholder="Filter by query"
+            className="w-56"
+            actions={[
+              inputValue && (
+                <Button
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
+                  onClick={() => setInputValue('')}
+                  className="p-0 h-5 w-5"
+                />
+              ),
+            ]}
+          />
+
           <FilterPopover
             name="Roles"
             options={roles}
@@ -100,34 +98,26 @@ export const QueryPerformanceFilterBar = ({
             valueKey="name"
             activeOptions={isLoadingRoles ? [] : filters.roles}
             onSaveFilters={onFilterRolesChange}
+            className="w-56"
           />
-          <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} />
 
-          <div className="border-r border-strong h-6" />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button icon={sortByValue?.order === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                {getSortButtonLabel()}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuRadioGroup
-                value={sortByValue?.order}
-                onValueChange={(value: any) => onSortChange(value)}
-              >
-                <DropdownMenuRadioItem value="desc" defaultChecked={sortByValue?.order === 'desc'}>
-                  Sort by latency - high to low
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="asc" defaultChecked={sortByValue?.order === 'asc'}>
-                  Sort by latency - low to high
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {sort && (
+            <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
+              <p className="md:inline-flex gap-x-1 hidden truncate">
+                Sort: {sort.column} <span className="text-foreground-lighter">{sort.order}</span>
+              </p>
+              <Tooltip>
+                <TooltipTrigger onClick={clearSort}>
+                  <X size={14} className="text-foreground-light hover:text-foreground" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Clear sort</TooltipContent>
+              </Tooltip>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center pl-2">
         {!showBottomSection && onResetReportClick && (
           <Button type="default" onClick={() => onResetReportClick()}>
             Reset report
@@ -149,6 +139,7 @@ export const QueryPerformanceFilterBar = ({
         <DownloadResultsButton
           results={queryPerformanceQuery.data ?? []}
           fileName={`Supabase Query Performance (${ref})`}
+          align="end"
         />
       </div>
     </div>

@@ -22,12 +22,12 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@redocly/cli": "^1.6.0",
+    "@redocly/cli": "^1.28.0",
     "@types/json-stringify-safe": "^5.0.0",
     "@types/lodash": "^4.14.202",
     "json-stringify-safe": "^5.0.1",
     "lodash": "^4.17.21",
     "tsconfig": "workspace:*",
-    "tsx": "^4.7.0"
+    "tsx": "^4.19.3"
   }
 }

@@ -14,12 +14,12 @@ permissions:
 
 jobs:
   update-troubleshooting:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     env:
-      SEARCH_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
-      SEARCH_GITHUB_APP_INSTALLATION_ID: ${{ secrets.SEARCH_GITHUB_APP_INSTALLATION_ID }}
-      SEARCH_GITHUB_APP_PRIVATE_KEY: ${{ secrets.SEARCH_GITHUB_APP_PRIVATE_KEY }}
+      DOCS_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
+      DOCS_GITHUB_APP_INSTALLATION_ID: ${{ secrets.SEARCH_GITHUB_APP_INSTALLATION_ID }}
+      DOCS_GITHUB_APP_PRIVATE_KEY: ${{ secrets.SEARCH_GITHUB_APP_PRIVATE_KEY }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
       SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
 

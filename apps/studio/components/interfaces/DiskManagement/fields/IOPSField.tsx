@@ -13,11 +13,7 @@ import {
 } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { ComputeSizeRecommendationSection } from '../ui/ComputeSizeRecommendationSection'
-import {
-  COMPUTE_BASELINE_IOPS,
-  DiskType,
-  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
-} from '../ui/DiskManagement.constants'
+import { DiskType, RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from '../ui/DiskManagement.constants'
 import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
 import FormMessage from '../ui/FormMessage'
 import { InputPostTab } from '../ui/InputPostTab'
@@ -117,13 +113,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                     type="number"
                     className="flex-grow font-mono rounded-r-none max-w-32"
                     {...field}
-                    value={
-                      disableIopsInput
-                        ? COMPUTE_BASELINE_IOPS[
-                            watchedComputeSize as keyof typeof COMPUTE_BASELINE_IOPS
-                          ]
-                        : field.value
-                    }
+                    value={field.value}
                     disabled={disableInput || disableIopsInput || isError}
                     onChange={(e) => {
                       setValue('provisionedIOPS', e.target.valueAsNumber, {

@@ -1,0 +1,9 @@
+<Price price="2" /> per 1 million invocations. You are only charged for usage exceeding your subscription
+plan's quota.
+
+| Plan       | Quota     | Over-Usage                                    |
+| ---------- | --------- | --------------------------------------------- |
+| Free       | 500,000   | -                                             |
+| Pro        | 2 million | <Price price="2" /> per 1 million invocations |
+| Team       | 2 million | <Price price="2" /> per 1 million invocations |
+| Enterprise | Custom    | Custom                                        |

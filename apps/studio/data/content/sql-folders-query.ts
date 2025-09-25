@@ -6,8 +6,10 @@ import { ResponseError } from 'types'
 import { contentKeys } from './keys'
 
 export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
-export type SnippetFolder = components['schemas']['UserContentFolder']
-export type Snippet = components['schemas']['UserContentObjectMeta']
+export type SnippetFolder =
+  components['schemas']['GetUserContentFolderResponse']['data']['folders'][number]
+export type Snippet =
+  components['schemas']['GetUserContentFolderResponse']['data']['contents'][number]
 
 export type SQLSnippetFolderVariables = {
   projectRef?: string

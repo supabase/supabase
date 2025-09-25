@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import { projectKeys } from 'data/projects/keys'
 import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
@@ -11,22 +11,29 @@ export type BranchCreateVariables = {
   branchName: string
   gitBranch?: string
   region?: string
-}
+  withData?: boolean
+} & Pick<components['schemas']['CreateBranchBody'], 'is_default' | 'desired_instance_size'>
 
 export async function createBranch({
   projectRef,
+  is_default,
   branchName,
   gitBranch,
   region,
+  withData,
+  desired_instance_size,
 }: BranchCreateVariables) {
   const { data, error } = await post('/v1/projects/{ref}/branches', {
     params: {
       path: { ref: projectRef },
     },
     body: {
+      is_default,
       branch_name: branchName,
       git_branch: gitBranch,
-      region: region,
+      region,
+      with_data: withData,
+      desired_instance_size,
     },
   })
 
@@ -51,8 +58,6 @@ export const useBranchCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(branchKeys.list(projectRef))
-        await queryClient.invalidateQueries(projectKeys.detail(projectRef))
-        await queryClient.invalidateQueries(projectKeys.list())
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

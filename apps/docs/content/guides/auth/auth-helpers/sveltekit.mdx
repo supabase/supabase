@@ -3,12 +3,12 @@ id: 'sveltekit'
 title: 'Supabase Auth with SvelteKit'
 description: 'Convenience helpers for implementing user authentication in SvelteKit.'
 sidebar_label: 'SvelteKit'
-sitemapPriority: 0.5
+sitemapPriority: 0.3
 ---
 
 <Admonition type="caution">
 
-We generally recommend using the new `@supabase/ssr` package instead of `auth-helpers`. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Check out the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
+The Auth helpers package is deprecated. Use the new `@supabase/ssr` package for Server Side Authentication. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Read the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
 
 </Admonition>
 
@@ -40,12 +40,12 @@ npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 
 ### Declare environment variables
 
-Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
 # Find these in your Supabase project settings https://supabase.com/dashboard/project/_/settings/api
 PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon key
 ```
 
 ### Creating a Supabase client
@@ -61,17 +61,17 @@ PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 Create a new `hooks.server.js` file in the root of your project and populate with the following to retrieve the user session.
 
-<GetSessionWarning />
+<$Partial path="get_session_warning.mdx" />
 
 ```js src/hooks.server.js
 // src/hooks.server.js
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 
 export const handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     event,
   })
 
@@ -111,14 +111,14 @@ Create a new `hooks.server.ts` file in the root of your project and populate wit
 
 ```ts src/hooks.server.ts
 // src/hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     event,
   })
 
@@ -161,7 +161,7 @@ Note that we are specifying `filterSerializedResponseHeaders` here. We need to t
 
 ### Code Exchange route
 
-The `Code Exchange` route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the SvelteKit Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The `Code Exchange` route is required for the [server-side auth flow](/docs/guides/auth/server-side-rendering) implemented by the SvelteKit Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
 
 <Tabs
   scrollable
@@ -213,7 +213,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
 ### Generate types from your database
 
-In order to get the most out of TypeScript and its IntelliSense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](https://supabase.com/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
+In order to get the most out of TypeScript and its IntelliSense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
 
 ```ts src/app.d.ts
 // src/app.d.ts
@@ -307,7 +307,7 @@ To utilize Supabase in shared load functions and within pages, it is essential t
 
 ```ts src/routes/+layout.js
 // src/routes/+layout.js
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 
 export const load = async ({ fetch, data, depends }) => {
@@ -315,7 +315,7 @@ export const load = async ({ fetch, data, depends }) => {
 
   const supabase = createSupabaseLoadClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     event: { fetch },
     serverSession: data.session,
   })
@@ -339,7 +339,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import type { Database } from '../DatabaseDefinitions'
 
@@ -348,7 +348,7 @@ export const load = async ({ fetch, data, depends }) => {
 
   const supabase = createSupabaseLoadClient<Database>({
     supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     event: { fetch },
     serverSession: data.session,
   })
@@ -368,7 +368,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/typescript-support) and passed to `createSupabaseLoadClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createSupabaseLoadClient` to add type support to the Supabase client.
 
 </Admonition>
 
@@ -648,7 +648,7 @@ Edit your `/src/hooks.server.js` with the below:
 
 ```js src/hooks.server.js
 // src/hooks.server.js
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import { redirect, error } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
@@ -656,7 +656,7 @@ import { sequence } from '@sveltejs/kit/hooks'
 async function supabase({ event, resolve }) {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     event,
   })
 
@@ -717,14 +717,14 @@ export const handle = sequence(supabase, authorization)
 ```ts src/hooks.server.ts
 // src/hooks.server.ts
 import { type Handle, redirect, error } from '@sveltejs/kit'
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import { sequence } from '@sveltejs/kit/hooks'
 
 async function supabase({ event, resolve }) {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     event,
   })
 
@@ -785,7 +785,7 @@ export const handle: Handle = sequence(supabase, authorization)
 
 ### Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/guides/database/postgres/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
+For [row level security](/docs/guides/database/postgres/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
 ```svelte src/routes/+page.svelte
 <script lang="ts">
@@ -932,9 +932,12 @@ import { createClient } from '@supabase/auth-helpers-sveltekit'
 import { env } from '$env/dynamic/public'
 // or use the static env
 
-// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
+export const supabaseClient = createClient(
+  env.PUBLIC_SUPABASE_URL,
+  env.PUBLIC_SUPABASE_PUBLISHABLE_KEY
+)
 ```
 
 </TabPanel>
@@ -942,14 +945,14 @@ export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_S
 
 ```js src/hooks.server.ts
 // src/hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     event,
   })
 
@@ -1024,7 +1027,7 @@ In order to use the Supabase library in your client code you will need to setup 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
 import { invalidate } from '$app/navigation'
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import type { LayoutLoad } from './$types'
 import type { Database } from '../DatabaseDefinitions'
@@ -1034,7 +1037,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
   const supabase = createSupabaseLoadClient<Database>({
     supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     event: { fetch },
     serverSession: data.session,
   })
@@ -1295,12 +1298,16 @@ import { dev } from '$app/environment'
 import { env } from '$env/dynamic/public'
 // or use the static env
 
-// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY, {
-  persistSession: false,
-  autoRefreshToken: false,
-})
+export const supabaseClient = createClient(
+  env.PUBLIC_SUPABASE_URL,
+  env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  {
+    persistSession: false,
+    autoRefreshToken: false,
+  }
+)
 
 setupSupabaseHelpers({
   supabaseClient,
@@ -1318,9 +1325,12 @@ import { createClient } from '@supabase/auth-helpers-sveltekit'
 import { env } from '$env/dynamic/public'
 // or use the static env
 
-// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
+export const supabaseClient = createClient(
+  env.PUBLIC_SUPABASE_URL,
+  env.PUBLIC_SUPABASE_PUBLISHABLE_KEY
+)
 ```
 
 </TabPanel>
@@ -1646,7 +1656,7 @@ import { createSupabaseClient } from '@supabase/auth-helpers-sveltekit';
 
 const { supabaseClient } = createSupabaseClient(
   import.meta.env.VITE_SUPABASE_URL as string,
-  import.meta.env.VITE_SUPABASE_ANON_KEY as string
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string
 );
 
 export { supabaseClient };
@@ -1662,12 +1672,16 @@ import { dev } from '$app/environment'
 import { env } from '$env/dynamic/public'
 // or use the static env
 
-// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY, {
-  persistSession: false,
-  autoRefreshToken: false,
-})
+export const supabaseClient = createClient(
+  env.PUBLIC_SUPABASE_URL,
+  env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  {
+    persistSession: false,
+    autoRefreshToken: false,
+  }
+)
 
 setupSupabaseHelpers({
   supabaseClient,

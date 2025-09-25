@@ -3,12 +3,12 @@ id: 'remix'
 title: 'Supabase Auth with Remix'
 description: 'Authentication helpers for loaders and actions in Remix.'
 sidebar_label: 'Remix'
-sitemapPriority: 0.5
+sitemapPriority: 0.3
 ---
 
 <Admonition type="caution">
 
-We generally recommend using the new `@supabase/ssr` package instead of `auth-helpers`. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Check out the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
+The Auth helpers package is deprecated. Use the new `@supabase/ssr` package for Server Side Authentication. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Read the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
 
 </Admonition>
 
@@ -20,7 +20,7 @@ We generally recommend using the new `@supabase/ssr` package instead of `auth-he
   size="medium"
   className="text-foreground-light border-b mt-8 pb-2"
   >
-  
+
   <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
@@ -55,16 +55,16 @@ This library supports the following tooling versions:
 
 ## Set up environment variables
 
-Retrieve your project URL and anon key in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
+Retrieve your project URL and anon key in your project's [API settings](/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
 
 ```bash .env
 SUPABASE_URL=YOUR_SUPABASE_URL
-SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
 ### Code Exchange route
 
-The `Code Exchange` route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the Remix Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The `Code Exchange` route is required for the [server-side auth flow](/docs/guides/auth/server-side-rendering) implemented by the Remix Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
 
 <Tabs
   scrollable
@@ -89,7 +89,7 @@ export const loader = async ({ request }) => {
   if (code) {
     const supabaseClient = createServerClient(
       process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY,
+      process.env.SUPABASE_PUBLISHABLE_KEY,
       { request, response }
     )
     await supabaseClient.auth.exchangeCodeForSession(code)
@@ -122,7 +122,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (code) {
     const supabaseClient = createServerClient<Database>(
       process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
       { request, response }
     )
     await supabaseClient.auth.exchangeCodeForSession(code)
@@ -145,7 +145,7 @@ The Supabase client can now be used server-side - in loaders and actions - by ca
 
 ### Loader
 
-Loader functions run on the server immediately before the component is rendered. They respond to all GET requests on a route. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
+Loader functions run on the server immediately before the component is rendered. They respond to all GET requests on a route. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and a `Request` and `Response`.
 
 <Tabs
   scrollable
@@ -167,7 +167,7 @@ export const loader = async ({ request }) => {
 
   const supabaseClient = createServerClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
+    process.env.SUPABASE_PUBLISHABLE_KEY,
     { request, response }
   )
 
@@ -203,7 +203,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
   const supabaseClient = createServerClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
     { request, response }
   )
 
@@ -229,7 +229,7 @@ Supabase will set cookie headers to manage the user's auth session, therefore, t
 
 ### Action
 
-Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
+Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and a `Request` and `Response`.
 
 <Tabs
   scrollable
@@ -249,7 +249,7 @@ export const action = async ({ request }) => {
 
   const supabaseClient = createServerClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
+    process.env.SUPABASE_PUBLISHABLE_KEY,
     { request, response }
   )
 
@@ -284,7 +284,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const supabaseClient = createServerClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
     { request, response }
   )
 
@@ -320,7 +320,7 @@ const {
 
 The session contains a user property. This is the user metadata saved, unencoded, to the local storage medium. It's unverified and can be tampered by the user, so don't use it for authorization or sensitive purposes.
 
-<GetSessionWarning />
+<$Partial path="get_session_warning.mdx" />
 
 ```jsx
 const user = session?.user
@@ -355,7 +355,7 @@ Since our environment variables are not available client-side, we need to plumb 
 export const loader = () => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+    SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY,
   }
 
   return json({ env })
@@ -377,7 +377,9 @@ const { env } = useLoaderData()
 We then want to instantiate a single instance of a Supabase browser client, to be used across our client-side components.
 
 ```jsx app/root.jsx
-const [supabase] = useState(() => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY))
+const [supabase] = useState(() =>
+  createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY)
+)
 ```
 
 And then we can share this instance across our application with Outlet Context.
@@ -393,7 +395,7 @@ And then we can share this instance across our application with Outlet Context.
 export const loader = ({}: LoaderFunctionArgs) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
   }
 
   return json({ env })
@@ -416,7 +418,7 @@ We then want to instantiate a single instance of a Supabase browser client, to b
 
 ```tsx app/root.tsx
 const [supabase] = useState(() =>
-  createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+  createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY)
 )
 ```
 
@@ -453,15 +455,19 @@ Let's pipe that through from our loader.
 export const loader = async ({ request }) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+    SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY,
   }
 
   const response = new Response()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
-    request,
-    response,
-  })
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_PUBLISHABLE_KEY,
+    {
+      request,
+      response,
+    }
+  )
 
   const {
     data: { session },
@@ -487,15 +493,19 @@ export const loader = async ({ request }) => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
   }
 
   const response = new Response()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-    request,
-    response,
-  })
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      request,
+      response,
+    }
+  )
 
   const {
     data: { session },
@@ -533,7 +543,9 @@ And then use the revalidator, inside the `onAuthStateChange` hook.
 const { env, session } = useLoaderData()
 const { revalidate } = useRevalidator()
 
-const [supabase] = useState(() => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY))
+const [supabase] = useState(() =>
+  createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY)
+)
 
 const serverAccessToken = session?.access_token
 
@@ -562,7 +574,7 @@ const { env, session } = useLoaderData<typeof loader>()
 const { revalidate } = useRevalidator()
 
 const [supabase] = useState(() =>
-  createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+  createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY)
 )
 
 const serverAccessToken = session?.access_token
@@ -703,10 +715,14 @@ import { useEffect, useState } from 'react'
 
 export const loader = async ({ request }) => {
   const response = new Response()
-  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
-    request,
-    response,
-  })
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_PUBLISHABLE_KEY,
+    {
+      request,
+      response,
+    }
+  )
 
   const { data } = await supabase.from('posts').select()
 
@@ -760,7 +776,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
   const supabase = createServerClient<Database>(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
     {
       request,
       response,
@@ -806,7 +822,7 @@ export default function Index() {
 
 <Admonition type="tip">
 
-Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/publications) on the table you are subscribing to.
+Ensure you have [enabled replication](/dashboard/project/_/database/publications) on the table you are subscribing to.
 
 </Admonition>
 

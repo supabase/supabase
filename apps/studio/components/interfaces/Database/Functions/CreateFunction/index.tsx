@@ -7,13 +7,13 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -69,7 +69,7 @@ const FormSchema = z.object({
 })
 
 const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   // For now, there's no AI assistant for functions
@@ -134,6 +134,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
 
   useEffect(() => {
     if (visible) {
+      setFocusedEditor(false)
       form.reset({
         name: func?.name ?? '',
         schema: func?.schema ?? 'public',
@@ -147,6 +148,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
       })
     }
   }, [visible, func])
+
+  const { data: protectedSchemas } = useProtectedSchemas()
 
   return (
     <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
@@ -183,7 +186,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       layout="horizontal"
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} />
+                        <Input_Shadcn_ {...field} placeholder="Name of function" />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -202,8 +205,9 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     >
                       <FormControl_Shadcn_>
                         <SchemaSelector
+                          portal={false}
                           selectedSchemaName={field.value}
-                          excludedSchemas={PROTECTED_SCHEMAS}
+                          excludedSchemas={protectedSchemas?.map((s) => s.name)}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />
@@ -397,7 +401,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
-              Confirm
+              {isEditing ? 'Save' : 'Create'} function
             </Button>
           </SheetFooter>
         </div>
@@ -597,7 +601,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
 const ALL_ALLOWED_LANGUAGES = ['plpgsql', 'sql', 'plcoffee', 'plv8', 'plls']
 
 const FormFieldLanguage = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: enabledExtensions } = useDatabaseExtensionsQuery(
     {

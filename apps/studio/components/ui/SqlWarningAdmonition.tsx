@@ -21,13 +21,13 @@ const SqlWarningAdmonition = ({
       type="warning"
       className={`mb-0 rounded-none border-0 shrink-0 bg-background-100 ${className}`}
     >
-      <p>
+      <p className="text-xs !mb-1">
         {warningType === 'hasWriteOperation'
           ? 'This query contains write operations.'
           : 'This query involves running a function.'}{' '}
         Are you sure you want to execute it?
       </p>
-      <p className="text-foreground-light">
+      <p className="text-foreground-light text-xs">
         Make sure you are not accidentally removing something important.
       </p>
       <div className="flex justify-stretch mt-2 gap-2">

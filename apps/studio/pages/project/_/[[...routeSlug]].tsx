@@ -1,27 +1,31 @@
+import { AlertTriangleIcon } from 'lucide-react'
 import { NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
-import { ProjectList } from 'components/interfaces/Home/ProjectList'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
+import {
+  Header,
+  LoadingCardView,
+  NoOrganizationsState,
+} from 'components/interfaces/Home/ProjectList/EmptyStates'
+import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
+import { HomePageActions } from 'components/interfaces/HomePageActions'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
-import { BASE_PATH } from 'lib/constants'
-
-const Header = () => {
-  return (
-    <div className="border-default border-b p-3">
-      <div className="flex items-center space-x-2">
-        <Link href="/projects">
-          <img
-            src={`${BASE_PATH}/img/supabase-logo.svg`}
-            alt="Supabase"
-            className="border-default rounded border p-1 hover:border-white"
-            style={{ height: 24 }}
-          />
-        </Link>
-      </div>
-    </div>
-  )
-}
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
 
 // [Joshen] I'd say we don't do route validation here, this page will act more
 // like a proxy to the project specific pages, and we let those pages handle
@@ -30,6 +34,23 @@ const Header = () => {
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
+
+  const [lastVisitedOrgSlug] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
+  const [selectedSlug, setSlug] = useState(lastVisitedOrgSlug)
+
+  const {
+    data: organizations = [],
+    isSuccess: isSuccessOrganizations,
+    isLoading: isLoadingOrganizations,
+    isError: isErrorOrganizations,
+  } = useOrganizationsQuery({
+    enabled: IS_PLATFORM,
+  })
+  const selectedOrganization = organizations.find((x) => x.slug === selectedSlug)
 
   const query = Object.keys(queryParams).length
     ? `?${new URLSearchParams(queryParams as Record<string, string>)}`
@@ -48,19 +69,63 @@ const GenericProjectPage: NextPage = () => {
     }
   }
 
+  useEffect(() => {
+    if (!!lastVisitedOrgSlug) {
+      setSlug(lastVisitedOrgSlug)
+    } else if (isSuccessOrganizations) {
+      setSlug(organizations[0]?.slug)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastVisitedOrgSlug, isSuccessOrganizations])
+
   return (
-    <>
+    <div className="h-screen flex flex-col">
       <Header />
-      <div className="flex flex-col mx-auto w-full max-w-5xl">
-        <h1 className="mt-8 text-2xl">Select a project to continue</h1>
-        <div
-          className="flex-grow py-6 space-y-8 overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
-        >
-          <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} search="" />
-        </div>
-      </div>
-    </>
+      <PageLayout className="flex-grow min-h-0" title="Select a project to continue">
+        <ScaffoldContainer className="flex-grow flex flex-col">
+          {organizations.length > 0 && (
+            <ScaffoldSection isFullWidth>
+              <div className="flex items-center gap-x-2">
+                <Select_Shadcn_ value={selectedSlug} onValueChange={setSlug}>
+                  <SelectTrigger_Shadcn_ size="tiny" className="w-60 truncate">
+                    <div className="flex items-center gap-x-2">
+                      <p className="text-xs text-foreground-light">Organization:</p>
+                      <SelectValue_Shadcn_ placeholder="Select an organization" />
+                    </div>
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_ className="col-span-8">
+                    {organizations.map((org) => (
+                      <SelectItem_Shadcn_ key={org.slug} value={org.slug} className="text-xs">
+                        {org.name}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+                <HomePageActions hideNewProject />
+              </div>
+            </ScaffoldSection>
+          )}
+          <ScaffoldSection isFullWidth className="flex-grow pt-0 flex flex-col gap-y-4 h-px">
+            {isLoadingOrganizations ? (
+              <LoadingCardView />
+            ) : isErrorOrganizations ? (
+              <Alert_Shadcn_ variant="warning">
+                <AlertTriangleIcon />
+                <AlertTitle_Shadcn_>Failed to load your Supabase organizations</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>Try refreshing the page</AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            ) : organizations.length === 0 ? (
+              <NoOrganizationsState />
+            ) : !!selectedOrganization ? (
+              <ProjectList
+                organization={selectedOrganization}
+                rewriteHref={urlRewriterFactory(routeSlug)}
+              />
+            ) : null}
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      </PageLayout>
+    </div>
   )
 }
 

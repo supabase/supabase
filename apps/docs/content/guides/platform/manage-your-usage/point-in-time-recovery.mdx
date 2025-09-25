@@ -5,7 +5,7 @@ title: 'Manage Point-in-Time Recovery usage'
 
 ## What you are charged for
 
-You can configure [Point-in-Time Recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery) for a project by enabling the [PITR add-on](https://supabase.com/dashboard/project/_/settings/addons?panel=pitr). You are charged for every enabled PITR add-on across your projects.
+You can configure [Point-in-Time Recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery) for a project by enabling the [PITR add-on](/dashboard/project/_/settings/addons?panel=pitr). You are charged for every enabled PITR add-on across your projects.
 
 ## How charges are calculated
 
@@ -28,7 +28,7 @@ Usage is shown as "Point-in-time recovery Hours" on your invoice.
 
 ## Pricing
 
-<PricingPitr />
+<$Partial path="billing/pricing/pricing_pitr.mdx" />
 
 ## Billing examples
 
@@ -36,32 +36,32 @@ Usage is shown as "Point-in-time recovery Hours" on your invoice.
 
 The project has PITR with a recovery retention period of 7 days activated throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs    |
-| ----------------------------- | ----- | -------- |
-| Pro Plan                      | -     | $25      |
-| Compute Hours Small Project 1 | 744   | $15      |
-| PITR Hours                    | 744   | $100     |
-| **Subtotal**                  |       | **$140** |
-| Compute Credits               |       | -$10     |
-| **Total**                     |       | **$130** |
+| Line Item                     | Hours | Costs                     |
+| ----------------------------- | ----- | ------------------------- |
+| Pro Plan                      | -     | <Price price="25" />      |
+| Compute Hours Small Project 1 | 744   | <Price price="15" />      |
+| PITR Hours                    | 744   | <Price price="100" />     |
+| **Subtotal**                  |       | **<Price price="140" />** |
+| Compute Credits               |       | -<Price price="10" />     |
+| **Total**                     |       | **<Price price="130" />** |
 
 ### Multiple projects
 
 All projects have PITR with a recovery retention period of 14 days activated throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs    |
-| ----------------------------- | ----- | -------- |
-| Pro Plan                      | -     | $25      |
-|                               |       |          |
-| Compute Hours Small Project 1 | 744   | $15      |
-| PITR Hours Project 1          | 744   | $200     |
-|                               |       |          |
-| Compute Hours Small Project 2 | 744   | $15      |
-| PITR Hours Project 2          | 744   | $200     |
-|                               |       |          |
-| **Subtotal**                  |       | **$455** |
-| Compute Credits               |       | -$10     |
-| **Total**                     |       | **$445** |
+| Line Item                     | Hours | Costs                     |
+| ----------------------------- | ----- | ------------------------- |
+| Pro Plan                      | -     | <Price price="25" />      |
+|                               |       |                           |
+| Compute Hours Small Project 1 | 744   | <Price price="15" />      |
+| PITR Hours Project 1          | 744   | <Price price="200" />     |
+|                               |       |                           |
+| Compute Hours Small Project 2 | 744   | <Price price="15" />      |
+| PITR Hours Project 2          | 744   | <Price price="200" />     |
+|                               |       |                           |
+| **Subtotal**                  |       | **<Price price="455" />** |
+| Compute Credits               |       | -<Price price="10" />     |
+| **Total**                     |       | **<Price price="445" />** |
 
 ## Optimize usage
 

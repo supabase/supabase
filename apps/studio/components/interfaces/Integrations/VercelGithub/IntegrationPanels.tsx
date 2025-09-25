@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
+import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Image from 'next/legacy/image'
-import React from 'react'
+import Link from 'next/link'
+import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -11,14 +13,12 @@ import type {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { ArrowRight, ExternalLink, Github } from 'lucide-react'
-import Link from 'next/link'
 import { Badge, Button, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
 
-export interface IntegrationInstallationProps extends React.RefAttributes<HTMLLIElement> {
+export interface IntegrationInstallationProps extends RefAttributes<HTMLLIElement> {
   title: string
   integration: Integration
   disabled?: boolean
@@ -72,7 +72,7 @@ const Avatar = ({ src }: { src: string | undefined }) => {
   )
 }
 
-const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInstallationProps>(
+const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallationProps>(
   ({ integration, disabled, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
@@ -136,21 +136,23 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
   }
 )
 
-export interface IntegrationConnectionProps extends React.HTMLAttributes<HTMLLIElement> {
+export interface IntegrationConnectionProps extends HTMLAttributes<HTMLLIElement> {
   connection: IntegrationProjectConnection
   type: Integration['integration']['name']
-  actions?: React.ReactNode
+  actions?: ReactNode
   showNode?: boolean
   orientation?: 'horizontal' | 'vertical'
 }
 
-const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
+const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   (
     { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
     ref
   ) => {
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data } = useProjectsQuery()
+    const project = (data?.projects ?? []).find(
+      (project) => project.ref === connection.supabase_project_ref
+    )
 
     return (
       <li
@@ -234,10 +236,12 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
   }
 )
 
-const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
+const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ connection, type, ...props }, ref) => {
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data } = useProjectsQuery()
+    const project = (data?.projects ?? []).find(
+      (project) => project.ref === connection.supabase_project_ref
+    )
 
     return (
       <li
@@ -268,11 +272,10 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
   }
 )
 
-const EmptyIntegrationConnection = React.forwardRef<
+const EmptyIntegrationConnection = forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
+  HTMLAttributes<HTMLDivElement> & {
     showNode?: boolean
-    orgSlug?: string
     onClick: () => void
     disabled?: boolean
   }
@@ -322,7 +325,7 @@ interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElemen
   showNode?: boolean
 }
 
-const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
+const IntegrationConnectionHeader = forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
   ({ className, markdown = '', showNode = true, ...props }, ref) => {
     return (
       <div

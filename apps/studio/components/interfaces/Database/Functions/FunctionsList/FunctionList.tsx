@@ -3,12 +3,11 @@ import { includes, noop, sortBy } from 'lodash'
 import { Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   DropdownMenu,
@@ -16,6 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
 } from 'ui'
 
 interface FunctionListProps {
@@ -34,8 +35,8 @@ const FunctionList = ({
   deleteFunction = noop,
 }: FunctionListProps) => {
   const router = useRouter()
-  const { project: selectedProject } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
@@ -50,34 +51,34 @@ const FunctionList = ({
     (func) => func.name.toLocaleLowerCase()
   )
   const projectRef = selectedProject?.ref
-  const canUpdateFunctions = useCheckPermissions(
+  const { can: canUpdateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
   if (_functions.length === 0 && filterString.length === 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+      <TableRow key={schema}>
+        <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No functions created yet</p>
           <p className="text-sm text-foreground-light">
             There are no functions found in the schema "{schema}"
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
   if (_functions.length === 0 && filterString.length > 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+      <TableRow key={schema}>
+        <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
@@ -87,26 +88,39 @@ const FunctionList = ({
         const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
 
         return (
-          <Table.tr key={x.id}>
-            <Table.td className="truncate">
-              <p title={x.name}>{x.name}</p>
-            </Table.td>
-            <Table.td className="table-cell overflow-auto">
+          <TableRow key={x.id}>
+            <TableCell className="truncate">
+              <Button
+                type="text"
+                className="text-foreground text-sm p-0 hover:bg-transparent"
+                onClick={() => editFunction(x)}
+              >
+                {x.name}
+              </Button>
+            </TableCell>
+            <TableCell className="table-cell overflow-auto">
               <p title={x.argument_types} className="truncate">
                 {x.argument_types || '-'}
               </p>
-            </Table.td>
-            <Table.td className="table-cell">
+            </TableCell>
+            <TableCell className="table-cell">
               <p title={x.return_type}>{x.return_type}</p>
-            </Table.td>
-            <Table.td className="table-cell">{x.security_definer ? 'Definer' : 'Invoker'}</Table.td>
-            <Table.td className="text-right">
+            </TableCell>
+            <TableCell className="table-cell">
+              {x.security_definer ? 'Definer' : 'Invoker'}
+            </TableCell>
+            <TableCell className="text-right">
               {!isLocked && (
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button type="default" className="px-1" icon={<MoreVertical />} />
+                        <Button
+                          aria-label="More options"
+                          type="default"
+                          className="px-1"
+                          icon={<MoreVertical />}
+                        />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="left" className="w-52">
                         {isApiDocumentAvailable && (
@@ -125,16 +139,27 @@ const FunctionList = ({
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => {
-                            setAiAssistantPanel({
+                            aiSnap.newChat({
+                              name: `Update function ${x.name}`,
                               open: true,
                               initialInput: 'Update this function to do...',
                               suggestions: {
                                 title:
                                   'I can help you make a change to this function, here are a few example prompts to get you started:',
                                 prompts: [
-                                  'Rename this function to ...',
-                                  'Modify this function so that it ...',
-                                  'Add a trigger for this function that calls it when ...',
+                                  {
+                                    label: 'Rename Function',
+                                    description: 'Rename this function to ...',
+                                  },
+                                  {
+                                    label: 'Modify Function',
+                                    description: 'Modify this function so that it ...',
+                                  },
+                                  {
+                                    label: 'Add Trigger',
+                                    description:
+                                      'Add a trigger for this function that calls it when ...',
+                                  },
                                 ],
                               },
                               sqlSnippets: [x.complete_statement],
@@ -167,8 +192,8 @@ const FunctionList = ({
                   )}
                 </div>
               )}
-            </Table.td>
-          </Table.tr>
+            </TableCell>
+          </TableRow>
         )
       })}
     </>

@@ -10,6 +10,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
@@ -34,6 +35,8 @@ interface DatabaseSelectorProps {
   additionalOptions?: { id: string; name: string }[]
   buttonProps?: ButtonProps
   onSelectId?: (id: string) => void // Optional callback
+  onCreateReplicaClick?: () => void
+  portal?: boolean
 }
 
 const DatabaseSelector = ({
@@ -42,6 +45,8 @@ const DatabaseSelector = ({
   additionalOptions = [],
   onSelectId = noop,
   buttonProps,
+  onCreateReplicaClick = noop,
+  portal = true,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -107,7 +112,7 @@ const DatabaseSelector = ({
           </Button>
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end" portal={portal}>
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             {additionalOptions.length > 0 && (
@@ -198,29 +203,32 @@ const DatabaseSelector = ({
                 })}
               </ScrollArea>
             </CommandGroup_Shadcn_>
-            <CommandGroup_Shadcn_ className="border-t">
-              <CommandItem_Shadcn_
-                className="cursor-pointer w-full"
-                onSelect={() => {
-                  setOpen(false)
-                  router.push(`/project/${projectRef}/settings/infrastructure`)
-                }}
-                onClick={() => setOpen(false)}
-              >
-                <Link
-                  href={`/project/${projectRef}/settings/infrastructure`}
-                  onClick={() => {
+            {IS_PLATFORM && (
+              <CommandGroup_Shadcn_ className="border-t">
+                <CommandItem_Shadcn_
+                  className="cursor-pointer w-full"
+                  onSelect={() => {
                     setOpen(false)
-                    // [Joshen] This is used in the Connect UI which is available across all pages
-                    setShowConnect(null)
+                    router.push(`/project/${projectRef}/settings/infrastructure`)
                   }}
-                  className="w-full flex items-center gap-2"
+                  onClick={() => setOpen(false)}
                 >
-                  <Plus size={14} strokeWidth={1.5} />
-                  <p>Create a new read replica</p>
-                </Link>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
+                  <Link
+                    href={`/project/${projectRef}/settings/infrastructure`}
+                    onClick={() => {
+                      setOpen(false)
+                      // [Joshen] This is used in the Connect UI which is available across all pages
+                      setShowConnect(null)
+                      onCreateReplicaClick?.()
+                    }}
+                    className="w-full flex items-center gap-2"
+                  >
+                    <Plus size={14} strokeWidth={1.5} />
+                    <p>Create a new read replica</p>
+                  </Link>
+                </CommandItem_Shadcn_>
+              </CommandGroup_Shadcn_>
+            )}
           </CommandList_Shadcn_>
         </Command_Shadcn_>
       </PopoverContent_Shadcn_>

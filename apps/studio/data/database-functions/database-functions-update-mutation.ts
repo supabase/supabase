@@ -10,7 +10,7 @@ import type { DatabaseFunction } from './database-functions-query'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   func: DatabaseFunction
   payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
 }

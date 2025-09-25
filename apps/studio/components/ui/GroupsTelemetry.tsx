@@ -3,13 +3,12 @@ import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import { useParams, useTelemetryCookie, useUser } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams, useTelemetryCookie, useUser } from 'common'
 import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identify-mutation'
 import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
 import { usePrevious } from 'hooks/deprecated'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 
 const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()
@@ -29,8 +28,7 @@ const GroupsTelemetry = ({ hasAcceptedConsent }: { hasAcceptedConsent: boolean }
   const user = useUser()
   const router = useRouter()
   const { ref, slug } = useParams()
-  const snap = useAppStateSnapshot()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const previousPathname = usePrevious(router.pathname)
 
@@ -40,13 +38,6 @@ const GroupsTelemetry = ({ hasAcceptedConsent }: { hasAcceptedConsent: boolean }
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
   useTelemetryCookie({ hasAcceptedConsent, title, referrer })
-
-  useEffect(() => {
-    if (hasAcceptedConsent) {
-      snap.setIsOptedInTelemetry(hasAcceptedConsent)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasAcceptedConsent])
 
   useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)

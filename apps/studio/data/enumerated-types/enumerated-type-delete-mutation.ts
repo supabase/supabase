@@ -7,7 +7,7 @@ import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeDeleteVariables = {
   projectRef: string
-  connectionString: string
+  connectionString: string | null
   name: string
   schema: string
 }

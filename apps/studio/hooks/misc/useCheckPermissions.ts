@@ -1,13 +1,12 @@
 import { useIsLoggedIn, useParams } from 'common'
 import jsonLogic from 'json-logic-js'
 
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
-import { useSelectedOrganization } from './useSelectedOrganization'
-import { useSelectedProject } from './useSelectedProject'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
+import { useSelectedProjectQuery } from './useSelectedProject'
+import { useMemo } from 'react'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -74,108 +73,70 @@ export function useGetPermissions(
   return useGetProjectPermissions(permissionsOverride, organizationSlugOverride, undefined, enabled)
 }
 
-export function useGetProjectPermissions(
+function useGetProjectPermissions(
   permissionsOverride?: Permission[],
   organizationSlugOverride?: string,
   projectRefOverride?: string,
   enabled = true
 ) {
-  const permissionsResult = usePermissionsQuery({
+  const {
+    data,
+    isLoading: isLoadingPermissions,
+    isSuccess: isSuccessPermissions,
+  } = usePermissionsQuery({
     enabled: permissionsOverride === undefined && enabled,
   })
+  const permissions = permissionsOverride === undefined ? data : permissionsOverride
 
-  const permissions =
-    permissionsOverride === undefined ? permissionsResult.data : permissionsOverride
-
-  const organizationResult = useSelectedOrganization({
-    enabled: organizationSlugOverride === undefined && enabled,
+  const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
+  const {
+    data: organizationData,
+    isLoading: isLoadingOrganization,
+    isSuccess: isSuccessOrganization,
+  } = useSelectedOrganizationQuery({
+    enabled: getOrganizationDataFromParamsSlug,
   })
-
   const organization =
-    organizationSlugOverride === undefined ? organizationResult : { slug: organizationSlugOverride }
+    organizationSlugOverride === undefined ? organizationData : { slug: organizationSlugOverride }
   const organizationSlug = organization?.slug
 
-  const projectResult = useSelectedProject({
-    enabled: projectRefOverride === undefined && enabled,
+  const { ref: urlProjectRef } = useParams()
+  const getProjectDataFromParamsRef = !!urlProjectRef && projectRefOverride === undefined && enabled
+  const {
+    data: projectData,
+    isLoading: isLoadingProject,
+    isSuccess: isSuccessProject,
+  } = useSelectedProjectQuery({
+    enabled: getProjectDataFromParamsRef,
   })
-
   const project =
-    projectRefOverride === undefined || projectResult?.parent_project_ref
-      ? projectResult
+    projectRefOverride === undefined || projectData?.parent_project_ref
+      ? projectData
       : { ref: projectRefOverride, parent_project_ref: undefined }
+
   const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
+
+  const isLoading =
+    isLoadingPermissions ||
+    (getOrganizationDataFromParamsSlug && isLoadingOrganization) ||
+    (getProjectDataFromParamsRef && isLoadingProject)
+  const isSuccess =
+    isSuccessPermissions &&
+    (!getOrganizationDataFromParamsSlug || isSuccessOrganization) &&
+    (!getProjectDataFromParamsRef || isSuccessProject)
 
   return {
     permissions,
     organizationSlug,
     projectRef,
-    isLoading: permissionsResult.isLoading,
+    isLoading,
+    isSuccess,
   }
 }
 
-export function useCheckPermissions(
-  action: string,
-  resource: string,
-  data?: object,
-  // [Joshen] Pass the variables if you want to avoid hooks in this
-  // e.g If you want to use useCheckPermissions in a loop like organization settings
-  organizationSlug?: string,
-  permissions?: Permission[]
-) {
-  return useCheckProjectPermissions(action, resource, data, {
-    organizationSlug,
-    projectRef: undefined,
-    permissions,
-  })
-}
-
-export function useCheckProjectPermissions(
-  action: string,
-  resource: string,
-  data?: object,
-  overrides?: {
-    organizationSlug?: string
-    projectRef?: string
-    permissions?: Permission[]
-  }
-) {
-  const isLoggedIn = useIsLoggedIn()
-  const { organizationSlug, projectRef, permissions } = overrides ?? {}
-
-  const {
-    permissions: allPermissions,
-    organizationSlug: _organizationSlug,
-    projectRef: _projectRef,
-  } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
-
-  if (!isLoggedIn) return false
-  if (!IS_PLATFORM) return true
-
-  return doPermissionsCheck(allPermissions, action, resource, data, _organizationSlug, _projectRef)
-}
-
-export function usePermissionsLoaded() {
-  const isLoggedIn = useIsLoggedIn()
-  const { isFetched: isPermissionsFetched } = usePermissionsQuery({ enabled: isLoggedIn })
-  const { isFetched: isOrganizationsFetched } = useOrganizationsQuery({ enabled: isLoggedIn })
-
-  const { ref } = useParams()
-  const { isFetched: isProjectDetailFetched } = useProjectDetailQuery(
-    { ref },
-    { enabled: !!ref && isLoggedIn }
-  )
-
-  if (!IS_PLATFORM) return true
-
-  if (ref) {
-    return isLoggedIn && isPermissionsFetched && isOrganizationsFetched && isProjectDetailFetched
-  }
-
-  return isLoggedIn && isPermissionsFetched && isOrganizationsFetched
-}
-
+/** [Joshen] To be renamed to be useAsyncCheckPermissions, more generic as it covers both org and project perms */
 // Useful when you want to avoid layout changes while waiting for permissions to load
-export function useAsyncCheckProjectPermissions(
+export function useAsyncCheckPermissions(
   action: string,
   resource: string,
   data?: object,
@@ -193,21 +154,37 @@ export function useAsyncCheckProjectPermissions(
     organizationSlug: _organizationSlug,
     projectRef: _projectRef,
     isLoading: isPermissionsLoading,
+    isSuccess: isPermissionsSuccess,
   } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
 
-  if (!isLoggedIn)
-    return {
-      isLoading: false,
-      can: false,
-    }
-  if (!IS_PLATFORM)
-    return {
-      isLoading: false,
-      can: true,
-    }
+  const can = useMemo(() => {
+    if (!IS_PLATFORM) return true
+    if (!isLoggedIn) return false
+    if (!isPermissionsSuccess || !allPermissions) return false
 
-  return {
-    isLoading: isPermissionsLoading,
-    can: doPermissionsCheck(allPermissions, action, resource, data, _organizationSlug, _projectRef),
-  }
+    return doPermissionsCheck(
+      allPermissions,
+      action,
+      resource,
+      data,
+      _organizationSlug,
+      _projectRef
+    )
+  }, [
+    isLoggedIn,
+    isPermissionsSuccess,
+    allPermissions,
+    action,
+    resource,
+    data,
+    _organizationSlug,
+    _projectRef,
+  ])
+
+  // Derive loading/success consistently from the same branches
+  const isLoading = !IS_PLATFORM ? false : !isLoggedIn ? true : isPermissionsLoading
+
+  const isSuccess = !IS_PLATFORM ? true : !isLoggedIn ? false : isPermissionsSuccess
+
+  return { isLoading, isSuccess, can }
 }

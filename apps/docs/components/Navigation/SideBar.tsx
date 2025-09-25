@@ -28,7 +28,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
     if (foundItem) return group
   })
 
-  const currentSubSection: NavMenuSection =
+  const currentSubSection: NavMenuSection | undefined =
     currentSection !== undefined
       ? currentSection.items.find((section) => {
           if (section.items.length === 0) {
@@ -105,7 +105,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   size={14}
                   strokeWidth={2}
                 />
-                <span className="text-foreground text-sm group-hover:text-brand transition">
+                <span className="text-foreground text-sm group-hover:text-brand-link transition">
                   {group.label}
                 </span>
               </Accordion.Trigger>
@@ -113,13 +113,13 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                 {group.items.map((section: NavMenuSection) => {
                   if (section.items.length === 0) {
                     return (
-                      <Link href={section.url} key={section.name}>
+                      <Link href={section.url || '#'} key={section.name}>
                         <div
                           className={[
                             'py-1.5 px-5 rounded text-sm transition',
                             `${
                               section.url === pathname
-                                ? 'bg-background text-brand'
+                                ? 'bg-background text-brand-link'
                                 : 'text-foreground-light hover:text-foreground'
                             }`,
                           ].join(' ')}
@@ -144,20 +144,20 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                               size={14}
                               strokeWidth={2}
                             />
-                            <span className="text-foreground text-sm group-hover:text-brand transition">
+                            <span className="text-foreground text-sm group-hover:text-brand-link transition">
                               {section.name}
                             </span>
                           </Accordion.Trigger>
                           <Accordion.Content className="my-2 data-open:animate-slide-down data-closed:animate-slide-up">
                             {section.items.map((item: NavMenuSection) => (
-                              <Link key={item.name} href={item.url}>
+                              <Link key={item.name} href={item.url || '#'}>
                                 <div
                                   key={item.name}
                                   className={[
                                     'py-1.5 ml-4 px-5 rounded text-sm transition',
                                     `${
                                       item.url === pathname
-                                        ? 'bg-background text-brand'
+                                        ? 'bg-background text-brand-link'
                                         : 'text-foreground-light hover:text-foreground'
                                     }`,
                                   ].join(' ')}

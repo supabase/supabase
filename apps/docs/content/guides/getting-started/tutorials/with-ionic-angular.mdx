@@ -3,7 +3,7 @@ title: 'Build a User Management App with Ionic Angular'
 description: 'Learn how to use Supabase in your Ionic Angular App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -37,10 +37,12 @@ npm install @supabase/supabase-js
 ```
 
 And finally, we want to save the environment variables in the `src/environments/environment.ts` file.
-All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+All we need are the API URL and the key that you copied [earlier](#get-api-details).
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```ts environment.ts
+<$CodeTabs>
+
+```ts name=environment.ts
 export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
@@ -48,9 +50,13 @@ export const environment = {
 }
 ```
 
+</$CodeTabs>
+
 Now that we have the API credentials in place, let's create a `SupabaseService` with `ionic g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
-```ts src/app/supabase.service.ts
+<$CodeTabs>
+
+```ts name=src/app/supabase.service.ts
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
 import { AuthChangeEvent, createClient, Session, SupabaseClient } from '@supabase/supabase-js'
@@ -133,6 +139,8 @@ export class SupabaseService {
 }
 ```
 
+</$CodeTabs>
+
 ### Set up a login route
 
 Let's set up a route to manage logins and signups. We'll use Magic Links so users can sign in with their email without using passwords.
@@ -144,7 +152,9 @@ This guide will show the template inline, but the example app will have `templat
 
 </Admonition>
 
-```ts src/app/login/login.page.ts
+<$CodeTabs>
+
+```ts name=src/app/login/login.page.ts
 import { Component, OnInit } from '@angular/core'
 import { SupabaseService } from '../supabase.service'
 
@@ -201,12 +211,16 @@ export class LoginPage {
 }
 ```
 
+</$CodeTabs>
+
 ### Account page
 
 After a user is signed in, we can allow them to edit their profile details and manage their account.
 Create an `AccountComponent` with `ionic g page account` Ionic CLI command.
 
-```ts src/app/account.page.ts
+<$CodeTabs>
+
+```ts name=src/app/account.page.ts
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Profile, SupabaseService } from '../supabase.service'
@@ -308,11 +322,15 @@ export class AccountPage implements OnInit {
 }
 ```
 
+</$CodeTabs>
+
 ### Launch!
 
 Now that we have all the components in place, let's update `AppComponent`:
 
-```ts src/app/app.component.ts
+<$CodeTabs>
+
+```ts name=src/app/app.component.ts
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { SupabaseService } from './supabase.service'
@@ -341,9 +359,13 @@ export class AppComponent {
 }
 ```
 
+</$CodeTabs>
+
 Then update the `AppRoutingModule`
 
-```ts src/app/app-routing.module.ts"
+<$CodeTabs>
+
+```ts name=src/app/app-routing.module.ts"
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
@@ -368,6 +390,8 @@ const routes: Routes = [
 })
 export class AppRoutingModule {}
 ```
+
+</$CodeTabs>
 
 Once that's done, run this in a terminal window:
 
@@ -399,7 +423,9 @@ Ionic PWA elements is a companion package that will polyfill certain browser API
 
 With those packages installed, we can update our `main.ts` to include an additional bootstrapping call for the Ionic PWA Elements.
 
-```ts src/main.ts
+<$CodeTabs>
+
+```ts name=src/main.ts
 import { enableProdMode } from '@angular/core'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 
@@ -417,13 +443,17 @@ platformBrowserDynamic()
   .catch((err) => console.log(err))
 ```
 
+</$CodeTabs>
+
 Then create an `AvatarComponent` with this Ionic CLI command:
 
 ```bash
  ionic g component avatar --module=/src/app/account/account.module.ts --create-module
 ```
 
-```ts src/app/avatar.component.ts
+<$CodeTabs>
+
+```ts name=src/app/avatar.component.ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
@@ -534,11 +564,15 @@ export class AvatarComponent {
 }
 ```
 
+</$CodeTabs>
+
 ### Add the new widget
 
 And then, we can add the widget on top of the `AccountComponent` HTML template:
 
-```ts src/app/account.component.ts
+<$CodeTabs>
+
+```ts name=src/app/account.component.ts
 template: `
 <ion-header>
   <ion-toolbar>
@@ -556,8 +590,10 @@ template: `
 `
 ```
 
+</$CodeTabs>
+
 At this stage, you have a fully functional application!
 
 ## See also
 
-- [Authentication in Ionic Angular with Supabase](https://supabase.com/blog/authentication-in-ionic-angular)
+- [Authentication in Ionic Angular with Supabase](/blog/authentication-in-ionic-angular)

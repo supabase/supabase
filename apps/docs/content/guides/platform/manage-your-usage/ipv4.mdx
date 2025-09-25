@@ -5,7 +5,7 @@ title: 'Manage IPv4 usage'
 
 ## What you are charged for
 
-You can assign a dedicated [IPv4 address](/docs/guides/platform/ipv4-address) to a database by enabling the [IPv4 add-on](https://supabase.com/dashboard/project/_/settings/addons?panel=ipv4). You are charged for all IPv4 addresses configured across your databases.
+You can assign a dedicated [IPv4 address](/docs/guides/platform/ipv4-address) to a database by enabling the [IPv4 add-on](/dashboard/project/_/settings/addons?panel=ipv4). You are charged for all IPv4 addresses configured across your databases.
 
 <Admonition type="note">
 
@@ -34,7 +34,7 @@ Usage is shown as "IPv4 Hours" on your invoice.
 
 ## Pricing
 
-$0.0055 per hour ($4 per month).
+<Price price="0.0055" /> per hour (<Price price="4" /> per month).
 
 ## Billing examples
 
@@ -42,56 +42,56 @@ $0.0055 per hour ($4 per month).
 
 The project has the IPv4 add-on enabled throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs   |
-| ----------------------------- | ----- | ------- |
-| Pro Plan                      | -     | $25     |
-| Compute Hours Micro Project 1 | 744   | $10     |
-| IPv4 Hours                    | 744   | $4      |
-| **Subtotal**                  |       | **$39** |
-| Compute Credits               |       | -$10    |
-| **Total**                     |       | **$29** |
+| Line Item                     | Hours | Costs                    |
+| ----------------------------- | ----- | ------------------------ |
+| Pro Plan                      | -     | <Price price="25" />     |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />     |
+| IPv4 Hours                    | 744   | <Price price="4" />      |
+| **Subtotal**                  |       | **<Price price="39" />** |
+| Compute Credits               |       | -<Price price="10" />    |
+| **Total**                     |       | **<Price price="29" />** |
 
 ### Multiple projects
 
 All projects have the IPv4 add-on enabled throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs   |
-| ----------------------------- | ----- | ------- |
-| Pro Plan                      | -     | $25     |
-|                               |       |         |
-| Compute Hours Micro Project 1 | 744   | $10     |
-| IPv4 Hours Project 1          | 744   | $4      |
-|                               |       |         |
-| Compute Hours Micro Project 2 | 744   | $10     |
-| IPv4 Hours Project 2          | 744   | $4      |
-|                               |       |         |
-| Compute Hours Micro Project 3 | 744   | $10     |
-| IPv4 Hours Project 3          | 744   | $4      |
-|                               |       |         |
-| **Subtotal**                  |       | **$67** |
-| Compute Credits               |       | -$10    |
-| **Total**                     |       | **$57** |
+| Line Item                     | Hours | Costs                    |
+| ----------------------------- | ----- | ------------------------ |
+| Pro Plan                      | -     | <Price price="25" />     |
+|                               |       |                          |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />     |
+| IPv4 Hours Project 1          | 744   | <Price price="4" />      |
+|                               |       |                          |
+| Compute Hours Micro Project 2 | 744   | <Price price="10" />     |
+| IPv4 Hours Project 2          | 744   | <Price price="4" />      |
+|                               |       |                          |
+| Compute Hours Micro Project 3 | 744   | <Price price="10" />     |
+| IPv4 Hours Project 3          | 744   | <Price price="4" />      |
+|                               |       |                          |
+| **Subtotal**                  |       | **<Price price="67" />** |
+| Compute Credits               |       | -<Price price="10" />    |
+| **Total**                     |       | **<Price price="57" />** |
 
 ### One project with Read Replicas
 
 The project has two Read Replicas and the IPv4 add-on enabled throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs   |
-| ----------------------------- | ----- | ------- |
-| Pro Plan                      | -     | $25     |
-|                               |       |         |
-| Compute Hours Small Project 1 | 744   | $15     |
-| IPv4 Hours Project 1          | 744   | $4      |
-|                               |       |         |
-| Compute Hours Small Replica 1 | 744   | $15     |
-| IPv4 Hours Replica 1          | 744   | $4      |
-|                               |       |         |
-| Compute Hours Small Replica 2 | 744   | $15     |
-| IPv4 Hours Replica 2          | 744   | $4      |
-|                               |       |         |
-| **Subtotal**                  |       | **$82** |
-| Compute Credits               |       | -$10    |
-| **Total**                     |       | **$72** |
+| Line Item                     | Hours | Costs                    |
+| ----------------------------- | ----- | ------------------------ |
+| Pro Plan                      | -     | <Price price="25" />     |
+|                               |       |                          |
+| Compute Hours Small Project 1 | 744   | <Price price="15" />     |
+| IPv4 Hours Project 1          | 744   | <Price price="4" />      |
+|                               |       |                          |
+| Compute Hours Small Replica 1 | 744   | <Price price="15" />     |
+| IPv4 Hours Replica 1          | 744   | <Price price="4" />      |
+|                               |       |                          |
+| Compute Hours Small Replica 2 | 744   | <Price price="15" />     |
+| IPv4 Hours Replica 2          | 744   | <Price price="4" />      |
+|                               |       |                          |
+| **Subtotal**                  |       | **<Price price="82" />** |
+| Compute Credits               |       | -<Price price="10" />    |
+| **Total**                     |       | **<Price price="72" />** |
 
 ## Optimize usage
 

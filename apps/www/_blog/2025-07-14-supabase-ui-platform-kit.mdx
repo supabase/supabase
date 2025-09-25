@@ -1,0 +1,121 @@
+---
+title: 'Supabase UI: Platform Kit'
+description: 'We are launching new components in the Supabase UI Library that makes it incredibly easy to build platforms on top of Supabase.'
+categories:
+  - product
+  - launch-week
+tags:
+  - launch-week
+  - studio
+date: '2025-07-14:00:00'
+toc_depth: 3
+author: saxon_fletcher
+image: launch-week-15/day-1-ui-platform-kit/og.jpg
+thumb: launch-week-15/day-1-ui-platform-kit/thumb.png
+launchweek: '15'
+---
+
+Today we’re releasing our Platform Kit, new components in the Supabase UI Library that makes it incredibly easy to build platforms on top of Supabase.
+
+## What’s Supabase UI?
+
+Earlier this year we released [Supabase UI Library](https://supabase.com/blog/supabase-ui-library). This was designed mostly for building _apps_. Since we released it, we have had a strong pull - not from _app_ builders, but from _platform_ builders, such as [AI Builders](https://supabase.com/solutions/ai-builders).
+
+## What’s the Platform Kit?
+
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/platform-kit/platform-kit.mp4"
+    title="Supabase UI: Platform Kit"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+    autoplay
+    muted
+    loop
+    playsInline
+  />
+</div>
+
+You can think of the Platform Kit as a bunch of UI components that sit on top of our [Management API](/docs/reference/api/introduction). Who is it for? Well, anyone who is providing Supabase projects to their users.
+
+It includes the following components:
+
+### Database components
+
+Display all the data in your database:
+
+<Img
+  alt="Database components"
+  src={{
+    light: '/images/blog/launch-week-15/day-1-ui-platform-kit/database-components.png',
+    dark: '/images/blog/launch-week-15/day-1-ui-platform-kit/database-components.png',
+  }}
+/>
+
+### Storage components
+
+<Img
+  alt="Storage components"
+  src={{
+    light: '/images/blog/launch-week-15/day-1-ui-platform-kit/storage-components.png',
+    dark: '/images/blog/launch-week-15/day-1-ui-platform-kit/storage-components.png',
+  }}
+/>
+
+### Authentication components
+
+<Img
+  alt="Auth settings"
+  src={{
+    light: '/images/blog/launch-week-15/day-1-ui-platform-kit/auth-settings.png',
+    dark: '/images/blog/launch-week-15/day-1-ui-platform-kit/auth-settings.png',
+  }}
+/>
+
+<Img
+  alt="Auth users"
+  src={{
+    light: '/images/blog/launch-week-15/day-1-ui-platform-kit/auth-users.png',
+    dark: '/images/blog/launch-week-15/day-1-ui-platform-kit/auth-users.png',
+  }}
+/>
+
+### AI components
+
+<Img
+  alt="AI components"
+  src={{
+    light: '/images/blog/launch-week-15/day-1-ui-platform-kit/ai-components.png',
+    dark: '/images/blog/launch-week-15/day-1-ui-platform-kit/ai-components.png',
+  }}
+/>
+
+## How does Supabase UI work?
+
+The library is 100% shadcn/ui compatible by leveraging the [component registry](https://x.com/shadcn/status/1829646556318089509) feature. Components are styled with shadcn/ui and Tailwind CSS and are completely customizable. Read the [original launch post](https://supabase.com/blog/supabase-ui-library) for more details, or check out the docs: [ui.supabase.com](https://supabase.com/ui)
+
+## Supabase as a Service
+
+While we started Supabase as Service directly for developers, more and more companies are building on top of Supabase to provide critical infrastructure for their own users. Today, [30% of Supabase sign ups](https://x.com/kiwicopple/status/1894251335224320000) can be attributed to some sort of AI Builder:
+
+<Img
+  alt="Supabase signups"
+  src={{
+    light: '/images/blog/launch-week-15/day-1-ui-platform-kit/supabase-signups.png',
+    dark: '/images/blog/launch-week-15/day-1-ui-platform-kit/supabase-signups.png',
+  }}
+/>
+
+We’re in the process of adding more features so that you can use Supabase as a “Platform as a Service” for many other tools:
+
+> **\*Platform as a service** (**PaaS**) is a cloud computing model where users run a modular bundle of a computing platform and applications, without the complexity of building and maintaining the infrastructure associated with developing and launching applications.
+<br/><br/>Source: [Wikipedia](https://en.wikipedia.org/wiki/Platform_as_a_service)
+
+If you’re building your own plaform, reach out to the team: [supabase.com/solutions/ai-builders](https://supabase.com/solutions/ai-builders)
+
+## Getting started with Platform UI
+
+Head on over to the docs to get started: [ui.supabase.com](https://supabase.com/ui/docs/platform/platform-kit)
+
+You can also check out the [repo](https://github.com/supabase/supabase/tree/master/apps/ui-library/registry/default/platform) to download and run the app yourself to see how it works, or just pull key files and components to use in your own implementation. The code is yours to use and improve however you see fit.

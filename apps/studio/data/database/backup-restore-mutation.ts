@@ -11,7 +11,7 @@ export type BackupRestoreVariables = {
 }
 
 // [Joshen] Shift to backups RQ query once created
-export type Backup = components['schemas']['Backup']
+export type Backup = components['schemas']['BackupsResponse']['backups'][number]
 
 export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables) {
   if (backup.isPhysicalBackup) {

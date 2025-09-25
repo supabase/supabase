@@ -1,7 +1,7 @@
 ---
 # Specify the following for Cursor rules
 description: Guidelines for writing Next.js apps with Supabase Auth
-globs: "**/*.ts, **/*.tsx, **/*.js, **/*.jsx"
+alwaysApply: false
 ---
 
 # Bootstrap Next.js app with Supabase Auth
@@ -77,7 +77,7 @@ import { createBrowserClient } from '@supabase/ssr'
 export function createClient() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
   )
 }
 ```
@@ -93,7 +93,7 @@ export async function createClient() {
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -129,7 +129,7 @@ export async function middleware(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {

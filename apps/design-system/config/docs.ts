@@ -38,13 +38,13 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Color usage',
-          href: '/docs/color-usage',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
           items: [],
         },
         {
-          title: 'Tailwind classes',
-          href: '/docs/tailwind-classes',
+          title: 'Color Usage',
+          href: '/docs/color-usage',
           items: [],
         },
         {
@@ -115,6 +115,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Multi Select',
           href: '/docs/fragments/multi-select',
+          items: [],
+        },
+        {
+          title: 'Filter Bar',
+          href: '/docs/fragments/filter-bar',
           items: [],
         },
         {
@@ -382,11 +387,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Textarea',
           href: '/docs/components/textarea',
-          items: [],
-        },
-        {
-          title: 'Toast',
-          href: '/docs/components/toast',
           items: [],
         },
         {

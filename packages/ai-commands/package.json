@@ -14,16 +14,18 @@
   "dependencies": {
     "@serafin/schema-builder": "^0.18.5",
     "@supabase/supabase-js": "catalog:",
-    "ai": "^3.4.33",
+    "ai": "^5.0.0",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
-    "openai": "^4.26.1"
+    "openai": "^4.75.1",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@ai-sdk/openai": "^0.0.72",
+    "@ai-sdk/openai": "^2.0.0",
     "@types/common-tags": "^1.8.4",
+    "@types/mdast": "^4.0.0",
     "@types/node": "catalog:",
     "api-types": "workspace:*",
     "chalk": "^5.3.0",
@@ -32,7 +34,8 @@
     "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.0",
     "tsconfig": "workspace:*",
-    "typescript": "~5.5.0",
-    "vitest": "^3.0.0"
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "^3.0.5"
   }
 }

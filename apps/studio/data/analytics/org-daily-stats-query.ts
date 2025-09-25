@@ -19,6 +19,7 @@ export enum EgressType {
 // [Joshen] Get this from common package instead of API and dashboard having one copy each
 export enum PricingMetric {
   EGRESS = 'EGRESS',
+  CACHED_EGRESS = 'CACHED_EGRESS',
   DATABASE_SIZE = 'DATABASE_SIZE',
   STORAGE_SIZE = 'STORAGE_SIZE',
   DISK_SIZE_GB_HOURS_GP3 = 'DISK_SIZE_GB_HOURS_GP3',
@@ -56,12 +57,20 @@ export enum ComputeUsageMetric {
   COMPUTE_HOURS_8XL = 'COMPUTE_HOURS_8XL',
   COMPUTE_HOURS_12XL = 'COMPUTE_HOURS_12XL',
   COMPUTE_HOURS_16XL = 'COMPUTE_HOURS_16XL',
+  COMPUTE_HOURS_24XL = 'COMPUTE_HOURS_24XL',
+  COMPUTE_HOURS_24XL_OPTIMIZED_CPU = 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU',
+  COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY = 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY',
+  COMPUTE_HOURS_24XL_HIGH_MEMORY = 'COMPUTE_HOURS_24XL_HIGH_MEMORY',
+  COMPUTE_HOURS_48XL = 'COMPUTE_HOURS_48XL',
+  COMPUTE_HOURS_48XL_OPTIMIZED_CPU = 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU',
+  COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY = 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY',
+  COMPUTE_HOURS_48XL_HIGH_MEMORY = 'COMPUTE_HOURS_48XL_HIGH_MEMORY',
 }
 
 export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) => {
   switch (computeUsageMetric) {
     case 'COMPUTE_HOURS_BRANCH':
-      return 'Branches'
+      return 'Branching'
     case 'COMPUTE_HOURS_XS':
       return 'Micro'
     case 'COMPUTE_HOURS_SM':
@@ -82,6 +91,22 @@ export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) 
       return '12XL'
     case 'COMPUTE_HOURS_16XL':
       return '16XL'
+    case 'COMPUTE_HOURS_24XL':
+      return '24XL'
+    case 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU':
+      return '24XL - Optimized CPU'
+    case 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY':
+      return '24XL - Optimized Memory'
+    case 'COMPUTE_HOURS_24XL_HIGH_MEMORY':
+      return '24XL - High Memory'
+    case 'COMPUTE_HOURS_48XL':
+      return '48XL'
+    case 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU':
+      return '48XL - Optimized CPU'
+    case 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY':
+      return '48XL - Optimized Memory'
+    case 'COMPUTE_HOURS_48XL_HIGH_MEMORY':
+      return '48XL - High Memory'
   }
 }
 

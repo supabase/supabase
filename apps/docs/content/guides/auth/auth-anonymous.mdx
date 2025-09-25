@@ -4,7 +4,7 @@ title: 'Anonymous Sign-Ins'
 subtitle: 'Create and use anonymous users to authenticate with Supabase'
 ---
 
-[Enable Anonymous Sign-Ins](/dashboard/project/_/settings/auth) to build apps which provide users an authenticated experience without requiring users to enter an email address, password, use an OAuth provider or provide any other PII (Personally Identifiable Information). Later, when ready, the user can link an authentication method to their account.
+[Enable Anonymous Sign-Ins](/dashboard/project/_/auth/providers) to build apps which provide users an authenticated experience without requiring users to enter an email address, password, use an OAuth provider or provide any other PII (Personally Identifiable Information). Later, when ready, the user can link an authentication method to their account.
 
 <Admonition type="note" label="Anonymous user vs the anon key">
 
@@ -56,10 +56,15 @@ For self-hosting, you can update your project configuration using the files and 
 Call the [`signInAnonymously()`](/docs/reference/javascript/auth-signinanonymously) method:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 const { data, error } = await supabase.auth.signInAnonymously()
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Flutter">
 
 Call the [`signInAnonymously()`](/docs/reference/dart/auth-signinanonymously) method:
@@ -69,6 +74,8 @@ await supabase.auth.signInAnonymously();
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 Call the [`signInAnonymously()`](/docs/reference/swift/auth-signinanonymously) method:
@@ -78,6 +85,8 @@ let session = try await supabase.auth.signInAnonymously()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) method:
@@ -87,6 +96,8 @@ supabase.auth.signInAnonymously()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 Call the [`sign_in_anonymously()`](/docs/reference/python/auth-signinanonymously) method:
@@ -96,11 +107,12 @@ response = supabase.auth.sign_in_anonymously()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Convert an anonymous user to a permanent user
 
-Converting an anonymous user to a permanent user requires [linking an identity](/docs/guides/auth/auth-identity-linking#manual-linking-beta) to the user. This requires you to [enable manual linking](/dashboard/project/_/settings/auth) in your Supabase project.
+Converting an anonymous user to a permanent user requires [linking an identity](/docs/guides/auth/auth-identity-linking#manual-linking-beta) to the user. This requires you to [enable manual linking](/dashboard/project/_/auth/providers) in your Supabase project.
 
 ### Link an email / phone identity
 
@@ -116,16 +128,25 @@ Converting an anonymous user to a permanent user requires [linking an identity](
 You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
 ```js
-const { data, error } = await supabase.auth.updateUser({ email: 'valid.email@supabase.io' })
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
+const { data: updateEmailData, error: updateEmailError } = await supabase.auth.updateUser({
+  email: 'valid.email@supabase.io',
+})
 
 // verify the user's email by clicking on the email change link
 // or entering the 6-digit OTP sent to the email address
 
 // once the user has been verified, update the password
-const { data, error } = await supabase.auth.updateUser({ password: 'password' })
+const { data: updatePasswordData, error: updatePasswordError } = await supabase.auth.updateUser({
+  password: 'password',
+})
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Flutter">
 
 You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
@@ -135,6 +156,8 @@ await supabase.auth.updateUser(UserAttributes(email: 'valid.email@supabase.io'))
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
@@ -146,6 +169,8 @@ try await supabase.auth.updateUser(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 You can use the [`updateUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
@@ -157,6 +182,8 @@ supabase.auth.updateUser {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 You can use the [`update_user()`](/docs/reference/python/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
@@ -176,6 +203,7 @@ response = supabase.auth.update_user({
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Link an OAuth identity
@@ -192,10 +220,15 @@ response = supabase.auth.update_user({
 You can use the [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Flutter">
 
 You can use the [`linkIdentity()`](/docs/reference/dart/auth-linkidentity) method to link an OAuth identity to the anonymous user.
@@ -205,6 +238,8 @@ await supabase.auth.linkIdentity(OAuthProvider.google);
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 You can use the [`linkIdentity()`](/docs/reference/swift/auth-linkidentity) method to link an OAuth identity to the anonymous user.
@@ -214,6 +249,8 @@ try await supabase.auth.linkIdentity(provider: .google)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an OAuth identity to the anonymous user.
@@ -223,6 +260,8 @@ supabase.auth.linkIdentity(Google)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 You can use the [`link_identity()`](/docs/reference/python/auth-linkidentity) method to link an OAuth identity to the anonymous user.
@@ -232,6 +271,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Access control
@@ -253,6 +293,7 @@ using ( true );
 <Admonition type="note" label="Use restrictive policies">
 
 RLS policies are permissive by default, which means that they are combined using an "OR" operator when multiple policies are applied. It is important to construct restrictive policies to ensure that the checks for an anonymous user are always enforced when combined with other policies.
+Be aware that a single 'restrictive' RLS policy alone will fail unless combined with another policy that returns true, ensuring the combined condition is met.
 
 </Admonition>
 

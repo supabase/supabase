@@ -1,8 +1,8 @@
-import { useRouter } from 'next/router'
-import { MouseEvent, useState } from 'react'
+import Link from 'next/link'
+import { useState } from 'react'
 
-import { components } from 'api-types'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -11,7 +11,6 @@ import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -27,17 +26,14 @@ interface ComputeBadgeWrapperProps {
     ref?: string
     organization_slug?: string
     cloud_provider?: string
-    infra_compute_size?: components['schemas']['DbInstanceSize']
+    infra_compute_size?: InfraInstanceSize
   }
 }
 
 export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
-  const router = useRouter()
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
-
-  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   // returns hardcoded values for infra
   const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
@@ -64,19 +60,6 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
     (addon) => addon.name === 'Compute Instance'
   )?.variants
 
-  const navigateToAddons = (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
-    // These are required as the button is inside an a tag
-    // side note: not the best idea to nest clickables 🥲
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (diskAndComputeFormEnabled) {
-      router.push(`/project/${project?.ref}/settings/compute-and-disk`)
-    } else {
-      router.push(`/project/${project?.ref}/settings/addons?panel=computeInstance`)
-    }
-  }
-
   const highestComputeAvailable = availableCompute?.[availableCompute.length - 1].identifier
 
   const isHighestCompute =
@@ -95,77 +78,82 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   if (!project?.infra_compute_size) return null
 
   return (
-    <>
-      <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
-        <HoverCardTrigger className="group" asChild>
-          <button onClick={navigateToAddons} type="button" role="button">
-            <ComputeBadge infraComputeSize={project.infra_compute_size} />
-          </button>
-        </HoverCardTrigger>
-        <HoverCardContent side="bottom" align="start" className="p-0 overflow-hidden w-96">
-          <div className="p-2 px-5 text-xs text-foreground-lighter">Compute size</div>
-          <Separator />
-          <div className="p-3 px-5 flex flex-row gap-4">
-            <div>
-              <ComputeBadge infraComputeSize={project?.infra_compute_size} />
-            </div>
-            <div className="flex flex-col gap-4">
-              {isLoading ? (
-                <>
-                  <div className="flex flex-col gap-1">
-                    <ShimmeringLoader className="h-[20px] py-0 w-32" />
-                    <ShimmeringLoader className="h-[20px] py-0 w-32" />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-col gap-1">
-                    {meta !== undefined ? (
-                      <>
-                        <Row
-                          label="CPU"
-                          stat={`${meta.cpu_cores ?? '?'}-core ${cpuArchitecture} ${meta.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
-                        />
-                        <Row label="Memory" stat={`${meta.memory_gb ?? '-'} GB`} />
-                      </>
-                    ) : (
-                      <>
-                        {/* meta is only undefined for nano sized compute */}
-                        <Row label="CPU" stat="Shared" />
-                        <Row label="Memory" stat="Up to 0.5 GB" />
-                      </>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
+    <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
+      <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
+        <div>
+          <ComputeBadge infraComputeSize={project.infra_compute_size} />
+        </div>
+      </HoverCardTrigger>
+      <HoverCardContent
+        side="bottom"
+        align="start"
+        className="p-0 overflow-hidden w-96"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-2 px-5 text-xs text-foreground-lighter">Compute size</div>
+        <Separator />
+        <div className="p-3 px-5 flex flex-row gap-4">
+          <div>
+            <ComputeBadge infraComputeSize={project?.infra_compute_size} />
           </div>
-          {(!isHighestCompute || isEligibleForFreeUpgrade) && (
-            <>
-              <Separator />
-              <div className="p-3 px-5 text-sm flex flex-col gap-2 bg-studio">
-                <div className="flex flex-col gap-0">
-                  <p className="text-foreground">
-                    {isEligibleForFreeUpgrade
-                      ? 'Free upgrade to Micro available'
-                      : 'Unlock more compute'}
-                  </p>
-                  <p className="text-foreground-light">
-                    {isEligibleForFreeUpgrade
-                      ? 'Paid plans include a free upgrade to Micro compute.'
-                      : 'Scale your project up to 64 cores and 256 GB RAM.'}
-                  </p>
+          <div className="flex flex-col gap-4">
+            {isLoading ? (
+              <>
+                <div className="flex flex-col gap-1">
+                  <ShimmeringLoader className="h-[20px] py-0 w-32" />
+                  <ShimmeringLoader className="h-[20px] py-0 w-32" />
                 </div>
-                <div>
-                  <Button type="default" onClick={navigateToAddons} htmlType="button" role="button">
-                    Upgrade compute
-                  </Button>
+              </>
+            ) : (
+              <>
+                <div className="flex flex-col gap-1">
+                  {meta !== undefined ? (
+                    <>
+                      <Row
+                        label="CPU"
+                        stat={`${meta.cpu_cores ?? '?'}-core ${cpuArchitecture} ${meta.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
+                      />
+                      <Row label="Memory" stat={`${meta.memory_gb ?? '-'} GB`} />
+                    </>
+                  ) : (
+                    <>
+                      {/* meta is only undefined for nano sized compute */}
+                      <Row label="CPU" stat="Shared" />
+                      <Row label="Memory" stat="Up to 0.5 GB" />
+                    </>
+                  )}
                 </div>
+              </>
+            )}
+          </div>
+        </div>
+        {(!isHighestCompute || isEligibleForFreeUpgrade) && (
+          <>
+            <Separator />
+            <div className="p-3 px-5 text-sm flex flex-col gap-2 bg-studio">
+              <div className="flex flex-col gap-0">
+                <p className="text-foreground">
+                  {isEligibleForFreeUpgrade
+                    ? 'Free upgrade to Micro available'
+                    : 'Unlock more compute'}
+                </p>
+                <p className="text-foreground-light">
+                  {isEligibleForFreeUpgrade
+                    ? 'Paid plans include a free upgrade to Micro compute.'
+                    : 'Scale your project up to 64 cores and 256 GB RAM.'}
+                </p>
               </div>
-            </>
-          )}
-        </HoverCardContent>
-      </HoverCard>
-    </>
+              <div>
+                <Button asChild type="default" htmlType="button" role="button">
+                  <Link href={`/project/${project?.ref}/settings/compute-and-disk`}>
+                    Upgrade compute
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </HoverCardContent>
+    </HoverCard>
   )
 }

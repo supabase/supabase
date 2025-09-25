@@ -35,9 +35,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertTriangle, XIcon } from 'lucide-react'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
@@ -76,7 +76,10 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
 
-  const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
+  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'field.jwt_secret'
+  )
 
   const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
     LOCAL_STORAGE_KEYS.GRAPHIQL_RLS_BYPASS_WARNING,

@@ -10,7 +10,7 @@ interface ProductMenuProps {
 
 const ProductMenu = ({ page, menu }: ProductMenuProps) => {
   return (
-    <div className="flex flex-col space-y-8 overflow-y-auto">
+    <div className="flex flex-col space-y-8">
       <Menu type="pills">
         {menu.map((group, idx) => (
           <div key={group.key || group.title}>
@@ -28,7 +28,9 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                 />
                 <div>
                   {group.items.map((item) => {
-                    const isActive = !!item.pages ? item.pages.includes(page) : page === item.key
+                    const isActive = !!item.pages
+                      ? item.pages.includes(page ?? '')
+                      : page === item.key
 
                     return (
                       <ProductMenuItem

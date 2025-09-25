@@ -107,7 +107,7 @@ const BreadcrumbsInternal = ({
                   <DrawerTrigger aria-label="Toggle Menu">
                     <BreadcrumbEllipsis className="h-4 w-4" />
                   </DrawerTrigger>
-                  <DrawerContent showHandle={false}>
+                  <DrawerContent>
                     <div className="grid gap-1 px-4">
                       {breadcrumbs.slice(1, -2).map((crumb, index) =>
                         crumb.url ? (
@@ -181,7 +181,7 @@ function useBreadcrumbs() {
   return findMenuItemByUrl(menu, pathname, [])
 }
 
-function findMenuItemByUrl(menu, targetUrl, parents = []) {
+function findMenuItemByUrl(menu: any, targetUrl: string, parents: any[] = []) {
   // If the menu has items, recursively search through them
   if (menu.items) {
     for (let item of menu.items) {

@@ -96,7 +96,7 @@ WHERE
 
 export type ForeignKeyConstraintsVariables = GetForeignKeyConstraintsVariables & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getForeignKeyConstraints(

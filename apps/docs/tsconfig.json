@@ -15,7 +15,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -25,7 +25,7 @@
         "name": "next"
       }
     ],
-    "strictNullChecks": false
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",

@@ -1,39 +1,46 @@
-import { ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import AuthLayout from './AuthLayout'
 
-interface AuthProvidersLayoutProps {
-  children: ReactNode
-}
-
-export const AuthProvidersLayout = ({ children }: AuthProvidersLayoutProps) => {
+export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
+  const { authenticationSignInProviders, authenticationThirdPartyAuth } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+    'authentication:third_party_auth',
+  ])
 
   const navItems = [
     {
       label: 'Supabase Auth',
       href: `/project/${ref}/auth/providers`,
     },
-    {
-      label: 'Third Party Auth',
-      href: `/project/${ref}/auth/third-party`,
-    },
+    ...(authenticationThirdPartyAuth
+      ? [
+          {
+            label: 'Third Party Auth',
+            href: `/project/${ref}/auth/third-party`,
+          },
+        ]
+      : []),
   ]
 
   return (
-    <DefaultLayout>
-      <AuthLayout>
+    <AuthLayout>
+      {authenticationSignInProviders ? (
         <PageLayout
-          title="Sign In / Up"
+          title="Sign In / Providers"
           subtitle="Configure authentication providers and login methods for your users"
           navigationItems={navItems}
         >
           {children}
         </PageLayout>
-      </AuthLayout>
-    </DefaultLayout>
+      ) : (
+        <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
+      )}
+    </AuthLayout>
   )
 }

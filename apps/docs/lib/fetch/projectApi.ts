@@ -15,7 +15,7 @@ async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: Abort
     throw Error('projectRef is required')
   }
 
-  const { data, error } = await get('/platform/props/project/{ref}/api', {
+  const { data, error } = await get('/platform/projects/{ref}/settings', {
     params: {
       path: { ref: projectRef },
     },

@@ -83,7 +83,7 @@ export const FilterPopover = <T extends Record<string, any>>({
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className={cn('p-0 w-44', className)} align="start">
+      <PopoverContent_Shadcn_ className={cn('p-0 w-44', className)} align="start" portal={true}>
         <div className="border-b border-overlay bg-surface-200 rounded-t pb-1 px-3">
           <span className="text-xs text-foreground-light">
             {title ?? `Select ${name.toLowerCase()}`}

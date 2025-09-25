@@ -4,16 +4,20 @@ on:
   pull_request:
     branches:
       - 'master'
+  merge_group:
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   typecheck:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on: [larger-runner-4cpu]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout

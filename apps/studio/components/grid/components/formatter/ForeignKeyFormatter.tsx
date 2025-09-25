@@ -3,30 +3,28 @@ import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
 import { ReferenceRecordPeek } from './ReferenceRecordPeek'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
-  tableId?: string
+  tableId?: number
 }
 
 export const ForeignKeyFormatter = (props: Props) => {
-  const { project } = useProjectContext()
-
   const { tableId, row, column } = props
-  const id = tableId ? Number(tableId) : undefined
+  const { data: project } = useSelectedProjectQuery()
 
   const { data } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    id,
+    id: tableId,
   })
   const foreignKeyColumn = data?.columns.find((x) => x.name === column.key)
   const selectedTable = isTableLike(data) ? data : undefined

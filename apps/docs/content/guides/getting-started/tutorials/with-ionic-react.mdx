@@ -3,7 +3,7 @@ title: 'Build a User Management App with Ionic React'
 description: 'Learn how to use Supabase in your Ionic React App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -37,30 +37,40 @@ npm install @supabase/supabase-js
 ```
 
 And finally we want to save the environment variables in a `.env`.
-All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+All we need are the API URL and the key that you copied [earlier](#get-api-details).
 
-```bash .env
-REACT_APP_SUPABASE_URL=YOUR_SUPABASE_URL
-REACT_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+<$CodeTabs>
+
+```bash name=.env
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
+
+</$CodeTabs>
 
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js src/supabaseClient.js
+<$CodeTabs>
+
+```js name=src/supabaseClient.ts
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || ''
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabasePublishableKey)
 ```
+
+</$CodeTabs>
 
 ### Set up a login route
 
 Let's set up a React component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```jsx /src/pages/Login.tsx
+<$CodeTabs>
+
+```jsx name=/src/pages/Login.tsx
 import { useState } from 'react';
 import {
   IonButton,
@@ -76,7 +86,8 @@ import {
   useIonToast,
   useIonLoading,
 } from '@ionic/react';
-import { supabase } from '../supabaseClient';
+
+import {supabase} from '../supabaseClient'
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -88,7 +99,9 @@ export function LoginPage() {
     e.preventDefault();
     await showLoading();
     try {
-      await supabase.auth.signIn({ email });
+      await supabase.auth.signInWithOtp({
+        "email": email
+      });
       await showToast({ message: 'Check your email for the login link!' });
     } catch (e: any) {
       await showToast({ message: e.error_description || e.message , duration: 5000});
@@ -133,13 +146,17 @@ export function LoginPage() {
 }
 ```
 
+</$CodeTabs>
+
 ### Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 
 Let's create a new component for that called `Account.tsx`.
 
-```jsx src/pages/Account.tsx
+<$CodeTabs>
+
+```jsx name=src/pages/Account.tsx
 import {
   IonButton,
   IonContent,
@@ -156,17 +173,29 @@ import {
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
+import { Session } from '@supabase/supabase-js';
 
 export function AccountPage() {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
-  const [session] = useState(() => supabase.auth.session());
+  const [session, setSession] = useState<Session | null>(null)
   const router = useIonRouter();
   const [profile, setProfile] = useState({
     username: '',
     website: '',
     avatar_url: '',
   });
+
+  useEffect(() => {
+    const getSession = async () => {
+      setSession(await supabase.auth.getSession().then((res) => res.data.session))
+    }
+    getSession()
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [])
+
   useEffect(() => {
     getProfile();
   }, [session]);
@@ -174,11 +203,11 @@ export function AccountPage() {
     console.log('get');
     await showLoading();
     try {
-      const user = supabase.auth.user();
+      const user = await supabase.auth.getUser();
       const { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
-        .eq('id', user!.id)
+        .eq('id', user!.data.user?.id)
         .single();
 
       if (error && status !== 406) {
@@ -209,18 +238,16 @@ export function AccountPage() {
     await showLoading();
 
     try {
-      const user = supabase.auth.user();
+      const user = await supabase.auth.getUser();
 
       const updates = {
-        id: user!.id,
+        id: user!.data.user?.id,
         ...profile,
         avatar_url: avatar_url,
         updated_at: new Date(),
       };
 
-      const { error } = await supabase.from('profiles').upsert(updates, {
-        returning: 'minimal', // Don't return the value after inserting
-      });
+      const { error } = await supabase.from('profiles').upsert(updates);
 
       if (error) {
         throw error;
@@ -289,11 +316,15 @@ export function AccountPage() {
 }
 ```
 
+</$CodeTabs>
+
 ### Launch!
 
 Now that we have all the components in place, let's update `App.tsx`:
 
-```jsx src/App.tsx
+<$CodeTabs>
+
+```jsx name=src/App.tsx
 import { Redirect, Route } from 'react-router-dom'
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
@@ -311,9 +342,12 @@ import { Session } from '@supabase/supabase-js'
 setupIonicReact()
 
 const App: React.FC = () => {
-  const [session, setSession] = useState < Session > null
+  const [session, setSession] = useState<Session | null>(null)
   useEffect(() => {
-    setSession(supabase.auth.session())
+    const getSession = async () => {
+      setSession(await supabase.auth.getSession().then((res) => res.data.session))
+    }
+    getSession()
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
@@ -340,6 +374,8 @@ const App: React.FC = () => {
 
 export default App
 ```
+
+</$CodeTabs>
 
 Once that's done, run this in a terminal window:
 
@@ -369,7 +405,9 @@ Ionic PWA elements is a companion package that will polyfill certain browser API
 
 With those packages installed we can update our `index.tsx` to include an additional bootstrapping call for the Ionic PWA Elements.
 
-```ts src/index.tsx
+<$CodeTabs>
+
+```ts name=src/index.tsx
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
@@ -390,9 +428,13 @@ serviceWorkerRegistration.unregister()
 reportWebVitals()
 ```
 
+</$CodeTabs>
+
 Then create an `AvatarComponent`.
 
-```jsx src/components/Avatar.tsx
+<$CodeTabs>
+
+```jsx name=src/components/Avatar.tsx
 import { IonIcon } from '@ionic/react';
 import { person } from 'ionicons/icons';
 import { Camera, CameraResultType } from '@capacitor/camera';
@@ -471,11 +513,15 @@ export function Avatar({
 }
 ```
 
+</$CodeTabs>
+
 ### Add the new widget
 
 And then we can add the widget to the Account page:
 
-```jsx src/pages/Account.tsx
+<$CodeTabs>
+
+```jsx name=src/pages/Account.tsx
 // Import the new component
 
 import { Avatar } from '../components/Avatar';
@@ -492,5 +538,7 @@ return (
     <IonContent>
       <Avatar url={profile.avatar_url} onUpload={updateProfile}></Avatar>
 ```
+
+</$CodeTabs>
 
 At this stage you have a fully functional application!

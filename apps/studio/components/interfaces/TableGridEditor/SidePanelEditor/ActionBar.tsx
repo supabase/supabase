@@ -12,6 +12,7 @@ interface ActionBarProps {
   closePanel: () => void
   formId?: string
 }
+
 const ActionBar = ({
   loading = false,
   disableApply = false,

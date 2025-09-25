@@ -18,7 +18,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-     ```bash Terminal
+     ```bash name=Terminal
      rails new blog -d=postgresql
      ```
 
@@ -31,19 +31,21 @@ hideToc: true
 
     Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
 
-    When your project is up and running, navigate to the [database settings](https://supabase.com/dashboard/project/_/settings/database) to find the URI connection string. Make sure **Use connection pooling** is checked and **Session mode** is selected. Then copy the URI. Replace the password placeholder with your saved database password.
+    When your project is up and running, navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true).
 
-    <Admonition type="tip">
+    Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
 
-    If your network supports IPv6 connections, you can also use the direct connection string. Uncheck **Use connection pooling** and copy the new URI.
+      <Admonition type="note">
 
-    </Admonition>
+        If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+
+      </Admonition>
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-    ```bash Terminal
+    ```bash name=Terminal
     export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
     ```
 
@@ -62,7 +64,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-    ```bash Terminal
+    ```bash name=Terminal
     bin/rails generate model Article title:string body:text
     bin/rails db:migrate
     ```
@@ -80,11 +82,11 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       bin/rails console
       ```
 
-      ```rb irb
+      ```rb name=irb
       article = Article.new(title: "Hello Rails", body: "I am on Rails!")
       article.save # Saves the entry to the database
 
@@ -104,7 +106,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       bin/rails server
       ```
 

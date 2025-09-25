@@ -3,7 +3,7 @@ title: 'Build a User Management App with RedwoodJS'
 description: 'Learn how to use Supabase in your RedwoodJS App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
@@ -39,7 +39,7 @@ Instead, we'll rely on the Supabase client to do some of the work on the **`web`
 That means you will want to refrain from running any `yarn rw prisma migrate` commands and also double check your build commands on deployment to ensure Prisma won't reset your database. Prisma currently doesn't support cross-schema foreign keys, so introspecting the schema fails due
 to how your Supabase `public` schema references the `auth.users`.
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -103,17 +103,23 @@ Say, **yes** and it will setup the Supabase client in your app and also provide 
 ```
 
 Next, we want to save the environment variables in a `.env`.
-We need the `API URL` as well as the `anon` and `jwt_secret` keys that you copied [earlier](#get-the-api-keys).
+We need the `API URL` as well as the key and `jwt_secret` that you copied [earlier](#get-api-details).
 
-```bash .env
+<$CodeTabs>
+
+```bash name=.env
 SUPABASE_URL=YOUR_SUPABASE_URL
-SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
+SUPABASE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
 ```
 
+</$CodeTabs>
+
 And finally, you will also need to save **just** the `web side` environment variables to the `redwood.toml`.
 
-```bash redwood.toml
+<$CodeTabs>
+
+```bash name=redwood.toml
 [web]
   title = "Supabase Redwood Tutorial"
   port = 8910
@@ -125,13 +131,17 @@ And finally, you will also need to save **just** the `web side` environment vari
   open = true
 ```
 
+</$CodeTabs>
+
 These variables will be exposed on the browser, and that's completely fine.
 They allow your web app to initialize the Supabase client with your public anon key
 since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 You'll see these being used to configure your Supabase client in `web/src/App.js`:
 
-```js web/src/App.js
+<$CodeTabs>
+
+```js name=web/src/App.js
 // ... Redwood imports
 import { AuthProvider } from '@redwoodjs/auth'
 import { createClient } from '@supabase/supabase-js'
@@ -154,6 +164,8 @@ const App = () => (
 
 export default App
 ```
+
+</$CodeTabs>
 
 ### App styling (optional)
 
@@ -199,7 +211,9 @@ You can stop the `dev` server if you want; to see your changes, just be sure to 
 
 You should see the `Home` page route in `web/src/Routes.js`:
 
-```bash web/src/Routes.js
+<$CodeTabs>
+
+```bash name=web/src/Routes.js
 import { Router, Route } from '@redwoodjs/router'
 
 const Routes = () => {
@@ -213,6 +227,8 @@ const Routes = () => {
 
 export default Routes
 ```
+
+</$CodeTabs>
 
 ### Set up a login component
 
@@ -230,7 +246,9 @@ yarn rw g component auth
 
 Now, update the `Auth.js` component to contain:
 
-```jsx /web/src/components/Auth/Auth.js
+<$CodeTabs>
+
+```jsx name=/web/src/components/Auth/Auth.js
 import { useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
 
@@ -286,6 +304,8 @@ const Auth = () => {
 export default Auth
 ```
 
+</$CodeTabs>
+
 ### Set up an account component
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
@@ -303,7 +323,9 @@ yarn rw g component account
 
 And then update the file to contain:
 
-```jsx web/src/components/Account/Account.js
+<$CodeTabs>
+
+```jsx name=web/src/components/Account/Account.js
 import { useState, useEffect } from 'react'
 import { useAuth } from '@redwoodjs/auth'
 
@@ -427,6 +449,8 @@ const Account = () => {
 export default Account
 ```
 
+</$CodeTabs>
+
 You'll see the use of `useAuth()` several times. Redwood's `useAuth` hook provides convenient ways to access
 `logIn`, `logOut`, `currentUser`, and access the `supabase` authenticate client. We'll use it to get an instance
 of the Supabase client to interact with your API.
@@ -435,7 +459,9 @@ of the Supabase client to interact with your API.
 
 Now that we have all the components in place, let's update your `HomePage` page to use them:
 
-```jsx web/src/pages/HomePage/HomePage.js
+<$CodeTabs>
+
+```jsx name=web/src/pages/HomePage/HomePage.js
 import { useAuth } from '@redwoodjs/auth'
 import { MetaTags } from '@redwoodjs/web'
 
@@ -455,6 +481,8 @@ const HomePage = () => {
 
 export default HomePage
 ```
+
+</$CodeTabs>
 
 <Admonition type="note">
 
@@ -492,7 +520,9 @@ yarn rw g component avatar
 
 Now, update your Avatar component to contain the following widget:
 
-```jsx web/src/components/Avatar/Avatar.js
+<$CodeTabs>
+
+```jsx name=web/src/components/Avatar/Avatar.js
 import { useEffect, useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
 
@@ -581,11 +611,15 @@ const Avatar = ({ url, size, onUpload }) => {
 export default Avatar
 ```
 
+</$CodeTabs>
+
 ### Add the new widget
 
 And then we can add the widget to the Account component:
 
-```jsx web/src/components/Account/Account.js
+<$CodeTabs>
+
+```jsx name=web/src/components/Account/Account.js
 // Import the new component
 import Avatar from 'src/components/Avatar'
 
@@ -606,6 +640,8 @@ return (
   </div>
 )
 ```
+
+</$CodeTabs>
 
 At this stage you have a fully functional application!
 

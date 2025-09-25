@@ -8,7 +8,7 @@ import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
 } & Partial<VaultSecret>
 
 export async function createVaultSecret({
@@ -16,13 +16,12 @@ export async function createVaultSecret({
   connectionString,
   ...newSecret
 }: VaultSecretCreateVariables) {
-  const { name, description, secret, key_id } = newSecret
+  const { name, description, secret } = newSecret
   const sql = /* SQL */ `
 select vault.create_secret(
     new_secret := ${quoteLiteral(secret)}
   ${name ? `, new_name := ${quoteLiteral(name)}` : ''}
   ${description ? `, new_description := ${quoteLiteral(description)}` : ''}
-  ${key_id ? `, new_key_id := ${quoteLiteral(key_id)}` : ''}
 )
 `
 

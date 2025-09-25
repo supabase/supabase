@@ -1,7 +1,8 @@
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import CodeSnippet from './CodeSnippet'
 import Snippets from './Snippets'
 
@@ -12,9 +13,10 @@ interface AuthenticationProps {
 
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { ref: projectRef } = useParams()
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
-  const { anonKey, serviceKey } = getAPIKeys(settings)
+  const { anonKey, serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const hostEndpoint = settings?.app_config?.endpoint
   const endpoint = `${protocol}://${hostEndpoint ?? ''}`

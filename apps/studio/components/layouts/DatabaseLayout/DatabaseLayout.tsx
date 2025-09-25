@@ -1,11 +1,13 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { useFlag } from 'common'
 import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
@@ -15,7 +17,7 @@ export interface DatabaseLayoutProps {
 }
 
 const DatabaseProductMenu = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -29,6 +31,12 @@ const DatabaseProductMenu = () => {
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
+  const enablePgReplicate = useFlag('enablePgReplicate')
+
+  const { databaseReplication: showPgReplicate, databaseRoles: showRoles } = useIsFeatureEnabled([
+    'database:replication',
+    'database:roles',
+  ])
 
   return (
     <>
@@ -38,6 +46,9 @@ const DatabaseProductMenu = () => {
           pgNetExtensionExists,
           pitrEnabled,
           columnLevelPrivileges,
+          enablePgReplicate,
+          showPgReplicate,
+          showRoles,
         })}
       />
     </>

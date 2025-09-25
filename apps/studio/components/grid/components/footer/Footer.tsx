@@ -1,21 +1,16 @@
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GridFooter } from 'components/ui/GridFooter'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike, isViewLike } from 'data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import RefreshButton from '../header/RefreshButton'
 import { Pagination } from './pagination'
 
-export interface FooterProps {
-  isRefetching?: boolean
-}
-
-const Footer = ({ isRefetching }: FooterProps) => {
-  const { project } = useProjectContext()
+export const Footer = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: entity } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -41,10 +36,6 @@ const Footer = ({ isRefetching }: FooterProps) => {
       {selectedView === 'data' && <Pagination />}
 
       <div className="ml-auto flex items-center gap-x-2">
-        {entity && selectedView === 'data' && (
-          <RefreshButton table={entity} isRefetching={isRefetching} />
-        )}
-
         {(isViewSelected || isTableSelected) && (
           <TwoOptionToggle
             width={75}
@@ -58,5 +49,3 @@ const Footer = ({ isRefetching }: FooterProps) => {
     </GridFooter>
   )
 }
-
-export default Footer

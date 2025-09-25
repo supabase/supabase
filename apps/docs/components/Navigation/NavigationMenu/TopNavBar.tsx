@@ -1,15 +1,17 @@
-import { Command, Search, Menu } from 'lucide-react'
+import { memo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import type { FC } from 'react'
-import { memo, useState } from 'react'
+import { Command, Search, Menu } from 'lucide-react'
 
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
-import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
-
+import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
+import useDropdownMenu from './useDropdownMenu'
+
+import type { FC } from 'react'
+
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
@@ -17,6 +19,8 @@ const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const user = useUser()
+  const menu = useDropdownMenu(user)
 
   return (
     <>
@@ -80,12 +84,7 @@ const TopNavBar: FC = () => {
           <div className="hidden lg:flex items-center justify-end gap-3">
             {!isUserLoading && (
               <Button asChild>
-                <a
-                  href="https://supabase.com/dashboard"
-                  className="h-[30px]"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
+                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
                   {isLoggedIn ? 'Dashboard' : 'Sign up'}
                 </a>
               </Button>
@@ -95,7 +94,11 @@ const TopNavBar: FC = () => {
                 <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
               </Button>
             )}
-            <TopNavDropdown />
+            {isLoggedIn ? (
+              <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
+            ) : (
+              <TopNavDropdown />
+            )}
           </div>
         </div>
       </nav>

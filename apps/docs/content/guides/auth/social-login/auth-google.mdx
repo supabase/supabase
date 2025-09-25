@@ -2,16 +2,51 @@
 id: 'auth-google'
 title: 'Login with Google'
 description: 'Use Sign in with Google on the web, in native apps or with Chrome extensions'
-tocVideo: 'vojHmGUGUGc'
 ---
 
-Supabase Auth supports Sign in with Google for the web, native Android applications, and Chrome extensions.
+Supabase Auth supports [Sign in with Google for the web](https://developers.google.com/identity/gsi/web/guides/overview), native applications ([Android](https://developer.android.com/identity/sign-in/credential-manager-siwg), [macOS and iOS](https://developers.google.com/identity/sign-in/ios/start-integrating)), and [Chrome extensions](https://cloud.google.com/identity-platform/docs/web/chrome-extension).
+
+You can use Sign in with Google in two ways:
+
+- [By writing application code](#application-code) for the web, native applications or Chrome extensions
+- [By using Google's pre-built solutions](#google-pre-built) such as [personalized sign-in buttons](https://developers.google.com/identity/gsi/web/guides/personalized-button), [One Tap](https://developers.google.com/identity/gsi/web/guides/features) or [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out)
 
 ## Prerequisites
 
-- A Google Cloud project. Go to the [Google Cloud Platform](https://console.cloud.google.com/home/dashboard) and create a new project if necessary.
+You need to do some setup to get started with Sign in with Google:
 
-## Configuration
+- Prepare a Google Cloud project. Go to the [Google Cloud Platform](https://console.cloud.google.com/home/dashboard) and create a new project if necessary.
+- Use the [Google Auth Platform console](https://console.cloud.google.com/auth/overview) to register and set up your application's:
+  - [**Audience**](https://console.cloud.google.com/auth/audience) by configuring which Google users are allowed to sign in to your application.
+  - [**Data Access (Scopes)**](https://console.cloud.google.com/auth/scopes) define what your application can do with your user's Google data and APIs, such as access profile information or more.
+  - [**Branding**](https://console.cloud.google.com/auth/branding) and [**Verification**](https://console.cloud.google.com/auth/verification) show a logo and name instead of the Supabase project ID in the consent screen, improving user retention. Brand verification may take a few business days.
+
+### Setup required scopes
+
+Supabase Auth needs a few scopes granting access to profile data of your end users, which you have to configure in the [**Data Access (Scopes)**](https://console.cloud.google.com/auth/scopes) screen:
+
+- `openid` (add manually)
+- `.../auth/userinfo.email` (added by default)
+- `...auth/userinfo.profile` (added by default)
+
+If you add more scopes, especially those on the sensitive or restricted list your application might be subject to verification which may take a long time.
+
+### Setup consent screen branding
+
+<Admonition type="note">
+
+It's strongly recommended you set up a custom domain and optionally verify your brand information with Google, as this makes phishing attempts easier to spot by your users.
+
+</Admonition>
+
+Google's consent screen is shown to users when they sign in. Optionally configure the following to improve the appearance of the screen, increasing the perception of trust by your users:
+
+1. Set up a [custom domain for your project](/docs/guides/platform/custom-domains) to present the user with a clear relationship to the website they clicked Sign in with Google on.
+   - A good approach is to use `auth.example.com` or `api.example.com`, if your application is hosted on `example.com`.
+   - If you don't set this up, users will see `<project-id>.supabase.co` which does not inspire trust and can make your application more susceptible to successful phishing attempts.
+1. Verify your application's brand (logo and name) by configuring it in the [Branding](https://console.cloud.google.com/auth/branding) section of the Google Auth Platform console. Brand verification is not automatic and may take a few business days.
+
+## Project setup
 
 To support Sign In with Google, you need to configure the Google provider for your Supabase project.
 
@@ -24,108 +59,69 @@ To support Sign In with Google, you need to configure the Google provider for yo
 >
   <TabPanel id="web" label="Web">
 
-For web applications, you can set up your signin button two different ways:
+Regardless of whether you use application code or Google's pre-built solutions to implement the sign in flow, you need to configure your project by obtaining a Client ID and Client Secret in the [Clients](https://console.cloud.google.com/auth/clients) section of the Google Auth Platform console:
 
-- Use your own [application code](#application-code) for the button.
-- Use [Google's pre-built sign-in or One Tap flows](#google-pre-built).
-
-### Application code configuration
-
-To use your own application code:
-
-1. In the Google Cloud console, go to the [Consent Screen configuration page](https://console.cloud.google.com/apis/credentials/consent). The consent screen is the view shown to your users when they consent to signing in to your app.
-1. Under **Authorized domains**, add your Supabase project's domain, which has the form `<PROJECT_ID>.supabase.co`.
-1. Configure the following non-sensitive scopes:
-   - `.../auth/userinfo.email`
-   - `...auth/userinfo.profile`
-   - `openid`
-1. Go to the [API Credentials page](https://console.cloud.google.com/apis/credentials).
-1. Click `Create credentials` and choose `OAuth Client ID`.
-1. For application type, choose `Web application`.
-1. Under **Authorized JavaScript origins**, add your site URL.
-1. Under **Authorized redirect URLs**, enter the callback URL from the [Supabase dashboard](/dashboard/project/_/auth/providers). Expand the Google Auth Provider section to display it.
-
-   <Admonition type="tip">
-
-   The redirect URL is visible to your users. You can customize it by configuring [custom domains](/docs/guides/platform/custom-domains).
-
-   </Admonition>
-
-1. When you finish configuring your credentials, you will be shown your client ID and secret. Add these to the [Google Auth Provider section of the Supabase Dashboard](/dashboard/project/_/auth/providers).
-
-   <Admonition type="tip">
-
-   In local development, you can add the client ID and secret to your `config.toml` file.
-
-   </Admonition>
-
-### Google pre-built configuration
-
-To use Google's pre-built signin buttons:
-
-1. In the Google Cloud console, go to the [Consent Screen configuration page](https://console.cloud.google.com/apis/credentials/consent). The consent screen is the view shown to your users when they consent to signing in to your app.
-1. Configure the screen to your liking, making sure you add links to your app's privacy policy and terms of service.
-1. Go to the [API Credentials page](https://console.cloud.google.com/apis/credentials).
-1. Click `Create credentials` and choose `OAuth Client ID`.
-1. For application type, choose `Web application`.
-1. Under **Authorized JavaScript origins** and **Authorized redirect URLs**, add your site URL. This is the URL of the website where the signin button will appear, _not_ your Supabase project domain. If you're testing in localhost, ensure that you have `http://localhost` set in the **Authorized JavaScript origins** section as well. This is important when integrating with Google One-Tap to ensure you can use it locally.
-1. When you finish configuring your credentials, you will be shown your client ID. Add this to the **Client IDs** field in the [Google Auth Provider section of the Supabase Dashboard](/dashboard/project/_/auth/providers). Leave the OAuth client ID and secret blank. You don't need them when using Google's pre-built approach.
+1. [Create a new OAuth client ID](https://console.cloud.google.com/auth/clients/create) and choose **Web application** for the application type.
+1. Under **Authorized JavaScript origins** add your application's URL. These should also be configured as the [Site URL or redirect configuration in your project](/docs/guides/auth/redirect-urls).
+   - If your app is hosted on `https://example.com/app` add `https://example.com`.
+   - Add `http://localhost:<port>` while developing locally. Remember to remove this when your application [goes into production](/docs/guides/deployment/going-into-prod).
+1. Under **Authorized redirect URIs** add your Supabase project's callback URL.
+   - Access it from the [Google provider page on the Dashboard](/dashboard/project/_/auth/providers?provider=Google).
+   - For local development, use `http://localhost:3000/auth/v1/callback`.
+1. Click `Create` and make sure you save the Client ID and Client Secret.
+   - Add these values to the [Google provider page on the Dashboard](/dashboard/project/_/auth/providers?provider=Google).
 
   </TabPanel>
 
   <TabPanel id="react-native" label="Expo React Native">
 
-    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
-        - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-          - You will have a different set of SHA-1 certificate fingerprint for testing locally and going to production. Make sure to add both to the Google Cloud Console. and add all of the Client IDs to Supabase dashboard.
-        - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
-    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-    3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_.
-
-    Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
+1. [Create a new OAuth client ID](https://console.cloud.google.com/auth/clients/create) and choose **Android** or **iOS** depending on the OS you're building the app for.
+   - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+   - You will have a different set of SHA-1 certificate fingerprints for testing locally and going to production. Make sure to add both to the Google Cloud Console, and add all of the Client IDs to the Supabase dashboard.
+   - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
+1. Register the Client ID in the [Google provider page on the Dashboard](/dashboard/project/_/auth/providers?provider=Google).
 
   </TabPanel>
 
-  <TabPanel id="flutter" label="Flutter">
+  <TabPanel id="flutter-mobile" label="Flutter (iOS and Android)">
 
-    ### iOS and Android
+1. [Create a new OAuth client ID](https://console.cloud.google.com/auth/clients/create) and choose **Android** or **iOS** depending on the OS you're building the app for.
+   - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+   - You will have a different set of SHA-1 certificate fingerprints for testing locally and going to production. Make sure to add both to the Google Cloud Console, and add all of the Client IDs to the Supabase dashboard.
+   - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
+1. Register the Client ID in the [Google provider page on the Dashboard](/dashboard/project/_/auth/providers?provider=Google).
+   - For iOS enable the `Skip nonce check` option.
 
-    1. Configure Web, Android, and iOS OAuth credentials. Follow the Platform integration instructions on the [README of google_sign_in package](https://pub.dev/packages/google_sign_in#platform-integration) for Android and iOS.
-        - For both Android and iOS, you will need to create a Web client ID in the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
-        - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-          - You will have a different set of SHA-1 certificate fingerprint for testing locally and going to production. Make sure to add both to the Google Cloud Console. and add all of the Client IDs to Supabase dashboard.
-        - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
-    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-    3. Add only the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_. If you need iOS support, enable the `Skip nonce check` option.
-    4. For iOS, add the `CFBundleURLTypes` attributes below into the `/ios/Runner/Info.plist` file.
-        ```xml
-        <!-- Put me in the [my_project]/ios/Runner/Info.plist file -->
-        <!-- Google Sign-in Section -->
-        <key>CFBundleURLTypes</key>
-        <array>
-          <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-              <!-- TODO Replace this value: -->
-              <!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
-              <string>com.googleusercontent.apps.861823949799-vc35cprkp249096uujjn0vvnmcvjppkn</string>
-            </array>
-          </dict>
-        </array>
-        <!-- End of the Google Sign-in Section -->
-        ```
+For iOS add a `CFBundleURLTypes` key in the `<project>/ios/Runner/Info.plist` file:
 
-    ### Web, macOS, Windows, and Linux
+```xml
+<!-- Put me in the [my_project]/ios/Runner/Info.plist file -->
+<!-- Google Sign-in Section -->
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleTypeRole</key>
+    <string>Editor</string>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <!-- TODO Replace this value: -->
+      <!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
+      <string>com.googleusercontent.apps.861823949799-vc35cprkp249096uujjn0vvnmcvjppkn</string>
+    </array>
+  </dict>
+</array>
+<!-- End of the Google Sign-in Section -->
+```
 
-    To use the OAuth 2.0 flow, you will require the following information:
+</TabPanel>
 
-    1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. If you already have a web client ID, no need to create a new one. When creating a new credential, choose _Web application_. In _Authorized redirect URIs_ enter `https://<project-id>.supabase.co/auth/v1/callback`. This URL will be seen by your users, and you can customize it by configuring [custom domains](/docs/guides/platform/custom-domains).
-    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. Within _Authorized domains_ make sure you add your Supabase project's domain `<project-id>.supabase.co`. Configure the non-sensitive scopes by making sure the following ones are selected: `.../auth/userinfo.email`, `.../auth/userinfo.profile`, `openid`. If you're selecting other sensitive scopes, your app may require additional verification. In those cases, it's best to use [custom domains](/docs/guides/platform/custom-domains).
-    3. Finally, add the client ID and secret from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers).
+<TabPanel id="flutter-other" label="Flutter (web, macOS, Windows, Linux)">
 
-  </TabPanel>
+Follow the same configuration guide as if your app was a Web application when building a desktop Flutter application.
+
+</TabPanel>
+
+<$Show if="sdk:swift">
 
   <TabPanel id="swift" label="Swift">
 
@@ -168,46 +164,60 @@ To use Google's pre-built signin buttons:
 
     1. Follow the integration instructions on the [get started with Google Sign-In](https://developers.google.com/identity/sign-in/ios/start-integrating) for the iOS guide.
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-    3. Add web client ID and iOS client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_, separated by a comma. Enable the `Skip nonce check` option.
+    3. Add web client ID and iOS client ID from step 1 in the [Google provider on the Supabase Dashboard](/dashboard/project/_/auth/providers), under _Client IDs_, separated by a comma. Enable the `Skip nonce check` option.
 
   </TabPanel>
+  </$Show>
 
   <TabPanel id="android" label="Android (Kotlin)">
 
-    ### Using Google sign-in on Android
-
-    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. You need two client IDs, a web client ID and Android client ID. When creating a new Android OAuth client ID, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-    3. Finally, add the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_.
-
-    Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
-
-    ### Using Google sign-in with Kotlin Multiplatform
-
-    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
-
-      - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-      - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
-
-    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-    3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_.
-
-    Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
+1. [Create a new OAuth client ID](https://console.cloud.google.com/auth/clients/create) and choose **Android** or **iOS** if also building an iOS app with Kotlin Multiplatform.
+   - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+   - You will have a different set of SHA-1 certificate fingerprints for testing locally and going to production. Make sure to add both to the Google Cloud Console, and add all of the Client IDs to the Supabase dashboard.
+   - For iOS (with Kotlin Multiplatform), use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
+1. Register the Client ID in the [Google provider page on the Dashboard](/dashboard/project/_/auth/providers?provider=Google).
 
   </TabPanel>
 
   <TabPanel id="chrome-extensions" label="Chrome Extensions">
 
-    You will need to configure a client ID for your Chrome extension:
-
-    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Chrome extension_ for the application type. For _Item ID_ provide the unique ID of your Chrome extension. You can get this by calling `chrome.runtime.id` within the extension, or from the Web Store URL of the extension. For example, the [Google Translate extension](https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb) has the Web Store URL `https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb` and the last part `aapbdbdomjkkjkaonfhkkikfgjllcleb` is its unique ID.
-    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app.
-    3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_.
-
-    Note that you do not have to configure the OAuth flow in the Supabase Dashboard to sign in with Google inside Chrome extensions.
+1. [Create a new OAuth client ID](https://console.cloud.google.com/auth/clients/create) and choose **Chrome Extension** for application type.
+   - Enter your extension's Item ID and optionally verify app ownership.
+1. Register the Client ID in the [Google provider page on the Dashboard](/dashboard/project/_/auth/providers?provider=Google) under _Client IDs_.
 
   </TabPanel>
 </Tabs>
+
+### Local development
+
+To use the Google provider in local development:
+
+1. Add a new environment variable:
+   ```env
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET="<client-secret>"
+   ```
+2. Configure the provider:
+   ```toml
+   [auth.external.google]
+   enabled = true
+   client_id = "<client-id>"
+   secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+   skip_nonce_check = false
+   ```
+
+If you have multiple client IDs, such as one for Web, iOS and Android, concatenate all of the client IDs with a comma but make sure the web's client ID is first in the list.
+
+### Using the management API
+
+Use the [PATCH `/v1/projects/{ref}/config/auth` Management API endpoint](/docs/reference/api/v1-update-auth-service-config) to configure the project's Auth settings programmatically. For configuring the Google provider send these options:
+
+```json
+{
+  "external_google_enabled": true,
+  "external_google_client_id": "your-google-client-id",
+  "external_google_secret": "your-google-client-secret"
+}
+```
 
 ## Signing users in
 
@@ -224,9 +234,13 @@ To use Google's pre-built signin buttons:
 
 To use your own application code for the signin button, call the `signInWithOAuth` method (or the equivalent for your language).
 
-<CreateClientSnippet />
+<$Partial path="create_client_snippet.mdx" />
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('url', 'anonKey')
+
+// ---cut---
 supabase.auth.signInWithOAuth({
   provider: 'google',
 })
@@ -234,7 +248,7 @@ supabase.auth.signInWithOAuth({
 
 For an implicit flow, that's all you need to do. The user will be taken to Google's consent screen, and finally redirected to your app with an access and refresh token pair representing their session.
 
-<OAuthPkceFlow />
+<$Partial path="oauth_pkce_flow.mdx" />
 
 After a successful code exchange, the user's session will be saved to cookies.
 
@@ -247,6 +261,10 @@ On initial login, you can extract the `provider_token` from the session and stor
 Google does not send out a refresh token by default, so you will need to pass parameters like these to `signInWithOAuth()` in order to extract the `provider_refresh_token`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'google',
   options: {
@@ -258,7 +276,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
-### Google pre-built
+### Google pre-built [#google-pre-built]
 
 Most web apps and websites can utilize Google's [personalized sign-in buttons](https://developers.google.com/identity/gsi/web/guides/personalized-button), [One Tap](https://developers.google.com/identity/gsi/web/guides/features) or [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for the best user experience.
 
@@ -350,82 +368,72 @@ If you're integrating Google One-Tap with your Next.js application, you can refe
 
 import Script from 'next/script'
 import { createClient } from '@/utils/supabase/client'
-import { CredentialResponse } from 'google-one-tap'
+import type { accounts, CredentialResponse } from 'google-one-tap'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+
+declare const google: { accounts: accounts }
+
+// generate nonce to use for google id token sign-in
+const generateNonce = async (): Promise<string[]> => {
+  const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))))
+  const encoder = new TextEncoder()
+  const encodedNonce = encoder.encode(nonce)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encodedNonce)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashedNonce = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+
+  return [nonce, hashedNonce]
+}
 
 const OneTapComponent = () => {
   const supabase = createClient()
   const router = useRouter()
 
-  // generate nonce to use for google id token sign-in
-  const generateNonce = async (): Promise<string[]> => {
-    const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))))
-    const encoder = new TextEncoder()
-    const encodedNonce = encoder.encode(nonce)
-    const hashBuffer = await crypto.subtle.digest('SHA-256', encodedNonce)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const hashedNonce = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  const initializeGoogleOneTap = async () => {
+    console.log('Initializing Google One Tap')
+    const [nonce, hashedNonce] = await generateNonce()
+    console.log('Nonce: ', nonce, hashedNonce)
 
-    return [nonce, hashedNonce]
+    // check if there's already an existing session before initializing the one-tap UI
+    const { data, error } = await supabase.auth.getSession()
+    if (error) {
+      console.error('Error getting session', error)
+    }
+    if (data.session) {
+      router.push('/')
+      return
+    }
+
+    /* global google */
+    google.accounts.id.initialize({
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      callback: async (response: CredentialResponse) => {
+        try {
+          // send id token returned in response.credential to supabase
+          const { data, error } = await supabase.auth.signInWithIdToken({
+            provider: 'google',
+            token: response.credential,
+            nonce,
+          })
+
+          if (error) throw error
+          console.log('Session data: ', data)
+          console.log('Successfully logged in with Google One Tap')
+
+          // redirect to protected page
+          router.push('/')
+        } catch (error) {
+          console.error('Error logging in with Google One Tap', error)
+        }
+      },
+      nonce: hashedNonce,
+      // with chrome's removal of third-party cookies, we need to use FedCM instead (https://developers.google.com/identity/gsi/web/guides/fedcm-migration)
+      use_fedcm_for_prompt: true,
+    })
+    google.accounts.id.prompt() // Display the One Tap UI
   }
 
-  useEffect(() => {
-    const initializeGoogleOneTap = () => {
-      console.log('Initializing Google One Tap')
-      window.addEventListener('load', async () => {
-        const [nonce, hashedNonce] = await generateNonce()
-        console.log('Nonce: ', nonce, hashedNonce)
-
-        // check if there's already an existing session before initializing the one-tap UI
-        const { data, error } = await supabase.auth.getSession()
-        if (error) {
-          console.error('Error getting session', error)
-        }
-        if (data.session) {
-          router.push('/')
-          return
-        }
-
-        /* global google */
-        google.accounts.id.initialize({
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-          callback: async (response: CredentialResponse) => {
-            try {
-              // send id token returned in response.credential to supabase
-              const { data, error } = await supabase.auth.signInWithIdToken({
-                provider: 'google',
-                token: response.credential,
-                nonce,
-              })
-
-              if (error) throw error
-              console.log('Session data: ', data)
-              console.log('Successfully logged in with Google One Tap')
-
-              // redirect to protected page
-              router.push('/')
-            } catch (error) {
-              console.error('Error logging in with Google One Tap', error)
-            }
-          },
-          nonce: hashedNonce,
-          // with chrome's removal of third-party cookiesm, we need to use FedCM instead (https://developers.google.com/identity/gsi/web/guides/fedcm-migration)
-          use_fedcm_for_prompt: true,
-        })
-        google.accounts.id.prompt() // Display the One Tap UI
-      })
-    }
-    initializeGoogleOneTap()
-    return () => window.removeEventListener('load', initializeGoogleOneTap)
-  }, [])
-
-  return (
-    <>
-      <Script src="https://accounts.google.com/gsi/client" />
-      <div id="oneTap" className="fixed top-0 right-0 z-[100]" />
-    </>
-  )
+  return <Script onReady={initializeGoogleOneTap} src="https://accounts.google.com/gsi/client" />
 }
 
 export default OneTapComponent
@@ -495,9 +503,7 @@ export default function () {
 
 </TabPanel>
 
-<TabPanel id="flutter" label="Flutter">
-
-### iOS and Android
+<TabPanel id="flutter-mobile" label="Flutter (iOS and Android)">
 
 Google sign-in with Supabase is done through the [google_sign_in](https://pub.dev/packages/google_sign_in) package for iOS and Android.
 
@@ -521,32 +527,54 @@ Future<void> _nativeGoogleSignIn() async {
   /// iOS Client ID that you registered with Google Cloud.
   const iosClientId = 'my-ios.apps.googleusercontent.com';
 
-  final GoogleSignIn googleSignIn = GoogleSignIn(
-    clientId: iosClientId,
-    serverClientId: webClientId,
-  );
-  final googleUser = await googleSignIn.signIn();
-  final googleAuth = await googleUser!.authentication;
-  final accessToken = googleAuth.accessToken;
-  final idToken = googleAuth.idToken;
+  final scopes = ['email', 'profile'];
+  final googleSignIn = GoogleSignIn.instance;
 
-  if (accessToken == null) {
-    throw 'No Access Token found.';
+  await googleSignIn.initialize(
+    serverClientId: webClientId,
+    clientId: iosClientId,
+  );
+
+  final googleUser = await googleSignIn.attemptLightweightAuthentication();
+  // or await googleSignIn.authenticate(); which will return a GoogleSignInAccount or throw an exception
+
+  if (googleUser == null) {
+    throw AuthException('Failed to sign in with Google.');
   }
+
+  /// Authorization is required to obtain the access token with the appropriate scopes for Supabase authentication,
+  /// while also granting permission to access user information.
+  final authorization =
+      await googleUser.authorizationClient.authorizationForScopes(scopes) ??
+      await googleUser.authorizationClient.authorizeScopes(scopes);
+
+  final idToken = googleUser.authentication.idToken;
+
   if (idToken == null) {
-    throw 'No ID Token found.';
+    throw AuthException('No ID Token found.');
   }
 
   await supabase.auth.signInWithIdToken(
     provider: OAuthProvider.google,
     idToken: idToken,
-    accessToken: accessToken,
+    accessToken: authorization.accessToken,
   );
 }
 ...
 ```
 
-### Web, macOS, Windows, and Linux
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/utMg6fVmX0U"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+</TabPanel>
+
+<TabPanel id="flutter-other" label="Flutter (web, macOS, Windows, Linux)">
 
 Google sign-in with Supabase on Web, macOS, Windows, and Linux is done through the [`signInWithOAuth`](docs/reference/dart/auth-signinwithoauth) method.
 
@@ -675,7 +703,7 @@ fun GoogleSignInButton() {
 
 ### Using Google sign-in with Kotlin Multiplatform
 
-When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses the Credential Manager automatically and on other platforms it uses `auth.signInWith(Google)`.
+When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](/docs/reference/kotlin/installing) plugin. On Android it uses the Credential Manager automatically and on other platforms it uses `auth.signInWith(Google)`.
 
 **Initialize the Supabase Client**
 
@@ -686,9 +714,9 @@ val supabaseClient = createSupabaseClient(
     supabaseUrl = "SUPABASE_URL",
     supabaseKey = "SUPABASE_KEY"
 ) {
-    install(GoTrue)
+    install(Auth)
     install(ComposeAuth) {
-        nativeGoogleLogin("WEB_GOOGLE_CLIENT_ID") //Use the Web Client ID, not the Android one!
+        googleNativeLogin("WEB_GOOGLE_CLIENT_ID") //Use the Web Client ID, not the Android one!
     }
 }
 ```
@@ -696,7 +724,7 @@ val supabaseClient = createSupabaseClient(
 **Use the Compose Auth plugin in your Auth Screen**
 
 ```kotlin
-val authState = supabaseClient.composeAuth.rememberLoginWithGoogle(
+val authState = supabaseClient.composeAuth.rememberSignInWithGoogle(
     onResult = {
         when(it) { //handle errors
             NativeSignInResult.ClosedByUser -> TODO()
@@ -778,11 +806,3 @@ chrome.identity.launchWebAuthFlow(
 
 </TabPanel>
 </Tabs>
-
-## Google consent screen
-
-![Google Consent Screen](/docs/img/guides/auth-google/auth-google-consent-screen.png)
-
-By default, the Google consent screen shows the root domain of the callback URL, where Google will send the authentication response. With Supabase Auth, it is your Supabase project's domain `(https://<your-project-ref>.supabase.co)`.
-
-If that is not preferable, you can use a [Custom Domain](https://supabase.com/docs/guides/platform/custom-domains) with your Supabase project. You can use it as your project's domain when creating the Supabase client in your application and initiating the authentication flow. It will then show up in the Google consent screen. If you want your app name and the logo on the consent screen, [you must submit your app to Google for verification](https://support.google.com/cloud/answer/10311615).

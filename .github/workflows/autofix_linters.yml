@@ -5,32 +5,40 @@ on:
     types:
       - labeled
 
-permissions:
-  contents: write
-
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   autofix:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    permissions:
+      contents: write
     if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix') }}
     steps:
+      - name: Calculate number of commits
+        run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
+
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: apps
           ref: ${{ github.head_ref }}
+          token: ${{ secrets.PAT_AUTOFIX }}
+          fetch-depth: ${{ env.PR_FETCH_DEPTH }}
+          sparse-checkout: |
+            packages
+            apps
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
-        with:
-          run_install: false
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
+          cache: pnpm
 
       - name: Install required dependencies
         run: pnpm i
@@ -39,15 +47,8 @@ jobs:
         run: pnpm run format
 
       - name: Commit changes and push to existing branch
-        run: |
-          git config --global user.name 'github-tidy-bot'
-          git config --global user.email 'github-tidy-bot@supabase.com'
-          if [[ `git status --porcelain` ]]; then
-            echo "[bot] Changes detected, committing."
-
-            echo "[bot] Running in non-squash mode."
-            git commit -am "ci: Autofix updates from GitHub workflow"
-            git push
-          else
-            echo "[bot] No changes detected, nothing to commit."
-          fi
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: Autofix updates from GitHub workflow"
+          commit_user_name: "kevcodez"
+          commit_user_email: "k.grueneberg1994@gmail.com"

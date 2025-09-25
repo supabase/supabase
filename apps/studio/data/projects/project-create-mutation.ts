@@ -7,6 +7,7 @@ import { handleError, post } from 'data/fetchers'
 import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
 
 const WHITELIST_ERRORS = [
   'The following organization members have reached their maximum limits for the number of active free projects',
@@ -18,21 +19,21 @@ const WHITELIST_ERRORS = [
   'already exists in your organization.',
 ]
 
-export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
-export type ReleaseChannel = components['schemas']['ReleaseChannel']
-export type PostgresEngine = components['schemas']['PostgresEngine']
+type CreateProjectBody = components['schemas']['CreateProjectBody']
+type CloudProvider = CreateProjectBody['cloud_provider']
 
 export type ProjectCreateVariables = {
   name: string
-  organizationId: number
+  organizationSlug: string
   dbPass: string
-  dbRegion: string
+  dbRegion?: string
+  regionSelection?: CreateProjectBody['region_selection']
   dbSql?: string
   dbPricingTierId?: string
   cloudProvider?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
-  dbInstanceSize?: DbInstanceSize
+  dbInstanceSize?: DesiredInstanceSize
   dataApiExposedSchemas?: string[]
   dataApiUseApiSchema?: boolean
   postgresEngine?: PostgresEngine
@@ -41,9 +42,10 @@ export type ProjectCreateVariables = {
 
 export async function createProject({
   name,
-  organizationId,
+  organizationSlug,
   dbPass,
   dbRegion,
+  regionSelection,
   dbSql,
   cloudProvider = PROVIDERS.AWS.id,
   authSiteUrl,
@@ -54,12 +56,13 @@ export async function createProject({
   postgresEngine,
   releaseChannel,
 }: ProjectCreateVariables) {
-  const body: components['schemas']['CreateProjectBody'] = {
-    cloud_provider: cloudProvider,
-    org_id: organizationId,
+  const body: CreateProjectBody = {
+    cloud_provider: cloudProvider as CloudProvider,
+    organization_slug: organizationSlug,
     name,
     db_pass: dbPass,
     db_region: dbRegion,
+    region_selection: regionSelection,
     db_sql: dbSql,
     auth_site_url: authSiteUrl,
     ...(customSupabaseRequest !== undefined && {

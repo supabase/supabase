@@ -10,9 +10,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   format:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
@@ -36,7 +39,7 @@ jobs:
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
@@ -60,7 +63,7 @@ jobs:
           pnpm exec prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
 
   format-sql:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Check out repo
         uses: actions/checkout@v4

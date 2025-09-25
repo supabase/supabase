@@ -1,4 +1,4 @@
 export const tableEditorKeys = {
-  tableEditor: (projectRef: string | undefined, id: number | undefined) =>
-    ['projects', projectRef, 'table-editor', id] as const,
+  tableEditor: (projectRef: string | undefined, id?: number) =>
+    ['projects', projectRef, 'table-editor', id].filter(Boolean),
 }

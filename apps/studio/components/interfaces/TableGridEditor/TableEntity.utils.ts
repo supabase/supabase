@@ -39,12 +39,21 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
 
         // We only check for NULL, array and JSON types, everything else we stringify
         // given that Postgres can implicitly cast the right type based on the column type
+        // For string types, we need to deal with escaping single quotes
+        const stringFormats = ['text', 'varchar']
+
         if (val === null) {
           return 'null'
         } else if (dataType === 'ARRAY') {
           return `'${JSON.stringify(val).replace('[', '{').replace(/.$/, '}')}'`
         } else if (format?.includes('json')) {
-          return `${JSON.stringify(val).replace(/\\"/g, '"').replace('"', "'").replace(/.$/, "'")}`
+          return `${JSON.stringify(val).replace(/\\"/g, '"').replace(/'/g, "''").replace('"', "'").replace(/.$/, "'")}`
+        } else if (
+          typeof format === 'string' &&
+          typeof val === 'string' &&
+          stringFormats.includes(format)
+        ) {
+          return `'${val.replaceAll("'", "''")}'`
         } else {
           return `'${val}'`
         }

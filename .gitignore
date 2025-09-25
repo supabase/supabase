@@ -63,6 +63,9 @@ typings/
 # TypeScript cache
 *.tsbuildinfo
 
+# Next.js declaration files (auto-generated)
+next-env.d.ts
+
 # Optional npm cache directory
 .npm
 
@@ -133,3 +136,13 @@ gcloud.json
 # sitemaps
 # apps/www/public/*.xml
 # apps/docs/public/*.xml
+
+# CLI version file
+.temp/cli-latest
+
+.pnpm-store/*
+
+# Sentry CLI config
+**/.sentryclirc
+
+keys.json

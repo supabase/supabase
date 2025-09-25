@@ -10,15 +10,15 @@ This quickly shows how to connect your Prisma application to Supabase Postgres. 
 
 <Admonition type="note">
 
-If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), turn it off in the [API Settings](https://supabase.com/dashboard/project/_/settings/api).
+If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), turn it off in the [API Settings](/dashboard/project/_/settings/api).
 
 </Admonition>
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create a custom user for Prisma">
-      - In the [SQL Editor](https://supabase.com/dashboard/project/_/sql/new), create a Prisma DB user with full privileges on the public schema.
-      - This gives you better control over Prisma's access and makes it easier to monitor using Supabase tools like the [Query Performance Dashboard](https://supabase.com/dashboard/project/_/advisors/query-performance) and [Log Explorer](https://supabase.com/dashboard/project/_/logs/explorer).
+      - In the [SQL Editor](/dashboard/project/_/sql/new), create a Prisma DB user with full privileges on the public schema.
+      - This gives you better control over Prisma's access and makes it easier to monitor using Supabase tools like the [Query Performance Dashboard](/dashboard/project/_/advisors/query-performance) and [Log Explorer](/dashboard/project/_/logs/explorer).
       <Admonition type="note" label="password manager">
 
         For security, consider using a [password generator](https://bitwarden.com/password-generator/) for the Prisma role.
@@ -122,10 +122,12 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Add your connection information to your .env file">
-    - Visit the [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
-    - Find your Supavisor Session Mode string. It should end with 5432. It will be used in your `.env` file.
+    - On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true)
+    - Find your Supavisor Session pooler string. It should end with 5432. It will be used in your `.env` file.
     <Admonition type="note">
+
       If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+
     </Admonition>
 
     - If you plan on deploying Prisma to a serverless or auto-scaling environment, you'll also need your Supavisor transaction mode string.
@@ -282,7 +284,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="tip" label="conflict management">
+
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
+
             </Admonition>
 
             ```bash
@@ -308,7 +312,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">
+
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
+
             </Admonition>
 
             ```bash
@@ -334,7 +340,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">
+
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
+
             </Admonition>
 
             ```bash
@@ -360,7 +368,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">
+
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma-troubleshooting) for more details
+
             </Admonition>
 
             ```bash

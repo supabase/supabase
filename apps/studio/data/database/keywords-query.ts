@@ -12,7 +12,7 @@ SELECT word FROM pg_get_keywords();
 
 export type KeywordsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getKeywords(

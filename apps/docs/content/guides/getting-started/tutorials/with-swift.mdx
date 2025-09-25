@@ -3,7 +3,7 @@ title: 'Build a User Management App with Swift and SwiftUI'
 description: 'Learn how to use Supabase in your SwiftUI App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/supabase-swift-demo.png)
 
@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -28,26 +28,32 @@ Add the [supabase-swift](https://github.com/supabase/supabase-swift) dependency.
 Add the `https://github.com/supabase/supabase-swift` package to your app. For instructions, see the [Apple tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
 Create a helper file to initialize the Supabase client.
-You need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+You need the API URL and the key that you copied [earlier](#get-api-details).
 These variables will be exposed on the application, and that's completely fine since you have
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on your database.
 
-```swift Supabase.swift
+<$CodeTabs>
+
+```swift name=Supabase.swift
 import Foundation
 import Supabase
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
-  supabaseKey: "YOUR_SUPABASE_ANON_KEY"
+  supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
 )
 ```
+
+</$CodeTabs>
 
 ### Set up a login view
 
 Set up a SwiftUI view to manage logins and sign ups.
 Users should be able to sign in using a magic link.
 
-```swift AuthView.swift
+<$CodeTabs>
+
+```swift name=AuthView.swift
 import SwiftUI
 import Supabase
 
@@ -116,6 +122,8 @@ struct AuthView: View {
 }
 ```
 
+</$CodeTabs>
+
 <Admonition type="note">
 
 The example uses a custom `redirectTo` URL. For this to work, add a custom redirect URL to Supabase and a custom URL scheme to your SwiftUI application. Follow the guide on [implementing deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
@@ -128,7 +136,9 @@ After a user is signed in, you can allow them to edit their profile details and 
 
 Create a new view for that called `ProfileView.swift`.
 
-```swift ProfileView.swift
+<$CodeTabs>
+
+```swift name=ProfileView.swift
 import SwiftUI
 
 struct ProfileView: View {
@@ -227,11 +237,15 @@ struct ProfileView: View {
 }
 ```
 
+</$CodeTabs>
+
 ### Models
 
 In `ProfileView.swift`, you used 2 model types for deserializing the response and serializing the request to Supabase. Add those in a new `Models.swift` file.
 
-```swift Models.swift
+<$CodeTabs>
+
+```swift name=Models.swift
 struct Profile: Decodable {
   let username: String?
   let fullName: String?
@@ -257,13 +271,17 @@ struct UpdateProfileParams: Encodable {
 }
 ```
 
+</$CodeTabs>
+
 ### Launch!
 
 Now that you've created all the views, add an entry point for the application. This will verify if the user has a valid session and route them to the authenticated or non-authenticated state.
 
 Add a new `AppView.swift` file.
 
-```swift AppView.swift
+<$CodeTabs>
+
+```swift name=AppView.swift
 import SwiftUI
 
 struct AppView: View {
@@ -288,6 +306,8 @@ struct AppView: View {
 }
 ```
 
+</$CodeTabs>
+
 Update the entry point to the newly created `AppView`. Run in Xcode to launch your application in the simulator.
 
 ## Bonus: Profile photos
@@ -302,7 +322,9 @@ photos and videos.
 Let's add support for the user to pick an image from the library and upload it.
 Start by creating a new type to hold the picked avatar image:
 
-```swift AvatarImage.swift
+<$CodeTabs>
+
+```swift name=AvatarImage.swift
 import SwiftUI
 
 struct AvatarImage: Transferable, Equatable {
@@ -336,14 +358,18 @@ enum TransferError: Error {
 }
 ```
 
+</$CodeTabs>
+
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 #### Add `PhotosPicker` to profile page
 
-```swift ProfileView.swift
-+ import PhotosUI
-+ import Storage
-+ import Supabase
+<$CodeTabs>
+
+```swift name=ProfileView.swift
+import PhotosUI
+import Storage
+import Supabase
 import SwiftUI
 
 struct ProfileView: View {
@@ -353,34 +379,34 @@ struct ProfileView: View {
 
   @State var isLoading = false
 
-+ @State var imageSelection: PhotosPickerItem?
-+ @State var avatarImage: AvatarImage?
+ @State var imageSelection: PhotosPickerItem?
+ @State var avatarImage: AvatarImage?
 
   var body: some View {
     NavigationStack {
       Form {
-+        Section {
-+          HStack {
-+            Group {
-+              if let avatarImage {
-+                avatarImage.image.resizable()
-+              } else {
-+                Color.clear
-+              }
-+            }
-+            .scaledToFit()
-+            .frame(width: 80, height: 80)
-+
-+            Spacer()
-+
-+            PhotosPicker(selection: $imageSelection, matching: .images) {
-+              Image(systemName: "pencil.circle.fill")
-+                .symbolRenderingMode(.multicolor)
-+                .font(.system(size: 30))
-+                .foregroundColor(.accentColor)
-+            }
-+          }
-+        }
+        Section {
+          HStack {
+            Group {
+              if let avatarImage {
+                avatarImage.image.resizable()
+              } else {
+                Color.clear
+              }
+            }
+            .scaledToFit()
+            .frame(width: 80, height: 80)
+
+            Spacer()
+
+            PhotosPicker(selection: $imageSelection, matching: .images) {
+              Image(systemName: "pencil.circle.fill")
+                .symbolRenderingMode(.multicolor)
+                .font(.system(size: 30))
+                .foregroundColor(.accentColor)
+            }
+          }
+        }
 
         Section {
           TextField("Username", text: $username)
@@ -414,10 +440,10 @@ struct ProfileView: View {
           }
         }
       })
-+      .onChange(of: imageSelection) { _, newValue in
-+        guard let newValue else { return }
-+        loadTransferable(from: newValue)
-+      }
+      .onChange(of: imageSelection) { _, newValue in
+        guard let newValue else { return }
+        loadTransferable(from: newValue)
+      }
     }
     .task {
       await getInitialProfile()
@@ -441,9 +467,9 @@ struct ProfileView: View {
       fullName = profile.fullName ?? ""
       website = profile.website ?? ""
 
-+      if let avatarURL = profile.avatarURL, !avatarURL.isEmpty {
-+        try await downloadImage(path: avatarURL)
-+      }
+      if let avatarURL = profile.avatarURL, !avatarURL.isEmpty {
+        try await downloadImage(path: avatarURL)
+      }
 
     } catch {
       debugPrint(error)
@@ -455,7 +481,7 @@ struct ProfileView: View {
       isLoading = true
       defer { isLoading = false }
       do {
-+        let imageURL = try await uploadImage()
+        let imageURL = try await uploadImage()
 
         let currentUser = try await supabase.auth.session.user
 
@@ -463,7 +489,7 @@ struct ProfileView: View {
           username: username,
           fullName: fullName,
           website: website,
-+          avatarURL: imageURL
+          avatarURL: imageURL
         )
 
         try await supabase
@@ -477,42 +503,46 @@ struct ProfileView: View {
     }
   }
 
-+  private func loadTransferable(from imageSelection: PhotosPickerItem) {
-+    Task {
-+      do {
-+        avatarImage = try await imageSelection.loadTransferable(type: AvatarImage.self)
-+      } catch {
-+        debugPrint(error)
-+      }
-+    }
-+  }
-+
-+  private func downloadImage(path: String) async throws {
-+    let data = try await supabase.storage.from("avatars").download(path: path)
-+    avatarImage = AvatarImage(data: data)
-+  }
-+
-+  private func uploadImage() async throws -> String? {
-+    guard let data = avatarImage?.data else { return nil }
-+
-+    let filePath = "\(UUID().uuidString).jpeg"
-+
-+    try await supabase.storage
-+      .from("avatars")
-+      .upload(
-+        filePath,
-+        data: data,
-+        options: FileOptions(contentType: "image/jpeg")
-+      )
-+
-+    return filePath
-+  }
+  private func loadTransferable(from imageSelection: PhotosPickerItem) {
+    Task {
+      do {
+        avatarImage = try await imageSelection.loadTransferable(type: AvatarImage.self)
+      } catch {
+        debugPrint(error)
+      }
+    }
+  }
+
+  private func downloadImage(path: String) async throws {
+    let data = try await supabase.storage.from("avatars").download(path: path)
+    avatarImage = AvatarImage(data: data)
+  }
+
+  private func uploadImage() async throws -> String? {
+    guard let data = avatarImage?.data else { return nil }
+
+    let filePath = "\(UUID().uuidString).jpeg"
+
+    try await supabase.storage
+      .from("avatars")
+      .upload(
+        filePath,
+        data: data,
+        options: FileOptions(contentType: "image/jpeg")
+      )
+
+    return filePath
+  }
 }
 ```
 
+</$CodeTabs>
+
 Finally, update your Models.
 
-```swift Models.swift
+<$CodeTabs>
+
+```swift name=Models.swift
 struct Profile: Codable {
   let username: String?
   let fullName: String?
@@ -527,6 +557,8 @@ struct Profile: Codable {
   }
 }
 ```
+
+</$CodeTabs>
 
 You no longer need the `UpdateProfileParams` struct, as you can now reuse the `Profile` struct for both request and response calls.
 

@@ -4,7 +4,13 @@ title: Upgrading
 
 Supabase ships fast and we endeavor to add all new features to existing projects wherever possible. In some cases, access to new features require upgrading or migrating your Supabase project.
 
-You can upgrade your project using `pg_upgrade` or by pausing and restoring your project.
+<Admonition type="tip">
+
+This guide refers to upgrading the Postgres version of your Supabase Project. For scaling your compute size, refer to the [Compute and Disk page](/docs/guides/platform/compute-and-disk).
+
+</Admonition>
+
+You can upgrade your project using in-place upgrades or by pausing and restoring your project.
 
 <ShowUntil date="2024-12-17">
 <Admonition type="tip">
@@ -14,54 +20,49 @@ The Migrating and Upgrading guide has been divided into two sections. To migrate
 </Admonition>
 </ShowUntil>
 
-## `pg_upgrade`
+## In-place upgrades
 
 <Admonition type="note">
 
-This upgrade method is currently in Beta.
+For security purposes, passwords for custom roles are not backed up and, following a restore, they would need to be reset. See [here](/docs/guides/platform/backups#daily-backups) for more details
 
 </Admonition>
 
-<Admonition type="note">
-  For security purposes, passwords for custom roles are not backed up and, following a restore, they
-  would need to be reset. See [here](/docs/guides/platform/backups#daily-backups) for more details
-</Admonition>
-
-pg_upgrade performs an in-place upgrade on your database. For projects larger than 1GB, pg_upgrade is generally faster than a pause+restore cycle, and the speed advantage grows with the size of the database.
+In-place upgrades uses `pg_upgrade`. For projects larger than 1GB, this method is generally faster than a pause and restore cycle, and the speed advantage grows with the size of the database.
 
 1. Plan for an appropriate downtime window, and ensure you have reviewed the [caveats](#caveats) section of this document before executing the upgrade.
-1. Use the "Upgrade project" button on the [Infrastructure](https://supabase.com/dashboard/project/_/settings/infrastructure) section of your dashboard.
+1. Use the "Upgrade project" button on the [Infrastructure](/dashboard/project/_/settings/infrastructure) section of your dashboard.
 
-Additionally, if a pg_upgrade upgrade should fail, your original DB would be brought back up online and be able to service requests.
+Additionally, if the upgrade should fail, your original database would be brought back up online and be able to service requests.
 
-As a rough rule of thumb, pg_upgrade operates at ~100mbps (when executing an upgrade on your data). Using the size of your database, you can use this metric to derive an approximate sense of the downtime window necessary for the upgrade. During this window, you should plan for your DB and associated services to be unavailable.
+As a rough rule of thumb, pg_upgrade operates at ~100MBps (when executing an upgrade on your data). Using the size of your database, you can use this metric to derive an approximate sense of the downtime window necessary for the upgrade. During this window, you should plan for your database and associated services to be unavailable.
 
 ## Pause and restore
 
 <Admonition type="note">
 
-We recommend using the pg_upgrade method, as it is faster, and more reliable. Additionally, only Free-tier projects are eligible to use the Pause + Restore method.
+We recommend using the In-place upgrade method, as it is faster, and more reliable. Additionally, only Free-tier projects are eligible to use the Pause and Restore method.
 
 </Admonition>
 
 When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
 
-1. On the [General Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
+1. On the [General Settings](/dashboard/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
 1. After your project is paused, click **Restore project**. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
 
 Note that a pause + restore upgrade involves tearing down your project's resources before bringing them back up again. If the restore process should fail, manual intervention from Supabase support will be required to bring your project back online.
 
-### Caveats
+## Caveats
 
 Regardless of the upgrade method, a few caveats apply:
 
-#### Logical replication
+### Logical replication
 
 If you are using logical replication, the replication slots will not be preserved by the upgrade process. You will need to manually recreate them after the upgrade with the method `pg_create_logical_replication_slot`. Refer to the Postgres docs on [Replication Management Functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-REPLICATION) for more details about the method.
 
-#### Breaking changes
+### Breaking changes
 
-Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](https://supabase.com/dashboard/project/_/settings/infrastructure).
+Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](/dashboard/project/_/settings/infrastructure).
 
 Breaking changes are generally only present in major version upgrades of Postgres and PostgREST. You can find their respective release notes at:
 
@@ -70,13 +71,13 @@ Breaking changes are generally only present in major version upgrades of Postgre
 
 If you are upgrading from a significantly older version, you will need to consider the release notes for any intermediary releases as well.
 
-#### Time limits
+### Time limits
 
 Starting from 2024-06-24, when a project is paused, users then have a 90-day window to restore the project on the platform from within Supabase Studio.
 
 The 90-day window allows Supabase to introduce platform changes that may not be backwards compatible with older backups. Unlike active projects, static backups can't be updated to accommodate such changes.
 
-During the 90-day restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](https://supabase.com/dashboard/projects).
+During the 90-day restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](/dashboard/projects).
 
 <Image
   zoomable
@@ -84,7 +85,7 @@ During the 90-day restore window a paused project can be restored to the platfor
   src="/docs/img/guides/platform/paused-90-day.png"
 />
 
-After the 90-day restore window, you can download your project's backup file, and Storage objects from the project dashboard. See [restoring a backup locally](#restoring-a-downloaded-backup-locally) for instructions on how to load that backup locally to recover your data.
+After the 90-day restore window, you can download your project's backup file, and Storage objects from the project dashboard. See [restoring a backup locally](/docs/guides/local-development/restoring-downloaded-backup) for instructions on how to load that backup locally to recover your data.
 
 <Image
   zoomable
@@ -100,66 +101,24 @@ If you upgrade to a paid plan while your project is paused, any expired one-clic
   src="/docs/img/guides/platform/paused-paid-tier.png"
 />
 
-#### Restoring a downloaded backup locally
-
-<Admonition type="caution">
-  If you want to restore your backup to a hosted Supabase project, you will need to use the
-  [Migrating within Supabase guide](/docs/guides/platform/migrating-within-supabase)
-</Admonition>
-
-If the 90 day project restore window has expired but you need to access data contained within your project using SQL, you can use the [Supabase CLI](/docs/guides/local-development) to restore the project into a local Postgres instance.
-
-First, download your project's backup file from dashboard and identify its backup image version (following the `PG:` prefix):
-
-<Image
-  zoomable
-  alt="Project Paused: 90 Days Remaining"
-  src="/docs/img/guides/platform/paused-dl-image-version.png"
-/>
-
-Given Postgres version `15.6.1.115`, start Postgres locally with `db_cluster.backup` being the path to your backup file.
-
-```sh
-supabase init
-echo '15.6.1.115' > supabase/.temp/postgres-version
-supabase db start --from-backup db_cluster.backup
-```
-
-Note that the earliest Supabase Postgres version that supports a local restore is `15.1.0.55`. If your hosted project was running on earlier versions, you will likely run into errors during restore. Before submitting any support ticket, make sure you have attached the error logs from `supabase_db_*` docker container.
-
-Once your local database starts up successfully, you can connect using psql to verify that all your data is restored.
-
-```sh
-psql 'postgresql://postgres:postgres@localhost:54322/postgres'
-```
-
-If you want to use other services like Auth, Storage, and Studio dashboard together with your restored database, restart the local development stack.
-
-```sh
-supabase stop
-supabase start
-```
-
-A Postgres database started with Supabase CLI is not production ready and should not be used outside of local development.
-
-#### Disk sizing
+### Disk sizing
 
 When upgrading, the Supabase platform will "right-size" your disk based on the current size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, the upgrade will reduce the disk size to 120GB (1.2x the size of your database).
 
-#### Objects dependent on Postgres extensions
+### Objects dependent on Postgres extensions
 
-pg_upgrade does not support upgrading of databases containing reg\* data types referencing system OIDs.
+In-place upgrades do not support upgrading of databases containing reg\* data types referencing system OIDs.
 If you have created any objects that depend on the following extensions, you will need to recreate them after the upgrade.
 
-#### `pg_cron` records
+### `pg_cron` records
 
 [pg_cron](https://github.com/citusdata/pg_cron#viewing-job-run-details) does not automatically clean up historical records. This can lead to extremely large `cron.job_run_details` tables if the records are not regularly pruned; you should clean unnecessary records from this table prior to an upgrade.
 
-During the `pg_upgrade` process, the `pg_cron` extension gets dropped and recreated. Prior to this process, the `cron.job_run_details` table is duplicated to avoid losing historical logs. The instantaneous disk pressure created by duplicating an extremely large details table can cause at best unnecessary performance degradation, or at worst, upgrade process failures.
+During an in-place upgrade, the `pg_cron` extension gets dropped and recreated. Prior to this process, the `cron.job_run_details` table is duplicated to avoid losing historical logs. The instantaneous disk pressure created by duplicating an extremely large details table can cause at best unnecessary performance degradation, or at worst, upgrade process failures.
 
-#### Extensions
+### Extensions
 
-pg_upgrade does not currently support upgrading of databases using extensions older than the following versions:
+In-place upgrades do not currently support upgrading of databases using extensions older than the following versions:
 
 - TimescaleDB 2.16.1
 - plv8 3.1.10
@@ -187,10 +146,28 @@ WHERE rolcanlogin = true
 ALTER ROLE <role_name> WITH PASSWORD '<password>';
 ```
 
-#### Database size reduction
+### Database size reduction
 
 As part of the upgrade process, maintenance operations such as [vacuuming](https://www.postgresql.org/docs/current/routine-vacuuming.html#ROUTINE-VACUUMING) are also executed. This can result in a reduction in the reported database size.
 
-#### Post-upgrade validation
+### Post-upgrade validation
 
 Supabase performs extensive pre- and post-upgrade validations to ensure that the database has been correctly upgraded. However, you should plan for your own application-level validations, as there might be changes you might not have anticipated, and this should be budgeted for when planning your downtime window.
+
+## Specific upgrade notes
+
+### Upgrading to Postgres 17
+
+In projects using Postgres 17, the following extensions are deprecated:
+
+- `plcoffee`
+- `plls`
+- `plv8`
+- `timescaledb`
+- `pgjwt`
+
+Projects planning to upgrade from Postgres 15 to Postgres 17 need to first disable these extensions in the [Supabase Dashboard](/dashboard/project/_/database/extensions).
+
+`pgjwt` was enabled by default on every Supabase project up until Postgres 17. If you weren’t explicitly using `pgjwt` in your project, it’s most likely safe to disable.
+
+Existing projects on lower versions of Postgres are not impacted, and the extensions will continue to be supported on projects using Postgres 15, until the end of life of Postgres 15 on the Supabase platform.

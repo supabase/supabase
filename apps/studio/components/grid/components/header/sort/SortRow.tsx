@@ -3,11 +3,11 @@ import { Menu, X } from 'lucide-react'
 import { memo, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
-import type { DragItem, Sort, SupaTable } from 'components/grid/types'
+import type { DragItem, Sort } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Toggle } from 'ui'
 
 export interface SortRowProps {
-  table: SupaTable
   index: number
   columnName: string
   sort: Sort
@@ -16,8 +16,9 @@ export interface SortRowProps {
   onDrag: (dragIndex: number, hoverIndex: number) => void
 }
 
-const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
-  const column = table.columns.find((x) => x.name === columnName)
+const SortRow = ({ index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+  const column = snap.table.columns.find((x) => x.name === columnName)
 
   const ref = useRef<HTMLDivElement>(null)
 

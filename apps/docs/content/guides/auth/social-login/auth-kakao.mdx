@@ -14,7 +14,7 @@ Kakao OAuth consists of six broad steps:
 - Obtaining a `REST API key` - this will serve as the `client_id`.
 - Generating the `Client secret code` - this will serve as the `client_secret`.
 - Additional configurations on Kakao Developers Portal.
-- Add your `client id` and `client secret` keys to your [Supabase Project](https://supabase.com/dashboard).
+- Add your `client id` and `client secret` keys to your [Supabase Project](/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your Kakao Developer account
@@ -45,8 +45,10 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ## Find your callback URL
 
-<SocialProviderSetup provider="Kakao" />- To add callback URL on Kakao, go to `Product settings` >
-`Kakao Login` > `Redirect URI`.
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "Kakao" }} />
+
+- To add callback URL on Kakao, go to `Product settings` >
+  `Kakao Login` > `Redirect URI`.
 
 ## Generate and activate a `client_secret`
 
@@ -64,7 +66,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ## Add your OAuth credentials to Supabase
 
-<SocialProviderSettingsSupabase provider="Kakao" />
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Kakao" }} />
 
 ## Add login code to your client app
 
@@ -77,11 +79,15 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 >
 <TabPanel id="js" label="JavaScript">
 
-<CreateClientSnippet />
+<$Partial path="create_client_snippet.mdx" />
 
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `kakao` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+// ---cut---
 async function signInWithKakao() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'kakao',
@@ -106,6 +112,7 @@ Future<void> signInWithKakao() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Kakao` as the `Provider`:
@@ -117,9 +124,10 @@ suspend fun signInWithKakao() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
-<OAuthPkceFlow />
+<$Partial path="oauth_pkce_flow.mdx" />
 
 <Tabs
   scrollable
@@ -150,6 +158,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -161,6 +170,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Using Kakao Login JS SDK

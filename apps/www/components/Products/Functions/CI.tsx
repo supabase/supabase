@@ -6,7 +6,7 @@ const ciCode = `jobs:
   runs-on: ubuntu-latest
  
   steps:
-   - uses: actions/checkout@v3
+   - uses: actions/checkout@v4
    - uses: supabase/setup-cli@v1
    with:
     version: latest

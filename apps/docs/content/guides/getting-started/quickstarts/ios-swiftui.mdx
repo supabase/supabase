@@ -9,7 +9,7 @@ hideToc: true
 
   <StepHikeCompact.Step step={1}>
 
-    <QuickstartDbSetup />
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -42,18 +42,18 @@ hideToc: true
       Create a new `Supabase.swift` file add a new Supabase instance using your project URL and public API (anon) key:
 
       <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="anonKey" />
+      <ProjectConfigVariables variable="publishableKey" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```swift Supabase.swift
+      ```swift name=Supabase.swift
       import Supabase
 
       let supabase = SupabaseClient(
         supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
-        supabaseKey: "YOUR_SUPABASE_ANON_KEY"
+        supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
       )
       ```
 
@@ -73,7 +73,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```swift Supabase.swift
+      ```swift name=Supabase.swift
       struct Instrument: Decodable, Identifiable {
         let id: Int
         let name: String
@@ -96,7 +96,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```swift ContentView.swift
+      ```swift name=ContentView.swift
       struct ContentView: View {
 
         @State var instruments: [Instrument] = []

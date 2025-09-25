@@ -1,34 +1,52 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
+import { AlertCircle, Info, Search } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Input, Toggle } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import PublicationSkeleton from './PublicationSkeleton'
-import { Search, AlertCircle } from 'lucide-react'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import {
+  Button,
+  Card,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { PublicationSkeleton } from './PublicationSkeleton'
 
 interface PublicationEvent {
   event: string
   key: string
 }
 
-interface PublicationsListProps {
-  onSelectPublication: (id: number) => void
-}
-
-const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
-  const { project } = useProjectContext()
+export const PublicationsList = () => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data, isLoading } = useDatabasePublicationsQuery({
+  const {
+    data = [],
+    error,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -39,11 +57,10 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     },
   })
 
-  const canUpdatePublications = useCheckPermissions(
+  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )
-  const isPermissionsLoaded = usePermissionsLoaded()
 
   const publicationEvents: PublicationEvent[] = [
     { event: 'Insert', key: 'publish_insert' },
@@ -51,10 +68,11 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     { event: 'Delete', key: 'publish_delete' },
     { event: 'Truncate', key: 'publish_truncate' },
   ]
-  const publications =
+  const publications = (
     filterString.length === 0
-      ? data ?? []
-      : (data ?? []).filter((publication) => publication.name.includes(filterString))
+      ? data
+      : data.filter((publication) => publication.name.includes(filterString))
+  ).sort((a, b) => a.id - b.id)
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
     publication: any
@@ -82,8 +100,9 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           <div className="flex items-center">
             <Input
               size="tiny"
-              icon={<Search size="14" />}
-              placeholder={'Filter'}
+              icon={<Search size={12} />}
+              className="w-48 pl-8"
+              placeholder="Search for a publication"
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
             />
@@ -100,32 +119,62 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto">
-        <Table
-          head={[
-            <Table.th key="header.name">Name</Table.th>,
-            <Table.th key="header.id">System ID</Table.th>,
-            <Table.th key="header.insert">Insert</Table.th>,
-            <Table.th key="header.update">Update</Table.th>,
-            <Table.th key="header.delete">Delete</Table.th>,
-            <Table.th key="header.truncate">Truncate</Table.th>,
-            <Table.th key="header.source" className="text-right">
-              Source
-            </Table.th>,
-          ]}
-          body={
-            isLoading
-              ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
-              : publications.map((x) => (
-                  <Table.tr className="border-t" key={x.name}>
-                    <Table.td className="px-4 py-3">{x.name}</Table.td>
-                    <Table.td>{x.id}</Table.td>
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>System ID</TableHead>
+                <TableHead>Insert</TableHead>
+                <TableHead>Update</TableHead>
+                <TableHead>Delete</TableHead>
+                <TableHead>Truncate</TableHead>
+                <TableHead />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading &&
+                Array.from({ length: 2 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)}
+
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <AlertError error={error} subject="Failed to retrieve publications" />
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {isSuccess &&
+                publications.map((x) => (
+                  <TableRow key={x.name}>
+                    <TableCell className="flex items-center gap-x-2 items-center">
+                      {x.name}
+                      {/* [Joshen] Making this tooltip very specific for these 2 publications */}
+                      {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
+                        x.name
+                      ) && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info size={14} className="text-foreground-light" />
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            {x.name === 'supabase_realtime'
+                              ? 'This publication is managed by Supabase and handles Postgres changes'
+                              : x.name === 'supabase_realtime_messages_publication'
+                                ? 'This publication is managed by Supabase and handles broadcasts from the database'
+                                : undefined}
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </TableCell>
+                    <TableCell>{x.id}</TableCell>
                     {publicationEvents.map((event) => (
-                      <Table.td key={event.key}>
-                        <Toggle
-                          size="tiny"
+                      <TableCell key={event.key}>
+                        <Switch
+                          size="small"
                           checked={(x as any)[event.key]}
                           disabled={!canUpdatePublications}
-                          onChange={() => {
+                          onClick={() => {
                             setToggleListenEventValue({
                               publication: x,
                               event,
@@ -133,27 +182,24 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
                             })
                           }}
                         />
-                      </Table.td>
+                      </TableCell>
                     ))}
-                    <Table.td className="px-4 py-3 pr-2">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          type="default"
-                          style={{ paddingTop: 3, paddingBottom: 3 }}
-                          onClick={() => onSelectPublication(x.id)}
-                        >
-                          {x.tables == null
-                            ? 'All tables'
-                            : `${x.tables.length} ${
-                                x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
-                              }`}
+                    <TableCell>
+                      <div className="flex justify-end">
+                        <Button asChild type="default" style={{ paddingTop: 3, paddingBottom: 3 }}>
+                          <Link href={`/project/${ref}/database/publications/${x.id}`}>
+                            {x.tables === null
+                              ? 'All tables'
+                              : `${x.tables.length} ${x.tables.length === 1 ? 'table' : 'tables'}`}
+                          </Link>
                         </Button>
                       </div>
-                    </Table.td>
-                  </Table.tr>
-                ))
-          }
-        />
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </Card>
       </div>
 
       {!isLoading && publications.length === 0 && (
@@ -183,5 +229,3 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     </>
   )
 }
-
-export default PublicationsList

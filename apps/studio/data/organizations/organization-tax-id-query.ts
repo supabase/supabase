@@ -3,7 +3,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -20,14 +20,10 @@ export async function getOrganizationTaxId(
   const { data, error } = await get(`/platform/organizations/{slug}/tax-ids`, {
     params: { path: { slug } },
     signal,
-    headers: {
-      Version: '2',
-    },
   })
   if (error) throw handleError(error)
 
-  // @ts-ignore wrong typing due to mgmt api versioning
-  return (data as components['schemas']['TaxIdV2Response']).tax_id
+  return (data as components['schemas']['TaxIdResponse']).tax_id
 }
 
 export type OrganizationTaxIdData = Awaited<ReturnType<typeof getOrganizationTaxId>>
@@ -40,7 +36,11 @@ export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
     ...options
   }: UseQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
 ) => {
-  const canReadSubscriptions = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
+  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.tax_ids'
+  )
+
   return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>(
     organizationKeys.taxId(slug),
     ({ signal }) => getOrganizationTaxId({ slug }, signal),

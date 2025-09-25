@@ -9,7 +9,9 @@ database_id = "c89147f8-a66a-4c04-a1a7-45442fd7f2ee"
 
 ### Finding your database hostname
 
-Your database's hostname is crucial for establishing a direct connection. It resolves to the underlying IP address of your database. To find your hostname, navigate to your [Database Settings](https://supabase.com/dashboard/project/_/settings/database). It's important to note that the pooler (connection pooler) has a different IP than your database. Therefore, to reveal the database host and direct connection string, you must hide the pooler connection string.
+Your database's hostname is crucial for establishing a direct connection. It resolves to the underlying IP address of your database.
+
+To find your hostname, navigate to the dashboard and click [Connect](/dashboard/project/_?showConnect=true). Look at the Direct connection string and click the View parameters under it to see the hostname.
 
 Example Hostname: `db.zcjtzmeifsoteyjytnbc.supabase.co`
 
@@ -33,7 +35,7 @@ Upon project creation, a static IPv6 address is assigned. However, it's essentia
 
 ### IPv4 address
 
-Opting for the static [IPv4 add-on](https://supabase.com/docs/guides/platform/ipv4-address) provides a more stable connection address. The IPv4 address remains constant unless:
+Opting for the static [IPv4 add-on](/docs/guides/platform/ipv4-address) provides a more stable connection address. The IPv4 address remains constant unless:
 
 - The project is paused or resumed.
 - Unlike the IPv6 address, upgrading your database does not affect the IPv4 address.

@@ -1,57 +1,62 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Clock } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Button } from 'ui'
 
-const BranchingPITRNotice = () => {
+export const BranchingPITRNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
 
   return (
-    <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 !border-t-0 !border-l-0 !border-r-0">
-      <AlertTitle_Shadcn_ className="text-base">
-        We strongly encourage enabling Point in Time Recovery (PITR)
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        This is to ensure that you can always recover data if you make a "bad migration". For
-        example, if you accidentally delete a column or some of your production data.
-      </AlertDescription_Shadcn_>
-      {!canUpdateSubscription ? (
-        <ButtonTooltip
-          disabled
-          size="tiny"
-          type="default"
-          className="mt-4"
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: 'You need additional permissions to amend subscriptions',
-            },
-          }}
-        >
-          Enable PITR add-on
-        </ButtonTooltip>
-      ) : (
-        <Button size="tiny" type="default" className="mt-4">
-          <Link
-            href={`/project/${ref}/settings/addons?panel=pitr`}
-            onClick={() => snap.setShowEnableBranchingModal(false)}
+    <div className="flex flex-row gap-4">
+      <div>
+        <figure className="w-10 h-10 rounded-md border flex items-center justify-center">
+          <Clock className="text-warning-700" size={20} strokeWidth={2} />
+        </figure>
+      </div>
+      <div className="flex grow items-center justify-between gap-4">
+        <div className="flex flex-col gap-y-1">
+          <p className="text-sm text-foreground">Consider enabling Point in Time Recovery (PITR)</p>
+          <p className="text-sm text-foreground-light">
+            This ensures you can recover production data if you merge a bad migration (e.g. delete a
+            column).
+          </p>
+        </div>
+        {!canUpdateSubscription ? (
+          <ButtonTooltip
+            disabled
+            size="tiny"
+            type="default"
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to amend subscriptions',
+              },
+            }}
           >
             Enable PITR add-on
-          </Link>
-        </Button>
-      )}
-    </Alert_Shadcn_>
+          </ButtonTooltip>
+        ) : (
+          <Button size="tiny" type="default" asChild>
+            <Link
+              href={`/project/${ref}/settings/addons?panel=pitr`}
+              onClick={() => snap.setShowCreateBranchModal(false)}
+            >
+              Enable PITR
+            </Link>
+          </Button>
+        )}
+      </div>
+    </div>
   )
 }
-
-export default BranchingPITRNotice

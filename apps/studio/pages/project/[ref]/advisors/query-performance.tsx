@@ -1,48 +1,44 @@
-import { useRouter } from 'next/router'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 
 import { useParams } from 'common'
+import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/EnableIndexAdvisorButton'
+import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
-import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import {
-  QueryPerformanceSort,
-  useQueryPerformanceQuery,
-} from 'components/interfaces/Reports/Reports.queries'
+import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-
-const PRESET_MAP = {
-  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
-  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: 'mostFrequentlyInvoked',
-  [QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION]: 'slowestExecutionTime',
-} as const
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref: projectRef, search, sort, order, preset: urlPreset } = useParams()
+  const { ref } = useParams()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { sort: sortConfig } = useQueryPerformanceSort()
+
+  const [{ search: searchQuery, roles }] = useQueryStates({
+    sort: parseAsString,
+    order: parseAsString,
+    search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
+  })
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
-  const hooks = queriesFactory(config.queries, projectRef ?? 'default')
+  const hooks = queriesFactory(config.queries, ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
-
-  const orderBy = sort !== undefined ? ({ column: sort, order } as QueryPerformanceSort) : undefined
-  const searchQuery = search ?? ''
-  const roles = router?.query?.roles ?? []
-  const preset =
-    urlPreset !== undefined
-      ? PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
-      : 'mostTimeConsuming'
+  const queryMetrics = hooks.queryMetrics()
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
-    orderBy,
-    preset,
-    roles: typeof roles === 'string' ? [roles] : roles,
+    orderBy: sortConfig || undefined,
+    preset: 'unified',
+    roles,
+    runIndexAdvisor: isIndexAdvisorEnabled,
   })
 
   return (
@@ -50,10 +46,19 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
       <FormHeader
         className="py-4 px-6 !mb-0"
         title="Query Performance"
-        docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-        actions={<DatabaseSelector />}
+        actions={
+          <div className="flex items-center gap-2">
+            <EnableIndexAdvisorButton />
+            <DocsButton href="https://supabase.com/docs/guides/platform/performance#examining-query-performance" />
+            <DatabaseSelector />
+          </div>
+        }
       />
-      <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
+      <QueryPerformance
+        queryHitRate={queryHitRate}
+        queryPerformanceQuery={queryPerformanceQuery}
+        queryMetrics={queryMetrics}
+      />
     </div>
   )
 }

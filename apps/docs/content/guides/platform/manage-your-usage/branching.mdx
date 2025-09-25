@@ -19,31 +19,31 @@ Compute incurred by Preview branches is shown as "Branching Compute Hours" on yo
 
 ## Pricing
 
-<PricingBranching />
+<$Partial path="billing/pricing/pricing_branching.mdx" />
 
 ## Billing examples
 
 The project has a Preview branch "XYZ", that runs for 30 hours, incurring Compute and Egress costs. Disk Size usage remains within the 8 GB included in the subscription plan, so no additional charges apply.
 
-| Line Item                      | Costs     |
-| ------------------------------ | --------- |
-| Pro Plan                       | $25       |
-|                                |           |
-| Compute Hours Small Project 1  | $15       |
-| Egress Project 1               | $7        |
-| Disk Size Project 1            | $3        |
-|                                |           |
-| Compute Hours Micro Branch XYZ | $0.4      |
-| Egress Branch XYZ              | $1        |
-| Disk Size Branch XYZ           | $0        |
-|                                |           |
-| **Subtotal**                   | **$51.4** |
-| Compute Credits                | -$10      |
-| **Total**                      | **$41.4** |
+| Line Item                      | Costs                      |
+| ------------------------------ | -------------------------- |
+| Pro Plan                       | <Price price="25" />       |
+|                                |                            |
+| Compute Hours Small Project 1  | <Price price="15" />       |
+| Egress Project 1               | <Price price="7" />        |
+| Disk Size Project 1            | <Price price="3" />        |
+|                                |                            |
+| Compute Hours Micro Branch XYZ | <Price price="0.4" />      |
+| Egress Branch XYZ              | <Price price="1" />        |
+| Disk Size Branch XYZ           | <Price price="0" />        |
+|                                |                            |
+| **Subtotal**                   | **<Price price="51.4" />** |
+| Compute Credits                | -<Price price="10" />      |
+| **Total**                      | **<Price price="41.4" />** |
 
 ## View usage
 
-You can view Branching usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+You can view Branching usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 
 <Image
   alt="Usage page navigation bar"
@@ -54,10 +54,10 @@ You can view Branching usage on the [organization's usage page](https://supabase
   zoomable
 />
 
-In the Usage Summary section, you can see how many hours your Preview branches existed during the selected time period. Hover over "Branches Compute Hours" for a detailed breakdown.
+In the Usage Summary section, you can see how many hours your Preview branches existed during the selected time period. Hover over "Branching Compute Hours" for a detailed breakdown.
 
 <Image
-  alt="Usage summary Branches Compute Hours"
+  alt="Usage summary Branching Compute Hours"
   src={{
     light: '/docs/img/guides/platform/usage-summary-branch-hours--light.png',
     dark: '/docs/img/guides/platform/usage-summary-branch-hours--dark.png',

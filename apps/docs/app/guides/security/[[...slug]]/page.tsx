@@ -4,19 +4,20 @@ import {
   genGuidesStaticParams,
 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
-
-export const dynamicParams = false
+import { IS_PROD } from 'common'
+import { getEmptyArray } from '~/features/helpers.fn'
 
 type Params = { slug?: string[] }
 
-const SecurityGuidePage = async ({ params }: { params: Params }) => {
+const SecurityGuidePage = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const slug = ['security', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 
   return <GuideTemplate {...data!} />
 }
 
-const generateStaticParams = genGuidesStaticParams('security')
+const generateStaticParams = IS_PROD ? genGuidesStaticParams('security') : getEmptyArray
 const generateMetadata = genGuideMeta((params: { slug?: string[] }) =>
   getGuidesMarkdown(['security', ...(params.slug ?? [])])
 )

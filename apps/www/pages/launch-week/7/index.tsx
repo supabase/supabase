@@ -1,39 +1,21 @@
-import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
-import { useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { createClient } from '@supabase/supabase-js'
 
 import { LW_URL, SITE_ORIGIN } from '~/lib/constants'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
-import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
-import { useTheme } from 'next-themes'
 
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/7/Releases'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/7/LaunchWeekPrizeSection')
 )
-const TicketBrickWall = dynamic(
-  () => import('~/components/LaunchWeek/7/LaunchSection/TicketBrickWall')
-)
+
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
-interface Props {
-  users: UserData[]
-}
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
-  // ANON KEY
-  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-)
-export default function TicketHome({ users }: Props) {
-  const { theme, setTheme } = useTheme()
-
+export default function TicketHome() {
   const TITLE = 'Supabase LaunchWeek 7'
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
@@ -46,7 +28,7 @@ export default function TicketHome({ users }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW_URL,
+          url: `${LW_URL}/7`,
           images: [
             {
               url: OG_IMAGE,
@@ -69,25 +51,9 @@ export default function TicketHome({ users }: Props) {
             <LW7Releases />
             <LaunchWeekPrizeSection className="pt-10" />
           </div>
-          {users && <TicketBrickWall users={users} />}
         </div>
         <CTABanner />
       </DefaultLayout>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!
-    .from('lw7_tickets_golden')
-    .select('*')
-    .order('createdAt', { ascending: false })
-    .limit(17)
-
-  return {
-    props: {
-      users,
-    },
-  }
 }

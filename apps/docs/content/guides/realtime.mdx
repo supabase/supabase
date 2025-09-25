@@ -6,163 +6,21 @@ subtitle: 'Send and receive messages to connected clients.'
 hideToc: true
 ---
 
-Supabase provides a globally distributed cluster of [Realtime](https://github.com/supabase/realtime) servers that enable the following functionality:
+Supabase provides a globally distributed [Realtime](https://github.com/supabase/realtime) service with the following features:
 
-- [Broadcast](/docs/guides/realtime/broadcast): Send ephemeral messages from client to clients with low latency.
-- [Presence](/docs/guides/realtime/presence): Track and synchronize shared state between clients.
-- [Postgres Changes](/docs/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
+- [Broadcast](/docs/guides/realtime/broadcast): Send low-latency messages between clients. Perfect for real-time messaging, database changes, cursor tracking, game events, and custom notifications.
+- [Presence](/docs/guides/realtime/presence): Track and synchronize user state across clients. Ideal for showing who's online, or active participants.
+- [Postgres Changes](/docs/guides/realtime/postgres-changes): Listen to database changes in real-time.
 
-### Realtime API
+## What can you build?
 
-By default Realtime is disabled on your database. Let's turn on Realtime for a `todos` table.
+- **Chat applications** - Real-time messaging with typing indicators and online presence
+- **Collaborative tools** - Document editing, whiteboards, and shared workspaces
+- **Live dashboards** - Real-time data visualization and monitoring
+- **Multiplayer games** - Synchronized game state and player interactions
+- **Social features** - Live notifications, reactions, and user activity feeds
 
- <Tabs
-   scrollable
-   size="small"
-   type="underlined"
-   defaultActiveId="dashboard"
- >
- <TabPanel id="dashboard" label="Dashboard">
-
-1.  Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
-2.  Click on **Publications** in the sidebar.
-3.  Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
-4.  Control which tables broadcast changes by selecting **Source** and toggling each table.
-
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
-    type="video/mp4"
-  />
-</video>
-
- </TabPanel>
- <TabPanel id="sql" label="SQL">
-
-```sql
-alter
-  publication supabase_realtime add table todos;
-```
-
- </TabPanel>
- </Tabs>
-
-From the client, we can listen to any new data that is inserted into the `todos` table:
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-```js
-// Initialize the JS client
-import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-// Create a function to handle inserts
-const handleInserts = (payload) => {
-  console.log('Change received!', payload)
-}
-
-// Listen to inserts
-supabase
-  .channel('todos')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'todos' }, handleInserts)
-  .subscribe()
-```
-
-</TabPanel>
-<TabPanel id="dart" label="Dart">
-
-```dart
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-void main() async {
-  // Initialize the Flutter client
-  Supabase.initialize(
-    url: 'https://<project>.supabase.co',
-    anonKey: '<your-anon-key>',
-    realtimeClientOptions: const RealtimeClientOptions(
-      eventsPerSecond: 2,
-    ),
-  );
-  runApp(const MyApp());
-}
-
-final supabase = Supabase.instance.client;
-
-void handleInserts(payload) {
-  print('Change received! $payload');
-}
-
-// Listen to inserts
-supabase
-    .channel('todos')
-    .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'todos',
-        callback: handleInserts)
-    .subscribe();
-```
-
-</TabPanel>
-<TabPanel id="swift" label="Swift">
-
-```swift
-// Initialize the Swift client
-import Supabase
-
-let supabase = SupabaseClient(supabaseURL: SUPABASE_URL, supabaseKey: SUPABASE_ANON_KEY)
-
-// Create channel
-let channel = await supabase.realtime.channel("todos")
-
-// Create the observations before subscribing
-let insertions = await channel.postgresChanges(
-  InsertAction.self,
-  schema: "public",
-  table: "todos"
-)
-
-await channel.subscribe()
-
-for await insertion in insertions {
-  let todo = try insertion.decoded(as: Todo.self)
-  print("Todo inserted", todo)
-}
-```
-
-</TabPanel>
-<TabPanel id="python" label="Python">
-
-```py
-# Initialize the Python client
-from supabase import create_client, Client
-
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-# Create a function to handle inserts
-def handle_inserts(payload):
-  print("Change received", payload)
-
-# Listen to inserts
-await supabase.channel("todos").on_postgres_changes(
-    "INSERT", schema="public", table="todos", callback=handle_inserts
-).subscribe()
-```
-
-</TabPanel>
-
-</Tabs>
-
-Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes.
-The Realtime API works through PostgreSQL's replication functionality. Postgres sends database changes to a [publication](/docs/guides/database/replication#publications)
-called `supabase_realtime`, and by managing this publication you can control which data is broadcast.
+Check the [Getting Started](/docs/guides/realtime/getting-started) guide to get started.
 
 ## Examples
 
@@ -170,16 +28,32 @@ called `supabase_realtime`, and by managing this publication you can control whi
   {[
     {
       name: 'Multiplayer.dev',
-      description: 'Mouse movements and chat messages.',
+      description: 'Showcase application displaying cursor movements and chat messages using Broadcast.',
       href: 'https://multiplayer.dev',
     },
-  ].map((x) => (
-    <div className="col-span-12" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
+    {
+      name: 'Chat',
+      description: 'Supabase UI chat component using Broadcast to send message between users.',
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-chat'
+    },
+    {
+      name: 'Avatar Stack',
+      description: 'Supabase UI avatar stack component using Presence to track connected users.',
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-avatar-stack'
+    },
+    {
+      name: 'Realtime Cursor',
+      description: "Supabase UI realtime cursor component using Broadcast to share users' cursors to build collaborative applications.",
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-cursor'
+    }
+].map((x) => (
+  <div className="col-span-6" key={x.href}>
+    <Link href={x.href} target="_blank" passHref>
+      <GlassPanel title={x.name}>{x.description}</GlassPanel>
+    </Link>
+  </div>
+))}
+
 </div>
 
 ## Resources

@@ -1,44 +1,59 @@
-import { NextPage } from 'next'
+import { GlobeAltIcon } from '@heroicons/react/outline'
+import { Check } from 'lucide-react'
+import { GetServerSideProps } from 'next'
+import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
-import { GlobeAltIcon } from '@heroicons/react/outline'
-import { Check } from 'lucide-react'
-import { Badge, Button, Separator, buttonVariants, cn } from 'ui'
 import ReactMarkdown from 'react-markdown'
+import { Badge, Button, buttonVariants, cn, Separator } from 'ui'
+import { z } from 'zod'
 import Styles from '~/styles/career.module.css'
 
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-import { groupJobsByTeam, filterGenericJob, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
 import career from '~/data/career.json'
+import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
 
-export async function getStaticProps() {
+const ContributorSchema = z.object({
+  login: z.string(),
+  avatar_url: z.string(),
+  html_url: z.string(),
+})
+
+type Contributor = z.infer<typeof ContributorSchema>
+
+export const getServerSideProps: GetServerSideProps = (async ({ res }) => {
+  // refresh every 5 minutes
+  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=300')
+
   const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
-  const job_data = await job_res.json()
+  const job_data = (await job_res.json()) as { jobs: JobItemProps[] }
 
-  const jobs = groupJobsByTeam(job_data.jobs.filter((job: JobItemProps) => !filterGenericJob(job)))
+  const jobs = groupJobsByTeam(job_data.jobs.filter((job) => !filterGenericJob(job)))
   const placeholderJob = job_data.jobs.find(filterGenericJob)
 
-  const contributor_res = await fetch(
+  const contributorResponse = await fetch(
     'https://api.github.com/repos/supabase/supabase/contributors?per_page=100'
   )
-  const contributor_arr = await contributor_res.json()
+  let contributorArray: Contributor[] = []
+  try {
+    const contributorResponseData = await contributorResponse.json()
+    // if the response is not in the expected format, throw an error and return an empty array
+    contributorArray = ContributorSchema.array().parse(contributorResponseData)
+  } catch {}
 
-  const contributor_data = await contributor_arr.map(
-    (contributor: { login: string; avatar_url: string; html_url: string }) => {
-      return {
-        login: contributor.login,
-        avatar_url: contributor.avatar_url,
-        html_url: contributor.html_url,
-      }
+  const contributor_data = contributorArray.map((contributor) => {
+    return {
+      login: contributor.login,
+      avatar_url: contributor.avatar_url,
+      html_url: contributor.html_url,
     }
-  )
+  })
 
-  const contributors = await contributor_data.filter((contributor: any) =>
+  const contributors = await contributor_data.filter((contributor) =>
     career.contributors.includes(contributor.login)
   )
 
@@ -65,30 +80,17 @@ export async function getStaticProps() {
     }
   )
 
-  if (!job_data && !contributors) {
-    return {
-      props: {
-        notFound: true,
-      },
-    }
-  }
-
-  return {
-    props: {
-      jobs,
-      placeholderJob: placeholderJob ?? null,
-      contributors: contributors,
-    },
-  }
-}
+  // Pass data to the page via props
+  return { props: { jobs, placeholderJob: placeholderJob ?? null, contributors } }
+}) satisfies GetServerSideProps<CareersPageProps>
 
 interface CareersPageProps {
   jobs: Record<string, JobItemProps[]>
-  placeholderJob: JobItemProps
+  placeholderJob: JobItemProps | null
   contributors: { login: string; avatar_url: string; html_url: string }[]
 }
 
-const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contributors }) => {
+const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) => {
   const { basePath } = useRouter()
 
   const meta_title = 'Careers | Supabase'
@@ -128,7 +130,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
 
         <SectionContainer className="!pt-8">
           <div className="flex flex-wrap md:flex-nowrap -mt-6 md:mt-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
-            {career.company.map((company: { number: string; text: string }, i: number) => {
+            {career.company.map((company, i) => {
               return (
                 <div
                   key={i}
@@ -164,7 +166,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                   We work together, <br className="md:hidden" />
                   wherever we are
                 </h2>
-                <p className="text-foreground-light mt-4 text-sm md:text-base md:w-full">
+                <p className="text-foreground-light mt-4 text-sm md:text-lg md:w-full">
                   Working in a globally distributed team is rewarding but has its challenges. We are
                   across many different timezones, so we use tools like Notion, Slack, and Discord
                   to stay connected to our team, and our community.
@@ -185,19 +187,20 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                     <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">
                       What is Supabase
                     </h2>
-                    <p className="text-foreground-light text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
-                      Supabase is an open source Firebase alternative, built by developers for
+                    <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
+                      Supabase is the Postgres development platform, built by developers for
                       developers. Supabase adds auth, realtime, storage, restful APIs, and edge
-                      functions to Postgres without a single line of code. Supabase was born-remote.
-                      Having a globally distributed, open source company is our secret weapon to
-                      hiring top-tier talent.
+                    </p>
+                    <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
+                      Supabase was born-remote. Having a globally distributed, open source company
+                      is our secret weapon to hiring top-tier talent.
                     </p>
                   </div>
                   <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
                     <div className="relative w-full aspect-[148/125]">
                       <Image
-                        src="/images/career/1.jpg"
-                        alt="team photo"
+                        src="/images/career/team.jpg"
+                        alt="supabase team"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
                         placeholder="blur"
@@ -211,8 +214,8 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                     <div className="w-full md:w-5/6 rounded-md mt-6">
                       <div className="relative w-full aspect-[29/22]">
                         <Image
-                          src="/images/career/2.jpg"
-                          alt="team photo"
+                          src="/images/career/founders.jpg"
+                          alt="supabase founders"
                           fill
                           sizes="(min-width: 767px) 45vw, 100vw"
                           placeholder="blur"
@@ -272,8 +275,8 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                   <div className="w-full rounded-md mt-6">
                     <div className="relative w-full aspect-[16/9]">
                       <Image
-                        src="/images/career/6.jpg"
-                        alt="team photo"
+                        src="/images/career/supateam.jpg"
+                        alt="supabase company"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
                         placeholder="blur"
@@ -289,32 +292,30 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
 
             <SectionContainer>
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">Human powered</h2>
-              <p className="text-foreground-lighter text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
+              <p className="text-foreground-light text-sm lg:text-lg pt-3 sm:w-3/5 lg:max-w-md">
                 As a completely remote and asynchronous team, we focus on these five traits to keep
                 our team effective:
               </p>
               <div className="grid pt-10 gap-8 grid-cols-2 md:grid-cols-3 lg:gap-16 lg:grid-cols-5">
-                {career.humanPowered.map(
-                  (human: { icon: string; title: string; text: string }, i: number) => {
-                    return (
-                      <div key={i} className="flex flex-col gap-3">
-                        <div>
-                          <h3 className="text-base">{human.title}</h3>
-                          <p className="text-foreground-light text-xs lg:text-sm">{human.text}</p>
-                        </div>
+                {career.humanPowered.map((human, i) => {
+                  return (
+                    <div key={i} className="flex flex-col gap-3">
+                      <div>
+                        <h3 className="text-base">{human.title}</h3>
+                        <p className="text-foreground-light text-xs lg:text-sm">{human.text}</p>
                       </div>
-                    )
-                  }
-                )}
+                    </div>
+                  )
+                })}
               </div>
             </SectionContainer>
 
             <SectionContainer className="!pb-0">
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1px]">
-                  1,000 + Contributors building Supabase
+                  1,000+ Contributors building Supabase
                 </h2>
-                <p className="text-foreground-light text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
+                <p className="text-foreground-light text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                   We're building a community of communities, bringing together developers from many
                   different backgrounds, as well as new developers looking to get involved with open
                   source. We love celebrating everyone who contributes their time to the Supabase
@@ -322,7 +323,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                 </p>
               </div>
               <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">
-                {contributors.map((contributor: any, i: number) => {
+                {contributors.map((contributor, i) => {
                   return (
                     <div
                       className={`${
@@ -382,61 +383,17 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
               </h2>
             </div>
             <div className="mt-12 xl:mt-0 space-y-6 lg:space-y-0 sm:w-fit sm:mx-auto lg:grid lg:grid-cols-2 lg:gap-16">
-              {career.benefits.map(
-                (benefits: { icon: string; title: string; text: string }, i: number) => {
-                  return (
-                    <div className="h-full flex items-start space-x-6 w-full" key={i}>
-                      <div className="h-fit text-sm lg:text-base">
-                        <h3 className="text-sm">{benefits.title}</h3>
-                        <ReactMarkdown className="prose pt-1 text-sm">
-                          {benefits.text}
-                        </ReactMarkdown>
-                      </div>
+              {career.benefits.map((benefits, i) => {
+                return (
+                  <div className="h-full flex items-start space-x-6 w-full" key={i}>
+                    <div className="h-fit text-sm lg:text-base">
+                      <h3 className="text-base">{benefits.title}</h3>
+                      <ReactMarkdown className="prose pt-1 text-sm">{benefits.text}</ReactMarkdown>
                     </div>
-                  )
-                }
-              )}
+                  </div>
+                )
+              })}
             </div>
-          </div>
-        </SectionContainer>
-
-        <SectionContainer>
-          <div className="md:text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">How we hire</h2>
-            <p className="text-sm lg:text-base text-foreground-light pt-3">
-              The entire process is fully remote and all communication happens over email or via
-              video chat in Google Meet. The calls are all 1:1 and usually take between 20-45
-              minutes. We know you are interviewing us too, so please ask questions. We are happy to
-              answer.
-            </p>
-          </div>
-          <div className="mt-16 md:ml-36 lg:flex lg:items-start lg:w-fit lg:mx-auto">
-            {career.hiring.map((hiring: { title: string; text: string }, i: number) => {
-              return (
-                <div
-                  key={i + 1}
-                  className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
-                >
-                  <div className="lg:flex items-center">
-                    <div className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
-                      {i + 1}
-                    </div>
-                    <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-500 lg:pr-6"></div>
-                  </div>
-                  <div className="lg:mt-6">
-                    <h3 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
-                      {hiring.title}
-                    </h3>
-                    <p className="text-foreground-light text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
-                      {hiring.text}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-            <h3 className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-xl w-[44px] lg:min-w-[40px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
-              <Check />
-            </h3>
           </div>
         </SectionContainer>
 
@@ -454,9 +411,9 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                 <div key={team}>
                   <h3 className="text-foreground-lighter text-sm">{team}</h3>
                   <div className="mt-2 -space-y-px">
-                    {(teamJobs as JobItemProps[])
-                      .filter((job: any) => !filterGenericJob(job))
-                      .map((job: JobItemProps) => (
+                    {teamJobs
+                      .filter((job) => !filterGenericJob(job))
+                      .map((job) => (
                         <JobItem job={job} key={job.id} />
                       ))}
                   </div>
@@ -491,7 +448,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
   )
 }
 
-const JobItem: React.FC<{ job: JobItemProps }> = ({ job }) => {
+const JobItem = ({ job }: { job: JobItemProps }) => {
   const isPlaceholderJob = job.id === PLACEHOLDER_JOB_ID
 
   return (

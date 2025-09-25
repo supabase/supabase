@@ -8,7 +8,8 @@ import { DataPoint } from 'data/analytics/constants'
 import { useOrgDailyComputeStatsQuery } from 'data/analytics/org-daily-compute-stats-query'
 import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
-import SectionContent from './SectionContent'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { SectionContent } from './SectionContent'
 import { Attribute, AttributeColor } from './Usage.constants'
 import UsageBarChart from './UsageBarChart'
 
@@ -34,6 +35,8 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
     endDate,
   })
 
+  const { billingAll } = useIsFeatureEnabled(['billing:all'])
+
   const chartData: DataPoint[] = egressData?.data ?? []
 
   const COMPUTE_TO_COLOR: Record<ComputeUsageMetric, AttributeColor> = {
@@ -48,6 +51,14 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
     [ComputeUsageMetric.COMPUTE_HOURS_8XL]: 'red',
     [ComputeUsageMetric.COMPUTE_HOURS_12XL]: 'dark-red',
     [ComputeUsageMetric.COMPUTE_HOURS_16XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_OPTIMIZED_CPU]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_HIGH_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_OPTIMIZED_CPU]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_HIGH_MEMORY]: 'purple',
   }
 
   const attributes: Attribute[] = Object.keys(ComputeUsageMetric).map((it) => ({
@@ -71,16 +82,18 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
           name: 'Compute Hours',
           description:
             'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Micro Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
-          links: [
-            {
-              name: 'Compute Add-ons',
-              url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
-            },
-            {
-              name: 'Usage-billing for Compute',
-              url: 'https://supabase.com/docs/guides/platform/manage-your-usage/compute',
-            },
-          ],
+          links: billingAll
+            ? [
+                {
+                  name: 'Compute Add-ons',
+                  url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+                },
+                {
+                  name: 'Usage-billing for Compute',
+                  url: 'https://supabase.com/docs/guides/platform/manage-your-usage/compute',
+                },
+              ]
+            : [],
         }}
       >
         {isLoading && <GenericSkeletonLoader />}

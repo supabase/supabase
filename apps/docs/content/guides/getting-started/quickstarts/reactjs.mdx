@@ -9,7 +9,7 @@ hideToc: true
 
   <StepHikeCompact.Step step={1}>
 
-    <QuickstartDbSetup />
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -23,7 +23,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm create vite@latest my-app -- --template react
       ```
 
@@ -42,7 +42,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app && npm install @supabase/supabase-js
       ```
 
@@ -51,63 +51,82 @@ hideToc: true
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Query data from the app">
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    In `App.jsx`, create a Supabase client using your project URL and public API (anon) key:
+    Create a `.env.local` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
-
-    Add a `getInstruments` function to fetch the data and display the query result to the page.
+    <ProjectConfigVariables variable="publishableKey" />
 
     </StepHikeCompact.Details>
+
     <StepHikeCompact.Code>
 
+      <$CodeTabs>
 
-      ```js src/App.jsx
-        import { useEffect, useState } from "react";
-        import { createClient } from "@supabase/supabase-js";
+        ```text name=.env.local
+        VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        ```
 
-        const supabase = createClient("https://<project>.supabase.co", "<your-anon-key>");
-
-        function App() {
-          const [instruments, setInstruments] = useState([]);
-
-          useEffect(() => {
-            getInstruments();
-          }, []);
-
-          async function getInstruments() {
-            const { data } = await supabase.from("instruments").select();
-            setInstruments(data);
-          }
-
-          return (
-            <ul>
-              {instruments.map((instrument) => (
-                <li key={instrument.name}>{instrument.name}</li>
-              ))}
-            </ul>
-          );
-        }
-
-        export default App;
-      ```
+      </$CodeTabs>
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+    Replace the contents of `App.jsx` to add a `getInstruments` function to fetch the data and display the query result to the page using a Supabase client.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+      ```js name=src/App.jsx
+      import { useEffect, useState } from "react";
+      import { createClient } from "@supabase/supabase-js";
+
+      const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+
+      function App() {
+        const [instruments, setInstruments] = useState([]);
+
+        useEffect(() => {
+          getInstruments();
+        }, []);
+
+        async function getInstruments() {
+          const { data } = await supabase.from("instruments").select();
+          setInstruments(data);
+        }
+
+        return (
+          <ul>
+            {instruments.map((instrument) => (
+              <li key={instrument.name}>{instrument.name}</li>
+            ))}
+          </ul>
+        );
+      }
+
+      export default App;
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app, go to http://localhost:5173 in a browser, and open the browser console and you should see the list of instruments.
+    Run the development server, go to http://localhost:5173 in a browser and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 

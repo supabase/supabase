@@ -2,21 +2,31 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { Button, Input, SidePanel } from 'ui'
-import MigrationsEmptyState from './MigrationsEmptyState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Search } from 'lucide-react'
+import {
+  Button,
+  Card,
+  Input,
+  SidePanel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
+import MigrationsEmptyState from './MigrationsEmptyState'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data, isLoading, isSuccess, isError, error } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -46,8 +56,8 @@ const Migrations = () => {
             description={
               <>
                 <p className="mb-1">
-                  Try refreshing your browser, but if the issue persists, please reach out to us via
-                  support.
+                  Try refreshing your browser, but if the issue persists for more than a few
+                  minutes, please reach out to us via support.
                 </p>
                 <p className="mb-4">Error: {(error as any)?.message ?? 'Unknown'}</p>
               </>
@@ -55,7 +65,7 @@ const Migrations = () => {
           >
             <Button key="contact-support" asChild type="default">
               <Link
-                href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+                href={`/support/new?projectRef=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
               >
                 Contact support
               </Link>
@@ -77,59 +87,63 @@ const Migrations = () => {
                     icon={<Search size="14" />}
                   />
                 </div>
-                <Table
-                  head={[
-                    <Table.th key="version" style={{ width: '180px' }}>
-                      Version
-                    </Table.th>,
-                    <Table.th key="version">Name</Table.th>,
-                    <Table.th key="version">Inserted at (UTC)</Table.th>,
-                    <Table.th key="buttons"></Table.th>,
-                  ]}
-                  body={
-                    migrations.length > 0 ? (
-                      migrations.map((migration) => {
-                        // [Joshen] LEFT OFF HERE
-                        const insertedAt = dayjs(migration.version, 'YYYYMMDDHHmmss').format(
-                          'DD MMM YYYY, HH:mm:ss'
-                        )
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead key="version" style={{ width: '180px' }}>
+                          Version
+                        </TableHead>
+                        <TableHead key="version">Name</TableHead>
+                        <TableHead key="version">Inserted at (UTC)</TableHead>
+                        <TableHead key="buttons"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {migrations.length > 0 ? (
+                        migrations.map((migration) => {
+                          // [Joshen] LEFT OFF HERE
+                          const insertedAt = dayjs(migration.version, 'YYYYMMDDHHmmss').format(
+                            'DD MMM YYYY, HH:mm:ss'
+                          )
 
-                        return (
-                          <Table.tr key={migration.version}>
-                            <Table.td>{migration.version}</Table.td>
-                            <Table.td
-                              className={
-                                (migration?.name ?? '').length === 0
-                                  ? '!text-foreground-lighter'
-                                  : ''
-                              }
-                            >
-                              {migration?.name ?? 'Name not available'}
-                            </Table.td>
-                            <Table.td>{insertedAt}</Table.td>
-                            <Table.td align="right">
-                              <Button
-                                type="default"
-                                onClick={() => setSelectedMigration(migration)}
+                          return (
+                            <TableRow key={migration.version}>
+                              <TableCell>{migration.version}</TableCell>
+                              <TableCell
+                                className={
+                                  (migration?.name ?? '').length === 0
+                                    ? '!text-foreground-lighter'
+                                    : ''
+                                }
                               >
-                                View migration SQL
-                              </Button>
-                            </Table.td>
-                          </Table.tr>
-                        )
-                      })
-                    ) : (
-                      <Table.tr>
-                        <Table.td colSpan={3}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-light">
-                            Your search for "{search}" did not return any results
-                          </p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  }
-                />
+                                {migration?.name ?? 'Name not available'}
+                              </TableCell>
+                              <TableCell>{insertedAt}</TableCell>
+                              <TableCell align="right">
+                                <Button
+                                  type="default"
+                                  onClick={() => setSelectedMigration(migration)}
+                                >
+                                  View migration SQL
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={3}>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
+                              Your search for "{search}" did not return any results
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </Card>
               </>
             )}
           </div>

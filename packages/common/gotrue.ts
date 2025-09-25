@@ -9,17 +9,28 @@ export const AUTH_NAVIGATOR_LOCK_DISABLED_KEY =
   process.env.NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY ||
   'supabase.dashboard.auth.navigatorLock.disabled'
 
+/**
+ * Catches errors thrown when accessing localStorage. Safari with certain
+ * security settings throws when localStorage is accessed.
+ */
+function safeGetLocalStorage(key: string) {
+  try {
+    return globalThis?.localStorage?.getItem(key)
+  } catch {
+    return null
+  }
+}
+
 const debug =
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  globalThis?.localStorage?.getItem(AUTH_DEBUG_KEY) === 'true'
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && safeGetLocalStorage(AUTH_DEBUG_KEY) === 'true'
 
 const persistedDebug =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  globalThis?.localStorage?.getItem(AUTH_DEBUG_PERSISTED_KEY) === 'true'
+  safeGetLocalStorage(AUTH_DEBUG_PERSISTED_KEY) === 'true'
 
 const shouldEnableNavigatorLock =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  !(globalThis?.localStorage?.getItem(AUTH_NAVIGATOR_LOCK_DISABLED_KEY) === 'true')
+  !(safeGetLocalStorage(AUTH_NAVIGATOR_LOCK_DISABLED_KEY) === 'true')
 
 const shouldDetectSessionInUrl = process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL
   ? process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL === 'true'
@@ -110,6 +121,10 @@ export const gotrueClient = new AuthClient({
   detectSessionInUrl: shouldDetectSessionInUrl,
   debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
   lock: navigatorLockEnabled ? navigatorLock : undefined,
+
+  ...('localStorage' in globalThis
+    ? { storage: globalThis.localStorage, userStorage: globalThis.localStorage }
+    : null),
 })
 
 export type { User }

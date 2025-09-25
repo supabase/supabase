@@ -10,11 +10,13 @@ import UserImpersonationSelector from './UserImpersonationSelector'
 export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   padded?: boolean
+  disallowAuthenticatedOption?: boolean
 }
 
 const RoleImpersonationSelector = ({
   serviceRoleLabel,
   padded = true,
+  disallowAuthenticatedOption = false,
 }: RoleImpersonationSelectorProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -57,7 +59,7 @@ const RoleImpersonationSelector = ({
   return (
     <>
       <div className={cn('flex flex-col gap-3', padded ? 'p-5' : 'pb-5')}>
-        <h2 className="text-foreground text-base">Database role settings</h2>
+        <p className="text-foreground text-base">Database role settings</p>
 
         <form
           onSubmit={(e) => {
@@ -81,21 +83,25 @@ const RoleImpersonationSelector = ({
               icon={<AnonIcon isSelected={selectedOption === 'anon'} />}
             />
 
-            <RoleImpersonationRadio
-              value="authenticated"
-              isSelected={
-                selectedOption === 'authenticated' &&
-                (isAuthenticatedOptionFullySelected || 'partially')
-              }
-              onSelectedChange={onSelectedChange}
-              icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
-            />
+            {!disallowAuthenticatedOption && (
+              <RoleImpersonationRadio
+                value="authenticated"
+                isSelected={
+                  selectedOption === 'authenticated' &&
+                  (isAuthenticatedOptionFullySelected || 'partially')
+                }
+                onSelectedChange={onSelectedChange}
+                icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
+              />
+            )}
           </fieldset>
         </form>
 
         {selectedOption === 'service_role' && (
           <p className="text-foreground-light text-sm">
-            The default Postgres/superuser role. This has admin privileges.
+            The default Postgres/superuser role.
+            {disallowAuthenticatedOption ? <br /> : ' '}
+            This has admin privileges.
             <br />
             It will bypass Row Level Security (RLS) policies.
           </p>
@@ -103,16 +109,21 @@ const RoleImpersonationSelector = ({
 
         {selectedOption === 'anon' && (
           <p className="text-foreground-light text-sm">
-            For "anonymous access". This is the role which the API (PostgREST) will use when a user
+            For "anonymous access".
+            {disallowAuthenticatedOption ? <br /> : ' '}
+            This is the role which the API (PostgREST)
             <br />
-            is not logged in. It will respect Row Level Security (RLS) policies.
+            will use when a user is not logged in.
+            {disallowAuthenticatedOption ? <br /> : ' '}
+            It will respect Row Level Security (RLS) policies.
           </p>
         )}
 
         {selectedOption === 'authenticated' && (
           <p className="text-foreground-light text-sm">
-            For "authenticated access". This is the role which the API (PostgREST) will use when
-            <br /> a user is logged in. It will respect Row Level Security (RLS) policies.
+            For "authenticated access". This is the role which the API (PostgREST)
+            <br />
+            will use when a user is logged in. It will respect Row Level Security (RLS) policies.
           </p>
         )}
       </div>
@@ -120,9 +131,7 @@ const RoleImpersonationSelector = ({
       {selectedOption === 'authenticated' && (
         <>
           <DropdownMenuSeparator />
-          <div className={cn('py-5', padded && 'px-5')}>
-            <UserImpersonationSelector />
-          </div>
+          <UserImpersonationSelector />
         </>
       )}
     </>

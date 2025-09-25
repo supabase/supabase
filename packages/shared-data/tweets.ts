@@ -1,9 +1,81 @@
 const tweets = [
   {
-    text: "Working with @supabase has been one of the best dev experiences I've had lately. Incredibly easy to set up, great documentation, and so many fewer hoops to jump through than the competition. I definitely plan to use it on any and all future projects.",
-    url: 'https://twitter.com/thatguy_tex/status/1497602628410388480',
-    handle: 'thatguy_tex',
-    img_url: '/images/twitter-profiles/09HouOSt_400x400.jpg',
+    text: "Really impressed with @supabase's Assistant.\n\nIt has helped me troubleshoot and solve complex CORS Configuration issues on Pinger.",
+    url: 'https://x.com/TyronBache/status/1924425289959928039',
+    handle: 'TyronBache',
+    img_url: '/images/twitter-profiles/89h9ROOs_400x400.jpg',
+  },
+  {
+    text: 'I’ve always used Supabase just as a database.\n\nYesterday, I helped debug a founder’s vibe-coding project built with React + React Router — no backend server.\nThe “backend” was entirely Supabase Edge Functions as the API.\nFirst time using Supabase this way.\nImpressive.',
+    url: 'https://x.com/MinimEditor/status/1954422981708722372',
+    handle: 'MinimEditor',
+    img_url: '/images/twitter-profiles/5KvPPRZz_400x400.jpg',
+  },
+  {
+    text: 'Love @supabase custom domains\n\nmakes the auth so much better',
+    url: 'https://x.com/orlandopedro_/status/1958618806143578336',
+    handle: 'orlandopedro_',
+    img_url: '/images/twitter-profiles/JwLEqyeo_400x400.jpg',
+  },
+  {
+    text: 'Loving #Supabase MCP. Claude Code would not only plan what data we should save but also figure out a migration script by checking what the schema looks like on Supabase via MCP.',
+    url: 'https://x.com/sdusteric/status/1957703488470921550',
+    handle: 'sdusteric',
+    img_url: '/images/twitter-profiles/FQsUZJMC_400x400.jpg',
+  },
+  {
+    text: "I love @supabase's built-in Advisors. The security and performance linters improve everything and boost my confidence in what I'm building!",
+    url: 'https://x.com/SteinlageScott/status/1958603243401183701',
+    handle: 'SteinlageScott',
+    img_url: '/images/twitter-profiles/nbmmwDll_400x400.jpg',
+  },
+  {
+    text: "Working with @supabase has been one of the best dev experiences I've had lately.\n\nIncredibly easy to set up, great documentation, and so many fewer hoops to jump through than the competition.\n\nI definitely plan to use it on any and all future projects.",
+    url: 'https://x.com/BowTiedQilin/status/1497602628410388480',
+    handle: 'BowTiedQilin',
+    img_url: '/images/twitter-profiles/ZmOmQeTl_400x400.jpg',
+  },
+  {
+    text: 'Love supabse edge functions. Cursor+Supabase+MCP+Docker desktop is all I need',
+    url: 'https://x.com/adm_lawson/status/1958216298309066887',
+    handle: 'adm_lawson',
+    img_url: '/images/twitter-profiles/I5pY1PAA_400x400.jpg',
+  },
+  {
+    text: 'First time running @supabase in local. It just works. Very good DX imo.',
+    url: 'https://x.com/gokul_i/status/1958880167889133811',
+    handle: 'gokul_i',
+    img_url: '/images/twitter-profiles/EtC0mhne_400x400.jpg',
+  },
+  {
+    text: 'Run supabase locally and just wow in silence! I am impressed! This is the kind of tooling I would want for my team.',
+    url: 'https://x.com/dadooos_/status/1947924753618243663',
+    handle: 'dadooos_',
+    img_url: '/images/twitter-profiles/T42R9GFf_400x400.jpg',
+  },
+  {
+    text: "After a week of diving deep into Supabase for my new SaaS project, I'm really impressed with its Auth and RLS features. It makes security much simpler for solo founders. #buildinpublic #SaaS",
+    url: 'https://x.com/Rodrigo66799141/status/1959246083957100851',
+    handle: 'Rodrigo66799141',
+    img_url: '/images/twitter-profiles/ukFtCkww_400x400.jpg',
+  },
+  {
+    text: 'Lately been using Supabase over AWS/ GCP for products to save on costs and rapid builds(Vibe Code) that do not need all the Infra and the hefty costs that come with AWS/ GCP out the door. Great solution overall. Love the new Feature stack thats implemented',
+    url: 'https://x.com/xthemadgeniusx/status/1960049950110384250',
+    handle: 'xthemadgeniusx',
+    img_url: '/images/twitter-profiles/XE8Oyngj_400x400.jpg',
+  },
+  {
+    text: 'I love everything about Supabase.',
+    url: 'https://x.com/pontusab/status/1958603243401183701',
+    handle: 'pontusab',
+    img_url: '/images/twitter-profiles/JwLEqyeo_400x400.jpg',
+  },
+  {
+    text: 'Love how Supabase makes full stack features this easy. Using it with Next.js and loving the experience!',
+    url: 'https://x.com/viratt_mankali/status/1963290133421240591',
+    handle: 'viratt_mankali',
+    img_url: '/images/twitter-profiles/GtrVV2dD_400x400.jpg',
   },
   {
     text: '@supabase is just 🤯 Now I see why a lot of people love using it as a backend for their applications. I am really impressed with how easy it is to set up an Auth and then just code it together for the frontend. @IngoKpp now I see your joy with Supabase #coding #fullstackwebdev',
@@ -24,7 +96,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/9k_ZB9OO_400x400.jpg',
   },
   {
-    text: 'And thanks to @supabase, I was able to go from idea to launched feature in a matter of hours. Absolutely amazing!',
+    text: 'And thanks to @supabase, I was able to go from idea to launched feature in a matter of hours.\n\nAbsolutely amazing!',
     url: 'https://twitter.com/BraydonCoyer/status/1511071369731137537',
     handle: 'BraydonCoyer',
     img_url: '/images/twitter-profiles/8YxkpW8f_400x400.jpg',
@@ -138,12 +210,6 @@ const tweets = [
     img_url: '/images/twitter-profiles/LTw5OCnv_400x400.jpg',
   },
   {
-    text: '10/100 All day i was migrating my project from firebase to @supabase Because it is perfect and simple!!! I like design and API for understandable. There are in BETA now. Just try!🧪',
-    url: 'https://twitter.com/roomahhka/status/1363155396391763971',
-    handle: 'roomahhka',
-    img_url: '/images/twitter-profiles/e_2eQt6C_400x400.jpg',
-  },
-  {
     text: 'I gave @supabase a try today and I was positively impressed! Very quick setup to get a working remote database with API access and documentation generated automatically for you 👌 10/10 will play more',
     url: 'https://twitter.com/razvanilin/status/1363002398738800640',
     handle: 'razvanilin',
@@ -214,12 +280,6 @@ const tweets = [
     url: 'https://twitter.com/_strawbird/status/1372607500499841025',
     handle: '_strawbird',
     img_url: '/images/twitter-profiles/iMBvvQdn_400x400.jpg',
-  },
-  {
-    text: "Did a website with @supabase last week with no prior experience with it. Up and running in 20 minutes. It's awesome to use. Thumbs up",
-    url: 'https://twitter.com/michael_webdev/status/1352885366928404481?s=20',
-    handle: 'michael_webdev',
-    img_url: '/images/twitter-profiles/SvAyLaWV_400x400.jpg',
   },
   {
     text: 'I just learned about @supabase and im in love 😍 Supabase is an open source Firebase alternative! EarListen (& react) to database changes 💁 Manage users & permissions 🔧 Simple UI for database interaction',

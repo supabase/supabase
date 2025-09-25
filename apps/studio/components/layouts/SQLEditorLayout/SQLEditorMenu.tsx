@@ -1,15 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useProfile } from 'lib/profile'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProfile } from 'lib/profile'
 import { getAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -28,17 +28,16 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import { SqlEditorMenuStaticLinks } from './SqlEditorMenuStaticLinks'
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()
-  const { profile } = useProfile()
-  const project = useSelectedProject()
   const { ref } = useParams()
-
+  const { profile } = useProfile()
+  const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
+
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>(
@@ -49,10 +48,14 @@ export const SQLEditorMenu = () => {
   const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const createNewFolder = () => {
     if (!ref) return console.error('Project ref is required')
@@ -134,6 +137,7 @@ export const SQLEditorMenu = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                data-testid="sql-editor-new-query-button"
                 type="default"
                 icon={<Plus className="text-foreground" />}
                 className="w-[26px]"
@@ -152,14 +156,7 @@ export const SQLEditorMenu = () => {
           </DropdownMenu>
         </div>
 
-        {showSearch ? (
-          <SearchList search={debouncedSearch} />
-        ) : (
-          <>
-            <SqlEditorMenuStaticLinks />
-            <SQLEditorNav sort={sort} />
-          </>
-        )}
+        {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">

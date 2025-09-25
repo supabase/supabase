@@ -1,6 +1,7 @@
 {
   "name": "common",
   "version": "0.0.0",
+  "type": "module",
   "main": "./index.tsx",
   "types": "./index.tsx",
   "license": "MIT",
@@ -12,26 +13,34 @@
   },
   "dependencies": {
     "@types/dat.gui": "^0.7.12",
-    "@vercel/flags": "^2.6.0",
+    "@usercentrics/cmp-browser-sdk": "^4.42.0",
     "api-types": "workspace:*",
     "config": "workspace:*",
+    "configcat-js": "^9.5.1",
     "dat.gui": "^0.7.9",
+    "flags": "^4.0.0",
     "lodash": "^4.17.21",
     "next-themes": "^0.3.0",
-    "react-use": "^17.4.0"
+    "posthog-js": "^1.257.2",
+    "react-use": "^17.4.0",
+    "valtio": "catalog:"
   },
   "devDependencies": {
     "@types/lodash": "4.17.5",
-    "@types/react": "^18.2.24",
-    "@types/react-dom": "^18.2.8",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitest/coverage-v8": "^3.0.9",
+    "@vitest/ui": "^3.0.0",
     "tsconfig": "workspace:*",
-    "typescript": "~5.5.0"
+    "typescript": "catalog:",
+    "vitest": "^3.0.5"
   },
   "peerDependencies": {
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "next": "catalog:",
-    "react": "*",
-    "react-dom": "*"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

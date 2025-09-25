@@ -2,20 +2,31 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { useIsLoggedIn, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import useLatest from 'hooks/misc/useLatest'
-import { DEFAULT_HOME, IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref, slug, id } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const isLoggedIn = useIsLoggedIn()
-  const snap = useAppStateSnapshot()
+  const isUserMFAEnabled = useIsMFAEnabled()
+
+  const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
+  const [__, setLastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
+  const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
 
   /**
    * Array of urls/routes that should be ignored
@@ -53,16 +64,17 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const isValidOrg = organizations.some((org) => org.slug === slug)
 
       if (!isValidOrg) {
-        toast.error('This organization does not exist')
-        router.push(DEFAULT_HOME)
+        toast.error("We couldn't find that organization")
+        router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
         return
       }
     }
   }, [orgsInitialized])
 
-  const { data: projects, isSuccess: projectsInitialized } = useProjectsQuery({
+  const { data, isSuccess: projectsInitialized } = useProjectsQuery({
     enabled: isLoggedIn,
   })
+  const projects = data?.projects ?? []
   const projectsRef = useLatest(projects)
 
   useEffect(() => {
@@ -88,13 +100,28 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {
       if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
-        snap.setDashboardHistory(ref, 'sql', id)
-      }
-      if (router.pathname.endsWith('/editor/[id]')) {
-        snap.setDashboardHistory(ref, 'editor', id)
+        setLastVisitedSnippet(id)
+      } else if (router.pathname.endsWith('/editor/[id]')) {
+        setLastVisitedTable(id)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, id])
+
+  useEffect(() => {
+    if (organization) {
+      setLastVisitedOrganization(organization.slug)
+
+      if (
+        organization.organization_requires_mfa &&
+        !isUserMFAEnabled &&
+        router.pathname !== '/org/[slug]'
+      ) {
+        router.push(`/org/${organization.slug}`)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organization])
 
   return <>{children}</>
 }
