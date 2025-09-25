@@ -176,8 +176,6 @@ const CodePage = () => {
         functionBody.files.map((file) => file.name)
       )
       const filesWithRelPath = functionBody.files
-        // ignore empty files
-        .filter((file: { name: string; content: string }) => !!file.content.length)
         // set file paths relative to entrypoint
         .map((file: { name: string; content: string }) => {
           try {
