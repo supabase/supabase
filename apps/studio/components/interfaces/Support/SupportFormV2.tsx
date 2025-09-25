@@ -24,11 +24,11 @@ import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSe
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
 import {
   Badge,
   Button,
@@ -57,6 +57,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
+import { IssueSuggestion } from './IssueSuggestions'
 import { LibrarySuggestions } from './LibrarySuggestions'
 import { PlanExpectationInfoBox } from './PlanExpectationInfoBox'
 import {
@@ -66,7 +67,6 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { useRouter } from 'next/router'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -158,7 +158,7 @@ export const SupportFormV2 = ({
     () => organizations?.find((org) => org.slug === organizationSlug),
     [organizationSlug, organizations]
   )
-  const { data, isLoading: isLoadingProjects, isSuccess: isSuccessProjects } = useProjectsQuery()
+  const { data, isSuccess: isSuccessProjects } = useProjectsQuery()
   const allProjects = data?.projects ?? []
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -189,10 +189,6 @@ export const SupportFormV2 = ({
   const respondToEmail = profile?.primary_email ?? 'your email'
   const subscriptionPlanId = selectedOrganization?.plan.id
 
-  const projects = [
-    ...(allProjects ?? []).filter((project) => project.organization_slug === organizationSlug),
-    { ref: 'no-project', name: 'No specific project' } as Partial<Project>,
-  ]
   const hasResults =
     state.status === 'fullResults' ||
     state.status === 'partialResults' ||
@@ -539,6 +535,9 @@ export const SupportFormV2 = ({
               </FormItemLayout>
             )}
           />
+
+          <IssueSuggestion category={category} projectRef={projectRef} />
+
           {(severity === 'Urgent' || severity === 'High') && (
             <p className="text-sm text-foreground-light mt-2 sm:col-span-2">
               We do our best to respond to everyone as quickly as possible; however, prioritization

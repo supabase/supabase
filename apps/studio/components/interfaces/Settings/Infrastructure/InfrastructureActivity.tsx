@@ -202,7 +202,7 @@ const InfrastructureActivity = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer id="infrastructure-activity">
         <div className="mx-auto flex flex-col gap-10 pt-6">
           <div>
             <p className="text-xl">Infrastructure Activity</p>
