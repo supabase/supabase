@@ -61,7 +61,7 @@ export const ReportBlockContainer = ({
                 showDragHandle && 'group-hover:opacity-25'
               )}
             >
-              <h3 className="heading-meta !normal-case !tracking-normal truncate">{label}</h3>
+              <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>
             <div className="flex items-center">{actions}</div>
