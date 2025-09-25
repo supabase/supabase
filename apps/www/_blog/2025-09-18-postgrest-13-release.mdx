@@ -46,18 +46,23 @@ You can now do it this way:
 <$CodeTabs>
 
 ```js name=JavaScript
-const { data, error } = await supabase.from('titles').select(${'`
+const { data, error } = await supabase.from('titles').select(`
   title:primary_title,
   ...people(actors:primary_name),
   ...genres(genres:name)
-`'})
+`)
+
+// Note: to get typechecking for this feature, you need to create the supabase client like this:
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
+  PostgrestVersion: '13'
+})
 ```
 
 ```bash name=Bash
-curl 'https://your-project.supabase.co/rest/v1/titles'
+curl 'https://<your-domain>/titles'
   -d "select=title:primary_title,...people(actors:primary_name),...genres(genres:name)"
-  -H "apikey: YOUR_ANON_KEY"
-  -H "Authorization: Bearer YOUR_ANON_KEY"
+  -H "Authorization: Bearer <YOUR_KEY>"
 ```
 
 </$CodeTabs>
