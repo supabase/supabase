@@ -2,6 +2,7 @@ import { Link, Check } from 'lucide-react'
 import { useState } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { copyToClipboard } from 'ui'
 
 interface ReportSectionHeaderProps {
   id: string
@@ -14,13 +15,9 @@ export const ReportSectionHeader = ({ id, title, description }: ReportSectionHea
 
   const copyLinkToClipboard = async () => {
     const url = `${window.location.origin}${window.location.pathname}#${id}`
-    try {
-      await navigator.clipboard.writeText(url)
-      setCopiedLink(id)
-      setTimeout(() => setCopiedLink(null), 2000)
-    } catch (err) {
-      console.error('Failed to copy link:', err)
-    }
+    await copyToClipboard(url)
+    setCopiedLink(id)
+    setTimeout(() => setCopiedLink(null), 2000)
   }
 
   return (
