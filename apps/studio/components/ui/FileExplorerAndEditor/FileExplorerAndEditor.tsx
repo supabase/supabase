@@ -65,6 +65,7 @@ const FileExplorerAndEditor = ({
   aiMetadata,
 }: FileExplorerAndEditorProps) => {
   const selectedFile = files.find((f) => f.selected) ?? files[0]
+  const [isDragOver, setIsDragOver] = useState(false)
 
   const [treeData, setTreeData] = useState({
     name: '',
@@ -99,6 +100,32 @@ const FileExplorerAndEditor = ({
     ])
   }
 
+  const addDroppedFiles = async (droppedFiles: FileList) => {
+    const newFiles: FileData[] = []
+    const updatedFiles = files.map((f) => ({ ...f, selected: false }))
+
+    for (let i = 0; i < droppedFiles.length; i++) {
+      const file = droppedFiles[i]
+      const newId = Math.max(0, ...files.map((f) => f.id), ...newFiles.map((f) => f.id)) + 1
+
+      try {
+        const content = await file.text()
+        newFiles.push({
+          id: newId,
+          name: file.name,
+          content,
+          selected: i === droppedFiles.length - 1, // Select the last dropped file
+        })
+      } catch (error) {
+        console.error(`Failed to read file ${file.name}:`, error)
+      }
+    }
+
+    if (newFiles.length > 0) {
+      onFilesChange([...updatedFiles, ...newFiles])
+    }
+  }
+
   const handleFileNameChange = (id: number, newName: string) => {
     if (!newName.trim()) return // Don't allow empty names
     const updatedFiles = files.map((file) =>
@@ -106,7 +133,10 @@ const FileExplorerAndEditor = ({
         ? {
             ...file,
             name: newName,
-            content: newName === 'deno.json' && file.content === '' ? denoJsonDefaultContent : '',
+            content:
+              newName === 'deno.json' && file.content === ''
+                ? denoJsonDefaultContent
+                : file.content,
           }
         : file
     )
@@ -157,6 +187,26 @@ const FileExplorerAndEditor = ({
     setTreeData(updatedTreeData)
   }
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+
+    const droppedFiles = e.dataTransfer.files
+    if (droppedFiles.length > 0) {
+      await addDroppedFiles(droppedFiles)
+    }
+  }
+
   // Update treeData when files change
   useEffect(() => {
     setTreeData({
@@ -173,7 +223,17 @@ const FileExplorerAndEditor = ({
   }, [files])
 
   return (
-    <div className="flex-1 overflow-hidden flex h-full">
+    <div
+      className={`flex-1 overflow-hidden flex h-full relative ${isDragOver ? 'bg-blue-50' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {isDragOver && (
+        <div className="absolute inset-0 bg-blue-100 bg-opacity-50 border-2 border-dashed border-blue-300 z-10 flex items-center justify-center">
+          <div className="text-blue-600 text-lg font-medium">Drop files here to add them</div>
+        </div>
+      )}
       <div className="w-64 border-r bg-surface-200 flex flex-col">
         <div className="py-4 px-6 border-b flex items-center justify-between">
           <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
