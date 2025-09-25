@@ -78,10 +78,7 @@ export function CustomReportSection() {
   const persistReport = useCallback(
     (updated: Dashboards.Content) => {
       if (!ref || !homeReport) return
-      upsertContent({
-        projectRef: ref,
-        payload: { ...homeReport, content: updated },
-      })
+      upsertContent({ projectRef: ref, payload: { ...homeReport, content: updated } })
     },
     [homeReport, ref, upsertContent]
   )

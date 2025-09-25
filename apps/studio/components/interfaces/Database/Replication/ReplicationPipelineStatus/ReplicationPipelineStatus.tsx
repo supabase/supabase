@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import {
   Activity,
   ArrowUpCircle,
@@ -27,204 +26,25 @@ import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-sta
 import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
-import { formatBytes } from 'lib/helpers'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { ErroredTableDetails } from './ErroredTableDetails'
+import { ErroredTableDetails } from '../ErroredTableDetails'
 import {
   PIPELINE_ACTIONABLE_STATES,
   PIPELINE_ERROR_MESSAGES,
   getStatusName,
-} from './Pipeline.utils'
-import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
-import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+} from '../Pipeline.utils'
+import { PipelineStatus, PipelineStatusName } from '../PipelineStatus'
+import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import { UpdateVersionModal } from '../UpdateVersionModal'
 import { SlotLagMetrics, TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
-import { UpdateVersionModal } from './UpdateVersionModal'
-
-type SlotLagMetricKey = keyof SlotLagMetrics
-
-const SLOT_LAG_FIELDS: {
-  key: SlotLagMetricKey
-  label: string
-  type: 'bytes' | 'duration'
-  description: string
-}[] = [
-  {
-    key: 'confirmed_flush_lsn_bytes',
-    label: 'WAL Flush lag (size)',
-    type: 'bytes',
-    description:
-      'Bytes between the newest WAL record applied locally and the latest flushed WAL record acknowledged by ETL.',
-  },
-  {
-    key: 'flush_lag',
-    label: 'WAL Flush lag (time)',
-    type: 'duration',
-    description:
-      'Time between flushing recent WAL locally and receiving notification that ETL has written and flushed it.',
-  },
-  {
-    key: 'safe_wal_size_bytes',
-    label: 'Remaining WAL size',
-    type: 'bytes',
-    description:
-      'Bytes still available to write to WAL before this slot risks entering the "lost" state.',
-  },
-]
-
-const numberFormatter = new Intl.NumberFormat()
-
-const formatLagBytesValue = (value?: number) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return { display: '—', detail: undefined }
-  }
-
-  const decimals = value < 1024 ? 0 : value < 1024 * 1024 ? 1 : 2
-  const display = formatBytes(value, decimals)
-  const detail = `${numberFormatter.format(value)} bytes`
-
-  return { display, detail }
-}
-
-const formatLagDurationValue = (value?: number) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return { display: '—', detail: undefined }
-  }
-
-  const sign = value < 0 ? '-' : ''
-  const absMilliseconds = Math.abs(value)
-  const duration = dayjs.duration(absMilliseconds, 'milliseconds')
-
-  if (absMilliseconds < 1000) {
-    return { display: `${value} ms`, detail: undefined }
-  }
-
-  const seconds = duration.asSeconds()
-  if (seconds < 60) {
-    const decimals = seconds >= 10 ? 1 : 2
-    return {
-      display: `${sign}${seconds.toFixed(decimals)} s`,
-      detail: `${numberFormatter.format(value)} ms`,
-    }
-  }
-
-  const minutes = duration.asMinutes()
-  if (minutes < 60) {
-    const roundedSeconds = Math.round(seconds)
-    return {
-      display: `${sign}${minutes.toFixed(minutes >= 10 ? 1 : 2)} min`,
-      detail: `${numberFormatter.format(roundedSeconds)} s`,
-    }
-  }
-
-  const hours = duration.asHours()
-  const roundedMinutes = Math.round(minutes)
-  return {
-    display: `${sign}${hours.toFixed(hours >= 10 ? 1 : 2)} h`,
-    detail: `${numberFormatter.format(roundedMinutes)} min`,
-  }
-}
-
-const getFormattedLagValue = (type: 'bytes' | 'duration', value?: number) =>
-  type === 'bytes' ? formatLagBytesValue(value) : formatLagDurationValue(value)
-
-const SlotLagMetricsInline = ({
-  tableName,
-  metrics,
-}: {
-  tableName: string
-  metrics: SlotLagMetrics
-}) => {
-  return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-foreground">
-      <span className="truncate font-medium" title={tableName}>
-        {tableName}
-      </span>
-      <span className="text-foreground-lighter">•</span>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-foreground-light">
-        {SLOT_LAG_FIELDS.map(({ key, label, type }) => {
-          const { display } = getFormattedLagValue(type, metrics[key])
-          return (
-            <span key={`${tableName}-${key}`} className="flex items-center gap-1">
-              <span className="uppercase tracking-wide text-[10px] text-foreground-lighter">
-                {label}
-              </span>
-              <span className="text-foreground">{display}</span>
-            </span>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-const SlotLagMetricsList = ({
-  metrics,
-  size = 'default',
-  showMetricInfo = true,
-}: {
-  metrics: SlotLagMetrics
-  size?: 'default' | 'compact'
-  showMetricInfo?: boolean
-}) => {
-  const gridClasses =
-    size === 'default'
-      ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-4 gap-x-6'
-      : 'grid-cols-2 gap-y-2 gap-x-4'
-
-  const labelClasses =
-    size === 'default' ? 'text-xs text-foreground-light' : 'text-[11px] text-foreground-lighter'
-
-  const valueClasses =
-    size === 'default'
-      ? 'text-sm font-medium text-foreground'
-      : 'text-xs font-medium text-foreground'
-
-  return (
-    <dl className={`grid ${gridClasses}`}>
-      {SLOT_LAG_FIELDS.map(({ key, label, type, description }) => (
-        <div key={key} className="flex flex-col gap-0.5">
-          <dt className={labelClasses}>
-            <span className="inline-flex items-center gap-1">
-              {label}
-              {showMetricInfo && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      aria-label={`What is ${label}`}
-                      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
-                    >
-                      <Info size={12} />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" align="start" className="max-w-xs text-xs">
-                    {description}
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </span>
-          </dt>
-          {(() => {
-            const { display, detail } = getFormattedLagValue(type, metrics[key])
-            return (
-              <dd className={`flex flex-col ${valueClasses}`}>
-                <span>{display}</span>
-                {detail && <span className="text-[11px] text-foreground-lighter">{detail}</span>}
-              </dd>
-            )
-          })()}
-        </div>
-      ))}
-    </dl>
-  )
-}
+import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -234,7 +54,6 @@ export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [filterString, setFilterString] = useState<string>('')
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
-  const [isRetryingStatus, setIsRetryingStatus] = useState(false)
 
   const pipelineId = Number(_pipelineId)
   const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
@@ -256,7 +75,6 @@ export const ReplicationPipelineStatus = () => {
     isLoading: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
-    refetch: refetchPipelineStatus,
   } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId },
     {
@@ -267,10 +85,8 @@ export const ReplicationPipelineStatus = () => {
 
   const {
     data: replicationStatusData,
-    error: statusError,
     isLoading: isStatusLoading,
     isError: isStatusError,
-    refetch: refetchReplicationStatus,
   } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId },
     {
@@ -355,15 +171,6 @@ export const ReplicationPipelineStatus = () => {
       }
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
-    }
-  }
-
-  const onRetryStatusFetch = async () => {
-    setIsRetryingStatus(true)
-    try {
-      await Promise.allSettled([refetchReplicationStatus(), refetchPipelineStatus()])
-    } finally {
-      setIsRetryingStatus(false)
     }
   }
 
@@ -502,12 +309,15 @@ export const ReplicationPipelineStatus = () => {
                 Updates every {refreshIntervalLabel}
               </p>
             </div>
+
             {isStatusError && (
               <p className="text-xs text-warning-700">
                 Unable to refresh data. Showing the last values we received.
               </p>
             )}
+
             <SlotLagMetricsList metrics={applyLagMetrics} />
+
             {tablesWithLag.length > 0 && (
               <>
                 <div className="border-t border-default/40" />

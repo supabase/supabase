@@ -11,6 +11,8 @@ export type SlotLagMetrics = {
   flush_lag?: number
 }
 
+export type SlotLagMetricKey = keyof SlotLagMetrics
+
 export type TableState = {
   table_id: number
   table_name: string
