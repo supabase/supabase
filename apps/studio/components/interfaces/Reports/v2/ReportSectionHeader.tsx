@@ -14,14 +14,18 @@ export const ReportSectionHeader = ({ id, title, description }: ReportSectionHea
   const [copiedLink, setCopiedLink] = useState<string | null>(null)
 
   const copyLinkToClipboard = async () => {
-    const url = `${window.location.origin}${window.location.pathname}#${id}`
+    // [jordi] We want to keep the existing query params (filters)
+    // But if the user has an anchor in the URL,
+    // we remove it and add the one for this section
+    // This is so the shared URL shows the exact same report as the one the user is on
+    const url = `${window.location.href.split('#')[0]}#${id}`
     await copyToClipboard(url)
     setCopiedLink(id)
     setTimeout(() => setCopiedLink(null), 2000)
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1 mb-4">
       <div className="flex items-center gap-2">
         <h3 className="text-foreground text-lg font-semibold">{title}</h3>
         <ButtonTooltip
