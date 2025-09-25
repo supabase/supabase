@@ -1,4 +1,7 @@
 import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+
+dayjs.extend(duration)
 
 export const formatDuration = (milliseconds: number) => {
   const duration = dayjs.duration(milliseconds, 'milliseconds')
