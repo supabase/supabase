@@ -185,6 +185,11 @@
       "description": "Enable web apps getting started documentation"
     },
 
+    "edge_functions:show_stripe_example": {
+      "type": "boolean",
+      "description": "Show all the Stripe example in edge function templates in the edge functions page."
+    },
+
     "feedback:docs": {
       "type": "boolean",
       "description": "Enable feedback submission for docs site"
