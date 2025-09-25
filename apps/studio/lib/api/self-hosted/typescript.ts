@@ -11,6 +11,11 @@ type GenerateTypescriptTypesResult = {
   types: string
 }
 
+/**
+ * Generates TypeScript types for the self-hosted Postgres instance via pg-meta service.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
 export async function generateTypescriptTypes({
   headers,
 }: GenerateTypescriptTypesOptions): Promise<WrappedResult<GenerateTypescriptTypesResult>> {
