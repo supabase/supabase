@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { Button } from 'ui'
 
+console.log('trigger those tests')
+
 const ErrorPage = ({ error }) => {
   useEffect(() => {
     Sentry.captureException(error)

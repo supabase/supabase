@@ -1973,6 +1973,20 @@
                   },
                   "with_delimiter": {
                     "type": "boolean"
+                  },
+                  "sortBy": {
+                    "type": "object",
+                    "properties": {
+                      "column": {
+                        "type": "string",
+                        "enum": ["name", "updated_at", "created_at"]
+                      },
+                      "order": {
+                        "type": "string",
+                        "enum": ["asc", "desc"]
+                      }
+                    },
+                    "required": ["column"]
                   }
                 }
               }

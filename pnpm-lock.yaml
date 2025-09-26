@@ -382,7 +382,7 @@ importers:
         version: 1.0.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10.3.0
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3
@@ -597,6 +597,9 @@ importers:
       '@graphql-codegen/typescript-resolvers':
         specifier: 4.5.0
         version: 4.5.0(encoding@0.1.13)(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)
+      '@redocly/cli':
+        specifier: ^1.34.1
+        version: 1.34.1(ajv@8.17.1)(encoding@0.1.13)(supports-color@8.1.1)
       '@supabase/supa-mdx-lint':
         specifier: 0.3.1
         version: 0.3.1
@@ -794,7 +797,7 @@ importers:
         version: 1.1.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10.3.0
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@std/path':
         specifier: npm:@jsr/std__path@^1.0.8
         version: '@jsr/std__path@1.0.8'
@@ -1567,7 +1570,7 @@ importers:
         version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3
@@ -7343,10 +7346,6 @@ packages:
     resolution: {integrity: sha512-qVrDc27DHpeO2NRCMeRdb4299nijKQE3BY0wrA+WUHlOLScorIi/y7JzammLk22IaTvjR9Mv9aTAdjE1aUwJnA==}
     engines: {node: '>=14.19.0', npm: '>=7.0.0'}
 
-  '@redocly/openapi-core@1.34.0':
-    resolution: {integrity: sha512-Ji00EiLQRXq0pJIz5pAjGF9MfQvQVsQehc6uIis6sqat8tG/zh25Zi64w6HVGEDgJEzUeq/CuUlD0emu3Hdaqw==}
-    engines: {node: '>=18.17.0', npm: '>=9.5.0'}
-
   '@redocly/openapi-core@1.34.1':
     resolution: {integrity: sha512-KI1QOGvDk6oREbTu0JORxZX1NBxraXUbXczv0LYDs9EPp06coq874hQORqSHGEUV/DX2A6gjv4Ax33g/LFJBww==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
@@ -10259,9 +10258,6 @@ packages:
 
   copy-to-clipboard@3.3.3:
     resolution: {integrity: sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==}
-
-  core-js@3.35.0:
-    resolution: {integrity: sha512-ntakECeqg81KqMueeGJ79Q5ZgQNR+6eaE8sxGCx62zMbAIj65q+uYvatToew3m6eAGdU4gNZwpZ34NMe4GYswg==}
 
   core-js@3.44.0:
     resolution: {integrity: sha512-aFCtd4l6GvAXwVEh3XbbVqJGHDJt0OZRa+5ePGx3LLwi12WfexqQxcsohb2wgsa/92xtl19Hd66G/L+TaAxDMw==}
@@ -21737,7 +21733,7 @@ snapshots:
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
       node-fetch: 2.7.0(encoding@0.1.13)
       nopt: 8.1.0
-      semver: 7.7.1
+      semver: 7.7.2
       tar: 7.4.3
     transitivePeerDependencies:
       - encoding
@@ -22005,11 +22001,11 @@ snapshots:
   '@npmcli/fs@1.1.1':
     dependencies:
       '@gar/promisify': 1.1.3
-      semver: 7.7.1
+      semver: 7.7.2
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.2
 
   '@npmcli/git@4.1.0':
     dependencies:
@@ -22019,7 +22015,7 @@ snapshots:
       proc-log: 3.0.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.7.1
+      semver: 7.7.2
       which: 3.0.1
     transitivePeerDependencies:
       - bluebird
@@ -22444,7 +22440,7 @@ snapshots:
       '@types/shimmer': 1.2.0
       import-in-the-middle: 1.14.2
       require-in-the-middle: 7.5.2(supports-color@8.1.1)
-      semver: 7.7.1
+      semver: 7.7.2
       shimmer: 1.2.1
     transitivePeerDependencies:
       - supports-color
@@ -22598,7 +22594,7 @@ snapshots:
       '@opentelemetry/propagator-b3': 1.24.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/propagator-jaeger': 1.24.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.24.1(@opentelemetry/api@1.9.0)
-      semver: 7.7.1
+      semver: 7.7.2
 
   '@opentelemetry/sdk-trace-node@1.26.0(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -22608,7 +22604,7 @@ snapshots:
       '@opentelemetry/propagator-b3': 1.26.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/propagator-jaeger': 1.26.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.26.0(@opentelemetry/api@1.9.0)
-      semver: 7.7.1
+      semver: 7.7.2
 
   '@opentelemetry/semantic-conventions@1.24.1': {}
 
@@ -25122,7 +25118,7 @@ snapshots:
       abort-controller: 3.0.0
       chokidar: 3.6.0
       colorette: 1.4.0
-      core-js: 3.35.0
+      core-js: 3.44.0
       dotenv: 16.5.0
       form-data: 4.0.4
       get-port-please: 3.1.2
@@ -25132,8 +25128,8 @@ snapshots:
       pluralize: 8.0.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      redoc: 2.4.0(core-js@3.35.0)(encoding@0.1.13)(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(supports-color@8.1.1)
-      semver: 7.7.1
+      redoc: 2.4.0(core-js@3.44.0)(encoding@0.1.13)(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(supports-color@8.1.1)
+      semver: 7.7.2
       simple-websocket: 9.1.0(supports-color@8.1.1)
       styled-components: 6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       yargs: 17.0.1
@@ -25165,12 +25161,12 @@ snapshots:
       - encoding
       - supports-color
 
-  '@redocly/openapi-core@1.34.0(supports-color@9.4.0)':
+  '@redocly/openapi-core@1.34.1(supports-color@8.1.1)':
     dependencies:
       '@redocly/ajv': 8.11.2
       '@redocly/config': 0.22.1
       colorette: 1.4.0
-      https-proxy-agent: 7.0.6(supports-color@9.4.0)
+      https-proxy-agent: 7.0.6(supports-color@8.1.1)
       js-levenshtein: 1.1.6
       js-yaml: 4.1.0
       minimatch: 5.1.6
@@ -25179,12 +25175,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@1.34.1(supports-color@8.1.1)':
+  '@redocly/openapi-core@1.34.1(supports-color@9.4.0)':
     dependencies:
       '@redocly/ajv': 8.11.2
       '@redocly/config': 0.22.1
       colorette: 1.4.0
-      https-proxy-agent: 7.0.6(supports-color@8.1.1)
+      https-proxy-agent: 7.0.6(supports-color@9.4.0)
       js-levenshtein: 1.1.6
       js-yaml: 4.1.0
       minimatch: 5.1.6
@@ -25449,7 +25445,7 @@ snapshots:
 
   '@sentry/core@10.3.0': {}
 
-  '@sentry/nextjs@10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
+  '@sentry/nextjs@10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.36.0
@@ -27659,7 +27655,7 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.3
-      semver: 7.7.1
+      semver: 7.7.2
       ts-api-utils: 1.0.3(typescript@5.9.2)
     optionalDependencies:
       typescript: 5.9.2
@@ -27676,7 +27672,7 @@ snapshots:
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
-      semver: 7.7.1
+      semver: 7.7.2
       ts-api-utils: 2.1.0(typescript@5.9.2)
       typescript: 5.9.2
     transitivePeerDependencies:
@@ -29179,8 +29175,6 @@ snapshots:
   copy-to-clipboard@3.3.3:
     dependencies:
       toggle-selection: 1.0.6
-
-  core-js@3.35.0: {}
 
   core-js@3.44.0: {}
 
@@ -32783,7 +32777,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.2
 
   make-error@1.3.6:
     optional: true
@@ -34264,7 +34258,7 @@ snapshots:
       rollup: 4.38.0
       rollup-plugin-visualizer: 5.14.0(rollup@4.38.0)
       scule: 1.3.0
-      semver: 7.7.1
+      semver: 7.7.2
       serve-placeholder: 2.0.2
       serve-static: 1.16.2(supports-color@8.1.1)
       source-map: 0.7.4
@@ -34316,7 +34310,7 @@ snapshots:
 
   node-abi@3.75.0:
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.2
 
   node-addon-api@1.7.2: {}
 
@@ -34376,7 +34370,7 @@ snapshots:
       nopt: 5.0.0
       npmlog: 6.0.2
       rimraf: 3.0.2
-      semver: 7.7.1
+      semver: 7.7.2
       tar: 6.2.1
       which: 2.0.2
     transitivePeerDependencies:
@@ -34442,7 +34436,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       is-core-module: 2.16.1
-      semver: 7.7.1
+      semver: 7.7.2
       validate-npm-package-license: 3.0.4
 
   normalize-path@2.1.1:
@@ -34455,7 +34449,7 @@ snapshots:
 
   npm-install-checks@6.3.0:
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.2
 
   npm-normalize-package-bin@3.0.1: {}
 
@@ -34463,7 +34457,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       proc-log: 3.0.0
-      semver: 7.7.1
+      semver: 7.7.2
       validate-npm-package-name: 5.0.1
 
   npm-pick-manifest@8.0.2:
@@ -34471,7 +34465,7 @@ snapshots:
       npm-install-checks: 6.3.0
       npm-normalize-package-bin: 3.0.1
       npm-package-arg: 10.1.0
-      semver: 7.7.1
+      semver: 7.7.2
 
   npm-run-all@4.1.5:
     dependencies:
@@ -34745,7 +34739,7 @@ snapshots:
 
   openapi-typescript@7.6.1(typescript@5.9.2):
     dependencies:
-      '@redocly/openapi-core': 1.34.0(supports-color@9.4.0)
+      '@redocly/openapi-core': 1.34.1(supports-color@9.4.0)
       ansi-colors: 4.1.3
       change-case: 5.4.4
       parse-json: 8.1.0
@@ -36103,11 +36097,11 @@ snapshots:
     dependencies:
       redis-errors: 1.2.0
 
-  redoc@2.4.0(core-js@3.35.0)(encoding@0.1.13)(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(supports-color@8.1.1):
+  redoc@2.4.0(core-js@3.44.0)(encoding@0.1.13)(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(supports-color@8.1.1):
     dependencies:
       '@redocly/openapi-core': 1.34.1(supports-color@8.1.1)
       classnames: 2.5.1
-      core-js: 3.35.0
+      core-js: 3.44.0
       decko: 1.2.0
       dompurify: 3.2.4
       eventemitter3: 5.0.1
@@ -36701,8 +36695,7 @@ snapshots:
 
   semver@7.7.1: {}
 
-  semver@7.7.2:
-    optional: true
+  semver@7.7.2: {}
 
   send@0.19.0(supports-color@8.1.1):
     dependencies:
