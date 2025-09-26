@@ -137,7 +137,7 @@ export const QueryPlan = ({ query }: { query: string }) => {
       <div
         className={cn(
           'overflow-hidden pb-0 z-0 relative transition-all duration-300',
-          !explainError && 'h-[200px]'
+          explainError ? 'pb-6' : 'h-[200px]'
         )}
       >
         <p className="text-xs text-foreground-light mb-4">
