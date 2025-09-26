@@ -1745,6 +1745,64 @@ export interface HipaaRequestButtonClickedEvent {
 }
 
 /**
+ * User created a table via table editor or SQL editor.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface TableCreatedEvent {
+  action: 'table_created'
+  properties: {
+    method: 'table_editor' | 'sql_editor'
+    schema: string
+    table_name: string
+    column_count: number
+    rls_enabled: boolean
+    realtime_enabled: boolean
+    has_import_data: boolean
+    time_since_project_creation_seconds: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User inserted data into a table via row editor, bulk import, or SQL editor.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface DataInsertedEvent {
+  action: 'data_inserted'
+  properties: {
+    method: 'row_editor' | 'bulk_import' | 'sql_editor'
+    schema: string
+    table_name: string
+    row_count: number
+    import_file_type?: 'csv' | 'excel'
+    time_since_project_creation_seconds: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User enabled RLS on a table via table settings or SQL editor.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RlsEnabledEvent {
+  action: 'rls_enabled'
+  properties: {
+    method: 'table_settings' | 'sql_editor'
+    schema: string
+    table_name: string
+    during_creation: boolean
+    time_since_project_creation_seconds: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1851,3 +1909,6 @@ export type TelemetryEvent =
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
+  | TableCreatedEvent
+  | DataInsertedEvent
+  | RlsEnabledEvent
