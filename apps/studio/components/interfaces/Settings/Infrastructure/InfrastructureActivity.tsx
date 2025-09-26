@@ -47,7 +47,7 @@ const NON_DEDICATED_IO_RESOURCES = [
   'ci_2xlarge',
 ]
 
-const InfrastructureActivity = () => {
+export const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -65,7 +65,7 @@ const InfrastructureActivity = () => {
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
 
-  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
+  const { setShowNewReplicaPanel } = useShowNewReplicaPanel()
 
   const { computeInstance } = getAddons(selectedAddons)
   const hasDedicatedIOResources =
@@ -202,7 +202,7 @@ const InfrastructureActivity = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer id="infrastructure-activity">
         <div className="mx-auto flex flex-col gap-10 pt-6">
           <div>
             <p className="text-xl">Infrastructure Activity</p>
@@ -447,5 +447,3 @@ const InfrastructureActivity = () => {
     </>
   )
 }
-
-export default InfrastructureActivity
