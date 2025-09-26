@@ -15,6 +15,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { formatBytes } from 'lib/helpers'
 import { numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 export interface ChartHeaderProps {
   title?: string
@@ -41,6 +42,7 @@ export interface ChartHeaderProps {
   isNetworkChart?: boolean
   attributes?: any[]
   sql?: string
+  titleTooltip?: string
 }
 
 export const ChartHeader = ({
@@ -68,6 +70,7 @@ export const ChartHeader = ({
   isNetworkChart = false,
   attributes,
   sql,
+  titleTooltip,
 }: ChartHeaderProps) => {
   const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
@@ -162,9 +165,12 @@ export const ChartHeader = ({
 
   const chartTitle = (
     <div className="flex flex-row items-center gap-x-2">
-      <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
-        {title}
-      </h3>
+      <div className="flex flex-row items-center gap-x-2">
+        <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
+          {title}
+        </h3>
+        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+      </div>
       {docsUrl && (
         <ButtonTooltip
           type="text"
