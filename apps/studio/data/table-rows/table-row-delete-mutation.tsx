@@ -7,6 +7,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { DocsButton } from 'components/ui/DocsButton'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { Entity } from 'data/table-editor/table-editor-types'
+import { DOCS_URL } from 'lib/constants'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
@@ -108,7 +109,7 @@ export const useTableRowDeleteMutation = ({
                       View "{referencingTable}" table
                     </Link>
                   </Button> */}
-                  <DocsButton href="https://supabase.com/docs/guides/database/postgres/cascade-deletes" />
+                  <DocsButton href={`${DOCS_URL}/guides/database/postgres/cascade-deletes`} />
                 </div>
               ),
             })
@@ -121,7 +122,7 @@ export const useTableRowDeleteMutation = ({
                     each row before updating or deleting the row.
                   </p>
                   <div className="mt-3">
-                    <DocsButton href="https://supabase.com/docs/guides/database/tables#primary-keys" />
+                    <DocsButton href={`${DOCS_URL}/guides/database/tables#primary-keys`} />
                   </div>
                 </div>
               ),

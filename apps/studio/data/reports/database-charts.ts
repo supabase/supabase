@@ -1,5 +1,6 @@
 import { numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { Organization } from 'types'
 import { DiskAttributesData } from '../config/disk-attributes-query'
@@ -97,7 +98,7 @@ export const getReportAttributes = (diskConfig?: DiskAttributesData): ReportAttr
         tickFormatter: (value: any) => numberFormatter(value, 2),
       },
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#compute-size',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#compute-size`,
       attributes: [
         {
           attribute: 'disk_iops_write',
@@ -225,7 +226,7 @@ export const getReportAttributesV2: (
     {
       id: 'ram-usage',
       label: 'Memory usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#memory-usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
       availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
@@ -267,7 +268,7 @@ export const getReportAttributesV2: (
     {
       id: 'cpu-usage',
       label: 'CPU usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#cpu-usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
@@ -336,8 +337,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-iops',
       label: 'Disk Input/Output operations per second (IOPS)',
-      docsUrl:
-        'https://supabase.com/docs/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
       availableIn: ['team', 'enterprise'],
       hide: false,
@@ -381,7 +381,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-io-usage',
       label: 'Disk IO Usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#disk-io-usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-io-usage`,
       syncId: 'database-reports',
       availableIn: ['team', 'enterprise'],
       hide: false,
@@ -421,7 +421,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#database-connections',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
           attribute: 'client_connections_postgres',
@@ -485,7 +485,7 @@ export const getReportAttributesV2: (
       YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#limits-and-constraints',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
           attribute: 'client_connections_pgbouncer',
@@ -543,7 +543,7 @@ export const getReportAttributesV2: (
       },
       hideChartType: false,
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#disk-size',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
       attributes: [
         {
           attribute: 'disk_fs_used_system',

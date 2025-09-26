@@ -14,6 +14,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
@@ -49,7 +50,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         actions={
           <div className="flex items-center gap-2">
             <EnableIndexAdvisorButton />
-            <DocsButton href="https://supabase.com/docs/guides/platform/performance#examining-query-performance" />
+            <DocsButton
+              href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
+            />
             <DatabaseSelector />
           </div>
         }

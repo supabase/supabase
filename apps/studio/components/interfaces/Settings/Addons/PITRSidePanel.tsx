@@ -16,7 +16,7 @@ import type { AddonVariantId } from 'data/subscriptions/types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
@@ -167,7 +167,7 @@ const PITRSidePanel = () => {
           <h4>Point in Time Recovery</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+              href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
               target="_blank"
               rel="noreferrer"
             >
