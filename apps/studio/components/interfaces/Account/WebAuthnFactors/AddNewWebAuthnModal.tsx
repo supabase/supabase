@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import InformationBox from 'components/ui/InformationBox'
+import { useQueryClient } from '@tanstack/react-query'
 import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useQueryClient } from '@tanstack/react-query'
+import InformationBox from 'components/ui/InformationBox'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { organizationKeys } from 'data/organizations/keys'
 import { useMfaWebAuthnRegisterMutation } from 'data/profile/mfa-webauthn-register-mutation'
@@ -32,7 +32,6 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
     reset,
   } = useMfaWebAuthnRegisterMutation({
     onError: (error) => {
-      console.error('onError', error)
       toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
     onSuccess: async () => {

@@ -220,7 +220,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               <Alert>
                 <Fingerprint />
                 <AlertTitle>Security Key Authentication</AlertTitle>
-                <AlertDescription>Click "Verify" to use your security key</AlertDescription>
+                <AlertDescription>
+                  Click "Verify" to use your security key:
+                  <div className="block italic">{selectedFactor?.friendly_name}</div>
+                </AlertDescription>
               </Alert>
             )}
 

@@ -1,9 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
 import type { AuthMFAVerifyResponse } from '@supabase/auth-js'
-import { type UseMutationOptions, useMutation } from '@tanstack/react-query'
+import { type UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { auth } from 'lib/gotrue'
+import { profileKeys } from './keys'
 
 // Defining here as it's not exported by @supabase/auth-js
 interface MFAVerifyWebauthnParams {
@@ -12,6 +13,7 @@ interface MFAVerifyWebauthnParams {
   rpId: string
   /** Relying party origins */
   rpOrigins?: string[]
+  refreshFactors?: boolean
 }
 
 export const mfaWebAuthnRegister = async (params: MFAVerifyWebauthnParams) => {
@@ -39,12 +41,22 @@ export const useMfaWebAuthnRegisterMutation = ({
   UseMutationOptions<CustomMFAVerifyResponse, CustomMFAVerifyError, MFAVerifyWebauthnParams>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
+
   return useMutation(
     (vars) => {
       return mfaWebAuthnRegister(vars)
     },
     {
       async onSuccess(data, variables, context) {
+        // when a MFA is added, the aaLevel is bumped up
+        const refreshFactors = variables.refreshFactors ?? true
+
+        await Promise.all([
+          ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
+          queryClient.invalidateQueries(profileKeys.aaLevel()),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
