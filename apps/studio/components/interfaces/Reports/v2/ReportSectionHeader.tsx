@@ -25,20 +25,22 @@ export const ReportSectionHeader = ({ id, title, description }: ReportSectionHea
   }
 
   return (
-    <div className="flex flex-col gap-1 mb-4">
-      <div className="flex items-center gap-2">
-        <h3 className="text-foreground text-lg font-semibold">{title}</h3>
+    <div className="flex flex-col gap-1 mb-4 group">
+      <div
+        className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={copyLinkToClipboard}
+      >
+        <h3 className="text-foreground text-lg font-medium">{title}</h3>
         <ButtonTooltip
           type="text"
           icon={copiedLink === id ? <Check size={14} /> : <Link size={14} />}
-          className="w-7 h-7"
+          className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity"
           tooltip={{
             content: {
               side: 'bottom',
               text: copiedLink === id ? 'Link copied!' : 'Copy link to section',
             },
           }}
-          onClick={copyLinkToClipboard}
         />
       </div>
       <p className="text-foreground-light text-sm">{description}</p>
