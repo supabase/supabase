@@ -14,7 +14,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { withAuth } from 'hooks/misc/withAuth'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { useQueryState } from 'nuqs'
 import { NextPageWithLayout } from 'types'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -43,7 +43,7 @@ const SupportPage: NextPageWithLayout = () => {
             <div className="flex items-center gap-x-3">
               <Button asChild type="default" icon={<Wrench />}>
                 <Link
-                  href="https://supabase.com/docs/guides/platform/troubleshooting"
+                  href={`${DOCS_URL}/guides/platform/troubleshooting`}
                   target="_blank"
                   rel="noreferrer"
                 >

@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { ComputeUsageMetric, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
+import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
@@ -74,7 +75,7 @@ export const ComputeMetric = ({
                 Each Preview branch is a separate environment with all Supabase services (Database,
                 Auth, Storage, etc.).{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/manage-your-usage/branching"
+                  href={`${DOCS_URL}/guides/platform/manage-your-usage/branching`}
                   target="_blank"
                   className="transition text-brand hover:text-brand-600 underline"
                 >
@@ -87,7 +88,7 @@ export const ComputeMetric = ({
                 active, it incurs compute costs based on the compute size of your project. Paused
                 projects do not incur compute costs.{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
+                  href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                   target="_blank"
                   className="transition text-brand hover:text-brand-600 underline"
                 >

@@ -6,10 +6,11 @@ import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { InstanceSpecs } from 'lib/constants'
+import { DOCS_URL, InstanceSpecs } from 'lib/constants'
 import Link from 'next/link'
 import {
   cn,
@@ -33,7 +34,6 @@ import {
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 /**
  * to do: this could be a type from api-types
@@ -139,7 +139,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 <div className="mt-3">
                   <DocsButton
                     abbrev={false}
-                    href="https://supabase.com/docs/guides/platform/compute-and-disk"
+                    href={`${DOCS_URL}/guides/platform/compute-and-disk`}
                   />
                 </div>
 

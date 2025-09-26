@@ -18,6 +18,7 @@ import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import {
   Button,
@@ -236,7 +237,9 @@ export const StorageSettings = () => {
                           description={
                             <>
                               Optimize and resize images on the fly.{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
+                              <InlineLink
+                                href={`${DOCS_URL}/guides/storage/serving/image-transformations`}
+                              >
                                 Learn more
                               </InlineLink>
                               .
@@ -274,7 +277,7 @@ export const StorageSettings = () => {
                                   Loading bucket information...
                                 </span>
                               )}{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/storage/uploads/file-limits">
+                              <InlineLink href={`${DOCS_URL}/guides/storage/uploads/file-limits`}>
                                 Learn more
                               </InlineLink>
                               .

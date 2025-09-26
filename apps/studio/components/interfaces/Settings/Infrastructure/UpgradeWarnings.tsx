@@ -1,6 +1,8 @@
-import { useParams } from 'common'
 import Link from 'next/link'
+
+import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
@@ -44,7 +46,7 @@ export const ObjectsToBeDroppedWarning = ({
         <div>
           <Button size="tiny" type="default" asChild>
             <a
-              href="https://supabase.com/docs/guides/platform/upgrading#extensions"
+              href={`${DOCS_URL}/guides/platform/upgrading#extensions`}
               target="_blank"
               rel="noreferrer"
             >
@@ -73,7 +75,7 @@ export const UnsupportedExtensionsWarning = ({
             The following extensions are not supported in newer versions of Postgres and must be
             removed before you can upgrade.{' '}
             <InlineLink
-              href="https://supabase.com/docs/guides/platform/upgrading#upgrading-to-postgres-17"
+              href={`${DOCS_URL}/guides/platform/upgrading#upgrading-to-postgres-17`}
               target="_blank"
               rel="noopener noreferrer"
             >

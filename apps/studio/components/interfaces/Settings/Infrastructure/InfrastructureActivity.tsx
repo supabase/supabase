@@ -31,7 +31,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
+import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Admonition } from 'ui-patterns/admonition'
@@ -404,7 +404,7 @@ export const InfrastructureActivity = () => {
                       >
                         <DocsButton
                           abbrev={false}
-                          href="https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops"
+                          href={`${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`}
                         />
                       </Admonition>
                     </>

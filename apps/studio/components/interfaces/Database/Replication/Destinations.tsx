@@ -11,6 +11,7 @@ import { replicationKeys } from 'data/replication/keys'
 import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { DOCS_URL } from 'lib/constants'
 import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { DestinationPanel } from './DestinationPanel'
@@ -136,7 +137,7 @@ export const Destinations = () => {
             <div className="flex gap-x-2">
               <EnableReplicationModal />
               {/* [Joshen] Placeholder for when we have documentation */}
-              <DocsButton href="https://supabase.com/docs" />
+              <DocsButton href={`${DOCS_URL}`} />
             </div>
           </div>
         ) : hasDestinations ? (
