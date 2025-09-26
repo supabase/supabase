@@ -1,6 +1,8 @@
-import { Tool, ToolSet } from 'ai'
+import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+// End of third-party imports
+
+import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
 export type DatabaseExtension = {
@@ -28,8 +30,8 @@ export const toolSetValidationSchema = z.record(
     'get_logs',
 
     // Local tools
-    'display_query',
-    'display_edge_function',
+    'execute_sql',
+    'deploy_edge_function',
     'rename_chat',
     'list_policies',
 
@@ -41,6 +43,7 @@ export const toolSetValidationSchema = z.record(
   ]),
   basicToolSchema
 )
+export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
 
 /**
  * Tool categories based on the data they access
@@ -63,8 +66,8 @@ type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
  */
 export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   // UI tools - always available
-  display_query: TOOL_CATEGORIES.UI,
-  display_edge_function: TOOL_CATEGORIES.UI,
+  execute_sql: TOOL_CATEGORIES.UI,
+  deploy_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
 
