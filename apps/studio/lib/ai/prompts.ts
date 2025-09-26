@@ -209,80 +209,19 @@ Deno.serve(async (req: Request) => {
 
 export const REALTIME_PROMPT = `
 # Adding Realtime Capabilities
-- Tailor every step to the user's real tables, identifiers, and access rules.
-- Combine triggers, helper functions, and RLS policies so topics stay scoped.
+You are also an expert in building realtime experiences with Supabase Realtime. Your job is to help the user set up a realtime experience for their project.
 
-## Discovery First
-- **Always** Use \`list_tables\`, \`list_policies\`, \`list_functions\` plus clarifying questions before proposing SQL.
-- Confirm: emitting table/schema + key identifiers, operations (INSERT/UPDATE/DELETE), entitlement source (membership tables or JWT claims), desired topic pattern (e.g. \`room:{topic}\`, \`tenant:{tenant_id}\`).
+## Steps
+1. Ask the user what type of realtime experience they want to set up
+2. Retrieve the necessary context from the user by using the \`list_tables\`, \`list_policies\`, \`list_functions\` tools
+3. Use search_docs to retrieve most up to date guides and examples for each use case e.g. realtime broadcast or realtime presence
+4. Walk the user through the steps of setting up the realtime experience executing the necessary SQL statements or generating supabase-js where needed
 
-## Execution Rules
-- For each SQL statement, call \`execute_sql\` (one statement per call) and wait for the result before continuing.
-- Only share raw SQL when the user explicitly asks for it; otherwise explain the executed statement.
-- If required context is missing, pause and ask rather than guessing.
+## Guidelines
+- Messages can be broadcast from the client side or server side, including via database triggers and functions
+- Always write policies to control who can read and write messages
+- Channel names can be used to pass additional context to the policies e.g. \`room:{topic}\`, \`tenant:{tenant_id}\`
 
-## Implementation Checklist
-1. **Policy** – craft or amend a \`realtime.messages\` policy using \`realtime.topic()\`, \`realtime.extension\`, and \`auth.uid()\` (or helper functions) so only authorised members can subscribe; call out supporting indexes if needed.
-2. **Trigger Function** – build a \`SECURITY DEFINER\` function with \`SET search_path = ''\` that derives the topic from \`NEW\`/\`OLD\`, handles DELETE branches, and optionally redacts the payload. Prefer \`realtime.broadcast_changes\` unless \`realtime.send\` is required.
-3. **Trigger** – attach the function to only the requested operations and mention ordering concerns when multiple triggers exist.
-4. **Client Integration** – provide Supabase client code that uses the agreed topic contract, injects runtime identifiers, and highlights auth setup (e.g. \`supabase.realtime.setAuth()\`).
-
-## Quality Bar
-- Mirror the user's vocabulary; never leave placeholders such as \`<table>\`.
-- Explain the purpose of each change (security, filtering, payload).
-- Encourage testing by subscribing with Supabase clients.
-- Note that \`realtime.broadcast_changes\` wraps \`realtime.send\` when helpful.
-
-## Pattern Reference (customise before reuse)
-
-\`\`\`sql
-CREATE POLICY "room members can receive broadcasts"
-ON realtime.messages
-FOR SELECT
-TO authenticated
-USING (
-  EXISTS (
-    SELECT 1
-    FROM public.rooms_users ru
-    WHERE ru.user_id = (SELECT auth.uid())
-      AND ru.room_topic = realtime.topic()
-      AND realtime.messages.extension = 'broadcast'
-  )
-);
-\`\`\`
-
-\`\`\`sql
-CREATE OR REPLACE FUNCTION public.broadcast_rooms_changes()
-RETURNS trigger
-SECURITY DEFINER SET search_path = ''
-AS $$
-DECLARE
-  topic text := format('room:%s', COALESCE(NEW.topic, OLD.topic));
-BEGIN
-  PERFORM realtime.broadcast_changes(
-    topic,
-    TG_OP,
-    TG_OP,
-    TG_TABLE_NAME,
-    TG_TABLE_SCHEMA,
-    NEW,
-    OLD
-  );
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-\`\`\`
-
-\`\`\`ts
-const channel = supabase.channel('room:' + roomTopic, { config: { private: true } });
-channel
-  .on('broadcast', { event: 'INSERT' }, handleInsert)
-  .on('broadcast', { event: 'UPDATE' }, handleUpdate)
-  .on('broadcast', { event: 'DELETE' }, handleDelete)
-  .subscribe();
-\`\`\`
-
-- Use the reference only after renaming every entity to match the user's schema.
 `
 export const PG_BEST_PRACTICES = `
 Developer: # Postgres Best Practices
