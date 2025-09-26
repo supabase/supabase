@@ -29,6 +29,22 @@ export const TopSection = ({
   organization,
   isPaused,
 }: TopSectionProps) => {
+  if (isPaused) {
+    return (
+      <div>
+        <div className="mb-8">
+          {!isMainBranch && (
+            <Link href={`/project/${parentProject?.ref}`} className="text-sm text-foreground-light">
+              {parentProject?.name}
+            </Link>
+          )}
+          <h1 className="text-3xl">{projectName}</h1>
+        </div>
+        <ProjectPausedState />
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-0 w-full items-center">
@@ -88,7 +104,6 @@ export const TopSection = ({
         </div>
       </div>
       <ProjectUpgradeFailedBanner />
-      {isPaused && <ProjectPausedState />}
     </div>
   )
 }
