@@ -212,7 +212,6 @@ export function McpConfigPanel() {
         projectRef={project?.ref}
         theme={theme as 'light' | 'dark'}
         isPlatform={isPlatform}
-        apiUrl={null} // Not relevant for docs
       />
     </div>
   )

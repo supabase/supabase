@@ -19,7 +19,7 @@ export interface McpConfigPanelProps {
   theme?: 'light' | 'dark'
   className?: string
   isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
-  apiUrl: string | null
+  apiUrl?: string
 }
 
 export function McpConfigPanel({

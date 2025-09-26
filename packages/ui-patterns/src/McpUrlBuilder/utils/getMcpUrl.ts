@@ -7,7 +7,7 @@ interface GetMcpUrlOptions {
   features?: string[]
   selectedClient?: McpClient
   isPlatform: boolean
-  apiUrl: string | null
+  apiUrl?: string
 }
 
 interface GetMcpUrlReturn {
@@ -57,7 +57,7 @@ export function getMcpUrl({
 /**
  * Assembles base `/mcp` endpoint URL for the given environment
  */
-function getMcpUrlBase({ isPlatform, apiUrl }: { isPlatform: boolean; apiUrl: string | null }) {
+function getMcpUrlBase({ isPlatform, apiUrl }: { isPlatform: boolean; apiUrl?: string }) {
   // Hosted platform uses environment variable with fallback
   if (isPlatform) {
     return process.env.NEXT_PUBLIC_MCP_URL ?? DEFAULT_MCP_URL_PLATFORM

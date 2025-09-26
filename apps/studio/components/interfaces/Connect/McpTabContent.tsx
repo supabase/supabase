@@ -44,7 +44,7 @@ const McpTabContentInnerLoaded = ({
       projectRef={projectRef}
       theme={resolvedTheme as 'light' | 'dark'}
       isPlatform={IS_PLATFORM}
-      apiUrl={projectKeys.apiUrl}
+      apiUrl={projectKeys.apiUrl ?? undefined}
     />
   )
 }
