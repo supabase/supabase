@@ -1,3 +1,5 @@
+import { DOCS_URL } from 'lib/constants'
+
 interface ResourceWarningMessage {
   // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
   restrictToRoutes?: string[]
@@ -41,7 +43,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: 'Database is no longer accepting write requests.',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
+    docsUrl: `${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`,
     buttonText: 'Learn more',
     metric: 'read_only',
   },
@@ -69,7 +71,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: 'It may become unresponsive',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-disk-io',
+    docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-disk-io`,
     buttonText: 'Learn more',
     metric: 'disk_io',
   },
@@ -97,7 +99,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: 'It may become unresponsive',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+    docsUrl: `${DOCS_URL}/guides/platform/database-size#disk-management`,
     buttonText: undefined,
     metric: 'disk_space',
   },
@@ -124,7 +126,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/high-cpu-usage',
+    docsUrl: `${DOCS_URL}/guides/troubleshooting/high-cpu-usage`,
     buttonText: 'Learn more',
     metric: 'cpu',
   },
@@ -152,7 +154,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-ram',
+    docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-ram`,
     buttonText: 'Learn more',
     metric: 'ram',
   },
@@ -180,7 +182,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: undefined,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits',
+    docsUrl: `${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`,
     buttonText: 'Enable Custom SMTP',
     metric: 'auth_email_rate_limit',
   },

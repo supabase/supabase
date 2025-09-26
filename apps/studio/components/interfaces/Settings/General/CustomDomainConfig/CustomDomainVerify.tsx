@@ -11,6 +11,7 @@ import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domain
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import { useInterval } from 'hooks/misc/useInterval'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -191,7 +192,7 @@ const CustomDomainVerify = () => {
 
       <Panel.Content>
         <div className="flex items-center justify-between">
-          <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+          <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <div className="flex items-center space-x-2">
             <Button
               type="default"
