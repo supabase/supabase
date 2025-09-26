@@ -8,7 +8,7 @@ import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import dayjs from 'dayjs'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { GB } from 'lib/constants'
+import { DOCS_URL, GB } from 'lib/constants'
 import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -156,10 +156,7 @@ export function DiskSizeField({
               `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
 
             <div className="mt-3">
-              <DocsButton
-                abbrev={false}
-                href="https://supabase.com/docs/guides/platform/database-size"
-              />
+              <DocsButton abbrev={false} href={`${DOCS_URL}/guides/platform/database-size`} />
             </div>
           </span>
           <DiskTypeRecommendationSection

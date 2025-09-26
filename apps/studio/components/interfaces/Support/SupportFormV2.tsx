@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   Book,
   Check,
@@ -13,6 +14,7 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -20,15 +22,17 @@ import * as z from 'zod'
 
 import { useDocsSearch, useParams, type DocsSearchResult as Page } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
+import CopyButton from 'components/ui/CopyButton'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import type { Project } from 'data/projects/project-detail-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { DOCS_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { useQueryState } from 'nuqs'
 import {
   Badge,
   Button,
@@ -57,6 +61,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
+import { IssueSuggestion } from './IssueSuggestions'
 import { LibrarySuggestions } from './LibrarySuggestions'
 import { PlanExpectationInfoBox } from './PlanExpectationInfoBox'
 import {
@@ -66,11 +71,45 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { useRouter } from 'next/router'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 const CONTAINER_CLASSES = 'px-6'
+
+const FormSchema = z
+  .object({
+    organizationSlug: z.string().min(1, 'Please select an organization'),
+    projectRef: z.string().min(1, 'Please select a project'),
+    category: z.string().min(1, 'Please select an issue type'),
+    severity: z.string(),
+    library: z.string(),
+    subject: z.string().min(1, 'Please add a subject heading'),
+    message: z.string().min(1, "Please add a message about the issue that you're facing"),
+    affectedServices: z.string(),
+    allowSupportAccess: z.boolean(),
+  })
+  .refine(
+    (data) => {
+      return !(data.category === 'Problem' && data.library === '')
+    },
+    {
+      message: "Please select the library that you're facing issues with",
+      path: ['library'],
+    }
+  )
+
+const defaultValues = {
+  organizationSlug: '',
+  // [Joshen TODO] We should refactor this to accept a null value instead of a magic string
+  projectRef: 'no-project',
+  category: '',
+  severity: 'Low',
+  library: '',
+  subject: '',
+  message: '',
+  affectedServices: '',
+  allowSupportAccess: true,
+}
 
 interface SupportFormV2Props {
   onProjectSelected: (value: string) => void
@@ -86,9 +125,12 @@ export const SupportFormV2 = ({
   setSentCategory,
 }: SupportFormV2Props) => {
   const { profile } = useProfile()
+  const [highlightRef, setHighlightRef] = useQueryState('highlight', { defaultValue: '' })
+
+  // [Joshen] Ideally refactor all these to use nuqs
   const {
-    projectRef: ref,
-    slug,
+    projectRef: urlRef,
+    slug: urlSlug,
     category: urlCategory,
     subject: urlSubject,
     message: urlMessage,
@@ -102,40 +144,6 @@ export const SupportFormV2 = ({
   const [docsResults, setDocsResults] = useState<Page[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
-
-  const FormSchema = z
-    .object({
-      organizationSlug: z.string().min(1, 'Please select an organization'),
-      projectRef: z.string().min(1, 'Please select a project'),
-      category: z.string().min(1, 'Please select an issue type'),
-      severity: z.string(),
-      library: z.string(),
-      subject: z.string().min(1, 'Please add a subject heading'),
-      message: z.string().min(1, "Please add a message about the issue that you're facing"),
-      affectedServices: z.string(),
-      allowSupportAccess: z.boolean(),
-    })
-    .refine(
-      (data) => {
-        return !(data.category === 'Problem' && data.library === '')
-      },
-      {
-        message: "Please select the library that you're facing issues with",
-        path: ['library'],
-      }
-    )
-
-  const defaultValues = {
-    organizationSlug: '',
-    projectRef: 'no-project',
-    category: '',
-    severity: 'Low',
-    library: '',
-    subject: '',
-    message: '',
-    affectedServices: '',
-    allowSupportAccess: true,
-  }
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -158,8 +166,6 @@ export const SupportFormV2 = ({
     () => organizations?.find((org) => org.slug === organizationSlug),
     [organizationSlug, organizations]
   )
-  const { data, isLoading: isLoadingProjects, isSuccess: isSuccessProjects } = useProjectsQuery()
-  const allProjects = data?.projects ?? []
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -189,10 +195,6 @@ export const SupportFormV2 = ({
   const respondToEmail = profile?.primary_email ?? 'your email'
   const subscriptionPlanId = selectedOrganization?.plan.id
 
-  const projects = [
-    ...(allProjects ?? []).filter((project) => project.organization_slug === organizationSlug),
-    { ref: 'no-project', name: 'No specific project' } as Partial<Project>,
-  ]
   const hasResults =
     state.status === 'fullResults' ||
     state.status === 'partialResults' ||
@@ -286,28 +288,32 @@ export const SupportFormV2 = ({
 
   useEffect(() => {
     // For prefilling form fields via URL, project ref will taking higher precedence than org slug
-    if (isSuccessOrganizations && isSuccessProjects) {
-      if (organizations.length === 0) {
-        form.setValue('organizationSlug', 'no-org')
-      } else if (ref) {
-        const selectedProject = allProjects.find((p) => p.ref === ref)
-        if (selectedProject !== undefined) {
-          form.setValue('organizationSlug', selectedProject.organization_slug)
-          form.setValue('projectRef', selectedProject.ref)
-        }
-      } else if (slug) {
-        if (organizations.some((it) => it.slug === slug)) {
-          form.setValue('organizationSlug', slug)
-        }
-      } else if (ref === undefined && slug === undefined) {
-        const firstOrganization = organizations?.[0]
-        if (firstOrganization !== undefined) {
-          form.setValue('organizationSlug', firstOrganization.slug)
+    const prefillForm = async () => {
+      if (isSuccessOrganizations) {
+        if (organizations.length === 0) {
+          form.setValue('organizationSlug', 'no-org')
+        } else if (urlRef) {
+          // Check validity of project via project details
+          const selectedProject = await getProjectDetail({ ref: urlRef })
+          if (!!selectedProject) {
+            const org = organizations.find((x) => x.id === selectedProject.organization_id)
+            if (!!org) form.setValue('organizationSlug', org.slug)
+            form.setValue('projectRef', selectedProject.ref)
+          }
+        } else if (urlSlug) {
+          if (organizations.some((it) => it.slug === urlSlug)) {
+            form.setValue('organizationSlug', urlSlug)
+          }
+        } else if (!urlRef && !urlSlug) {
+          const firstOrganization = organizations?.[0]
+          if (!!firstOrganization) {
+            form.setValue('organizationSlug', firstOrganization.slug)
+          }
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref, slug, isSuccessOrganizations, isSuccessProjects])
+    prefillForm()
+  }, [urlRef, urlSlug, isSuccessOrganizations])
 
   useEffect(() => {
     if (urlCategory) {
@@ -400,19 +406,21 @@ export const SupportFormV2 = ({
           )}
         />
 
-        <div className={cn(CONTAINER_CLASSES, 'flex flex-col gap-y-2')}>
+        <div id="projectRef-field" className={cn(CONTAINER_CLASSES, 'flex flex-col gap-y-2')}>
           <FormField_Shadcn_
             name="projectRef"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout layout="vertical" label="Which project is affected?">
+              <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
                 <FormControl_Shadcn_>
                   <OrganizationProjectSelector
                     sameWidthAsTrigger
                     checkPosition="left"
                     slug={organizationSlug}
                     selectedRef={field.value}
-                    onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? 'no-project')}
+                    onInitialLoad={(projects) => {
+                      if (!urlRef) field.onChange(projects[0]?.ref ?? 'no-project')
+                    }}
                     onSelect={(project) => field.onChange(project.ref)}
                     renderTrigger={({ isLoading, project }) => (
                       <Button
@@ -453,6 +461,46 @@ export const SupportFormV2 = ({
               </FormItemLayout>
             )}
           />
+
+          <AnimatePresence>
+            {projectRef !== 'no-project' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center gap-x-1"
+              >
+                <p
+                  className={cn(
+                    'text-sm prose transition',
+                    highlightRef ? 'text-foreground' : 'text-foreground-lighter'
+                  )}
+                >
+                  Project ID:{' '}
+                  <code
+                    className={cn(
+                      'transition',
+                      highlightRef
+                        ? 'text-brand font-medium border-brand-500 animate-pulse'
+                        : 'text-foreground-light'
+                    )}
+                  >
+                    {projectRef}
+                  </code>
+                </p>
+                <CopyButton
+                  iconOnly
+                  type="text"
+                  text={projectRef}
+                  onClick={() => {
+                    toast.success('Copied to clipboard')
+                    setHighlightRef(null)
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {organizationSlug &&
             subscriptionPlanId !== 'enterprise' &&
@@ -539,6 +587,9 @@ export const SupportFormV2 = ({
               </FormItemLayout>
             )}
           />
+
+          <IssueSuggestion category={category} projectRef={projectRef} />
+
           {(severity === 'Urgent' || severity === 'High') && (
             <p className="text-sm text-foreground-light mt-2 sm:col-span-2">
               We do our best to respond to everyone as quickly as possible; however, prioritization
@@ -598,9 +649,7 @@ export const SupportFormV2 = ({
                       )}
                       <a
                         href={
-                          page.type === 'github-discussions'
-                            ? page.path
-                            : `https://supabase.com/docs${page.path}`
+                          page.type === 'github-discussions' ? page.path : `${DOCS_URL}${page.path}`
                         }
                         target="_blank"
                         rel="noreferrer"
