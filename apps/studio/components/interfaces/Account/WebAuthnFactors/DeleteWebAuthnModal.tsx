@@ -31,7 +31,7 @@ const DeleteWebAuthnModal = ({
       if (lastVisitedOrganization) {
         await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
       }
-      toast.success(`Successfully deleted webauthn factor`)
+      toast.success(`Successfully deleted security key`)
       onClose()
     },
   })
@@ -41,7 +41,7 @@ const DeleteWebAuthnModal = ({
       size="medium"
       visible={visible}
       variant={'destructive'}
-      title="Confirm to delete WebAuthn factor"
+      title="Confirm to delete security key"
       confirmLabel="Delete"
       confirmLabelLoading="Deleting"
       loading={isLoading}
@@ -52,11 +52,11 @@ const DeleteWebAuthnModal = ({
           ? 'Multi-factor authentication will be disabled'
           : 'This action cannot be undone',
         description: lastFactorToBeDeleted
-          ? 'There are no other factors that are set up once you delete this webauthn factor, as such your account will no longer be guarded by multi-factor authentication'
-          : 'You will no longer be able to use this webauthn factor for multi-factor authentication when signing in to the dashboard',
+          ? 'There are no other factors that are set up once you delete this security key, as such your account will no longer be guarded by multi-factor authentication'
+          : 'You will no longer be able to use this security key for multi-factor authentication when signing in to the dashboard',
       }}
     >
-      <p className="text-sm">Before deleting this webauthn factor, consider:</p>
+      <p className="text-sm">Before deleting this security key, consider:</p>
       <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
         {lastFactorToBeDeleted ? (
           <>

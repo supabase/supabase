@@ -31,8 +31,8 @@ const WebAuthnFactors = ({
     <>
       <CardContent>
         <p className="text-sm text-foreground-lighter">
-          Use hardware webauthn factors like YubiKey for strong, phishing-resistant authentication
-          as a second factor to verify your identity during sign-in.
+          Use hardware security keys like YubiKey for strong, phishing-resistant authentication as a
+          second factor to verify your identity during sign-in.
         </p>
         <div>
           {isLoading && <GenericSkeletonLoader />}
@@ -72,7 +72,7 @@ const WebAuthnFactors = ({
       </CardContent>
       {webauthnFactors.length < 2 ? (
         <CardFooter className="justify-end w-full space-x-2">
-          <Button onClick={() => setIsAddNewWebAuthnOpen(true)}>Add new WebAuthn key</Button>
+          <Button onClick={() => setIsAddNewWebAuthnOpen(true)}>Add new security key</Button>
         </CardFooter>
       ) : null}
       <AddNewWebAuthnModal

@@ -2,9 +2,13 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import InformationBox from 'components/ui/InformationBox'
-import { auth } from 'lib/gotrue'
 import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useQueryClient } from '@tanstack/react-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { organizationKeys } from 'data/organizations/keys'
+import { useMfaWebAuthnRegisterMutation } from 'data/profile/mfa-webauthn-register-mutation'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 interface AddNewWebAuthnModalProps {
   visible: boolean
@@ -12,90 +16,81 @@ interface AddNewWebAuthnModalProps {
 }
 
 export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalProps) => {
-  // Generate a name with a number between 0 and 1000
-  const [name, setName] = useState(`WebAuthn key ${Math.floor(Math.random() * 1000)}`)
-  const [isRegistering, setIsRegistering] = useState(false)
-  const [isRegistered, setIsRegistered] = useState(false)
+  const [name, setName] = useState(`Security key ${Math.floor(Math.random() * 1000)}`)
+
+  const queryClient = useQueryClient()
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
+  const {
+    mutate: register,
+    isLoading: isVerifying,
+    isSuccess,
+    reset,
+  } = useMfaWebAuthnRegisterMutation({
+    onError: (error) => {
+      console.error('onError', error)
+      toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
+    },
+    onSuccess: async () => {
+      if (lastVisitedOrganization) {
+        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+      }
+      toast.success(`Successfully added a second factor authentication`)
+      onClose()
+    },
+  })
 
   useEffect(() => {
     if (!visible) {
-      setName(`WebAuthn key ${Math.floor(Math.random() * 1000)}`)
-      setIsRegistered(false)
+      setName(`Security key ${Math.floor(Math.random() * 1000)}`)
+      reset()
     }
-  }, [visible])
-
-  const handleRegister = async () => {
-    if (!name.trim()) return
-
-    setIsRegistering(true)
-    try {
-      const { error } = await auth.mfa.webauthn.register(
-        {
-          friendlyName: name,
-          rpId: window.location.hostname,
-          rpOrigins: [window.location.origin],
-        },
-        {
-          authenticatorSelection: {
-            authenticatorAttachment: 'cross-platform', // Allow both platform and cross-platform
-            residentKey: 'discouraged',
-            userVerification: 'preferred',
-            requireResidentKey: false,
-          },
-        }
-      )
-
-      if (error) throw error
-
-      toast.success('WebAuthn key registered successfully!')
-      setIsRegistered(true)
-
-      // Close modal after a short delay to show success
-      setTimeout(() => {
-        onClose()
-      }, 1500)
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      toast.error(`Failed to register WebAuthn key: ${errorMessage}`)
-    } finally {
-      setIsRegistering(false)
-    }
-  }
+  }, [reset, visible])
 
   return (
     <ConfirmationModal
       size="medium"
       visible={visible}
-      title="Add a new WebAuthn key as a factor"
-      confirmLabel={isRegistered ? 'Complete' : 'Register WebAuthn key'}
+      title="Add a new security key as a factor"
+      confirmLabel={isSuccess ? 'Complete' : 'Register security key'}
       confirmLabelLoading="Registering..."
-      disabled={name.length === 0 || isRegistered}
-      loading={isRegistering}
-      onCancel={onClose}
-      onConfirm={handleRegister}
+      disabled={name.length === 0 || isSuccess}
+      loading={isVerifying}
+      onCancel={reset}
+      onConfirm={() =>
+        register({
+          friendlyName: name,
+          rpId: window.location.hostname,
+          rpOrigins: [window.location.origin],
+        })
+      }
     >
       <Input
-        label="Provide a friendly name to identify this WebAuthn key"
+        label="Provide a friendly name to identify this security key"
         descriptionText="A string will be randomly generated if a name is not provided"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        disabled={isRegistering || isRegistered}
+        disabled={isVerifying || isSuccess}
       />
 
-      {isRegistered && (
+      {isSuccess && (
         <div className="mt-4">
           <InformationBox
-            title="WebAuthn key Registered Successfully"
-            description="Your WebAuthn key has been registered and is now available for multi-factor authentication."
+            title="Security key Registered Successfully"
+            description="Your security key has been registered and is now available for multi-factor authentication."
           />
         </div>
       )}
 
-      {!isRegistered && (
+      {!isSuccess && (
         <div className="mt-4">
           <InformationBox
             title="Ready to register"
-            description="Click 'Register WebAuthn key' and follow your browser's prompts. You may need to touch your WebAuthn key or provide biometric authentication."
+            description="Click 'Register security key' and follow your browser's prompts. You may need to touch your security key or provide biometric authentication."
           />
         </div>
       )}

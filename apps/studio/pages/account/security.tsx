@@ -42,7 +42,6 @@ const Security: NextPageWithLayout = () => {
   const [isAuthenticatorAppOpen, setIsAuthenticatorAppOpen] = useState(false)
   const [isWebAuthnOpen, setIsWebAuthnOpen] = useState(false)
 
-  console.log(data)
   const verifiedFactors = data?.all.filter((factor) => factor.status === 'verified')
 
   return (
@@ -118,13 +117,13 @@ const Security: NextPageWithLayout = () => {
               >
                 <div className="flex flex-row gap-4 items-center py-1">
                   <Fingerprint strokeWidth={1.5} />
-                  <span className="text-sm">WebAuthn Key</span>
+                  <span className="text-sm">Security key</span>
                 </div>
 
                 <div className="flex flex-row gap-3 items-center">
                   {data ? (
                     <Badge variant={data.webauthn.length === 0 ? 'default' : 'brand'}>
-                      {data.webauthn.length} app{data.webauthn.length === 1 ? '' : 's'} configured
+                      {data.webauthn.length} key{data.webauthn.length === 1 ? '' : 's'} configured
                     </Badge>
                   ) : null}
                   <ChevronRightIcon

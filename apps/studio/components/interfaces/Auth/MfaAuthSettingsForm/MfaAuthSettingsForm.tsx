@@ -72,10 +72,6 @@ const totpSchema = object({
     .max(30, 'Must be a value no greater than 30'),
 })
 
-const webAuthnSchema = object({
-  MFA_WEB_AUTHN: string().required(),
-})
-
 const phoneSchema = object({
   MFA_PHONE: string().required(),
   MFA_PHONE_OTP_LENGTH: number()
@@ -95,7 +91,6 @@ export const MfaAuthSettingsForm = () => {
 
   // Separate loading states for each form
   const [isUpdatingTotpForm, setIsUpdatingTotpForm] = useState(false)
-  const [isUpdatingWebAuthnForm, setIsUpdatingWebAuthnForm] = useState(false)
   const [isUpdatingPhoneForm, setIsUpdatingPhoneForm] = useState(false)
   const [isUpdatingSecurityForm, setIsUpdatingSecurityForm] = useState(false)
 
@@ -128,13 +123,6 @@ export const MfaAuthSettingsForm = () => {
     },
   })
 
-  const webAuthnForm = useForm({
-    resolver: yupResolver(webAuthnSchema),
-    defaultValues: {
-      MFA_WEB_AUTHN: 'Disabled',
-    },
-  })
-
   const phoneForm = useForm({
     resolver: yupResolver(phoneSchema),
     defaultValues: {
@@ -152,7 +140,6 @@ export const MfaAuthSettingsForm = () => {
   })
 
   useEffect(() => {
-    console.log('authConfig', authConfig)
     if (authConfig) {
       if (!isUpdatingTotpForm) {
         totpForm.reset({
@@ -162,16 +149,6 @@ export const MfaAuthSettingsForm = () => {
               authConfig?.MFA_TOTP_ENROLL_ENABLED ?? true
             ) || 'Enabled',
           MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS ?? 10,
-        })
-      }
-
-      if (!isUpdatingWebAuthnForm) {
-        webAuthnForm.reset({
-          MFA_WEB_AUTHN:
-            determineMFAStatus(
-              authConfig?.MFA_WEB_AUTHN_VERIFY_ENABLED ?? true,
-              authConfig?.MFA_WEB_AUTHN_ENROLL_ENABLED ?? true
-            ) || 'Disabled',
         })
       }
 
@@ -218,36 +195,6 @@ export const MfaAuthSettingsForm = () => {
         onSuccess: () => {
           toast.success('Successfully updated TOTP settings')
           setIsUpdatingTotpForm(false)
-        },
-      }
-    )
-  }
-
-  const onSubmitWebAuthnForm = (values: any) => {
-    const {
-      verifyEnabled: MFA_WEB_AUTHN_VERIFY_ENABLED,
-      enrollEnabled: MFA_WEB_AUTHN_ENROLL_ENABLED,
-    } = MfaStatusToState(values.MFA_WEB_AUTHN)
-
-    const payload = {
-      ...values,
-      MFA_WEB_AUTHN_ENROLL_ENABLED,
-      MFA_WEB_AUTHN_VERIFY_ENABLED,
-    }
-    delete payload.MFA_WEB_AUTHN
-
-    setIsUpdatingWebAuthnForm(true)
-
-    updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
-      {
-        onError: (error) => {
-          toast.error(`Failed to update WebAuthn settings: ${error?.message}`)
-          setIsUpdatingWebAuthnForm(false)
-        },
-        onSuccess: () => {
-          toast.success('Successfully updated WebAuthn settings')
-          setIsUpdatingWebAuthnForm(false)
         },
       }
     )
@@ -382,7 +329,7 @@ export const MfaAuthSettingsForm = () => {
                     <FormItemLayout
                       layout="flex-row-reverse"
                       label="Maximum number of per-user MFA factors"
-                      description="How many MFA factors can be enrolled at once per user"
+                      description="How many MFA factors can be enrolled at once per user."
                     >
                       <FormControl_Shadcn_>
                         <PrePostTab postTab="factors">
@@ -411,67 +358,6 @@ export const MfaAuthSettingsForm = () => {
                   htmlType="submit"
                   disabled={!canUpdateConfig || isUpdatingTotpForm || !totpForm.formState.isDirty}
                   loading={isUpdatingTotpForm}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
-
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">WebAuthn MFA</ScaffoldSectionTitle>
-
-        <Form_Shadcn_ {...webAuthnForm}>
-          <form onSubmit={webAuthnForm.handleSubmit(onSubmitWebAuthnForm)} className="space-y-4">
-            <Card>
-              <CardContent className="pt-6">
-                <FormField_Shadcn_
-                  control={webAuthnForm.control}
-                  name="MFA_WEB_AUTHN"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="WebAuthn Keys"
-                      description="Control use of security key factors such as YubiKeys"
-                    >
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        >
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select status" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            {MFAFactorSelectionOptions.map((option) => (
-                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-
-              <CardFooter className="justify-end space-x-2">
-                {webAuthnForm.formState.isDirty && (
-                  <Button type="default" onClick={() => webAuthnForm.reset()}>
-                    Cancel
-                  </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig || isUpdatingWebAuthnForm || !webAuthnForm.formState.isDirty
-                  }
-                  loading={isUpdatingWebAuthnForm}
                 >
                   Save changes
                 </Button>
