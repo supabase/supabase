@@ -21,7 +21,13 @@ import {
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
   Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
   DialogSectionSeparator,
+  DialogTitle,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -84,6 +90,8 @@ export const DestinationPanel = ({
 
   const editMode = !!existingDestination
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
+  const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
+  const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(null)
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -144,7 +152,7 @@ export const DestinationPanel = ({
 
   const isSubmitDisabled = isSaving || isSelectedPublicationMissing
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const submitPipeline = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!sourceId) return console.error('Source id is required')
     if (isSelectedPublicationMissing) {
@@ -234,6 +242,32 @@ export const DestinationPanel = ({
       const action = editMode ? 'apply and run' : 'create and start'
       toast.error(`Failed to ${action} destination`)
     }
+  }
+
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    if (!editMode) {
+      setPendingFormValues(data)
+      setShowDisclaimerDialog(true)
+      return
+    }
+
+    await submitPipeline(data)
+  }
+
+  const handleDisclaimerDialogChange = (open: boolean) => {
+    setShowDisclaimerDialog(open)
+    if (!open) {
+      setPendingFormValues(null)
+    }
+  }
+
+  const handleDisclaimerConfirm = async () => {
+    if (!pendingFormValues) return
+
+    const values = pendingFormValues
+    setPendingFormValues(null)
+    setShowDisclaimerDialog(false)
+    await submitPipeline(values)
   }
 
   useEffect(() => {
@@ -486,6 +520,56 @@ export const DestinationPanel = ({
           </div>
         </SheetContent>
       </Sheet>
+
+      <Dialog open={showDisclaimerDialog} onOpenChange={handleDisclaimerDialogChange}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Before you create this pipeline</DialogTitle>
+          </DialogHeader>
+          <DialogSectionSeparator />
+          <DialogSection className="space-y-4 text-sm">
+            <p className="text-foreground">
+              Creating this replication pipeline will immediately start syncing data from your
+              publication into the destination. Make sure you understand these requirements to avoid
+              partial or failed syncs.
+            </p>
+
+            <Admonition type="warning">
+              <ul className="list-disc space-y-2 pl-5 text-foreground-light">
+                <li>
+                  <strong className="text-foreground">Every table must have a primary key.</strong>{' '}
+                  Without one, updates and deletes cannot be tracked, and replication will fail for that table.
+                </li>
+                <li>
+                  <strong className="text-foreground">Custom types replicate as strings.</strong>{' '}
+                  Check your schema for enums or user-defined types and confirm you’re okay with them being stored as strings in the destination.
+                </li>
+                <li>
+                  <strong className="text-foreground">Generated columns are ignored.</strong>{' '}
+                  If a generated column is important downstream, replace it with a trigger or a materialized view in the destination.
+                </li>
+                <li>
+                  <strong className="text-foreground">Prefer FULL replica identity.</strong>{' '}
+                  This ensures update and delete events include all the data needed to process them reliably.
+                </li>
+                <li>
+                  <strong className="text-foreground">Schema changes are not supported.</strong>{' '}
+                  Support for schema changes is not yet available, but we’re looking to add it.
+                </li>
+              </ul>
+            </Admonition>
+          </DialogSection>
+          <DialogSectionSeparator />
+          <DialogFooter>
+            <Button type="default" disabled={isSaving} onClick={() => handleDisclaimerDialogChange(false)}>
+              Cancel
+            </Button>
+            <Button loading={isSaving} onClick={handleDisclaimerConfirm}>
+              I’m ready, start replication
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <NewPublicationPanel
         visible={publicationPanelVisible}
