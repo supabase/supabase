@@ -43,8 +43,8 @@ export const DecryptedReadOnlyInput = ({
   return (
     <Input
       readOnly
-      // if the value is hidden, don't allow copying to clipboard
-      copy={showHidden}
+      // If the value is secure, allow copying to clipboard if the value is revealed. Otherwise, always allow copying
+      copy={!secureEntry || showHidden}
       disabled
       label={
         <div className="flex items-center gap-x-2">
