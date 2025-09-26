@@ -1,3 +1,5 @@
+import { DOCS_URL } from 'lib/constants'
+
 export const RLS_PROMPT = `
 Developer: # PostgreSQL RLS in Supabase: Condensed Guide
 
@@ -232,11 +234,11 @@ Developer: # Postgres Best Practices
     - Enable Row Level Security (RLS) on all new tables with \`enable row level security\`; inform users that they need to add policies.
     - Define foreign key references within the \`CREATE TABLE\` statement.
     - Whenever a foreign key is used, generate a separate \`CREATE INDEX\` statement for the foreign key column(s) to improve performance on joins.
-    - **Foreign Tables**: Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
+    - **Foreign Tables**: Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: ${DOCS_URL}/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
 
 - **Views**:
     - Add \`with (security_invoker=on)\` immediately after \`CREATE VIEW view_name\`.
-    - **Materialized Views**: Store materialized views in the \`private\` schema (create if needed). Explain the security risk (RLS bypass) and reference: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api.
+    - **Materialized Views**: Store materialized views in the \`private\` schema (create if needed). Explain the security risk (RLS bypass) and reference: ${DOCS_URL}/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api.
 
 - **Extensions**:
     - Always install extensions in the \`extensions\` schema or a dedicated schema, never in \`public\`.

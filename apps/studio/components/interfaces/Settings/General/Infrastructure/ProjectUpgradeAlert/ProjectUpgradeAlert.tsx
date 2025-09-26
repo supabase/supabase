@@ -183,7 +183,7 @@ const ProjectUpgradeAlert = () => {
                     extLinks
                     className="text-foreground"
                     content={`Your current disk size of ${diskAttributes?.attributes.size_gb}GB will also be
-                    [right-sized](https://supabase.com/docs/guides/platform/upgrading#disk-sizing) with the upgrade.`}
+                    [right-sized](${DOCS_URL}/guides/platform/upgrading#disk-sizing) with the upgrade.`}
                   />
                 )}
                 {/* @ts-ignore */}
