@@ -47,6 +47,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
+    <title>GitHub icon</title>
     <path
       fill="#ffffff"
       fillRule="evenodd"
@@ -93,9 +94,7 @@ const GitHubIntegrationConnectionForm = ({
   })
 
   const refetchGitHubAuthorizationAndRepositories = () => {
-    console.log('refetching github authorization and repositories in 2 seconds')
     setTimeout(() => {
-      console.log('start refetching github authorization and repositories')
       refetchGitHubAuthorization()
       refetchGitHubRepositories()
     }, 2000) // 2 second to delay to let github authorization and repositories to be updated
