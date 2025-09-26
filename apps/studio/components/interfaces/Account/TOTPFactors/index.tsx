@@ -1,19 +1,31 @@
 import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { DATETIME_FORMAT } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Button } from 'ui'
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
+import type { AuthMFAListFactorsResponse } from '@supabase/auth-js'
 
-const TOTPFactors = () => {
+const TOTPFactors = ({
+  data,
+  isLoading,
+  isError,
+  isSuccess,
+  error,
+}: {
+  data?: AuthMFAListFactorsResponse['data']
+  isLoading: boolean
+  isError: boolean
+  isSuccess: boolean
+  error: AuthMFAListFactorsResponse['error']
+}) => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
-  const { data, isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+
+  const totpFactors = data?.totp ?? []
 
   return (
     <>
@@ -29,19 +41,8 @@ const TOTPFactors = () => {
           )}
           {isSuccess && (
             <>
-              {data.totp.length === 1 && (
-                <Alert_Shadcn_ variant="default" className="mb-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>
-                    We recommend configuring two authenticator apps across different devices
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                    The two authenticator apps will serve as a backup for each other.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
               <div>
-                {data.totp.map((factor) => {
+                {totpFactors.map((factor) => {
                   return (
                     <div key={factor.id} className="flex flex-row justify-between py-2">
                       <p className="text-sm text-foreground flex items-center space-x-2">
@@ -64,12 +65,10 @@ const TOTPFactors = () => {
                   )
                 })}
               </div>
-              {data.totp.length < 2 ? (
-                <>
-                  <div className="pt-2">
-                    <Button onClick={() => setIsAddNewFactorOpen(true)}>Add new app</Button>
-                  </div>
-                </>
+              {totpFactors.length && totpFactors.length < 2 ? (
+                <div className="pt-2">
+                  <Button onClick={() => setIsAddNewFactorOpen(true)}>Add new app</Button>
+                </div>
               ) : null}
             </>
           )}
@@ -82,7 +81,7 @@ const TOTPFactors = () => {
       <DeleteFactorModal
         visible={factorToBeDeleted !== null}
         factorId={factorToBeDeleted}
-        lastFactorToBeDeleted={data?.totp.length === 1}
+        lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
       />
     </>

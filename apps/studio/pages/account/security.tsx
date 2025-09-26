@@ -1,13 +1,14 @@
-import { Fingerprint, Smartphone } from 'lucide-react'
-
+import { AlertCircle, ChevronRightIcon, Fingerprint, Smartphone } from 'lucide-react'
 import { TOTPFactors, WebAuthnFactors } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import type { NextPageWithLayout } from 'types'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Badge,
   cn,
   Collapsible_Shadcn_,
@@ -19,6 +20,9 @@ import {
   ScaffoldHeader,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
+
+import type { NextPageWithLayout } from 'types'
+import { useState } from 'react'
 
 const collapsibleClasses = [
   'bg-surface-100',
@@ -34,7 +38,9 @@ const collapsibleClasses = [
 ]
 
 const Security: NextPageWithLayout = () => {
-  const { data } = useMfaListFactorsQuery()
+  const { data, isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+  const [isAuthenticatorAppOpen, setIsAuthenticatorAppOpen] = useState(false)
+  const [isWebAuthnOpen, setIsWebAuthnOpen] = useState(false)
 
   return (
     <>
@@ -43,9 +49,24 @@ const Security: NextPageWithLayout = () => {
           <ScaffoldSectionTitle>Security</ScaffoldSectionTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
+      {data?.all.length === 1 && (
+        <Alert_Shadcn_ variant="default" className="mb-2">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle_Shadcn_>
+            We recommend configuring two security keys across different devices
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+            The two security keys will serve as a backup for each other.
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
+      )}
       <ScaffoldContainer bottomPadding>
         <div className="space-y-4">
-          <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
+          <Collapsible_Shadcn_
+            open={isAuthenticatorAppOpen}
+            onOpenChange={setIsAuthenticatorAppOpen}
+            className={cn(collapsibleClasses)}
+          >
             <CollapsibleTrigger_Shadcn_ asChild>
               <button
                 type="button"
@@ -56,19 +77,37 @@ const Security: NextPageWithLayout = () => {
                   <span className="text-sm">Authenticator app</span>
                 </div>
 
-                {data ? (
-                  <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
-                    {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
-                  </Badge>
-                ) : null}
+                <div className="flex flex-row gap-3 items-center">
+                  {data ? (
+                    <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
+                      {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
+                    </Badge>
+                  ) : null}
+                  <ChevronRightIcon
+                    className={cn(
+                      'transition-transform w-4 h-4 text-foreground-light',
+                      isAuthenticatorAppOpen ? 'rotate-90' : 'rotate-0'
+                    )}
+                  />
+                </div>
               </button>
             </CollapsibleTrigger_Shadcn_>
             <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
-              <TOTPFactors />
+              <TOTPFactors
+                data={data}
+                isLoading={isLoading}
+                isError={isError}
+                isSuccess={isSuccess}
+                error={error}
+              />
             </CollapsibleContent_Shadcn_>
           </Collapsible_Shadcn_>
 
-          <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
+          <Collapsible_Shadcn_
+            open={isWebAuthnOpen}
+            onOpenChange={setIsWebAuthnOpen}
+            className={cn(collapsibleClasses)}
+          >
             <CollapsibleTrigger_Shadcn_ asChild>
               <button
                 type="button"
@@ -76,25 +115,32 @@ const Security: NextPageWithLayout = () => {
               >
                 <div className="flex flex-row gap-4 items-center py-1">
                   <Fingerprint strokeWidth={1.5} />
-                  <span className="text-sm">WehAuthn</span>
+                  <span className="text-sm">WebAuthn Key</span>
                 </div>
 
-                {data
-                  ? (() => {
-                      const webauthnCount = data.all.filter(
-                        (factor) => factor.factor_type === 'webauthn'
-                      ).length
-                      return (
-                        <Badge variant={webauthnCount === 0 ? 'default' : 'brand'}>
-                          {webauthnCount} key{webauthnCount === 1 ? '' : 's'} configured
-                        </Badge>
-                      )
-                    })()
-                  : null}
+                <div className="flex flex-row gap-3 items-center">
+                  {data ? (
+                    <Badge variant={data.webauthn.length === 0 ? 'default' : 'brand'}>
+                      {data.webauthn.length} app{data.webauthn.length === 1 ? '' : 's'} configured
+                    </Badge>
+                  ) : null}
+                  <ChevronRightIcon
+                    className={cn(
+                      'transition-transform w-4 h-4 text-foreground-light',
+                      isWebAuthnOpen ? 'rotate-90' : 'rotate-0'
+                    )}
+                  />
+                </div>
               </button>
             </CollapsibleTrigger_Shadcn_>
             <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
-              <WebAuthnFactors />
+              <WebAuthnFactors
+                data={data}
+                isLoading={isLoading}
+                isError={isError}
+                isSuccess={isSuccess}
+                error={error}
+              />
             </CollapsibleContent_Shadcn_>
           </Collapsible_Shadcn_>
         </div>

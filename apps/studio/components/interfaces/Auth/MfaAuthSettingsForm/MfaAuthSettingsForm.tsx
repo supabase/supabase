@@ -242,11 +242,11 @@ export const MfaAuthSettingsForm = () => {
       { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
-          toast.error(`Failed to update TOTP settings: ${error?.message}`)
+          toast.error(`Failed to update WebAuthn settings: ${error?.message}`)
           setIsUpdatingWebAuthnForm(false)
         },
         onSuccess: () => {
-          toast.success('Successfully updated TOTP settings')
+          toast.success('Successfully updated WebAuthn settings')
           setIsUpdatingWebAuthnForm(false)
         },
       }
@@ -432,7 +432,7 @@ export const MfaAuthSettingsForm = () => {
                   name="MFA_WEB_AUTHN"
                   render={({ field }) => (
                     <FormItemLayout
-                      layout="flex-row-reverse"   
+                      layout="flex-row-reverse"
                       label="WebAuthn Keys"
                       description="Control use of security key factors such as YubiKeys"
                     >

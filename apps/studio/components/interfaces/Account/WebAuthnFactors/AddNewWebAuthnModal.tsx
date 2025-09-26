@@ -13,13 +13,13 @@ interface AddNewWebAuthnModalProps {
 
 export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalProps) => {
   // Generate a name with a number between 0 and 1000
-  const [name, setName] = useState(`Security Key ${Math.floor(Math.random() * 1000)}`)
+  const [name, setName] = useState(`WebAuthn key ${Math.floor(Math.random() * 1000)}`)
   const [isRegistering, setIsRegistering] = useState(false)
   const [isRegistered, setIsRegistered] = useState(false)
 
   useEffect(() => {
     if (!visible) {
-      setName(`Security Key ${Math.floor(Math.random() * 1000)}`)
+      setName(`WebAuthn key ${Math.floor(Math.random() * 1000)}`)
       setIsRegistered(false)
     }
   }, [visible])
@@ -47,7 +47,7 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
 
       if (error) throw error
 
-      toast.success('Security key registered successfully!')
+      toast.success('WebAuthn key registered successfully!')
       setIsRegistered(true)
 
       // Close modal after a short delay to show success
@@ -56,7 +56,7 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
       }, 1500)
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      toast.error(`Failed to register security key: ${errorMessage}`)
+      toast.error(`Failed to register WebAuthn key: ${errorMessage}`)
     } finally {
       setIsRegistering(false)
     }
@@ -66,8 +66,8 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
     <ConfirmationModal
       size="medium"
       visible={visible}
-      title="Add a new security key as a factor"
-      confirmLabel={isRegistered ? 'Complete' : 'Register Security Key'}
+      title="Add a new WebAuthn key as a factor"
+      confirmLabel={isRegistered ? 'Complete' : 'Register WebAuthn key'}
       confirmLabelLoading="Registering..."
       disabled={name.length === 0 || isRegistered}
       loading={isRegistering}
@@ -75,7 +75,7 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
       onConfirm={handleRegister}
     >
       <Input
-        label="Provide a friendly name to identify this security key"
+        label="Provide a friendly name to identify this WebAuthn key"
         descriptionText="A string will be randomly generated if a name is not provided"
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -85,8 +85,8 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
       {isRegistered && (
         <div className="mt-4">
           <InformationBox
-            title="Security Key Registered Successfully"
-            description="Your security key has been registered and is now available for multi-factor authentication."
+            title="WebAuthn key Registered Successfully"
+            description="Your WebAuthn key has been registered and is now available for multi-factor authentication."
           />
         </div>
       )}
@@ -95,7 +95,7 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
         <div className="mt-4">
           <InformationBox
             title="Ready to register"
-            description="Click 'Register Security Key' and follow your browser's prompts. You may need to touch your security key or provide biometric authentication."
+            description="Click 'Register WebAuthn key' and follow your browser's prompts. You may need to touch your WebAuthn key or provide biometric authentication."
           />
         </div>
       )}

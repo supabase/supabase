@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { Lock, Smartphone, Key } from 'lucide-react'
+import { Lock, Fingerprint } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -11,21 +11,21 @@ import z from 'zod'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaAuthenticateWebAuthnMutation } from 'data/profile/mfa-authenticate-webauthn-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
-import { auth } from 'lib/gotrue'
 import {
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
-  RadioGroup_Shadcn_,
-  RadioGroupItem_Shadcn_,
-  Label_Shadcn_,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
 
 const schema = z.object({
   code: z.string().optional(),
@@ -43,20 +43,21 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const signOut = useSignOut()
   const queryClient = useQueryClient()
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
-  const [isWebAuthnAuthenticating, setIsWebAuthnAuthenticating] = useState(false)
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { code: '', selectedFactorType: undefined },
   })
 
   const handleSuccess = async () => {
-    await queryClient.resetQueries()
-
     if (context === 'forgot-password') {
-      router.push({
-        pathname: '/reset-password',
-        query: router.query,
-      })
+      router
+        .push({
+          pathname: '/reset-password',
+          query: router.query,
+        })
+        .then(async () => {
+          await queryClient.resetQueries()
+        })
     } else {
       router.push(getReturnToPath())
     }
@@ -71,11 +72,21 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
-    isLoading: isVerifying,
-    isSuccess,
+    isLoading: isTotpVerifying,
+    isSuccess: isTotpSuccess,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: handleSuccess,
   })
+  const {
+    mutate: mfaAuthenticateWebAuthn,
+    isLoading: isWebAuthnVerifying,
+    isSuccess: isWebAuthnSuccess,
+  } = useMfaAuthenticateWebAuthnMutation({
+    onSuccess: handleSuccess,
+  })
+
+  const isFormDisabled =
+    isTotpVerifying || isWebAuthnVerifying || isTotpSuccess || isWebAuthnSuccess
 
   const onClickLogout = async () => {
     await signOut()
@@ -86,34 +97,12 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     if (!selectedFactor) return
 
     if (selectedFactorType === 'webauthn') {
-      await handleWebAuthnAuthentication()
+      mfaAuthenticateWebAuthn({
+        factorId: selectedFactor.id,
+        webauthn: { rpId: window.location.hostname, rpOrigins: [window.location.origin] },
+      })
     } else if (code && selectedFactorType === 'totp') {
       mfaChallengeAndVerify({ factorId: selectedFactor.id, code, refreshFactors: false })
-    }
-  }
-
-  const handleWebAuthnAuthentication = async () => {
-    if (!selectedFactor) return
-
-    setIsWebAuthnAuthenticating(true)
-    try {
-      const { error } = await auth.mfa.webauthn.authenticate({
-        factorId: selectedFactor.id,
-        rpId: window.location.hostname,
-        rpOrigins: [window.location.origin],
-      })
-
-      if (error) {
-        throw error
-      }
-
-      handleSuccess()
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'WebAuthn authentication failed'
-      console.error('WebAuthn authentication error:', errorMessage)
-      // The error will be handled by the mutation's onError callback
-    } finally {
-      setIsWebAuthnAuthenticating(false)
     }
   }
 
@@ -153,7 +142,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                 render={({ field }) => (
                   <FormItemLayout name="selectedFactorType" label="Choose authentication method">
                     <FormControl_Shadcn_>
-                      <RadioGroup_Shadcn_
+                      <RadioGroupStacked
                         value={field.value}
                         onValueChange={(value) => {
                           field.onChange(value)
@@ -164,33 +153,23 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                             setSelectedFactor(factors.webauthn[0])
                           }
                         }}
-                        className="grid grid-cols-1 gap-3"
+                        className="flex flex-col"
                       >
                         {factors.totp.length > 0 && (
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem_Shadcn_ value="totp" id="totp" />
-                            <Label_Shadcn_
-                              htmlFor="totp"
-                              className="flex items-center space-x-2 cursor-pointer"
-                            >
-                              <Smartphone className="h-4 w-4" />
-                              <span>Authenticator app (TOTP)</span>
-                            </Label_Shadcn_>
-                          </div>
+                          <RadioGroupStackedItem
+                            value="totp"
+                            id="totp"
+                            label="Authenticator app (TOTP)"
+                          />
                         )}
                         {factors.webauthn.length > 0 && (
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem_Shadcn_ value="webauthn" id="webauthn" />
-                            <Label_Shadcn_
-                              htmlFor="webauthn"
-                              className="flex items-center space-x-2 cursor-pointer"
-                            >
-                              <Key className="h-4 w-4" />
-                              <span>Security key (WebAuthn)</span>
-                            </Label_Shadcn_>
-                          </div>
+                          <RadioGroupStackedItem
+                            value="webauthn"
+                            id="webauthn"
+                            label="Security key (WebAuthn)"
+                          />
                         )}
-                      </RadioGroup_Shadcn_>
+                      </RadioGroupStacked>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -227,7 +206,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                           autoCapitalize="none"
                           spellCheck="false"
                           placeholder="XXXXXX"
-                          disabled={isVerifying}
+                          disabled={isTotpVerifying}
                         />
                       </div>
                     </FormControl_Shadcn_>
@@ -238,15 +217,11 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
 
             {/* WebAuthn Info - only show for WebAuthn factors */}
             {form.watch('selectedFactorType') === 'webauthn' && (
-              <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
-                <Key className="h-5 w-5 text-foreground-light" />
-                <div>
-                  <p className="text-sm font-medium">Security Key Authentication</p>
-                  <p className="text-xs text-foreground-light">
-                    Click "Verify" to use your security key
-                  </p>
-                </div>
-              </div>
+              <Alert>
+                <Fingerprint />
+                <AlertTitle>Security Key Authentication</AlertTitle>
+                <AlertDescription>Click "Verify" to use your security key</AlertDescription>
+              </Alert>
             )}
 
             <div className="flex items-center justify-between space-x-2">
@@ -254,7 +229,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                 block
                 type="outline"
                 size="large"
-                disabled={isVerifying || isSuccess || isWebAuthnAuthenticating}
+                disabled={isFormDisabled}
                 onClick={onClickLogout}
                 className="opacity-80 hover:opacity-100 transition"
               >
@@ -265,14 +240,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                 form={formId}
                 htmlType="submit"
                 size="large"
-                disabled={isVerifying || isSuccess || isWebAuthnAuthenticating}
-                loading={isVerifying || isSuccess || isWebAuthnAuthenticating}
+                disabled={isFormDisabled}
+                loading={isFormDisabled}
               >
-                {isVerifying || isWebAuthnAuthenticating
-                  ? 'Verifying'
-                  : isSuccess
-                    ? 'Signing in'
-                    : 'Verify'}
+                {isWebAuthnVerifying ? 'Verifying' : isWebAuthnSuccess ? 'Signing in' : 'Verify'}
               </Button>
             </div>
           </form>
