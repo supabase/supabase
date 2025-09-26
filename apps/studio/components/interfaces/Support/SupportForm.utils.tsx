@@ -7,6 +7,7 @@ import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
+import { DOCS_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 
 const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL || ''
@@ -96,7 +97,7 @@ export function generateLink(pageType: PageType, link: string): string {
   switch (pageType) {
     case PageType.Markdown:
     case PageType.Reference:
-      return `https://supabase.com/docs${link}`
+      return `${DOCS_URL}${link}`
     case PageType.Integration:
       return `https://supabase.com${link}`
     case PageType.GithubDiscussion:
