@@ -60,17 +60,10 @@ export const SupabaseGrid = ({
     },
     {
       keepPreviousData: true,
-      retryDelay: (retryAttempt, error: any) => {
+      retry: (_, error: any) => {
         const doesNotExistError = error && error.message?.includes('does not exist')
-        const tooManyRequestsError = error.message?.includes('Too Many Requests')
-        const vaultError = error.message?.includes('query vault failed')
-
         if (doesNotExistError) onApplySorts([])
-
-        if (retryAttempt > 3 || doesNotExistError || tooManyRequestsError || vaultError) {
-          return Infinity
-        }
-        return 5000
+        return false
       },
     }
   )
