@@ -522,7 +522,7 @@ export const DestinationPanel = ({
       </Sheet>
 
       <Dialog open={showDisclaimerDialog} onOpenChange={handleDisclaimerDialogChange}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Before you create this pipeline</DialogTitle>
           </DialogHeader>
@@ -530,34 +530,48 @@ export const DestinationPanel = ({
           <DialogSection className="space-y-4 text-sm">
             <p className="text-foreground">
               Creating this replication pipeline will immediately start syncing data from your
-              publication into the destination. Make sure you understand these requirements to avoid
-              partial or failed syncs.
+              publication into the destination. Make sure you understand requirements and limitations
+              of the system before proceeding.
             </p>
 
-            <Admonition type="warning">
-              <ul className="list-disc space-y-2 pl-5 text-foreground-light">
-                <li>
-                  <strong className="text-foreground">Every table must have a primary key.</strong>{' '}
-                  Without one, updates and deletes cannot be tracked, and replication will fail for that table.
-                </li>
-                <li>
-                  <strong className="text-foreground">Custom types replicate as strings.</strong>{' '}
-                  Check your schema for enums or user-defined types and confirm you’re okay with them being stored as strings in the destination.
-                </li>
-                <li>
-                  <strong className="text-foreground">Generated columns are ignored.</strong>{' '}
-                  If a generated column is important downstream, replace it with a trigger or a materialized view in the destination.
-                </li>
-                <li>
-                  <strong className="text-foreground">Prefer FULL replica identity.</strong>{' '}
-                  This ensures update and delete events include all the data needed to process them reliably.
-                </li>
-                <li>
-                  <strong className="text-foreground">Schema changes are not supported.</strong>{' '}
-                  Support for schema changes is not yet available, but we’re looking to add it.
-                </li>
-              </ul>
+            <Admonition type="warning" className="space-y-1 px-4 py-3">
+              <p className="font-medium text-foreground">Primary keys are required</p>
+              <p className="text-foreground-light">
+                Every table included in the publication must expose a primary key for replication to
+                work correctly.
+              </p>
             </Admonition>
+
+            <Accordion_Shadcn_ type="single" collapsible>
+              <AccordionItem_Shadcn_ value="limitations" className="border-none">
+                <AccordionTrigger_Shadcn_ className="justify-between gap-2 text-sm font-medium py-2">
+                  View limitations
+                </AccordionTrigger_Shadcn_>
+                <AccordionContent_Shadcn_ className="pt-2">
+                  <div className="space-y-2 text-foreground-light">
+                    <ul className="list-disc space-y-1.5 pl-5 text-sm leading-snug">
+                      <li>
+                        <strong className="text-foreground">Custom data types replicate as strings.</strong>{' '}
+                        Check that the destination can interpret those string values correctly.
+                      </li>
+                      <li>
+                        <strong className="text-foreground">Generated columns are skipped.</strong>{' '}
+                        Replace them with triggers or materialized views if you need the derived values downstream.
+                      </li>
+                      <li>
+                        <strong className="text-foreground">FULL replica identity is strongly recommended.</strong>{' '}
+                        With FULL replica identity deletes and updates include the payload that is needed to correctly
+                        apply those changes.
+                      </li>
+                      <li>
+                        <strong className="text-foreground">Schema changes aren’t supported yet.</strong>{' '}
+                        Plan for manual adjustments if you need to alter replicated tables.
+                      </li>
+                    </ul>
+                  </div>
+                </AccordionContent_Shadcn_>
+              </AccordionItem_Shadcn_>
+            </Accordion_Shadcn_>
           </DialogSection>
           <DialogSectionSeparator />
           <DialogFooter>
