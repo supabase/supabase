@@ -2,9 +2,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
+import { ReportSectionHeader } from 'components/interfaces/Reports/v2/ReportSectionHeader'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
@@ -20,10 +21,19 @@ import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIRepor
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
-import { createAuthReportConfig } from 'data/reports/v2/auth.config'
+import {
+  createUsageReportConfig,
+  createErrorsReportConfig,
+  createLatencyReportConfig,
+} from 'data/reports/v2/auth.config'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
 import { useRouter } from 'next/router'
+import {
+  ReportsNumericFilter,
+  numericFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { useQueryState, parseAsJson } from 'nuqs'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -76,12 +86,33 @@ const AuthUsage = () => {
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const authReportConfig = createAuthReportConfig({
+  const [statusCodeFilter, setStatusCodeFilter] = useQueryState(
+    'status_code',
+    parseAsJson(numericFilterSchema.parse)
+  )
+
+  const usageReportConfig = createUsageReportConfig({
     projectRef: ref || '',
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
-    filters: { status_code: null },
+    filters: { status_code: statusCodeFilter },
+  })
+
+  const errorsReportConfig = createErrorsReportConfig({
+    projectRef: ref || '',
+    startDate: selectedDateRange?.period_start?.date,
+    endDate: selectedDateRange?.period_end?.date,
+    interval: selectedDateRange?.interval,
+    filters: { status_code: statusCodeFilter },
+  })
+
+  const latencyReportConfig = createLatencyReportConfig({
+    projectRef: ref || '',
+    startDate: selectedDateRange?.period_start?.date,
+    endDate: selectedDateRange?.period_end?.date,
+    interval: selectedDateRange?.interval,
+    filters: { status_code: statusCodeFilter },
   })
 
   const onRefreshReport = async () => {
@@ -121,17 +152,17 @@ const AuthUsage = () => {
       <ReportHeader title="Auth" showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <>
-            <ButtonTooltip
-              type="default"
-              disabled={isRefreshing}
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
-            <ReportSettings chartId={chartSyncId} />
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <ButtonTooltip
+                type="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+                onClick={onRefreshReport}
+              />
+              <ReportSettings chartId={chartSyncId} />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -158,46 +189,118 @@ const AuthUsage = () => {
                 </div>
               )}
             </div>
-          </>
+            <div className="w-full flex items-center gap-2 flex-wrap">
+              <ReportsNumericFilter
+                label="Status Code"
+                value={statusCodeFilter}
+                onChange={setStatusCodeFilter}
+                defaultOperator="="
+                isLoading={isRefreshing}
+              />
+            </div>
+          </div>
         }
       >
-        {authReportConfig.map((metric, i) => (
-          <ReportChartV2
-            key={`${metric.id}`}
-            report={metric}
-            projectRef={ref!}
-            interval={selectedDateRange.interval}
-            startDate={selectedDateRange?.period_start?.date}
-            endDate={selectedDateRange?.period_end?.date}
-            updateDateRange={updateDateRange}
-            syncId={chartSyncId}
-            filters={{
-              status_code: null,
-            }}
-            highlightActions={highlightActions}
-          />
-        ))}
-        <div>
-          <div className="mb-4">
-            <h5 className="text-foreground mb-2">Auth API Gateway</h5>
-            <ReportFilterBar
-              filters={filters}
-              onAddFilter={addFilter}
-              onRemoveFilters={removeFilters}
-              isLoading={isLoadingData || isRefetching}
-              hideDatepicker={true}
-              datepickerHelpers={datePickerHelpers}
-              selectedProduct={'auth'}
-              showDatabaseSelector={false}
+        <div className="mt-8 flex flex-col gap-8 pb-24">
+          <div className="flex flex-col gap-4" id="usage">
+            <ReportSectionHeader
+              id="usage"
+              title="Usage"
+              description="Monitor user activity, sign-ins, sign-ups, and password reset requests to understand how users interact with your authentication system."
+            />
+            <div className="grid md:grid-cols-2 gap-4">
+              {usageReportConfig.map((metric) => (
+                <ReportChartV2
+                  key={`${metric.id}`}
+                  report={metric}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  syncId={chartSyncId}
+                  filters={{ status_code: statusCodeFilter }}
+                  highlightActions={highlightActions}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Errors Section */}
+          <div className="flex flex-col gap-4" id="errors">
+            <ReportSectionHeader
+              id="errors"
+              title="Errors"
+              description="Track authentication errors by status code and error type to identify issues and improve user experience."
+            />
+            <div className="grid md:grid-cols-2 gap-4">
+              {errorsReportConfig.map((metric) => (
+                <ReportChartV2
+                  key={`${metric.id}`}
+                  report={metric}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  syncId={chartSyncId}
+                  filters={{ status_code: statusCodeFilter }}
+                  highlightActions={highlightActions}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Latency Section */}
+          <div className="flex flex-col gap-4" id="latency">
+            <ReportSectionHeader
+              id="latency"
+              title="Latency"
+              description="Monitor sign-in and sign-up performance metrics including average, percentiles, and request counts to ensure optimal authentication speed."
+            />
+            <div className="grid md:grid-cols-2 gap-4">
+              {latencyReportConfig.map((metric) => (
+                <ReportChartV2
+                  key={`${metric.id}`}
+                  report={metric}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  syncId={chartSyncId}
+                  filters={{ status_code: statusCodeFilter }}
+                  highlightActions={highlightActions}
+                />
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="mb-4 space-y-4">
+              <ReportSectionHeader
+                id="auth-api-gateway"
+                title="Auth API Gateway"
+                description="Monitor user activity, sign-ins, sign-ups, and password reset requests to understand how users interact with your authentication system."
+              />
+              <ReportFilterBar
+                filters={filters}
+                onAddFilter={addFilter}
+                onRemoveFilters={removeFilters}
+                isLoading={isLoadingData || isRefetching}
+                hideDatepicker={true}
+                datepickerHelpers={datePickerHelpers}
+                selectedProduct={'auth'}
+                showDatabaseSelector={false}
+              />
+            </div>
+            <SharedAPIReport
+              data={data}
+              error={error}
+              isLoading={isLoading}
+              isRefetching={isRefetching}
+              sql={sql}
             />
           </div>
-          <SharedAPIReport
-            data={data}
-            error={error}
-            isLoading={isLoading}
-            isRefetching={isRefetching}
-            sql={sql}
-          />
         </div>
       </ReportStickyNav>
     </>
