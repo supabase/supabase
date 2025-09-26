@@ -1,7 +1,8 @@
 import classNames from 'classnames'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
+
+import { useBreakpoint } from 'common'
 
 export function LaunchWeekLogoHeader() {
   const isMobile = useBreakpoint(640)
