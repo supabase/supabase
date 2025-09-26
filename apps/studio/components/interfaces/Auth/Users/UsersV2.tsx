@@ -7,6 +7,7 @@ import {
   Loader2,
   RefreshCw,
   Search,
+  Snail,
   Trash,
   Users,
   X,
@@ -73,7 +74,7 @@ export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
 // [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
 // Can change it to remove V2 thereafter
-export const UsersV2 = () => {
+const UsersV2Implementation = ({ initialCount }: { initialCount: number }) => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -93,13 +94,16 @@ export const UsersV2 = () => {
     'authentication:show_user_type_filter',
   ])
 
+  const slowFilterToggleShown = initialCount >= THRESHOLD_COUNT
+
+  const [allowSlowFiltering, setAllowSlowFiltering] = useState(!slowFilterToggleShown)
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
-  const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
+  const [sortByValue, setSortByValue] = useState('id:asc')
 
   const [selectedUser, setSelectedUser] = useState<string>()
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
@@ -110,14 +114,8 @@ export const UsersV2 = () => {
   const [forceExactCount, setForceExactCount] = useState(false)
   const [showFetchExactCountModal, setShowFetchExactCountModal] = useState(false)
 
-  const [
-    columnConfiguration,
-    setColumnConfiguration,
-    { isSuccess: isSuccessStorage, isError: isErrorStorage, error: errorStorage },
-  ] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.AUTH_USERS_COLUMNS_CONFIGURATION(projectRef ?? ''),
-    null as ColumnConfiguration[] | null
-  )
+  // do not load column configuration from local storage as it may cause unexpected performance issues
+  const columnConfiguration: ColumnConfiguration[] = []
 
   const [sortColumn, sortOrder] = sortByValue.split(':')
 
@@ -139,7 +137,7 @@ export const UsersV2 = () => {
       keywords: filterKeywords,
       filter: filter === 'all' ? undefined : filter,
       providers: selectedProviders,
-      sort: sortColumn as 'created_at' | 'email' | 'phone',
+      sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
     },
     {
@@ -204,32 +202,6 @@ export const UsersV2 = () => {
     return updatedColumns
   }
 
-  // [Joshen] Left off here - it's tricky trying to do both column toggling and re-ordering
-  const saveColumnConfiguration = AwesomeDebouncePromise(
-    (event: 'resize' | 'reorder' | 'toggle', value) => {
-      if (event === 'toggle') {
-        const columnConfig = value.columns.map((col: any) => ({
-          id: col.key,
-          width: col.width,
-        }))
-        setColumnConfiguration(columnConfig)
-      } else if (event === 'resize') {
-        const columnConfig = columns.map((col, idx) => ({
-          id: col.key,
-          width: idx === value.idx ? value.width : col.width,
-        }))
-        setColumnConfiguration(columnConfig)
-      } else if (event === 'reorder') {
-        const columnConfig = value.columns.map((col: any) => ({
-          id: col.key,
-          width: col.width,
-        }))
-        setColumnConfiguration(columnConfig)
-      }
-    },
-    500
-  )
-
   const handleDeleteUsers = async () => {
     if (!projectRef) return console.error('Project ref is required')
     const userIds = [...selectedUsers]
@@ -259,11 +231,7 @@ export const UsersV2 = () => {
   }
 
   useEffect(() => {
-    if (
-      !isRefetching &&
-      (isSuccessStorage ||
-        (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
-    ) {
+    if (!isRefetching) {
       const columns = formatUserColumns({
         config: columnConfiguration ?? [],
         users: users ?? [],
@@ -277,15 +245,7 @@ export const UsersV2 = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isSuccess,
-    isRefetching,
-    isSuccessStorage,
-    isErrorStorage,
-    errorStorage,
-    users,
-    selectedUsers,
-  ])
+  }, [isSuccess, isRefetching, users, selectedUsers])
 
   return (
     <>
@@ -308,11 +268,36 @@ export const UsersV2 = () => {
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-2">
+                {slowFilterToggleShown && (
+                  <>
+                    <ButtonTooltip
+                      type={allowSlowFiltering ? 'default' : 'warning'}
+                      icon={<Snail />}
+                      onClick={() => setAllowSlowFiltering((v) => !v)}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: (
+                            <>
+                              Accidentally filtering through a large table may negatively affect
+                              your application's performance.
+                              <br />
+                              Click this button to enable the filters.
+                            </>
+                          ),
+                        },
+                      }}
+                    >
+                      Filtering: {allowSlowFiltering ? 'Enabled' : 'Disabled'}
+                    </ButtonTooltip>
+                  </>
+                )}
                 <Input
                   size="tiny"
                   className="w-52 pl-7 bg-transparent"
                   iconContainerClassName="pl-2"
                   icon={<Search size={14} className="text-foreground-lighter" />}
+                  disabled={!allowSlowFiltering}
                   placeholder="Search email, phone or UID"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -328,6 +313,7 @@ export const UsersV2 = () => {
                         size="tiny"
                         type="text"
                         icon={<X />}
+                        disabled={!allowSlowFiltering}
                         onClick={() => clearSearch()}
                         className="p-0 h-5 w-5"
                       />
@@ -343,6 +329,7 @@ export const UsersV2 = () => {
                         'w-[140px] !bg-transparent',
                         filter === 'all' && 'border-dashed'
                       )}
+                      disabled={!allowSlowFiltering}
                     >
                       <SelectValue_Shadcn_ />
                     </SelectTrigger_Shadcn_>
@@ -377,6 +364,7 @@ export const UsersV2 = () => {
                     maxHeightClass="h-[190px]"
                     className="w-52"
                     onSaveFilters={setSelectedProviders}
+                    disabled={!allowSlowFiltering}
                   />
                 )}
 
@@ -392,6 +380,7 @@ export const UsersV2 = () => {
                   labelClass="text-xs"
                   maxHeightClass="h-[190px]"
                   clearButtonText="Reset"
+                  disabled={!allowSlowFiltering}
                   activeOptions={selectedColumns}
                   onSaveFilters={(value) => {
                     // When adding back hidden columns:
@@ -423,18 +412,23 @@ export const UsersV2 = () => {
 
                     setSelectedColumns(value)
                     setColumns(updatedColumns)
-                    saveColumnConfiguration('toggle', { columns: updatedColumns })
                   }}
                 />
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                      Sorted by {sortColumn.replaceAll('_', ' ')}
+                    <Button
+                      icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}
+                      disabled={!allowSlowFiltering}
+                    >
+                      {sortColumn === 'id'
+                        ? 'Sorted by User ID'
+                        : `Sorted by ${sortColumn.replaceAll('_', ' ')}`}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-44" align="start">
                     <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
+                      <DropdownMenuRadioItem value="id:desc">User ID</DropdownMenuRadioItem>
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
@@ -495,6 +489,7 @@ export const UsersV2 = () => {
                   icon={<RefreshCw />}
                   type="default"
                   loading={isRefetching && !isFetchingNextPage}
+                  disabled={!allowSlowFiltering}
                   onClick={() => {
                     refetch()
                     refetchCount()
@@ -538,15 +533,12 @@ export const UsersV2 = () => {
                     toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
                   } else setSelectedUsers(rows)
                 }}
-                onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
                 onColumnsReorder={(source, target) => {
                   const sourceIdx = columns.findIndex((col) => col.key === source)
                   const targetIdx = columns.findIndex((col) => col.key === target)
 
                   const updatedColumns = swapColumns(columns, sourceIdx, targetIdx)
                   setColumns(updatedColumns)
-
-                  saveColumnConfiguration('reorder', { columns: updatedColumns })
                 }}
                 renderers={{
                   renderRow(id, props) {
@@ -709,4 +701,24 @@ export const UsersV2 = () => {
       </ConfirmationModal>
     </>
   )
+}
+
+export const UsersV2 = () => {
+  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const { data: countData, isLoading: isLoadingCount } = useUsersCountQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    keywords: '',
+    filter: undefined,
+    providers: [],
+    forceExactCount: false,
+  })
+
+  if (isLoadingCount) {
+    return <></>
+  }
+
+  return <UsersV2Implementation initialCount={countData?.count ?? 0} />
 }
