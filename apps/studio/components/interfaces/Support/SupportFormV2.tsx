@@ -99,6 +99,7 @@ const FormSchema = z
 
 const defaultValues = {
   organizationSlug: '',
+  // [Joshen TODO] We should refactor this to accept a null value instead of a magic string
   projectRef: 'no-project',
   category: '',
   severity: 'Low',
