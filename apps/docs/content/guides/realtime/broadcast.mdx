@@ -836,12 +836,6 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
 ## Trigger broadcast messages from your database
 
-<Admonition type="caution">
-
-This feature is currently in Public Alpha. If you have any issues [submit a support ticket](https://supabase.help).
-
-</Admonition>
-
 ### How it works
 
 Broadcast Changes allows you to trigger messages from your database. To achieve it Realtime is directly reading your WAL (Write Append Log) file using a publication against the `realtime.messages` table so whenever a new insert happens a message is sent to connected users.
