@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -9,12 +10,12 @@ import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useChangedSync } from 'hooks/misc/useChanged'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Dashboards, SqlSnippets } from 'types'
+import type { Dashboards, SqlSnippets } from 'types'
 import { DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
-import { toast } from 'sonner'
 
 interface ReportBlockProps {
   item: Dashboards.Chart
@@ -77,27 +78,14 @@ export const ReportBlock = ({
 
   const [rows, setRows] = useState<any[] | undefined>(undefined)
   const [isWriteQuery, setIsWriteQuery] = useState(false)
-  const lastQueryType = useRef<'select' | 'mutation'>('select')
 
   const {
     mutate: executeSql,
     error: executeSqlError,
     isLoading: executeSqlLoading,
   } = useExecuteSqlMutation({
-    onSuccess: (data) => {
-      setRows(data.result)
-      setIsWriteQuery(lastQueryType.current === 'mutation')
-    },
-    onError: (mutationError) => {
-      const lowerMessage = mutationError.message.toLowerCase()
-      const isReadOnlyError =
-        lowerMessage.includes('read-only transaction') ||
-        lowerMessage.includes('permission denied') ||
-        lowerMessage.includes('must be owner')
-
-      if (lastQueryType.current === 'select' && isReadOnlyError) {
-        setIsWriteQuery(true)
-      }
+    onError: () => {
+      // Silence the error toast because the error will be displayed inline
     },
   })
 
@@ -115,26 +103,45 @@ export const ReportBlock = ({
         return false
       }
 
-      lastQueryType.current = queryType
       if (queryType === 'mutation') {
         setIsWriteQuery(true)
       }
-      executeSql({ projectRef, connectionString, sql: sqlToRun })
+      executeSql(
+        { projectRef, connectionString, sql: sqlToRun },
+        {
+          onSuccess: (data) => {
+            setRows(data.result)
+            setIsWriteQuery(queryType === 'mutation')
+          },
+          onError: (mutationError) => {
+            const lowerMessage = mutationError.message.toLowerCase()
+            const isReadOnlyError =
+              lowerMessage.includes('read-only transaction') ||
+              lowerMessage.includes('permission denied') ||
+              lowerMessage.includes('must be owner')
+
+            if (queryType === 'select' && isReadOnlyError) {
+              setIsWriteQuery(true)
+            }
+          },
+        }
+      )
       return true
     },
     [projectRef, readOnlyConnectionString, postgresConnectionString, executeSql]
   )
 
-  useEffect(() => {
-    if (!executeSqlLoading && isRefreshing) {
-      runQuery('select', sql)
-    }
-  }, [isRefreshing, executeSqlLoading, sql, runQuery])
+  const sqlHasChanged = useChangedSync(sql)
+  const isRefreshingChanged = useChangedSync(isRefreshing)
+  if (sqlHasChanged || (isRefreshingChanged && isRefreshing)) {
+    runQuery('select', sql)
+  }
 
   return (
     <>
       {isSnippet ? (
         <QueryBlock
+          blockWriteQueries
           id={item.id}
           label={item.label}
           chartConfig={chartConfig}
@@ -159,6 +166,7 @@ export const ReportBlock = ({
             runQuery(queryType, sql)
           }}
           onUpdateChartConfig={onUpdateChart}
+          onRemoveChart={() => onRemoveChart({ metric: { key: item.attribute } })}
           disabled={isLoading || snippetMissing || !sql}
         />
       ) : isDeprecatedChart ? (

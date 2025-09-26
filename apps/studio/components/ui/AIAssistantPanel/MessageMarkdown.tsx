@@ -1,7 +1,8 @@
+import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { memo, ReactNode, useEffect, useMemo, useRef } from 'react'
 
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import Link from 'next/link'
 import {
   Button,
   cn,
@@ -17,11 +18,10 @@ import {
   DialogTrigger,
 } from 'ui'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
-import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
+import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { defaultUrlTransform } from './Message.utils'
-import { Loader2 } from 'lucide-react'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>

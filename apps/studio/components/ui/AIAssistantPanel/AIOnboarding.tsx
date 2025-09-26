@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion'
 import { BarChart, FileText, Shield } from 'lucide-react'
 
-import { Button, Skeleton } from 'ui'
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { createLintSummaryPrompt, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
 import { type Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { type SqlSnippet } from './AIAssistant.types'
+import { Button, Skeleton } from 'ui'
 import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
+import { type SqlSnippet } from './AIAssistant.types'
 
 interface AIOnboardingProps {
   sqlSnippets?: SqlSnippet[]
