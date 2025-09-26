@@ -1,6 +1,8 @@
-import { Tool, ToolSet } from 'ai'
+import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+// End of third-party imports
+
+import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
 export type DatabaseExtension = {
@@ -41,6 +43,7 @@ export const toolSetValidationSchema = z.record(
   ]),
   basicToolSchema
 )
+export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
 
 /**
  * Tool categories based on the data they access

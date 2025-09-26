@@ -7,7 +7,7 @@ import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 
-import { Badge, ChartContainer, ChartTooltipContent, cn, CodeBlock } from 'ui'
+import { Badge, Button, ChartContainer, ChartTooltipContent, cn, CodeBlock } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
@@ -37,11 +37,13 @@ export interface QueryBlockProps {
   errorText?: string
   isExecuting?: boolean
   initialHideSql?: boolean
-  onExecute?: (queryType: 'select' | 'mutation') => void
-  onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
   draggable?: boolean
-  onDragStart?: (e: DragEvent<Element>) => void
   disabled?: boolean
+  blockWriteQueries?: boolean
+  onExecute?: (queryType: 'select' | 'mutation') => void
+  onRemoveChart?: () => void
+  onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
+  onDragStart?: (e: DragEvent<Element>) => void
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -57,11 +59,13 @@ export const QueryBlock = ({
   isWriteQuery = false,
   isExecuting = false,
   initialHideSql = false,
-  onExecute,
-  onUpdateChartConfig,
   draggable = false,
-  onDragStart,
   disabled = false,
+  blockWriteQueries = false,
+  onExecute,
+  onRemoveChart,
+  onUpdateChartConfig,
+  onDragStart,
 }: QueryBlockProps) => {
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
   const { xKey, yKey, view = 'table' } = chartSettings
@@ -190,7 +194,7 @@ export const QueryBlock = ({
         )
       }
     >
-      {!!showWarning && (
+      {!!showWarning && !blockWriteQueries && (
         <SqlWarningAdmonition
           warningType={showWarning}
           className="border-b"
@@ -293,7 +297,21 @@ export const QueryBlock = ({
         </>
       ) : (
         <>
-          {!isExecuting && !!errorText ? (
+          {isWriteQuery && blockWriteQueries ? (
+            <div className="flex flex-col h-full justify-center items-center text-center">
+              <p className="text-xs text-foreground-light">
+                SQL query is not read-only and cannot be rendered
+              </p>
+              <p className="text-xs text-foreground-lighter text-center">
+                Queries that involve any mutation will not be run in reports
+              </p>
+              {!!onRemoveChart && (
+                <Button type="default" className="mt-2" onClick={() => onRemoveChart()}>
+                  Remove chart
+                </Button>
+              )}
+            </div>
+          ) : !isExecuting && !!errorText ? (
             <div className={cn('flex-1 w-full overflow-auto relative border-t px-3.5 py-2')}>
               <span className="font-mono text-xs">ERROR: {errorText}</span>
             </div>

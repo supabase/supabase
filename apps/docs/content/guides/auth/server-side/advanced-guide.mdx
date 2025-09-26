@@ -24,8 +24,6 @@ In the PKCE flow, a redirect is made to your app, with an Auth Code contained in
 
 To maintain the session, these tokens must be stored in a storage medium securely shared between client and server, which is traditionally cookies. Whenever the session is refreshed, the auth and refresh tokens in the shared storage medium must be updated. Supabase client libraries provide a customizable `storage` option when a client is initiated, allowing you to change where tokens are stored.
 
-For an implementation example, see the [@supabase/ssr](https://github.com/supabase/auth-helpers/blob/main/packages/ssr/src/index.ts) package.
-
 ## Frequently asked questions
 
 {/* supa-mdx-lint-disable Rule004ExcludeWords */}

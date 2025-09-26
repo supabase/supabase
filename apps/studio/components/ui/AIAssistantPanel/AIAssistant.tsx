@@ -18,16 +18,16 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useHotKey } from 'hooks/ui/useHotKey'
+import { prepareMessagesForAPI } from 'lib/ai/message-utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
-import type { AssistantMessageType } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary'
-import { type SqlSnippet } from './AIAssistant.types'
+import type { SqlSnippet } from './AIAssistant.types'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
@@ -181,21 +181,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
       async prepareSendMessagesRequest({ messages, ...options }) {
-        // [Joshen] Specifically limiting the chat history that get's sent to reduce the
-        // size of the context that goes into the model. This should always be an odd number
-        // as much as possible so that the first message is always the user's
-        const MAX_CHAT_HISTORY = 7
-
-        const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
-
-        // Filter out results from messages before sending to the model
-        const cleanedMessages = slicedMessages.map((message: any) => {
-          const cleanedMessage = { ...message } as AssistantMessageType
-          if (message.role === 'assistant' && (message as AssistantMessageType).results) {
-            delete cleanedMessage.results
-          }
-          return cleanedMessage
-        })
+        const cleanedMessages = prepareMessagesForAPI(messages)
 
         const headerData = await constructHeaders()
         const authorizationHeader = headerData.get('Authorization')

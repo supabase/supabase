@@ -1,5 +1,5 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { type DynamicToolUIPart, type ToolUIPart, type ReasoningUIPart, type TextUIPart } from 'ai'
+import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
 import { useMemo, type PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -10,12 +10,12 @@ import { cn, markdownComponents } from 'ui'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
+import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 import {
   deployEdgeFunctionInputSchema,
   deployEdgeFunctionOutputSchema,
   parseExecuteSqlChartResult,
 } from './Message.utils'
-import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 import {
   Heading3,
   Hyperlink,
@@ -252,7 +252,7 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   }
 
   if (state === 'output-error') {
-    return <div className="text-xs text-danger">Failed to deploy Edge Function.</div>
+    return <p className="text-xs text-danger">Failed to deploy Edge Function.</p>
   }
 
   if (!TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT.has(state)) return null
