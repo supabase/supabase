@@ -64,6 +64,7 @@ export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
   },
   {
     name: 'pgbouncer',
-    description: 'PgBouncer is a lightweight connection pooler for PostgreSQL. Paid plans only.',
+    description:
+      'PgBouncer is a lightweight connection pooler for PostgreSQL. Available on paid plans only.',
   },
 ] as const
