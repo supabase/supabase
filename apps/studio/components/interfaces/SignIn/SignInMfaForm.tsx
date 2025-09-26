@@ -166,7 +166,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                           <RadioGroupStackedItem
                             value="webauthn"
                             id="webauthn"
-                            label="Security key (WebAuthn)"
+                            label="WebAuthn (YubiKey)"
                           />
                         )}
                       </RadioGroupStacked>

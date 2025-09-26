@@ -42,6 +42,9 @@ const Security: NextPageWithLayout = () => {
   const [isAuthenticatorAppOpen, setIsAuthenticatorAppOpen] = useState(false)
   const [isWebAuthnOpen, setIsWebAuthnOpen] = useState(false)
 
+  console.log(data)
+  const verifiedFactors = data?.all.filter((factor) => factor.status === 'verified')
+
   return (
     <>
       <ScaffoldContainer>
@@ -51,7 +54,7 @@ const Security: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer>
         <div className="space-y-4">
-          {data?.all.length === 1 && (
+          {verifiedFactors?.length === 1 && (
             <Alert_Shadcn_ variant="default" className="mb-2">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle_Shadcn_>
