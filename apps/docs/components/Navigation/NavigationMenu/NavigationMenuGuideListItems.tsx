@@ -1,10 +1,10 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
-import { ChevronRight } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import MenuIconPicker from './MenuIconPicker'
 
@@ -28,64 +28,40 @@ const HeaderLink = React.memo(function HeaderLink(props: {
   )
 })
 
-interface LinkContainerProps {
-  url: string
-  className: string
-  hasSubItems: boolean
-  children: React.ReactNode
-}
-
-const LinkContainer = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, LinkContainerProps>(
-  ({ url, className, hasSubItems, children }, ref) => {
-    const isExternal = url.startsWith('https://')
-
-    if (hasSubItems) {
-      return (
-        <Accordion.Trigger className={className} ref={ref as React.ForwardedRef<HTMLButtonElement>}>
-          {children}
-        </Accordion.Trigger>
-      )
-    }
-
-    return (
-      <Link
-        href={url}
-        className={className}
-        target={isExternal ? '_blank' : undefined}
-        rel={isExternal ? 'noopener noreferrer' : undefined}
-        ref={ref as React.ForwardedRef<HTMLAnchorElement>}
-      >
-        {children}
-      </Link>
-    )
-  }
-)
-
-LinkContainer.displayName = 'LinkContainer'
-
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === pathname
-  const activeItemRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null)
-  const hasSubItems = props.subItem.items && props.subItem.items.length > 0
-
-  const setActiveItemRef = React.useCallback(
-    (element: HTMLButtonElement | HTMLAnchorElement | null) => {
-      if (activeItemRef.current !== element) {
-        ;(
-          activeItemRef as React.MutableRefObject<HTMLButtonElement | HTMLAnchorElement | null>
-        ).current = element
-      }
-      if (activeItem && element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        }, 0)
-      }
-    },
-    [activeItem]
+  const activeItemRef = useRef<HTMLLIElement>(null)
+  
+  const isChildActive = props.subItem.items && props.subItem.items.some(
+    (child: any) => child.url === pathname
   )
 
+  const LinkContainer = (props) => {
+    const isExternal = props.url.startsWith('https://')
+
+    return (
+      <Link
+        href={props.url}
+        className={props.className}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+      >
+        {props.children}
+      </Link>
+    )
+  }
+
+  useEffect(() => {
+    // scroll to active item
+    if (activeItem && activeItemRef.current) {
+      // this is a hack, but seems a common one on Stackoverflow
+      setTimeout(() => {
+        activeItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 0)
+    }
+  })
   return (
     <>
       {props.subItemIndex === 0 && (
@@ -96,49 +72,42 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           </span>
         </>
       )}
-      {hasSubItems ? (
-        <Accordion.Root collapsible type="single" className="space-y-0.5">
+      {props.subItem.items && props.subItem.items.length > 0 ? (
+        <Accordion.Root 
+          collapsible 
+          type="single" 
+          className="space-y-0.5"
+          defaultValue={isChildActive ? props.subItem.url : undefined}
+        >
           <Accordion.Item key={props.subItem.url || props.subItem.name} value={props.subItem.url}>
-            <LinkContainer
-              url={props.subItem.url}
-              hasSubItems={hasSubItems}
-              className={[
-                'flex items-center gap-2',
-                'cursor-pointer transition text-sm',
-                hasSubItems ? 'justify-between' : '',
-                activeItem
-                  ? 'text-brand-link font-medium'
-                  : 'hover:text-foreground text-foreground-lighter',
-              ].join(' ')}
-              ref={setActiveItemRef}
-            >
-              <div className="flex items-center gap-2">
-                {props.subItem.icon && (
-                  <Image
-                    alt={props.subItem.name}
-                    src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
-                    width={15}
-                    height={15}
-                  />
-                )}
-                {props.subItem.name}
-              </div>
-              {hasSubItems && (
-                <ChevronRight
-                  className="transition text-foreground-lighter data-open-parent:rotate-90"
-                  size={14}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                />
-              )}
-            </LinkContainer>
-
+            <Accordion.Trigger className={[
+              'flex items-center gap-2 w-full',
+              'cursor-pointer transition text-sm',
+              activeItem
+                ? 'text-brand-link font-medium'
+                : 'hover:text-foreground text-foreground-lighter',
+            ].join(' ')}>
+              <span className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  {props.subItem.icon && (
+                    <Image
+                      alt={props.subItem.name}
+                      src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+                      width={15}
+                      height={15}
+                    />
+                  )}
+                  {props.subItem.name}
+                </div>
+                <ChevronDown className="w-4 h-4 transition-transform data-open-parent:rotate-180" />
+              </span>
+            </Accordion.Trigger>
             <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
               {props.subItem.items
                 .filter((subItem) => subItem.enabled !== false)
                 .map((subSubItem) => {
                   return (
-                    <li key={subSubItem.url || subSubItem.name}>
+                    <li key={`${props.subItem.name}-${subSubItem.url}`}>
                       <Link
                         href={`${subSubItem.url}`}
                         className={[
@@ -157,30 +126,31 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           </Accordion.Item>
         </Accordion.Root>
       ) : (
-        <LinkContainer
-          url={props.subItem.url}
-          hasSubItems={hasSubItems}
-          className={[
-            'flex items-center gap-2',
-            'cursor-pointer transition text-sm',
-            activeItem
-              ? 'text-brand-link font-medium'
-              : 'hover:text-foreground text-foreground-lighter',
-          ].join(' ')}
-          ref={setActiveItemRef}
-        >
-          <div className="flex items-center gap-2">
-            {props.subItem.icon && (
-              <Image
-                alt={props.subItem.name}
-                src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
-                width={15}
-                height={15}
-              />
-            )}
-            {props.subItem.name}
-          </div>
-        </LinkContainer>
+        <li key={props.subItem.name} ref={activeItem ? activeItemRef : null}>
+          <LinkContainer
+            url={props.subItem.url}
+            className={[
+              'flex items-center gap-2',
+              'cursor-pointer transition text-sm',
+              activeItem
+                ? 'text-brand-link font-medium'
+                : 'hover:text-foreground text-foreground-lighter',
+            ].join(' ')}
+            parent={props.subItem.parent}
+           >
+             <div className="flex items-center gap-2">
+               {props.subItem.icon && (
+                 <Image
+                   alt={props.subItem.name}
+                   src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+                   width={15}
+                   height={15}
+                 />
+               )}
+               {props.subItem.name}
+             </div>
+           </LinkContainer>
+        </li>
       )}
     </>
   )
@@ -256,3 +226,4 @@ const Content = (props) => {
 }
 
 export default React.memo(Content)
+
