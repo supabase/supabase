@@ -81,6 +81,7 @@
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
+        "POSTGRES_PASSWORD",
         "READ_ONLY_URL",
         "READ_ONLY_API_KEY",
         "SUPABASE_SERVICE_KEY",
