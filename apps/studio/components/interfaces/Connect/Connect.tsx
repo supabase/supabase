@@ -5,6 +5,7 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
+import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -34,7 +35,6 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
-import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
 
 export const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -365,7 +365,7 @@ export const Connect = () => {
                   value="mcp"
                   className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
                 >
-                  <McpTabContent />
+                  <McpTabContent projectKeys={projectKeys} />
                 </TabsContent_Shadcn_>
               )
             }

@@ -21,6 +21,13 @@ import {
 import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
 import { useProjectsQuery } from '~/lib/fetch/projects'
 
+type PlatformType = (typeof PLATFORMS)[number]['value']
+
+const PLATFORMS = [
+  { value: 'hosted', label: 'Hosted' },
+  { value: 'local', label: 'CLI' },
+] as const satisfies Array<{ value: string; label: string }>
+
 function ProjectSelector({
   className,
   selectedProject,
@@ -108,26 +115,105 @@ function ProjectSelector({
   )
 }
 
+function PlatformSelector({
+  className,
+  selectedPlatform,
+  onPlatformSelect,
+}: {
+  className?: string
+  selectedPlatform: PlatformType
+  onPlatformSelect?: (platform: PlatformType) => void
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+      <div className={cn('flex', className)}>
+        <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+          Platform
+        </span>
+
+        <PopoverTrigger_Shadcn_ asChild>
+          <Button
+            size="small"
+            type="default"
+            className="gap-0 rounded-l-none"
+            iconRight={
+              <ChevronDown
+                strokeWidth={1.5}
+                className={cn('transition-transform duration-200', open && 'rotate-180')}
+              />
+            }
+          >
+            <div className="flex items-center gap-2">
+              {PLATFORMS.find((p) => p.value === selectedPlatform)?.label}
+            </div>
+          </Button>
+        </PopoverTrigger_Shadcn_>
+      </div>
+      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
+        <Command_Shadcn_>
+          <CommandList_Shadcn_>
+            <CommandGroup_Shadcn_>
+              {PLATFORMS.map((platform) => (
+                <CommandItem_Shadcn_
+                  key={platform.value}
+                  value={platform.value}
+                  onSelect={() => {
+                    onPlatformSelect?.(platform.value)
+                    setOpen(false)
+                  }}
+                  className="flex gap-2 items-center"
+                >
+                  {platform.label}
+                  <Check
+                    aria-label={platform.value === selectedPlatform ? 'selected' : undefined}
+                    size={15}
+                    className={cn(
+                      'ml-auto',
+                      platform.value === selectedPlatform ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                </CommandItem_Shadcn_>
+              ))}
+            </CommandGroup_Shadcn_>
+          </CommandList_Shadcn_>
+        </Command_Shadcn_>
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
+  )
+}
+
 export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
+  const [selectedPlatform, setSelectedPlatform] = useState<'hosted' | 'local'>('hosted')
   const { theme } = useTheme()
+
+  const isPlatform = selectedPlatform === 'hosted'
+  const project = isPlatform ? selectedProject : null
 
   return (
     <div className="not-prose">
-      <ProjectSelector
-        className="mb-3"
-        selectedProject={selectedProject}
-        onProjectSelect={setSelectedProject}
-      />
+      <div className="flex gap-3 mb-3">
+        <PlatformSelector
+          selectedPlatform={selectedPlatform}
+          onPlatformSelect={setSelectedPlatform}
+        />
+        {isPlatform && (
+          <ProjectSelector selectedProject={project} onProjectSelect={setSelectedProject} />
+        )}
+      </div>
       <p className="text-xs text-foreground-lighter">
-        Scope the MCP server to a project. If no project is selected, all projects will be
-        accessible.
+        {isPlatform
+          ? 'Scope the MCP server to a project. If no project is selected, all projects will be accessible.'
+          : 'Project selection is only available for the hosted platform.'}
       </p>
       <McpConfigPanelBase
         basePath="/docs"
         className="mt-6"
-        projectRef={selectedProject?.ref}
+        projectRef={project?.ref}
         theme={theme as 'light' | 'dark'}
+        isPlatform={isPlatform}
       />
     </div>
   )
