@@ -8,7 +8,7 @@ const generatedEnv = require('../keys.json')
  */
 
 const defaultEnv = {
-  // POSTGRES_PASSWORD: 'postgres',
+  POSTGRES_PASSWORD: 'postgres',
   // NEXT_ANALYTICS_BACKEND_PROVIDER: 'postgres',
   // SUPABASE_REST_URL: 'http://127.0.0.1:54321/rest/v1/',
   // NEXT_PUBLIC_ENABLE_LOGS: 'false',
