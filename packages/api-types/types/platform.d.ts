@@ -7946,6 +7946,34 @@ export interface components {
       }[]
     }
     ReplicationPipelineReplicationStatusResponse: {
+      /** @description The apply worker lag */
+      apply_lag?: {
+        /**
+         * @description Bytes between the current WAL location and the confirmed flush LSN.
+         * @example 2048
+         */
+        confirmed_flush_lsn_bytes: number
+        /**
+         * @description Flush lag expressed in milliseconds.
+         * @example 1200
+         */
+        flush_lag?: number
+        /**
+         * @description Bytes between the current WAL location and the slot restart LSN.
+         * @example 1024
+         */
+        restart_lsn_bytes: number
+        /**
+         * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+         * @example 8192
+         */
+        safe_wal_size_bytes: number
+        /**
+         * @description Write lag expressed in milliseconds.
+         * @example 1500
+         */
+        write_lag?: number
+      }
       /**
        * @description Pipeline id
        * @example 1012
@@ -7968,7 +7996,6 @@ export interface components {
               name: 'copied_table'
             }
           | {
-              lag: number
               /** @enum {string} */
               name: 'following_wal'
             }
@@ -8006,6 +8033,34 @@ export interface components {
          * @example public.orders
          */
         table_name: string
+        /** @description The table sync worker lag */
+        table_sync_lag?: {
+          /**
+           * @description Bytes between the current WAL location and the confirmed flush LSN.
+           * @example 2048
+           */
+          confirmed_flush_lsn_bytes: number
+          /**
+           * @description Flush lag expressed in milliseconds.
+           * @example 1200
+           */
+          flush_lag?: number
+          /**
+           * @description Bytes between the current WAL location and the slot restart LSN.
+           * @example 1024
+           */
+          restart_lsn_bytes: number
+          /**
+           * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+           * @example 8192
+           */
+          safe_wal_size_bytes: number
+          /**
+           * @description Write lag expressed in milliseconds.
+           * @example 1500
+           */
+          write_lag?: number
+        }
       }[]
     }
     /** @description Pipeline */
@@ -8342,7 +8397,6 @@ export interface components {
             name: 'copied_table'
           }
         | {
-            lag: number
             /** @enum {string} */
             name: 'following_wal'
           }
