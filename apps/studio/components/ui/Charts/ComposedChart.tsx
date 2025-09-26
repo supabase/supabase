@@ -103,6 +103,7 @@ export function ComposedChart({
   docsUrl,
   sql,
   highlightActions,
+  titleTooltip,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -302,6 +303,7 @@ export function ComposedChart({
         className={className}
         attribute={title}
         format={format}
+        titleTooltip={titleTooltip}
       />
     )
   }
@@ -312,6 +314,7 @@ export function ComposedChart({
         hideHighlightedValue={hideHighlightedValue}
         title={title}
         format={format}
+        titleTooltip={titleTooltip}
         customDateFormat={customDateFormat}
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
         highlightedLabel={resolvedHighlightedLabel}
