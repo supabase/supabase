@@ -21,6 +21,13 @@ import {
 import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
 import { useProjectsQuery } from '~/lib/fetch/projects'
 
+type PlatformType = (typeof PLATFORMS)[number]['value']
+
+const PLATFORMS = [
+  { value: 'hosted', label: 'Hosted' },
+  { value: 'local', label: 'CLI' },
+] as const satisfies Array<{ value: string; label: string }>
+
 function ProjectSelector({
   className,
   selectedProject,
@@ -114,15 +121,10 @@ function PlatformSelector({
   onPlatformSelect,
 }: {
   className?: string
-  selectedPlatform: 'hosted' | 'local'
-  onPlatformSelect?: (platform: 'hosted' | 'local') => void
+  selectedPlatform: PlatformType
+  onPlatformSelect?: (platform: PlatformType) => void
 }) {
   const [open, setOpen] = useState(false)
-
-  const platforms = [
-    { value: 'hosted', label: 'Hosted' },
-    { value: 'local', label: 'CLI' },
-  ]
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -144,7 +146,7 @@ function PlatformSelector({
             }
           >
             <div className="flex items-center gap-2">
-              {platforms.find((p) => p.value === selectedPlatform)?.label}
+              {PLATFORMS.find((p) => p.value === selectedPlatform)?.label}
             </div>
           </Button>
         </PopoverTrigger_Shadcn_>
@@ -153,12 +155,12 @@ function PlatformSelector({
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             <CommandGroup_Shadcn_>
-              {platforms.map((platform) => (
+              {PLATFORMS.map((platform) => (
                 <CommandItem_Shadcn_
                   key={platform.value}
                   value={platform.value}
                   onSelect={() => {
-                    onPlatformSelect?.(platform.value as 'hosted' | 'local')
+                    onPlatformSelect?.(platform.value)
                     setOpen(false)
                   }}
                   className="flex gap-2 items-center"
