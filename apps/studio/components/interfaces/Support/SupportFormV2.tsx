@@ -30,7 +30,6 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { DOCS_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useRouter } from 'next/router'
 import {
   Badge,
   Button,
