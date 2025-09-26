@@ -45,13 +45,7 @@ export const RegionSelector = ({
   )
 
   const { data: availableRegionsData, isLoading: isLoadingAvailableRegions } =
-    useOrganizationAvailableRegionsQuery(
-      {
-        slug,
-        cloudProvider,
-      },
-      { enabled: smartRegionEnabled }
-    )
+    useOrganizationAvailableRegionsQuery({ slug, cloudProvider }, { enabled: smartRegionEnabled })
 
   const smartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []

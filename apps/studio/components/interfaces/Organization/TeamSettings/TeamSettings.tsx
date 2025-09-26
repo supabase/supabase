@@ -10,6 +10,7 @@ import {
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
@@ -33,7 +34,7 @@ export const TeamSettings = () => {
             placeholder="Filter members"
           />
           <ScaffoldActionsGroup className="w-full md:w-auto">
-            <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
+            <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
             <InviteMemberButton />
           </ScaffoldActionsGroup>
         </ScaffoldActionsContainer>

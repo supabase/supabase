@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -180,7 +181,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                     className="underline"
                     target="_blank"
                     rel="noreferrer"
-                    href="https://supabase.com/docs/guides/realtime/postgres-changes#available-filters"
+                    href={`${DOCS_URL}/guides/realtime/postgres-changes#available-filters`}
                   >
                     our docs
                   </Link>
