@@ -49,19 +49,19 @@ const Security: NextPageWithLayout = () => {
           <ScaffoldSectionTitle>Security</ScaffoldSectionTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      {data?.all.length === 1 && (
-        <Alert_Shadcn_ variant="default" className="mb-2">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle_Shadcn_>
-            We recommend configuring two security keys across different devices
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-            The two security keys will serve as a backup for each other.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )}
-      <ScaffoldContainer bottomPadding>
+      <ScaffoldContainer>
         <div className="space-y-4">
+          {data?.all.length === 1 && (
+            <Alert_Shadcn_ variant="default" className="mb-2">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle_Shadcn_>
+                We recommend configuring two mfa factors across different devices
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                The two mfa factors will serve as a backup for each other.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
           <Collapsible_Shadcn_
             open={isAuthenticatorAppOpen}
             onOpenChange={setIsAuthenticatorAppOpen}
@@ -92,7 +92,7 @@ const Security: NextPageWithLayout = () => {
                 </div>
               </button>
             </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+            <CollapsibleContent_Shadcn_ className="group border-t border-default text-foreground">
               <TOTPFactors
                 data={data}
                 isLoading={isLoading}
@@ -133,7 +133,7 @@ const Security: NextPageWithLayout = () => {
                 </div>
               </button>
             </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+            <CollapsibleContent_Shadcn_ className="group border-t border-default text-foreground">
               <WebAuthnFactors
                 data={data}
                 isLoading={isLoading}
