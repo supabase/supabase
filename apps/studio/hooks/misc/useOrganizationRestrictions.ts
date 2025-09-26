@@ -31,11 +31,12 @@ export function useOrganizationRestrictions() {
   )
 
   if (
-    org &&
-    org.plan.id !== 'free' &&
-    billingCustomer &&
-    !billingCustomer.address?.line1 &&
-    !org.billing_partner
+    // org &&
+    // org.plan.id !== 'free' &&
+    // billingCustomer &&
+    // !billingCustomer.address?.line1 &&
+    // !org.billing_partner
+    true
   ) {
     warnings.push({
       type: 'warning',
