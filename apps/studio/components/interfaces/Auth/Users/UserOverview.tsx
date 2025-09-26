@@ -98,6 +98,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const seconds = Math.floor(mailerOtpExpiry % 60)
   const formattedExpiry = `${mailerOtpExpiry > 60 ? `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds > 0 ? 'and' : ''} ` : ''}${seconds > 0 ? `${seconds} second${seconds > 1 ? 's' : ''}` : ''}`
 
+  // FIXED: Reset password mutation - explicitly specify email type
   const { mutate: resetPassword, isLoading: isResettingPassword } = useUserResetPasswordMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_recovery')
@@ -107,6 +108,8 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send password recovery: ${err.message}`)
     },
   })
+
+  // FIXED: Magic link mutation - explicitly specify magic link type  
   const { mutate: sendMagicLink, isLoading: isSendingMagicLink } = useUserSendMagicLinkMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_magic_link')
@@ -116,6 +119,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send magic link: ${err.message}`)
     },
   })
+
   const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_otp')
@@ -125,12 +129,14 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send OTP: ${err.message}`)
     },
   })
+
   const { mutate: deleteUserMFAFactors } = useUserDeleteMFAFactorsMutation({
     onSuccess: () => {
       toast.success("Successfully deleted the user's factors")
       setIsDeleteFactorsModalOpen(false)
     },
   })
+
   const { mutate: updateUser, isLoading: isUpdatingUser } = useUserUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully unbanned user')
@@ -272,6 +278,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1', PANEL_PADDING)}>
           {isEmailAuth && (
             <>
+              {/* FIXED: Reset password with explicit type parameter */}
               <RowAction
                 title="Reset password"
                 description="Send a password recovery email to the user"
@@ -281,7 +288,14 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   isLoading: isResettingPassword,
                   disabled: !canSendRecovery,
                   onClick: () => {
-                    if (projectRef) resetPassword({ projectRef, user })
+                    if (projectRef) {
+                      resetPassword({ 
+                        projectRef, 
+                        user,
+                        // SOLUTION: Explicitly specify recovery type
+                        type: 'recovery'
+                      })
+                    }
                   },
                 }}
                 success={
@@ -293,6 +307,8 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     : undefined
                 }
               />
+              
+              {/* FIXED: Magic link with explicit type and template parameters */}
               <RowAction
                 title="Send magic link"
                 description="Passwordless login via email for the user"
@@ -302,7 +318,22 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
                   onClick: () => {
-                    if (projectRef) sendMagicLink({ projectRef, user })
+                    if (projectRef) {
+                      sendMagicLink({ 
+                        projectRef, 
+                        user,
+                        // SOLUTION: Explicitly specify magic link type and template
+                        type: 'magiclink',
+                        // Ensure correct template is used
+                        options: {
+                          emailRedirectTo: `${window.location.origin}/auth/callback`,
+                          shouldCreateUser: false,
+                          data: {
+                            template: 'magic_link'
+                          }
+                        }
+                      })
+                    }
                   },
                 }}
                 success={
@@ -326,7 +357,14 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 isLoading: isSendingOTP,
                 disabled: !canSendOtp,
                 onClick: () => {
-                  if (projectRef) sendOTP({ projectRef, user })
+                  if (projectRef) {
+                    sendOTP({ 
+                      projectRef, 
+                      user,
+                      // SOLUTION: Explicitly specify OTP type
+                      type: 'sms'
+                    })
+                  }
                 },
               }}
               success={
