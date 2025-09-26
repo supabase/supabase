@@ -1,4 +1,4 @@
-/* no react imports to avoid type resolution issues here */
+import type { PropsWithChildren } from 'react'
 
 import {
   cn,
@@ -7,12 +7,11 @@ import {
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
 
-type ToolProps = {
+type ToolProps = PropsWithChildren<{
   className?: string
   label: string | JSX.Element
   icon?: JSX.Element
-  children?: any
-}
+}>
 
 export function Tool({ className, label, icon, children }: ToolProps) {
   const isCollapsible = !!children
@@ -28,7 +27,10 @@ export function Tool({ className, label, icon, children }: ToolProps) {
       )}
     >
       <Collapsible>
-        <CollapsibleTrigger className={cn('flex items-center gap-2 w-full text-left')}>
+        <CollapsibleTrigger
+          className={cn('flex items-center gap-2 w-full text-left')}
+          disabled={!children}
+        >
           {icon}
           {typeof label === 'string' ? (
             <span className="text-foreground-lighter">{label}</span>

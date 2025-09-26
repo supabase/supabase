@@ -1,5 +1,6 @@
-import { Code, GripHorizontal, Loader2 } from 'lucide-react'
+import { Code, GripHorizontal } from 'lucide-react'
 import { DragEvent, PropsWithChildren, ReactNode } from 'react'
+
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface ReportBlockContainerProps {
@@ -54,7 +55,12 @@ export const ReportBlockContainer = ({
             ) : (
               <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <div className="flex items-center gap-2 flex-1">
+            <div
+              className={cn(
+                'flex items-center gap-2 flex-1 transition-opacity',
+                showDragHandle && 'group-hover:opacity-25'
+              )}
+            >
               <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>

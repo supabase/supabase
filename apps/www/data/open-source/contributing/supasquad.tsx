@@ -1,4 +1,4 @@
-import { Image } from 'ui'
+import { Badge, Image } from 'ui'
 import { companyStats } from '~/data/company-stats'
 
 export const data = {
@@ -144,6 +144,43 @@ export const data = {
       {
         heading: companyStats.databasesLaunchedDaily.label,
         subheading: companyStats.databasesLaunchedDaily.text,
+      },
+    ],
+  },
+  featured: {
+    id: 'featured',
+    label: '',
+    heading: (
+      <>
+        <p className="label">Featured</p>
+        <span className="text-foreground">We're especially looking for</span>
+      </>
+    ),
+    subheading:
+      "These are the areas where we need the most help right now. If you have expertise in any of these domains, we'd love to hear from you!",
+    features: [
+      {
+        id: 'ai-builders',
+        icon: 'bot',
+        heading: (
+          <div className="flex items-center gap-2">
+            AI Builders <Badge variant="success">High Priority</Badge>
+          </div>
+        ),
+        subheading:
+          "Help our users who are building with AI + Supabase. If you've vibed a bunch of projects but understand what's happening under the hood, we'd love to talke with you .",
+      },
+
+      {
+        id: 'realtime',
+        icon: 'zap',
+        heading: (
+          <div className="flex items-center gap-2">
+            Realtime <Badge variant="success">High Priority</Badge>
+          </div>
+        ),
+        subheading:
+          'Help the team by writing docs, creating examples, and making sure our guides are up to date. Experience with React and friends is an extra bonus.',
       },
     ],
   },

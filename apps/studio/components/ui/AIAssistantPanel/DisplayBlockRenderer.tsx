@@ -1,19 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { DragEvent, PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { type DragEvent, type PropsWithChildren, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useChangedSync } from 'hooks/misc/useChanged'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
-
-import { ConfirmFooter } from './ConfirmFooter'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
 import { identifyQueryType } from './AIAssistant.utils'
+import { ConfirmFooter } from './ConfirmFooter'
 
 interface DisplayBlockRendererProps {
   messageId: string
@@ -51,6 +51,15 @@ export const DisplayBlockRenderer = ({
   onChartConfigChange,
   onQueryRun,
 }: PropsWithChildren<DisplayBlockRendererProps>) => {
+  const savedInitialArgs = useRef(initialArgs)
+  const savedInitialResults = useRef(initialResults)
+  const savedInitialConfig = useRef<ChartConfig>({
+    ...DEFAULT_CHART_CONFIG,
+    view: initialArgs.view === 'chart' ? 'chart' : 'table',
+    xKey: initialArgs.xAxis ?? '',
+    yKey: initialArgs.yAxis ?? '',
+  })
+
   const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
@@ -86,56 +95,30 @@ export const DisplayBlockRenderer = ({
   const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
   const postgresConnectionString = primaryDatabase?.connectionString
 
-  const lastQueryType = useRef<'select' | 'mutation'>('select')
-
-  useEffect(() => {
-    const initialConfig: ChartConfig = {
-      ...DEFAULT_CHART_CONFIG,
-      view: initialArgs.view === 'chart' ? 'chart' : 'table',
-      xKey: initialArgs.xAxis ?? '',
-      yKey: initialArgs.yAxis ?? '',
-    }
-    setChartConfig(initialConfig)
-    onChartConfigChange?.(initialConfig)
-    setIsWriteQuery(initialArgs.isWriteQuery || false)
-    setRows(Array.isArray(initialResults) ? initialResults : undefined)
-    lastQueryType.current = initialArgs.isWriteQuery ? 'mutation' : 'select'
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toolCallId])
-
-  useEffect(() => {
-    const normalized = Array.isArray(initialResults) ? initialResults : undefined
-    if (!normalized || normalized === rows) return
-    setRows(normalized)
-  }, [initialResults, rows])
-
   const {
     mutate: executeSql,
     error: executeSqlError,
     isLoading: executeSqlLoading,
   } = useExecuteSqlMutation({
-    onSuccess: (data) => {
-      setRows(Array.isArray(data.result) ? data.result : undefined)
-      setIsWriteQuery(lastQueryType.current === 'mutation' || initialArgs.isWriteQuery || false)
-      onResults?.({
-        messageId,
-        results: Array.isArray(data.result) ? data.result : undefined,
-      })
-    },
-    onError: (error) => {
-      const lowerMessage = error.message.toLowerCase()
-      const isReadOnlyError =
-        lowerMessage.includes('read-only transaction') ||
-        lowerMessage.includes('permission denied') ||
-        lowerMessage.includes('must be owner')
-
-      if (lastQueryType.current === 'select' && isReadOnlyError) {
-        setIsWriteQuery(true)
-      }
-
-      onError?.({ messageId, errorText: error.message })
+    onError: () => {
+      // Suppress toast because error message is displayed inline
     },
   })
+
+  const toolCallIdChanged = useChangedSync(toolCallId)
+  if (toolCallIdChanged) {
+    setChartConfig(savedInitialConfig.current)
+    onChartConfigChange?.(savedInitialConfig.current)
+    setIsWriteQuery(savedInitialArgs.current.isWriteQuery || false)
+    setRows(Array.isArray(savedInitialResults.current) ? savedInitialResults.current : undefined)
+  }
+
+  const initialResultsChanged = useChangedSync(initialResults)
+  if (initialResultsChanged) {
+    const normalized = Array.isArray(initialResults) ? initialResults : undefined
+    if (!normalized || normalized === rows) return
+    setRows(normalized)
+  }
 
   const handleRunQuery = (queryType: 'select' | 'mutation') => {
     if (!sqlQuery) return
@@ -169,11 +152,35 @@ export const DisplayBlockRenderer = ({
       return
     }
 
-    lastQueryType.current = queryType
     if (queryType === 'mutation') {
       setIsWriteQuery(true)
     }
-    executeSql({ projectRef: ref, connectionString, sql: sqlQuery })
+    executeSql(
+      { projectRef: ref, connectionString, sql: sqlQuery },
+      {
+        onSuccess: (data) => {
+          setRows(Array.isArray(data.result) ? data.result : undefined)
+          setIsWriteQuery(queryType === 'mutation' || initialArgs.isWriteQuery || false)
+          onResults?.({
+            messageId,
+            results: Array.isArray(data.result) ? data.result : undefined,
+          })
+        },
+        onError: (error) => {
+          const lowerMessage = error.message.toLowerCase()
+          const isReadOnlyError =
+            lowerMessage.includes('read-only transaction') ||
+            lowerMessage.includes('permission denied') ||
+            lowerMessage.includes('must be owner')
+
+          if (queryType === 'select' && isReadOnlyError) {
+            setIsWriteQuery(true)
+          }
+
+          onError?.({ messageId, errorText: error.message })
+        },
+      }
+    )
   }
 
   const handleExecute = (queryType: 'select' | 'mutation') => {
@@ -231,7 +238,7 @@ export const DisplayBlockRenderer = ({
           <ConfirmFooter
             message="Assistant wants to run this query"
             cancelLabel="Skip"
-            confirmLabel={executeSqlLoading ? 'Running…' : 'Run Query'}
+            confirmLabel={executeSqlLoading ? 'Running...' : 'Run Query'}
             isLoading={executeSqlLoading}
             onCancel={async () => {
               onResults?.({ messageId, results: 'User skipped running the query' })

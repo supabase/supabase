@@ -1,4 +1,4 @@
-import { PropsWithChildren, useMemo, useState } from 'react'
+import { type PropsWithChildren, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -100,7 +100,10 @@ export const EdgeFunctionRenderer = ({
     sendEvent({
       action: 'edge_function_deploy_button_clicked',
       properties: { origin: 'functions_ai_assistant' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
 
     setShowReplaceWarning(false)
@@ -134,13 +137,14 @@ export const EdgeFunctionRenderer = ({
         onCancelReplace={() => setShowReplaceWarning(false)}
         onConfirmReplace={() => void performDeploy()}
         onDeploy={handleDeploy}
+        hideDeployButton={showConfirmFooter}
       />
       {showConfirmFooter && (
         <div className="mx-4">
           <ConfirmFooter
-            message="Assistant wants to deploy this EdgeFunction"
+            message="Assistant wants to deploy this Edge Function"
             cancelLabel="Skip"
-            confirmLabel={isDeploying ? 'Deploying…' : 'Deploy'}
+            confirmLabel={isDeploying ? 'Deploying...' : 'Deploy'}
             isLoading={isDeploying}
             onCancel={() => {
               onDeployed?.({ success: false, errorText: 'Skipped' })

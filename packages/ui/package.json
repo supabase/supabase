@@ -76,7 +76,7 @@
     "recharts": "^2.12.7",
     "sonner": "^1.5.0",
     "tailwind-merge": "^1.13.2",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "catalog:",
     "vaul": "^0.9.9"
   },
   "devDependencies": {
@@ -95,7 +95,7 @@
     "glob": "^8.1.0",
     "style-dictionary": "^3.7.1",
     "tsconfig": "workspace:*",
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "^3.0.5"
   },
