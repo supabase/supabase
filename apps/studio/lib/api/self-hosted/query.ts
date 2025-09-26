@@ -1,10 +1,11 @@
 import { PG_META_URL } from 'lib/constants/index'
 import { constructHeaders } from '../apiHelpers'
 import { PgMetaDatabaseError, databaseErrorSchema, WrappedResult } from './types'
-import { assertSelfHosted } from './util'
+import { assertSelfHosted, encryptString, getConnectionString } from './util'
 
 export type QueryOptions = {
   query: string
+  readOnly?: boolean
   headers?: HeadersInit
 }
 
@@ -15,16 +16,21 @@ export type QueryOptions = {
  */
 export async function executeQuery<T = unknown>({
   query,
+  readOnly = false,
   headers,
 }: QueryOptions): Promise<WrappedResult<T[]>> {
   assertSelfHosted()
 
+  const connectionString = getConnectionString({ readOnly })
+  const connectionStringEncrypted = encryptString(connectionString)
+
   const response = await fetch(`${PG_META_URL}/query`, {
     method: 'POST',
-    headers: {
+    headers: constructHeaders({
+      ...headers,
       'Content-Type': 'application/json',
-      ...constructHeaders(headers ?? {}),
-    },
+      'x-connection-encrypted': connectionStringEncrypted,
+    }),
     body: JSON.stringify({ query }),
   })
 
