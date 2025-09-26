@@ -33,10 +33,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === pathname
   const activeItemRef = useRef<HTMLLIElement>(null)
-  
-  const isChildActive = props.subItem.items && props.subItem.items.some(
-    (child: any) => child.url === pathname
-  )
+
+  const isChildActive =
+    props.subItem.items && props.subItem.items.some((child: any) => child.url === pathname)
 
   const LinkContainer = (props) => {
     const isExternal = props.url.startsWith('https://')
@@ -73,20 +72,22 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
         </>
       )}
       {props.subItem.items && props.subItem.items.length > 0 ? (
-        <Accordion.Root 
-          collapsible 
-          type="single" 
+        <Accordion.Root
+          collapsible
+          type="single"
           className="space-y-0.5"
           defaultValue={isChildActive ? props.subItem.url : undefined}
         >
           <Accordion.Item key={props.subItem.url || props.subItem.name} value={props.subItem.url}>
-            <Accordion.Trigger className={[
-              'flex items-center gap-2 w-full',
-              'cursor-pointer transition text-sm',
-              activeItem
-                ? 'text-brand-link font-medium'
-                : 'hover:text-foreground text-foreground-lighter',
-            ].join(' ')}>
+            <Accordion.Trigger
+              className={[
+                'flex items-center gap-2 w-full',
+                'cursor-pointer transition text-sm',
+                activeItem
+                  ? 'text-brand-link font-medium'
+                  : 'hover:text-foreground text-foreground-lighter',
+              ].join(' ')}
+            >
               <span className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
                   {props.subItem.icon && (
@@ -137,19 +138,19 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                 : 'hover:text-foreground text-foreground-lighter',
             ].join(' ')}
             parent={props.subItem.parent}
-           >
-             <div className="flex items-center gap-2">
-               {props.subItem.icon && (
-                 <Image
-                   alt={props.subItem.name}
-                   src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
-                   width={15}
-                   height={15}
-                 />
-               )}
-               {props.subItem.name}
-             </div>
-           </LinkContainer>
+          >
+            <div className="flex items-center gap-2">
+              {props.subItem.icon && (
+                <Image
+                  alt={props.subItem.name}
+                  src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+                  width={15}
+                  height={15}
+                />
+              )}
+              {props.subItem.name}
+            </div>
+          </LinkContainer>
         </li>
       )}
     </>
@@ -226,4 +227,3 @@ const Content = (props) => {
 }
 
 export default React.memo(Content)
-
