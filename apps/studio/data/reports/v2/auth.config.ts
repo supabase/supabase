@@ -18,8 +18,10 @@ const METRIC_KEYS = [
   'SignInAttempts',
   'PasswordResetRequests',
   'TotalSignUps',
-  'SignInLatency',
-  'SignUpLatency',
+  'SignInProcessingTimeBasic',
+  'SignInProcessingTimePercentiles',
+  'SignUpProcessingTimeBasic',
+  'SignUpProcessingTimePercentiles',
   'ErrorsByStatus',
   'ErrorsByAuthCode',
 ]
@@ -101,38 +103,64 @@ const AUTH_REPORT_SQL: Record<
         order by timestamp desc
       `
   },
-  SignInLatency: (interval, _filters) => {
+  SignInProcessingTimeBasic: (interval, _filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
-        --signin-latency
+        --signin-processing-time-basic
         select 
           timestamp_trunc(timestamp, ${granularity}) as timestamp,
           count(*) as count,
-          round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms,
-          round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_latency_ms,
-          round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_latency_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_latency_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_latency_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_latency_ms
+          round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_processing_time_ms,
+          round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_processing_time_ms,
+          round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_processing_time_ms
         from auth_logs
         where json_value(event_message, "$.auth_event.action") = 'login'
         group by timestamp
         order by timestamp desc
       `
   },
-  SignUpLatency: (interval, _filters) => {
+  SignInProcessingTimePercentiles: (interval, _filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
-        --signup-latency
+        --signin-processing-time-percentiles
         select 
           timestamp_trunc(timestamp, ${granularity}) as timestamp,
           count(*) as count,
-          round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms,
-          round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_latency_ms,
-          round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_latency_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_latency_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_latency_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_latency_ms
+          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_processing_time_ms,
+          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_processing_time_ms,
+          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_processing_time_ms
+        from auth_logs
+        where json_value(event_message, "$.auth_event.action") = 'login'
+        group by timestamp
+        order by timestamp desc
+      `
+  },
+  SignUpProcessingTimeBasic: (interval, _filters) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    return `
+        --signup-processing-time-basic
+        select 
+          timestamp_trunc(timestamp, ${granularity}) as timestamp,
+          count(*) as count,
+          round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_processing_time_ms,
+          round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_processing_time_ms,
+          round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_processing_time_ms
+        from auth_logs
+        where json_value(event_message, "$.auth_event.action") = 'user_signedup'
+        group by timestamp
+        order by timestamp desc
+      `
+  },
+  SignUpProcessingTimePercentiles: (interval, _filters) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    return `
+        --signup-processing-time-percentiles
+        select 
+          timestamp_trunc(timestamp, ${granularity}) as timestamp,
+          count(*) as count,
+          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_processing_time_ms,
+          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_processing_time_ms,
+          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_processing_time_ms
         from auth_logs
         where json_value(event_message, "$.auth_event.action") = 'user_signedup'
         group by timestamp
@@ -616,8 +644,8 @@ export const createLatencyReportConfig = ({
   filters: AuthReportFilters
 }): ReportConfig<AuthReportFilters>[] => [
   {
-    id: 'sign-in-latency',
-    label: 'Sign In Latency',
+    id: 'sign-in-processing-time-basic',
+    label: 'Sign In Processing Time',
     valuePrecision: 2,
     hide: false,
     hideHighlightedValue: true,
@@ -626,41 +654,26 @@ export const createLatencyReportConfig = ({
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
-    titleTooltip: 'The average latency for sign in operations by grant type.',
-    availableIn: ['pro', 'team', 'enterprise'],
+    titleTooltip:
+      'Basic processing time metrics for sign in operations within the auth server (excludes network latency).',
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async () => {
       const attributes = [
         {
-          attribute: 'avg_latency_ms',
-          label: 'Avg. Latency (ms)',
+          attribute: 'avg_processing_time_ms',
+          label: 'Avg. Processing Time (ms)',
         },
         {
-          attribute: 'max_latency_ms',
-          label: 'Max. Latency (ms)',
+          attribute: 'min_processing_time_ms',
+          label: 'Min. Processing Time (ms)',
         },
         {
-          attribute: 'min_latency_ms',
-          label: 'Min. Latency (ms)',
-        },
-        {
-          attribute: 'p50_latency_ms',
-          label: 'P50 Latency (ms)',
-        },
-        {
-          attribute: 'p95_latency_ms',
-          label: 'P95 Latency (ms)',
-        },
-        {
-          attribute: 'p99_latency_ms',
-          label: 'P99 Latency (ms)',
-        },
-        {
-          attribute: 'request_count',
-          label: 'Request Count',
+          attribute: 'max_processing_time_ms',
+          label: 'Max. Processing Time (ms)',
         },
       ]
 
-      const sql = AUTH_REPORT_SQL.SignInLatency(interval, filters)
+      const sql = AUTH_REPORT_SQL.SignInProcessingTimeBasic(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
       const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
@@ -668,8 +681,8 @@ export const createLatencyReportConfig = ({
     },
   },
   {
-    id: 'sign-up-latency',
-    label: 'Sign Up Latency',
+    id: 'sign-in-processing-time-percentiles',
+    label: 'Sign In Processing Time Percentiles',
     valuePrecision: 2,
     hide: false,
     hideHighlightedValue: true,
@@ -678,41 +691,100 @@ export const createLatencyReportConfig = ({
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
-    titleTooltip: 'The average latency for sign up operations by provider.',
+    titleTooltip:
+      'Percentile processing time metrics for sign in operations within the auth server (excludes network latency).',
     availableIn: ['pro', 'team', 'enterprise'],
     dataProvider: async () => {
       const attributes = [
         {
-          attribute: 'avg_latency_ms',
-          label: 'Avg. Latency (ms)',
+          attribute: 'p50_processing_time_ms',
+          label: 'P50 Processing Time (ms)',
         },
         {
-          attribute: 'max_latency_ms',
-          label: 'Max. Latency (ms)',
+          attribute: 'p95_processing_time_ms',
+          label: 'P95 Processing Time (ms)',
         },
         {
-          attribute: 'min_latency_ms',
-          label: 'Min. Latency (ms)',
-        },
-        {
-          attribute: 'p50_latency_ms',
-          label: 'P50 Latency (ms)',
-        },
-        {
-          attribute: 'p95_latency_ms',
-          label: 'P95 Latency (ms)',
-        },
-        {
-          attribute: 'p99_latency_ms',
-          label: 'P99 Latency (ms)',
-        },
-        {
-          attribute: 'request_count',
-          label: 'Request Count',
+          attribute: 'p99_processing_time_ms',
+          label: 'P99 Processing Time (ms)',
         },
       ]
 
-      const sql = AUTH_REPORT_SQL.SignUpLatency(interval, filters)
+      const sql = AUTH_REPORT_SQL.SignInProcessingTimePercentiles(interval, filters)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+      const transformedData = defaultAuthReportFormatter(rawData, attributes)
+
+      return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
+    },
+  },
+  {
+    id: 'sign-up-processing-time-basic',
+    label: 'Sign Up Processing Time',
+    valuePrecision: 2,
+    hide: false,
+    hideHighlightedValue: true,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'line',
+    titleTooltip:
+      'Basic processing time metrics for sign up operations within the auth server (excludes network latency).',
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    dataProvider: async () => {
+      const attributes = [
+        {
+          attribute: 'avg_processing_time_ms',
+          label: 'Avg. Processing Time (ms)',
+        },
+        {
+          attribute: 'min_processing_time_ms',
+          label: 'Min. Processing Time (ms)',
+        },
+        {
+          attribute: 'max_processing_time_ms',
+          label: 'Max. Processing Time (ms)',
+        },
+      ]
+
+      const sql = AUTH_REPORT_SQL.SignUpProcessingTimeBasic(interval, filters)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+      const transformedData = defaultAuthReportFormatter(rawData, attributes)
+
+      return { data: transformedData.data, attributes: transformedData.chartAttributes, query: sql }
+    },
+  },
+  {
+    id: 'sign-up-processing-time-percentiles',
+    label: 'Sign Up Processing Time Percentiles',
+    valuePrecision: 2,
+    hide: false,
+    hideHighlightedValue: true,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'line',
+    titleTooltip:
+      'Percentile processing time metrics for sign up operations within the auth server (excludes network latency).',
+    availableIn: ['pro', 'team', 'enterprise'],
+    dataProvider: async () => {
+      const attributes = [
+        {
+          attribute: 'p50_processing_time_ms',
+          label: 'P50 Processing Time (ms)',
+        },
+        {
+          attribute: 'p95_processing_time_ms',
+          label: 'P95 Processing Time (ms)',
+        },
+        {
+          attribute: 'p99_processing_time_ms',
+          label: 'P99 Processing Time (ms)',
+        },
+      ]
+
+      const sql = AUTH_REPORT_SQL.SignUpProcessingTimePercentiles(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
       const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
