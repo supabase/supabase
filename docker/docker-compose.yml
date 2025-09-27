@@ -317,7 +317,8 @@ services:
     image: supabase/edge-runtime:v1.69.6
     restart: unless-stopped
     volumes:
-      - ./volumes/functions:/home/deno/functions:Z
+      - ./volumes/functions:${FUNCTIONS_VOLUME_PATH}:Z
+      - ./volumes/functions/config.toml:${FUNCTIONS_VOLUME_PATH}/config.toml:Z
     depends_on:
       analytics:
         condition: service_healthy
@@ -329,11 +330,12 @@ services:
       SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       # TODO: Allow configuring VERIFY_JWT per function. This PR might help: https://github.com/supabase/cli/pull/786
       VERIFY_JWT: "${FUNCTIONS_VERIFY_JWT}"
+      FUNCTIONS_VOLUME_PATH: ${FUNCTIONS_VOLUME_PATH}
     command:
       [
         "start",
         "--main-service",
-        "/home/deno/functions/main"
+        "${FUNCTIONS_VOLUME_PATH}/main"
       ]
 
   analytics:
