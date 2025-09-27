@@ -8,6 +8,7 @@ import { useClientSecretCreateMutation } from 'data/oauth-secrets/client-secret-
 import { CreatedSecret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
 import { SecretRow } from './SecretRow'
 
@@ -42,7 +43,9 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
           <span className="text-sm text-foreground">Client secrets</span>
           <span className="text-sm text-foreground-light">
             For handling callbacks in the OAuth 2.0 flow. Learn more{' '}
-            <InlineLink href="https://supabase.com/docs/guides/integrations/build-a-supabase-integration#handling-the-callback">
+            <InlineLink
+              href={`${DOCS_URL}/guides/integrations/build-a-supabase-integration#handling-the-callback`}
+            >
               here
             </InlineLink>
             .

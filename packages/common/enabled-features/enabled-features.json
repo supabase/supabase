@@ -40,6 +40,8 @@
   "docs:auth_troubleshooting": true,
   "docs:compliance": true,
   "docs:contribution": true,
+  "docs:fdw": true,
+  "docs:footer": true,
   "docs:self-hosting": true,
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,

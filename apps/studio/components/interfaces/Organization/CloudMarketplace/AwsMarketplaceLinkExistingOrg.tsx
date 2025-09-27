@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { RadioGroupCard, RadioGroupCardItem } from '@ui/components/radio-group-card'
 import { cn } from '@ui/lib/utils'
 import { Boxes, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
@@ -7,6 +6,13 @@ import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { RadioGroupCard, RadioGroupCardItem } from '@ui/components/radio-group-card'
+import { useOrganizationLinkAwsMarketplaceMutation } from 'data/organizations/organization-link-aws-marketplace-mutation'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { DOCS_URL } from 'lib/constants'
+import { Organization } from 'types'
 import {
   Button,
   Collapsible_Shadcn_,
@@ -17,10 +23,6 @@ import {
   Skeleton,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
-import { useOrganizationLinkAwsMarketplaceMutation } from '../../../../data/organizations/organization-link-aws-marketplace-mutation'
-import { useProjectsQuery } from '../../../../data/projects/projects-query'
-import { Organization } from '../../../../types'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -139,11 +141,7 @@ const AwsMarketplaceLinkExistingOrg = ({
             <p>
               You can read more on billing through AWS in our {''}
               {/*TODO(thomas): Update docs link once the new docs exist*/}
-              <Link
-                href="https://supabase.com/docs/guides/platform"
-                target="_blank"
-                className="underline"
-              >
+              <Link href={`${DOCS_URL}/guides/platform`} target="_blank" className="underline">
                 Billing Docs.
               </Link>
             </p>

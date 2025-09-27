@@ -32,7 +32,7 @@ import {
   useIsAwsK8sCloudProvider,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { GB, PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
   Button,
@@ -372,7 +372,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
                     />
                   </Admonition>
                 )}
@@ -385,7 +385,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                     />
                   </Admonition>
                 )}

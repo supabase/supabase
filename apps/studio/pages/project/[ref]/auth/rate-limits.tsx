@@ -12,6 +12,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const RateLimitsPage: NextPageWithLayout = () => {
@@ -51,7 +52,9 @@ RateLimitsPage.getLayout = (page) => (
         title="Rate Limits"
         subtitle="Safeguard against bursts of incoming traffic to prevent abuse and maximize stability"
         primaryActions={
-          <DocsButton href="https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention" />
+          <DocsButton
+            href={`${DOCS_URL}/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention`}
+          />
         }
       >
         {page}

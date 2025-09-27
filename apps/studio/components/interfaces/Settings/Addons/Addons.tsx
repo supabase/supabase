@@ -36,7 +36,7 @@ import {
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { BASE_PATH, DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
@@ -180,7 +180,7 @@ export const Addons = () => {
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                        href={`${DOCS_URL}/guides/platform/compute-add-ons`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -192,7 +192,7 @@ export const Addons = () => {
                     </div>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
+                        href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -347,7 +347,7 @@ export const Addons = () => {
                         <p className="text-sm text-foreground-light m-0">More information</p>
                         <div>
                           <Link
-                            href="https://supabase.com/docs/guides/platform/ipv4-address"
+                            href={`${DOCS_URL}/guides/platform/ipv4-address`}
                             target="_blank"
                             rel="noreferrer"
                           >
@@ -424,7 +424,7 @@ export const Addons = () => {
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+                        href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -548,7 +548,7 @@ export const Addons = () => {
                         <p className="text-sm text-foreground-light m-0">More information</p>
                         <div>
                           <Link
-                            href="https://supabase.com/docs/guides/platform/custom-domains"
+                            href={`${DOCS_URL}/guides/platform/custom-domains`}
                             target="_blank"
                             rel="noreferrer"
                           >
