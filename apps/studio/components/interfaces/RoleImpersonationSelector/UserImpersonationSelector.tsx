@@ -10,6 +10,7 @@ import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { ResponseError } from 'types'
 import {
@@ -393,10 +394,7 @@ const UserImpersonationSelector = () => {
                       AAL1 verifies users via standard login methods, while AAL2 adds a second
                       authentication factor. If you're not using MFA, you can leave this on AAL1.
                       Learn more about MFA{' '}
-                      <InlineLink href="https://supabase.com/docs/guides/auth/auth-mfa">
-                        here
-                      </InlineLink>
-                      .
+                      <InlineLink href={`${DOCS_URL}/guides/auth/auth-mfa`}>here</InlineLink>.
                     </InfoTooltip>
                   </div>
 

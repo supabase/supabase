@@ -2,11 +2,12 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
 import { createLintSummaryPrompt, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import { EntityTypeIcon, LintCTA, LintCategoryBadge, LintEntity } from './Linter.utils'
 import { Lint } from 'data/lint/lint-query'
+import { DOCS_URL } from 'lib/constants'
+import { ExternalLink } from 'lucide-react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Button } from 'ui'
-import { ExternalLink } from 'lucide-react'
+import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
 
 interface LintDetailProps {
   lint: Lint
@@ -54,7 +55,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
           <Link
             href={
               lintInfoMap.find((item) => item.name === lint.name)?.docsLink ||
-              'https://supabase.com/docs/guides/database/database-linter'
+              `${DOCS_URL}/guides/database/database-linter`
             }
             target="_blank"
             rel="noreferrer"

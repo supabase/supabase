@@ -10,6 +10,7 @@ import {
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -53,7 +54,7 @@ export const AuthProvidersForm = () => {
                   to more than an hour. It is recommended to set this value to less than an hour.
                 </p>
                 <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                  <Link href="https://supabase.com/docs/guides/platform/going-into-prod#security">
+                  <Link href={`${DOCS_URL}/guides/platform/going-into-prod#security`}>
                     View security recommendations
                   </Link>
                 </Button>

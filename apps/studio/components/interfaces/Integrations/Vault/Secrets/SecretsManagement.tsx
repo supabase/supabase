@@ -10,6 +10,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { VaultSecret } from 'types'
 import {
   Button,
@@ -127,7 +128,7 @@ export const SecretsManagement = () => {
               >
                 Refresh
               </Button>
-              <DocsButton href="https://supabase.com/docs/guides/database/vault" />
+              <DocsButton href={`${DOCS_URL}/guides/database/vault`} />
               <ButtonTooltip
                 type="primary"
                 disabled={!canManageSecrets}

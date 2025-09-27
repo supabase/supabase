@@ -29,6 +29,7 @@ import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { DOCS_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useQueryState } from 'nuqs'
@@ -648,9 +649,7 @@ export const SupportFormV2 = ({
                       )}
                       <a
                         href={
-                          page.type === 'github-discussions'
-                            ? page.path
-                            : `https://supabase.com/docs${page.path}`
+                          page.type === 'github-discussions' ? page.path : `${DOCS_URL}${page.path}`
                         }
                         target="_blank"
                         rel="noreferrer"

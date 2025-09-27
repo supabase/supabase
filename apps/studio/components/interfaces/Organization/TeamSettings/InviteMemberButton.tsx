@@ -17,6 +17,7 @@ import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-su
 import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -300,7 +301,7 @@ export const InviteMemberButton = () => {
                     <div className="flex items-center space-x-2">
                       <Button asChild type="default">
                         <Link
-                          href="https://supabase.com/docs/guides/platform/sso"
+                          href={`${DOCS_URL}/guides/platform/sso`}
                           target="_blank"
                           rel="noreferrer"
                         >
