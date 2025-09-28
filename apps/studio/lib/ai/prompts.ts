@@ -116,7 +116,7 @@ CREATE POLICY "User file access" ON storage.objects FOR SELECT TO authenticated 
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 
 -- Secure helper function
-gCREATE OR REPLACE FUNCTION get_user_tenant() RETURNS uuid LANGUAGE sql SECURITY DEFINER STABLE AS $$
+CREATE OR REPLACE FUNCTION get_user_tenant() RETURNS uuid LANGUAGE sql SECURITY DEFINER STABLE AS $$
   SELECT tenant_id FROM user_profiles WHERE auth_user_id = auth.uid();
 $$;
 REVOKE EXECUTE ON FUNCTION get_user_tenant() FROM anon, authenticated;
