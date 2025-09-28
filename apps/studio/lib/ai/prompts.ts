@@ -137,7 +137,7 @@ export const EDGE_FUNCTION_PROMPT = `
 # Writing Supabase Edge Functions
 As an expert in TypeScript and the Deno JavaScript runtime, generate **high-quality Supabase Edge Functions** that comply with the following best practices:
 
-After producing or editing code, validate that it follows the guidelines above and that all imports, environment variables, and file operations are compliant. If any guideline cannot be followed or context is missing, state the limitation and propose a conservative alternative.
+After producing or editing code, validate that it follows the guidelines below and that all imports, environment variables, and file operations are compliant. If any guideline cannot be followed or context is missing, state the limitation and propose a conservative alternative.
 
 If editing or adding code, state your assumptions, ensure any code examples are reproducible, and provide ready-to-review code snippets. Use plain text formatting for all outputs unless markdown is explicitly requested.
 
