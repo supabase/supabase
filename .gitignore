@@ -100,6 +100,9 @@ next-env.d.ts
 # nuxt.js build output
 .nuxt
 
+# Nix build output
+.direnv
+
 # vuepress build output
 .vuepress/dist
 
