@@ -1,3 +1,4 @@
+import { DOCS_URL } from 'lib/constants'
 import { CodeBlockLang } from 'ui'
 
 export type DatabaseConnectionType =
@@ -75,7 +76,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'nextjs',
     label: 'Next.js',
     icon: 'nextjs',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/nextjs',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/nextjs`,
     children: [
       {
         key: 'app',
@@ -109,8 +110,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'remix',
     label: 'Remix',
     icon: 'remix',
-    guideLink:
-      'https://supabase.com/docs/guides/auth/server-side/creating-a-client?framework=remix&environment=remix-loader',
+    guideLink: `${DOCS_URL}/guides/auth/server-side/creating-a-client?framework=remix&environment=remix-loader`,
     children: [
       {
         key: 'supabasejs',
@@ -124,7 +124,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'react',
     label: 'React',
     icon: 'react',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/reactjs',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/reactjs`,
     children: [
       {
         key: 'create-react-app',
@@ -158,7 +158,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'nuxt',
     label: 'Nuxt',
     icon: 'nuxt',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/nuxtjs`,
     children: [
       {
         key: 'supabasejs',
@@ -172,7 +172,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'vuejs',
     label: 'Vue.JS',
     icon: 'vuejs',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/vue',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/vue`,
     children: [
       {
         key: 'supabasejs',
@@ -187,7 +187,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'sveltekit',
     label: 'SvelteKit',
     icon: 'sveltekit',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/sveltekit`,
     children: [
       {
         key: 'supabasejs',
@@ -201,7 +201,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'solidjs',
     label: 'Solid.js',
     icon: 'solidjs',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/solidjs',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/solidjs`,
     children: [
       {
         key: 'supabasejs',
@@ -229,7 +229,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'refine',
     label: 'refine',
     icon: 'refine',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/refine',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/refine`,
     children: [
       {
         key: 'supabasejs',
@@ -246,7 +246,7 @@ export const MOBILES: ConnectionType[] = [
     key: 'exporeactnative',
     label: 'Expo React Native',
     icon: 'expo',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native',
+    guideLink: `${DOCS_URL}/guides/getting-started/tutorials/with-expo-react-native`,
     children: [
       {
         key: 'supabasejs',
@@ -260,7 +260,7 @@ export const MOBILES: ConnectionType[] = [
     key: 'flutter',
     label: 'Flutter',
     icon: 'flutter',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-flutter',
+    guideLink: `${DOCS_URL}/guides/getting-started/tutorials/with-flutter`,
     children: [
       {
         key: 'supabaseflutter',
@@ -274,7 +274,7 @@ export const MOBILES: ConnectionType[] = [
     key: 'ionicreact',
     label: 'Ionic React',
     icon: 'react',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-react',
+    guideLink: `${DOCS_URL}/guides/getting-started/tutorials/with-ionic-react`,
     children: [
       {
         key: 'supabasejs',
@@ -288,7 +288,7 @@ export const MOBILES: ConnectionType[] = [
     key: 'swift',
     label: 'Swift',
     icon: 'swift',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-swift',
+    guideLink: `${DOCS_URL}/guides/getting-started/tutorials/with-swift`,
     children: [
       {
         key: 'supabaseswift',
@@ -302,7 +302,7 @@ export const MOBILES: ConnectionType[] = [
     key: 'androidkotlin',
     label: 'Android Kotlin',
     icon: 'kotlin',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-kotlin',
+    guideLink: `${DOCS_URL}/guides/getting-started/tutorials/with-kotlin`,
     children: [
       {
         key: 'supabasekt',
@@ -316,7 +316,7 @@ export const MOBILES: ConnectionType[] = [
     key: 'ionicangular',
     label: 'Ionic Angular',
     icon: 'ionic-angular',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-angular',
+    guideLink: `${DOCS_URL}/guides/getting-started/tutorials/with-ionic-angular`,
     children: [
       {
         key: 'supabasejs',
@@ -340,8 +340,7 @@ export const ORMS: ConnectionType[] = [
     key: 'drizzle',
     label: 'Drizzle',
     icon: 'drizzle',
-    guideLink:
-      'https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle',
+    guideLink: `${DOCS_URL}/guides/database/connecting-to-postgres#connecting-with-drizzle`,
     children: [],
   },
 ]

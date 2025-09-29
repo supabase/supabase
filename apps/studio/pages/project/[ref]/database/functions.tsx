@@ -12,6 +12,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
@@ -67,7 +68,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
           <div className="col-span-12">
             <FormHeader
               title="Database Functions"
-              docsUrl="https://supabase.com/docs/guides/database/functions"
+              docsUrl={`${DOCS_URL}/guides/database/functions`}
             />
             <FunctionsList
               createFunction={createFunction}

@@ -10,3 +10,11 @@ export function useChanged<T>(value: T): boolean {
 
   return changed
 }
+
+export function useChangedSync<T>(value: T): boolean {
+  const prev = useRef<T>()
+  const changed = prev.current !== value
+  prev.current = value
+
+  return changed
+}

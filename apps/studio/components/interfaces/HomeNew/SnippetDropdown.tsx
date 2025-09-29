@@ -85,7 +85,7 @@ export const SnippetDropdown = ({
           />
           <CommandList_Shadcn_ ref={scrollRootRef}>
             {isLoading ? (
-              <CommandEmpty_Shadcn_>Loading…</CommandEmpty_Shadcn_>
+              <CommandEmpty_Shadcn_>Loading...</CommandEmpty_Shadcn_>
             ) : snippets.length === 0 ? (
               <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
             ) : null}
