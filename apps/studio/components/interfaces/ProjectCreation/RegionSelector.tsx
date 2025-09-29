@@ -155,7 +155,12 @@ export const RegionSelector = ({
                         className="w-5 rounded-sm"
                         src={`${BASE_PATH}/img/regions/${value.code}.svg`}
                       />
-                      <span className="text-foreground">{value.name}</span>
+                      <div className="flex items-center gap-x-2">
+                        <span className="text-foreground">{value.name}</span>
+                        <span className="text-xs text-foreground-lighter font-mono">
+                          {value.code}
+                        </span>
+                      </div>
                     </div>
 
                     <div>
