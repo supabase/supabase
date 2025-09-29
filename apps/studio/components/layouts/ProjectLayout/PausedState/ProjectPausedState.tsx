@@ -18,11 +18,11 @@ import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.consta
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import {
   AlertDescription_Shadcn_,
@@ -94,7 +94,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     },
   })
 
-  const canResumeProject = useCheckPermissions(
+  const { can: canResumeProject } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.initialize_or_resume'
   )
@@ -207,7 +207,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                               <a
                                 target="_blank"
                                 rel="noreferrer"
-                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+                                href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#time-limits`}
                               >
                                 More information
                               </a>

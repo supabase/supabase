@@ -25,14 +25,14 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
   useIsAwsK8sCloudProvider,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { GB, PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
   Button,
@@ -80,7 +80,7 @@ export function DiskManagementForm() {
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'projects', {
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
       resource: {
         project_id: project?.id,
       },
@@ -372,7 +372,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
                     />
                   </Admonition>
                 )}
@@ -385,7 +385,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                     />
                   </Admonition>
                 )}

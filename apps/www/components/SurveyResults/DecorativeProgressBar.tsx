@@ -1,3 +1,48 @@
+interface ProgressBarProps {
+  className?: string
+  backgroundClassName?: string
+  foregroundClassName?: string
+  animationDelay: string
+  reverse?: boolean
+}
+
+export function ProgressBar({
+  className = 'h-4',
+  backgroundClassName = 'bg-foreground-muted/80',
+  foregroundClassName = 'bg-brand',
+  animationDelay,
+  reverse = false,
+}: ProgressBarProps) {
+  return (
+    <div className={`relative ${className}`}>
+      {/* Background bar (static) */}
+      <div
+        className={`h-full w-full ${backgroundClassName}`}
+        style={{
+          maskImage: 'url("/images/state-of-startups/pattern-stipple.svg")',
+          maskSize: '4px',
+          maskRepeat: 'repeat',
+          maskPosition: 'center',
+        }}
+      />
+
+      {/* Animated foreground bar */}
+      <div
+        className={`absolute inset-0 h-full w-full ${foregroundClassName}`}
+        style={{
+          maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
+          maskSize: '4px',
+          maskRepeat: 'repeat',
+          maskPosition: 'top left',
+          clipPath: 'inset(0 100% 0 0)',
+          animation: `terminalLine 10s steps(8, end) ${animationDelay} infinite ${reverse ? 'reverse' : ''}`,
+          animationFillMode: 'both',
+        }}
+      />
+    </div>
+  )
+}
+
 interface DecorativeProgressBarProps {
   /** Whether to reverse the animation direction */
   reverse?: boolean
@@ -40,30 +85,14 @@ export function DecorativeProgressBar({
       }}
     >
       {progressBars.map((bar, index) => (
-        <div key={`progress-bar-${index}`} className="relative">
-          {/* Background bar (static) */}
-          <div
-            className={`${bar.height} w-full ${bar.bgColor}`}
-            style={{
-              maskImage: 'url("/images/state-of-startups/pattern-stipple.svg")',
-              maskSize: '4px',
-              maskRepeat: 'repeat',
-              maskPosition: 'center',
-            }}
-          />
-
-          {/* Animated foreground bar */}
-          <div
-            className={`absolute inset-0 ${bar.height} w-full ${bar.fgColor}`}
-            style={{
-              maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
-              maskSize: '4px',
-              maskRepeat: 'repeat',
-              maskPosition: 'top left',
-              animation: `terminalLine 10s steps(8, end) ${bar.animationDelay} infinite ${reverse ? 'reverse' : ''}`,
-            }}
-          />
-        </div>
+        <ProgressBar
+          key={`progress-bar-${index}`}
+          className={bar.height}
+          backgroundClassName={bar.bgColor}
+          foregroundClassName={bar.fgColor}
+          animationDelay={bar.animationDelay}
+          reverse={reverse}
+        />
       ))}
     </div>
   )

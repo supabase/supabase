@@ -5,7 +5,16 @@ import { LogChartHandler } from 'components/ui/Charts/LogChartHandler'
 import { ReportConfig } from 'data/reports/v2/reports.types'
 import { Button, Card, cn } from 'ui'
 
-export function ReportChartUpsell({ report, orgSlug }: { report: ReportConfig; orgSlug: string }) {
+export function ReportChartUpsell({
+  report,
+  orgSlug,
+}: {
+  report: {
+    label: string
+    availableIn: string[]
+  }
+  orgSlug: string
+}) {
   const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
 
   const startDate = '2025-01-01'
@@ -48,7 +57,7 @@ export function ReportChartUpsell({ report, orgSlug }: { report: ReportConfig; o
           onMouseLeave={() => setIsHoveringUpgrade(false)}
           className="mt-4"
         >
-          <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=reports`}>
+          <Link href={`/org/${orgSlug || '_'}/billing?panel=subscriptionPlan&source=reports`}>
             Upgrade to{' '}
             <span className="capitalize">
               {!!report.availableIn?.length ? report.availableIn[0] : 'Pro'}

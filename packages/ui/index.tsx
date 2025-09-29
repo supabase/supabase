@@ -38,6 +38,7 @@ export { Heading } from './src/components/CustomHTMLElements'
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
+export * from './src/components/AnimatedCounter'
 export * from './src/lib/utils'
 
 // DATA ENTRY

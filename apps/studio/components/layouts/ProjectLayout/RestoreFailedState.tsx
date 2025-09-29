@@ -10,7 +10,7 @@ import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
@@ -19,11 +19,9 @@ export const RestoreFailedState = () => {
   const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
 
-  const { can: canDeleteProject } = useAsyncCheckProjectPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
-  )
+  const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: { project_id: project?.id },
+  })
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []

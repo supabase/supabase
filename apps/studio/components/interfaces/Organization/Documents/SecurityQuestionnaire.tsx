@@ -11,15 +11,17 @@ import {
 import NoPermission from 'components/ui/NoPermission'
 import { getDocument } from 'data/documents/document-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const SecurityQuestionnaire = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
+
   const { mutate: sendEvent } = useSendEventMutation()
-  const canReadSubscriptions = useCheckPermissions(
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
@@ -51,7 +53,11 @@ export const SecurityQuestionnaire = () => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadSubscriptions ? (
+          {isLoadingPermissions ? (
+            <div className="flex items-center justify-center h-full">
+              <ShimmeringLoader className="w-24" />
+            </div>
+          ) : !canReadSubscriptions ? (
             <NoPermission resourceText="access our security questionnaire" />
           ) : (
             <>

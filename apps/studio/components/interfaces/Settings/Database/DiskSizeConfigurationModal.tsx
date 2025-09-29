@@ -11,6 +11,7 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -144,7 +145,7 @@ const DiskSizeConfigurationModal = ({
                             )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
                       </div>
                       <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                        <Link href="https://supabase.com/docs/guides/platform/database-size#disk-management">
+                        <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
                           Read more about disk management
                         </Link>
                       </Button>

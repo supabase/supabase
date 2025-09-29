@@ -49,7 +49,7 @@ import {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -58,6 +58,7 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
+  DOCS_URL,
   FLY_REGIONS_DEFAULT,
   MANAGED_BY,
   PROJECT_STATUS,
@@ -66,7 +67,7 @@ import {
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
-import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -159,6 +160,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
@@ -258,9 +260,11 @@ const Wizard: NextPageWithLayout = () => {
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
   const defaultRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
-    : _defaultRegion
+    : defaultProvider === 'AWS_NIMBUS'
+      ? AWS_REGIONS.EAST_US.displayName
+      : _defaultRegion
 
-  const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
   const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
@@ -502,7 +506,7 @@ const Wizard: NextPageWithLayout = () => {
                             <p>
                               Each project includes a dedicated Postgres instance running on its own
                               server. You are charged for the{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
+                              <InlineLink href={`${DOCS_URL}/guides/platform/billing-on-supabase`}>
                                 Compute resource
                               </InlineLink>{' '}
                               of that server, independent of your database usage.
@@ -751,7 +755,7 @@ const Wizard: NextPageWithLayout = () => {
                                     <Link
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                                      href={`${DOCS_URL}/guides/platform/compute-add-ons`}
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute add-ons</p>
@@ -761,7 +765,7 @@ const Wizard: NextPageWithLayout = () => {
                                     <Link
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
+                                      href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute billing</p>
@@ -1026,7 +1030,7 @@ const Wizard: NextPageWithLayout = () => {
               monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
               clicking "I understand", you agree to the additional costs.{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                 target="_blank"
                 className="underline"
               >

@@ -18,7 +18,8 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -59,7 +60,7 @@ export const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const { can: canUpdateEdgeFunction } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateEdgeFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_WRITE,
     '*'
   )
@@ -378,7 +379,7 @@ export const EdgeFunctionDetails = () => {
                         icon={<ExternalLink strokeWidth={1.5} />}
                       >
                         <Link
-                          href="https://supabase.com/docs/guides/functions/dependencies"
+                          href={`${DOCS_URL}/guides/functions/dependencies`}
                           target="_blank"
                           rel="noreferrer"
                         >

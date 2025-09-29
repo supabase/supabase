@@ -1,7 +1,9 @@
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { ControllerRenderProps } from 'react-hook-form'
 import {
   Button,
+  cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -14,24 +16,29 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { ControllerRenderProps } from 'react-hook-form'
 
 interface PublicationsComboBoxProps {
   publications: string[]
-  loading: boolean
+  isLoadingPublications: boolean
+  isLoadingCheck: boolean
   onNewPublicationClick: () => void
   field: ControllerRenderProps<any, 'publicationName'>
 }
 
 const PublicationsComboBox = ({
   publications,
-  loading,
+  isLoadingPublications,
+  isLoadingCheck,
   onNewPublicationClick,
   field,
 }: PublicationsComboBoxProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
   const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    setSelectedPublication(field?.value || '')
+  }, [field?.value])
 
   function handleSearchChange(value: string) {
     setSearchTerm(value)
@@ -58,13 +65,16 @@ const PublicationsComboBox = ({
         <Button
           type="default"
           size="medium"
-          className={`w-full [&>span]:w-full text-left`}
+          className={cn(
+            'w-full [&>span]:w-full text-left',
+            !selectedPublication && 'text-foreground-muted'
+          )}
           iconRight={
-            <ChevronsUpDown
-              className="text-foreground-muted"
-              strokeWidth={2}
-              size={14}
-            ></ChevronsUpDown>
+            isLoadingCheck ? (
+              <Loader2 className="animate-spin" size={14} />
+            ) : (
+              <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+            )
           }
           name={field.name}
           onBlur={field.onBlur}
@@ -78,10 +88,10 @@ const PublicationsComboBox = ({
             placeholder="Find publication..."
             value={searchTerm}
             onValueChange={handleSearchChange}
-          ></CommandInput_Shadcn_>
+          />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>
-              {loading ? (
+              {isLoadingPublications ? (
                 <div className="flex items-center gap-2 text-center justify-center">
                   <Loader2 size={12} className="animate-spin" />
                   Loading...

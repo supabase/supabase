@@ -15,9 +15,16 @@ export async function generateStaticParams() {
   return tags.map((tag: string) => ({ tag }))
 }
 
+export const revalidate = 30
 export const dynamic = 'force-static'
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata({
+  params: paramsPromise,
+}: {
+  params: Promise<Params>
+}): Promise<Metadata> {
+  const params = await paramsPromise
+
   const capitalizedTag = capitalize(params?.tag.replaceAll('-', ' '))
   return {
     title: `Blog | ${capitalizedTag}`,
@@ -25,7 +32,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 }
 
-export default async function TagPage({ params }: { params: Params }) {
+export default async function TagPage({ params: paramsPromise }: { params: Promise<Params> }) {
+  const params = await paramsPromise
+
   const staticPosts = getSortedPosts({ directory: '_blog', limit: 0, tags: [params.tag] })
   const cmsPosts = await getAllCMSPosts({ tags: [params.tag] })
   const blogs = [...(staticPosts as any[]), ...(cmsPosts as any[])] as unknown as PostTypes[]

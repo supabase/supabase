@@ -7,7 +7,8 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 
 import { useFlag } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
-import { BASE_PATH } from 'lib/constants'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
 
@@ -29,6 +30,8 @@ const SignInLayout = ({
   const queryClient = useQueryClient()
   const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
+
+  const showTestimonial = useIsFeatureEnabled('dashboard_auth:show_testimonial')
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
@@ -108,7 +111,7 @@ const SignInLayout = ({
             </div>
 
             <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
-              <DocsButton abbrev={false} href="https://supabase.com/docs" />
+              <DocsButton abbrev={false} href={`${DOCS_URL}`} />
             </div>
           </nav>
         </div>
@@ -148,7 +151,7 @@ const SignInLayout = ({
           </main>
 
           <aside className="flex-col items-center justify-center flex-1 flex-shrink hidden basis-1/4 xl:flex">
-            {quote !== null && (
+            {quote !== null && showTestimonial && (
               <div className="relative flex flex-col gap-6">
                 <div className="absolute select-none -top-12 -left-11">
                   <span className="text-[160px] leading-none text-foreground-muted/30">{'“'}</span>

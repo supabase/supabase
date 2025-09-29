@@ -15,6 +15,5 @@
 
 /apps/studio/csp.js                                                 @supabase/security
 /apps/studio/components/interfaces/Billing/Payment                  @supabase/security
-/apps/studio/components/interfaces/Organization/BillingSettings/    @supabase/security
 /apps/studio/components/interfaces/Organization/Documents/          @supabase/security
 /apps/studio/pages/new/index.tsx                                    @supabase/security

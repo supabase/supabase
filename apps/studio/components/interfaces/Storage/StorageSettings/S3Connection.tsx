@@ -22,8 +22,9 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
@@ -54,9 +55,11 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
-  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const { can: canUpdateStorageSettings } = useAsyncCheckProjectPermissions(
+  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_READ,
+    '*'
+  )
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
   )
@@ -120,7 +123,7 @@ export const S3Connection = () => {
               Connect to your bucket using any S3-compatible service via the S3 protocol
             </ScaffoldSectionDescription>
           </div>
-          <DocsButton href="https://supabase.com/docs/guides/storage/s3/authentication" />
+          <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />
         </div>
         <Form_Shadcn_ {...form}>
           <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>

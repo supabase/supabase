@@ -6,6 +6,7 @@ import { ReactNode, useState } from 'react'
 import { IS_PLATFORM } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import { logConstants } from 'shared-data'
 import {
   Badge,
@@ -111,7 +112,7 @@ const LogsQueryPanel = ({
               <DropdownMenuContent
                 side="bottom"
                 align="start"
-                className="max-h-[70vh] overflow-auto"
+                className="max-h-[390px] overflow-auto"
               >
                 {logsTableNames
                   .sort((a, b) => a.localeCompare(b))
@@ -222,7 +223,7 @@ const LogsQueryPanel = ({
                   respective source. Do note that to access nested keys, you would need to perform
                   the necessary{' '}
                   <Link
-                    href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                    href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                     target="_blank"
                     rel="noreferrer"
                     className="text-brand"
