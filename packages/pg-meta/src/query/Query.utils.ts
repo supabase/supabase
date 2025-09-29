@@ -234,7 +234,7 @@ function applySorts(query: string, sorts: Sort[]) {
     .map((x) => {
       const order = x.ascending ? 'asc' : 'desc'
       const nullOrder = x.nullsFirst ? 'nulls first' : 'nulls last'
-      return `${ident(x.table)}.${ident(x.column)} ${order} ${nullOrder}`
+      return `"${ident(x.table)}"."${ident(x.column)}" ${order} ${nullOrder}`
     })
     .join(', ')}`
   return query
@@ -245,7 +245,7 @@ function applySorts(query: string, sorts: Sort[]) {
 //============================================================
 
 function queryTable(table: QueryTable) {
-  return `${ident(table.schema)}.${ident(table.name)}`
+  return `"${ident(table.schema)}"."${ident(table.name)}"`
 }
 
 function queryCTE(table: QueryTable) {

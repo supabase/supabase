@@ -141,6 +141,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               <ResizablePanel
                 order={1}
                 maxSize={33}
+                minSize={1}
                 defaultSize={1}
                 id="panel-left"
                 className={cn(
