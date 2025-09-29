@@ -7,7 +7,7 @@ WITH targets(rel) AS (
 )
 SELECT
   n.nspname AS schema,
-  c.relname AS table,
+  c.relname AS name,
   (con.conrelid IS NOT NULL) AS has_primary_key
 FROM targets t
 JOIN pg_class c ON c.oid = t.rel

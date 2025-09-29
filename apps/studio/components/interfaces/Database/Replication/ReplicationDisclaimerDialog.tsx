@@ -26,7 +26,7 @@ export const ReplicationDisclaimerDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Before creating this pipeline</DialogTitle>
+          <DialogTitle>Replication limitations</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="space-y-4 text-sm">

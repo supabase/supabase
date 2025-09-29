@@ -151,18 +151,15 @@ export const DestinationPanel = ({
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
   const selectedPublication = publications.find((pub) => pub.name === publicationName)
-  const { data: checkPrimaryKeysExistsData } = useCheckPrimaryKeysExists({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    tables: selectedPublication?.tables ?? [],
-  })
+  const { data: checkPrimaryKeysExistsData } = useCheckPrimaryKeysExists(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      tables: selectedPublication?.tables ?? [],
+    },
+    { enabled: visible && !!selectedPublication }
+  )
   const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
-
-  console.log({
-    selectedPublication,
-    hasTablesWithNoPrimaryKeys,
-    data: checkPrimaryKeysExistsData,
-  })
 
   const isSubmitDisabled = isSaving || isSelectedPublicationMissing || hasTablesWithNoPrimaryKeys
 
@@ -369,9 +366,9 @@ export const DestinationPanel = ({
                             <Admonition type="warning" className="mt-2 mb-0">
                               <p className="!leading-normal">
                                 Replication requires every table in the publication to have a
-                                primary key to work. The following tables are missing one:
+                                primary key to work, which these tables are missing:
                               </p>
-                              <ul className="list-disc">
+                              <ul className="list-disc pl-6 mb-2">
                                 {(checkPrimaryKeysExistsData?.offendingTables ?? []).map((x) => {
                                   const value = `${x.schema}.${x.name}`
                                   return (
@@ -382,8 +379,7 @@ export const DestinationPanel = ({
                                 })}
                               </ul>
                               <p className="!leading-normal">
-                                Ensure that those tables have primary keys before starting
-                                replication on this publication.
+                                Ensure that these tables have primary keys first.
                               </p>
                             </Admonition>
                           ) : null}
