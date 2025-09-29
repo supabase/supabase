@@ -12,15 +12,6 @@ export const getRenderingTools = () => ({
         .describe(
           'Whether the SQL statement performs a write operation of any kind instead of a read operation'
         ),
-      view: z.enum(['table', 'chart']).describe('How to display the results - as a table or chart'),
-      xAxis: z
-        .string()
-        .optional()
-        .describe('The column name to use for the X-axis when displaying as a chart'),
-      yAxis: z
-        .string()
-        .optional()
-        .describe('The column name to use for the Y-axis when displaying as a chart'),
     }),
   }),
   deploy_edge_function: tool({
