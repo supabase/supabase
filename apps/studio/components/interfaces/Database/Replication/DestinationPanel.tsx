@@ -91,7 +91,9 @@ export const DestinationPanel = ({
   const editMode = !!existingDestination
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
-  const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(null)
+  const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
+    null
+  )
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -530,8 +532,8 @@ export const DestinationPanel = ({
           <DialogSection className="space-y-4 text-sm">
             <p className="text-foreground">
               Creating this replication pipeline will immediately start syncing data from your
-              publication into the destination. Make sure you understand requirements and limitations
-              of the system before proceeding.
+              publication into the destination. Make sure you understand requirements and
+              limitations of the system before proceeding.
             </p>
 
             <Admonition type="warning" className="space-y-1 px-4 py-3">
@@ -551,20 +553,27 @@ export const DestinationPanel = ({
                   <div className="space-y-2 text-foreground-light">
                     <ul className="list-disc space-y-1.5 pl-5 text-sm leading-snug">
                       <li>
-                        <strong className="text-foreground">Custom data types replicate as strings.</strong>{' '}
+                        <strong className="text-foreground">
+                          Custom data types replicate as strings.
+                        </strong>{' '}
                         Check that the destination can interpret those string values correctly.
                       </li>
                       <li>
                         <strong className="text-foreground">Generated columns are skipped.</strong>{' '}
-                        Replace them with triggers or materialized views if you need the derived values downstream.
+                        Replace them with triggers or materialized views if you need the derived
+                        values downstream.
                       </li>
                       <li>
-                        <strong className="text-foreground">FULL replica identity is strongly recommended.</strong>{' '}
-                        With FULL replica identity deletes and updates include the payload that is needed to correctly
-                        apply those changes.
+                        <strong className="text-foreground">
+                          FULL replica identity is strongly recommended.
+                        </strong>{' '}
+                        With FULL replica identity deletes and updates include the payload that is
+                        needed to correctly apply those changes.
                       </li>
                       <li>
-                        <strong className="text-foreground">Schema changes aren’t supported yet.</strong>{' '}
+                        <strong className="text-foreground">
+                          Schema changes aren’t supported yet.
+                        </strong>{' '}
                         Plan for manual adjustments if you need to alter replicated tables.
                       </li>
                     </ul>
@@ -575,7 +584,11 @@ export const DestinationPanel = ({
           </DialogSection>
           <DialogSectionSeparator />
           <DialogFooter>
-            <Button type="default" disabled={isSaving} onClick={() => handleDisclaimerDialogChange(false)}>
+            <Button
+              type="default"
+              disabled={isSaving}
+              onClick={() => handleDisclaimerDialogChange(false)}
+            >
               Cancel
             </Button>
             <Button loading={isSaving} onClick={handleDisclaimerConfirm}>
