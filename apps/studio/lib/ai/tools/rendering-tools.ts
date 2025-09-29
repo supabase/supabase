@@ -12,10 +12,7 @@ export const getRenderingTools = () => ({
         .describe(
           'Whether the SQL statement performs a write operation of any kind instead of a read operation'
         ),
-      view: z
-        .enum(['table', 'chart'])
-        .optional()
-        .describe('How to display the results - as a table or chart'),
+      view: z.enum(['table', 'chart']).describe('How to display the results - as a table or chart'),
       xAxis: z
         .string()
         .optional()
