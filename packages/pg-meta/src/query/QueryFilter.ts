@@ -32,7 +32,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
 
   order(table: string, column: string, ascending = true, nullsFirst = false) {
     this.sorts.push({
-      table: `"${table}"`,
+      table: table,
       column: column,
       ascending,
       nullsFirst,
