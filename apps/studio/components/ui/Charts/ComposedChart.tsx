@@ -39,6 +39,7 @@ import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
+  chartId?: string
   attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
@@ -68,6 +69,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
 }
 
 export function ComposedChart({
+  chartId,
   data,
   attributes,
   yAxisKey,
@@ -501,6 +503,7 @@ export function ComposedChart({
           chartHighlight={chartHighlight}
           updateDateRange={updateDateRange}
           actions={highlightActions}
+          chartId={chartId}
         />
       </Container>
       {data && (

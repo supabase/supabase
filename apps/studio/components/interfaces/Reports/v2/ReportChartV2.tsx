@@ -117,6 +117,7 @@ export const ReportChartV2 = ({
         ) : (
           <div className="w-full">
             <ComposedChart
+              chartId={report.id}
               attributes={dynamicAttributes}
               data={filledChartData}
               format={report.format ?? undefined}

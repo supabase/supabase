@@ -131,8 +131,14 @@ const AuthUsage = () => {
       id: 'api-gateway-logs',
       label: 'Open in API Gateway Logs',
       icon: <LogsIcon size={12} />,
-      onSelect: ({ start, end, clear }) => {
-        const url = `/project/${ref}/logs/edge-logs?its=${start}&ite=${end}&f={"product":{"auth":true}}`
+      onSelect: ({ start, end, clear, chartId }) => {
+        let url = `/project/${ref}/logs/edge-logs?its=${start}&ite=${end}`
+
+        if (chartId?.includes('errors')) {
+          url += `&f={"product":{"auth":true},"status_code":{"error":true,"warning":true}}`
+        }
+
+        url += `&f={"product":{"auth":true}}`
         router.push(url)
       },
     },
