@@ -11,6 +11,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const AuditLogsPage: NextPageWithLayout = () => {
@@ -38,9 +39,7 @@ const AuditLogsPage: NextPageWithLayout = () => {
   )
 }
 
-const secondaryActions = [
-  <DocsButton key="docs" href="https://supabase.com/docs/guides/auth/audit-logs" />,
-]
+const secondaryActions = [<DocsButton key="docs" href={`${DOCS_URL}/guides/auth/audit-logs`} />]
 
 AuditLogsPage.getLayout = (page) => (
   <DefaultLayout>

@@ -12,6 +12,7 @@ import { useSSOConfigCreateMutation } from 'data/sso/sso-config-create-mutation'
 import { useOrgSSOConfigQuery } from 'data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -219,7 +220,7 @@ export const SSOConfig = () => {
                                 Enable and configure SSO for your organization. Learn more about SSO{' '}
                                 <InlineLink
                                   className="text-foreground-lighter hover:text-foreground"
-                                  href="https://supabase.com/docs/guides/platform/sso"
+                                  href={`${DOCS_URL}/guides/platform/sso`}
                                 >
                                   here
                                 </InlineLink>

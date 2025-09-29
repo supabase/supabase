@@ -13,7 +13,7 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
@@ -81,7 +81,7 @@ const BuildingState = () => {
                     <p className="text-sm text-foreground-light">
                       Browse the Supabase{' '}
                       <Link
-                        href="https://supabase.com/docs"
+                        href={`${DOCS_URL}`}
                         className="mb-0 text-brand transition-colors hover:text-brand-600"
                         target="_blank"
                         rel="noreferrer"
