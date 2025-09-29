@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { BranchSelector } from './BranchSelector'
 
 import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
 
 const EMPTY_STATE_CONTAINER = 'flex items-center flex-col justify-center w-full py-10 px-4'
@@ -69,7 +70,7 @@ export const PreviewBranchesEmptyState = ({
         your database schema without affecting your main database.
       </p>
       <div className="flex items-center space-x-2">
-        <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
         <Button type="primary" onClick={() => onSelectCreateBranch()}>
           Create your first branch
         </Button>

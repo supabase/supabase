@@ -1,16 +1,17 @@
-import { memo, useState } from 'react'
+import { Command, Menu, Search } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Command, Search, Menu } from 'lucide-react'
+import type { FC } from 'react'
+import { memo, useState } from 'react'
+// End of third-party imports
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
+import { useCustomContent } from '../../../hooks/custom-content/useCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
-
-import type { FC } from 'react'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
@@ -55,7 +56,8 @@ const TopNavBar: FC = () => {
                   <div className="flex items-center space-x-2 text-foreground-muted">
                     <Search size={18} strokeWidth={2} />
                     <p className="flex text-sm pr-2">
-                      Search<span className="hidden xl:inline ml-1"> docs...</span>
+                      Search
+                      <span className="hidden xl:inline ml-1"> docs...</span>
                     </p>
                   </div>
                   <div className="hidden md:flex items-center space-x-1">
@@ -108,6 +110,8 @@ const TopNavBar: FC = () => {
 }
 
 const HeaderLogo = memo(() => {
+  const { navigationLogoUrl } = useCustomContent(['navigation:logo_url'])
+
   return (
     <Link
       href="/"
@@ -118,7 +122,7 @@ const HeaderLogo = memo(() => {
     >
       <Image
         className="hidden dark:block !m-0"
-        src="/docs/supabase-dark.svg"
+        src={navigationLogoUrl?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
         width={96}
@@ -127,7 +131,7 @@ const HeaderLogo = memo(() => {
       />
       <Image
         className="block dark:hidden !m-0"
-        src="/docs/supabase-light.svg"
+        src={navigationLogoUrl?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"
         width={96}

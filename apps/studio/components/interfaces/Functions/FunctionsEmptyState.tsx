@@ -11,6 +11,7 @@ import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -236,7 +237,9 @@ export const FunctionsEmptyStateLocal = () => {
                   value="supabase functions new hello-world"
                 />
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/functions/local-quickstart#create-an-edge-function" />
+              <DocsButton
+                href={`${DOCS_URL}/guides/functions/local-quickstart#create-an-edge-function`}
+              />
             </div>
 
             <div className="p-8">
@@ -259,7 +262,9 @@ supabase start # start the supabase stack
 supabase functions serve # start the Functions watcher`.trim()}
                 />
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/functions/local-quickstart#running-edge-functions-locally" />
+              <DocsButton
+                href={`${DOCS_URL}/guides/functions/local-quickstart#running-edge-functions-locally`}
+              />
             </div>
 
             <div className="p-8">
@@ -285,7 +290,9 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
   --data '{ "name":"Functions" }'`.trim()}
                 />
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/functions/local-quickstart#invoking-edge-functions-locally" />
+              <DocsButton
+                href={`${DOCS_URL}/guides/functions/local-quickstart#invoking-edge-functions-locally`}
+              />
             </div>
           </CardContent>
         </Card>
@@ -306,7 +313,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
                 on providers like Fly.io, Digital Ocean, or AWS.
               </p>
               <div className="flex items-center gap-x-2">
-                <DocsButton href="https://supabase.com/docs/reference/self-hosting-functions/introduction" />
+                <DocsButton href={`${DOCS_URL}/reference/self-hosting-functions/introduction`} />
                 <Button asChild type="default" icon={<Github />}>
                   <a href="https://github.com/supabase/edge-runtime/">GitHub</a>
                 </Button>
@@ -383,7 +390,7 @@ export const FunctionsSecretsEmptyStateLocal = () => {
               </li>
             </ul>
           </div>
-          <DocsButton href="https://supabase.com/docs/guides/functions/secrets#using-the-cli" />
+          <DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />
         </div>
       </CardContent>
     </Card>

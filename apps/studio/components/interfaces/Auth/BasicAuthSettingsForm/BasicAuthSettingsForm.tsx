@@ -15,6 +15,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -186,7 +187,7 @@ export const BasicAuthSettingsForm = () => {
                             Enable{' '}
                             <InlineLink
                               className="text-foreground-light hover:text-foreground"
-                              href="https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta"
+                              href={`${DOCS_URL}/guides/auth/auth-identity-linking#manual-linking-beta`}
                             >
                               manual linking APIs
                             </InlineLink>{' '}
@@ -219,7 +220,7 @@ export const BasicAuthSettingsForm = () => {
                           Enable{' '}
                           <InlineLink
                             className="text-foreground-light hover:text-foreground"
-                            href="https://supabase.com/docs/guides/auth/auth-anonymous"
+                            href={`${DOCS_URL}/guides/auth/auth-anonymous`}
                           >
                             anonymous sign-ins
                           </InlineLink>{' '}
@@ -263,7 +264,7 @@ export const BasicAuthSettingsForm = () => {
                           to ensure that access to your data is restricted where required.
                         </p>
                         <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                          <Link href="https://supabase.com/docs/guides/auth/auth-anonymous#access-control">
+                          <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
                             View access control docs
                           </Link>
                         </Button>
