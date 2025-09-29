@@ -59,7 +59,10 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
       confirmLabelLoading="Registering..."
       disabled={name.length === 0 || isSuccess}
       loading={isVerifying}
-      onCancel={reset}
+      onCancel={() => {
+        reset()
+        onClose()
+      }}
       onConfirm={() =>
         register({
           friendlyName: name,

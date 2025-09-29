@@ -1,5 +1,5 @@
+import dynamic from 'next/dynamic'
 import { AlertCircle, ChevronRightIcon, Fingerprint, Smartphone } from 'lucide-react'
-import { TOTPFactors, WebAuthnFactors } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -24,6 +24,13 @@ import {
 import type { NextPageWithLayout } from 'types'
 import { useState } from 'react'
 import { useFlag } from 'common'
+
+const TOTPFactors = dynamic(() =>
+  import('components/interfaces/Account').then((mod) => mod.TOTPFactors)
+)
+const WebAuthnFactors = dynamic(() =>
+  import('components/interfaces/Account').then((mod) => mod.WebAuthnFactors)
+)
 
 const collapsibleClasses = [
   'bg-surface-100',

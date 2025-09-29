@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/auth-js'
+import type { AuthMFAVerifyResponse, MFAChallengeWebauthnParams } from '@supabase/auth-js'
 import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -8,25 +8,48 @@ import { profileKeys } from './keys'
 
 const WHITELIST_ERRORS = ['Invalid TOTP code entered']
 
-interface MFAChallengeAndVerifyVariables extends MFAChallengeAndVerifyParams {
+interface MFAWebAuthnChallengeAndVerifyVariables extends MFAChallengeWebauthnParams {
   refreshFactors?: boolean
 }
 
-export const mfaChallengeAndVerify = async (params: MFAChallengeAndVerifyParams) => {
-  const { error, data } = await auth.mfa.challengeAndVerify(params)
-  if (error) throw error
-  return data
+export const mfaWebAuthnChallengeAndVerify = async (params: MFAChallengeWebauthnParams) => {
+  const challenge = await auth.mfa.webauthn.challenge(params)
+
+  if (challenge.error) {
+    throw challenge.error
+  }
+
+  const verify = await auth.mfa.webauthn.verify({
+    factorId: challenge.data.factorId,
+    challengeId: challenge.data.challengeId,
+    webauthn: {
+      rpId: window.location.hostname,
+      rpOrigins: [window.location.origin],
+      type: challenge.data.webauthn.type,
+      credential_response: challenge.data.webauthn.credential_response,
+    },
+  })
+
+  if (verify.error) {
+    throw verify.error
+  }
+
+  return verify.data
 }
 
 type CustomMFAVerifyResponse = NonNullable<AuthMFAVerifyResponse['data']>
 type CustomMFAVerifyError = NonNullable<AuthMFAVerifyResponse['error']>
 
-export const useMfaChallengeAndVerifyMutation = ({
+export const useMfaWebAuthnChallengeAndVerifyMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomMFAVerifyResponse, CustomMFAVerifyError, MFAChallengeAndVerifyVariables>,
+  UseMutationOptions<
+    CustomMFAVerifyResponse,
+    CustomMFAVerifyError,
+    MFAWebAuthnChallengeAndVerifyVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -34,7 +57,7 @@ export const useMfaChallengeAndVerifyMutation = ({
   return useMutation(
     (vars) => {
       const { refreshFactors, ...params } = vars
-      return mfaChallengeAndVerify(params)
+      return mfaWebAuthnChallengeAndVerify(params)
     },
     {
       async onSuccess(data, variables, context) {
