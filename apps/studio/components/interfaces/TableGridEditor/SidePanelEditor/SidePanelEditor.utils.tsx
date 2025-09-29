@@ -41,6 +41,7 @@ import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { executeWithRetry } from 'data/table-rows/table-rows-query'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -892,7 +893,9 @@ export const insertRowsViaSpreadsheet = async (
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
         try {
-          await executeSql({ projectRef, connectionString, sql: insertQuery })
+          await executeWithRetry(() =>
+            executeSql({ projectRef, connectionString, sql: insertQuery })
+          )
         } catch (error) {
           console.warn(error)
           insertError = error
