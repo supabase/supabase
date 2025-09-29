@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2025.09.22-sha-7b3007d
+    image: supabase/studio:2025.09.23-sha-081a753
     restart: unless-stopped
     healthcheck:
       test:
@@ -79,7 +79,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.179.0
+    image: supabase/gotrue:v2.180.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -231,7 +231,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.27.4
+    image: supabase/storage-api:v1.27.6
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -387,7 +387,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:17.6.1.005
+    image: supabase/postgres:17.6.1.010
     restart: unless-stopped
     volumes:
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
