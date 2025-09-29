@@ -10,8 +10,9 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -75,7 +76,7 @@ const NetworkRestrictions = () => {
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
-  const { can: canUpdateNetworkRestrictions } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {
@@ -109,7 +110,7 @@ const NetworkRestrictions = () => {
             description="Allow specific IP ranges to have access to your database."
           />
           <div className="flex items-center gap-x-2">
-            <DocsButton href="https://supabase.com/docs/guides/platform/network-restrictions" />
+            <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
             {!canUpdateNetworkRestrictions ? (
               <ButtonTooltip
                 disabled

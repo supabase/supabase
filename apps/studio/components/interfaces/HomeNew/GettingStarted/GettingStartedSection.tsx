@@ -1,25 +1,27 @@
-import { useParams } from 'common'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { GettingStarted } from './GettingStarted'
 import {
+  BarChart3,
   Code,
   Database,
-  Table,
-  User,
-  Upload,
-  UserPlus,
-  BarChart3,
-  Shield,
-  Table2,
   GitBranch,
+  Shield,
+  Table,
+  Table2,
+  Upload,
+  User,
+  UserPlus,
 } from 'lucide-react'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
-import { FrameworkSelector } from './FrameworkSelector'
+
+import { useParams } from 'common'
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
   Button,
@@ -29,7 +31,8 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
-import { BASE_PATH } from 'lib/constants'
+import { FrameworkSelector } from './FrameworkSelector'
+import { GettingStarted } from './GettingStarted'
 
 export type GettingStartedAction = {
   label: string
@@ -46,7 +49,7 @@ export type GettingStartedStep = {
   icon?: React.ReactNode
   title: string
   description: string
-  image?: React.ReactNode
+  image?: string
   actions: GettingStartedAction[]
 }
 
@@ -60,13 +63,16 @@ export function GettingStartedSection({
   onChange: (v: GettingStartedState) => void
 }) {
   const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
   const router = useRouter()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   // Local state for framework selector preview
   const [selectedFramework, setSelectedFramework] = useState<string>(FRAMEWORKS[0]?.key ?? 'nextjs')
   const workflow: 'no-code' | 'code' | null = value === 'code' || value === 'no-code' ? value : null
+  const [previousWorkflow, setPreviousWorkflow] = useState<'no-code' | 'code' | null>(null)
 
   const { data: tablesData } = useTablesQuery({
     projectRef: project?.ref,
@@ -81,6 +87,11 @@ export function GettingStartedSection({
   const isDefaultProject = project?.parent_project_ref === undefined
   const hasNonDefaultBranch =
     (branchesData ?? []).some((b) => !b.is_default) || isDefaultProject === false
+
+  const selectedFrameworkMeta = useMemo(
+    () => FRAMEWORKS.find((item) => item.key === selectedFramework),
+    [selectedFramework]
+  )
 
   // Helpers
   const openAiChat = useCallback(
@@ -118,11 +129,11 @@ export function GettingStartedSection({
       },
       {
         label: 'Connect',
-        variant: 'default',
+        variant: 'primary',
         onClick: openConnect,
       },
     ],
-    [openConnect, selectedFramework]
+    [openConnect, openAiChat, selectedFramework, selectedFrameworkMeta?.label]
   )
 
   const codeSteps: GettingStartedStep[] = useMemo(
@@ -133,7 +144,7 @@ export function GettingStartedSection({
         title: 'Install the Supabase CLI',
         icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          'To get started, install the Supabase CLI to manage your project locally, handle migrations, and seed data.',
+          'To get started, install the Supabase CLI—our command-line toolkit for managing projects locally, handling migrations, and seeding data—using the npm command below to add it to your workspace.',
         actions: [
           {
             label: 'Install via npm',
@@ -150,11 +161,13 @@ export function GettingStartedSection({
         status: tablesCount > 0 ? 'complete' : 'incomplete',
         title: 'Design your database schema',
         icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: 'Next, create a schema file that defines the structure of your database.',
+        image: `${BASE_PATH}/img/getting-started/declarative-schemas.png`,
+        description:
+          'Next, create a schema file that defines the structure of your database, either following our declarative schema guide or asking the AI assistant to generate one for you.',
         actions: [
           {
             label: 'Create schema file',
-            href: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
+            href: `${DOCS_URL}/guides/local-development/declarative-database-schemas`,
             variant: 'default',
           },
           {
@@ -174,11 +187,12 @@ export function GettingStartedSection({
         status: 'incomplete',
         title: 'Seed your database with data',
         icon: <Table strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: 'Now, create a seed file to populate your database with initial data.',
+        description:
+          'Now, create a seed file to populate your database with initial data, using the docs for guidance or letting the AI assistant draft realistic inserts.',
         actions: [
           {
             label: 'Create a seed file',
-            href: 'https://supabase.com/docs/guides/local-development/seeding-your-database',
+            href: `${DOCS_URL}/guides/local-development/seeding-your-database`,
             variant: 'default',
           },
           {
@@ -199,7 +213,7 @@ export function GettingStartedSection({
         title: 'Secure your data with RLS policies',
         icon: <Shield strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "Let's secure your data by enabling Row Level Security and defining access policies in a migration file.",
+          "Let's secure your data by enabling Row Level Security (per-row access rules that decide who can read or write specific records) and defining policies in a migration file, either configuring them manually or letting the AI assistant draft policies for your tables.",
         actions: [
           {
             label: 'Create a migration file',
@@ -224,7 +238,7 @@ export function GettingStartedSection({
         title: 'Configure authentication',
         icon: <User strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "It's time to configure your authentication providers and settings for Supabase Auth.",
+          "It's time to configure your authentication providers and settings for Supabase Auth, so jump into the configuration page and tailor the providers you need.",
         actions: [
           { label: 'Configure', href: `/project/${ref}/auth/providers`, variant: 'default' },
         ],
@@ -234,7 +248,8 @@ export function GettingStartedSection({
         status: 'incomplete',
         title: 'Connect your application',
         icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: 'Your project is ready. Connect your app using one of our client libraries.',
+        description:
+          'Your project is ready; use the framework selector to preview starter code and launch the Connect flow with the client library you prefer.',
         actions: connectActions,
       },
       {
@@ -242,11 +257,12 @@ export function GettingStartedSection({
         status: 'incomplete',
         title: 'Sign up your first user',
         icon: <UserPlus strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: 'Test your authentication setup by creating the first user account.',
+        description:
+          'Test your authentication setup by creating the first user account, following the docs if you need a step-by-step walkthrough.',
         actions: [
           {
             label: 'Read docs',
-            href: 'https://supabase.com/docs/guides/auth',
+            href: `${DOCS_URL}/guides/auth`,
             variant: 'default',
           },
         ],
@@ -256,7 +272,8 @@ export function GettingStartedSection({
         status: 'incomplete',
         title: 'Upload a file',
         icon: <Upload strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: 'Integrate file storage by creating a bucket and uploading a file.',
+        description:
+          'Integrate file storage by creating a bucket and uploading a file, starting from the buckets dashboard linked below.',
         actions: [
           { label: 'Buckets', href: `/project/${ref}/storage/buckets`, variant: 'default' },
         ],
@@ -266,7 +283,8 @@ export function GettingStartedSection({
         status: 'incomplete',
         title: 'Deploy an Edge Function',
         icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: 'Add server-side logic by creating and deploying your first Edge Function.',
+        description:
+          'Add server-side logic by creating and deploying your first Edge Function—a lightweight TypeScript or JavaScript function that runs close to your users—then revisit the list to monitor and iterate on it.',
         actions: [
           {
             label: 'Create a function',
@@ -282,7 +300,7 @@ export function GettingStartedSection({
         title: "Monitor your project's usage",
         icon: <BarChart3 strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "Track your project's activity by creating custom reports for API, database, and auth events.",
+          "Track your project's activity by creating custom reports for API, database, and auth events right from the reports dashboard.",
         actions: [{ label: 'Reports', href: `/project/${ref}/reports`, variant: 'default' }],
       },
       {
@@ -291,7 +309,7 @@ export function GettingStartedSection({
         title: 'Connect to GitHub',
         icon: <GitBranch strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          'Streamline your development workflow by connecting your project to GitHub to automatically manage branches.',
+          'Streamline your development workflow by connecting your project to GitHub, using the integrations page to automate branch management.',
         actions: [
           {
             label: 'Connect to GitHub',
@@ -311,8 +329,9 @@ export function GettingStartedSection({
         status: tablesCount > 0 ? 'complete' : 'incomplete',
         title: 'Create your first table',
         icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
+        image: `${BASE_PATH}/img/getting-started/sample.png`,
         description:
-          "To kick off your new project, let's start by creating your very first database table using either the table editor or AI Assistant.",
+          "To kick off your new project, let's start by creating your very first database table using either the table editor or the AI assistant to shape the structure for you.",
         actions: [
           { label: 'Create a table', href: `/project/${ref}/editor`, variant: 'default' },
           {
@@ -333,7 +352,7 @@ export function GettingStartedSection({
         title: 'Add sample data',
         icon: <Table strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "Next, let's add some sample data that you can play with once you connect your app.",
+          "Next, let's add some sample data that you can play with once you connect your app, either by inserting rows yourself or letting the AI assistant craft realistic examples.",
         actions: [
           { label: 'Add data', href: `/project/${ref}/editor`, variant: 'default' },
           {
@@ -354,7 +373,7 @@ export function GettingStartedSection({
         title: 'Secure your data with Row Level Security',
         icon: <Shield strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "Now that you have some data, let's secure it by enabling Row Level Security and creating policies.",
+          "Now that you have some data, let's secure it by enabling Row Level Security (row-specific access rules that control who can view or modify records) and creating policies yourself or with help from the AI assistant.",
         actions: [
           {
             label: 'Create a policy',
@@ -378,7 +397,8 @@ export function GettingStartedSection({
         status: 'incomplete',
         title: 'Set up authentication',
         icon: <User strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: "It's time to set up authentication so you can start signing up users.",
+        description:
+          "It's time to set up authentication so you can start signing up users, configuring providers and settings from the auth dashboard.",
         actions: [
           {
             label: 'Configure auth',
@@ -392,7 +412,8 @@ export function GettingStartedSection({
         status: 'incomplete',
         title: 'Connect your application',
         icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: "Your project is ready. Let's connect your application to Supabase.",
+        description:
+          'Your project is ready; use the framework selector to preview starter code and launch the Connect flow to wire up your app.',
         actions: connectActions,
       },
       {
@@ -400,11 +421,12 @@ export function GettingStartedSection({
         status: 'incomplete',
         title: 'Sign up your first user',
         icon: <UserPlus strokeWidth={1} className="text-foreground-muted" size={16} />,
-        description: 'Test your authentication by signing up your first user.',
+        description:
+          'Test your authentication by signing up your first user, referencing the docs if you need sample flows or troubleshooting tips.',
         actions: [
           {
             label: 'Read docs',
-            href: 'https://supabase.com/docs/guides/auth',
+            href: `${DOCS_URL}/guides/auth`,
             variant: 'default',
           },
         ],
@@ -415,7 +437,7 @@ export function GettingStartedSection({
         title: 'Upload a file',
         icon: <Upload strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "Let's add file storage to your app by creating a bucket and uploading your first file.",
+          "Let's add file storage to your app by creating a bucket and uploading your first file from the buckets dashboard.",
         actions: [
           { label: 'Buckets', href: `/project/${ref}/storage/buckets`, variant: 'default' },
         ],
@@ -426,7 +448,7 @@ export function GettingStartedSection({
         title: 'Add server-side logic',
         icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "Extend your app's functionality by creating an Edge Function for server-side logic.",
+          "Extend your app's functionality by creating an Edge Function—a lightweight serverless function that executes close to your users—for server-side logic directly from the functions page.",
         actions: [
           {
             label: 'Create a function',
@@ -441,7 +463,7 @@ export function GettingStartedSection({
         title: "Monitor your project's health",
         icon: <BarChart3 strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          "Keep an eye on your project's performance and usage by setting up custom reports.",
+          "Keep an eye on your project's performance and usage by setting up custom reports from the reports dashboard.",
         actions: [
           { label: 'Create a report', href: `/project/${ref}/reports`, variant: 'default' },
         ],
@@ -452,7 +474,7 @@ export function GettingStartedSection({
         title: 'Create a branch to test changes',
         icon: <GitBranch strokeWidth={1} className="text-foreground-muted" size={16} />,
         description:
-          'Safely test changes by creating a preview branch before deploying to production.',
+          'Safely test changes by creating a preview branch before deploying to production, using the branches view to spin one up.',
         actions: [
           { label: 'Create a branch', href: `/project/${ref}/branches`, variant: 'default' },
         ],
@@ -471,24 +493,69 @@ export function GettingStartedSection({
           <ToggleGroup
             type="single"
             value={workflow ?? undefined}
-            onValueChange={(v) => v && onChange(v as 'no-code' | 'code')}
+            onValueChange={(v) => {
+              if (v) {
+                const newWorkflow = v as 'no-code' | 'code'
+                setPreviousWorkflow(workflow)
+                onChange(newWorkflow)
+                sendEvent({
+                  action: 'home_getting_started_workflow_clicked',
+                  properties: {
+                    workflow: newWorkflow === 'no-code' ? 'no_code' : 'code',
+                    is_switch: previousWorkflow !== null,
+                  },
+                  groups: {
+                    project: project?.ref || '',
+                    organization: organization?.slug || '',
+                  },
+                })
+              }
+            }}
           >
             <ToggleGroupItem
               value="no-code"
               aria-label="No-code workflow"
-              className="w-[26px] h-[26px] p-0"
+              size="sm"
+              className="text-xs gap-2 h-auto"
             >
-              <Table2 size={16} strokeWidth={1.5} className="text-foreground" />
+              <Table2 size={16} strokeWidth={1.5} />
+              Code
             </ToggleGroupItem>
             <ToggleGroupItem
               value="code"
+              size="sm"
               aria-label="Code workflow"
-              className="w-[26px] h-[26px] p-0"
+              className="text-xs gap-2 h-auto"
             >
-              <Code size={16} strokeWidth={1.5} className="text-foreground" />
+              <Code size={16} strokeWidth={1.5} />
+              No-code
             </ToggleGroupItem>
           </ToggleGroup>
-          <Button size="tiny" type="outline" onClick={() => onChange('hidden')}>
+          <Button
+            size="tiny"
+            type="outline"
+            onClick={() => {
+              onChange('hidden')
+              if (workflow) {
+                const completedSteps = (workflow === 'code' ? codeSteps : noCodeSteps).filter(
+                  (step) => step.status === 'complete'
+                ).length
+                const totalSteps = (workflow === 'code' ? codeSteps : noCodeSteps).length
+                sendEvent({
+                  action: 'home_getting_started_closed',
+                  properties: {
+                    workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                    steps_completed: completedSteps,
+                    total_steps: totalSteps,
+                  },
+                  groups: {
+                    project: project?.ref || '',
+                    organization: organization?.slug || '',
+                  },
+                })
+              }
+            }}
+          >
             Dismiss
           </Button>
         </div>
@@ -524,7 +591,21 @@ export function GettingStartedSection({
               <Button
                 size="medium"
                 type="outline"
-                onClick={() => onChange('no-code')}
+                onClick={() => {
+                  setPreviousWorkflow(workflow)
+                  onChange('no-code')
+                  sendEvent({
+                    action: 'home_getting_started_workflow_clicked',
+                    properties: {
+                      workflow: 'no_code',
+                      is_switch: previousWorkflow !== null,
+                    },
+                    groups: {
+                      project: project?.ref || '',
+                      organization: organization?.slug || '',
+                    },
+                  })
+                }}
                 className="block gap-2 h-auto p-4 md:p-8 max-w-80 text-left justify-start bg-background "
               >
                 <Table2 size={20} strokeWidth={1.5} className="text-brand" />
@@ -538,7 +619,21 @@ export function GettingStartedSection({
               <Button
                 size="medium"
                 type="outline"
-                onClick={() => onChange('code')}
+                onClick={() => {
+                  setPreviousWorkflow(workflow)
+                  onChange('code')
+                  sendEvent({
+                    action: 'home_getting_started_workflow_clicked',
+                    properties: {
+                      workflow: 'code',
+                      is_switch: previousWorkflow !== null,
+                    },
+                    groups: {
+                      project: project?.ref || '',
+                      organization: organization?.slug || '',
+                    },
+                  })
+                }}
                 className="bg-background block gap-2 h-auto p-4 md:p-8 max-w-80 text-left justify-start"
               >
                 <Code size={20} strokeWidth={1.5} className="text-brand" />
@@ -553,7 +648,27 @@ export function GettingStartedSection({
           </CardContent>
         </Card>
       ) : (
-        <GettingStarted steps={steps} />
+        <GettingStarted
+          steps={steps}
+          onStepClick={({ stepIndex, stepTitle, actionType, wasCompleted }) => {
+            if (workflow) {
+              sendEvent({
+                action: 'home_getting_started_step_clicked',
+                properties: {
+                  workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                  step_number: stepIndex + 1,
+                  step_title: stepTitle,
+                  action_type: actionType,
+                  was_completed: wasCompleted,
+                },
+                groups: {
+                  project: project?.ref || '',
+                  organization: organization?.slug || '',
+                },
+              })
+            }
+          }}
+        />
       )}
     </section>
   )

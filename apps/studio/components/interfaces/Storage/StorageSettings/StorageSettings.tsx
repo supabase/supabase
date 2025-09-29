@@ -16,8 +16,9 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import {
   Button,
@@ -58,9 +59,11 @@ interface StorageSettingsState {
 
 export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
-  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const { can: canUpdateStorageSettings } = useAsyncCheckProjectPermissions(
+  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_READ,
+    '*'
+  )
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
   )
@@ -234,7 +237,9 @@ export const StorageSettings = () => {
                           description={
                             <>
                               Optimize and resize images on the fly.{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
+                              <InlineLink
+                                href={`${DOCS_URL}/guides/storage/serving/image-transformations`}
+                              >
                                 Learn more
                               </InlineLink>
                               .
@@ -272,7 +277,7 @@ export const StorageSettings = () => {
                                   Loading bucket information...
                                 </span>
                               )}{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/storage/uploads/file-limits">
+                              <InlineLink href={`${DOCS_URL}/guides/storage/uploads/file-limits`}>
                                 Learn more
                               </InlineLink>
                               .

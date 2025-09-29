@@ -15,8 +15,9 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -102,7 +103,7 @@ export const PostgrestConfig = () => {
   const formId = 'project-postgres-config'
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
@@ -170,7 +171,7 @@ export const PostgrestConfig = () => {
       <CardHeader className="flex-row items-center justify-between">
         Data API Settings
         <div className="flex items-center gap-x-2">
-          <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#data-apis" />
+          <DocsButton href={`${DOCS_URL}/guides/database/connecting-to-postgres#data-apis`} />
           <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
             Harden Data API
           </Button>

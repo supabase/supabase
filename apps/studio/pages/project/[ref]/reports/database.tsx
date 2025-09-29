@@ -7,12 +7,13 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
-import { ReportChart } from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import { ReportChartUpsell } from 'components/interfaces/Reports/v2/ReportChartUpsell'
+import { POOLING_OPTIMIZATIONS } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
@@ -34,10 +35,12 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
@@ -107,7 +110,17 @@ const DatabaseUsage = () => {
   })
   const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
+  // PGBouncer connections
+  const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
+  const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const poolingOptimizations =
+    POOLING_OPTIMIZATIONS[
+      (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
+        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
+    ]
+  const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
+
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {
@@ -117,19 +130,13 @@ const DatabaseUsage = () => {
     }
   )
 
-  const REPORT_ATTRIBUTES = getReportAttributes(
-    org!,
-    project!,
-    diskConfig,
-    maxConnections,
-    poolerConfig
-  )
+  const REPORT_ATTRIBUTES = getReportAttributes(diskConfig)
   const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(
     org!,
     project!,
     diskConfig,
     maxConnections,
-    poolerConfig
+    defaultMaxClientConn
   )
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -307,13 +314,13 @@ const DatabaseUsage = () => {
                     }
                   />
                 ) : (
-                  <ReportChart
-                    key={`${chart.id}-${i}`}
-                    chart={chart}
-                    interval={selectedDateRange.interval}
-                    startDate={selectedDateRange?.period_start?.date}
-                    endDate={selectedDateRange?.period_end?.date}
-                    updateDateRange={updateDateRange}
+                  <ReportChartUpsell
+                    key={chart.id}
+                    report={{
+                      label: chart.label,
+                      availableIn: chart.availableIn ?? [],
+                    }}
+                    orgSlug={org?.slug ?? ''}
                   />
                 )
               ))}
@@ -432,7 +439,7 @@ const DatabaseUsage = () => {
 
                     <Button asChild type="default" icon={<ExternalLink />}>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/database-size#disk-space-usage"
+                        href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
                         target="_blank"
                         rel="noreferrer"
                       >

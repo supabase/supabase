@@ -19,7 +19,7 @@ import {
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
-import ChartHighlightActions from './ChartHighlightActions'
+import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -66,6 +66,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   syncId?: string
   docsUrl?: string
   sql?: string
+  highlightActions?: ChartHighlightAction[]
 }
 
 export function ComposedChart({
@@ -105,6 +106,7 @@ export function ComposedChart({
   syncId,
   docsUrl,
   sql,
+  highlightActions,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -115,11 +117,12 @@ export function ComposedChart({
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
+  const [hiddenAttributes, setHiddenAttributes] = useState<Set<string>>(new Set())
   const isDarkMode = resolvedTheme?.includes('dark')
 
   useEffect(() => {
     updateStackedChartColors(isDarkMode ?? false)
-  }, [resolvedTheme])
+  }, [isDarkMode])
 
   const { Container } = useChartSize(size)
 
@@ -178,6 +181,7 @@ export function ComposedChart({
       ...attributesToIgnore,
       ...(referenceLines?.map((a: MultiAttribute) => a.attribute) ?? []),
       ...(maxAttribute?.attribute ? [maxAttribute?.attribute] : []),
+      ...Array.from(hiddenAttributes),
     ]
 
     const lastDataPoint = data[data.length - 1]
@@ -269,6 +273,7 @@ export function ComposedChart({
     const attribute = attributes.find((attr) => attr.attribute === att.name)
     return !attribute?.isMaxValue
   })
+  const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
   const isPercentage = format === '%'
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
@@ -286,10 +291,11 @@ export function ComposedChart({
   // to the highest value in the chart data for percentage charts
   // to vertically zoom in on the data
   // */
-  const yDomain = [
+  const yMaxFromVisible = Math.max(
     0,
-    Math.max(...chartData.map((att) => (typeof att.value === 'number' ? att.value : 0))),
-  ]
+    ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
+  )
+  const yDomain = [0, yMaxFromVisible]
 
   if (data.length === 0) {
     return (
@@ -307,6 +313,7 @@ export function ComposedChart({
   return (
     <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
+        hideHighlightedValue={hideHighlightedValue}
         title={title}
         format={format}
         customDateFormat={customDateFormat}
@@ -320,7 +327,6 @@ export function ComposedChart({
         onChartStyleChange={onChartStyleChange}
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
-        hideHighlightedValue={hideHighlightedValue}
         docsUrl={docsUrl}
         syncId={syncId}
         data={data}
@@ -338,6 +344,7 @@ export function ComposedChart({
         <RechartComposedChart
           data={data}
           syncId={syncId}
+          style={{ cursor: 'crosshair' }}
           onMouseMove={(e: any) => {
             setIsActiveHoveredChart(true)
             if (e.activeTooltipIndex !== focusDataIndex) {
@@ -392,7 +399,7 @@ export function ComposedChart({
           />
           <Tooltip
             content={(props) =>
-              showTooltip ? (
+              showTooltip && !showHighlightActions ? (
                 <CustomTooltip
                   {...props}
                   format={format}
@@ -409,29 +416,28 @@ export function ComposedChart({
             }
           />
           {chartStyle === 'bar'
-            ? stackedAttributes.map((attribute) => (
+            ? visibleAttributes.map((attribute) => (
                 <Bar
                   key={attribute.name}
                   dataKey={attribute.name}
                   stackId={attributes?.find((a) => a.attribute === attribute?.name)?.stackId ?? '1'}
                   fill={attribute.color}
-                  fillOpacity={hoveredLabel && hoveredLabel !== attribute?.name ? 0.25 : 1}
                   radius={0.75}
-                  opacity={hoveredLabel && hoveredLabel !== attribute?.name ? 0.5 : 1}
+                  opacity={1}
                   name={
                     attributes?.find((a) => a.attribute === attribute?.name)?.label ||
                     attribute?.name
                   }
+                  maxBarSize={24}
                 />
               ))
-            : stackedAttributes.map((attribute, i) => (
+            : visibleAttributes.map((attribute, i) => (
                 <Area
                   key={attribute.name}
                   type="step"
                   dataKey={attribute.name}
                   stackId={attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? '1'}
                   fill={attribute.color}
-                  strokeOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.4 : 1}
                   stroke={attribute.color}
                   radius={20}
                   animationDuration={375}
@@ -494,7 +500,11 @@ export function ComposedChart({
             />
           )}
         </RechartComposedChart>
-        <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
+        <ChartHighlightActions
+          chartHighlight={chartHighlight}
+          updateDateRange={updateDateRange}
+          actions={highlightActions}
+        />
       </Container>
       {data && (
         <div
@@ -515,6 +525,28 @@ export function ComposedChart({
           attributes={attributes}
           showMaxValue={_showMaxValue}
           onLabelHover={setHoveredLabel}
+          onToggleAttribute={(attribute, options) => {
+            setHiddenAttributes((prev) => {
+              if (options?.exclusive) {
+                const next = new Set<string>()
+                // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
+                const allNames = chartData.map((c) => c.name)
+                const allHiddenExcept = allNames.filter((n) => n !== attribute)
+                const isAlreadyExclusive =
+                  allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
+                return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
+              }
+
+              const next = new Set(prev)
+              if (next.has(attribute)) {
+                next.delete(attribute)
+              } else {
+                next.add(attribute)
+              }
+              return next
+            })
+          }}
+          hiddenAttributes={hiddenAttributes}
         />
       )}
     </div>

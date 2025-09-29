@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -10,23 +9,18 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import {
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -38,17 +32,12 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ScrollArea,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
   Switch,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
@@ -66,14 +55,9 @@ export const InviteMemberButton = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
-  const { data } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
-
-  const orgProjects = (data?.projects ?? [])
-    .filter((project) => project.organization_id === organization?.id)
-    .sort((a, b) => a.name.localeCompare(b.name))
 
   const currentPlan = organization?.plan
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
@@ -118,7 +102,7 @@ export const InviteMemberButton = () => {
     defaultValues: { email: '', role: '', applyToOrg: true, projectRef: '' },
   })
 
-  const { applyToOrg } = form.watch()
+  const { applyToOrg, projectRef } = form.watch()
 
   const onInviteMember = async (values: z.infer<typeof FormSchema>) => {
     if (!slug) return console.error('Slug is required')
@@ -164,16 +148,8 @@ export const InviteMemberButton = () => {
       const developerRole = orgScopedRoles.find((role) => role.name === 'Developer')
       if (developerRole !== undefined) form.setValue('role', developerRole.id.toString())
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, isOpen])
-
-  useEffect(() => {
-    if (!applyToOrg) {
-      const firstProject = orgProjects?.[0]
-      if (firstProject !== undefined) form.setValue('projectRef', firstProject.ref)
-    } else {
-      form.setValue('projectRef', '')
-    }
-  }, [applyToOrg])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -278,81 +254,16 @@ export const InviteMemberButton = () => {
                       description="You can assign roles to multiple projects once the invite is accepted"
                     >
                       <FormControl_Shadcn_>
-                        <Popover_Shadcn_
+                        <OrganizationProjectSelector
+                          sameWidthAsTrigger
+                          checkPosition="left"
+                          selectedRef={projectRef}
                           open={projectDropdownOpen}
-                          onOpenChange={setProjectDropdownOpen}
-                        >
-                          <PopoverTrigger_Shadcn_ asChild>
-                            <Button
-                              block
-                              type="default"
-                              role="combobox"
-                              size="small"
-                              className="justify-between max-w-[470px]"
-                              iconRight={
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              }
-                            >
-                              {orgProjects.find((project) => project.ref === field.value)?.name ??
-                                'Unknown'}
-                            </Button>
-                          </PopoverTrigger_Shadcn_>
-                          <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0">
-                            <Command_Shadcn_
-                              // [Joshen] Let's update this to use keywords in CommandItem once cmdk is updated
-                              filter={(value, search) => {
-                                const project = orgProjects.find((project) => project.ref === value)
-                                const projectName = project?.name.toLowerCase()
-                                if (
-                                  projectName !== undefined &&
-                                  projectName.includes(search.toLowerCase())
-                                ) {
-                                  return 1
-                                } else if (value.includes(search)) {
-                                  return 1
-                                } else {
-                                  return 0
-                                }
-                              }}
-                            >
-                              <CommandInput_Shadcn_ placeholder="Search project..." />
-                              <CommandList_Shadcn_>
-                                <CommandEmpty_Shadcn_>No projects found...</CommandEmpty_Shadcn_>
-                                <CommandGroup_Shadcn_>
-                                  <ScrollArea
-                                    className={cn(
-                                      (orgProjects || []).length > 7 &&
-                                        'max-h-[210px] overflow-y-auto'
-                                    )}
-                                  >
-                                    {orgProjects.map((project) => {
-                                      return (
-                                        <CommandItem_Shadcn_
-                                          key={project.ref}
-                                          value={project.ref}
-                                          onSelect={(value) => {
-                                            form.setValue('projectRef', value)
-                                            setProjectDropdownOpen(false)
-                                          }}
-                                        >
-                                          <Check
-                                            className={cn(
-                                              'mr-2 h-4 w-4',
-                                              field.value === project.ref
-                                                ? 'opacity-100'
-                                                : 'opacity-0'
-                                            )}
-                                          />
-                                          {project.name}
-                                        </CommandItem_Shadcn_>
-                                      )
-                                    })}
-                                  </ScrollArea>
-                                </CommandGroup_Shadcn_>
-                              </CommandList_Shadcn_>
-                            </Command_Shadcn_>
-                          </PopoverContent_Shadcn_>
-                        </Popover_Shadcn_>
+                          setOpen={setProjectDropdownOpen}
+                          searchPlaceholder="Search project..."
+                          onSelect={(project) => field.onChange(project.ref)}
+                          onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
+                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -390,7 +301,7 @@ export const InviteMemberButton = () => {
                     <div className="flex items-center space-x-2">
                       <Button asChild type="default">
                         <Link
-                          href="https://supabase.com/docs/guides/platform/sso"
+                          href={`${DOCS_URL}/guides/platform/sso`}
                           target="_blank"
                           rel="noreferrer"
                         >

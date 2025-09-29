@@ -1,6 +1,6 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { compact } from 'lodash'
-import { useEffect } from 'react'
+import { compact, filter } from 'lodash'
+import { useEffect, useState } from 'react'
 import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 
 import type { Filter, SavedState } from 'components/grid/types'
@@ -11,6 +11,9 @@ import { FilterOperatorOptions } from './components/header/filter/Filter.constan
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
+import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
+
+export const LOAD_TAB_FROM_CACHE_PARAM = 'loadFromCache'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -176,41 +179,60 @@ export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromis
   500
 )
 
-export function useLoadTableEditorStateFromLocalStorageIntoUrl({
+function getLatestParams() {
+  const queryParams = new URLSearchParams(window.location.search)
+  const sort = queryParams.getAll('sort')
+  const filter = queryParams.getAll('filter')
+  const loadFromCache = !!queryParams.get(LOAD_TAB_FROM_CACHE_PARAM)
+  return { sort, filter, loadFromCache }
+}
+
+export function useSyncTableEditorStateFromLocalStorageWithUrl({
   projectRef,
   table,
 }: {
   projectRef: string | undefined
   table: Entity | undefined
 }) {
-  const [_, setParams] = useUrlState({
-    arrayKeys: ['sort', 'filter'],
-  })
+  const [urlParams, updateUrlParams] = useQueryStates(
+    {
+      sort: parseAsArrayOf(parseAsString).withDefault([]),
+      filter: parseAsArrayOf(parseAsString).withDefault([]),
+      [LOAD_TAB_FROM_CACHE_PARAM]: parseAsBoolean.withDefault(false),
+    },
+    {
+      history: 'replace',
+    }
+  )
+
   useEffect(() => {
     if (!projectRef || !table) {
       return
     }
 
-    const searchParams = new URLSearchParams(window.location.search)
+    // `urlParams` from `useQueryStates` can be stale so always get the latest from the URL
+    const latestUrlParams = getLatestParams()
 
-    const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
-
-    // If no sort params are set, use saved state
-
-    let params: { sort?: string[]; filter?: string[] } | undefined
-
-    if (searchParams.getAll('sort').length <= 0 && savedState?.sorts) {
-      params = { ...params, sort: savedState.sorts }
+    if (latestUrlParams.loadFromCache) {
+      const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
+      updateUrlParams(
+        {
+          sort: savedState?.sorts ?? [],
+          filter: savedState?.filters ?? [],
+          loadFromCache: false,
+        },
+        { clearOnDefault: true }
+      )
+    } else {
+      saveTableEditorStateToLocalStorage({
+        projectRef,
+        tableName: table.name,
+        schema: table.schema,
+        sorts: latestUrlParams.sort,
+        filters: latestUrlParams.filter,
+      })
     }
-
-    if (searchParams.getAll('filter').length <= 0 && savedState?.filters) {
-      params = { ...params, filter: savedState.filters }
-    }
-
-    if (params) {
-      setParams((prevParams) => ({ ...prevParams, ...params }))
-    }
-  }, [projectRef, table])
+  }, [urlParams, table, projectRef])
 }
 
 export const handleCopyCell = (

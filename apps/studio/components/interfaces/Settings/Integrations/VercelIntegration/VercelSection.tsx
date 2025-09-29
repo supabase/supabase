@@ -26,7 +26,7 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
@@ -44,12 +44,12 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const isBranch = project?.parent_project_ref !== undefined
 
   const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'integrations.vercel_connections')
-  const { can: canCreateVercelConnection } = useAsyncCheckProjectPermissions(
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.vercel_connections')
+  const { can: canCreateVercelConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.vercel_connections'
   )
-  const { can: canUpdateVercelConnection } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateVercelConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )

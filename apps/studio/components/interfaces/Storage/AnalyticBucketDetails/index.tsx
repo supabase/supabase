@@ -28,6 +28,7 @@ import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -149,7 +150,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             Namespaces and tables connected to this bucket.
           </ScaffoldSectionDescription>
         </ScaffoldHeader>
-        <DocsButton href="https://supabase.com/docs/guides/storage/analytics/introduction" />
+        <DocsButton href={`${DOCS_URL}/guides/storage/analytics/introduction`} />
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-4" bottomPadding>
         {state === 'loading' && <GenericSkeletonLoader />}
@@ -183,7 +184,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                       target="_blank"
                       rel="noreferrer"
                       className="text-brand underline"
-                      href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket"
+                      href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
                     >
                       {' '}
                       to get started
@@ -237,7 +238,9 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                     )}
                     values={wrapperValues}
                   />
-                  <DocsButton href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket" />
+                  <DocsButton
+                    href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+                  />
                 </div>
               </div>
               <Card className="flex flex-col gap-8 p-6">

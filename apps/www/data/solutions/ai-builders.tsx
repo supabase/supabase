@@ -35,17 +35,7 @@ const data: {
         without worrying about infrastructure.
       </>,
     ],
-    image: (
-      <Image
-        src={{
-          dark: '/images/solutions/ai-builders/ai-builders-agent-dark.svg',
-          light: '/images/solutions/ai-builders/ai-builders-agent-light.svg',
-        }}
-        alt="AI agent for ai builders"
-        width={1000}
-        height={1000}
-      />
-    ),
+    image: undefined,
     ctas: [
       {
         label: 'Start your project',

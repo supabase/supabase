@@ -2,6 +2,7 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from 'lib/constants'
 import {
   Button,
   Card,
@@ -15,6 +16,23 @@ import {
   TableRow,
 } from 'ui'
 import { ShimmeringCard } from './ShimmeringCard'
+
+export const Header = () => {
+  return (
+    <div className="border-default border-b p-3">
+      <div className="flex items-center space-x-2">
+        <Link href="/projects">
+          <img
+            src={`${BASE_PATH}/img/supabase-logo.svg`}
+            alt="Supabase"
+            className="border-default rounded border p-1 hover:border-white"
+            style={{ height: 24 }}
+          />
+        </Link>
+      </div>
+    </div>
+  )
+}
 
 export const NoFilterResults = ({
   filterStatus,
@@ -119,6 +137,24 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
           <Link href={`/new/${slug}`}>New Project</Link>
         </Button>
       )}
+    </div>
+  )
+}
+
+export const NoOrganizationsState = () => {
+  return (
+    <div className="col-span-4 space-y-4 rounded-lg border border-dashed border-muted p-6 text-center">
+      <div className="space-y-1">
+        <p>You are not part of any organizations yet</p>
+        <p className="text-sm text-foreground-light">
+          Create your first organization to get started with Supabase
+        </p>
+      </div>
+      <div>
+        <Button asChild icon={<Plus />}>
+          <Link href="/new">New organization</Link>
+        </Button>
+      </div>
     </div>
   )
 }

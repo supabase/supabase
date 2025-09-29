@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'

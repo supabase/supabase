@@ -25,7 +25,7 @@ export const DeleteProjectPanel = () => {
 
       <Alert_Shadcn_ variant="destructive">
         <CriticalIcon />
-        <AlertTitle_Shadcn_ className="mt-2">{title}</AlertTitle_Shadcn_>
+        <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
         <div className="mt-2">
           <DeleteProjectButton />

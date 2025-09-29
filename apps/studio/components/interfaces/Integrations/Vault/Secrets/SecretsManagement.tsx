@@ -1,26 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import DataGrid, { Row } from 'react-data-grid'
 import { sortBy } from 'lodash'
-import { Loader, RefreshCw, Search, X } from 'lucide-react'
+import { RefreshCw, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import DataGrid, { Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { VaultSecret } from 'types'
 import {
   Button,
+  cn,
   Input,
   LoadingLine,
-  cn,
   Select_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
@@ -35,7 +36,7 @@ export const SecretsManagement = () => {
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
-  const { can: canManageSecrets } = useAsyncCheckProjectPermissions(
+  const { can: canManageSecrets } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
@@ -127,7 +128,7 @@ export const SecretsManagement = () => {
               >
                 Refresh
               </Button>
-              <DocsButton href="https://supabase.com/docs/guides/database/vault" />
+              <DocsButton href={`${DOCS_URL}/guides/database/vault`} />
               <ButtonTooltip
                 type="primary"
                 disabled={!canManageSecrets}

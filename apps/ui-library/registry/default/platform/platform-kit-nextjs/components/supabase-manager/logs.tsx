@@ -36,7 +36,7 @@ const logTypes = [
   {
     value: LogsTableName.FN_EDGE,
     label: 'Function Edge Logs',
-    description: 'Edge function execution logs with request/response data',
+    description: 'Edge function execution logs with request and response metadata',
   },
   {
     value: LogsTableName.AUTH,
@@ -66,7 +66,7 @@ const logTypes = [
   {
     value: LogsTableName.EDGE,
     label: 'Edge Logs',
-    description: 'HTTP requests and responses from Edge Functions',
+    description: 'HTTP requests and responses from the data API',
   },
 
   {
@@ -88,11 +88,6 @@ const logTypes = [
     value: LogsTableName.PGBOUNCER,
     label: 'PgBouncer Logs',
     description: 'Legacy connection pooling logs',
-  },
-  {
-    value: LogsTableName.WAREHOUSE,
-    label: 'Warehouse Logs',
-    description: 'Data warehouse operations and analytics',
   },
   {
     value: LogsTableName.PG_UPGRADE,

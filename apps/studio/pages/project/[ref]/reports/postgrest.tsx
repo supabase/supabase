@@ -61,6 +61,7 @@ const PostgrestReport = () => {
     addFilter,
     removeFilters,
     isLoadingData,
+    sql,
   } = useSharedAPIReport({
     filterBy: 'postgrest',
     start: selectedDateRange?.period_start?.date,
@@ -151,6 +152,7 @@ const PostgrestReport = () => {
             error={error}
             isLoading={isLoading}
             isRefetching={isRefetching}
+            sql={sql}
           />
         </div>
       </ReportStickyNav>

@@ -1,21 +1,13 @@
 import { numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { Organization } from 'types'
-import { Project } from '../projects/project-detail-query'
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
-import { PgbouncerConfigData } from '../database/pgbouncer-config-query'
+import { Project } from '../projects/project-detail-query'
 
-export const getReportAttributes = (
-  org: Organization,
-  project: Project,
-  diskConfig?: DiskAttributesData,
-  maxConnections?: MaxConnectionsData,
-  poolerConfig?: PgbouncerConfigData
-): ReportAttributes[] => {
-  const computeSize = project?.infra_compute_size || 'medium'
-
+export const getReportAttributes = (diskConfig?: DiskAttributesData): ReportAttributes[] => {
   return [
     {
       id: 'ram-usage',
@@ -106,19 +98,19 @@ export const getReportAttributes = (
         tickFormatter: (value: any) => numberFormatter(value, 2),
       },
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#compute-size',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#compute-size`,
       attributes: [
         {
           attribute: 'disk_iops_write',
           provider: 'infra-monitoring',
-          label: 'write IOPS',
+          label: 'Write IOPS',
           tooltip:
             'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
         },
         {
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
-          label: 'read IOPS',
+          label: 'Read IOPS',
           tooltip:
             'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
         },
@@ -224,10 +216,9 @@ export const getReportAttributesV2: (
   project: Project,
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
-  poolerConfig?: PgbouncerConfigData
-) => ReportAttributes[] = (org, project, diskConfig, maxConnections, poolerConfig) => {
+  pgBouncerMaxConnections?: number
+) => ReportAttributes[] = (org, project, diskConfig, maxConnections, pgBouncerMaxConnections) => {
   const isFreePlan = org?.plan?.id === 'free'
-  const computeSize = project?.infra_compute_size || 'medium'
   const isSpendCapEnabled =
     org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
 
@@ -235,7 +226,7 @@ export const getReportAttributesV2: (
     {
       id: 'ram-usage',
       label: 'Memory usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#memory-usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
       availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
@@ -261,7 +252,7 @@ export const getReportAttributesV2: (
         {
           attribute: 'ram_usage_cache_and_buffers',
           provider: 'infra-monitoring',
-          label: 'Cache + buffers',
+          label: 'Cache + Buffers',
           tooltip:
             'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
         },
@@ -277,7 +268,7 @@ export const getReportAttributesV2: (
     {
       id: 'cpu-usage',
       label: 'CPU usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#cpu-usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
@@ -346,8 +337,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-iops',
       label: 'Disk Input/Output operations per second (IOPS)',
-      docsUrl:
-        'https://supabase.com/docs/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
       availableIn: ['team', 'enterprise'],
       hide: false,
@@ -366,14 +356,14 @@ export const getReportAttributesV2: (
         {
           attribute: 'disk_iops_write',
           provider: 'infra-monitoring',
-          label: 'write IOPS',
+          label: 'Write IOPS',
           tooltip:
             'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
         },
         {
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
-          label: 'read IOPS',
+          label: 'Read IOPS',
           tooltip:
             'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
         },
@@ -391,7 +381,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-io-usage',
       label: 'Disk IO Usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#disk-io-usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-io-usage`,
       syncId: 'database-reports',
       availableIn: ['team', 'enterprise'],
       hide: false,
@@ -431,7 +421,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#database-connections',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
           attribute: 'client_connections_postgres',
@@ -495,7 +485,7 @@ export const getReportAttributesV2: (
       YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#limits-and-constraints',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
           attribute: 'client_connections_pgbouncer',
@@ -507,7 +497,7 @@ export const getReportAttributesV2: (
           attribute: 'pg_pooler_max_connections',
           provider: 'reference-line',
           label: 'Max pooler connections',
-          value: poolerConfig?.max_client_conn,
+          value: pgBouncerMaxConnections,
           tooltip: 'Maximum allowed pooler connections for your current compute size',
           isMaxValue: true,
         },
@@ -553,7 +543,7 @@ export const getReportAttributesV2: (
       },
       hideChartType: false,
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#disk-size',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
       attributes: [
         {
           attribute: 'disk_fs_used_system',

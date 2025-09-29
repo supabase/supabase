@@ -5,6 +5,7 @@ import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
+import { DOCS_URL } from 'lib/constants'
 import { ReactFlowProvider } from 'reactflow'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
@@ -31,9 +32,9 @@ export const TopSection = ({
 }: TopSectionProps) => {
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 py-16 md:p-0 w-full items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-0 w-full items-center">
         <div className="flex flex-col">
-          <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
+          <div className="flex flex-row flex-wrap items-center gap-4 w-full">
             <div>
               {!isMainBranch && (
                 <Link
@@ -54,7 +55,7 @@ export const TopSection = ({
                   <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
                     This project is using Postgres with OrioleDB which is currently in preview and
                     not suitable for production workloads. View our{' '}
-                    <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
+                    <InlineLink href={`${DOCS_URL}/guides/database/orioledb`}>
                       documentation
                     </InlineLink>{' '}
                     for all limitations.

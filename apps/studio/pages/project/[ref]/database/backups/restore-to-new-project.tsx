@@ -23,14 +23,14 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsAwsK8sCloudProvider,
   useIsOrioleDb,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
@@ -82,9 +82,11 @@ const RestoreToNewProject = () => {
 
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'physical_backups')
-  const { can: canTriggerPhysicalBackups } = useAsyncCheckProjectPermissions(
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'physical_backups'
+  )
+  const { can: canTriggerPhysicalBackups } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
@@ -267,7 +269,7 @@ const RestoreToNewProject = () => {
             <Link
               target="_blank"
               className="underline"
-              href="https://supabase.com/docs/guides/platform/backups"
+              href={`${DOCS_URL}/guides/platform/backups`}
             >
               in our docs
             </Link>

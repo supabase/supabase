@@ -10,8 +10,9 @@ import { DocsButton } from 'components/ui/DocsButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { noop } from 'lib/void'
 import { Input } from 'ui'
 import { HooksListEmpty } from './HooksListEmpty'
@@ -46,8 +47,10 @@ export const HooksList = ({
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
 
-  const { can: canCreateWebhooks, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const { can: canCreateWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   return (
     <div className="w-full space-y-4">
@@ -61,7 +64,7 @@ export const HooksList = ({
           onChange={(e) => setFilterString(e.target.value)}
         />
         <div className="flex items-center gap-x-2">
-          <DocsButton href="https://supabase.com/docs/guides/database/webhooks" />
+          <DocsButton href={`${DOCS_URL}/guides/database/webhooks`} />
           <ButtonTooltip
             onClick={() => createHook()}
             disabled={!isPermissionsLoaded || !canCreateWebhooks}
