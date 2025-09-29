@@ -1,16 +1,9 @@
 import { Code } from 'lucide-react'
 import Link from 'next/link'
-import { DragEvent, ReactNode, useState } from 'react'
-import { toast } from 'sonner'
+import type { DragEvent, ReactNode } from 'react'
 
-import { useParams } from 'common'
 import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button, cn, CodeBlock, CodeBlockLang } from 'ui'
+import { Button, CodeBlock, type CodeBlockLang, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 interface EdgeFunctionBlockProps {
@@ -29,7 +22,31 @@ interface EdgeFunctionBlockProps {
   /** Tooltip when hovering over the header of the block */
   tooltip?: ReactNode
   /** Optional callback on drag start */
-  onDragStart?: (e: DragEvent<Element>) => void
+  onDragStart?: (e: DragEvent) => void
+  /** Hide the header deploy button (used when an external confirm footer is shown) */
+  hideDeployButton?: boolean
+  /** Disable interactive actions */
+  disabled?: boolean
+  /** Whether a deploy action is currently running */
+  isDeploying?: boolean
+  /** Whether a deploy action has completed */
+  isDeployed?: boolean
+  /** Optional message to show when deployment fails */
+  errorText?: string
+  /** URL to the deployed function */
+  functionUrl?: string
+  /** Link to the function details page */
+  deploymentDetailsUrl?: string
+  /** CLI command to download the function */
+  downloadCommand?: string
+  /** Show warning UI when replacing an existing function */
+  showReplaceWarning?: boolean
+  /** Cancel handler when replacing an existing function */
+  onCancelReplace?: () => void
+  /** Confirm handler when replacing an existing function */
+  onConfirmReplace?: () => void
+  /** Handler for triggering a deploy */
+  onDeploy?: () => void
 }
 
 export const EdgeFunctionBlock = ({
@@ -37,89 +54,56 @@ export const EdgeFunctionBlock = ({
   code,
   functionName,
   actions,
-  showCode: _showCode = false,
   tooltip,
+  hideDeployButton = false,
+  disabled = false,
+  isDeploying = false,
+  isDeployed = false,
+  errorText,
+  functionUrl,
+  deploymentDetailsUrl,
+  downloadCommand,
+  showReplaceWarning = false,
+  onCancelReplace,
+  onConfirmReplace,
+  onDeploy,
+  draggable = false,
+  onDragStart,
 }: EdgeFunctionBlockProps) => {
-  const { ref } = useParams()
-  const [isDeployed, setIsDeployed] = useState(false)
-  const [showWarning, setShowWarning] = useState(false)
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
-  const { data: existingFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionName })
+  const resolvedFunctionUrl = functionUrl ?? 'Function URL will be available after deployment'
+  const resolvedDownloadCommand = downloadCommand ?? `supabase functions download ${functionName}`
 
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: org } = useSelectedOrganizationQuery()
+  const hasStatusMessage = isDeploying || isDeployed || !!errorText
 
-  const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
-    onSuccess: () => {
-      setIsDeployed(true)
-      toast.success('Successfully deployed edge function')
-    },
-  })
-
-  const handleDeploy = async () => {
-    if (!code || isDeploying || !ref) return
-
-    if (existingFunction) {
-      return setShowWarning(true)
-    }
-
-    try {
-      await deployFunction({
-        projectRef: ref,
-        slug: functionName,
-        metadata: {
-          entrypoint_path: 'index.ts',
-          name: functionName,
-          verify_jwt: true,
-        },
-        files: [{ name: 'index.ts', content: code }],
-      })
-      sendEvent({
-        action: 'edge_function_deploy_button_clicked',
-        properties: { origin: 'functions_ai_assistant' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
-    } catch (error) {
-      toast.error(
-        `Failed to deploy function: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
-    }
-  }
-
-  let functionUrl = 'Function URL not available'
-  const endpoint = settings?.app_config?.endpoint
-  if (endpoint) {
-    const restUrl = `https://${endpoint}`
-    const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
-    functionUrl =
-      ref && functionName && restUrlTld
-        ? `https://${ref}.supabase.${restUrlTld}/functions/v1/${functionName}`
-        : 'Function URL will be available after deployment'
-  }
   return (
     <ReportBlockContainer
       tooltip={tooltip}
       icon={<Code size={16} strokeWidth={1.5} className="text-foreground-muted" />}
       label={label}
+      loading={isDeploying}
+      draggable={draggable}
+      onDragStart={onDragStart}
       actions={
-        ref && functionName ? (
+        hideDeployButton || !onDeploy ? (
+          actions ?? null
+        ) : (
           <>
             <Button
               type="outline"
               size="tiny"
               loading={isDeploying}
-              disabled={!ref}
-              onClick={handleDeploy}
+              disabled={disabled || isDeploying}
+              onClick={onDeploy}
             >
               {isDeploying ? 'Deploying...' : 'Deploy'}
             </Button>
 
             {actions}
           </>
-        ) : null
+        )
       }
     >
-      {showWarning && ref && functionName && (
+      {showReplaceWarning && (
         <Admonition
           type="warning"
           className="mb-0 rounded-none border-0 border-b shrink-0 bg-background-100"
@@ -133,7 +117,8 @@ export const EdgeFunctionBlock = ({
               type="outline"
               size="tiny"
               className="w-full flex-1"
-              onClick={() => setShowWarning(false)}
+              disabled={isDeploying}
+              onClick={onCancelReplace}
             >
               Cancel
             </Button>
@@ -141,25 +126,9 @@ export const EdgeFunctionBlock = ({
               type="danger"
               size="tiny"
               className="w-full flex-1"
-              onClick={async () => {
-                setShowWarning(false)
-                try {
-                  await deployFunction({
-                    projectRef: ref,
-                    slug: functionName,
-                    metadata: {
-                      entrypoint_path: 'index.ts',
-                      name: functionName,
-                      verify_jwt: true,
-                    },
-                    files: [{ name: 'index.ts', content: code }],
-                  })
-                } catch (error) {
-                  toast.error(
-                    `Failed to deploy function: ${error instanceof Error ? error.message : 'Unknown error'}`
-                  )
-                }
-              }}
+              loading={isDeploying}
+              disabled={isDeploying}
+              onClick={onConfirmReplace}
             >
               Replace function
             </Button>
@@ -180,26 +149,29 @@ export const EdgeFunctionBlock = ({
         />
       </div>
 
-      {(isDeploying || isDeployed) && (
+      {hasStatusMessage && (
         <div className="p-4 w-full border-t bg-surface-75 text-xs">
           {isDeploying ? (
             <p className="text-foreground-light">Deploying function...</p>
+          ) : errorText ? (
+            <p className="text-danger">{errorText}</p>
           ) : (
             <>
               <p className="text-foreground-light mb-2">
                 The{' '}
-                <Link
-                  className="text-foreground"
-                  href={`/project/${ref}/functions/${functionName}/details`}
-                >
-                  new function
-                </Link>{' '}
+                {deploymentDetailsUrl ? (
+                  <Link className="text-foreground" href={deploymentDetailsUrl}>
+                    new function
+                  </Link>
+                ) : (
+                  <span className="text-foreground">new function</span>
+                )}{' '}
                 is now live at:
               </p>
               <CodeBlock
                 language="bash"
                 hideLineNumbers
-                value={functionUrl}
+                value={resolvedFunctionUrl}
                 className="text-xs p-2"
               />
               <p className="text-foreground-light mt-4 mb-2">
@@ -208,7 +180,7 @@ export const EdgeFunctionBlock = ({
               <CodeBlock
                 hideLineNumbers
                 language="bash"
-                value={`supabase functions download ${functionName}`}
+                value={resolvedDownloadCommand}
                 className="text-xs p-2"
               />
             </>
