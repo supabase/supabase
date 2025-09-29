@@ -232,11 +232,10 @@ const AuthUsage = () => {
             </div>
           </div>
 
-          {/* Errors Section */}
-          <div className="flex flex-col gap-4" id="errors">
+          <div className="flex flex-col gap-4" id="monitoring">
             <ReportSectionHeader
-              id="errors"
-              title="Errors"
+              id="monitoring"
+              title="Monitoring"
               description="Track authentication errors by status code and error type to identify issues and improve user experience."
             />
             <div className="grid md:grid-cols-2 gap-4">
@@ -257,11 +256,10 @@ const AuthUsage = () => {
             </div>
           </div>
 
-          {/* Latency Section */}
-          <div className="flex flex-col gap-4" id="latency">
+          <div className="flex flex-col gap-4" id="performance">
             <ReportSectionHeader
-              id="latency"
-              title="Latency"
+              id="performance"
+              title="Performance"
               description="Monitor sign-in and sign-up performance metrics including average, percentiles, and request counts to ensure optimal authentication speed."
             />
             <div className="grid md:grid-cols-2 gap-4">
