@@ -152,31 +152,6 @@ export const MCP_CLIENTS: McpClient[] = [
     },
   },
   {
-    key: 'claude-desktop',
-    label: 'Claude Desktop',
-    icon: 'claude',
-    configFile:
-      '~/Library/Application Support/Claude/claude_desktop_config.json (MacOS), or %APPDATA%\\Claude\\claude_desktop_config.json (Windows)',
-    externalDocsUrl: 'https://modelcontextprotocol.io/quickstart/user',
-    transformConfig: (config): ClaudeCodeMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    alternateInstructions: () => (
-      <p className="text-xs text-foreground-light">
-        Alternatively, configure through the UI by going to{' '}
-        <span className="font-medium">Settings</span> &gt;{' '}
-        <span className="font-medium">Integrations</span> and entering the URL above.
-      </p>
-    ),
-  },
-  {
     key: 'other',
     label: 'Other',
     transformConfig: (config): OtherMcpConfig => {
