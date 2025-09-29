@@ -5,12 +5,15 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -44,6 +47,7 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import NewPublicationPanel from './NewPublicationPanel'
 import PublicationsComboBox from './PublicationsComboBox'
+import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 
 const formId = 'destination-editor'
 const types = ['BigQuery'] as const
@@ -80,10 +84,15 @@ export const DestinationPanel = ({
   existingDestination,
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { setRequestStatus } = usePipelineRequestStatus()
 
   const editMode = !!existingDestination
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
+  const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
+  const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
+    null
+  )
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -142,9 +151,21 @@ export const DestinationPanel = ({
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
-  const isSubmitDisabled = isSaving || isSelectedPublicationMissing
+  const selectedPublication = publications.find((pub) => pub.name === publicationName)
+  const { data: checkPrimaryKeysExistsData, isLoading: isLoadingCheck } = useCheckPrimaryKeysExists(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      tables: selectedPublication?.tables ?? [],
+    },
+    { enabled: visible && !!selectedPublication }
+  )
+  const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const isSubmitDisabled =
+    isSaving || isSelectedPublicationMissing || isLoadingCheck || hasTablesWithNoPrimaryKeys
+
+  const submitPipeline = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!sourceId) return console.error('Source id is required')
     if (isSelectedPublicationMissing) {
@@ -236,6 +257,32 @@ export const DestinationPanel = ({
     }
   }
 
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    if (!editMode) {
+      setPendingFormValues(data)
+      setShowDisclaimerDialog(true)
+      return
+    }
+
+    await submitPipeline(data)
+  }
+
+  const handleDisclaimerDialogChange = (open: boolean) => {
+    setShowDisclaimerDialog(open)
+    if (!open) {
+      setPendingFormValues(null)
+    }
+  }
+
+  const handleDisclaimerConfirm = async () => {
+    if (!pendingFormValues) return
+
+    const values = pendingFormValues
+    setPendingFormValues(null)
+    setShowDisclaimerDialog(false)
+    await submitPipeline(values)
+  }
+
   useEffect(() => {
     if (editMode && destinationData && pipelineData) {
       form.reset(defaultValues)
@@ -303,12 +350,13 @@ export const DestinationPanel = ({
                           <FormControl_Shadcn_>
                             <PublicationsComboBox
                               publications={publicationNames}
-                              loading={isLoadingPublications}
+                              isLoadingPublications={isLoadingPublications}
+                              isLoadingCheck={!!selectedPublication && isLoadingCheck}
                               field={field}
                               onNewPublicationClick={() => setPublicationPanelVisible(true)}
                             />
                           </FormControl_Shadcn_>
-                          {isSelectedPublicationMissing && (
+                          {isSelectedPublicationMissing ? (
                             <Admonition type="warning" className="mt-2 mb-0">
                               <p className="!leading-normal">
                                 The publication{' '}
@@ -317,7 +365,29 @@ export const DestinationPanel = ({
                                 another one.
                               </p>
                             </Admonition>
-                          )}
+                          ) : hasTablesWithNoPrimaryKeys ? (
+                            <Admonition type="warning" className="mt-2 mb-0">
+                              <p className="!leading-normal">
+                                Replication requires every table in the publication to have a
+                                primary key to work, which these tables are missing:
+                              </p>
+                              <ul className="list-disc pl-6 mb-2">
+                                {(checkPrimaryKeysExistsData?.offendingTables ?? []).map((x) => {
+                                  const value = `${x.schema}.${x.name}`
+                                  return (
+                                    <li key={value} className="!leading-normal">
+                                      <InlineLink href={`/project/${projectRef}/editor/${x.id}`}>
+                                        {value}
+                                      </InlineLink>
+                                    </li>
+                                  )
+                                })}
+                              </ul>
+                              <p className="!leading-normal">
+                                Ensure that these tables have primary keys first.
+                              </p>
+                            </Admonition>
+                          ) : null}
                         </FormItemLayout>
                       )}
                     />
@@ -486,6 +556,13 @@ export const DestinationPanel = ({
           </div>
         </SheetContent>
       </Sheet>
+
+      <ReplicationDisclaimerDialog
+        open={showDisclaimerDialog}
+        onOpenChange={handleDisclaimerDialogChange}
+        isLoading={isSaving}
+        onConfirm={handleDisclaimerConfirm}
+      />
 
       <NewPublicationPanel
         visible={publicationPanelVisible}

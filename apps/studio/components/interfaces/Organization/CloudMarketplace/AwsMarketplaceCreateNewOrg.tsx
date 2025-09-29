@@ -1,20 +1,22 @@
-import { useAwsManagedOrganizationCreateMutation } from '../../../../data/organizations/organization-create-mutation'
-import { toast } from 'sonner'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { SubmitHandler } from 'react-hook-form'
-import NewAwsMarketplaceOrgForm, {
-  CREATE_AWS_MANAGED_ORG_FORM_ID,
-  NewMarketplaceOrgForm,
-} from './NewAwsMarketplaceOrgForm'
+import { toast } from 'sonner'
+
+import { useAwsManagedOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
+import { DOCS_URL } from 'lib/constants'
+import { Button } from 'ui'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '../../../layouts/Scaffold'
-import Link from 'next/link'
-import { Button } from 'ui'
-import { useRouter } from 'next/router'
 import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
 import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
+import NewAwsMarketplaceOrgForm, {
+  CREATE_AWS_MANAGED_ORG_FORM_ID,
+  NewMarketplaceOrgForm,
+} from './NewAwsMarketplaceOrgForm'
 
 interface Props {
   onboardingInfo?: CloudMarketplaceOnboardingInfo | undefined
@@ -61,11 +63,7 @@ const AwsMarketplaceCreateNewOrg = ({ onboardingInfo }: Props) => {
           <p>
             You can read more on billing through AWS in our {''}
             {/*TODO(thomas): Update docs link once the new docs exist*/}
-            <Link
-              href="https://supabase.com/docs/guides/platform"
-              target="_blank"
-              className="underline"
-            >
+            <Link href={`${DOCS_URL}/guides/platform`} target="_blank" className="underline">
               Billing Docs.
             </Link>
           </p>

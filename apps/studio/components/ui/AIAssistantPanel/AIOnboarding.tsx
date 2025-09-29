@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion'
-import { partition } from 'lodash'
 import { BarChart, FileText, Shield } from 'lucide-react'
+// End of third-party imports
 
-import { Button, Skeleton } from 'ui'
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { type SqlSnippet } from './AIAssistant.types'
+import { type Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { Button, Skeleton } from 'ui'
 import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
+import type { SqlSnippet } from './AIAssistant.types'
 
 interface AIOnboardingProps {
   sqlSnippets?: SqlSnippet[]
@@ -44,11 +44,10 @@ export const AIOnboarding = ({
   } = useProjectLintsQuery({ projectRef })
   const isLintsLoading = isLoadingLints || isFetchingLints
 
-  const errorLints = lints?.filter((lint) => lint.level === LINTER_LEVELS.ERROR) ?? []
-  const [securityErrorLints, performanceErrorLints] = partition(
-    errorLints,
-    (lint) => lint.categories?.[0] === 'SECURITY'
-  )
+  const errorLints: Lint[] = (lints?.filter((lint) => lint.level === LINTER_LEVELS.ERROR) ??
+    []) as Lint[]
+  const securityErrorLints = errorLints.filter((lint) => lint.categories?.[0] === 'SECURITY')
+  const performanceErrorLints = errorLints.filter((lint) => lint.categories?.[0] !== 'SECURITY')
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -56,7 +55,7 @@ export const AIOnboarding = ({
         <div className="mt-auto w-full space-y-6 py-8 ">
           <h2 className="heading-section text-foreground mx-4">How can I assist you?</h2>
           {suggestions?.prompts?.length ? (
-            <>
+            <div>
               <h3 className="heading-meta text-foreground-light mb-3 mx-4">Suggestions</h3>
               {prompts.map((item, index) => (
                 <motion.div
@@ -81,7 +80,7 @@ export const AIOnboarding = ({
                   </Button>
                 </motion.div>
               ))}
-            </>
+            </div>
           ) : (
             <>
               {isLintsLoading ? (

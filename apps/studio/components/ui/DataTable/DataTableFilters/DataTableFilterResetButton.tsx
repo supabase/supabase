@@ -24,7 +24,7 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
       }}
       onKeyDown={(e) => {
         e.stopPropagation()
-        if (e.code === 'Enter') {
+        if (e.code === 'Enter' || e.code === 'NumpadEnter') {
           column?.setFilterValue(undefined)
         }
       }}

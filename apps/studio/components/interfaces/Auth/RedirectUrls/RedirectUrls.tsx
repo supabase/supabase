@@ -11,6 +11,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -82,7 +83,7 @@ export const RedirectUrls = () => {
             allowed, for example, https://*.domain.com
           </ScaffoldDescription>
         </div>
-        <DocsButton href="https://supabase.com/docs/guides/auth/concepts/redirect-urls" />
+        <DocsButton href={`${DOCS_URL}/guides/auth/concepts/redirect-urls`} />
       </div>
 
       {isLoading && (

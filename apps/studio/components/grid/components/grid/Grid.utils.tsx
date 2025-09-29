@@ -11,6 +11,7 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Dictionary } from 'types'
@@ -115,7 +116,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
                 each row before updating or deleting the row.
               </p>
               <div className="mt-3">
-                <DocsButton href="https://supabase.com/docs/guides/database/tables#primary-keys" />
+                <DocsButton href={`${DOCS_URL}/guides/database/tables#primary-keys`} />
               </div>
             </div>
           ),
