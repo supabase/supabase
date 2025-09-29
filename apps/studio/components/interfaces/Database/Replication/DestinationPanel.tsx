@@ -5,12 +5,14 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -81,6 +83,7 @@ export const DestinationPanel = ({
   existingDestination,
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { setRequestStatus } = usePipelineRequestStatus()
 
   const editMode = !!existingDestination
@@ -147,7 +150,15 @@ export const DestinationPanel = ({
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
-  const isSubmitDisabled = isSaving || isSelectedPublicationMissing
+  const selectedPublication = publications.find((pub) => pub.name === publicationName)
+  const { data: checkPrimaryKeysExistsData } = useCheckPrimaryKeysExists({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    tables: selectedPublication?.tables ?? [],
+  })
+  const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
+
+  const isSubmitDisabled = isSaving || isSelectedPublicationMissing || hasTablesWithNoPrimaryKeys
 
   const submitPipeline = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -339,7 +350,7 @@ export const DestinationPanel = ({
                               onNewPublicationClick={() => setPublicationPanelVisible(true)}
                             />
                           </FormControl_Shadcn_>
-                          {isSelectedPublicationMissing && (
+                          {isSelectedPublicationMissing ? (
                             <Admonition type="warning" className="mt-2 mb-0">
                               <p className="!leading-normal">
                                 The publication{' '}
@@ -348,7 +359,28 @@ export const DestinationPanel = ({
                                 another one.
                               </p>
                             </Admonition>
-                          )}
+                          ) : hasTablesWithNoPrimaryKeys ? (
+                            <Admonition type="warning" className="mt-2 mb-0">
+                              <p className="!leading-normal">
+                                Replication requires every table in the publication to have a
+                                primary key to work. The following tables are missing one:
+                              </p>
+                              <ul className="list-disc">
+                                {(checkPrimaryKeysExistsData?.offendingTables ?? []).map((x) => {
+                                  const value = `${x.schema}.${x.name}`
+                                  return (
+                                    <li key={value} className="!leading-normal">
+                                      {value}
+                                    </li>
+                                  )
+                                })}
+                              </ul>
+                              <p className="!leading-normal">
+                                Ensure that those tables have primary keys before starting
+                                replication on this publication.
+                              </p>
+                            </Admonition>
+                          ) : null}
                         </FormItemLayout>
                       )}
                     />
