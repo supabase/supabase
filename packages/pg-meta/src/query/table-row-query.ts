@@ -151,7 +151,6 @@ export const getTableRowsSql = ({
   // allowing postgres to only truncate the columns within the subset that we'll return instead of attemting to do it on
   // all the rows within the table
   const baseSelectQuery = `with _base_query as (${queryChains.range(from, to).toSql({ isCTE: false, isFinal: false })})`
-  console.log(baseSelectQuery)
 
   const allColumnNames = table.columns
     .sort((a, b) => a.ordinal_position - b.ordinal_position)
