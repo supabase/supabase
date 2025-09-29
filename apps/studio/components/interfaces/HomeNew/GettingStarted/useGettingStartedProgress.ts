@@ -89,7 +89,7 @@ export const useGettingStartedProgress = (): GettingStartedStatuses => {
     const hasTables = (tablesData?.length ?? 0) > 0
     const hasCliSetup = (migrationsData?.length ?? 0) > 0
     const hasSampleData = (tablesData ?? []).some(
-      (table) => Number((table as any)?.live_rows_estimate ?? 0) > 0
+      (table) => Number(table?.live_rows_estimate ?? 0) > 0
     )
     const hasRlsPolicies = (policiesData?.length ?? 0) > 0
     const allowSignupsEnabled = authConfig ? !authConfig.DISABLE_SIGNUP : false
@@ -97,7 +97,7 @@ export const useGettingStartedProgress = (): GettingStartedStatuses => {
     const hasConfiguredAuth = allowSignupsEnabled && emailProviderEnabled
     const hasFirstUser = (usersCountData?.count ?? 0) > 0
     const hasStorageObjects = (storageTablesData ?? []).some(
-      (table) => table.name === 'objects' && Number((table as any)?.live_rows_estimate ?? 0) > 0
+      (table) => table.name === 'objects' && Number(table?.live_rows_estimate ?? 0) > 0
     )
     const hasEdgeFunctions = (edgeFunctionsData?.length ?? 0) > 0
     const hasReports = (reportsData?.pages?.[0]?.content?.length ?? 0) > 0
