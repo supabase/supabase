@@ -135,16 +135,16 @@ export const generateOtherRoutes = (
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
     },
-    ...(IS_PLATFORM && reportsEnabled
-      ? [
-          {
-            key: 'reports',
-            label: 'Reports',
-            icon: <Reports size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
-          },
-        ]
-      : []),
+    // ...(IS_PLATFORM && reportsEnabled
+    //   ? [
+    {
+      key: 'reports',
+      label: 'Reports',
+      icon: <Reports size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
+    },
+    //   ]
+    // : []),
     {
       key: 'logs',
       label: 'Logs',
