@@ -25,6 +25,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
@@ -397,7 +398,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
+                        href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
                       >
                         Learn more
                       </Link>

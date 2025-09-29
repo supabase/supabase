@@ -1,3 +1,5 @@
+import { DOCS_URL } from 'lib/constants'
+
 export const RLS_PROMPT = `
 # PostgreSQL RLS in Supabase: Condensed Guide
 

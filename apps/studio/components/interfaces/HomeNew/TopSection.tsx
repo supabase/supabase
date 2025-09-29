@@ -5,6 +5,7 @@ import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
+import { DOCS_URL } from 'lib/constants'
 import { ReactFlowProvider } from 'reactflow'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
@@ -54,7 +55,7 @@ export const TopSection = ({
                   <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
                     This project is using Postgres with OrioleDB which is currently in preview and
                     not suitable for production workloads. View our{' '}
-                    <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
+                    <InlineLink href={`${DOCS_URL}/guides/database/orioledb`}>
                       documentation
                     </InlineLink>{' '}
                     for all limitations.
