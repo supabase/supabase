@@ -5,7 +5,6 @@ import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
 import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { fetchLogs } from 'data/reports/report.utils'
 import z from 'zod'
-import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
