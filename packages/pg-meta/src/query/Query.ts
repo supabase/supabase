@@ -11,8 +11,8 @@ export class Query implements IQuery {
    */
   from(name: string, schema?: string) {
     return new QueryAction({
-      name: `"${name}"`,
-      schema: !!schema ? `"${schema}"` : 'public',
+      name,
+      schema: schema ?? 'public',
     })
   }
 }
