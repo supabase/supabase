@@ -351,7 +351,7 @@ export const DestinationPanel = ({
                             <PublicationsComboBox
                               publications={publicationNames}
                               isLoadingPublications={isLoadingPublications}
-                              isLoadingCheck={isLoadingCheck}
+                              isLoadingCheck={!!selectedPublication && isLoadingCheck}
                               field={field}
                               onNewPublicationClick={() => setPublicationPanelVisible(true)}
                             />
