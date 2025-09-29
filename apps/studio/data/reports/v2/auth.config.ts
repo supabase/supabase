@@ -11,7 +11,7 @@ import {
   generateStatusCodeAttributes,
   transformStatusCodeData,
 } from 'components/interfaces/Reports/Reports.utils'
-import { AUTH_ERROR_CODES } from 'pages/project/[ref]/reports/auth.utils'
+import { AUTH_ERROR_CODES } from 'data/reports/v2/auth.utils'
 
 const METRIC_KEYS = [
   'ActiveUsers',
