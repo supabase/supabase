@@ -9,15 +9,15 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button, LoadingLine, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Markdown } from '../Markdown'
 import { PresetHookResult } from '../Reports/Reports.utils'
-import { QueryPerformanceMetrics } from './QueryPerformanceMetrics'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
+import { QueryPerformanceMetrics } from './QueryPerformanceMetrics'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
@@ -100,7 +100,7 @@ export const QueryPerformance = ({
           <p>How is this report generated?</p>
           <Markdown
             className="text-xs"
-            content="This report uses the pg_stat_statements table, and pg_stat_statements extension. [Learn more here](https://supabase.com/docs/guides/platform/performance#examining-query-performance)."
+            content={`This report uses the pg_stat_statements table, and pg_stat_statements extension. [Learn more here](${DOCS_URL}/guides/platform/performance#examining-query-performance).`}
           />
         </div>
 
@@ -108,8 +108,8 @@ export const QueryPerformance = ({
           <p>Inspect your database for potential issues</p>
           <Markdown
             className="text-xs"
-            content="The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](https://supabase.com/docs/guides/database/inspect)."
+            content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
+            potential issues. [Learn more here](${DOCS_URL}/guides/database/inspect).`}
           />
         </div>
       </div>

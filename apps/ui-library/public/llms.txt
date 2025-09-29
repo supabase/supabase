@@ -81,3 +81,7 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/tanstack/social-auth)
     - Social authentication block for Tanstack Start
+- [Supabase Client Libraries](https://supabase.com/ui/docs/vue/client)
+    - Supabase client for Vue Single Page Applications
+- [Supabase Client Libraries](https://supabase.com/ui/docs/nuxtjs/client)
+    - Supabase client for Nuxt.js

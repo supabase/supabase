@@ -1,5 +1,5 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { ArrowUpRight, Book, BookOpen } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
@@ -91,7 +91,7 @@ export const generateDocsMenu = (
         {
           name: 'Guides',
           key: 'guides',
-          url: `https://supabase.com/docs`,
+          url: DOCS_URL,
           icon: <Book size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,
@@ -99,7 +99,7 @@ export const generateDocsMenu = (
         {
           name: 'API Reference',
           key: 'api-reference',
-          url: `https://supabase.com/docs/guides/api`,
+          url: `${DOCS_URL}/guides/api`,
           icon: <BookOpen size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,
