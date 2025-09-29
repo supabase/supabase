@@ -12,6 +12,7 @@ type CheckPrimaryKeysExistsVariables = {
 }
 
 type CheckPrimaryKeysExistResponse = {
+  id: string
   name: string
   schema: string
   has_primary_key: boolean

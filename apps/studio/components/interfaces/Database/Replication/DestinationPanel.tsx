@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
@@ -151,7 +152,7 @@ export const DestinationPanel = ({
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
   const selectedPublication = publications.find((pub) => pub.name === publicationName)
-  const { data: checkPrimaryKeysExistsData } = useCheckPrimaryKeysExists(
+  const { data: checkPrimaryKeysExistsData, isLoading: isLoadingCheck } = useCheckPrimaryKeysExists(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -161,7 +162,8 @@ export const DestinationPanel = ({
   )
   const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
 
-  const isSubmitDisabled = isSaving || isSelectedPublicationMissing || hasTablesWithNoPrimaryKeys
+  const isSubmitDisabled =
+    isSaving || isSelectedPublicationMissing || isLoadingCheck || hasTablesWithNoPrimaryKeys
 
   const submitPipeline = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -348,7 +350,8 @@ export const DestinationPanel = ({
                           <FormControl_Shadcn_>
                             <PublicationsComboBox
                               publications={publicationNames}
-                              loading={isLoadingPublications}
+                              isLoadingPublications={isLoadingPublications}
+                              isLoadingCheck={isLoadingCheck}
                               field={field}
                               onNewPublicationClick={() => setPublicationPanelVisible(true)}
                             />
@@ -373,7 +376,9 @@ export const DestinationPanel = ({
                                   const value = `${x.schema}.${x.name}`
                                   return (
                                     <li key={value} className="!leading-normal">
-                                      {value}
+                                      <InlineLink href={`/project/${projectRef}/editor/${x.id}`}>
+                                        {value}
+                                      </InlineLink>
                                     </li>
                                   )
                                 })}

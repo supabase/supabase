@@ -6,6 +6,7 @@ WITH targets(rel) AS (
   SELECT unnest(ARRAY[${formattedTables}]::regclass[])
 )
 SELECT
+  c.oid AS id,
   n.nspname AS schema,
   c.relname AS name,
   (con.conrelid IS NOT NULL) AS has_primary_key
@@ -14,6 +15,6 @@ JOIN pg_class c ON c.oid = t.rel
 JOIN pg_namespace n ON n.oid = c.relnamespace
 LEFT JOIN pg_constraint con
   ON con.conrelid = c.oid AND con.contype = 'p'
-ORDER BY 1,2;
+ORDER BY n.nspname, c.relname;
 `
 }

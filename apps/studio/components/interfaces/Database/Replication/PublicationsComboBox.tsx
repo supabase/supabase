@@ -19,14 +19,16 @@ import {
 
 interface PublicationsComboBoxProps {
   publications: string[]
-  loading: boolean
+  isLoadingPublications: boolean
+  isLoadingCheck: boolean
   onNewPublicationClick: () => void
   field: ControllerRenderProps<any, 'publicationName'>
 }
 
 const PublicationsComboBox = ({
   publications,
-  loading,
+  isLoadingPublications,
+  isLoadingCheck,
   onNewPublicationClick,
   field,
 }: PublicationsComboBoxProps) => {
@@ -67,7 +69,13 @@ const PublicationsComboBox = ({
             'w-full [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
           )}
-          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
+          iconRight={
+            isLoadingCheck ? (
+              <Loader2 className="animate-spin" size={14} />
+            ) : (
+              <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+            )
+          }
           name={field.name}
           onBlur={field.onBlur}
         >
@@ -80,10 +88,10 @@ const PublicationsComboBox = ({
             placeholder="Find publication..."
             value={searchTerm}
             onValueChange={handleSearchChange}
-          ></CommandInput_Shadcn_>
+          />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>
-              {loading ? (
+              {isLoadingPublications ? (
                 <div className="flex items-center gap-2 text-center justify-center">
                   <Loader2 size={12} className="animate-spin" />
                   Loading...
