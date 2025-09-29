@@ -158,6 +158,12 @@ export const DestinationPanel = ({
   })
   const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
 
+  console.log({
+    selectedPublication,
+    hasTablesWithNoPrimaryKeys,
+    data: checkPrimaryKeysExistsData,
+  })
+
   const isSubmitDisabled = isSaving || isSelectedPublicationMissing || hasTablesWithNoPrimaryKeys
 
   const submitPipeline = async (data: z.infer<typeof FormSchema>) => {

@@ -1,7 +1,9 @@
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { ControllerRenderProps } from 'react-hook-form'
 import {
   Button,
+  cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -14,7 +16,6 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { ControllerRenderProps } from 'react-hook-form'
 
 interface PublicationsComboBoxProps {
   publications: string[]
@@ -62,14 +63,11 @@ const PublicationsComboBox = ({
         <Button
           type="default"
           size="medium"
-          className={`w-full [&>span]:w-full text-left`}
-          iconRight={
-            <ChevronsUpDown
-              className="text-foreground-muted"
-              strokeWidth={2}
-              size={14}
-            ></ChevronsUpDown>
-          }
+          className={cn(
+            'w-full [&>span]:w-full text-left',
+            !selectedPublication && 'text-foreground-muted'
+          )}
+          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
           name={field.name}
           onBlur={field.onBlur}
         >
