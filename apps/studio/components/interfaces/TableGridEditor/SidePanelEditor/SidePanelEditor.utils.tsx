@@ -893,7 +893,9 @@ export const insertRowsViaSpreadsheet = async (
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
         try {
-          await executeWithRetry(() => executeSql({ projectRef, connectionString, sql: insertQuery }));
+          await executeWithRetry(() =>
+            executeSql({ projectRef, connectionString, sql: insertQuery })
+          )
         } catch (error) {
           console.warn(error)
           insertError = error
