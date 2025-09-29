@@ -31,6 +31,7 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
@@ -227,7 +228,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 <p>Grant or revoke privileges on a column based on user role.</p>
               </div>
             </div>
-            <DocsButton href="https://supabase.com/docs/guides/auth/column-level-security" />
+            <DocsButton href={`${DOCS_URL}/guides/auth/column-level-security`} />
           </div>
 
           {isEnabled ? (

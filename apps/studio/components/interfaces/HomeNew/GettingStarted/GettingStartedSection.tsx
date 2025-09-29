@@ -20,7 +20,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -167,7 +167,7 @@ export function GettingStartedSection({
         actions: [
           {
             label: 'Create schema file',
-            href: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
+            href: `${DOCS_URL}/guides/local-development/declarative-database-schemas`,
             variant: 'default',
           },
           {
@@ -192,7 +192,7 @@ export function GettingStartedSection({
         actions: [
           {
             label: 'Create a seed file',
-            href: 'https://supabase.com/docs/guides/local-development/seeding-your-database',
+            href: `${DOCS_URL}/guides/local-development/seeding-your-database`,
             variant: 'default',
           },
           {
@@ -262,7 +262,7 @@ export function GettingStartedSection({
         actions: [
           {
             label: 'Read docs',
-            href: 'https://supabase.com/docs/guides/auth',
+            href: `${DOCS_URL}/guides/auth`,
             variant: 'default',
           },
         ],
@@ -426,7 +426,7 @@ export function GettingStartedSection({
         actions: [
           {
             label: 'Read docs',
-            href: 'https://supabase.com/docs/guides/auth',
+            href: `${DOCS_URL}/guides/auth`,
             variant: 'default',
           },
         ],
