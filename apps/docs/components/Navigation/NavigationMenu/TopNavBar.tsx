@@ -110,7 +110,7 @@ const TopNavBar: FC = () => {
 }
 
 const HeaderLogo = memo(() => {
-  const { navigationLogoUrl } = useCustomContent(['navigation:logo_url'])
+  const { navigationLogo } = useCustomContent(['navigation:logo'])
 
   return (
     <Link
@@ -122,20 +122,20 @@ const HeaderLogo = memo(() => {
     >
       <Image
         className="hidden dark:block !m-0"
-        src={navigationLogoUrl?.dark ?? '/docs/supabase-dark.svg'}
+        src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
-        width={96}
-        height={18}
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
       <Image
         className="block dark:hidden !m-0"
-        src={navigationLogoUrl?.light ?? '/docs/supabase-light.svg'}
+        src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"
-        width={96}
-        height={18}
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
       <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
