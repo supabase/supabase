@@ -9,6 +9,7 @@ import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
@@ -24,7 +25,7 @@ const PageLayout: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (isStorageV2) {
-      router.replace(`/project/${ref}/storage/media`)
+      router.replace(`/project/${ref}/storage/${DEFAULT_BUCKET_TYPE}`)
     }
   }, [isStorageV2, ref, router])
 

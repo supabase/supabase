@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import type { NextPageWithLayout } from 'types'
 
 const Storage: NextPageWithLayout = () => {
@@ -13,7 +14,7 @@ const Storage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (isStorageV2) {
-      router.replace(`/project/${ref}/storage/media`)
+      router.replace(`/project/${ref}/storage/${DEFAULT_BUCKET_TYPE}`)
     } else {
       router.replace(`/project/${ref}/storage/buckets`)
     }

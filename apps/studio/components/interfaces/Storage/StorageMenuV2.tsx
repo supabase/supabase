@@ -1,26 +1,25 @@
 import Link from 'next/link'
 import { useParams } from 'common'
 import { Menu } from 'ui'
+import { BUCKET_TYPES, BUCKET_TYPE_KEYS, DEFAULT_BUCKET_TYPE } from './Storage.constants'
 
 const StorageMenuV2 = () => {
   const { ref, bucketType } = useParams()
-  const bucketTypes = ['Media', 'Analytics', 'Vectors']
-  const selectedBucketType = bucketType || 'Media' // Default to Media
+  const selectedBucketType = bucketType || DEFAULT_BUCKET_TYPE
 
   return (
     <Menu type="pills" className="mt-6 flex flex-grow flex-col">
       <div className="mx-3">
         <Menu.Group title={<span className="uppercase font-mono">Bucket Types</span>} />
 
-        {bucketTypes.map((bucketType, idx: number) => {
-          const isSelected = selectedBucketType === bucketType
+        {BUCKET_TYPE_KEYS.map((bucketTypeKey, idx: number) => {
+          const isSelected = selectedBucketType === bucketTypeKey
+          const config = BUCKET_TYPES[bucketTypeKey]
+
           return (
-            <Link
-              key={`${idx}_${bucketType}`}
-              href={`/project/${ref}/storage/${bucketType.toLowerCase()}`}
-            >
+            <Link key={`${idx}_${bucketTypeKey}`} href={`/project/${ref}/storage/${bucketTypeKey}`}>
               <Menu.Item rounded active={isSelected}>
-                <p className="truncate">{bucketType}</p>
+                <p className="truncate">{config.displayName}</p>
               </Menu.Item>
             </Link>
           )
