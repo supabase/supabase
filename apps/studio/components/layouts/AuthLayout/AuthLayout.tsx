@@ -14,8 +14,7 @@ const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
 
-  const isAuthOverviewPage = useFlag('authOverviewPage')
-  console.log('isAuthOverviewPage', isAuthOverviewPage)
+  const authenticationShowOverview = useFlag('authOverviewPage')
 
   const {
     authenticationSignInProviders,
@@ -46,7 +45,7 @@ const AuthProductMenu = () => {
         authenticationMultiFactor,
         authenticationAttackProtection,
         authenticationAdvanced,
-        authenticationShowOverview: isAuthOverviewPage,
+        authenticationShowOverview,
       })}
     />
   )
