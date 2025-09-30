@@ -3,12 +3,12 @@ import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 export type TableRowCreateVariables = {
   projectRef: string
@@ -79,7 +79,7 @@ export const useTableRowCreateMutation = ({
         // Track data insertion event
         try {
           sendEvent({
-            action: 'table_data_inserted',
+            action: 'table_data_added',
             properties: {
               method: 'table_editor',
               schema_name: table.schema,

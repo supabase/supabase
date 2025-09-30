@@ -16,7 +16,7 @@ type TelemetryGroups = {
 
 export const TABLE_EVENT_ACTIONS = {
   TableCreated: 'table_created',
-  TableDataInserted: 'table_data_inserted',
+  TableDataAdded: 'table_data_added',
   TableRLSEnabled: 'table_rls_enabled',
 } as const
 
@@ -1787,8 +1787,8 @@ export interface TableCreatedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
  */
-export interface TableDataInsertedEvent {
-  action: 'table_data_inserted'
+export interface TableDataAddedEvent {
+  action: 'table_data_added'
   properties: {
     /**
      * Method used to insert data
@@ -1940,5 +1940,5 @@ export type TelemetryEvent =
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
   | TableCreatedEvent
-  | TableDataInsertedEvent
+  | TableDataAddedEvent
   | TableRLSEnabledEvent

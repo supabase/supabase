@@ -1,6 +1,6 @@
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 import { describe, expect, it } from 'vitest'
-import { sqlEventParser, type TableEventDetails } from './sql-event-parser'
+import { sqlEventParser } from './sql-event-parser'
 
 describe('SQL Event Parser', () => {
   describe('CREATE TABLE detection', () => {
@@ -97,7 +97,7 @@ describe('SQL Event Parser', () => {
       const results = sqlEventParser.getTableEvents("INSERT INTO users (name) VALUES ('John')")
       expect(results).toHaveLength(1)
       expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataInserted,
+        type: TABLE_EVENT_ACTIONS.TableDataAdded,
         schema: undefined,
         tableName: 'users',
       })
@@ -109,7 +109,7 @@ describe('SQL Event Parser', () => {
       )
       expect(results).toHaveLength(1)
       expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataInserted,
+        type: TABLE_EVENT_ACTIONS.TableDataAdded,
         schema: 'public',
         tableName: 'users',
       })
@@ -119,7 +119,7 @@ describe('SQL Event Parser', () => {
       const results = sqlEventParser.getTableEvents('INSERT INTO "auth"."users" (id) VALUES (1)')
       expect(results).toHaveLength(1)
       expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataInserted,
+        type: TABLE_EVENT_ACTIONS.TableDataAdded,
         schema: 'auth',
         tableName: 'users',
       })
@@ -136,7 +136,7 @@ describe('SQL Event Parser', () => {
       const results = sqlEventParser.getTableEvents("COPY users FROM '/tmp/users.csv'")
       expect(results).toHaveLength(1)
       expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataInserted,
+        type: TABLE_EVENT_ACTIONS.TableDataAdded,
         schema: undefined,
         tableName: 'users',
       })
@@ -148,7 +148,7 @@ describe('SQL Event Parser', () => {
       )
       expect(results).toHaveLength(1)
       expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataInserted,
+        type: TABLE_EVENT_ACTIONS.TableDataAdded,
         schema: 'public',
         tableName: 'users',
       })
@@ -158,7 +158,7 @@ describe('SQL Event Parser', () => {
       const results = sqlEventParser.getTableEvents('COPY "auth"."users" FROM STDIN')
       expect(results).toHaveLength(1)
       expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataInserted,
+        type: TABLE_EVENT_ACTIONS.TableDataAdded,
         schema: 'auth',
         tableName: 'users',
       })
@@ -416,7 +416,7 @@ describe('SQL Event Parser', () => {
       expect(results[0]).toMatchObject({ tableName: 'users' })
       expect(results[1].type).toBe(TABLE_EVENT_ACTIONS.TableCreated)
       expect(results[1]).toMatchObject({ tableName: 'fake' })
-      expect(results[2].type).toBe(TABLE_EVENT_ACTIONS.TableDataInserted)
+      expect(results[2].type).toBe(TABLE_EVENT_ACTIONS.TableDataAdded)
     })
 
     it('handles SQL injection attempts safely', () => {
@@ -444,7 +444,7 @@ describe('SQL Event Parser', () => {
       expect(results).toHaveLength(3)
       expect(results.map((r) => r.type)).toEqual([
         TABLE_EVENT_ACTIONS.TableCreated,
-        TABLE_EVENT_ACTIONS.TableDataInserted,
+        TABLE_EVENT_ACTIONS.TableDataAdded,
         TABLE_EVENT_ACTIONS.TableRLSEnabled,
       ])
     })

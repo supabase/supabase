@@ -30,7 +30,7 @@ export class SQLEventParser {
       ],
     },
     {
-      type: TABLE_EVENT_ACTIONS.TableDataInserted,
+      type: TABLE_EVENT_ACTIONS.TableDataAdded,
       patterns: [
         /INSERT\s+INTO\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)/i,
         /COPY\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)\s+FROM/i,
