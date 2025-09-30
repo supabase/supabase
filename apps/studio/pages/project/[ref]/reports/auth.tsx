@@ -86,8 +86,8 @@ const AuthUsage = () => {
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const [statusCodeFilter, setStatusCodeFilter] = useQueryState(
-    'status_code',
+  const [monitoringStatusCodeFilter, setMonitoringStatusCodeFilter] = useQueryState(
+    'monitoring_status_code',
     parseAsJson(numericFilterSchema.parse)
   )
 
@@ -96,7 +96,7 @@ const AuthUsage = () => {
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
-    filters: { status_code: statusCodeFilter },
+    filters: {},
   })
 
   const errorsReportConfig = createErrorsReportConfig({
@@ -104,7 +104,7 @@ const AuthUsage = () => {
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
-    filters: { status_code: statusCodeFilter },
+    filters: { status_code: monitoringStatusCodeFilter },
   })
 
   const latencyReportConfig = createLatencyReportConfig({
@@ -112,7 +112,7 @@ const AuthUsage = () => {
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
-    filters: { status_code: statusCodeFilter },
+    filters: {},
   })
 
   const onRefreshReport = async () => {
@@ -195,15 +195,7 @@ const AuthUsage = () => {
                 </div>
               )}
             </div>
-            <div className="w-full flex items-center gap-2 flex-wrap">
-              <ReportsNumericFilter
-                label="Status Code"
-                value={statusCodeFilter}
-                onChange={setStatusCodeFilter}
-                defaultOperator="="
-                isLoading={isRefreshing}
-              />
-            </div>
+            <div className="w-full flex items-center gap-2 flex-wrap"></div>
           </div>
         }
       >
@@ -225,7 +217,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
-                  filters={{ status_code: statusCodeFilter }}
+                  filters={{}}
                   highlightActions={highlightActions}
                 />
               ))}
@@ -233,11 +225,21 @@ const AuthUsage = () => {
           </div>
 
           <div className="flex flex-col gap-4" id="monitoring">
-            <ReportSectionHeader
-              id="monitoring"
-              title="Monitoring"
-              description="Track authentication errors by status code and error type to identify issues and improve user experience."
-            />
+            <div>
+              <ReportSectionHeader
+                id="monitoring"
+                title="Monitoring"
+                description="Track authentication errors by status code and error type to identify issues and improve user experience."
+              />
+
+              <ReportsNumericFilter
+                label="Status Code"
+                value={monitoringStatusCodeFilter}
+                onChange={setMonitoringStatusCodeFilter}
+                defaultOperator="="
+                isLoading={isRefreshing}
+              />
+            </div>
             <div className="grid md:grid-cols-2 gap-4">
               {errorsReportConfig.map((metric) => (
                 <ReportChartV2
@@ -249,7 +251,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
-                  filters={{ status_code: statusCodeFilter }}
+                  filters={{ status_code: monitoringStatusCodeFilter }}
                   highlightActions={highlightActions}
                 />
               ))}
@@ -273,7 +275,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
-                  filters={{ status_code: statusCodeFilter }}
+                  filters={{}}
                   highlightActions={highlightActions}
                 />
               ))}
