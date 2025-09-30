@@ -22,6 +22,7 @@ import {
   Button,
   Card,
   CardContent,
+  cn,
   Input,
   Table,
   TableBody,
@@ -173,32 +174,36 @@ const TriggersList = ({
       {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
       {(schemaTriggers ?? []).length === 0 ? (
-        <Card>
-          <CardContent className="text-center p-12">
-            <div className="grid grid-cols-1 @lg:grid-cols-3 gap-8">
-              <div className="flex flex-col items-center">
-                <DatabaseZap strokeWidth={1.5} size={20} className="text-foreground-light" />
-                <h3 className="heading-default mt-4 mb-1">Create realtime experiences</h3>
-                <p className="text-sm text-foreground-light">
-                  Keep your application in sync by automatically updating when data changes
-                </p>
-              </div>
-              <div className="flex flex-col items-center">
-                <FunctionSquare strokeWidth={1.5} size={20} className="text-foreground-light" />
-                <h3 className="heading-default mt-4 mb-1">Trigger an edge function</h3>
-                <p className="text-sm text-foreground-light">
-                  Automatically invoke edge functions when database events occur
-                </p>
-              </div>
-              <div className="flex flex-col items-center">
-                <Shield strokeWidth={1.5} size={20} className="text-foreground-light" />
-                <h3 className="heading-default mt-4 mb-1">Data validation</h3>
-                <p className="text-sm text-foreground-light">
-                  Validate data before it is inserted into the database
-                </p>
-              </div>
+        <Card className="grid grid-cols-1 @xl:grid-cols-3 bg divide-x @container">
+          <div className="flex flex-col h-full p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <DatabaseZap strokeWidth={1.5} size={16} className="text-foreground-light" />
+              <h3 className="heading-default">Create realtime experiences</h3>
             </div>
-          </CardContent>
+            <p className="text-foreground-light text-sm flex-1">
+              Keep your application in sync by automatically updating when data changes
+            </p>
+          </div>
+
+          <div className="flex flex-col h-full p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <FunctionSquare strokeWidth={1.5} size={16} className="text-foreground-light" />
+              <h3 className="heading-default">Trigger an edge function</h3>
+            </div>
+            <p className="text-foreground-light text-sm flex-1">
+              Automatically invoke edge functions when database events occur
+            </p>
+          </div>
+
+          <div className="flex flex-col h-full p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <Shield strokeWidth={1.5} size={16} className="text-foreground-light" />
+              <h3 className="heading-default">Validate data</h3>
+            </div>
+            <p className="text-foreground-light text-sm flex-1">
+              Ensure data meets your requirements before it is inserted into the database
+            </p>
+          </div>
         </Card>
       ) : (
         <div className="w-full overflow-hidden overflow-x-auto">

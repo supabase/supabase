@@ -51,7 +51,7 @@ export const RealtimeInspector = () => {
               showSendMessage={() => setSendMessageShown(true)}
             />
           ) : (
-            <EmptyRealtime />
+            <EmptyRealtime projectRef={ref!} />
           )}
         </div>
       </div>

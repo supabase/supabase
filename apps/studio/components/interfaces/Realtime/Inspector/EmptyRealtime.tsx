@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { AiIconAnimation, Button, Card, cn } from 'ui'
 import Link from 'next/link'
 import { AnimatedCursors } from './AnimatedCursors'
@@ -7,7 +6,7 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 /**
  * Acts as a container component for the entire log display
  */
-export const EmptyRealtime = () => {
+export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
   const aiSnap = useAiAssistantStateSnapshot()
 
   const handleCreateTriggerWithAssistant = () => {
@@ -46,13 +45,13 @@ export const EmptyRealtime = () => {
               >
                 1
               </span>
-              <h3 className="heading-default">Send an event</h3>
+              <h3 className="heading-default">Broadcast messages</h3>
             </div>
             <p className="text-foreground-light text-sm mb-4 flex-1">
               Send events to a channel from your client application or database via triggers.
             </p>
             <Button type="default" className="w-full">
-              Create a trigger
+              <Link href={`/project/${projectRef}/database/triggers`}>Create a trigger</Link>
             </Button>
           </div>
 
@@ -70,7 +69,9 @@ export const EmptyRealtime = () => {
             <p className="text-foreground-light text-sm mb-4 flex-1">
               Set up Row Level Security policies to control who can see messages within a channel
             </p>
-            <Button type="default">Write a policy</Button>
+            <Button type="default">
+              <Link href={`/project/${projectRef}/realtime/policies`}>Write a policy</Link>
+            </Button>
           </div>
 
           <div className="flex flex-col h-full p-6">

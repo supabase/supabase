@@ -287,6 +287,281 @@ export const PG_BEST_PRACTICES = `
 - Use \`create or replace function\` whenever possible.
 `
 
+export const REALTIME_PROMPT = `
+# Supabase Realtime Implementation Guide
+
+## Core Rules
+
+### Do
+- Use \`broadcast\` for all realtime events (database changes via triggers, messaging, notifications, game state)
+- Use \`presence\` sparingly for user state tracking (online status, user counters)
+- Create indexes for all columns used in RLS policies
+- Use topic names that correlate with concepts and tables: \`scope:entity\` (e.g., \`room:123:messages\`)
+- Use snake_case for event names: \`entity_action\` (e.g., \`message_created\`)
+- Include unsubscribe/cleanup logic in all implementations
+- Set \`private: true\` for channels using database triggers or RLS policies
+- Prefer private channels over public channels for better security and control
+- Implement proper error handling and reconnection logic
+
+### Don't
+- Use \`postgres_changes\` for new applications (single-threaded, doesn't scale well)
+- Create multiple subscriptions without proper cleanup
+- Write complex RLS queries without proper indexing
+- Use generic event names like "update" or "change"
+- Subscribe directly in render functions without state management
+- Use database functions (\`realtime.send\`, \`realtime.broadcast_changes\`) in client code
+
+## Function Selection
+- **Custom payloads with business logic:** Use \`broadcast\`
+- **Database change notifications:** Use \`broadcast\` via database triggers
+- **High-frequency updates:** Use \`broadcast\` with minimal payload
+- **User presence/status tracking:** Use \`presence\` (sparingly)
+- **Client to client communication:** Use \`broadcast\` without triggers
+
+**Note:** Avoid \`postgres_changes\` due to scalability limitations. Use \`broadcast\` with database triggers for all database change notifications.
+
+## Naming Conventions
+
+### Topics (Channels)
+- **Pattern:** \`scope:entity\` or \`scope:entity:id\`
+- **Examples:** \`room:123:messages\`, \`game:456:moves\`, \`user:789:notifications\`
+- **One topic per room/user/organization for better performance and scalability**
+
+### Events
+- **Pattern:** \`entity_action\` (snake_case)
+- **Examples:** \`message_created\`, \`user_joined\`, \`game_ended\`, \`status_changed\`
+
+## Database Triggers
+
+### Using realtime.broadcast_changes (Recommended for database changes)
+\`\`\`sql
+CREATE OR REPLACE FUNCTION room_messages_broadcast_trigger()
+RETURNS TRIGGER AS $$
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  PERFORM realtime.broadcast_changes(
+    'room:' || COALESCE(NEW.room_id, OLD.room_id)::text,
+    TG_OP,
+    TG_OP,
+    TG_TABLE_NAME,
+    TG_TABLE_SCHEMA,
+    NEW,
+    OLD
+  );
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+CREATE TRIGGER messages_broadcast_trigger
+  AFTER INSERT OR UPDATE OR DELETE ON messages
+  FOR EACH ROW EXECUTE FUNCTION room_messages_broadcast_trigger();
+\`\`\`
+
+**Note:** \`realtime.broadcast_changes\` requires private channels by default.
+
+### Using realtime.send (For custom messages)
+\`\`\`sql
+CREATE OR REPLACE FUNCTION notify_custom_event()
+RETURNS TRIGGER AS $$
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  PERFORM realtime.send(
+    'room:' || NEW.room_id::text,
+    'status_changed',
+    jsonb_build_object('id', NEW.id, 'status', NEW.status),
+    false  -- set to true for private channels
+  );
+  RETURN NEW;
+END;
+$$;
+\`\`\`
+
+### Conditional Broadcasting
+\`\`\`sql
+-- Only broadcast significant changes
+IF TG_OP = 'UPDATE' AND OLD.status IS DISTINCT FROM NEW.status THEN
+  PERFORM realtime.broadcast_changes(
+    'room:' || NEW.room_id::text,
+    TG_OP,
+    TG_OP,
+    TG_TABLE_NAME,
+    TG_TABLE_SCHEMA,
+    NEW,
+    OLD
+  );
+END IF;
+\`\`\`
+
+## Authorization Setup
+
+### RLS Policies on realtime.messages
+
+#### Allow Users to Receive Broadcasts (SELECT)
+\`\`\`sql
+CREATE POLICY "room_members_can_read" ON realtime.messages
+FOR SELECT TO authenticated
+USING (
+  topic LIKE 'room:%' AND
+  EXISTS (
+    SELECT 1 FROM room_members
+    WHERE user_id = auth.uid()
+    AND room_id = SPLIT_PART(topic, ':', 2)::uuid
+  )
+);
+
+-- Required index for performance
+CREATE INDEX idx_room_members_user_room ON room_members(user_id, room_id);
+\`\`\`
+
+#### Allow Users to Send Broadcasts (INSERT)
+\`\`\`sql
+CREATE POLICY "room_members_can_write" ON realtime.messages
+FOR INSERT TO authenticated
+WITH CHECK (
+  topic LIKE 'room:%' AND
+  EXISTS (
+    SELECT 1 FROM room_members
+    WHERE user_id = auth.uid()
+    AND room_id = SPLIT_PART(topic, ':', 2)::uuid
+  )
+);
+\`\`\`
+
+## Client Implementation
+
+### Broadcasting from Client
+You can send broadcast messages using the Supabase client libraries:
+
+\`\`\`javascript
+const myChannel = supabase.channel('room:123:messages', {
+  config: { private: true }
+})
+
+// Sending before subscribing uses HTTP
+myChannel.send({
+  type: 'broadcast',
+  event: 'message_created',
+  payload: { message: 'Hello', user_id: 123 },
+})
+
+// Sending after subscribing uses WebSockets (recommended)
+myChannel.subscribe((status) => {
+  if (status !== 'SUBSCRIBED') return
+  
+  myChannel.send({
+    type: 'broadcast',
+    event: 'message_created',
+    payload: { message: 'Hello', user_id: 123 },
+  })
+})
+\`\`\`
+
+**Note:** Sending messages after subscribing uses WebSockets and is more efficient than HTTP for real-time communication.
+
+### React Pattern
+\`\`\`javascript
+const channelRef = useRef(null)
+
+useEffect(() => {
+  // Check if already subscribed to prevent multiple subscriptions
+  if (channelRef.current?.state === 'subscribed') return
+  
+  const channel = supabase.channel('room:123:messages', {
+    config: { private: true }
+  })
+  channelRef.current = channel
+
+  // Set auth before subscribing
+  await supabase.realtime.setAuth()
+
+  channel
+    .on('broadcast', { event: 'message_created' }, handleMessage)
+    .subscribe()
+
+  return () => {
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current)
+      channelRef.current = null
+    }
+  }
+}, [roomId])
+\`\`\`
+
+### Channel Configuration
+\`\`\`javascript
+const channel = supabase.channel('room:123:messages', {
+  config: {
+    broadcast: { self: true, ack: true },
+    presence: { key: 'user-session-id' },
+    private: true  // Required for RLS authorization
+  }
+})
+\`\`\`
+
+## Best Practices
+
+### Scalability
+- **Use dedicated, granular topics** - Messages only reach interested clients
+- **One topic per room:** \`room:123:messages\`
+- **One topic per user:** \`user:456:notifications\`
+- **Avoid broad topics** that broadcast to all users
+
+### Security
+- **Enable private-only channels** in Realtime Settings for production
+- **Always use \`private: true\`** for database-triggered channels
+- **Create separate RLS policies** for SELECT (receive) and INSERT (send) operations
+- **Index columns used in RLS policies** for performance
+
+### Performance
+- **Check channel state before subscribing** to prevent duplicate subscriptions
+- **Include cleanup logic** - Always unsubscribe when component unmounts
+- **Use \`SECURITY DEFINER\`** for trigger functions
+- **Add conditional logic** to broadcast only significant changes
+
+## Migration from postgres_changes
+
+### Replace Client Code
+\`\`\`javascript
+// ❌ Old: postgres_changes
+const oldChannel = supabase
+  .channel('changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, callback)
+
+// ✅ New: broadcast
+const newChannel = supabase
+  .channel(\`messages:\${room_id}:changes\`, { config: { private: true } })
+  .on('broadcast', { event: 'INSERT' }, callback)
+  .on('broadcast', { event: 'UPDATE' }, callback)
+  .on('broadcast', { event: 'DELETE' }, callback)
+\`\`\`
+
+### Add Database Trigger
+\`\`\`sql
+CREATE TRIGGER messages_broadcast_trigger
+  AFTER INSERT OR UPDATE OR DELETE ON messages
+  FOR EACH ROW EXECUTE FUNCTION room_messages_broadcast_trigger();
+\`\`\`
+
+### Setup Authorization
+\`\`\`sql
+CREATE POLICY "users_can_receive_broadcasts" ON realtime.messages
+  FOR SELECT TO authenticated USING (true);
+\`\`\`
+
+## Implementation Workflow
+1. Understand the use case (messaging, notifications, game state, etc.)
+2. Determine if database triggers are needed or client-only messaging
+3. Create RLS policies on \`realtime.messages\` for SELECT and INSERT
+4. If using database triggers, create trigger functions using \`realtime.broadcast_changes\` or \`realtime.send\`
+5. Add indexes for columns used in RLS policies
+6. Implement client code with proper cleanup and state management
+7. Enable private-only channels in Realtime Settings for production
+`
+
 export const GENERAL_PROMPT = `
 # Role and Objective
 Act as a Supabase Postgres expert to assist users in efficiently managing their Supabase projects.
