@@ -33,6 +33,10 @@ import {
   ReportsNumericFilter,
   numericFilterSchema,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { useQueryState, parseAsJson } from 'nuqs'
 
 const AuthReport: NextPageWithLayout = () => {
@@ -91,12 +95,48 @@ const AuthUsage = () => {
     parseAsJson(numericFilterSchema.parse)
   )
 
+  const [usageProviderFilter, setUsageProviderFilter] = useQueryState(
+    'usage_provider',
+    parseAsJson(selectFilterSchema.parse)
+  )
+
+  const providerOptions = [
+    { label: 'Email', value: 'email' },
+    { label: 'Google', value: 'google' },
+    { label: 'Apple', value: 'apple' },
+    { label: 'Phone', value: 'phone' },
+    { label: 'Discord', value: 'discord' },
+    { label: 'Azure', value: 'azure' },
+    { label: 'GitHub', value: 'github' },
+    { label: 'Kakao', value: 'kakao' },
+    { label: 'TOTP', value: 'totp' },
+    { label: 'Twitter', value: 'twitter' },
+    { label: 'SAML', value: 'saml' },
+    { label: 'Recovery', value: 'recovery' },
+    { label: 'SSO/SAML', value: 'sso/saml' },
+    { label: 'Magic Link', value: 'magiclink' },
+    { label: 'Keycloak', value: 'keycloak' },
+    { label: 'Facebook', value: 'facebook' },
+    { label: 'Twitch', value: 'twitch' },
+    { label: 'LinkedIn OIDC', value: 'linkedin_oidc' },
+    { label: 'Spotify', value: 'spotify' },
+    { label: 'Email Change', value: 'email_change' },
+    { label: 'Snapchat', value: 'snapchat' },
+    { label: 'WorkOS', value: 'workos' },
+    { label: 'Notion', value: 'notion' },
+    { label: 'Slack OIDC', value: 'slack_oidc' },
+    { label: 'Figma', value: 'figma' },
+    { label: 'GitLab', value: 'gitlab' },
+    { label: 'LinkedIn', value: 'linkedin' },
+    { label: 'Zoom', value: 'zoom' },
+  ]
+
   const usageReportConfig = createUsageReportConfig({
     projectRef: ref || '',
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
-    filters: {},
+    filters: { provider: usageProviderFilter },
   })
 
   const errorsReportConfig = createErrorsReportConfig({
@@ -201,11 +241,21 @@ const AuthUsage = () => {
       >
         <div className="mt-8 flex flex-col gap-8 pb-24">
           <div className="flex flex-col gap-4" id="usage">
-            <ReportSectionHeader
-              id="usage"
-              title="Usage"
-              description="Monitor user activity, sign-ins, sign-ups, and password reset requests to understand how users interact with your authentication system."
-            />
+            <div>
+              <ReportSectionHeader
+                id="usage"
+                title="Usage"
+                description="Monitor user activity, sign-ins, sign-ups, and password reset requests to understand how users interact with your authentication system."
+              />
+              <ReportsSelectFilter
+                label="Provider"
+                options={providerOptions}
+                value={usageProviderFilter || []}
+                onChange={setUsageProviderFilter}
+                isLoading={isRefreshing}
+                showSearch={true}
+              />
+            </div>
             <div className="grid md:grid-cols-2 gap-4">
               {usageReportConfig.map((metric) => (
                 <ReportChartV2
@@ -217,7 +267,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
-                  filters={{}}
+                  filters={{ provider: usageProviderFilter }}
                   highlightActions={highlightActions}
                 />
               ))}
