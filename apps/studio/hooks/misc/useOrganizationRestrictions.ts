@@ -6,6 +6,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useBillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useIsFeatureEnabled } from './useIsFeatureEnabled'
 
 export type WarningBannerProps = {
   type: 'danger' | 'warning' | 'note'
@@ -21,6 +22,8 @@ export function useOrganizationRestrictions() {
   const { data: organizations } = useOrganizationsQuery()
   const { data: billingCustomer } = useOrganizationCustomerProfileQuery({ slug: org?.slug })
 
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+
   const warnings: WarningBannerProps[] = []
 
   const overdueInvoicesFromOtherOrgs = overdueInvoices?.filter(
@@ -35,7 +38,8 @@ export function useOrganizationRestrictions() {
     org.plan.id !== 'free' &&
     billingCustomer &&
     !billingCustomer.address?.line1 &&
-    !org.billing_partner
+    !org.billing_partner &&
+    billingEnabled
   ) {
     warnings.push({
       type: 'warning',
