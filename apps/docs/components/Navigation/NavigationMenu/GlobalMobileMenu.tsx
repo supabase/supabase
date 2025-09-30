@@ -52,20 +52,22 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
         >
           {section[0].menuItems?.map((menuItem, menuItemIndex) => (
             <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
-              {menuItem.map((item) =>
-                !item.href ? (
-                  <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
-                    {item.label}
-                  </div>
-                ) : (
-                  <MenuItem
-                    href={item.href}
-                    title={item.label}
-                    community={item.community}
-                    icon={item.icon}
-                  />
-                )
-              )}
+              {menuItem
+                .filter((item) => item.enabled !== false)
+                .map((item) =>
+                  !item.href ? (
+                    <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
+                      {item.label}
+                    </div>
+                  ) : (
+                    <MenuItem
+                      href={item.href}
+                      title={item.label}
+                      community={item.community}
+                      icon={item.icon}
+                    />
+                  )
+                )}
             </Fragment>
           ))}
         </Accordion.Item>
@@ -90,7 +92,7 @@ const Menu = () => (
     justified
     chevronAlign="right"
   >
-    {GLOBAL_MENU_ITEMS.map((section) => (
+    {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section) => (
       <AccordionMenuItem section={section} />
     ))}
   </Accordion>
