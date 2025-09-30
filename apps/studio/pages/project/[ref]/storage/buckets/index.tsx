@@ -1,4 +1,7 @@
+import { useFlag } from 'common'
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -13,13 +16,21 @@ import type { NextPageWithLayout } from 'types'
  * PageLayout is used to setup layout - as usual it will requires inject global store
  */
 const PageLayout: NextPageWithLayout = () => {
+  const isStorageV2 = useFlag('storageAnalyticsVector')
   const { ref } = useParams()
+  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { error, isError } = useBucketsQuery({ projectRef: ref })
 
+  useEffect(() => {
+    if (isStorageV2) {
+      router.replace(`/project/${ref}/storage/media`)
+    }
+  }, [isStorageV2, ref, router])
+
   if (!project) return null
 
-  if (isError) <StorageBucketsError error={error as any} />
+  if (isError) return <StorageBucketsError error={error as any} />
 
   return (
     <div className="storage-container flex flex-grow">
