@@ -166,8 +166,6 @@ export function useFlag<T = boolean>(name: string) {
 
   const store = flagStore.configcat
 
-  if (name === 'storageAnalyticsVector') return true
-
   if (!isObjectEmpty(store) && store[name] === undefined) {
     console.error(`Flag key "${name}" does not exist in ConfigCat flag store`)
     return false
