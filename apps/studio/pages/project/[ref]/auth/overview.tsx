@@ -8,8 +8,26 @@ import { DOCS_URL } from 'lib/constants'
 import { OverviewMonitoring } from 'components/interfaces/Auth/Overview/OverviewMonitoring'
 import { OverviewUsage } from 'components/interfaces/Auth/Overview/OverviewUsage'
 import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
+import { useRouter } from 'next/router'
+import { useFlag, useParams } from 'common'
+import { useEffect } from 'react'
 
 const AuthOverview: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { ref } = useParams()
+  const authOverviewPageEnabled = useFlag('authOverviewPage')
+
+  useEffect(() => {
+    if (!authOverviewPageEnabled) {
+      router.push(`/project/${ref}/auth/users`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authOverviewPageEnabled, router, ref])
+
+  if (!authOverviewPageEnabled) {
+    return null
+  }
+
   return (
     <ScaffoldContainer size="large">
       <ScaffoldSection isFullWidth>
