@@ -81,9 +81,7 @@ Previously you could only use the full text search operator on `tsvector` column
 <$CodeTabs>
 
 ```js name=JavaScript
-const { data, error } = await supabase
-  .from('titles')
-  .textSearch('primary_name', `'god' & 'father'`)
+const { data, error } = await supabase.from('titles').textSearch('primary_name', `'god' & 'father'`)
 ```
 
 ```bash name=Bash
