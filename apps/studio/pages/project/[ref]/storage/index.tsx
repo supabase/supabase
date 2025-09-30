@@ -1,16 +1,16 @@
-import { useFlag } from 'common'
 import { useParams } from 'common'
+import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import type { NextPageWithLayout } from 'types'
 
 const Storage: NextPageWithLayout = () => {
-  const isStorageV2 = useFlag('storageAnalyticsVector')
   const { ref } = useParams()
   const router = useRouter()
+  const isStorageV2 = useIsNewStorageUIEnabled()
 
   useEffect(() => {
     if (isStorageV2) {
@@ -20,7 +20,7 @@ const Storage: NextPageWithLayout = () => {
     }
   }, [isStorageV2, ref, router])
 
-  return null // Will redirect, so return nothing
+  return null
 }
 
 Storage.getLayout = (page) => (

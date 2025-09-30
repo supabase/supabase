@@ -14,6 +14,7 @@ import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { InlineEditorPreview } from './InlineEditorPreview'
+import { NewStorageUIPreview } from './NewStorageUIPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
@@ -25,6 +26,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]: <NewStorageUIPreview />,
 }
 
 const FeaturePreviewModal = () => {

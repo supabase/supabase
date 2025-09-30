@@ -1,25 +1,22 @@
-import { useFlag } from 'common'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
-/**
- * PageLayout is used to setup layout - as usual it will requires inject global store
- */
 const PageLayout: NextPageWithLayout = () => {
-  const isStorageV2 = useFlag('storageAnalyticsVector')
   const { ref } = useParams()
   const router = useRouter()
+  const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
   const { error, isError } = useBucketsQuery({ projectRef: ref })
 

@@ -1,28 +1,26 @@
-import { useFlag } from 'common'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { BUCKET_TYPES, DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { BUCKET_TYPES, DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
-import type { NextPageWithLayout } from 'types'
 import { DocsButton } from 'components/ui/DocsButton'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import type { NextPageWithLayout } from 'types'
 
 const BucketTypePage: NextPageWithLayout = () => {
-  const isStorageV2 = useFlag('storageAnalyticsVector')
-  const { bucketType, ref } = useParams()
   const router = useRouter()
-
-  useEffect(() => {
-    if (!isStorageV2) {
-      router.replace(`/project/${ref}/storage`)
-    }
-  }, [isStorageV2, ref, router])
+  const { bucketType, ref } = useParams()
+  const isStorageV2 = useIsNewStorageUIEnabled()
 
   const bucketTypeKey = bucketType || DEFAULT_BUCKET_TYPE
   const config = BUCKET_TYPES[bucketTypeKey as keyof typeof BUCKET_TYPES]
+
+  useEffect(() => {
+    if (!isStorageV2) router.replace(`/project/${ref}/storage`)
+  }, [isStorageV2, ref])
 
   useEffect(() => {
     if (!config) {

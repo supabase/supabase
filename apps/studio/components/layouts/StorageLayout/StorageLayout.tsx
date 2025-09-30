@@ -1,7 +1,6 @@
 import { ReactNode } from 'react'
 
-import { useFlag } from 'common'
-
+import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import StorageMenu from 'components/interfaces/Storage/StorageMenu'
 import StorageMenuV2 from 'components/interfaces/Storage/StorageMenuV2'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -13,7 +12,7 @@ export interface StorageLayoutProps {
 }
 
 const StorageLayout = ({ title, children }: StorageLayoutProps) => {
-  const isStorageV2 = useFlag('storageAnalyticsVector')
+  const isStorageV2 = useIsNewStorageUIEnabled()
 
   return (
     <ProjectLayout
