@@ -447,7 +447,10 @@ const DeployNewReplicaPanel = ({
                   />
                 )}
               >
-                {region.name}
+                <p className="flex items-center gap-x-2">
+                  <span>{region.name}</span>
+                  <span className="text-xs text-foreground-lighter font-mono">{region.region}</span>
+                </p>
               </Listbox.Option>
             ))}
           </Listbox>

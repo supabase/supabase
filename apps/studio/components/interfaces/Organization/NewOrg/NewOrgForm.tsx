@@ -14,6 +14,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
+import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -571,9 +572,9 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
 
       <ConfirmationModal
         size="large"
-        loading={false}
+        loading={newOrgLoading}
         visible={isOrgCreationConfirmationModalVisible}
-        title={<>Confirm organization creation</>}
+        title="Confirm organization creation"
         confirmLabel="Create new organization"
         onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
         onConfirm={async () => {
@@ -584,13 +585,9 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       >
         <p className="text-sm text-foreground-light">
           Supabase{' '}
-          <Link
-            className="underline"
-            href="/docs/guides/platform/billing-on-supabase"
-            target="_blank"
-          >
+          <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
             bills per organization
-          </Link>
+          </InlineLink>
           . If you want to upgrade your existing projects, upgrade your existing organization
           instead.
         </p>
@@ -613,7 +610,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
                   </div>
                   <div className="text-foreground-light text-xs">
                     {orgProjects.length <= 2 ? (
-                      <span>{orgProjects.join('and ')}</span>
+                      <span>{orgProjects.join(' and ')}</span>
                     ) : (
                       <div>
                         {orgProjects.slice(0, 2).join(', ')} and{' '}
