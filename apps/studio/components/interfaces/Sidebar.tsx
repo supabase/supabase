@@ -45,6 +45,7 @@ import {
   useIsAPIDocsSidePanelEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
+import { useFlag } from 'common'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -240,12 +241,15 @@ const ProjectLinks = () => {
     'realtime:all',
   ])
 
+  const authOverviewPageEnabled = useFlag('authOverviewPage')
+
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
+    authOverviewPage: authOverviewPageEnabled,
   })
 
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
