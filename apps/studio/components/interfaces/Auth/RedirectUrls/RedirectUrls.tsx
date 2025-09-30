@@ -7,21 +7,13 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { DOCS_URL } from 'lib/constants'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Modal,
-  ScrollArea,
-  WarningIcon,
-  cn,
-} from 'ui'
+import { Button, Modal, ScrollArea, cn } from 'ui'
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
@@ -98,11 +90,7 @@ export const RedirectUrls = () => {
       )}
 
       {isError && (
-        <Alert_Shadcn_ variant="destructive">
-          <WarningIcon />
-          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
       )}
 
       {isSuccess && (
