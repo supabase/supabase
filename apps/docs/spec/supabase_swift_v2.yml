@@ -11,7 +11,7 @@ info:
   slugPrefix: '/'
   libraries:
     - id: 'Swift'
-      version: '2.0.0'
+      version: '2.33.2'
 
 functions:
   - id: initializing
@@ -75,6 +75,24 @@ functions:
             )
           )
           ```
+      - id: initialize-client-with-oslog
+        name: Initialize Client with OSLog
+        code: |
+          ```swift
+          import Supabase
+
+          let supabase = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+            supabaseKey: "publishable-or-anon-key",
+            options: SupabaseClientOptions(
+              global: SupabaseClientOptions.GlobalOptions(
+                logger: OSLogSupabaseLogger()
+              )
+            )
+          )
+          ```
+        description: |
+          OSLogSupabaseLogger provides native integration with Apple's unified logging system (OSLog). Available on macOS 11.0+, iOS 14.0+, tvOS 14.0+, and watchOS 7.0+.
       - id: api-schemas
         name: With custom schemas
         code: |
@@ -931,6 +949,21 @@ functions:
             // custom URL opening logic
           }
           ```
+      - id: link-identity-with-id-token
+        name: Link an identity using ID token
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentityWithIdToken(
+            credentials: OpenIDConnectCredentials(
+              provider: .apple,
+              idToken: "your-id-token",
+              nonce: "your-nonce"
+            )
+          )
+          ```
+        description: |
+          Link an OAuth identity to the currently signed-in user using an OpenID Connect ID token. This is useful for native Sign In With Apple or other OIDC providers.
   - id: unlink-identity
     title: 'unlinkIdentity()'
     notes: |
@@ -2307,6 +2340,19 @@ functions:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           working with JSON data. Currently, it is only possible to update the entire JSON document.
         hideCodeBlock: true
+      - id: update-with-max-affected
+        name: Limit affected rows
+        code: |
+          ```swift
+          try await supabase
+            .from("instruments")
+            .update(["status": "archived"])
+            .eq("section_id", value: sectionId)
+            .maxAffected(10)
+            .execute()
+          ```
+        description: |
+          Use `maxAffected()` to set a maximum number of rows that can be affected by an update operation. If the operation would affect more rows than specified, it will fail with an error. This is useful for preventing accidental bulk updates.
 
   - id: upsert
     title: 'Upsert data: upsert()'
@@ -2499,6 +2545,19 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: delete-with-max-affected
+        name: Limit deleted rows
+        code: |
+          ```swift
+          try await supabase
+            .from("instruments")
+            .delete()
+            .eq("section_id", value: sectionId)
+            .maxAffected(5)
+            .execute()
+          ```
+        description: |
+          Use `maxAffected()` to set a maximum number of rows that can be deleted. If the operation would affect more rows than specified, it will fail with an error. This is useful for preventing accidental bulk deletions.
 
   - id: rpc
     title: 'Postgres functions: rpc()'
