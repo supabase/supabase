@@ -8,10 +8,14 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
+import { useFlag } from 'common'
 
 const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
+
+  const isAuthOverviewPage = useFlag('authOverviewPage')
+  console.log('isAuthOverviewPage', isAuthOverviewPage)
 
   const {
     authenticationSignInProviders,
@@ -42,6 +46,7 @@ const AuthProductMenu = () => {
         authenticationMultiFactor,
         authenticationAttackProtection,
         authenticationAdvanced,
+        authenticationShowOverview: isAuthOverviewPage,
       })}
     />
   )
