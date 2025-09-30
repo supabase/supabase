@@ -6076,6 +6076,98 @@ functions:
           }
           ```
         hideCodeBlock: true
+  - id: max-affected
+    title: max_affected()
+    description: |
+      Set the maximum number of rows that can be affected by an update or delete operation.
+      If the query would affect more rows than the specified limit, the operation will fail with an error.
+
+      This uses PostgREST's `Prefer: max-affected` header with `handling=strict`.
+    notes: |
+      - Only available in PostgREST v13+
+      - Only works with PATCH (update) and DELETE methods
+      - The operation will fail if it would affect more rows than specified
+    params:
+      - name: value
+        isOptional: false
+        type: int
+        description: The maximum number of rows that can be affected
+    examples:
+      - id: with-update
+        name: Limit affected rows on update
+        code: |
+          ```python
+          response = (
+              supabase.table("planets")
+              .update({"name": "Updated"})
+              .eq("id", 1)
+              .max_affected(1)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              planets (id int8 primary key, name text);
+
+            insert into
+              planets (id, name)
+            values
+              (1, 'Mercury'),
+              (2, 'Earth');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Updated"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: with-delete
+        name: Limit affected rows on delete
+        code: |
+          ```python
+          response = (
+              supabase.table("planets")
+              .delete()
+              .eq("id", 1)
+              .max_affected(1)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              planets (id int8 primary key, name text);
+
+            insert into
+              planets (id, name)
+            values
+              (1, 'Mercury'),
+              (2, 'Earth');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Mercury"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
   - id: using-modifiers
     title: Using Modifiers
     description: |
