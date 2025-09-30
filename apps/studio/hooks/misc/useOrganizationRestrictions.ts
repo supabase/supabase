@@ -22,9 +22,12 @@ export function useOrganizationRestrictions() {
   const { data: organizations } = useOrganizationsQuery()
   const { data: billingCustomer } = useOrganizationCustomerProfileQuery({ slug: org?.slug })
 
-  const billingEnabled = useIsFeatureEnabled('billing:all')
-
   const warnings: WarningBannerProps[] = []
+
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+  if (!billingEnabled) {
+    return { warnings, org }
+  }
 
   const overdueInvoicesFromOtherOrgs = overdueInvoices?.filter(
     (invoice) => invoice.organization_id !== org?.id
@@ -38,8 +41,7 @@ export function useOrganizationRestrictions() {
     org.plan.id !== 'free' &&
     billingCustomer &&
     !billingCustomer.address?.line1 &&
-    !org.billing_partner &&
-    billingEnabled
+    !org.billing_partner
   ) {
     warnings.push({
       type: 'warning',
