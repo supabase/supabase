@@ -51,13 +51,6 @@ const { data, error } = await supabase.from('titles').select(`
   ...people(actors:primary_name),
   ...genres(genres:name)
 `)
-
-// To get typechecking for this feature, you need to create the supabase client like on the following snippet
-// This is only available starting from supabase-js version 2.56.0
-import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(''https://<your-domain>', '<YOUR_KEY>', {
-  PostgrestVersion: '13'
-})
 ```
 
 ```bash name=Bash
@@ -129,7 +122,7 @@ const { data, error } = await supabase
   .eq('nconst', 'nm0000008')
   .maxAffected(1)
 
-// This is only available starting from supabase-js version 2.56.0
+// This is available starting from supabase-js version 2.56.0
 ```
 
 ```bash name=Bash
@@ -151,7 +144,7 @@ try await supabase
   .maxAffected(1)
   .execute()
 
-// This is only available starting from supabase-swift version 2.33.0
+// This is available starting from supabase-swift version 2.33.0
 ```
 
 </$CodeTabs>
