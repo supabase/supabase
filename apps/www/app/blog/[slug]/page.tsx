@@ -39,7 +39,7 @@ async function getCMSPostFromAPI(
     const response = await fetch(url.toString(), fetchOptions)
 
     if (!response.ok) {
-      console.error('[getCMSPostFromAPI] Non-OK response:', response.status)
+      console.warn('[getCMSPostFromAPI] Non-OK response:', response.status)
       return null
     }
 
@@ -47,7 +47,7 @@ async function getCMSPostFromAPI(
 
     return data.success ? data.post : null
   } catch (error) {
-    console.error('[getCMSPostFromAPI] Error:', error)
+    console.warn('[getCMSPostFromAPI] Error:', error)
     return null
   }
 }
@@ -295,7 +295,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   try {
     processedContent = await processCMSContent(cmsPost.richContent || cmsPost.content, tocDepth)
   } catch (error) {
-    console.error('Error processing CMS content, falling back to legacy processing:', error)
+    console.warn('Error processing CMS content, falling back to legacy processing:', error)
     // Fallback to legacy processing
     const mdxSource = await mdxSerialize(cmsPost.content || '', { tocDepth })
     processedContent = {
