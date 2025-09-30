@@ -109,6 +109,18 @@ export const useRealtimeCursors = ({
     channelRef.current = channel
 
     channel
+      .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+        leftPresences.forEach(function(element) {
+           // Remove cursor when user leaves
+          setCursors((prev) => {
+            if (prev[element.key]) {
+              delete prev[element.key]
+            }
+
+            return {...prev}
+          })
+        })
+      })
       .on('presence', { event: 'join' }, () => {
         if (!cursorPayload.current) return
 
@@ -134,7 +146,11 @@ export const useRealtimeCursors = ({
           }
         })
       })
-      .subscribe()
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          const status = await channel.track({ key: userId, color: color })
+        }
+      })
 
     return () => {
       channel.unsubscribe()
