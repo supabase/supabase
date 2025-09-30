@@ -61,11 +61,6 @@ export const CONTEXT_MENU_KEYS = {
 }
 
 // New bucket types configuration
-export interface BucketTypeConfig {
-  displayName: string
-  description: string
-  docsUrl: string
-}
 
 export const BUCKET_TYPES = {
   media: {
@@ -83,7 +78,7 @@ export const BUCKET_TYPES = {
     description: 'Purpose-built storage for vector data.',
     docsUrl: `${DOCS_URL}/guides/storage/vectors`,
   },
-} as const satisfies Record<string, BucketTypeConfig>
+}
 
 export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
 export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'media'

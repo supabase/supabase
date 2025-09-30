@@ -1,13 +1,11 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
 import { useParams } from 'common'
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BUCKET_TYPES, DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { BucketTypeLayout } from 'components/layouts/StorageLayout/BucketLayout'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const BucketTypePage: NextPageWithLayout = () => {
@@ -38,27 +36,7 @@ const BucketTypePage: NextPageWithLayout = () => {
 }
 
 BucketTypePage.getLayout = (page) => {
-  // We need to get the bucketType from the router since it's not available in page.props
-  const BucketTypeLayout = () => {
-    const { bucketType } = useParams()
-    const bucketTypeKey = bucketType || DEFAULT_BUCKET_TYPE
-    const config = BUCKET_TYPES[bucketTypeKey as keyof typeof BUCKET_TYPES]
-
-    return (
-      <DefaultLayout>
-        <StorageLayout title="Storage">
-          <PageLayout
-            title={`${config?.displayName || 'Storage'} Buckets`}
-            subtitle={config?.description || 'Manage your storage buckets and files.'}
-          >
-            <ScaffoldContainer>{page}</ScaffoldContainer>
-          </PageLayout>
-        </StorageLayout>
-      </DefaultLayout>
-    )
-  }
-
-  return <BucketTypeLayout />
+  return <BucketTypeLayout>{page}</BucketTypeLayout>
 }
 
 export default BucketTypePage

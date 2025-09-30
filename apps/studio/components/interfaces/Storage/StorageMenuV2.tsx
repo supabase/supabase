@@ -1,9 +1,9 @@
-import Link from 'next/link'
 import { useParams } from 'common'
+import Link from 'next/link'
 import { Menu } from 'ui'
 import { BUCKET_TYPES, BUCKET_TYPE_KEYS, DEFAULT_BUCKET_TYPE } from './Storage.constants'
 
-const StorageMenuV2 = () => {
+export const StorageMenuV2 = () => {
   const { ref, bucketType } = useParams()
   const selectedBucketType = bucketType || DEFAULT_BUCKET_TYPE
 
@@ -12,12 +12,12 @@ const StorageMenuV2 = () => {
       <div className="mx-3">
         <Menu.Group title={<span className="uppercase font-mono">Bucket Types</span>} />
 
-        {BUCKET_TYPE_KEYS.map((bucketTypeKey, idx: number) => {
+        {BUCKET_TYPE_KEYS.map((bucketTypeKey) => {
           const isSelected = selectedBucketType === bucketTypeKey
           const config = BUCKET_TYPES[bucketTypeKey]
 
           return (
-            <Link key={`${idx}_${bucketTypeKey}`} href={`/project/${ref}/storage/${bucketTypeKey}`}>
+            <Link key={bucketTypeKey} href={`/project/${ref}/storage/${bucketTypeKey}`}>
               <Menu.Item rounded active={isSelected}>
                 <p className="truncate">{config.displayName}</p>
               </Menu.Item>
@@ -28,5 +28,3 @@ const StorageMenuV2 = () => {
     </Menu>
   )
 }
-
-export default StorageMenuV2

@@ -1,10 +1,11 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
 import { useParams } from 'common'
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const Storage: NextPageWithLayout = () => {
