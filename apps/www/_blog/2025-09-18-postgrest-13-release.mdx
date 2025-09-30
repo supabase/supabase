@@ -91,7 +91,6 @@ Previously you could only use the full text search operator on `tsvector` column
 const { data, error } = await supabase
   .from('titles')
   .textSearch('primary_name', `'god' & 'father'`)
-`)
 ```
 
 ```bash name=Bash
@@ -185,23 +184,6 @@ Proxy-Status: PostgREST; error=PGRST116
 You can check the `Proxy-Status` and `Content-Length` headers in the Supabase Logs Explorer.
 
 ## Breaking Changes
-
-### Limited Update/Delete
-
-Previously on v12, you could limit the updated or deleted affected rows with a combination of the `limit()` and `order()` methods.
-
-```js
-const { data, error } = await supabase
-  .from('people')
-  .update({ primary_name: 'Marlon Brando Jr.' })
-  .eq('primary_name', 'Marlon Brando')
-  .limit(1)
-  .order('nconst')
-```
-
-But this never gave an error, it only did the equivalent of a `UPDATE .. LIMIT` SQL statement. It also required adding a PK in the `order` method, which was a confusing interface.
-
-To do this now, you should use the new `Max Affected` instead.
 
 ### JWT `kid` validation
 
