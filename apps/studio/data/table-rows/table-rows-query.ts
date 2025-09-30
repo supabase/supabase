@@ -35,7 +35,9 @@ export interface GetTableRowsArgs {
 const getDefaultOrderByColumns = (table: SupaTable) => {
   const primaryKeyColumns = table.columns.filter((col) => col?.isPrimaryKey).map((col) => col.name)
   if (primaryKeyColumns.length === 0) {
-    return [table.columns[0]?.name]
+    const eligibleColumnsForSorting = table.columns.filter((x) => !x.dataType.includes('json'))
+    if (eligibleColumnsForSorting.length > 0) return [eligibleColumnsForSorting[0]?.name]
+    else return []
   } else {
     return primaryKeyColumns
   }
@@ -54,7 +56,8 @@ export async function executeWithRetry<T>(
     try {
       return await fn()
     } catch (error: any) {
-      if (error?.status === 429 && attempt < maxRetries) {
+      // Our custom ResponseError's use 'code' instead of 'status'
+      if ((error?.status ?? error?.code) === 429 && attempt < maxRetries) {
         // Get retry delay from headers or use exponential backoff (1s, then 2s, then 4s)
         const retryAfter = error.headers?.get('retry-after')
         const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : baseDelay * Math.pow(2, attempt)
@@ -236,9 +239,7 @@ export async function getTableRows(
 
     return { rows }
   } catch (error) {
-    throw new Error(
-      `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
+    throw new Error(error instanceof Error ? error.message : 'Unknown error')
   }
 }
 

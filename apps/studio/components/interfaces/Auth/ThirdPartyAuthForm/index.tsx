@@ -18,6 +18,7 @@ import {
   useThirdPartyAuthIntegrationsQuery,
 } from 'data/third-party-auth/integrations-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
@@ -73,14 +74,16 @@ export const ThirdPartyAuthForm = () => {
             <br />
             Billing is based on the number of monthly active users (MAUs) requesting your API
             throughout the billing period. Refer to our{' '}
-            <InlineLink href="https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users-third-party">
+            <InlineLink
+              href={`${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}
+            >
               billing docs
             </InlineLink>{' '}
             for more information.
           </ScaffoldSectionDescription>
         </div>
         <div className="flex items-center gap-2 ">
-          <DocsButton href="https://supabase.com/docs/guides/auth/third-party/overview" />
+          <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
           {integrations.length !== 0 && (
             <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
           )}

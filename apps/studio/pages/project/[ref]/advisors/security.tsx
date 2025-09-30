@@ -6,12 +6,13 @@ import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
-import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
+import { LinterPageFooter } from 'components/interfaces/Linter/LinterPageFooter'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
 
@@ -62,7 +63,7 @@ const ProjectLints: NextPageWithLayout = () => {
       <FormHeader
         className="py-4 px-6 !mb-0"
         title="Security Advisor"
-        docsUrl="https://supabase.com/docs/guides/database/database-linter"
+        docsUrl={`${DOCS_URL}/guides/database/database-linter`}
       />
       <LintPageTabs
         activeLints={activeLints}

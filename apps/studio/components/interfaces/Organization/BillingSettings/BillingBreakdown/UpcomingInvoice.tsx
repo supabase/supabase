@@ -2,70 +2,50 @@ import Link from 'next/link'
 
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import {
   UpcomingInvoiceResponse,
   useOrgUpcomingInvoiceQuery,
 } from 'data/invoices/org-invoice-upcoming-query'
+import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
-import { billingMetricUnit, formatUsage } from '../helpers'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import _ from 'lodash'
 import React from 'react'
+import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { billingMetricUnit, formatUsage } from '../helpers'
 
 export interface UpcomingInvoiceProps {
   slug?: string
 }
 
 const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
-  [PricingMetric.MONTHLY_ACTIVE_USERS]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users',
-  [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users-sso',
-  [PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users-third-party',
-  [PricingMetric.AUTH_MFA_PHONE]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/advanced-mfa-phone',
+  [PricingMetric.MONTHLY_ACTIVE_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users`,
+  [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-sso`,
+  [PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`,
+  [PricingMetric.AUTH_MFA_PHONE]: `${DOCS_URL}/guides/platform/manage-your-usage/advanced-mfa-phone`,
 
-  [PricingMetric.EGRESS]: 'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
-  [PricingMetric.CACHED_EGRESS]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
+  [PricingMetric.EGRESS]: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
+  [PricingMetric.CACHED_EGRESS]: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
 
-  [PricingMetric.FUNCTION_INVOCATIONS]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/edge-function-invocations',
+  [PricingMetric.FUNCTION_INVOCATIONS]: `${DOCS_URL}/guides/platform/manage-your-usage/edge-function-invocations`,
 
-  [PricingMetric.STORAGE_SIZE]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/storage-size',
-  [PricingMetric.STORAGE_IMAGES_TRANSFORMED]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/storage-image-transformations',
+  [PricingMetric.STORAGE_SIZE]: `${DOCS_URL}/guides/platform/manage-your-usage/storage-size`,
+  [PricingMetric.STORAGE_IMAGES_TRANSFORMED]: `${DOCS_URL}/guides/platform/manage-your-usage/storage-image-transformations`,
 
-  [PricingMetric.REALTIME_MESSAGE_COUNT]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/realtime-messages',
-  [PricingMetric.REALTIME_PEAK_CONNECTIONS]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/realtime-peak-connections',
+  [PricingMetric.REALTIME_MESSAGE_COUNT]: `${DOCS_URL}/guides/platform/manage-your-usage/realtime-messages`,
+  [PricingMetric.REALTIME_PEAK_CONNECTIONS]: `${DOCS_URL}/guides/platform/manage-your-usage/realtime-peak-connections`,
 
-  [PricingMetric.CUSTOM_DOMAIN]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/custom-domains',
-  [PricingMetric.IPV4]: 'https://supabase.com/docs/guides/platform/manage-your-usage/ipv4',
-  [PricingMetric.PITR_7]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/point-in-time-recovery',
-  [PricingMetric.PITR_14]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/point-in-time-recovery',
-  [PricingMetric.PITR_28]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/point-in-time-recovery',
-  [PricingMetric.DISK_SIZE_GB_HOURS_GP3]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
-  [PricingMetric.DISK_SIZE_GB_HOURS_IO2]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
-  [PricingMetric.DISK_IOPS_GP3]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/disk-iops',
-  [PricingMetric.DISK_IOPS_IO2]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/disk-iops',
-  [PricingMetric.DISK_THROUGHPUT_GP3]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/disk-throughput',
-  [PricingMetric.LOG_DRAIN]:
-    'https://supabase.com/docs/guides/platform/manage-your-usage/log-drains',
+  [PricingMetric.CUSTOM_DOMAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/custom-domains`,
+  [PricingMetric.IPV4]: `${DOCS_URL}/guides/platform/manage-your-usage/ipv4`,
+  [PricingMetric.PITR_7]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
+  [PricingMetric.PITR_14]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
+  [PricingMetric.PITR_28]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
+  [PricingMetric.DISK_SIZE_GB_HOURS_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
+  [PricingMetric.DISK_SIZE_GB_HOURS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
+  [PricingMetric.DISK_IOPS_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
+  [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
+  [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
+  [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
 }
 
 const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
@@ -147,7 +127,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       compute costs starting at <span translate="no">$10</span>/month, independent
                       of activity. See{' '}
                       <Link
-                        href={'https://supabase.com/docs/guides/platform/manage-your-usage/compute'}
+                        href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                         target="_blank"
                       >
                         docs
@@ -167,9 +147,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       Compute, Disk Size, provisioned Disk IOPS, provisioned Disk Throughput, and
                       IPv4. See{' '}
                       <Link
-                        href={
-                          'https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas'
-                        }
+                        href={`${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`}
                         target="_blank"
                       >
                         docs
@@ -200,9 +178,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                             See{' '}
                             <Link
                               className="underline"
-                              href={
-                                'https://supabase.com/docs/guides/platform/manage-your-usage/branching'
-                              }
+                              href={`${DOCS_URL}/guides/platform/manage-your-usage/branching`}
                               target="_blank"
                             >
                               docs

@@ -16,6 +16,6 @@ export interface TestOptions {
 
 export const test = base.extend<TestOptions>({
   env: env.STUDIO_URL,
-  ref: env.PROJECT_REF,
+  ref: 'default',
   apiUrl: env.API_URL,
 })

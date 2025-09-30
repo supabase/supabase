@@ -56,7 +56,7 @@
     "supabase": "^1.151.1",
     "supports-color": "^8.0.0",
     "turbo": "2.3.3",
-    "typescript": "~5.5.0"
+    "typescript": "catalog:"
   },
   "repository": {
     "type": "git",
@@ -74,9 +74,9 @@
     "neverBuiltDependencies": ["libpg-query"]
   },
   "engines": {
-    "pnpm": ">=9",
+    "pnpm": ">=10.16",
     "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@9.15.5"
+  "packageManager": "pnpm@10.16.1"
 }

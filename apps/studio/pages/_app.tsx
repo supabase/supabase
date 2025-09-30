@@ -32,6 +32,7 @@ import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+
 import {
   FeatureFlagProvider,
   getFlags,

@@ -14,15 +14,14 @@ export const QUERY_PERFORMANCE_PRESET_MAP = {
 
 export const QUERY_PERFORMANCE_COLUMNS = [
   { id: 'query', name: 'Query', description: undefined, minWidth: 500 },
-  { id: 'prop_total_time', name: 'Time consumed', description: undefined, minWidth: 130 },
-  { id: 'total_time', name: 'Total time', description: 'latency', minWidth: 150 },
+  { id: 'prop_total_time', name: 'Time consumed', description: undefined, minWidth: 150 },
   { id: 'calls', name: 'Count', description: undefined, minWidth: 100 },
   { id: 'max_time', name: 'Max time', description: undefined, minWidth: 100 },
   { id: 'mean_time', name: 'Mean time', description: undefined, minWidth: 100 },
   { id: 'min_time', name: 'Min time', description: undefined, minWidth: 100 },
-  { id: 'rows_read', name: 'Rows read', description: undefined, minWidth: 100 },
+  { id: 'rows_read', name: 'Rows processed', description: undefined, minWidth: 130 },
   { id: 'cache_hit_rate', name: 'Cache hit rate', description: undefined, minWidth: 130 },
-  { id: 'rolname', name: 'Role', description: undefined, minWidth: 160 },
+  { id: 'rolname', name: 'Role', description: undefined, minWidth: 200 },
 ] as const
 
 export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
@@ -62,5 +61,10 @@ export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
     name: 'supabase_admin',
     description:
       'An internal role Supabase uses for administrative tasks, such as running upgrades and automations.',
+  },
+  {
+    name: 'pgbouncer',
+    description:
+      'PgBouncer is a lightweight connection pooler for PostgreSQL. Available on paid plans only.',
   },
 ] as const

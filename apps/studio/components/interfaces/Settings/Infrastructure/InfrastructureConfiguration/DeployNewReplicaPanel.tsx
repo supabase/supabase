@@ -26,7 +26,7 @@ import {
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import { AWS_REGIONS_DEFAULT, BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
@@ -259,7 +259,7 @@ const DeployNewReplicaPanel = ({
               <DocsButton
                 abbrev={false}
                 className="mt-3"
-                href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                href={`${DOCS_URL}/guides/platform/read-replicas#prerequisites`}
               />
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
@@ -322,7 +322,7 @@ const DeployNewReplicaPanel = ({
                 </Button>
                 <DocsButton
                   abbrev={false}
-                  href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                  href={`${DOCS_URL}/guides/platform/read-replicas#prerequisites`}
                 />
               </div>
             </AlertDescription_Shadcn_>
@@ -363,7 +363,7 @@ const DeployNewReplicaPanel = ({
                 </Button>
                 <DocsButton
                   abbrev={false}
-                  href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
+                  href={`${DOCS_URL}/guides/platform/read-replicas#how-are-read-replicas-made`}
                 />
               </AlertDescription_Shadcn_>
             )}
@@ -447,7 +447,10 @@ const DeployNewReplicaPanel = ({
                   />
                 )}
               >
-                {region.name}
+                <p className="flex items-center gap-x-2">
+                  <span>{region.name}</span>
+                  <span className="text-xs text-foreground-lighter font-mono">{region.region}</span>
+                </p>
               </Listbox.Option>
             ))}
           </Listbox>
@@ -541,7 +544,7 @@ const DeployNewReplicaPanel = ({
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas"
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`}
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"

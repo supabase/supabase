@@ -30,7 +30,7 @@ import { THRESHOLD_COUNT } from 'data/table-rows/table-rows-count-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { isAtBottom } from 'lib/helpers'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   Button,
   cn,
@@ -317,7 +317,7 @@ export const UsersV2 = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.code === 'Enter') {
+                    if (e.code === 'Enter' || e.code === 'NumpadEnter') {
                       setSearch(search.trim())
                       setFilterKeywords(search.trim().toLocaleLowerCase())
                     }
@@ -680,10 +680,14 @@ export const UsersV2 = () => {
       <DeleteUserModal
         visible={!!selectedUserToDelete}
         selectedUser={selectedUserToDelete}
-        onClose={() => setSelectedUserToDelete(undefined)}
+        onClose={() => {
+          setSelectedUserToDelete(undefined)
+          cleanPointerEventsNoneOnBody()
+        }}
         onDeleteSuccess={() => {
           if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
           setSelectedUserToDelete(undefined)
+          cleanPointerEventsNoneOnBody(500)
         }}
       />
 

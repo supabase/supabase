@@ -1,0 +1,44 @@
+---
+title: Supabase Client Libraries
+description: Supabase client for Nuxt.js
+---
+
+## Installation
+
+<BlockItem name="supabase-client-nuxtjs" description="Supabase Client for Nuxt.js" />
+
+## Folder structure
+
+<RegistryBlock itemName="supabase-client-nuxtjs" />
+
+## Usage
+
+This block installs a Supabase client for connecting your Nuxt.js project to Supabase. It's designed to fully supports server-side rendering (SSR).
+
+If you've already set up your Supabase client—either using the `npm create nuxt@latest` template or another method—you can continue using your existing setup.
+
+### Getting started
+
+After installing the block, you'll have the following environment variables in your `.env.local` file:
+
+```env
+NUXT_PUBLIC_SUPABASE_URL=
+NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&tab=frameworks&framework=vuejs&using=supabasejs) under App Frameworks or in your project's [API keys](https://supabase.com/dashboard/project/_/settings/api-keys).
+
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+- Nuxt recommends [NuxtSupabase](https://supabase.nuxtjs.org/) module to integrate Nuxt application with Supabase. It’s an alternative to this approach, but both approaches are fine.
+
+<Callout type="warning" className="mt-4">
+  {' '}
+  This Supabase client is built for SSR with the Nuxt.js. If you're building a Vue SPA, use the [Vue
+  SPA client](/ui/docs/vue/client) instead.{' '}
+</Callout>
+
+## Further reading
+
+- [Use Supabase with Nuxt](https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs)
+- [Build a User Management App with Nuxt 3](https://supabase.com/docs/guides/getting-started/tutorials/with-nuxt-3)
