@@ -1,5 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, type ModelMessage, stepCountIs, streamText } from 'ai'
+import { convertToModelMessages, type ModelMessage, stepCountIs } from 'ai'
+import * as ai from 'ai'
 import { source } from 'common-tags'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
@@ -22,12 +23,20 @@ import { getTools } from 'lib/ai/tools'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
 import { executeQuery } from 'lib/api/self-hosted/query'
+import { initLogger, wrapAISDK } from 'braintrust'
 
 export const maxDuration = 120
 
 export const config = {
   api: { bodyParser: true },
 }
+
+initLogger({
+  projectName: process.env.BRAINTRUST_PROJECT_NAME,
+  apiKey: process.env.BRAINTRUST_API_KEY,
+})
+
+const { streamText } = wrapAISDK(ai)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
