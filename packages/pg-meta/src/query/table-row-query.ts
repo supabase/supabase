@@ -77,7 +77,9 @@ export const getDefaultOrderByColumns = (table: Pick<PGTable, 'primary_keys' | '
     return primaryKeyColumns
   }
   if (table.columns && table.columns.length > 0) {
-    return [table.columns[0].name]
+    const eligibleColumnsForSorting = table.columns.filter((x) => !x.data_type.includes('json'))
+    if (eligibleColumnsForSorting.length > 0) return [eligibleColumnsForSorting[0].name]
+    else return []
   }
   return []
 }
