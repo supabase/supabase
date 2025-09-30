@@ -54,7 +54,7 @@ const { data, error } = await supabase.from('titles').select(`
 ```
 
 ```bash name=Bash
-curl 'https://<your-domain>/titles'
+curl --get 'https://<your-domain>/titles'
   -d "select=title:primary_title,...people(actors:primary_name),...genres(genres:name)"
   -H "Authorization: Bearer <YOUR_KEY>"
 ```
