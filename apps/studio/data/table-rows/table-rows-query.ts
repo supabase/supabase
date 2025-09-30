@@ -237,9 +237,7 @@ export async function getTableRows(
 
     return { rows }
   } catch (error) {
-    throw new Error(
-      `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
+    throw new Error(error instanceof Error ? error.message : 'Unknown error')
   }
 }
 
