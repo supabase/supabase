@@ -1,45 +1,60 @@
 ```markdown
   - id: max-affected
-    title: 'max_affected()'
+    title: 'Set maximum affected rows'
     description: |
-      Limits the number of rows that can be modified by a single mutation operation (update or delete).
-
-      This method helps prevent unintentional bulk updates or deletions by setting a maximum number of rows that can be affected in a single query.
+      Set the maximum number of rows that can be affected by the query. Only available in PostgREST v13+ and only works with PATCH and DELETE methods. If more rows would be affected than the specified maximum, PostgREST returns an error instead of performing the operation.
     params:
       - name: value
         isOptional: false
         type: int
-        description: The maximum number of rows that can be modified by the mutation operation.
+        description: The maximum number of rows that can be affected by the query
+    returns:
+      type: Self
+      description: Returns the query builder instance for method chaining
     notes: |
-      - Introduced in PostgREST v10.0.0
-      - If the number of affected rows exceeds the specified limit, the operation will be aborted
+      - Requires PostgREST v13+
+      - Only works with PATCH and DELETE HTTP methods
+      - Sets 'handling=strict' and 'max-affected={value}' in the Prefer header
+      - If the number of affected rows would exceed the specified limit, PostgREST returns an error instead of performing the operation
       - Useful for preventing accidental mass updates or deletions
     examples:
-      - id: limit-update-rows
-        name: Limit the number of rows updated
+      - id: basic-update
+        name: Basic usage with update
         description: |
-          Update a maximum of 5 rows where the name starts with 'John'
+          Update rows with a maximum of 5 rows affected
         code: |
           ```python
           response = (
-              supabase.table("users")
-              .update({"status": "inactive"})
-              .like("name", "John%")
+              supabase.table("countries")
+              .update({"name": "Australia"})
               .max_affected(5)
               .execute()
           )
           ```
-      - id: limit-delete-rows
-        name: Limit the number of rows deleted
+      - id: basic-delete
+        name: Basic usage with delete
         description: |
-          Delete a maximum of 10 inactive users
+          Delete rows with a maximum of 10 rows affected
         code: |
           ```python
           response = (
-              supabase.table("users")
+              supabase.table("countries")
               .delete()
-              .eq("status", "inactive")
               .max_affected(10)
+              .execute()
+          )
+          ```
+      - id: chained-filters
+        name: Chained with filters
+        description: |
+          Update a single row by ID with a maximum of 1 row affected
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .update({"name": "Australia"})
+              .eq("id", 1)
+              .max_affected(1)
               .execute()
           )
           ```
