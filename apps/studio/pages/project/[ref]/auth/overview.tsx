@@ -5,11 +5,20 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
+import { OverviewMonitoring } from 'components/interfaces/Auth/Overview/OverviewMonitoring'
+import { OverviewUsage } from 'components/interfaces/Auth/Overview/OverviewUsage'
+import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
 
 const AuthOverview: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>Overview</ScaffoldSection>
+    <ScaffoldContainer size="large">
+      <ScaffoldSection isFullWidth>
+        <div className="mb-4 flex flex-col gap-6">
+          <OverviewMonitoring />
+          <OverviewUsage />
+          <OverviewLearnMore />
+        </div>
+      </ScaffoldSection>
     </ScaffoldContainer>
   )
 }
