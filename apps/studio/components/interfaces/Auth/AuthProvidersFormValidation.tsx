@@ -37,6 +37,8 @@ const PROVIDER_EMAIL = {
       description:
         'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
       type: 'boolean',
+      link: 'https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection',
+      isPaid: true,
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Minimum password length',
