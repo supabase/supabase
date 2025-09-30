@@ -42,7 +42,6 @@ const {
   'docs:contribution',
   'docs:fdw',
   'docs:framework_quickstarts',
-  'docs:self-hosting',
   'docs:full_platform',
   'docs:local_development',
   'docs:mobile_tutorials',
