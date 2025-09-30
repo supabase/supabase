@@ -10,6 +10,7 @@ export const generateAuthMenu = (
     authenticationMultiFactor: boolean
     authenticationAttackProtection: boolean
     authenticationAdvanced: boolean
+    // authenticationOverview: boolean
   }
 ): ProductMenuGroup[] => {
   const {
@@ -19,12 +20,19 @@ export const generateAuthMenu = (
     authenticationMultiFactor,
     authenticationAttackProtection,
     authenticationAdvanced,
+    // authenticationOverview,
   } = flags ?? {}
 
   return [
     {
       title: 'Manage',
-      items: [{ name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] }],
+      items: [
+        // ...(authenticationOverview
+        //   ? [{ name: 'Overview', key: 'overview', url: `/project/${ref}/auth/overview`, items: [] }]
+        //   : []),
+        { name: 'Overview', key: 'overview', url: `/project/${ref}/auth/overview`, items: [] },
+        { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
+      ],
     },
     {
       title: 'Configuration',
