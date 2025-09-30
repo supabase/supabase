@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -16,6 +17,7 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
@@ -279,6 +281,29 @@ export const ProtectionAuthSettingsForm = () => {
                 </CardContent>
               </>
             )}
+
+            <CardContent>
+              <FormField_Shadcn_
+                control={protectionForm.control}
+                name="PASSWORD_HIBP_ENABLED"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Prevent use of leaked passwords"
+                    description="Rejects the use of known or easy to guess passwords on sign up or password change. "
+                  >
+                    <div className="flex items-center gap-2">
+                      <Badge variant={field.value ? 'success' : 'default'}>
+                        {field.value ? 'Enabled' : 'Disabled'}
+                      </Badge>
+                      <Link href={`/project/${projectRef}/auth/providers?provider=Email`}>
+                        <Button type="default">Configure email provider</Button>
+                      </Link>
+                    </div>
+                  </FormItemLayout>
+                )}
+              />
+            </CardContent>
 
             <CardFooter className="justify-end space-x-2">
               {protectionForm.formState.isDirty && (

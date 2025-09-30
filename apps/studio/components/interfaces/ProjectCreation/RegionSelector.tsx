@@ -148,23 +148,28 @@ export const RegionSelector = ({
                   value={value.name}
                   className="w-full [&>:nth-child(2)]:w-full"
                 >
-                  <div className="flex flex-row items-center justify-between w-full">
+                  <div className="flex flex-row items-center justify-between w-full gap-x-2">
                     <div className="flex items-center gap-x-3">
                       <img
                         alt="region icon"
                         className="w-5 rounded-sm"
                         src={`${BASE_PATH}/img/regions/${value.code}.svg`}
                       />
-                      <span className="text-foreground">{value.name}</span>
+                      <div className="flex items-center gap-x-2">
+                        <span className="text-foreground">{value.name}</span>
+                        <span className="text-xs text-foreground-lighter font-mono">
+                          {value.code}
+                        </span>
+                      </div>
                     </div>
 
-                    <div>
-                      {recommendedSpecificRegions.has(value.code) && (
+                    {recommendedSpecificRegions.has(value.code) && (
+                      <div>
                         <Badge variant="success" className="mr-1">
                           Recommended
                         </Badge>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </SelectItem_Shadcn_>
               )
