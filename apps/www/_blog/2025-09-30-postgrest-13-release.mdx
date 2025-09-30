@@ -85,7 +85,7 @@ const { data, error } = await supabase.from('titles').textSearch('primary_name',
 ```
 
 ```bash name=Bash
-curl 'https://<your-domain>/titles'
+curl --get 'https://<your-domain>/titles'
   -d "primary_name=fts.'god'%26'father"
   -H "Authorization: Bearer <YOUR_KEY>"
 ```
