@@ -1,7 +1,7 @@
 {
   "$schema": "./custom-content.schema.json",
 
-  "app:title": "Test Title",
+  "app:title": null,
 
   "dashboard_auth:custom_provider": null,
 

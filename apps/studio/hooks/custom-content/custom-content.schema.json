@@ -7,7 +7,7 @@
     },
 
     "app:title": {
-      "type": "string",
+      "type": ["string", "null"],
       "description": "Render a custom HTML title for the site"
     },
 
