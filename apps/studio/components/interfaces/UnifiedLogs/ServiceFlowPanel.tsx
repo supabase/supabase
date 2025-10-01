@@ -44,7 +44,6 @@ export function ServiceFlowPanel({
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('service-flow')
 
-  // [Joshen] Using this flag to just hide the whole JSON as an obfuscation
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
   const logType = selectedRow?.log_type
