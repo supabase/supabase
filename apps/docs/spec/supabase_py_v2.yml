@@ -6076,6 +6076,98 @@ functions:
           }
           ```
         hideCodeBlock: true
+  - id: max-affected
+    title: max_affected()
+    description: |
+      Set the maximum number of rows that can be affected by an update or delete operation.
+      If the query would affect more rows than the specified limit, the operation will fail with an error.
+
+      This uses PostgREST's `Prefer: max-affected` header with `handling=strict`.
+    notes: |
+      - Only available in PostgREST v13+
+      - Only works with PATCH (update) and DELETE methods
+      - The operation will fail if it would affect more rows than specified
+    params:
+      - name: value
+        isOptional: false
+        type: int
+        description: The maximum number of rows that can be affected
+    examples:
+      - id: with-update
+        name: Limit affected rows on update
+        code: |
+          ```python
+          response = (
+              supabase.table("planets")
+              .update({"name": "Updated"})
+              .eq("id", 1)
+              .max_affected(1)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              planets (id int8 primary key, name text);
+
+            insert into
+              planets (id, name)
+            values
+              (1, 'Mercury'),
+              (2, 'Earth');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Updated"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: with-delete
+        name: Limit affected rows on delete
+        code: |
+          ```python
+          response = (
+              supabase.table("planets")
+              .delete()
+              .eq("id", 1)
+              .max_affected(1)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              planets (id int8 primary key, name text);
+
+            insert into
+              planets (id, name)
+            values
+              (1, 'Mercury'),
+              (2, 'Earth');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Mercury"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
   - id: using-modifiers
     title: Using Modifiers
     description: |
@@ -6832,6 +6924,7 @@ functions:
     title: on().subscribe()
     notes: |
       - By default, Broadcast and Presence are enabled for all projects.
+      - Presence is automatically enabled when you attach presence callbacks (`on_presence_sync()`, `on_presence_join()`, or `on_presence_leave()`). If you add presence callbacks to an already joined channel, the channel will automatically resubscribe with presence enabled.
       - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.

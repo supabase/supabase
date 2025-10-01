@@ -25,7 +25,11 @@ export const EmailTemplates = () => {
   return (
     <div className="w-full">
       {isError && (
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        <AlertError
+          className="mt-12"
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration"
+        />
       )}
       {isLoading && (
         <div className="w-[854px] mt-12">

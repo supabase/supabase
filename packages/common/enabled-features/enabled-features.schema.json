@@ -80,6 +80,10 @@
       "type": "boolean",
       "description": "Show the user type filter in the authentication users page"
     },
+    "authentication:show_email_phone_columns": {
+      "type": "boolean",
+      "description": "Show the email and phone columns in the authentication users page"
+    },
 
     "billing:all": {
       "type": "boolean",
@@ -114,6 +118,10 @@
     "database:roles": {
       "type": "boolean",
       "description": "Enable the database roles page"
+    },
+    "database:restore_to_new_project": {
+      "type": "boolean",
+      "description": "Enable the restore to new project page under backups"
     },
 
     "docs:auth_architecture": {
@@ -197,6 +205,10 @@
       "type": "boolean",
       "description": "Show all the Stripe example in edge function templates in the edge functions page."
     },
+    "edge_functions:show_all_edge_function_invocation_examples": {
+      "type": "boolean",
+      "description": "Show all the invocation examples in the edge function details page. (If off, it will only show cURL and Javascript invocation examples)"
+    },
 
     "feedback:docs": {
       "type": "boolean",
@@ -207,13 +219,18 @@
       "type": "boolean",
       "description": "Show all third-party-managed integrations"
     },
-    "integrations:show_stripe_wrapper": {
+    "integrations:wrappers": {
       "type": "boolean",
-      "description": "Show the Stripe wrapper under project integrations"
+      "description": "Show all wrappers (FDW) under project integrations"
     },
     "integrations:vercel": {
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
+    },
+
+    "infrastructure:read_replicas": {
+      "type": "boolean",
+      "description": "Enable read replicas management"
     },
 
     "logs:templates": {
@@ -224,10 +241,18 @@
       "type": "boolean",
       "description": "Enable the logs collections page"
     },
+    "logs:show_metadata_ip_template": {
+      "type": "boolean",
+      "description": "Show the Metadata IP template in the logs explorer"
+    },
 
     "organization:show_sso_settings": {
       "type": "boolean",
       "description": "Show the SSO settings tab in the organization settings page"
+    },
+    "organization:show_security_settings": {
+      "type": "boolean",
+      "description": "Show the security settings tab in the organization settings page"
     },
 
     "profile:show_email": {
@@ -346,6 +371,11 @@
     "search:fullIndex": {
       "type": "boolean",
       "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
+    },
+
+    "support:show_client_libraries": {
+      "type": "boolean",
+      "description": "Show the client libraries dropdown input and suggestions in the support form if the category 'API and client libraries' is selected"
     }
   },
   "required": [
@@ -353,20 +383,21 @@
     "ai:opt_in_level_schema",
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
-    "authentication:sign_in_providers",
-    "authentication:third_party_auth",
-    "authentication:rate_limits",
+    "authentication:advanced",
+    "authentication:attack_protection",
     "authentication:emails",
     "authentication:multi_factor",
-    "authentication:attack_protection",
-    "authentication:advanced",
-    "authentication:show_providers",
+    "authentication:rate_limits",
+    "authentication:show_email_phone_columns",
     "authentication:show_manual_linking",
     "authentication:show_provider_filter",
+    "authentication:show_providers",
     "authentication:show_send_invitation",
     "authentication:show_sort_by_email",
     "authentication:show_sort_by_phone",
     "authentication:show_user_type_filter",
+    "authentication:sign_in_providers",
+    "authentication:third_party_auth",
     "billing:all",
     "dashboard_auth:sign_up",
     "dashboard_auth:sign_in_with_github",
@@ -374,6 +405,7 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
+    "database:restore_to_new_project",
     "docs:auth_architecture",
     "docs:auth_configuration",
     "docs:auth_flows",
@@ -395,14 +427,16 @@
     "docs:web_apps",
     "feedback:docs",
     "integrations:partners",
-    "integrations:show_stripe_wrapper",
+    "integrations:wrappers",
     "integrations:vercel",
+    "infrastructure:read_replicas",
     "profile:show_email",
     "profile:show_information",
     "profile:show_analytics_and_marketing",
     "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
+    "logs:show_metadata_ip_template",
     "organization:show_sso_settings",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",

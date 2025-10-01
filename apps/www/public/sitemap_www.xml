@@ -2163,6 +2163,18 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/blog/defense-in-depth-mcp</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/postgrest-13-release</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/customers/asap-work</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
