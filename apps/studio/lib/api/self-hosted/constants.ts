@@ -1,6 +1,6 @@
 // Constants specific to self-hosted environments
 
-export const ENCRYPTION_KEY = 'SAMPLE_KEY' // See postgres-meta `CRYPTO_KEY` fallback
+export const ENCRYPTION_KEY = process.env.PG_META_CRYPTO_KEY || 'SAMPLE_KEY'
 export const POSTGRES_PORT = process.env.POSTGRES_PORT || 5432
 export const POSTGRES_HOST = process.env.POSTGRES_HOST || 'db'
 export const POSTGRES_DATABASE = process.env.POSTGRES_DB || 'postgres'
