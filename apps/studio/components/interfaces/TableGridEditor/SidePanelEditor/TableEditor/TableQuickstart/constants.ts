@@ -1,7 +1,3 @@
-export const STORAGE_KEYS = {
-  TABLE_QUICKSTART_DISMISSED: 'tableQuickstartDismissed',
-} as const
-
 export const LIMITS = {
   MAX_PROMPT_LENGTH: 500,
   MAX_TABLES_TO_GENERATE: 3,

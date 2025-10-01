@@ -48,7 +48,8 @@ import {
 } from './TableEditor.utils'
 import { TableTemplateSelector } from './TableQuickstart/TableTemplateSelector'
 import { QuickstartVariant } from './TableQuickstart/types'
-import { STORAGE_KEYS } from './TableQuickstart/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -104,19 +105,14 @@ export const TableEditor = ({
   })
   const publicTables = (tables ?? []).filter((table) => table.schema === 'public')
   const hasTables = publicTables.length > 0
-  const [quickstartDismissed, setQuickstartDismissed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED) === 'true'
-    }
-    return false
-  })
+  const [quickstartDismissed, setQuickstartDismissed] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
+    false
+  )
 
   const handleQuickstartDismiss = useCallback(() => {
     setQuickstartDismissed(true)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED, 'true')
-    }
-  }, [])
+  }, [setQuickstartDismissed])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
