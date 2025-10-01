@@ -5,8 +5,6 @@ import { useState } from 'react'
 import { StatusIcon } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
-import { useWorkflowRunLogsQuery } from 'data/workflow-runs/workflow-run-logs-query'
-import { useWorkflowRunsQuery } from 'data/workflow-runs/workflow-runs-query'
 import {
   Button,
   cn,
@@ -21,21 +19,20 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import BranchStatusBadge from './BranchStatusBadge'
+import ActionStatusBadge from './ActionStatusBadge'
+import { useActionsQuery } from 'data/actions/action-runs-query'
+import { useActionRunLogsQuery } from 'data/actions/action-logs-query'
+import { ActionRunData } from 'data/actions/action-detail-query'
 
 interface WorkflowLogsProps {
   projectRef: string
-  status?: Branch['status'] | string
+  status: Branch['status']
 }
 
-type StatusType = Branch['status'] | string
+type StatusType = Branch['status']
 
-const UNHEALTHY_STATUSES: StatusType[] = [
-  'ACTIVE_UNHEALTHY',
-  'INIT_FAILED',
-  'UNKNOWN',
-  'MIGRATIONS_FAILED',
-  'FUNCTIONS_FAILED',
-]
+const HEALTHY_STATUSES: StatusType[] = ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_PASSED']
+const UNHEALTHY_STATUSES: StatusType[] = ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED']
 
 export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -46,9 +43,11 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     isLoading: isWorkflowRunsLoading,
     isError: isWorkflowRunsError,
     error: workflowRunsError,
-  } = useWorkflowRunsQuery({ projectRef }, { enabled: isOpen })
+  } = useActionsQuery({ ref: projectRef }, { enabled: isOpen })
 
-  const [selectedWorkflowRunId, setSelectedWorkflowRunId] = useState<string | undefined>(undefined)
+  const [selectedWorkflowRun, setSelectedWorkflowRun] = useState<ActionRunData | undefined>(
+    undefined
+  )
 
   const {
     data: workflowRunLogs,
@@ -56,17 +55,13 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     isLoading: isWorkflowRunLogsLoading,
     isError: isWorkflowRunLogsError,
     error: workflowRunLogsError,
-  } = useWorkflowRunLogsQuery(
-    { workflowRunId: selectedWorkflowRunId },
-    { enabled: isOpen && selectedWorkflowRunId !== undefined }
+  } = useActionRunLogsQuery(
+    { ref: projectRef, run_id: selectedWorkflowRun?.id ?? '' },
+    { enabled: isOpen && Boolean(selectedWorkflowRun) }
   )
 
-  const showStatusIcon =
-    status !== undefined &&
-    status !== 'ACTIVE_HEALTHY' &&
-    status !== 'FUNCTIONS_DEPLOYED' &&
-    status !== 'MIGRATIONS_PASSED'
-  const isUnhealthy = status !== undefined && UNHEALTHY_STATUSES.includes(status)
+  const showStatusIcon = !HEALTHY_STATUSES.includes(status)
+  const isUnhealthy = !UNHEALTHY_STATUSES.includes(status)
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -93,7 +88,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
         <DialogSectionSeparator />
 
         <DialogSection className={cn('px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '!py-0')}>
-          {selectedWorkflowRunId === undefined ? (
+          {selectedWorkflowRun ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-4" />}
               {isWorkflowRunsError && (
@@ -108,11 +103,17 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                       <li key={workflowRun.id} className="py-3">
                         <button
                           type="button"
-                          onClick={() => setSelectedWorkflowRunId(workflowRun.id)}
+                          onClick={() => setSelectedWorkflowRun(workflowRun)}
                           className="flex items-center gap-2 w-full justify-between"
                         >
                           <div className="flex items-center gap-4">
-                            <BranchStatusBadge status={workflowRun.status} />
+                            {workflowRun.run_steps.length > 0 ? (
+                              workflowRun.run_steps.map((s) => (
+                                <ActionStatusBadge status={s.status} />
+                              ))
+                            ) : (
+                              <BranchStatusBadge status={status} />
+                            )}
                             <span className="text-sm">
                               {dayjs(workflowRun.created_at).format('DD MMM, YYYY HH:mm')}
                             </span>
@@ -131,7 +132,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
           ) : (
             <div className="flex flex-col gap-2 py-2">
               <Button
-                onClick={() => setSelectedWorkflowRunId(undefined)}
+                onClick={() => setSelectedWorkflowRun(undefined)}
                 type="text"
                 icon={<ArrowLeft />}
                 className="self-start"
