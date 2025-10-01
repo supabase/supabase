@@ -20,6 +20,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useDocsSearch, useParams, type DocsSearchResult as Page } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import CopyButton from 'components/ui/CopyButton'
@@ -29,6 +30,7 @@ import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -138,6 +140,17 @@ export const SupportFormV2 = ({
   } = useParams()
   const router = useRouter()
   const dashboardSentryIssueId = router.query.sid as string
+
+  const isBillingEnabled = useIsFeatureEnabled('billing:all')
+
+  const categoryOptions = useMemo(() => {
+    return CATEGORY_OPTIONS.filter((option) => {
+      if (option.value === SupportCategories.BILLING || option.value === SupportCategories.REFUND) {
+        return isBillingEnabled
+      }
+      return true
+    })
+  }, [isBillingEnabled])
 
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -317,7 +330,7 @@ export const SupportFormV2 = ({
 
   useEffect(() => {
     if (urlCategory) {
-      const validCategory = CATEGORY_OPTIONS.find((option) => {
+      const validCategory = categoryOptions.find((option) => {
         if (option.value.toLowerCase() === ((urlCategory as string) ?? '').toLowerCase())
           return option
       })
@@ -533,13 +546,13 @@ export const SupportFormV2 = ({
                     <SelectTrigger_Shadcn_ className="w-full">
                       <SelectValue_Shadcn_ placeholder="Select an issue">
                         {field.value
-                          ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
+                          ? categoryOptions.find((o) => o.value === field.value)?.label
                           : null}
                       </SelectValue_Shadcn_>
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
-                        {CATEGORY_OPTIONS.map((option) => (
+                        {categoryOptions.map((option) => (
                           <SelectItem_Shadcn_ key={option.value} value={option.value}>
                             {option.label}
                             <span className="block text-xs text-foreground-lighter">
