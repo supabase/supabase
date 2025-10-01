@@ -215,9 +215,9 @@
       "type": "boolean",
       "description": "Show all third-party-managed integrations"
     },
-    "integrations:show_stripe_wrapper": {
+    "integrations:wrappers": {
       "type": "boolean",
-      "description": "Show the Stripe wrapper under project integrations"
+      "description": "Show all wrappers (FDW) under project integrations"
     },
     "integrations:vercel": {
       "type": "boolean",
@@ -413,7 +413,7 @@
     "docs:web_apps",
     "feedback:docs",
     "integrations:partners",
-    "integrations:show_stripe_wrapper",
+    "integrations:wrappers",
     "integrations:vercel",
     "profile:show_email",
     "profile:show_information",

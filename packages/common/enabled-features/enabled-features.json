@@ -60,7 +60,7 @@
   "feedback:docs": true,
 
   "integrations:partners": true,
-  "integrations:show_stripe_wrapper": true,
+  "integrations:wrappers": true,
   "integrations:vercel": true,
 
   "logs:templates": true,
