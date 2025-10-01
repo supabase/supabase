@@ -32,17 +32,17 @@ const QueryDetailMetricBlock = ({
   icon,
 }: {
   title: string
-  value: string
+  value: React.ReactNode
   icon: React.ReactNode
 }) => {
   return (
     <div className="flex items-center gap-x-4">
-      <div className="flex h-12 w-12 bg-surface-100 rounded-[13px] items-center justify-center border text-foreground-lighter shadow-sm">
+      <div className="flex h-11 w-11 bg-surface-100 rounded-[13px] items-center justify-center border text-foreground-lighter shadow-sm">
         {icon}
       </div>
       <div className="flex flex-col">
-        <p className="text-foreground tabular-nums">{value}</p>
-        <p className="text-foreground-lighter">{title}</p>
+        <p className="text-foreground tabular-nums text-sm">{value}</p>
+        <p className="text-foreground-lighter text-sm">{title}</p>
       </div>
     </div>
   )
@@ -68,24 +68,19 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
       <QueryPanelSection className="pt-2 border-b relative bg-gradient-to-t to-background-studio from-background-surface-100/30">
         <div className="grid grid-cols-2 gap-5 pb-6">
           <QueryDetailMetricBlock
-            title="Score"
-            value="0"
-            icon={<div className="text-lg">C+</div>}
-          />
-          <QueryDetailMetricBlock
             title="Time consumed"
-            value={`${(selectedRow?.prop_total_time || 0).toFixed(1)}%`}
-            icon={<Hourglass size={20} strokeWidth={1.5} />}
-          />
-          <QueryDetailMetricBlock
-            title="Total time"
-            value={formatDuration((selectedRow?.total_time || 0) / 1000)}
-            icon={<Clock size={20} strokeWidth={1.5} />}
+            value={
+              <>
+                {(selectedRow?.prop_total_time || 0).toFixed(1)}%{' '}
+                <span className="text-muted">/</span> {formatDuration(selectedRow?.total_time || 0)}
+              </>
+            }
+            icon={<Clock size={16} strokeWidth={1.5} />}
           />
           <QueryDetailMetricBlock
             title="Count"
             value={selectedRow?.calls?.toLocaleString()}
-            icon={<Hash size={20} strokeWidth={1.5} />}
+            icon={<Hash size={16} strokeWidth={1.5} />}
           />
         </div>
       </QueryPanelSection>
