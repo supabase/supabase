@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronsUpDown, ListTree, Lock, PlusCircle, Unlock } from 'lucide-react'
+import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -11,6 +11,8 @@ import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import {
   Entity,
@@ -22,12 +24,14 @@ import {
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { sortBy } from 'lodash'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -39,9 +43,8 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import { useRouter } from 'next/router'
-import { sortBy } from 'lodash'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
@@ -53,6 +56,7 @@ export interface GridHeaderActionsProps {
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [showWarning, setShowWarning] = useQueryState(
     'showWarning',
@@ -67,6 +71,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
+  const triggersInsteadOfRealtime = usePHFlag<boolean>('triggersInsteadOfRealtime')
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
   const { mutate: updateTable } = useTableUpdateMutation({
@@ -78,6 +84,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     },
   })
 
+  const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
 
@@ -92,6 +99,26 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const policies = (data ?? []).filter(
     (policy) => policy.schema === table.schema && policy.table === table.name
   )
+
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+  const realtimeEnabledTables = realtimePublication?.tables ?? []
+  const isRealtimeEnabled = realtimeEnabledTables.some((t: any) => t.id === table?.id)
+
+  const { mutate: updatePublications, isLoading: isTogglingRealtime } =
+    useDatabasePublicationUpdateMutation({
+      onSuccess: () => {
+        setShowEnableRealtime(false)
+      },
+      onError: (error) => {
+        toast.error(`Failed to toggle realtime for ${table.name}: ${error.message}`)
+      },
+    })
 
   const { data: triggersData } = useDatabaseTriggersQuery(
     {
@@ -143,7 +170,42 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       table.schema
     )
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
+
+  const toggleRealtime = async () => {
+    if (!project) return console.error('Project is required')
+    if (!realtimePublication) return console.error('Unable to find realtime publication')
+
+    const exists = realtimeEnabledTables.some((x: any) => x.id == table.id)
+    const tables = !exists
+      ? [`${table.schema}.${table.name}`].concat(
+          realtimeEnabledTables.map((t: any) => `${t.schema}.${t.name}`)
+        )
+      : realtimeEnabledTables
+          .filter((x: any) => x.id != table.id)
+          .map((x: any) => `${x.schema}.${x.name}`)
+
+    sendEvent({
+      action: 'realtime_toggle_table_clicked',
+      properties: {
+        newState: exists ? 'disabled' : 'enabled',
+        origin: 'tableGridHeader',
+      },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+
+    updatePublications({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: realtimePublication.id,
+      tables,
+    })
+  }
 
   const closeConfirmModal = () => {
     setRlsConfirmModalOpen(false)
@@ -277,6 +339,55 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             )
           ) : null}
 
+          {isTable && triggersInsteadOfRealtime ? (
+            <Button
+              asChild
+              type={'default'}
+              size="tiny"
+              icon={
+                <div
+                  className={cn(
+                    'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                    tableTriggersCount > 9 ? 'px-1' : 'w-[16px]'
+                  )}
+                >
+                  <span className="text-[11px] text-foreground font-mono text-center">
+                    {tableTriggersCount}
+                  </span>
+                </div>
+              }
+            >
+              <Link href={manageTriggersHref}>
+                {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
+              </Link>
+            </Button>
+          ) : (
+            realtimeEnabled && (
+              <ButtonTooltip
+                type="default"
+                size="tiny"
+                icon={
+                  <MousePointer2
+                    strokeWidth={1.5}
+                    className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
+                  />
+                }
+                onClick={() => setShowEnableRealtime(true)}
+                className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: isRealtimeEnabled
+                      ? 'Click to disable realtime for this table'
+                      : 'Click to enable realtime for this table',
+                  },
+                }}
+              >
+                {!isRealtimeEnabled && 'Enable Realtime'}
+              </ButtonTooltip>
+            )
+          )}
+
           {isView && viewHasLints && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
@@ -409,30 +520,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             </Popover_Shadcn_>
           )}
 
-          {isTable && (
-            <Button
-              asChild
-              type={'default'}
-              size="tiny"
-              icon={
-                <div
-                  className={cn(
-                    'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
-                    tableTriggersCount > 9 ? 'px-1' : 'w-[16px]'
-                  )}
-                >
-                  <span className="text-[11px] text-foreground font-mono text-center">
-                    {tableTriggersCount}
-                  </span>
-                </div>
-              }
-            >
-              <Link href={manageTriggersHref}>
-                {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
-              </Link>
-            </Button>
-          )}
-
           <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
           {doesHaveAutoGeneratedAPIDocs && <APIDocsButton section={['entities', table.name]} />}
@@ -440,6 +527,32 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           <RefreshButton tableId={table.id} isRefetching={isRefetching} />
         </div>
       )}
+      <ConfirmationModal
+        visible={showEnableRealtime}
+        loading={isTogglingRealtime}
+        title={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for ${table.name}`}
+        confirmLabel={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime`}
+        confirmLabelLoading={`${isRealtimeEnabled ? 'Disabling' : 'Enabling'} realtime`}
+        onCancel={() => setShowEnableRealtime(false)}
+        onConfirm={() => toggleRealtime()}
+      >
+        <div className="space-y-2">
+          <p className="text-sm">
+            Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will{' '}
+            {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
+          </p>
+          {!isRealtimeEnabled && (
+            <p className="text-sm">
+              You may also select which events to broadcast to subscribers on the{' '}
+              <Link href={`/project/${ref}/database/publications`} className="text-brand">
+                database publications
+              </Link>{' '}
+              settings.
+            </p>
+          )}
+        </div>
+      </ConfirmationModal>
+
       <ViewEntityAutofixSecurityModal
         table={table}
         isAutofixViewSecurityModalOpen={isAutofixViewSecurityModalOpen}
