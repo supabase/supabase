@@ -32,6 +32,7 @@
 
   "database:replication": true,
   "database:roles": true,
+  "database:network_restrictions": true,
 
   "docs:auth_architecture": true,
   "docs:auth_configuration": true,

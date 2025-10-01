@@ -115,6 +115,10 @@
       "type": "boolean",
       "description": "Enable the database roles page"
     },
+    "database:network_restrictions": {
+      "type": "boolean",
+      "description": "Show the network restrictions setting under database settings"
+    },
 
     "docs:auth_architecture": {
       "type": "boolean",
@@ -387,6 +391,7 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
+    "database:network_restrictions",
     "docs:auth_architecture",
     "docs:auth_configuration",
     "docs:auth_flows",
