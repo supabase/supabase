@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react'
+import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { BUCKET_TYPES, DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
@@ -23,8 +24,12 @@ interface BucketTypeLayoutProps extends PropsWithChildren {
 
 export const BucketTypeLayout = ({ children, navigationItems, isEmpty }: BucketTypeLayoutProps) => {
   const { bucketType, ref } = useParams()
+  const router = useRouter()
   const bucketTypeKey = bucketType || DEFAULT_BUCKET_TYPE
   const config = BUCKET_TYPES[bucketTypeKey as keyof typeof BUCKET_TYPES]
+
+  // Check if we're on a files sub-route (settings or policies)
+  const isOnFilesSubRoute = router.asPath.includes('/storage/files/')
 
   // Define navigation items for files bucket type
   const filesNavigationItems = [
@@ -34,17 +39,18 @@ export const BucketTypeLayout = ({ children, navigationItems, isEmpty }: BucketT
     },
     {
       label: 'Settings',
-      href: `/project/${ref}/storage/settings`,
+      href: `/project/${ref}/storage/files/settings`,
     },
     {
       label: 'Policies',
-      href: `/project/${ref}/storage/policies`,
+      href: `/project/${ref}/storage/files/policies`,
     },
   ]
 
   // Use provided navigationItems or default based on bucket type
+  // Show files navigation items if we're on files bucket type OR on a files sub-route
   const finalNavigationItems =
-    navigationItems || (bucketTypeKey === 'files' ? filesNavigationItems : [])
+    navigationItems || (bucketTypeKey === 'files' || isOnFilesSubRoute ? filesNavigationItems : [])
 
   return (
     <DefaultLayout>
