@@ -109,6 +109,35 @@ const VisualizerBody = ({
   nodeTypes,
   planState,
 }: VisualizerBodyProps) => {
+  const containerClass = cn(
+    'relative h-full w-full bg-background',
+    expanded ? 'border-none' : 'border rounded-md'
+  )
+
+  if (meta?.errorMessage) {
+    return (
+      <div className={containerClass}>
+        <div className="flex h-full items-center justify-center px-4 py-10">
+          <div className="w-full max-w-md">
+            <Alert_Shadcn_ variant="destructive">
+              <AlertTitle_Shadcn_>{meta.errorMessage}</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="space-y-3 text-sm">
+                {meta.errorDetail && (
+                  <p className="whitespace-pre-wrap text-foreground-lighter">{meta.errorDetail}</p>
+                )}
+                <Button asChild type="default" size="tiny">
+                  <Link href="/support/new" target="_blank" rel="noreferrer">
+                    Contact support
+                  </Link>
+                </Button>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const {
     selectedNodeId,
     selectedNode,
@@ -258,35 +287,6 @@ const VisualizerBody = ({
       {detailPanelOverlay}
     </div>
   )
-
-  const containerClass = cn(
-    'relative h-full w-full bg-background',
-    expanded ? 'border-none' : 'border rounded-md'
-  )
-
-  if (meta?.errorMessage) {
-    return (
-      <div className={containerClass}>
-        <div className="flex h-full items-center justify-center px-4 py-10">
-          <div className="w-full max-w-md">
-            <Alert_Shadcn_ variant="destructive">
-              <AlertTitle_Shadcn_>{meta.errorMessage}</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="space-y-3 text-sm">
-                {meta.errorDetail && (
-                  <p className="whitespace-pre-wrap text-foreground-lighter">{meta.errorDetail}</p>
-                )}
-                <Button asChild type="default" size="tiny">
-                  <Link href="/support/new" target="_blank" rel="noreferrer">
-                    Contact support
-                  </Link>
-                </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   if (expanded) {
     return (
