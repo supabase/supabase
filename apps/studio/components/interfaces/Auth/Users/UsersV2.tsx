@@ -86,12 +86,24 @@ export const UsersV2 = () => {
     authenticationShowSortByEmail: showSortByEmail,
     authenticationShowSortByPhone: showSortByPhone,
     authenticationShowUserTypeFilter: showUserTypeFilter,
+    authenticationShowEmailPhoneColumns: showEmailPhoneColumns,
   } = useIsFeatureEnabled([
     'authentication:show_provider_filter',
     'authentication:show_sort_by_email',
     'authentication:show_sort_by_phone',
     'authentication:show_user_type_filter',
+    'authentication:show_email_phone_columns',
   ])
+
+  const userTableColumns = useMemo(() => {
+    if (showEmailPhoneColumns) return USERS_TABLE_COLUMNS
+    else {
+      return USERS_TABLE_COLUMNS.filter((col) => {
+        if (col.id === 'email' || col.id === 'phone') return false
+        return true
+      })
+    }
+  }, [showEmailPhoneColumns])
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
@@ -265,6 +277,7 @@ export const UsersV2 = () => {
         (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
     ) {
       const columns = formatUserColumns({
+        columns: userTableColumns,
         config: columnConfiguration ?? [],
         users: users ?? [],
         visibleColumns: selectedColumns,
@@ -272,7 +285,7 @@ export const UsersV2 = () => {
         onSelectDeleteUser: setSelectedUserToDelete,
       })
       setColumns(columns)
-      if (columns.length < USERS_TABLE_COLUMNS.length) {
+      if (columns.length < userTableColumns.length) {
         setSelectedColumns(columns.filter((col) => col.key !== 'img').map((col) => col.key))
       }
     }
@@ -386,7 +399,7 @@ export const UsersV2 = () => {
                   name={selectedColumns.length === 0 ? 'All columns' : 'Columns'}
                   title="Select columns to show"
                   buttonType={selectedColumns.length === 0 ? 'dashed' : 'default'}
-                  options={USERS_TABLE_COLUMNS.slice(1)} // Ignore user image column
+                  options={userTableColumns.slice(1)} // Ignore user image column
                   labelKey="name"
                   valueKey="id"
                   labelClass="text-xs"
@@ -401,19 +414,20 @@ export const UsersV2 = () => {
 
                     let updatedConfig = (columnConfiguration ?? []).slice()
                     if (value.length === 0) {
-                      updatedConfig = USERS_TABLE_COLUMNS.map((c) => ({ id: c.id, width: c.width }))
+                      updatedConfig = userTableColumns.map((c) => ({ id: c.id, width: c.width }))
                     } else {
                       value.forEach((col) => {
                         const hasExisting = updatedConfig.find((c) => c.id === col)
                         if (!hasExisting)
                           updatedConfig.push({
                             id: col,
-                            width: USERS_TABLE_COLUMNS.find((c) => c.id === col)?.width,
+                            width: userTableColumns.find((c) => c.id === col)?.width,
                           })
                       })
                     }
 
                     const updatedColumns = formatUserColumns({
+                      columns: userTableColumns,
                       config: updatedConfig,
                       users: users ?? [],
                       visibleColumns: value,
