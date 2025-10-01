@@ -129,7 +129,7 @@ export const CreateBucketModalSpecialized = ({
       await createBucket({
         projectRef: ref,
         id: values.name,
-        type: bucketType,
+        type: bucketType === 'VECTORS' ? 'ANALYTICS' : bucketType,
         isPublic: false, // Specialized buckets are always private
         file_size_limit: undefined,
         allowed_mime_types: undefined,

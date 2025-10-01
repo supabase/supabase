@@ -92,7 +92,7 @@ export const FilesBuckets = () => {
             <ScaffoldSection>
               <div className="col-span-12">
                 <FormHeader
-                  title="Buckets"
+                  title="File buckets"
                   actions={
                     <Button type="primary" icon={<Plus size={14} />} onClick={handleCreateBucket}>
                       New file bucket
