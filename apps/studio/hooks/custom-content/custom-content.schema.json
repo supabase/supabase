@@ -44,7 +44,7 @@
           "gitUrl": { "type": "string" },
           "altIconName": { "type": "string" }
         },
-        "required": ["language", "officialSupport", "docsUrl", "gitUrl"]
+        "required": ["language", "officialSupport", "docsUrl"]
       }
     },
     "project_homepage:example_projects": {

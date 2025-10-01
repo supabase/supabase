@@ -16,6 +16,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
 
@@ -135,7 +136,7 @@ If you upload more than 1.5x the current size of your storage, your database wil
 into read-only mode. If you know how big your database is going to be, you can
 manually increase the size here.
 
-Read more about [disk management](https://supabase.com/docs/guides/platform/database-size#disk-management) and how to [free up storage space](https://supabase.com/docs/guides/platform/database-size#vacuum-operations).
+Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk-management) and how to [free up storage space](${DOCS_URL}/guides/platform/database-size#vacuum-operations).
 `}
                           />
                         </AlertDescription_Shadcn_>

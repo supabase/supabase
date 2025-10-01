@@ -31,7 +31,7 @@ export async function ReferenceNavigation({
 }: ReferenceNavigationProps) {
   const navSections = await getReferenceSections(libraryId, version)
   const filteredNavSections = navSections?.filter((section) => section.title !== 'Auth')
-  const displayedNavSections = isFeatureEnabled('docs:auth') ? navSections : filteredNavSections
+  const displayedNavSections = isFeatureEnabled('sdk:auth') ? navSections : filteredNavSections
 
   const basePath = `/reference/${libPath}${isLatestVersion ? '' : `/${version}`}`
 

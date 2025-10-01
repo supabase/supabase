@@ -5,7 +5,7 @@ import { useCallback } from 'react'
 
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
-import { useLoadTableEditorStateFromLocalStorageIntoUrl } from 'components/grid/SupabaseGrid.utils'
+import { useSyncTableEditorStateFromLocalStorageWithUrl } from 'components/grid/SupabaseGrid.utils'
 import {
   Entity,
   isForeignTable,
@@ -41,13 +41,12 @@ export const TableGridEditor = ({
 
   const tabs = useTabsStateSnapshot()
 
-  useLoadTableEditorStateFromLocalStorageIntoUrl({
+  useSyncTableEditorStateFromLocalStorageWithUrl({
     projectRef,
     table: selectedTable,
   })
 
   const [{ view: selectedView = 'data' }] = useUrlState()
-
   const { can: canEditTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'

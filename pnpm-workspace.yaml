@@ -1,6 +1,7 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+  - 'blocks/*'
   - 'e2e/*'
 
 catalog:
@@ -23,3 +24,8 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - 'ai'
   - '@ai-sdk/*'
+  - '@supabase/mcp-server-supabase'
+  - '@supabase/mcp-utils'
+  - '@supabase/auth-js' 
+  - '@supabase/supabase-js'
+  - '@supabase/realtime-js'

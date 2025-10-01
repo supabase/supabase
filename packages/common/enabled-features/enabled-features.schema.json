@@ -116,21 +116,41 @@
       "description": "Enable the database roles page"
     },
 
-    "docs:auth": {
+    "docs:auth_architecture": {
       "type": "boolean",
-      "description": "Enable auth docs"
+      "description": "Enable docs on Auth architecture"
     },
-    "docs:contribution": {
+    "docs:auth_configuration": {
       "type": "boolean",
-      "description": "Enable documentation on contribution"
+      "description": "Enable auth configuration docs"
+    },
+    "docs:auth_flows": {
+      "type": "boolean",
+      "description": "Enable docs on auth flows"
+    },
+    "docs:auth_full_security": {
+      "type": "boolean",
+      "description": "Full auth security docs enabled"
+    },
+    "docs:auth_troubleshooting": {
+      "type": "boolean",
+      "description": "Enable auth troubleshooting docs"
     },
     "docs:compliance": {
       "type": "boolean",
       "description": "Enable documentation on compliance"
     },
-    "docs:self-hosting": {
+    "docs:contribution": {
       "type": "boolean",
-      "description": "Enable documentation for self-hosting"
+      "description": "Enable documentation on contribution"
+    },
+    "docs:fdw": {
+      "type": "boolean",
+      "description": "Enable documentation on foreign data wrappers"
+    },
+    "docs:footer": {
+      "type": "boolean",
+      "description": "Enable footer on docs site"
     },
     "docs:framework_quickstarts": {
       "type": "boolean",
@@ -148,6 +168,10 @@
       "type": "boolean",
       "description": "Hide docs on CLI profiles"
     },
+    "docs:local_development": {
+      "type": "boolean",
+      "description": "Enable local development documentation"
+    },
     "docs:mobile_tutorials": {
       "type": "boolean",
       "description": "Enable mobile tutorials getting started documentation"
@@ -160,10 +184,24 @@
       "type": "boolean",
       "description": "Enable production checklist"
     },
+    "docs:self-hosting": {
+      "type": "boolean",
+      "description": "Enable documentation for self-hosting"
+    },
     "docs:web_apps": {
       "type": "boolean",
       "description": "Enable web apps getting started documentation"
     },
+
+    "edge_functions:show_stripe_example": {
+      "type": "boolean",
+      "description": "Show all the Stripe example in edge function templates in the edge functions page."
+    },
+    "edge_functions:show_all_edge_function_invocation_examples": {
+      "type": "boolean",
+      "description": "Show all the invocation examples in the edge function details page. (If off, it will only show cURL and Javascript invocation examples)"
+    },
+
     "feedback:docs": {
       "type": "boolean",
       "description": "Enable feedback submission for docs site"
@@ -194,6 +232,10 @@
     "organization:show_sso_settings": {
       "type": "boolean",
       "description": "Show the SSO settings tab in the organization settings page"
+    },
+    "organization:show_security_settings": {
+      "type": "boolean",
+      "description": "Show the security settings tab in the organization settings page"
     },
 
     "profile:show_email": {
@@ -284,6 +326,10 @@
       "description": "Enable the project reports page"
     },
 
+    "sdk:auth": {
+      "type": "boolean",
+      "description": "Enable Auth SDK docs"
+    },
     "sdk:csharp": {
       "type": "boolean",
       "description": "Enable the C# SDK"
@@ -308,6 +354,11 @@
     "search:fullIndex": {
       "type": "boolean",
       "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
+    },
+
+    "support:show_client_libraries": {
+      "type": "boolean",
+      "description": "Show the client libraries dropdown input and suggestions in the support form if the category 'API and client libraries' is selected"
     }
   },
   "required": [
@@ -336,13 +387,20 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
-    "docs:auth",
+    "docs:auth_architecture",
+    "docs:auth_configuration",
+    "docs:auth_flows",
+    "docs:auth_full_security",
+    "docs:auth_troubleshooting",
     "docs:compliance",
     "docs:contribution",
+    "docs:fdw",
+    "docs:footer",
     "docs:framework_quickstarts",
     "docs:full_getting_started",
     "docs:full_platform",
     "docs:hide_cli_profiles",
+    "docs:local_development",
     "docs:mobile_tutorials",
     "docs:pgtap",
     "docs:production_checklist",
@@ -375,6 +433,7 @@
     "project_connection:show_orms",
     "quickstarts:hide_nimbus",
     "reports:all",
+    "sdk:auth",
     "sdk:csharp",
     "sdk:dart",
     "sdk:kotlin",

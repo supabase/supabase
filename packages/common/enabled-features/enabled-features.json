@@ -33,18 +33,28 @@
   "database:replication": true,
   "database:roles": true,
 
-  "docs:auth": true,
+  "docs:auth_architecture": true,
+  "docs:auth_configuration": true,
+  "docs:auth_flows": true,
+  "docs:auth_full_security": true,
+  "docs:auth_troubleshooting": true,
   "docs:compliance": true,
   "docs:contribution": true,
+  "docs:fdw": true,
+  "docs:footer": true,
   "docs:self-hosting": true,
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,
   "docs:full_platform": true,
   "docs:hide_cli_profiles": true,
+  "docs:local_development": true,
   "docs:mobile_tutorials": true,
   "docs:pgtap": true,
   "docs:production_checklist": true,
   "docs:web_apps": true,
+
+  "edge_functions:show_stripe_example": true,
+  "edge_functions:show_all_edge_function_invocation_examples": true,
 
   "feedback:docs": true,
 
@@ -56,6 +66,7 @@
   "logs:collections": true,
 
   "organization:show_sso_settings": true,
+  "organization:show_security_settings": true,
 
   "profile:show_email": true,
   "profile:show_information": true,
@@ -85,11 +96,14 @@
 
   "reports:all": true,
 
+  "sdk:auth": true,
   "sdk:csharp": true,
   "sdk:dart": true,
   "sdk:kotlin": true,
   "sdk:python": true,
   "sdk:swift": true,
 
-  "search:fullIndex": true
+  "search:fullIndex": true,
+
+  "support:show_client_libraries": true
 }

@@ -29616,8 +29616,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 {
                   "name": "transport",
                   "type": {
-                    "type": "nameOnly",
-                    "name": "WebSocketLikeConstructor"
+                    "type": "object",
+                    "name": "WebSocketLikeConstructor",
+                    "properties": []
                   },
                   "isOptional": true
                 },
@@ -30241,8 +30242,253 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         ],
         "ret": {
           "type": {
-            "type": "nameOnly",
-            "name": "WebSocketLike"
+            "type": "object",
+            "name": "WebSocketLike",
+            "properties": [
+              {
+                "name": "binaryType",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                },
+                "isOptional": true
+              },
+              {
+                "name": "bufferedAmount",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "number"
+                },
+                "isOptional": true
+              },
+              {
+                "name": "CLOSED",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "CLOSING",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "CONNECTING",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "dispatchEvent",
+                "type": {
+                  "type": "function",
+                  "params": [
+                    {
+                      "name": "event",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "Event"
+                      }
+                    }
+                  ],
+                  "ret": {
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "boolean"
+                    }
+                  }
+                },
+                "isOptional": true
+              },
+              {
+                "name": "extensions",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                },
+                "isOptional": true
+              },
+              {
+                "name": "onclose",
+                "type": {
+                  "type": "union",
+                  "subTypes": [
+                    {
+                      "type": "literal",
+                      "value": null
+                    },
+                    {
+                      "type": "function",
+                      "params": [
+                        {
+                          "name": "this",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "any"
+                          }
+                        },
+                        {
+                          "name": "ev",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "CloseEvent"
+                          }
+                        }
+                      ],
+                      "ret": {
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "onerror",
+                "type": {
+                  "type": "union",
+                  "subTypes": [
+                    {
+                      "type": "literal",
+                      "value": null
+                    },
+                    {
+                      "type": "function",
+                      "params": [
+                        {
+                          "name": "this",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "any"
+                          }
+                        },
+                        {
+                          "name": "ev",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "Event"
+                          }
+                        }
+                      ],
+                      "ret": {
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "onmessage",
+                "type": {
+                  "type": "union",
+                  "subTypes": [
+                    {
+                      "type": "literal",
+                      "value": null
+                    },
+                    {
+                      "type": "function",
+                      "params": [
+                        {
+                          "name": "this",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "any"
+                          }
+                        },
+                        {
+                          "name": "ev",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "MessageEvent"
+                          }
+                        }
+                      ],
+                      "ret": {
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "onopen",
+                "type": {
+                  "type": "union",
+                  "subTypes": [
+                    {
+                      "type": "literal",
+                      "value": null
+                    },
+                    {
+                      "type": "function",
+                      "params": [
+                        {
+                          "name": "this",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "any"
+                          }
+                        },
+                        {
+                          "name": "ev",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "Event"
+                          }
+                        }
+                      ],
+                      "ret": {
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "OPEN",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "protocol",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "name": "readyState",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "url",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              }
+            ]
           }
         }
       },

@@ -32,6 +32,7 @@ import {
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import { formatDuration } from './QueryPerformance.utils'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
@@ -173,14 +174,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   <span className="text-muted">/</span>
                   <span
                     className={cn(
-                      (totalTime / 1000).toFixed(2) === '0.00' && 'text-foreground-lighter'
+                      formatDuration(totalTime) === '0.00s' && 'text-foreground-lighter'
                     )}
                   >
-                    {(totalTime / 1000).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    s
+                    {formatDuration(totalTime)}
                   </span>
                 </span>
               ) : (

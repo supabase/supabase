@@ -1,18 +1,14 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
+import { convertToModelMessages, type ModelMessage, stepCountIs, streamText } from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod/v4'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import z from 'zod'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { getTools } from 'lib/ai/tools'
-import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-
 import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,
@@ -20,7 +16,12 @@ import {
   PG_BEST_PRACTICES,
   RLS_PROMPT,
   SECURITY_PROMPT,
+  LIMITATIONS_PROMPT,
 } from 'lib/ai/prompts'
+import { getTools } from 'lib/ai/tools'
+import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
+import apiWrapper from 'lib/api/apiWrapper'
+import { executeQuery } from 'lib/api/self-hosted/query'
 
 export const maxDuration = 120
 
@@ -36,7 +37,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return handlePost(req, res)
     default:
       res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+      res.status(405).json({
+        data: null,
+        error: { message: `Method ${method} Not Allowed` },
+      })
   }
 }
 
@@ -91,9 +95,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       aiOptInLevel = orgAIOptInLevel
       isLimited = orgAILimited
     } catch (error) {
-      return res
-        .status(400)
-        .json({ error: 'There was an error fetching your organization details' })
+      return res.status(400).json({
+        error: 'There was an error fetching your organization details',
+      })
     }
   }
 
@@ -107,13 +111,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return cleanedMsg
     }
     if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts.filter((part: any) => {
-        if (part.type.startsWith('tool-')) {
-          const invalidStates = ['input-streaming', 'input-available', 'output-error']
-          return !invalidStates.includes(part.state)
-        }
-        return true
-      })
+      const cleanedParts = msg.parts
+        .filter((part: any) => {
+          if (part.type.startsWith('tool-')) {
+            const invalidStates = ['input-streaming', 'input-available', 'output-error']
+            return !invalidStates.includes(part.state)
+          }
+          return true
+        })
+        .map((part: any) => {
+          return sanitizeMessagePart(part, aiOptInLevel)
+        })
       return { ...msg, parts: cleanedParts }
     }
     return msg
@@ -138,10 +146,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     // Get a list of all schemas to add to context
     const pgMetaSchemasList = pgMeta.schemas.list()
+    type Schemas = z.infer<(typeof pgMetaSchemasList)['zod']>
 
     const { result: schemas } =
       aiOptInLevel !== 'disabled'
-        ? await executeSql(
+        ? await executeSql<Schemas>(
             {
               projectRef,
               connectionString,
@@ -152,7 +161,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
               'Content-Type': 'application/json',
               ...(authorization && { Authorization: authorization }),
             },
-            IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+            IS_PLATFORM ? undefined : executeQuery
           )
         : { result: [] }
 
@@ -169,6 +178,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ${RLS_PROMPT}
       ${EDGE_FUNCTION_PROMPT}
       ${SECURITY_PROMPT}
+      ${LIMITATIONS_PROMPT}
     `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
@@ -177,7 +187,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
+        ...(promptProviderOptions && {
+          providerOptions: promptProviderOptions,
+        }),
       },
       {
         role: 'assistant',

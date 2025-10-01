@@ -17,6 +17,7 @@ import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforc
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SSLConfiguration = () => {
@@ -89,7 +90,7 @@ const SSLConfiguration = () => {
     <div id="ssl-configuration">
       <div className="flex items-center justify-between mb-6">
         <FormHeader className="mb-0" title="SSL Configuration" description="" />
-        <DocsButton href="https://supabase.com/docs/guides/platform/ssl-enforcement" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
       </div>
       <FormPanel>
         <FormSection
