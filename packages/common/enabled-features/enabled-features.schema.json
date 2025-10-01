@@ -123,6 +123,10 @@
       "type": "boolean",
       "description": "Enable the restore to new project page under backups"
     },
+    "database:network_restrictions": {
+      "type": "boolean",
+      "description": "Show the network restrictions setting under database settings"
+    },
 
     "docs:auth_architecture": {
       "type": "boolean",
@@ -406,6 +410,7 @@
     "database:replication",
     "database:roles",
     "database:restore_to_new_project",
+    "database:network_restrictions",
     "docs:auth_architecture",
     "docs:auth_configuration",
     "docs:auth_flows",
