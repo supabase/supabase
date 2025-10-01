@@ -62,7 +62,7 @@
   "integrations:show_stripe_wrapper": true,
   "integrations:vercel": true,
 
-  "infrastructure:read_replicas": false,
+  "infrastructure:read_replicas": true,
 
   "logs:templates": true,
   "logs:collections": true,

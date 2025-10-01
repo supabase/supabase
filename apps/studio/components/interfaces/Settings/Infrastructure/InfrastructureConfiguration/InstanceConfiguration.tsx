@@ -18,7 +18,11 @@ import {
 } from 'data/read-replicas/replicas-status-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
 import {
@@ -53,6 +57,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   const numTransition = useRef<number>()
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
 
+  const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
@@ -272,7 +277,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                     </DropdownMenu>
                   )}
                 </div>
-                {project?.cloud_provider === 'AWS' && (
+                {isAws && (
                   <div className="flex items-center justify-center">
                     <Button
                       type="default"
