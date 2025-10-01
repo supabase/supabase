@@ -3,9 +3,11 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { PageLayout, NavigationItem } from 'components/layouts/PageLayout/PageLayout'
+import { NavigationItem, PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useRouter } from 'next/compat/router'
 import { useEffect, useMemo } from 'react'
 import { NextPageWithLayout } from 'types'
@@ -14,6 +16,7 @@ import { Admonition } from 'ui-patterns'
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
@@ -115,6 +118,10 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   if (!router?.isReady) {
     return null
+  }
+
+  if (!integrationsWrappers && id?.endsWith('_wrapper')) {
+    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }
 
   return (
