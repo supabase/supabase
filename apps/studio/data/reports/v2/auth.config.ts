@@ -192,7 +192,7 @@ export function defaultAuthReportFormatter(
   const parsedRawData = rawDataSchema.parse(rawData)
   const result = parsedRawData.result
 
-  if (!result || result.length === 0) return { data: undefined, chartAttributes }
+  if (!result) return { data: undefined, chartAttributes }
 
   const timestamps = new Set<string>(result.map((p: any) => String(p.timestamp)))
   const data = Array.from(timestamps)
