@@ -28,8 +28,8 @@ const BucketTypePage: NextPageWithLayout = () => {
 
   return (
     <div>
-      {/* [Danny] Purposefully duplicated directly below StorageLayout‘s config.description for now. Will be placed in a conditional empty state in next PR. TODO: consider reusing FormHeader for non-empty state.*/}
-      <p className="text-foreground-light mb-4">{config.description}</p>
+      {/* [Danny] Purposefully duplicated directly below StorageLayout's config.description for now. Will be placed in a conditional empty state in next PR. TODO: consider reusing FormHeader for non-empty state.*/}
+      {/* <p className="text-foreground-light mb-4">{config.description}</p> */}
       <DocsButton href={config.docsUrl} />
     </div>
   )

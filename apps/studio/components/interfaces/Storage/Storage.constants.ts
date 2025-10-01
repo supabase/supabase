@@ -63,8 +63,8 @@ export const CONTEXT_MENU_KEYS = {
 // New bucket types configuration
 
 export const BUCKET_TYPES = {
-  media: {
-    displayName: 'Media',
+  files: {
+    displayName: 'Files',
     description: 'General file storage for most types of digital content.',
     docsUrl: `${DOCS_URL}/guides/storage/buckets/fundamentals`,
   },
@@ -81,4 +81,4 @@ export const BUCKET_TYPES = {
 }
 
 export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
-export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'media'
+export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'files'
