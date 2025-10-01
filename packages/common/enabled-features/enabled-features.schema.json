@@ -350,7 +350,7 @@
 
     "support:show_client_libraries": {
       "type": "boolean",
-      "description": "Show the client libraries section in the support form"
+      "description": "Show the client libraries dropdown input and suggestions in the support form if the category 'API and client libraries' is selected"
     }
   },
   "required": [
