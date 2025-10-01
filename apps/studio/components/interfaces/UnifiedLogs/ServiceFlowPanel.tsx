@@ -73,7 +73,7 @@ export function ServiceFlowPanel({
     shouldShowServiceFlow && serviceFlowData?.result?.[0] ? serviceFlowData.result[0] : selectedRow
 
   const formattedJsonData =
-    'raw_log_data' in jsonData && 'metadata' in jsonData.raw_log_data && !logsMetadata
+    !logsMetadata && 'raw_log_data' in jsonData && 'metadata' in jsonData.raw_log_data
       ? {
           ...jsonData,
           raw_log_data: { ...jsonData.raw_log_data, metadata: undefined },
