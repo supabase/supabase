@@ -14,14 +14,15 @@
   "authentication:attack_protection": true,
   "authentication:advanced": true,
 
-  "authentication:show_providers": true,
+
+  "authentication:show_email_phone_columns": true,
   "authentication:show_manual_linking": true,
-  "authentication:show_send_invitation": true,
   "authentication:show_provider_filter": true,
+  "authentication:show_providers": true,
+  "authentication:show_send_invitation": true,
   "authentication:show_sort_by_email": true,
   "authentication:show_sort_by_phone": true,
   "authentication:show_user_type_filter": true,
-
   "billing:all": true,
 
   "dashboard_auth:sign_up": true,
