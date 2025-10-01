@@ -220,6 +220,11 @@
       "description": "Enable the vercel integration section in the organization and project settings pages"
     },
 
+    "infrastructure:read_replicas": {
+      "type": "boolean",
+      "description": "Enable read replicas management"
+    },
+
     "logs:templates": {
       "type": "boolean",
       "description": "Enable the logs templates page"
@@ -410,6 +415,7 @@
     "integrations:partners",
     "integrations:show_stripe_wrapper",
     "integrations:vercel",
+    "infrastructure:read_replicas",
     "profile:show_email",
     "profile:show_information",
     "profile:show_analytics_and_marketing",
