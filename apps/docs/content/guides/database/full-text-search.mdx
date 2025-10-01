@@ -91,6 +91,13 @@ Converts a query string into tokens to match. `to_tsquery()` stands for "to text
 This conversion step is important because we will want to "fuzzy match" on keywords.
 For example if a user searches for `eggs`, and a column has the value `egg`, we probably still want to return a match.
 
+PostgreSQL provides several functions to create tsquery objects:
+
+- **`to_tsquery()`** - Requires manual specification of operators (`&`, `|`, `!`)
+- **`plainto_tsquery()`** - Converts plain text to an AND query: `plainto_tsquery('english', 'fat rats')` → `'fat' & 'rat'`
+- **`phraseto_tsquery()`** - Creates phrase queries: `phraseto_tsquery('english', 'fat rats')` → `'fat' <-> 'rat'`
+- **`websearch_to_tsquery()`** - Supports web search syntax with quotes, "or", and negation
+
 ### Match: `@@` [#match]
 
 The `@@` symbol is the "match" symbol for Full Text Search. It returns any matches between a `to_tsvector` result and a `to_tsquery` result.
@@ -741,6 +748,90 @@ When you want the search term to include a phrase or multiple words, you can con
 ```sql
 select * from search_books_by_title_prefix('Little+Puppy');
 ```
+
+## Web search syntax with `websearch_to_tsquery()` [#websearch-to-tsquery]
+
+The `websearch_to_tsquery()` function provides an intuitive search syntax similar to popular web search engines, making it ideal for user-facing search interfaces.
+
+### Basic usage
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select *
+from books
+where to_tsvector(description) @@ websearch_to_tsquery('english', 'green eggs');
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase
+  .from('books')
+  .select()
+  .textSearch('description', 'green eggs', { type: 'websearch' })
+```
+
+</TabPanel>
+</Tabs>
+
+### Quoted phrases
+
+Use quotes to search for exact phrases:
+
+```sql
+select * from books 
+where to_tsvector(description || ' ' || title) @@ websearch_to_tsquery('english', '"Green Eggs"');
+-- Matches documents containing "Green" immediately followed by "Eggs"
+```
+
+### OR searches
+
+Use "or" (case-insensitive) to search for multiple terms:
+
+```sql
+select * from books 
+where to_tsvector(description) @@ websearch_to_tsquery('english', 'puppy or rabbit');
+-- Matches documents containing either "puppy" OR "rabbit"
+```
+
+### Negation
+
+Use a dash (-) to exclude terms:
+
+```sql
+select * from books 
+where to_tsvector(description) @@ websearch_to_tsquery('english', 'animal -rabbit');
+-- Matches documents containing "animal" but NOT "rabbit"
+```
+
+### Complex queries
+
+Combine multiple operators for sophisticated searches:
+
+```sql
+select * from books 
+where to_tsvector(description || ' ' || title) @@ 
+  websearch_to_tsquery('english', '"Harry Potter" or "Dr. Seuss" -vegetables');
+-- Matches books by "Harry Potter" or "Dr. Seuss" but excludes those mentioning vegetables
+```
+
+### Comparison with other tsquery functions
+
+| Function | Input | Output | Best for |
+|----------|-------|---------|----------|
+| `to_tsquery()` | `'big & dreams'` | `'big' & 'dream'` | Manual control over operators |
+| `plainto_tsquery()` | `'big dreams'` | `'big' & 'dream'` | Simple AND searches |
+| `phraseto_tsquery()` | `'big dreams'` | `'big' <-> 'dream'` | Phrase searching |
+| `websearch_to_tsquery()` | `'"big dreams" or small'` | `'big' <-> 'dream' \| 'small'` | User-friendly search interfaces |
 
 ## Creating indexes
 
