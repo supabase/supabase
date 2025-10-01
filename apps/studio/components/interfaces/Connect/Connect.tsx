@@ -5,6 +5,7 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
+import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -353,6 +354,18 @@ export const Connect = () => {
                   <div className={DIALOG_PADDING_Y}>
                     <DatabaseConnectionString />
                   </div>
+                </TabsContent_Shadcn_>
+              )
+            }
+
+            if (type.key === 'mcp') {
+              return (
+                <TabsContent_Shadcn_
+                  key="mcp"
+                  value="mcp"
+                  className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+                >
+                  <McpTabContent projectKeys={projectKeys} />
                 </TabsContent_Shadcn_>
               )
             }
