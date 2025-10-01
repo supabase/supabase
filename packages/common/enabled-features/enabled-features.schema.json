@@ -245,6 +245,10 @@
       "type": "boolean",
       "description": "Enable the logs collections page"
     },
+    "logs:metadata": {
+      "type": "boolean",
+      "description": "Show the metadata field for logs in logs explorer"
+    },
     "logs:show_metadata_ip_template": {
       "type": "boolean",
       "description": "Show the Metadata IP template in the logs explorer"
@@ -449,6 +453,7 @@
     "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
+    "logs:metadata",
     "logs:show_metadata_ip_template",
     "organization:show_sso_settings",
     "project_creation:show_advanced_config",

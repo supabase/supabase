@@ -68,6 +68,7 @@
 
   "logs:templates": true,
   "logs:collections": true,
+  "logs:metadata": true,
   "logs:show_metadata_ip_template": true,
 
   "organization:show_sso_settings": true,
