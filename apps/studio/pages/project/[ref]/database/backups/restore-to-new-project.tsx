@@ -39,3 +39,5 @@ RestoreToNewProjectPage.getLayout = (page) => (
     <DatabaseLayout title="Database">{page}</DatabaseLayout>
   </DefaultLayout>
 )
+
+export default RestoreToNewProjectPage
