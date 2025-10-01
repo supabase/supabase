@@ -84,7 +84,7 @@ const createPlanNodeData = (
   subName: string | undefined,
   opts?: { executionTime?: number }
 ): PlanNodeData => {
-  let estDirection: 'over' | 'under' | 'none' | undefined = est.estDirection
+  const estDirection: 'over' | 'under' | 'none' | undefined = est.estDirection
   const estFactor = est.estFactor
 
   const data: PlanNodeData = {
@@ -117,8 +117,8 @@ const createPlanNodeData = (
     actualTotalTime: plan['Actual Total Time'],
     actualRows: plan['Actual Rows'],
     actualLoops: plan['Actual Loops'],
-    estFactor: estFactor,
-    estDirection: estDirection,
+    estFactor,
+    estDirection,
     estActualTotalRows: inclusive.actualRowsTotal,
     rowsRemovedByFilter: plan['Rows Removed by Filter'],
     rowsRemovedByJoinFilter: plan['Rows Removed by Join Filter'],
@@ -166,7 +166,7 @@ const createPlanNodeData = (
   }
 
   const isAnalyzeRun = opts?.executionTime !== undefined
-  if (isAnalyzeRun && (plan['Actual Loops'] ?? undefined) === 0) {
+  if (isAnalyzeRun && plan['Actual Loops'] === 0) {
     data.neverExecuted = true
   }
 
