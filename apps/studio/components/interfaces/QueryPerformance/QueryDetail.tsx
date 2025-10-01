@@ -1,11 +1,10 @@
-import { Lightbulb, ChevronsUpDown, Expand } from 'lucide-react'
+import { Lightbulb, ChevronsUpDown, Hourglass, Hash, Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
 
 import { formatSql } from 'lib/formatSql'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_COLUMNS,
@@ -27,6 +26,28 @@ const SqlMonacoBlock = dynamic(
   }
 )
 
+const QueryDetailMetricBlock = ({
+  title,
+  value,
+  icon,
+}: {
+  title: string
+  value: React.ReactNode
+  icon: React.ReactNode
+}) => {
+  return (
+    <div className="flex items-center gap-x-4">
+      <div className="flex h-11 w-11 bg-surface-100 rounded-[13px] items-center justify-center border text-foreground-lighter shadow-sm">
+        {icon}
+      </div>
+      <div className="flex flex-col">
+        <p className="text-foreground tabular-nums text-sm">{value}</p>
+        <p className="text-foreground-lighter text-sm">{title}</p>
+      </div>
+    </div>
+  )
+}
+
 export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
@@ -44,7 +65,26 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
 
   return (
     <QueryPanelContainer>
-      <QueryPanelSection className="pt-2 border-b relative">
+      <QueryPanelSection className="pt-2 border-b relative bg-gradient-to-t to-background-studio from-background-surface-100/30">
+        <div className="grid grid-cols-2 gap-5 pb-6">
+          <QueryDetailMetricBlock
+            title="Time consumed"
+            value={
+              <>
+                {(selectedRow?.prop_total_time || 0).toFixed(1)}%{' '}
+                <span className="text-muted">/</span> {formatDuration(selectedRow?.total_time || 0)}
+              </>
+            }
+            icon={<Clock size={16} strokeWidth={1.5} />}
+          />
+          <QueryDetailMetricBlock
+            title="Count"
+            value={selectedRow?.calls?.toLocaleString()}
+            icon={<Hash size={16} strokeWidth={1.5} />}
+          />
+        </div>
+      </QueryPanelSection>
+      <QueryPanelSection className="pt-5 border-b relative">
         <h4 className="mb-4">Query pattern</h4>
         <div
           className={cn(
