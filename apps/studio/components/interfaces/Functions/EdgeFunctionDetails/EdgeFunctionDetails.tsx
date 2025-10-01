@@ -70,9 +70,7 @@ export const EdgeFunctionDetails = () => {
     'edge_functions:show_all_edge_function_invocation_examples'
   )
   const invocationTabs = useMemo(() => {
-    if (showAllEdgeFunctionInvocationExamples) {
-      return INVOCATION_TABS
-    }
+    if (showAllEdgeFunctionInvocationExamples) return INVOCATION_TABS
     return INVOCATION_TABS.filter((tab) => tab.id === 'curl' || tab.id === 'supabase-js')
   }, [showAllEdgeFunctionInvocationExamples])
 

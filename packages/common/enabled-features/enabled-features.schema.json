@@ -199,7 +199,7 @@
     },
     "edge_functions:show_all_edge_function_invocation_examples": {
       "type": "boolean",
-      "description": "Show all the invocation examples in the edge function details page"
+      "description": "Show all the invocation examples in the edge function details page. (If off, it will only show cURL and Javascript invocation examples)"
     },
 
     "feedback:docs": {
