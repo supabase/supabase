@@ -26,6 +26,7 @@ const computeInclusiveBasics = (plan: RawPlan, workerMultiplier: number) => {
   const nodeCostIncl = plan['Total Cost'] ?? 0
   const actualRowsPerLoop = plan['Actual Rows'] ?? 0
   const actualRowsTotal = actualRowsPerLoop * loops
+
   return { loops, nodeTimeIncl, nodeCostIncl, actualRowsTotal }
 }
 
