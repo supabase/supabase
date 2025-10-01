@@ -2,7 +2,6 @@ import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
   CodeBlock,
@@ -29,7 +28,6 @@ export interface LogSelectionProps {
 
 const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectionProps) => {
   const [showCopied, setShowCopied] = useState(false)
-  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
   useEffect(() => {
     if (!showCopied) return
@@ -96,11 +94,10 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             <TabsTrigger_Shadcn_ className="px-3" value="details">
               Details
             </TabsTrigger_Shadcn_>
-            {logsMetadata && (
-              <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
-                Raw
-              </TabsTrigger_Shadcn_>
-            )}
+            <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
+              Raw
+            </TabsTrigger_Shadcn_>
+
             <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
               <ButtonTooltip
                 disabled={!log || isLoading}
