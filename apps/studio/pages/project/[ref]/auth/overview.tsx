@@ -9,17 +9,18 @@ import { OverviewMonitoring } from 'components/interfaces/Auth/Overview/Overview
 import { OverviewUsage } from 'components/interfaces/Auth/Overview/OverviewUsage'
 import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
 import { useRouter } from 'next/router'
-import { useFlag, useParams } from 'common'
-import { useEffect } from 'react'
+import { FeatureFlagContext, useFlag, useParams } from 'common'
+import { useContext, useEffect } from 'react'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const { hasLoaded } = useContext(FeatureFlagContext)
   const authOverviewPageEnabled = useFlag('authOverviewPage')
 
   useEffect(() => {
-    if (!authOverviewPageEnabled) {
-      router.push(`/project/${ref}/auth/users`)
+    if (hasLoaded && !authOverviewPageEnabled) {
+      router.replace(`/project/${ref}/auth/users`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authOverviewPageEnabled, router, ref])
