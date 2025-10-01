@@ -4,10 +4,9 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common/hooks'
-import Table from 'components/to-be-cleaned/Table'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { copyToClipboard, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface EdgeFunctionsListItemProps {
@@ -17,20 +16,17 @@ interface EdgeFunctionsListItemProps {
 export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const [isCopied, setIsCopied] = useState(false)
 
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
 
-  // get the .co or .net TLD from the restUrl
-  const restUrl = project?.restUrl
-  const restUrlTld = restUrl !== undefined ? new URL(restUrl).hostname.split('.').pop() : 'co'
-  const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${item.slug}`
-
-  const endpoint =
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint ?? ''
+  const functionUrl =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
-      : functionUrl
+      : `${protocol}://${endpoint}/functions/v1/${item.slug}`
 
   return (
     <TableRow
@@ -47,8 +43,8 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p title={endpoint} className="font-mono truncate hidden md:inline max-w-[30rem]">
-            {endpoint}
+          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-[30rem]">
+            {functionUrl}
           </p>
           <button
             type="button"
@@ -60,7 +56,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
                 setTimeout(() => setIsCopied(false), 3000)
               }
               event.stopPropagation()
-              onCopy(endpoint)
+              onCopy(functionUrl)
             }}
           >
             {isCopied ? (
