@@ -189,7 +189,6 @@ const annotateNodesWithHints = (
   const selfTimeValues = nodes
     .map((node) => node.data.exclusiveTimeMs ?? 0)
     .filter((value) => value > 0)
-
   const p90SelfTime = percentile(selfTimeValues, 0.9)
   const p95SelfTime = percentile(selfTimeValues, 0.95)
 
@@ -237,7 +236,8 @@ const annotateNodesWithHints = (
         costSeverity = newSeverity
         return
       }
-      const rank = { warn: 1, alert: 2 } as const
+
+      const rank = { warn: 1, alert: 2 }
       if (rank[newSeverity] > rank[costSeverity]) {
         costSeverity = newSeverity
       }
