@@ -53,6 +53,13 @@ export const useIsAwsK8sCloudProvider = () => {
   return isAwsK8s
 }
 
+export const useIsAwsNimbusCloudProvider = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const isAwsNimbus = project?.cloud_provider === PROVIDERS.AWS_NIMBUS.id
+
+  return isAwsNimbus
+}
+
 export const useIsOrioleDb = () => {
   const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
