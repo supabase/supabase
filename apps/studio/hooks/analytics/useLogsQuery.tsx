@@ -16,6 +16,7 @@ import {
   checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import { DOCS_URL } from 'lib/constants'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -98,13 +99,13 @@ const useLogsQuery = (
     if (usesWith) {
       error = {
         message: 'The parser does not yet support WITH and subquery statements.',
-        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported',
+        docs: `${DOCS_URL}/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported`,
       }
     }
     if (usesILIKE) {
       error = {
         message: 'BigQuery does not support ILIKE. Use REGEXP_CONTAINS instead.',
-        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported',
+        docs: `${DOCS_URL}/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported`,
       }
     }
   }

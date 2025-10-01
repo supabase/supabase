@@ -19,7 +19,12 @@ import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS, STRIPE_PUBLIC_KEY } from 'lib/constants'
+import {
+  DOCS_URL,
+  PRICING_TIER_PRODUCT_IDS,
+  PROJECT_STATUS,
+  STRIPE_PUBLIC_KEY,
+} from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
@@ -351,9 +356,7 @@ export const SubscriptionPlanUpdateDialog = ({
                               Credits; additional projects start at <span translate="no">$10</span>
                               /month regardless of usage.{' '}
                               <Link
-                                href={
-                                  'https://supabase.com/docs/guides/platform/manage-your-usage/compute'
-                                }
+                                href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                                 target="_blank"
                               >
                                 Learn more
@@ -589,7 +592,7 @@ export const SubscriptionPlanUpdateDialog = ({
                         /month regardless of usage.{' '}
                       </div>
                       <Link
-                        href={'https://supabase.com/docs/guides/platform/manage-your-usage/compute'}
+                        href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                         target="_blank"
                         className="underline"
                       >

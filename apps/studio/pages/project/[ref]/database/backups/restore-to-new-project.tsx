@@ -30,7 +30,7 @@ import {
   useIsOrioleDb,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
@@ -269,7 +269,7 @@ const RestoreToNewProject = () => {
             <Link
               target="_blank"
               className="underline"
-              href="https://supabase.com/docs/guides/platform/backups"
+              href={`${DOCS_URL}/guides/platform/backups`}
             >
               in our docs
             </Link>

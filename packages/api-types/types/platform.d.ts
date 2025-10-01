@@ -7965,7 +7965,7 @@ export interface components {
       }[]
     }
     ReplicationPipelineReplicationStatusResponse: {
-      /** @description Stats about apply worker lag */
+      /** @description The apply worker lag */
       apply_lag?: {
         /**
          * @description Bytes between the current WAL location and the confirmed flush LSN.
@@ -8052,7 +8052,7 @@ export interface components {
          * @example public.orders
          */
         table_name: string
-        /** @description Stats about table sync worker lag */
+        /** @description The table sync worker lag */
         table_sync_lag?: {
           /**
            * @description Bytes between the current WAL location and the confirmed flush LSN.

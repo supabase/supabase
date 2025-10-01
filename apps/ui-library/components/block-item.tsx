@@ -12,9 +12,11 @@ interface BlockItemProps {
 }
 
 export const BlockItem = ({ name }: BlockItemProps) => {
+  const framework = name.includes('vue') || name.includes('nuxtjs') ? 'vue' : 'react'
+
   return (
     <div className="mt-4">
-      <Command name={name} highlight />
+      <Command name={name} highlight framework={framework} />
       <OpenInV0Button name={name} className="w-fit shrink-0 mt-4" />
     </div>
   )

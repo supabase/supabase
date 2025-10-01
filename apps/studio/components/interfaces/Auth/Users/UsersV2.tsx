@@ -317,7 +317,7 @@ export const UsersV2 = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.code === 'Enter') {
+                    if (e.code === 'Enter' || e.code === 'NumpadEnter') {
                       setSearch(search.trim())
                       setFilterKeywords(search.trim().toLocaleLowerCase())
                     }

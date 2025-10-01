@@ -144,7 +144,7 @@ export const CronjobsTab = () => {
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
-                if (e.code === 'Enter') setSearchQuery(search.trim())
+                if (e.code === 'Enter' || e.code === 'NumpadEnter') setSearchQuery(search.trim())
               }}
               actions={[
                 search && (

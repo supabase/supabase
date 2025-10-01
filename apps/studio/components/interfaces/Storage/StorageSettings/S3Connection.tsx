@@ -24,6 +24,7 @@ import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
@@ -122,7 +123,7 @@ export const S3Connection = () => {
               Connect to your bucket using any S3-compatible service via the S3 protocol
             </ScaffoldSectionDescription>
           </div>
-          <DocsButton href="https://supabase.com/docs/guides/storage/s3/authentication" />
+          <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />
         </div>
         <Form_Shadcn_ {...form}>
           <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>

@@ -40,6 +40,8 @@
   "docs:auth_troubleshooting": true,
   "docs:compliance": true,
   "docs:contribution": true,
+  "docs:fdw": true,
+  "docs:footer": true,
   "docs:self-hosting": true,
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,
@@ -51,6 +53,9 @@
   "docs:production_checklist": true,
   "docs:web_apps": true,
 
+  "edge_functions:show_stripe_example": true,
+  "edge_functions:show_all_edge_function_invocation_examples": true,
+
   "feedback:docs": true,
 
   "integrations:partners": true,
@@ -61,6 +66,7 @@
   "logs:collections": true,
 
   "organization:show_sso_settings": true,
+  "organization:show_security_settings": true,
 
   "profile:show_email": true,
   "profile:show_information": true,
@@ -97,5 +103,7 @@
   "sdk:python": true,
   "sdk:swift": true,
 
-  "search:fullIndex": true
+  "search:fullIndex": true,
+
+  "support:show_client_libraries": true
 }

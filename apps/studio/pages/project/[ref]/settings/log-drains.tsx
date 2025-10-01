@@ -20,6 +20,7 @@ import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-quer
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -88,7 +89,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             </ScaffoldDescription>
           </div>
           <div className="flex items-center justify-end gap-2">
-            <DocsButton href="https://supabase.com/docs/guides/platform/log-drains" />
+            <DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />
 
             {!(logDrains?.length === 0) && (
               <Button

@@ -26,7 +26,7 @@ import {
   useProjectByRefQuery,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
@@ -127,7 +127,7 @@ export const Home = () => {
                     <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
                       This project is using Postgres with OrioleDB which is currently in preview and
                       not suitable for production workloads. View our{' '}
-                      <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
+                      <InlineLink href={`${DOCS_URL}/guides/database/orioledb`}>
                         documentation
                       </InlineLink>{' '}
                       for all limitations.
