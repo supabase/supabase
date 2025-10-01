@@ -41,7 +41,7 @@ const BucketTypePage: NextPageWithLayout = () => {
     }
   }
 
-  return <div>{renderBucketTypeContent()}</div>
+  return <>{renderBucketTypeContent()}</>
 }
 
 BucketTypePage.getLayout = (page) => {

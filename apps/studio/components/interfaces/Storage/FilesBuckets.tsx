@@ -52,7 +52,7 @@ export const FilesBuckets = () => {
             title="Buckets"
             actions={
               <Button type="primary" icon={<Plus size={14} />} onClick={handleCreateBucket}>
-                New media bucket
+                New file bucket
               </Button>
             }
           />

@@ -19,8 +19,8 @@ export const EmptyBucketState = ({ bucketType, onCreateBucket }: EmptyBucketStat
       <div className="max-w-sm mx-auto bg-surface-100 rounded-lg px-8 pt-10 pb-8 flex flex-col gap-6 border">
         {/* Text */}
         <div className="flex flex-col gap-1 text-balance">
-          <h3 className="text-foreground text-2xl">{config.displayName}</h3>
-          <p className="text-foreground-light text-base">
+          <h3 className="text-foreground text-xl">{config.displayName}</h3>
+          <p className="text-foreground-light text-sm">
             {config.description}{' '}
             <Link
               href={config.docsUrl}
@@ -35,7 +35,7 @@ export const EmptyBucketState = ({ bucketType, onCreateBucket }: EmptyBucketStat
         {/* Primary button */}
         <Button
           type="primary"
-          size="medium"
+          size="small"
           icon={<Plus size={14} />}
           onClick={onCreateBucket}
           className="w-fit"
