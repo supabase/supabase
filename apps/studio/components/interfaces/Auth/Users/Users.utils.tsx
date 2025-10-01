@@ -15,7 +15,7 @@ import {
   copyToClipboard,
 } from 'ui'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
-import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './Users.constants'
+import { ColumnConfiguration, UsersTableColumn } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
 
 const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
@@ -250,21 +250,23 @@ export function getAvatarUrl(user: User): string | undefined {
 }
 
 export const formatUserColumns = ({
+  columns,
   config,
   users,
   visibleColumns = [],
   setSortByValue,
   onSelectDeleteUser,
 }: {
+  columns: UsersTableColumn[]
   config: ColumnConfiguration[]
   users: User[]
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
 }) => {
-  const columnOrder = config.map((c) => c.id) ?? USERS_TABLE_COLUMNS.map((c) => c.id)
+  const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
-  let gridColumns = USERS_TABLE_COLUMNS.map((col) => {
+  let gridColumns = columns.map((col) => {
     const savedConfig = config.find((c) => c.id === col.id)
     const res: Column<any> = {
       key: col.id,

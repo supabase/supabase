@@ -80,6 +80,10 @@
       "type": "boolean",
       "description": "Show the user type filter in the authentication users page"
     },
+    "authentication:show_email_phone_columns": {
+      "type": "boolean",
+      "description": "Show the email and phone columns in the authentication users page"
+    },
 
     "billing:all": {
       "type": "boolean",
