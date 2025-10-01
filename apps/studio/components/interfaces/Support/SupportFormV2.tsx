@@ -26,6 +26,7 @@ import { useDocsSearch, useParams, type DocsSearchResult as Page } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import CopyButton from 'components/ui/CopyButton'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { PLAN_REQUEST_EMPTY } from 'components/ui/UpgradePlanButton'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -104,9 +105,19 @@ const createFormSchema = (showClientLibraries: boolean) => {
   }
 
   // When showClientLibraries is false, make library optional and remove the refine validation
-  return baseSchema.extend({
-    library: z.string().optional(),
-  })
+  return baseSchema
+    .extend({
+      library: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        return !data.message.includes(PLAN_REQUEST_EMPTY)
+      },
+      {
+        message: `Please let us know which plan you'd like to upgrade to for your organization`,
+        path: ['message'],
+      }
+    )
 }
 
 const defaultValues = {

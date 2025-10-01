@@ -5,16 +5,23 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
 
+export const PLAN_REQUEST_EMPTY = '<Specify which plan to upgrade to: Pro | Team | Enterprise>'
+
 interface UpgradePlanButtonProps {
   source?: string
   type?: 'default' | 'primary'
-  plan: 'Pro' | 'Team' | 'Enterprise'
+  plan?: 'Pro' | 'Team' | 'Enterprise'
+  // [Joshen] As an override if needed (Used in UpgradeToPro)
+  href?: string
+  disabled?: boolean
 }
 
 export const UpgradePlanButton = ({
   source,
   type = 'default',
   plan,
+  href: propsHref,
+  disabled,
   children,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { data: organization } = useSelectedOrganizationQuery()
@@ -22,18 +29,17 @@ export const UpgradePlanButton = ({
 
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
-  const subject = `Enquiry to upgrade to ${plan} plan for organization`
-  const message = `Could I have some help to upgrade my organization to the ${plan} plan?\n\nName: ${organization?.name}\nSlug: ${organization?.slug}`
+  const subject = `[Joshen Test] Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
+  const message = `Name: ${organization?.name}\nSlug: ${organization?.slug}\nRequested plan: ${plan ?? PLAN_REQUEST_EMPTY}`
 
   const href = billingAll
-    ? `/org/${slug}/billing?panel=subscriptionPlan${!!source ? `&source=${source}` : ''}`
+    ? propsHref ??
+      `/org/${slug}/billing?panel=subscriptionPlan${!!source ? `&source=${source}` : ''}`
     : `/support/new?slug=${slug}&projectRef=no-project&category=Plan_upgrade&subject=${subject}&message=${encodeURIComponent(message)}`
 
   return (
-    <Button asChild type={type}>
-      <Link href={href}>
-        {billingAll ? children || `Upgrade to ${plan}` : 'Contact support to upgrade plan'}
-      </Link>
+    <Button asChild type={type} disabled={disabled}>
+      <Link href={href}>{children || `Upgrade to ${plan}`}</Link>
     </Button>
   )
 }
