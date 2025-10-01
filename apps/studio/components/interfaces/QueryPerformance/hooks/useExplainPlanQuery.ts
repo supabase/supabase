@@ -81,5 +81,3 @@ export const useExplainPlanQuery = ({
     validationError,
   }
 }
-
-export type UseExplainPlanQueryResult = ReturnType<typeof useExplainPlanQuery>
