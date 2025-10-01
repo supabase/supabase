@@ -8,7 +8,7 @@ import type {
   WindsurfMcpConfig,
 } from './types'
 
-export const FEATURE_GROUPS: McpFeatureGroup[] = [
+export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
   {
     id: 'docs',
     name: 'Documentation',
@@ -50,6 +50,10 @@ export const FEATURE_GROUPS: McpFeatureGroup[] = [
     description: 'Manage files and storage buckets',
   },
 ]
+
+export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group) =>
+  ['docs', 'database', 'development'].includes(group.id)
+)
 
 export const MCP_CLIENTS: McpClient[] = [
   {
@@ -172,4 +176,5 @@ export const MCP_CLIENTS: McpClient[] = [
   },
 ]
 
-export const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL ?? 'http://localhost:8080/mcp'
+export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
+export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'

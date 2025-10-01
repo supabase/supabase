@@ -13,6 +13,7 @@ import {
 import type { McpFeatureGroup } from '../types'
 
 interface McpConfigurationOptionsProps {
+  isPlatform: boolean
   readonly: boolean
   onReadonlyChange: (readonly: boolean) => void
   selectedFeatures: string[]
@@ -22,6 +23,7 @@ interface McpConfigurationOptionsProps {
 }
 
 export function McpConfigurationOptions({
+  isPlatform,
   readonly,
   onReadonlyChange,
   selectedFeatures,
@@ -32,17 +34,19 @@ export function McpConfigurationOptions({
   return (
     <div className={cn('flex flex-col gap-4 lg:flex-row lg:gap-12 lg:items-baseline', className)}>
       {/* Readonly Mode */}
-      <div className="space-y-3 lg:flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <Label htmlFor="readonly" className="text-sm">
-            Read-only
-          </Label>
-          <InfoTooltip>Only allow read operations on your database</InfoTooltip>
+      {isPlatform && (
+        <div className="space-y-3 lg:flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="readonly" className="text-sm">
+              Read-only
+            </Label>
+            <InfoTooltip>Only allow read operations on your database</InfoTooltip>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch id="readonly" checked={readonly} onCheckedChange={onReadonlyChange} />
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Switch id="readonly" checked={readonly} onCheckedChange={onReadonlyChange} />
-        </div>
-      </div>
+      )}
 
       {/* Feature Groups */}
       <div className="space-y-3 lg:flex-1">

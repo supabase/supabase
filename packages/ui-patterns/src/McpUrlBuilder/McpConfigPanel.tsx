@@ -1,14 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { cn, Separator } from 'ui'
 
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { FEATURE_GROUPS, MCP_CLIENTS } from './constants'
-import { getMcpUrl } from './utils/getMcpUrl'
+import { FEATURE_GROUPS_PLATFORM, FEATURE_GROUPS_NON_PLATFORM, MCP_CLIENTS } from './constants'
 import type { McpClient } from './types'
+import { getMcpUrl } from './utils/getMcpUrl'
 
 export interface McpConfigPanelProps {
   basePath: string
@@ -18,26 +18,37 @@ export interface McpConfigPanelProps {
   onClientSelect?: (client: McpClient) => void
   theme?: 'light' | 'dark'
   className?: string
+  isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
+  apiUrl?: string
 }
 
 export function McpConfigPanel({
   basePath,
-  baseUrl,
   projectRef,
   initialSelectedClient,
   onClientSelect,
   className,
   theme = 'dark',
+  isPlatform,
+  apiUrl,
 }: McpConfigPanelProps) {
   const [readonly, setReadonly] = useState(false)
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
 
+  const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
+  const selectedFeaturesSupported = useMemo(() => {
+    return selectedFeatures.filter((feature) =>
+      supportedFeatures.some((group) => group.id === feature)
+    )
+  }, [selectedFeatures, supportedFeatures])
+
   const { clientConfig } = getMcpUrl({
-    baseUrl,
     projectRef,
+    isPlatform,
+    apiUrl,
     readonly,
-    features: selectedFeatures,
+    features: selectedFeaturesSupported,
     selectedClient,
   })
 
@@ -60,11 +71,12 @@ export function McpConfigPanel({
         <Separator />
         <McpConfigurationOptions
           className={innerPanelSpacing}
+          isPlatform={isPlatform}
           readonly={readonly}
           onReadonlyChange={setReadonly}
-          selectedFeatures={selectedFeatures}
+          selectedFeatures={selectedFeaturesSupported}
           onFeaturesChange={setSelectedFeatures}
-          featureGroups={FEATURE_GROUPS}
+          featureGroups={isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM}
         />
       </div>
       <div className="flex flex-col gap-y-3">
