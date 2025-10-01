@@ -1,5 +1,4 @@
 import { ScaffoldSectionTitle, ScaffoldSection } from 'components/layouts/Scaffold'
-import { Card } from 'ui'
 
 export const OverviewMonitoring = () => {
   return (
