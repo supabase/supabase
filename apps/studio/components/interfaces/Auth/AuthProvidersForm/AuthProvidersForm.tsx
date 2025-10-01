@@ -86,7 +86,10 @@ export const AuthProvidersForm = () => {
               } else if (providerSchema.title === 'Slack (OIDC)') {
                 isActive = authConfig && (authConfig as any)['EXTERNAL_SLACK_OIDC_ENABLED']
               } else if (providerSchema.title.includes('Web3')) {
-                isActive = authConfig && (authConfig as any)['EXTERNAL_WEB3_SOLANA_ENABLED']
+                isActive =
+                  authConfig &&
+                  ((authConfig as any)['EXTERNAL_WEB3_SOLANA_ENABLED'] ||
+                    (authConfig as any)['EXTERNAL_WEB3_ETHEREUM_ENABLED'])
               } else {
                 isActive =
                   authConfig &&
