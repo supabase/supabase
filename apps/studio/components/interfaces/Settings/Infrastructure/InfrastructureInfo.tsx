@@ -36,7 +36,8 @@ const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const authEnabled = useIsFeatureEnabled('project_auth:all')
+  const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
+    useIsFeatureEnabled(['project_auth:all', 'project_settings:database_upgrades'])
 
   const {
     data,
@@ -109,6 +110,7 @@ const InfrastructureInfo = () => {
               </Alert_Shadcn_>
             ) : (
               <>
+                {/* [Joshen] Double check why we need this waterfall loading behaviour here */}
                 {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
                 {isErrorUpgradeEligibility && (
                   <AlertError error={error} subject="Failed to retrieve Postgres version" />
@@ -187,7 +189,7 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {data.eligible ? (
+                    {showDatabaseUpgrades && data.eligible ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (
@@ -195,7 +197,7 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {!data.eligible ? (
+                    {showDatabaseUpgrades && !data.eligible ? (
                       hasObjectsToBeDropped ? (
                         <ObjectsToBeDroppedWarning
                           objectsToBeDropped={data.objects_to_be_dropped}
