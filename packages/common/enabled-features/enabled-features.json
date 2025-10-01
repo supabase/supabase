@@ -65,6 +65,7 @@
   "logs:collections": true,
 
   "organization:show_sso_settings": true,
+  "organization:show_security_settings": true,
 
   "profile:show_email": true,
   "profile:show_information": true,

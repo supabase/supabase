@@ -229,6 +229,10 @@
       "type": "boolean",
       "description": "Show the SSO settings tab in the organization settings page"
     },
+    "organization:show_security_settings": {
+      "type": "boolean",
+      "description": "Show the security settings tab in the organization settings page"
+    },
 
     "profile:show_email": {
       "type": "boolean",
