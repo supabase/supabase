@@ -35,12 +35,15 @@ export const FilesBuckets = () => {
     return (
       <>
         <EmptyBucketState bucketType="files" onCreateBucket={handleCreateBucket} />
-        <CreateBucketModal hideAnalyticsOption={true} />
+        <CreateBucketModal
+          hideAnalyticsOption={true}
+          visible={showCreateBucketModal}
+          onOpenChange={setShowCreateBucketModal}
+        />
       </>
     )
   }
 
-  // TODO: Implement bucket list view when buckets exist
   return (
     <div className="space-y-12">
       <ScaffoldSection>
@@ -48,10 +51,9 @@ export const FilesBuckets = () => {
           <FormHeader
             title="Buckets"
             actions={
-              //   <Button type="primary" icon={<Plus size={14} />} onClick={handleCreateBucket}>
-              //     New media bucket
-              //   </Button>
-              <CreateBucketModal hideAnalyticsOption={true} />
+              <Button type="primary" icon={<Plus size={14} />} onClick={handleCreateBucket}>
+                New media bucket
+              </Button>
             }
           />
 
@@ -66,6 +68,12 @@ export const FilesBuckets = () => {
               </div>
             ))}
           </div>
+
+          <CreateBucketModal
+            hideAnalyticsOption={true}
+            visible={showCreateBucketModal}
+            onOpenChange={setShowCreateBucketModal}
+          />
         </div>
       </ScaffoldSection>
     </div>

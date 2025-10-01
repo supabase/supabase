@@ -97,14 +97,24 @@ export type CreateBucketForm = z.infer<typeof FormSchema>
 
 interface CreateBucketModalProps {
   hideAnalyticsOption?: boolean
+  visible?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export const CreateBucketModal = ({ hideAnalyticsOption = false }: CreateBucketModalProps = {}) => {
+export const CreateBucketModal = ({
+  hideAnalyticsOption = false,
+  visible: externalVisible,
+  onOpenChange: externalOnOpenChange,
+}: CreateBucketModalProps = {}) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const [visible, setVisible] = useState(false)
+  const [internalVisible, setInternalVisible] = useState(false)
+
+  // Use external control if provided, otherwise use internal state
+  const visible = externalVisible !== undefined ? externalVisible : internalVisible
+  const setVisible = externalOnOpenChange || setInternalVisible
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
 
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -229,26 +239,29 @@ export const CreateBucketModal = ({ hideAnalyticsOption = false }: CreateBucketM
         }
       }}
     >
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          block
-          type="default"
-          icon={<Edit />}
-          disabled={!canCreateBuckets}
-          style={{ justifyContent: 'start' }}
-          onClick={() => setVisible(true)}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canCreateBuckets
-                ? 'You need additional permissions to create buckets'
-                : undefined,
-            },
-          }}
-        >
-          New bucket
-        </ButtonTooltip>
-      </DialogTrigger>
+      {/* Only show trigger button when not using external control */}
+      {externalVisible === undefined && (
+        <DialogTrigger asChild>
+          <ButtonTooltip
+            block
+            type="default"
+            icon={<Edit />}
+            disabled={!canCreateBuckets}
+            style={{ justifyContent: 'start' }}
+            onClick={() => setVisible(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canCreateBuckets
+                  ? 'You need additional permissions to create buckets'
+                  : undefined,
+              },
+            }}
+          >
+            New bucket
+          </ButtonTooltip>
+        </DialogTrigger>
+      )}
 
       <DialogContent>
         <DialogHeader>
