@@ -145,7 +145,11 @@ export const SupportFormV2 = ({
 
   const categoryOptions = useMemo(() => {
     return CATEGORY_OPTIONS.filter((option) => {
-      if (option.value === SupportCategories.BILLING || option.value === SupportCategories.REFUND) {
+      if (
+        option.value === SupportCategories.BILLING ||
+        option.value === SupportCategories.REFUND ||
+        option.value === SupportCategories.SALES_ENQUIRY
+      ) {
         return isBillingEnabled
       }
       return true
