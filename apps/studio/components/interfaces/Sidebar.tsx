@@ -43,6 +43,7 @@ import {
 } from 'ui'
 import {
   useIsAPIDocsSidePanelEnabled,
+  useIsNewStorageUIEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
 import { useFlag } from 'common'
@@ -223,9 +224,12 @@ const ProjectLinks = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const snap = useAppStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
+
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const isStorageV2 = useIsNewStorageUIEnabled()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -250,10 +254,8 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
+    isStorageV2,
   })
-
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
-
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,
     showReports,

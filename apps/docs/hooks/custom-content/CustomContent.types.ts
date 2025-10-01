@@ -1,7 +1,9 @@
 export type CustomContentTypes = {
   homepageHeading: string
-  navigationLogoUrl: {
+  navigationLogo: {
     light: string
     dark: string
+    width?: number
+    height?: number
   }
 }

@@ -41,6 +41,7 @@ export const generateToolRoutes = (ref?: string, project?: Project, features?: {
     },
   ]
 }
+
 export const generateProductRoutes = (
   ref?: string,
   project?: Project,
@@ -50,6 +51,7 @@ export const generateProductRoutes = (
     storage?: boolean
     realtime?: boolean
     authOverviewPage?: boolean
+    isStorageV2?: boolean
   }
 ): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -61,6 +63,7 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
   const authOverviewPageEnabled = features?.authOverviewPage ?? false
+  const isStorageV2 = features?.isStorageV2 ?? false
 
   const databaseMenu = generateDatabaseMenu(project)
   const authMenu = generateAuthMenu(ref as string)
@@ -102,7 +105,11 @@ export const generateProductRoutes = (
             key: 'storage',
             label: 'Storage',
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`),
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/storage/${isStorageV2 ? 'files' : 'buckets'}`),
           },
         ]
       : []),
