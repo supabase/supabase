@@ -10,7 +10,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         {
           name: 'user_id',
@@ -40,7 +39,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         {
           name: 'author_id',
@@ -67,7 +65,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         {
           name: 'follower_id',
@@ -98,7 +95,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         { name: 'name', type: 'text', nullable: false },
         { name: 'slug', type: 'text', nullable: false, unique: true },
@@ -125,7 +121,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         { name: 'order_number', type: 'text', nullable: false, unique: true },
         {
@@ -155,7 +150,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         {
           name: 'user_id',
@@ -187,7 +181,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         { name: 'title', type: 'text', nullable: false },
         { name: 'slug', type: 'text', nullable: false, unique: true },
@@ -217,7 +210,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         { name: 'name', type: 'text', nullable: false },
         { name: 'slug', type: 'text', nullable: false, unique: true },
@@ -236,7 +228,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         {
           name: 'article_id',
@@ -264,7 +255,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         { name: 'title', type: 'text', nullable: false },
         { name: 'description', type: 'text', nullable: true },
@@ -293,7 +283,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         { name: 'name', type: 'text', nullable: false },
         { name: 'description', type: 'text', nullable: true },
@@ -320,7 +309,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         {
           name: 'task_id',
@@ -347,7 +335,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         {
           name: 'user_id',
@@ -374,7 +361,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         {
           name: 'user_id',
@@ -400,7 +386,6 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
           type: 'uuid',
           nullable: false,
           isPrimary: true,
-          default: 'gen_random_uuid()',
         },
         { name: 'metric_name', type: 'text', nullable: false },
         { name: 'value', type: 'numeric', nullable: false },
