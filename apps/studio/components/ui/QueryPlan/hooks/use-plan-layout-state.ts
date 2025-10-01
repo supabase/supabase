@@ -16,6 +16,27 @@ export type UsePlanLayoutStateParams = {
   setIsExpanded: (value: SetStateAction<boolean>) => void
 }
 
+const centerNodeInView = (nodeId: string, rfInstance: ReactFlowInstance) => {
+  if (!rfInstance) return
+
+  const node = rfInstance.getNode(nodeId)
+  if (!node) return
+
+  const position = node.positionAbsolute ?? node.position
+  const nodeWidth = node.width ?? DEFAULT_NODE_WIDTH
+  const nodeHeight = node.height ?? DEFAULT_NODE_HEIGHT
+  const centerX = position.x + nodeWidth / 2
+  const centerY = position.y + nodeHeight / 2
+
+  const currentZoom = rfInstance.getZoom()
+  const targetZoom = currentZoom < 1 ? 1 : currentZoom
+
+  rfInstance.setCenter(centerX, centerY, {
+    zoom: targetZoom,
+    duration: 400,
+  })
+}
+
 export const usePlanLayoutState = ({
   layoutNodes,
   isExpanded,
@@ -45,30 +66,6 @@ export const usePlanLayoutState = ({
       if (secondFrameId) cancelAnimationFrame(secondFrameId)
     }
   }, [isExpanded, rfInstance])
-
-  const centerNodeInView = useCallback(
-    (nodeId: string) => {
-      if (!rfInstance) return
-
-      const node = rfInstance.getNode(nodeId)
-      if (!node) return
-
-      const position = node.positionAbsolute ?? node.position
-      const nodeWidth = node.width ?? DEFAULT_NODE_WIDTH
-      const nodeHeight = node.height ?? DEFAULT_NODE_HEIGHT
-      const centerX = position.x + nodeWidth / 2
-      const centerY = position.y + nodeHeight / 2
-
-      const currentZoom = rfInstance.getZoom()
-      const targetZoom = currentZoom < 1 ? 1 : currentZoom
-
-      rfInstance.setCenter(centerX, centerY, {
-        zoom: targetZoom,
-        duration: 400,
-      })
-    },
-    [rfInstance]
-  )
 
   const handleSelectNode = useCallback((node: Node<PlanNodeData>) => {
     setSelectedNodeId(node.id)
@@ -151,7 +148,7 @@ export const usePlanLayoutState = ({
 
     frameId = requestAnimationFrame(() => {
       secondFrameId = requestAnimationFrame(() => {
-        centerNodeInView(selectedNodeId)
+        centerNodeInView(selectedNodeId, rfInstance)
       })
     })
 
