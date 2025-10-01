@@ -156,36 +156,7 @@ export const usePlanLayoutState = ({
       if (frameId !== null) cancelAnimationFrame(frameId)
       if (secondFrameId !== null) cancelAnimationFrame(secondFrameId)
     }
-  }, [centerNodeInView, rfInstance, selectedNodeId])
-
-  useEffect(() => {
-    if (!isExpanded || typeof document === 'undefined') return
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-    }
-  }, [isExpanded])
-
-  useEffect(() => {
-    if (!isExpanded) return
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-
-      event.stopPropagation()
-      event.preventDefault()
-
-      setIsExpanded(false)
-    }
-
-    window.addEventListener('keydown', handleKeyDown, true)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown, true)
-    }
-  }, [isExpanded, setIsExpanded])
+  }, [rfInstance, selectedNodeId])
 
   const clearSelection = useCallback(() => {
     if (draggingNodeRef.current) return
