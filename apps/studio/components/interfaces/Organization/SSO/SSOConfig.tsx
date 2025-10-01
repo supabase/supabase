@@ -67,7 +67,7 @@ export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 export const SSOConfig = () => {
   const FORM_ID = 'sso-config-form'
 
-  const { data: organization, isLoading: isLoadingOrganization } = useSelectedOrganizationQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan.id
   const canSetupSSOConfig = ['team', 'enterprise'].includes(plan ?? '')
 

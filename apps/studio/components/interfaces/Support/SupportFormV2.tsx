@@ -128,8 +128,6 @@ interface SupportFormV2Props {
   setSentCategory: (value: string) => void
 }
 
-// [Joshen] Just naming it as V2 for now for PR review purposes so its easier to view
-// This is a rewrite of the old SupportForm to use the new form components
 export const SupportFormV2 = ({
   onProjectSelected: setSelectedProject,
   onOrganizationSelected: setSelectedOrganization,
@@ -161,7 +159,8 @@ export const SupportFormV2 = ({
         option.value === SupportCategories.SALES_ENQUIRY
       ) {
         return isBillingEnabled
-      }
+      } else if (option.value === 'Plan_upgrade') return !isBillingEnabled
+
       return true
     })
   }, [isBillingEnabled])
@@ -323,7 +322,7 @@ export const SupportFormV2 = ({
       if (isSuccessOrganizations) {
         if (organizations.length === 0) {
           form.setValue('organizationSlug', 'no-org')
-        } else if (urlRef) {
+        } else if (urlRef && urlRef !== 'no-project') {
           // Check validity of project via project details
           const selectedProject = await getProjectDetail({ ref: urlRef })
           if (!!selectedProject) {
@@ -750,7 +749,7 @@ export const SupportFormV2 = ({
 
         {library && library.length > 0 && <LibrarySuggestions library={library} />}
 
-        {category !== 'Login_issues' && (
+        {category !== 'Login_issues' && category !== 'Plan_upgrade' && (
           <FormField_Shadcn_
             name="affectedServices"
             control={form.control}
