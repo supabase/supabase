@@ -270,15 +270,6 @@ export const SessionsAuthSettingsForm = () => {
           >
             <Card>
               <CardContent>
-                {promptProPlanUpgrade && (
-                  <div className="mb-4">
-                    <UpgradeToPro
-                      primaryText="Upgrade to Pro"
-                      secondaryText="Configuring user sessions requires the Pro Plan."
-                    />
-                  </div>
-                )}
-
                 <FormField_Shadcn_
                   control={userSessionsForm.control}
                   name="SESSIONS_SINGLE_PER_USER"
@@ -352,6 +343,15 @@ export const SessionsAuthSettingsForm = () => {
                   )}
                 />
               </CardContent>
+
+              {promptProPlanUpgrade && (
+                <UpgradeToPro
+                  fullWidth
+                  primaryText="Configuring user sessions is only available on the Pro Plan and above"
+                  secondaryText="Upgrade to the Pro plan to configure settings for user sessions"
+                />
+              )}
+
               <CardFooter className="justify-end space-x-2">
                 {userSessionsForm.formState.isDirty && (
                   <Button type="default" onClick={() => userSessionsForm.reset()}>

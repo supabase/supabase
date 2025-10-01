@@ -10,6 +10,7 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
@@ -309,13 +310,7 @@ export const InviteMemberButton = () => {
                         </Link>
                       </Button>
                       {(currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
-                        <Button asChild type="default">
-                          <Link
-                            href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
-                          >
-                            Upgrade to Team
-                          </Link>
-                        </Button>
+                        <UpgradePlanButton source="inviteMemberSSO" plan="Team" />
                       )}
                     </div>
                   </div>
