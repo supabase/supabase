@@ -20,7 +20,7 @@ export const ToggleSpendCapButton = ({
 
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
-  const subject = `[Joshen Test] Enquiry to ${action} spend cap for organization`
+  const subject = `Enquiry to ${action} spend cap for organization`
   const message = `Name: ${organization?.name}\nSlug: ${organization?.slug}`
 
   const href = billingAll

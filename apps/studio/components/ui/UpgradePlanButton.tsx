@@ -11,8 +11,7 @@ interface UpgradePlanButtonProps {
   source?: string
   type?: 'default' | 'primary'
   plan?: 'Pro' | 'Team' | 'Enterprise'
-  // [Joshen] As an override if needed (Used in UpgradeToPro)
-  href?: string
+  href?: string // [Joshen] As an override if needed (Used in UpgradeToPro)
   disabled?: boolean
 }
 
@@ -29,7 +28,7 @@ export const UpgradePlanButton = ({
 
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
-  const subject = `[Joshen Test] Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
+  const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
   const message = `Name: ${organization?.name}\nSlug: ${organization?.slug}\nRequested plan: ${plan ?? PLAN_REQUEST_EMPTY}`
 
   const href = billingAll
