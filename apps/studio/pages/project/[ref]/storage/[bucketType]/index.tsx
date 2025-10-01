@@ -4,6 +4,9 @@ import { useEffect } from 'react'
 import { useParams } from 'common'
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BUCKET_TYPES, DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
+import { FilesBuckets } from 'components/interfaces/Storage/FilesBuckets'
+import { AnalyticsBuckets } from 'components/interfaces/Storage/AnalyticsBuckets'
+import { VectorsBuckets } from 'components/interfaces/Storage/VectorsBuckets'
 import { BucketTypeLayout } from 'components/layouts/StorageLayout/BucketLayout'
 import type { NextPageWithLayout } from 'types'
 
@@ -25,12 +28,20 @@ const BucketTypePage: NextPageWithLayout = () => {
     }
   }, [config, ref, router])
 
-  return (
-    <div>
-      {/* [Danny] Purposefully duplicated directly below StorageLayout's config.description for now. Will be placed in a conditional empty state in next PR. TODO: consider reusing FormHeader for non-empty state.*/}
-      {/* <p className="text-foreground-light mb-4">{config.description}</p> */}
-    </div>
-  )
+  const renderBucketTypeContent = () => {
+    switch (bucketTypeKey) {
+      case 'files':
+        return <FilesBuckets />
+      case 'analytics':
+        return <AnalyticsBuckets />
+      case 'vectors':
+        return <VectorsBuckets />
+      default:
+        return <FilesBuckets />
+    }
+  }
+
+  return <div>{renderBucketTypeContent()}</div>
 }
 
 BucketTypePage.getLayout = (page) => {
