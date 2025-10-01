@@ -54,6 +54,7 @@
   "docs:web_apps": true,
 
   "edge_functions:show_stripe_example": true,
+  "edge_functions:show_all_edge_function_invocation_examples": true,
 
   "feedback:docs": true,
 
