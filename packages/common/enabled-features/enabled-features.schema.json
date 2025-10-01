@@ -197,6 +197,10 @@
       "type": "boolean",
       "description": "Show all the Stripe example in edge function templates in the edge functions page."
     },
+    "edge_functions:show_all_edge_function_invocation_examples": {
+      "type": "boolean",
+      "description": "Show all the invocation examples in the edge function details page. (If off, it will only show cURL and Javascript invocation examples)"
+    },
 
     "feedback:docs": {
       "type": "boolean",
@@ -228,6 +232,10 @@
     "organization:show_sso_settings": {
       "type": "boolean",
       "description": "Show the SSO settings tab in the organization settings page"
+    },
+    "organization:show_security_settings": {
+      "type": "boolean",
+      "description": "Show the security settings tab in the organization settings page"
     },
 
     "profile:show_email": {

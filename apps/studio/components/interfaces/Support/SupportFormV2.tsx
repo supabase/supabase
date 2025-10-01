@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   Book,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useQueryState } from 'nuqs'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -33,7 +35,6 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useQueryState } from 'nuqs'
 import {
   Badge,
   Button,
@@ -149,7 +150,21 @@ export const SupportFormV2 = ({
   const router = useRouter()
   const dashboardSentryIssueId = router.query.sid as string
 
+  const isBillingEnabled = useIsFeatureEnabled('billing:all')
   const showClientLibraries = useIsFeatureEnabled('support:show_client_libraries')
+
+  const categoryOptions = useMemo(() => {
+    return CATEGORY_OPTIONS.filter((option) => {
+      if (
+        option.value === SupportCategories.BILLING ||
+        option.value === SupportCategories.REFUND ||
+        option.value === SupportCategories.SALES_ENQUIRY
+      ) {
+        return isBillingEnabled
+      }
+      return true
+    })
+  }, [isBillingEnabled])
 
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -333,7 +348,7 @@ export const SupportFormV2 = ({
 
   useEffect(() => {
     if (urlCategory) {
-      const validCategory = CATEGORY_OPTIONS.find((option) => {
+      const validCategory = categoryOptions.find((option) => {
         if (option.value.toLowerCase() === ((urlCategory as string) ?? '').toLowerCase())
           return option
       })
@@ -549,13 +564,13 @@ export const SupportFormV2 = ({
                     <SelectTrigger_Shadcn_ className="w-full">
                       <SelectValue_Shadcn_ placeholder="Select an issue">
                         {field.value
-                          ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
+                          ? categoryOptions.find((o) => o.value === field.value)?.label
                           : null}
                       </SelectValue_Shadcn_>
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
-                        {CATEGORY_OPTIONS.map((option) => (
+                        {categoryOptions.map((option) => (
                           <SelectItem_Shadcn_ key={option.value} value={option.value}>
                             {option.label}
                             <span className="block text-xs text-foreground-lighter">

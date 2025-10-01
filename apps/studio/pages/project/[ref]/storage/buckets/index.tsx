@@ -1,5 +1,9 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
+import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
@@ -9,17 +13,22 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
-/**
- * PageLayout is used to setup layout - as usual it will requires inject global store
- */
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
+  const router = useRouter()
+  const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
   const { error, isError } = useBucketsQuery({ projectRef: ref })
 
+  useEffect(() => {
+    if (isStorageV2) {
+      router.replace(`/project/${ref}/storage/${DEFAULT_BUCKET_TYPE}`)
+    }
+  }, [isStorageV2, ref, router])
+
   if (!project) return null
 
-  if (isError) <StorageBucketsError error={error as any} />
+  if (isError) return <StorageBucketsError error={error as any} />
 
   return (
     <div className="storage-container flex flex-grow">
