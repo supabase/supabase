@@ -2,7 +2,7 @@ name: Trigger Nimbus Sync
 
 on:
   push:
-    branches: [master]
+    branches: [master, chore/add-nimbus-auto-sync]
   workflow_dispatch: # Allow manual triggering
 
 jobs:
