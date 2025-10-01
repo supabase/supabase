@@ -354,6 +354,11 @@
     "search:fullIndex": {
       "type": "boolean",
       "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
+    },
+
+    "support:show_client_libraries": {
+      "type": "boolean",
+      "description": "Show the client libraries dropdown input and suggestions in the support form if the category 'API and client libraries' is selected"
     }
   },
   "required": [

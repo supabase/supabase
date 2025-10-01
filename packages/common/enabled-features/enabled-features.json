@@ -103,5 +103,7 @@
   "sdk:python": true,
   "sdk:swift": true,
 
-  "search:fullIndex": true
+  "search:fullIndex": true,
+
+  "support:show_client_libraries": true
 }
