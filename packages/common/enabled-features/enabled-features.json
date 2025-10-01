@@ -33,6 +33,7 @@
 
   "database:replication": true,
   "database:roles": true,
+  "database:restore_to_new_project": true,
 
   "docs:auth_architecture": true,
   "docs:auth_configuration": true,

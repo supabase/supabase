@@ -119,6 +119,10 @@
       "type": "boolean",
       "description": "Enable the database roles page"
     },
+    "database:restore_to_new_project": {
+      "type": "boolean",
+      "description": "Enable the restore to new project page under backups"
+    },
 
     "docs:auth_architecture": {
       "type": "boolean",
@@ -401,6 +405,7 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
+    "database:restore_to_new_project",
     "docs:auth_architecture",
     "docs:auth_configuration",
     "docs:auth_flows",
