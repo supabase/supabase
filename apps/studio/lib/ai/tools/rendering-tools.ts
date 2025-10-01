@@ -7,6 +7,13 @@ export const getRenderingTools = () => ({
     inputSchema: z.object({
       sql: z.string().describe('The SQL statement to execute.'),
       label: z.string().describe('A short 2-4 word label for the SQL statement.'),
+      chartConfig: z
+        .object({
+          view: z.enum(['table', 'chart']).describe('How to render the results after execution'),
+          xAxis: z.string().optional().describe('The column to use for the x-axis of the chart.'),
+          yAxis: z.string().optional().describe('The column to use for the y-axis of the chart.'),
+        })
+        .describe('Chart configuration for rendering the results'),
       isWriteQuery: z
         .boolean()
         .describe(
