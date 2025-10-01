@@ -1,3 +1,10 @@
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+
 export const OverviewLearnMore = () => {
-  return <div>Learn more content goes here...</div>
+  return (
+    <ScaffoldSection isFullWidth>
+      <ScaffoldSectionTitle className="mb-4">Learn more</ScaffoldSectionTitle>
+      <div>Items here...</div>
+    </ScaffoldSection>
+  )
 }

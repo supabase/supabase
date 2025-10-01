@@ -31,13 +31,11 @@ const AuthOverview: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainer size="large">
-      <ScaffoldSection isFullWidth>
-        <div className="mb-4 flex flex-col gap-6">
-          <OverviewMonitoring />
-          <OverviewUsage />
-          <OverviewLearnMore />
-        </div>
-      </ScaffoldSection>
+      <div className="mb-4 flex flex-col gap-2">
+        <OverviewMonitoring />
+        <OverviewUsage />
+        <OverviewLearnMore />
+      </div>
     </ScaffoldContainer>
   )
 }
