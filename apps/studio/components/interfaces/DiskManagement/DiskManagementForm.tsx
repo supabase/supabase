@@ -30,6 +30,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import {
   useIsAwsCloudProvider,
   useIsAwsK8sCloudProvider,
+  useIsAwsNimbusCloudProvider,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
@@ -78,6 +79,7 @@ export function DiskManagementForm() {
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -205,7 +207,7 @@ export function DiskManagementForm() {
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration ||
-    !isAws
+    (!isAws && !isAwsNimbus)
 
   const disableComputeInputs = isPlanUpgradeRequired
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
@@ -349,7 +351,7 @@ export function DiskManagementForm() {
           <SpendCapDisabledSection />
           <NoticeBar
             type="default"
-            visible={!isAws}
+            visible={!isAws && !isAwsNimbus}
             title="Disk configuration is only available for projects in the AWS cloud provider"
             description={
               isAwsK8s
