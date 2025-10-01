@@ -5,7 +5,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
 
-export const PLAN_REQUEST_EMPTY = '<Specify which plan to upgrade to: Pro | Team | Enterprise>'
+export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
+  '<Specify which plan to upgrade to: Pro | Team | Enterprise>'
 
 interface UpgradePlanButtonProps {
   source?: string
@@ -29,7 +30,7 @@ export const UpgradePlanButton = ({
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
-  const message = `Name: ${organization?.name}\nSlug: ${organization?.slug}\nRequested plan: ${plan ?? PLAN_REQUEST_EMPTY}`
+  const message = `Name: ${organization?.name}\nSlug: ${organization?.slug}\nRequested plan: ${plan ?? PLAN_REQUEST_EMPTY_PLACEHOLDER}`
 
   const href = billingAll
     ? propsHref ??
