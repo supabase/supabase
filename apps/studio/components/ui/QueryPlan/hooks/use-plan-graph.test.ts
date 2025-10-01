@@ -64,14 +64,18 @@ describe('usePlanGraph', () => {
 
     expect(result.current.nodes).toHaveLength(0)
     expect(result.current.meta?.errorMessage).toBe('Invalid EXPLAIN JSON: Plan node not found.')
-    expect(result.current.meta?.errorDetail).toContain('Provide output from EXPLAIN')
+    expect(result.current.meta?.errorDetail).toContain(
+      'The EXPLAIN (FORMAT JSON) result was invalid. The root should be an array and its first element must contain a "Plan" object.'
+    )
   })
 
   it('returns parse error when JSON parsing fails', () => {
     const { result } = renderHook(() => usePlanGraph('not json'))
 
     expect(mockGraph).not.toHaveBeenCalled()
-    expect(result.current.meta?.errorMessage).toBe('Failed to parse JSON')
-    expect(result.current.meta?.errorDetail).toContain('Paste valid JSON from EXPLAIN')
+    expect(result.current.meta?.errorMessage).toBe('Failed to parse EXPLAIN JSON')
+    expect(result.current.meta?.errorDetail).toContain(
+      'The EXPLAIN (FORMAT JSON) result was not valid JSON.'
+    )
   })
 })
