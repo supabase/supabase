@@ -6832,6 +6832,7 @@ functions:
     title: on().subscribe()
     notes: |
       - By default, Broadcast and Presence are enabled for all projects.
+      - Presence is automatically enabled when you attach presence callbacks (`on_presence_sync()`, `on_presence_join()`, or `on_presence_leave()`). If you add presence callbacks to an already joined channel, the channel will automatically resubscribe with presence enabled.
       - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
