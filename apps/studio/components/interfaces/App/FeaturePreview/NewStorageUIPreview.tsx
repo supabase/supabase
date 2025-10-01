@@ -1,12 +1,22 @@
-import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 
+import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { BASE_PATH } from 'lib/constants'
+import { useIsNewStorageUIEnabled } from './FeaturePreviewContext'
+
 export const NewStorageUIPreview = () => {
+  const { ref } = useParams()
+  const isStorageV2 = useIsNewStorageUIEnabled()
+
   return (
     <div className="text-sm text-foreground-light">
       <p className=" mb-4">
-        Experience our enhanced Storage interface with support for analytics and vector bucket
-        types.
+        Experience our enhanced{' '}
+        <InlineLink href={`/project/${ref ?? '_'}/storage/${isStorageV2 ? 'files' : 'buckets'}`}>
+          Storage interface
+        </InlineLink>{' '}
+        with support for analytics and vector bucket types.
       </p>
       <Image
         alt="new-storage-preview"
@@ -16,7 +26,7 @@ export const NewStorageUIPreview = () => {
         className="rounded border mb-4"
       />
       <div className="space-y-2 !mt-4">
-        <p>Enabling this preview will:</p>
+        <p className="text-foreground">Enabling this preview will:</p>
         <ul className="list-disc pl-6  space-y-1">
           <li>Move Storage buckets from the sidebar into the main content area</li>
           <li>Change the role of the sidebar to a bucket type selector</li>

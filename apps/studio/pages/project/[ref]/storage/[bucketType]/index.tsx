@@ -5,7 +5,6 @@ import { useParams } from 'common'
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BUCKET_TYPES, DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import { BucketTypeLayout } from 'components/layouts/StorageLayout/BucketLayout'
-import { DocsButton } from 'components/ui/DocsButton'
 import type { NextPageWithLayout } from 'types'
 
 const BucketTypePage: NextPageWithLayout = () => {
@@ -30,7 +29,6 @@ const BucketTypePage: NextPageWithLayout = () => {
     <div>
       {/* [Danny] Purposefully duplicated directly below StorageLayout's config.description for now. Will be placed in a conditional empty state in next PR. TODO: consider reusing FormHeader for non-empty state.*/}
       {/* <p className="text-foreground-light mb-4">{config.description}</p> */}
-      <DocsButton href={config.docsUrl} />
     </div>
   )
 }
