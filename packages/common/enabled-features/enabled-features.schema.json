@@ -336,6 +336,10 @@
       "type": "boolean",
       "description": "Enable the log drains page in project settings"
     },
+    "project_settings:restart_project": {
+      "type": "boolean",
+      "description": "Show the option to restart project in project settings (If off, only fast database reboot will be shown)"
+    },
     "project_settings:database_upgrades": {
       "type": "boolean",
       "description": "Show database upgrade callouts in the project settings infrastructure page"
@@ -456,6 +460,7 @@
     "project_settings:show_disable_legacy_api_keys",
     "project_settings:legacy_jwt_keys",
     "project_settings:log_drains",
+    "project_settings:restart_project",
     "project_settings:database_upgrades",
     "project_connection:javascript_example",
     "project_connection:dart_example",
