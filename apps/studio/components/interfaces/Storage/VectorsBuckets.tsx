@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { EmptyBucketState } from './EmptyBucketState'
-import { CreateBucketModalV2 } from './CreateBucketModalV2'
+import { CreateBucketModalSpecialized } from './CreateBucketModalSpecialized'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { Bucket } from 'data/storage/buckets-query'
 
@@ -32,10 +32,10 @@ export const VectorsBuckets = () => {
     return (
       <>
         <EmptyBucketState bucketType="vectors" onCreateBucket={handleCreateBucket} />
-        <CreateBucketModalV2
+        <CreateBucketModalSpecialized
           visible={showCreateBucketModal}
           onOpenChange={setShowCreateBucketModal}
-          defaultBucketType="VECTORS"
+          bucketType="VECTORS"
         />
       </>
     )
@@ -65,10 +65,10 @@ export const VectorsBuckets = () => {
         ))}
       </div>
 
-      <CreateBucketModalV2
+      <CreateBucketModalSpecialized
         visible={showCreateBucketModal}
         onOpenChange={setShowCreateBucketModal}
-        defaultBucketType="VECTORS"
+        bucketType="VECTORS"
       />
     </div>
   )

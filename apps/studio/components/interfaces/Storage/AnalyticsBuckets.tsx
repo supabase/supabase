@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { EmptyBucketState } from './EmptyBucketState'
-import { CreateBucketModalV2 } from './CreateBucketModalV2'
+import { CreateBucketModalSpecialized } from './CreateBucketModalSpecialized'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { Bucket } from 'data/storage/buckets-query'
 
@@ -31,10 +31,10 @@ export const AnalyticsBuckets = () => {
     return (
       <>
         <EmptyBucketState bucketType="analytics" onCreateBucket={handleCreateBucket} />
-        <CreateBucketModalV2
+        <CreateBucketModalSpecialized
           visible={showCreateBucketModal}
           onOpenChange={setShowCreateBucketModal}
-          defaultBucketType="ANALYTICS"
+          bucketType="ANALYTICS"
         />
       </>
     )
@@ -64,10 +64,10 @@ export const AnalyticsBuckets = () => {
         ))}
       </div>
 
-      <CreateBucketModalV2
+      <CreateBucketModalSpecialized
         visible={showCreateBucketModal}
         onOpenChange={setShowCreateBucketModal}
-        defaultBucketType="ANALYTICS"
+        bucketType="ANALYTICS"
       />
     </div>
   )
