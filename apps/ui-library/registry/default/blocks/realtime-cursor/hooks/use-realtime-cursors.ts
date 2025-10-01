@@ -110,14 +110,14 @@ export const useRealtimeCursors = ({
 
     channel
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-        leftPresences.forEach(function(element) {
+        leftPresences.forEach(function (element) {
           // Remove cursor when user leaves
           setCursors((prev) => {
             if (prev[element.key]) {
               delete prev[element.key]
             }
 
-            return {...prev}
+            return { ...prev }
           })
         })
       })
