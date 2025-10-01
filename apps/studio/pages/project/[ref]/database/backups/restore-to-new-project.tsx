@@ -3,6 +3,7 @@ import { ChevronRightIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
 import { BackupsList } from 'components/interfaces/Database/Backups/RestoreToNewProject/BackupsList'
@@ -19,11 +20,13 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsAwsK8sCloudProvider,
@@ -37,6 +40,13 @@ import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, But
 import { Admonition, TimestampInfo } from 'ui-patterns'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
+  const { ref } = useParams()
+  const { databaseRestoreToNewProject } = useIsFeatureEnabled(['database:restore_to_new_project'])
+
+  if (!databaseRestoreToNewProject) {
+    return <UnknownInterface urlBack={`/project/${ref}/database/backups/scheduled`} />
+  }
+
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
