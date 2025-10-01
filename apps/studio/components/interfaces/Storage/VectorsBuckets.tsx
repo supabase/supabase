@@ -12,9 +12,9 @@ export const VectorsBuckets = () => {
 
   const { data: buckets = [], isLoading } = useBucketsQuery({ projectRef: ref })
 
-  // Filter for vector buckets (assuming they would have a 'VECTORS' type)
-  // Note: This might need to be adjusted based on actual bucket type implementation
-  const vectorsBuckets = buckets.filter((bucket: Bucket) => bucket.type === 'VECTORS')
+  // Filter for vector buckets (using ANALYTICS type as placeholder)
+  // Note: This will be updated when VECTORS type is properly implemented
+  const vectorsBuckets = buckets.filter((bucket: Bucket) => bucket.type === 'ANALYTICS')
 
   const handleCreateBucket = () => {
     setShowCreateBucketModal(true)
