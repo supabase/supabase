@@ -3,7 +3,7 @@ import type { Edge, Node } from 'reactflow'
 
 import type { PlanNodeData } from '../types'
 import type { MetricsVisibility, HeatmapMode } from '../contexts'
-import { getLayoutedElementsViaDagre } from '../utils/layout'
+import { getNodesWithPositionsViaDagre } from '../utils/layout'
 import { estimateNodeHeight } from '../utils/node-display'
 import { DEFAULT_NODE_WIDTH } from '../constants'
 
@@ -18,12 +18,12 @@ export function useDagreLayout(
 
     const sizes: Record<string, { width: number; height: number }> = {}
     nodes.forEach((n) => {
-      const d = n.data
-      const height = estimateNodeHeight(d, metricsVisibility, heatmapMode)
+      const data = n.data
+      const height = estimateNodeHeight(data, metricsVisibility, heatmapMode)
       sizes[n.id] = { width: DEFAULT_NODE_WIDTH, height }
     })
 
-    const { nodes: nl, edges: el } = getLayoutedElementsViaDagre(
+    const { nodes: nl, edges: el } = getNodesWithPositionsViaDagre(
       nodes.map((n) => ({ ...n })),
       edges.map((e) => ({ ...e })),
       sizes

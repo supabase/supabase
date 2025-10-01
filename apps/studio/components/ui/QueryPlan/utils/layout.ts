@@ -1,9 +1,11 @@
 import { Position, type Edge, type Node } from 'reactflow'
 import dagre from '@dagrejs/dagre'
+
+import type { PlanNodeData } from '../types'
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from '../constants'
 
-export const getLayoutedElementsViaDagre = (
-  nodes: Node[],
+export const getNodesWithPositionsViaDagre = (
+  nodes: Node<PlanNodeData>[],
   edges: Edge[],
   sizes?: Record<string, { width: number; height: number }>
 ) => {
