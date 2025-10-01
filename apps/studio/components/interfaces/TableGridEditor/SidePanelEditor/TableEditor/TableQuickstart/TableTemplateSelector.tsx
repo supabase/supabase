@@ -1,9 +1,11 @@
-import { useState, useCallback } from 'react'
-import { ArrowLeft, ChevronRight } from 'lucide-react'
-import { Button, cn } from 'ui'
+import { useState, useCallback, useMemo } from 'react'
 import { tableTemplates } from './templates'
-import { QuickstartVariant } from './types'
+import { QuickstartVariant, ViewMode } from './types'
 import { convertTableSuggestionToTableField } from './utils'
+import { InitialView } from './components/InitialView'
+import { CategoryView } from './components/CategoryView'
+import { ResultsView } from './components/ResultsView'
+import { createViewConfig, type ViewKey } from './viewConfig'
 import type { TableSuggestion } from './types'
 import type { TableField } from '../TableEditor.types'
 
@@ -14,123 +16,98 @@ interface TableTemplateSelectorProps {
   disabled?: boolean
 }
 
+interface ViewState {
+  mode: ViewMode
+  selectedCategory: string | null
+  selectedTemplate: TableSuggestion | null
+  generatedTables: TableSuggestion[]
+  error: string | null
+  isLoading: boolean
+}
+
+const initialViewState: ViewState = {
+  mode: ViewMode.INITIAL,
+  selectedCategory: null,
+  selectedTemplate: null,
+  generatedTables: [],
+  error: null,
+  isLoading: false,
+}
+
 export const TableTemplateSelector = ({
   variant,
   onSelectTemplate,
   onDismiss,
   disabled,
 }: TableTemplateSelectorProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [selectedTemplate, setSelectedTemplate] = useState<TableSuggestion | null>(null)
+  const [viewState, setViewState] = useState<ViewState>(initialViewState)
+
+  // Memoize view configuration
+  const viewConfig = useMemo(() => createViewConfig(), [])
 
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
-      setSelectedTemplate(template)
+      setViewState((prev) => ({ ...prev, selectedTemplate: template }))
     },
     [onSelectTemplate]
   )
 
-  const handleBack = useCallback(() => {
-    setSelectedCategory(null)
-    setSelectedTemplate(null)
+  const handleReset = useCallback(() => {
+    setViewState(initialViewState)
   }, [])
 
-  const categories = Object.keys(tableTemplates)
+  // Handler collection for views
+  const handlers = useMemo(
+    () => ({
+      onCategorySelect: (category: string) => {
+        setViewState((prev) => ({
+          ...prev,
+          mode: ViewMode.CATEGORY_SELECTED,
+          selectedCategory: category,
+        }))
+      },
+      onBack: handleReset,
+      onSelectTemplate: handleSelectTemplate,
+    }),
+    [handleReset, handleSelectTemplate]
+  )
 
-  // Category selection view
-  if (!selectedCategory) {
-    return (
-      <div className="rounded-lg border border-default bg-surface-75 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h3 className="text-sm font-medium">Quick start with a template</h3>
-            <p className="text-xs text-foreground-lighter mt-1">
-              Choose a category to explore pre-built table templates
-            </p>
-          </div>
-          {onDismiss && (
-            <Button type="text" size="tiny" onClick={onDismiss}>
-              Dismiss
-            </Button>
-          )}
-        </div>
+  // Get the appropriate view component
+  const getView = (): JSX.Element | null => {
+    const { mode, selectedCategory } = viewState
 
-        <div className="grid grid-cols-2 gap-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              disabled={disabled}
-              className={cn(
-                'text-left p-3 rounded-md border transition-colors',
-                'border-default hover:border-foreground-muted hover:bg-surface-100',
-                'disabled:opacity-50 disabled:cursor-not-allowed'
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-sm capitalize">{category}</span>
-                <ChevronRight size={14} className="text-foreground-muted" />
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    )
+    // Determine the view key based on mode
+    let viewKey: ViewKey = mode
+
+    // Get the view configuration
+    const config = viewConfig.get(viewKey)
+    if (!config) return null
+
+    // Check if view should render
+    if (config.shouldRender && !config.shouldRender(viewState)) {
+      return null
+    }
+
+    // Get templates for category view
+    const templates = selectedCategory ? tableTemplates[selectedCategory] ?? [] : []
+
+    // Render the view with all necessary props
+    return config.render({
+      // Components
+      InitialView,
+      CategoryView,
+      ResultsView,
+      // Props
+      variant,
+      disabled,
+      onDismiss,
+      state: viewState,
+      templates,
+      handlers,
+    })
   }
 
-  // Template selection view
-  const templates = tableTemplates[selectedCategory] || []
-
-  return (
-    <div className="rounded-lg border border-default bg-surface-75 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Button
-            type="text"
-            size="tiny"
-            icon={<ArrowLeft size={14} />}
-            onClick={handleBack}
-            disabled={disabled}
-          >
-            Back
-          </Button>
-          <div className="text-sm">
-            <span className="text-foreground-lighter">Category: </span>
-            <span className="capitalize">{selectedCategory}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid gap-2">
-        {templates.map((template) => (
-          <button
-            key={template.tableName}
-            onClick={() => handleSelectTemplate(template)}
-            disabled={disabled}
-            className={cn(
-              'text-left p-3 rounded-md border transition-all w-full',
-              selectedTemplate?.tableName === template.tableName
-                ? 'border-foreground bg-surface-200'
-                : 'border-default hover:border-foreground-muted hover:bg-surface-100',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="text-sm font-medium">{template.tableName}</div>
-                {template.rationale && (
-                  <div className="text-xs text-foreground-light mt-1">{template.rationale}</div>
-                )}
-              </div>
-              <div className="flex items-center gap-1 text-xs text-foreground-muted ml-3">
-                <span>{template.fields.length} columns</span>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
+  return getView()
 }
