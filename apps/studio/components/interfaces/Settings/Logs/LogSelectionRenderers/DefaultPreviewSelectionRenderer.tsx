@@ -1,5 +1,6 @@
 import { Service } from 'data/graphql/graphql'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -230,6 +231,8 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
   const path = typeof log.path === 'string' ? log.path : undefined
   const log_file = log?.metadata?.[0]?.log_file
 
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
+
   return (
     <div data-testid="log-selection" className={`p-2 flex flex-col`}>
       {log?.id && (
@@ -247,7 +250,9 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
         <PropertyRow key="event_message" keyName="event_message" value={log.event_message} />
       )}
       {!!log_file && <PropertyRow key="log_file" keyName="log_file" value={log_file} />}
-      {log?.metadata && <PropertyRow key="metadata" keyName="metadata" value={log.metadata} />}
+      {log?.metadata && logsMetadata && (
+        <PropertyRow key="metadata" keyName="metadata" value={log.metadata} />
+      )}
     </div>
   )
 }

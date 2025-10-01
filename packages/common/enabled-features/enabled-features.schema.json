@@ -228,6 +228,10 @@
       "type": "boolean",
       "description": "Enable the logs collections page"
     },
+    "logs:metadata": {
+      "type": "boolean",
+      "description": "Show the metadata field for logs in logs explorer"
+    },
 
     "organization:show_sso_settings": {
       "type": "boolean",
@@ -416,6 +420,7 @@
     "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
+    "logs:metadata",
     "organization:show_sso_settings",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
