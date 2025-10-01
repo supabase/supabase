@@ -15,4 +15,3 @@ jobs:
           token: ${{ secrets.NIMBUS_SYNC_TOKEN }}
           repository: supabase/supabase-nimbus
           event-type: sync_from_upstream
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
