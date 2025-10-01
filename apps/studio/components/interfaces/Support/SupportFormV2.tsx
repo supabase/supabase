@@ -180,7 +180,12 @@ export const SupportFormV2 = ({
         option.value === SupportCategories.SALES_ENQUIRY
       ) {
         return isBillingEnabled
-      } else if (option.value === 'Plan_upgrade') return !isBillingEnabled
+      } else if (option.value === 'Plan_upgrade') {
+        // [Joshen] THIS IS JUST FOR TESTING OF SENDING A SUPPORT TICKET ON STAGING PREVIEW
+        // REVERT THIS VALUE ONCE TESTING IS COMPLETED BEFORE MERGING
+        // return !isBillingEnabled
+        return true
+      }
 
       return true
     })
