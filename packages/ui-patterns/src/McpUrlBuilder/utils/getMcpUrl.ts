@@ -28,7 +28,7 @@ export function getMcpUrl({
   if (projectRef && isPlatform) {
     url.searchParams.set('project_ref', projectRef)
   }
-  if (readonly) {
+  if (readonly && isPlatform) {
     url.searchParams.set('read_only', 'true')
   }
   if (features.length > 0) {

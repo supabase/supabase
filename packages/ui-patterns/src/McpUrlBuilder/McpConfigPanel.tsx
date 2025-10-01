@@ -71,6 +71,7 @@ export function McpConfigPanel({
         <Separator />
         <McpConfigurationOptions
           className={innerPanelSpacing}
+          isPlatform={isPlatform}
           readonly={readonly}
           onReadonlyChange={setReadonly}
           selectedFeatures={selectedFeaturesSupported}
