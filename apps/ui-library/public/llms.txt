@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-08-27T11:26:46.645Z
+Last updated: 2025-10-01T08:17:53.484Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -31,6 +31,8 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/nextjs/social-auth)
     - Social authentication block for Next.js
+- [Supabase Client Libraries](https://supabase.com/ui/docs/nuxtjs/client)
+    - Supabase client for Nuxt.js
 - [Platform Kit](https://supabase.com/ui/docs/platform/platform-kit)
     - The easiest way to build platforms on top of Supabase
 - [Supabase Client Libraries](https://supabase.com/ui/docs/react-router/client)
@@ -83,5 +85,3 @@ Library of components for your project. The components integrate with Supabase a
     - Social authentication block for Tanstack Start
 - [Supabase Client Libraries](https://supabase.com/ui/docs/vue/client)
     - Supabase client for Vue Single Page Applications
-- [Supabase Client Libraries](https://supabase.com/ui/docs/nuxtjs/client)
-    - Supabase client for Nuxt.js
