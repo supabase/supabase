@@ -1,18 +1,16 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { compact, filter } from 'lodash'
-import { useEffect, useState } from 'react'
+import { compact } from 'lodash'
+import { useEffect } from 'react'
 import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 
 import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
-import { useUrlState } from 'hooks/ui/useUrlState'
+import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { copyToClipboard } from 'ui'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
-import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
-
 export const LOAD_TAB_FROM_CACHE_PARAM = 'loadFromCache'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
@@ -228,11 +226,11 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
         projectRef,
         tableName: table.name,
         schema: table.schema,
-        sorts: latestUrlParams.sort,
-        filters: latestUrlParams.filter,
+        sorts: urlParams.sort,
+        filters: urlParams.filter,
       })
     }
-  }, [urlParams, table, projectRef])
+  }, [urlParams, updateUrlParams, table, projectRef])
 }
 
 export const handleCopyCell = (
