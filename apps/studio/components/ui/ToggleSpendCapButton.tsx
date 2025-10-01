@@ -28,7 +28,7 @@ export const ToggleSpendCapButton = ({
     : `/support/new?slug=${slug}&projectRef=no-project&category=Plan_upgrade&subject=${subject}&message=${encodeURIComponent(message)}`
 
   return (
-    <Button type={type}>
+    <Button type={type} asChild>
       <Link href={href} className="capitalize">
         {children || `${action} spend cap`}
       </Link>
