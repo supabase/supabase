@@ -91,6 +91,7 @@
   "project_settings:show_disable_legacy_api_keys": true,
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
+  "project_settings:restart_project": true,
 
   "quickstarts:hide_nimbus": true,
 
