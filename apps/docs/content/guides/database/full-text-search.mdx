@@ -1224,6 +1224,240 @@ data = client.from_('books').select().text_search('description', "'big' & !'litt
 </$Show>
 </Tabs>
 
+## Ranking search results [#ranking]
+
+PostgreSQL provides ranking functions to sort search results by relevance, helping you present the most relevant matches first. Since ranking functions need to be computed server-side, we'll use RPC functions and generated columns.
+
+### Creating a search function with ranking [#search-function-ranking]
+
+First, create a PostgreSQL function that handles search and ranking:
+
+```sql
+create or replace function search_books(search_query text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select 
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(to_tsvector('english', books.description), to_tsquery(search_query)) as rank
+  from books
+  where to_tsvector('english', books.description) @@ to_tsquery(search_query)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+Now you can call this function from your client:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase
+  .rpc('search_books', { search_query: 'big' })
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+final result = await client
+  .rpc('search_books', params: { 'search_query': 'big' });
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+data = client.rpc('search_books', { 'search_query': 'big' }).execute()
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select * from search_books('big');
+```
+
+</TabPanel>
+</Tabs>
+
+### Ranking with weighted columns [#weighted-ranking]
+
+You can give different weights to different parts of your documents. Create a function that prioritizes title matches over description matches:
+
+```sql
+create or replace function search_books_weighted(search_query text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select 
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(
+      '{0.1, 0.2, 0.4, 1.0}'::real[], -- weights array {D, C, B, A}
+      setweight(to_tsvector('english', books.title), 'A') || 
+      setweight(to_tsvector('english', books.description), 'B'),
+      to_tsquery(search_query)
+    ) as rank
+  from books
+  where (setweight(to_tsvector('english', books.title), 'A') || 
+         setweight(to_tsvector('english', books.description), 'B')) 
+        @@ to_tsquery(search_query)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase
+  .rpc('search_books_weighted', { search_query: 'big' })
+```
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select * from search_books_weighted('big');
+```
+
+</TabPanel>
+</Tabs>
+
+This gives title matches higher priority (weight 'A' = 1.0) than description matches (weight 'B' = 0.4).
+
+### Using ranking with indexes [#ranking-with-indexes]
+
+When using the `fts` column we created earlier, ranking becomes more efficient. Create a function that uses the indexed column:
+
+```sql
+create or replace function search_books_fts(search_query text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select 
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(books.fts, to_tsquery(search_query)) as rank
+  from books
+  where books.fts @@ to_tsquery(search_query)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase
+  .rpc('search_books_fts', { search_query: 'little & big' })
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+final result = await client
+  .rpc('search_books_fts', params: { 'search_query': 'little & big' });
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+data = client.rpc('search_books_fts', { 'search_query': 'little & big' }).execute()
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select * from search_books_fts('little & big');
+```
+
+</TabPanel>
+</Tabs>
+
+### Using websearch syntax with ranking [#websearch-ranking]
+
+You can also create a function that combines `websearch_to_tsquery()` with ranking for user-friendly search:
+
+```sql
+create or replace function websearch_books(search_text text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select 
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(books.fts, websearch_to_tsquery('english', search_text)) as rank
+  from books
+  where books.fts @@ websearch_to_tsquery('english', search_text)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+// Support natural search syntax
+const { data, error } = await supabase
+  .rpc('websearch_books', { search_text: '"little puppy" or train -vegetables' })
+```
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select * from websearch_books('"little puppy" or train -vegetables');
+```
+
+</TabPanel>
+</Tabs>
+
 ## Resources
 
 - [Postgres: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)
