@@ -81,6 +81,8 @@ export function DiskManagementForm() {
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
 
+  const isDiskConfigSupported = isAws || isAwsNimbus
+
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
       resource: {
@@ -119,24 +121,27 @@ export function DiskManagementForm() {
           setRefetchInterval(2000)
         }
       },
-      enabled: project != null && isAws,
+      enabled: project !== null && isDiskConfigSupported,
     }
   )
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
   const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
-      enabled: project != null && isAws,
+      enabled: project !== null && isDiskConfigSupported,
     })
   const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery(
     {
       projectRef,
     },
-    { enabled: project != null && isAws }
+    { enabled: project !== null && isDiskConfigSupported }
   )
 
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
-    useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: project != null && isAws })
+    useDiskAutoscaleCustomConfigQuery(
+      { projectRef },
+      { enabled: project !== null && isDiskConfigSupported }
+    )
 
   const computeSize = project?.infra_compute_size
     ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
@@ -207,7 +212,7 @@ export function DiskManagementForm() {
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration ||
-    (!isAws && !isAwsNimbus)
+    !isDiskConfigSupported
 
   const disableComputeInputs = isPlanUpgradeRequired
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
@@ -351,7 +356,7 @@ export function DiskManagementForm() {
           <SpendCapDisabledSection />
           <NoticeBar
             type="default"
-            visible={!isAws && !isAwsNimbus}
+            visible={!isDiskConfigSupported}
             title="Disk configuration is only available for projects in the AWS cloud provider"
             description={
               isAwsK8s
@@ -361,7 +366,7 @@ export function DiskManagementForm() {
                   : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
             }
           />
-          {isAws && (
+          {isDiskConfigSupported && (
             <>
               <div className="flex flex-col gap-y-3">
                 <DiskCountdownRadial />

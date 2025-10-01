@@ -65,7 +65,14 @@ export function DiskCountdownRadial() {
           </Card>
         </motion.div>
       )}
-      {error && <FormMessage message={error.message} type="error" />}
+      {error && (
+        <FormMessage
+          message="Failed to get remaining duration for disk configuration modification"
+          type="error"
+        >
+          {error.message}
+        </FormMessage>
+      )}
     </AnimatePresence>
   )
 }
