@@ -63,6 +63,8 @@
   "integrations:wrappers": true,
   "integrations:vercel": true,
 
+  "infrastructure:read_replicas": true,
+
   "logs:templates": true,
   "logs:collections": true,
   "logs:show_metadata_ip_template": true,
