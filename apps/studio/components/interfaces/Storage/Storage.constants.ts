@@ -1,3 +1,6 @@
+import { DOCS_URL } from 'lib/constants'
+
+// Original storage constants
 export enum URL_EXPIRY_DURATION {
   WEEK = 60 * 60 * 24 * 7,
   MONTH = 60 * 60 * 24 * 30,
@@ -56,3 +59,26 @@ export const CONTEXT_MENU_KEYS = {
   STORAGE_ITEM: 'STORAGE_ITEM',
   STORAGE_FOLDER: 'STORAGE_FOLDER',
 }
+
+// New bucket types configuration
+
+export const BUCKET_TYPES = {
+  files: {
+    displayName: 'Files',
+    description: 'General file storage for most types of digital content.',
+    docsUrl: `${DOCS_URL}/guides/storage/buckets/fundamentals`,
+  },
+  analytics: {
+    displayName: 'Analytics',
+    description: 'Purpose-built storage for analytical workloads.',
+    docsUrl: `${DOCS_URL}/guides/storage/analytics/introduction`,
+  },
+  vectors: {
+    displayName: 'Vectors',
+    description: 'Purpose-built storage for vector data.',
+    docsUrl: `${DOCS_URL}/guides/storage/vectors`,
+  },
+}
+
+export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
+export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'files'

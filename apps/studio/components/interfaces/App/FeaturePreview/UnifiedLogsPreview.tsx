@@ -16,7 +16,7 @@ export const UnifiedLogsPreview = () => {
         className="rounded border mb-4"
       />
       <p className="text-foreground-light text-sm mb-4">
-        Experience our enhanced logs interface with improved filtering, real-time updates, and a
+        Experience our enhanced Logs interface with improved filtering, real-time updates, and a
         unified view across all your services. Built for better performance and easier debugging.
       </p>
       <p className="text-foreground-light text-sm mb-4">
@@ -26,8 +26,8 @@ export const UnifiedLogsPreview = () => {
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
-            Replace the current logs interface on the{' '}
-            <InlineLink href={`/project/${ref}/logs`}>logs page</InlineLink> with a unified view
+            Replace the current Logs interface on the{' '}
+            <InlineLink href={`/project/${ref}/logs`}>Logs page</InlineLink> with a unified view
           </li>
           <li>Provide enhanced filtering capabilities and real-time log streaming</li>
           <li>Improve performance with optimized data loading and virtualization</li>
