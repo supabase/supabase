@@ -64,7 +64,7 @@
 
   "logs:templates": true,
   "logs:collections": true,
-  "logs:metadata": false,
+  "logs:metadata": true,
 
   "organization:show_sso_settings": true,
   "organization:show_security_settings": true,
