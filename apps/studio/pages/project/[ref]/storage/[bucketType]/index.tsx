@@ -57,7 +57,7 @@ const BucketTypePage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!isStorageV2) router.replace(`/project/${ref}/storage`)
-  }, [isStorageV2, ref])
+  }, [isStorageV2, ref, router])
 
   useEffect(() => {
     if (!config) {
