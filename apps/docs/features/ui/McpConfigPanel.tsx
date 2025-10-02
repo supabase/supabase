@@ -196,7 +196,7 @@ export function McpConfigPanel() {
   return (
     <>
       <div className="not-prose">
-        <div className="flex gap-3 mb-3">
+        <div className="flex flex-wrap gap-3 mb-3">
           <PlatformSelector
             selectedPlatform={selectedPlatform}
             onPlatformSelect={setSelectedPlatform}
