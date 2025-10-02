@@ -7,14 +7,14 @@ import type { TableSuggestion } from './types'
 import type { TableField } from '../TableEditor.types'
 
 interface TableTemplateSelectorProps {
-  variant: Exclude<QuickstartVariant, QuickstartVariant.CONTROL>
+  variant: Exclude<QuickstartVariant, QuickstartVariant.CONTROL> // [Sean] this will be used in PR #38934
   onSelectTemplate: (tableField: Partial<TableField>) => void
   onDismiss?: () => void
   disabled?: boolean
 }
 
 export const TableTemplateSelector = ({
-  variant,
+  variant: _variant,
   onSelectTemplate,
   onDismiss,
   disabled,
