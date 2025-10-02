@@ -109,7 +109,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                           <div className="flex items-center gap-4">
                             {workflowRun.run_steps.length > 0 ? (
                               workflowRun.run_steps.map((s) => (
-                                <ActionStatusBadge status={s.status} />
+                                <ActionStatusBadge name={s.name} status={s.status} />
                               ))
                             ) : (
                               <BranchStatusBadge status={status} />

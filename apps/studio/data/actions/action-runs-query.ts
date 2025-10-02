@@ -6,6 +6,7 @@ import type { ResponseError } from 'types'
 import { actionKeys } from './keys'
 
 export type ActionsVariables = operations['v1-list-action-runs']['parameters']['path']
+export type ActionName = components['schemas']['ActionRunResponse']['run_steps'][number]['name']
 export type ActionStatus = components['schemas']['ActionRunResponse']['run_steps'][number]['status']
 
 export async function listActionRuns(params: ActionsVariables, signal?: AbortSignal) {

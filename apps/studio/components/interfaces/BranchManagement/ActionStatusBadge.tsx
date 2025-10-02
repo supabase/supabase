@@ -1,27 +1,36 @@
-import { ActionStatus } from 'data/actions/action-runs-query'
+import { ActionName, ActionStatus } from 'data/actions/action-runs-query'
 import { Badge } from 'ui'
 import { StatusIcon } from 'ui'
 
-type Status = ActionStatus
-
 export interface ActionStatusBadgeProps {
-  status: Status
+  name: ActionName
+  status: ActionStatus
 }
 
-export const UNHEALTHY_STATUES: Status[] = ['DEAD', 'REMOVING']
-export const WAITING_STATUSES: Status[] = ['CREATED', 'RESTARTING', 'RUNNING']
+const UNHEALTHY_STATUES: ActionStatus[] = ['DEAD', 'REMOVING']
+const WAITING_STATUSES: ActionStatus[] = ['CREATED', 'RESTARTING', 'RUNNING']
 
-const STATUS_TO_LABEL: Record<Status, string> = {
-  CREATED: 'Created',
-  DEAD: 'Dead',
-  EXITED: 'Exited',
-  PAUSED: 'Paused',
-  REMOVING: 'Removing',
-  RESTARTING: 'Restarting',
-  RUNNING: 'Running',
+const STATUS_TO_LABEL: Record<ActionStatus, string> = {
+  CREATED: 'pending',
+  DEAD: 'failed',
+  EXITED: 'succeeded',
+  PAUSED: 'skipped',
+  REMOVING: 'failed',
+  RESTARTING: 'restarting',
+  RUNNING: 'running',
 }
 
-const ActionStatusBadge = ({ status }: ActionStatusBadgeProps) => {
+const NAME_TO_LABEL: Record<ActionName, string> = {
+  clone: 'Cloning repo',
+  pull: 'Pulling data',
+  health: 'Health check',
+  configure: 'Configurations',
+  migrate: 'Migrations',
+  seed: 'Data seeding',
+  deploy: 'Functions deployment',
+}
+
+const ActionStatusBadge = ({ name, status }: ActionStatusBadgeProps) => {
   if (status === 'EXITED') {
     return null
   }
@@ -34,7 +43,7 @@ const ActionStatusBadge = ({ status }: ActionStatusBadgeProps) => {
       {(isUnhealthy || isWaiting) && (
         <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
       )}
-      {STATUS_TO_LABEL[status]}
+      {NAME_TO_LABEL[name]}: {STATUS_TO_LABEL[status]}
     </Badge>
   )
 }
