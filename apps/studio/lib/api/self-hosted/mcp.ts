@@ -1,8 +1,10 @@
 import {
   ApplyMigrationOptions,
   DatabaseOperations,
+  DebuggingOperations,
   DevelopmentOperations,
   ExecuteSqlOptions,
+  GetLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
@@ -15,6 +17,10 @@ export type GetDatabaseOperationsOptions = {
 }
 
 export type GetDevelopmentOperationsOptions = {
+  headers?: HeadersInit
+}
+
+export type GetDebuggingOperationsOptions = {
   headers?: HeadersInit
 }
 
@@ -78,6 +84,22 @@ export function getDevelopmentOperations({
       }
 
       return response
+    },
+  }
+}
+
+export function getDebuggingOperations({
+  headers,
+}: GetDebuggingOperationsOptions): DebuggingOperations {
+  return {
+    async getLogs(_projectRef, options) {
+      throw new Error('Function not implemented.')
+    },
+    async getSecurityAdvisors(_projectRef) {
+      throw new Error('Function not implemented.')
+    },
+    async getPerformanceAdvisors(_projectRef) {
+      throw new Error('Function not implemented.')
     },
   }
 }
