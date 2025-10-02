@@ -151,29 +151,6 @@ export const MCP_CLIENTS: McpClient[] = [
       )
     },
   },
-  {
-    key: 'other',
-    label: 'Other',
-    transformConfig: (config): OtherMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    alternateInstructions: (_config) => {
-      return (
-        <p className="text-xs text-foreground-light">
-          These generic MCP settings may work with other MCP clients, but there are no guarantees,
-          due to differences between clients. Refer to your specific client docs for where to input
-          the configuration.
-        </p>
-      )
-    },
-  },
 ]
 
 export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
