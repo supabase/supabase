@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -94,25 +94,24 @@ export const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
-  const tableQuickstartVariant = usePHFlag('tableQuickstart') as
-    | QuickstartVariant   // user variation (if bucketed)
-    | false               // user not yet bucketed or targeted
-    | undefined           // posthog still loading
+
+  /**
+   * Returns:
+   * - `QuickstartVariant`: user variation (if bucketed)
+   * - `false`: user not yet bucketed or targeted
+   * - `undefined`: posthog still loading
+   */
+  const tableQuickstartVariant = usePHFlag<QuickstartVariant | false | undefined>('tableQuickstart')
 
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const publicTables = (tables ?? []).filter((table) => table.schema === 'public')
-  const hasTables = publicTables.length > 0
+
   const [quickstartDismissed, setQuickstartDismissed] = useLocalStorage(
     LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
     false
   )
-
-  const handleQuickstartDismiss = useCallback(() => {
-    setQuickstartDismissed(true)
-  }, [setQuickstartDismissed])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -315,7 +314,7 @@ export const TableEditor = ({
                 if (template.columns) updates.columns = template.columns
                 onUpdateField(updates)
               }}
-              onDismiss={handleQuickstartDismiss}
+              onDismiss={() => setQuickstartDismissed(true)}
               disabled={false}
             />
           )}

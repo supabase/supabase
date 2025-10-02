@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { Button, cn } from 'ui'
 import { tableTemplates } from './templates'
 import { QuickstartVariant } from './types'
@@ -31,7 +31,7 @@ export const TableTemplateSelector = ({
     [onSelectTemplate]
   )
 
-  const categories = Object.keys(tableTemplates)
+  const categories = useMemo(() => Object.keys(tableTemplates), [])
 
   useEffect(() => {
     if (activeCategory === null && categories.length > 0) {
@@ -39,7 +39,10 @@ export const TableTemplateSelector = ({
     }
   }, [categories, activeCategory])
 
-  const displayed = activeCategory ? tableTemplates[activeCategory] || [] : []
+  const displayed = useMemo(
+    () => (activeCategory ? tableTemplates[activeCategory] || [] : []),
+    [activeCategory]
+  )
 
   return (
     <div className="rounded-lg border border-default bg-surface-75 p-4">
