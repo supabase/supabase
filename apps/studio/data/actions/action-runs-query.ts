@@ -1,13 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 
-import type { components, operations } from 'data/api'
+import type { operations } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { actionKeys } from './keys'
 
 export type ActionsVariables = operations['v1-list-action-runs']['parameters']['path']
-export type ActionName = components['schemas']['ActionRunResponse']['run_steps'][number]['name']
-export type ActionStatus = components['schemas']['ActionRunResponse']['run_steps'][number]['status']
 
 export async function listActionRuns(params: ActionsVariables, signal?: AbortSignal) {
   const { data, error } = await get(`/v1/projects/{ref}/actions`, {
@@ -20,6 +18,10 @@ export async function listActionRuns(params: ActionsVariables, signal?: AbortSig
 
 export type ActionsData = Awaited<ReturnType<typeof listActionRuns>>
 export type ActionsError = ResponseError
+
+export type ActionRunStep = ActionsData[number]['run_steps'][number]
+export type ActionName = ActionRunStep['name']
+export type ActionStatus = ActionRunStep['status']
 
 export const useActionsQuery = <TData = ActionsData>(
   { ref }: ActionsVariables,
