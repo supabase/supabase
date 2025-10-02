@@ -1,19 +1,31 @@
 import * as Sentry from '@sentry/nextjs'
-import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/auth-js'
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import type { AuthMFAVerifyResponse } from '@supabase/auth-js'
+import { type UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
 
-const WHITELIST_ERRORS = ['Invalid TOTP code entered']
-
-interface MFAChallengeAndVerifyVariables extends MFAChallengeAndVerifyParams {
+// Defining here as it's not exported by @supabase/auth-js
+interface MFAVerifyWebauthnParams {
+  friendlyName: string
+  /** Relying party ID */
+  rpId: string
+  /** Relying party origins */
+  rpOrigins?: string[]
   refreshFactors?: boolean
 }
 
-export const mfaChallengeAndVerify = async (params: MFAChallengeAndVerifyParams) => {
-  const { error, data } = await auth.mfa.challengeAndVerify(params)
+export const mfaWebAuthnRegister = async (params: MFAVerifyWebauthnParams) => {
+  const { error, data } = await auth.mfa.webauthn.register(params, {
+    authenticatorSelection: {
+      authenticatorAttachment: 'cross-platform', // Allow both platform and cross-platform
+      residentKey: 'discouraged',
+      userVerification: 'preferred',
+      requireResidentKey: false,
+    },
+  })
+
   if (error) throw error
   return data
 }
@@ -21,20 +33,19 @@ export const mfaChallengeAndVerify = async (params: MFAChallengeAndVerifyParams)
 type CustomMFAVerifyResponse = NonNullable<AuthMFAVerifyResponse['data']>
 type CustomMFAVerifyError = NonNullable<AuthMFAVerifyResponse['error']>
 
-export const useMfaChallengeAndVerifyMutation = ({
+export const useMfaWebAuthnRegisterMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomMFAVerifyResponse, CustomMFAVerifyError, MFAChallengeAndVerifyVariables>,
+  UseMutationOptions<CustomMFAVerifyResponse, CustomMFAVerifyError, MFAVerifyWebauthnParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation(
     (vars) => {
-      const { refreshFactors, ...params } = vars
-      return mfaChallengeAndVerify(params)
+      return mfaWebAuthnRegister(vars)
     },
     {
       async onSuccess(data, variables, context) {
@@ -54,9 +65,8 @@ export const useMfaChallengeAndVerifyMutation = ({
         } else {
           onError(data, variables, context)
         }
-        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-          Sentry.captureMessage('[CRITICAL] Failed to sign in via MFA: ' + data.message)
-        }
+
+        Sentry.captureMessage('Failed to sign in via WebAuthn MFA: ' + data.message)
       },
       ...options,
     }
