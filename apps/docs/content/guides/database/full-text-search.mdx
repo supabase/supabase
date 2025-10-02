@@ -824,15 +824,6 @@ where to_tsvector(description || ' ' || title) @@
 -- Matches books by "Harry Potter" or "Dr. Seuss" but excludes those mentioning vegetables
 ```
 
-### Comparison with other tsquery functions
-
-| Function                 | Input                     | Output                         | Best for                        |
-| ------------------------ | ------------------------- | ------------------------------ | ------------------------------- |
-| `to_tsquery()`           | `'big & dreams'`          | `'big' & 'dream'`              | Manual control over operators   |
-| `plainto_tsquery()`      | `'big dreams'`            | `'big' & 'dream'`              | Simple AND searches             |
-| `phraseto_tsquery()`     | `'big dreams'`            | `'big' <-> 'dream'`            | Phrase searching                |
-| `websearch_to_tsquery()` | `'"big dreams" or small'` | `'big' <-> 'dream' \| 'small'` | User-friendly search interfaces |
-
 ## Creating indexes
 
 Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents preemptively so that they
@@ -1226,11 +1217,11 @@ data = client.from_('books').select().text_search('description', "'big' & !'litt
 
 ## Ranking search results [#ranking]
 
-PostgreSQL provides ranking functions to sort search results by relevance, helping you present the most relevant matches first. Since ranking functions need to be computed server-side, we'll use RPC functions and generated columns.
+Postgres provides ranking functions to sort search results by relevance, helping you present the most relevant matches first. Since ranking functions need to be computed server-side, we'll use RPC functions and generated columns.
 
 ### Creating a search function with ranking [#search-function-ranking]
 
-First, create a PostgreSQL function that handles search and ranking:
+First, create a Postgres function that handles search and ranking:
 
 ```sql
 create or replace function search_books(search_query text)
@@ -1295,11 +1286,11 @@ select * from search_books('big');
 
 ### Ranking with weighted columns [#weighted-ranking]
 
-PostgreSQL allows you to assign different importance levels to different parts of your documents using weight labels. This is especially useful when you want matches in certain fields (like titles) to rank higher than matches in other fields (like descriptions).
+Postgres allows you to assign different importance levels to different parts of your documents using weight labels. This is especially useful when you want matches in certain fields (like titles) to rank higher than matches in other fields (like descriptions).
 
 #### Understanding weight labels
 
-PostgreSQL uses four weight labels: **A**, **B**, **C**, and **D**, where:
+Postgres uses four weight labels: **A**, **B**, **C**, and **D**, where:
 
 - **A** = Highest importance (weight 1.0)
 - **B** = High importance (weight 0.4)
@@ -1494,7 +1485,7 @@ select * from search_books_fts('little & big');
 </TabPanel>
 </Tabs>
 
-### Using websearch syntax with ranking [#websearch-ranking]
+### Using web search syntax with ranking [#websearch-ranking]
 
 You can also create a function that combines `websearch_to_tsquery()` with ranking for user-friendly search:
 
