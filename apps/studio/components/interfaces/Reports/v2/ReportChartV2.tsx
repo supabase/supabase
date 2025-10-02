@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
+import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
@@ -10,6 +11,8 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Card, CardContent, cn } from 'ui'
 import { ReportChartUpsell } from './ReportChartUpsell'
+import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
+
 export interface ReportChartV2Props {
   report: ReportConfig
   projectRef: string
@@ -20,6 +23,7 @@ export interface ReportChartV2Props {
   className?: string
   syncId?: string
   filters?: any
+  highlightActions?: ChartHighlightAction[]
 }
 
 export const ReportChartV2 = ({
@@ -32,6 +36,7 @@ export const ReportChartV2 = ({
   className,
   syncId,
   filters,
+  highlightActions,
 }: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
@@ -85,6 +90,7 @@ export const ReportChartV2 = ({
   )
 
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
+  const chartHighlight = useChartHighlight()
 
   if (!isAvailable) {
     return <ReportChartUpsell report={report} orgSlug={org?.slug ?? ''} />
@@ -120,8 +126,8 @@ export const ReportChartV2 = ({
               highlightedValue={0}
               title={report.label}
               customDateFormat={undefined}
-              chartHighlight={undefined}
               chartStyle={chartStyle}
+              chartHighlight={chartHighlight}
               showTooltip={report.showTooltip}
               showLegend={report.showLegend}
               showTotal={false}
@@ -133,6 +139,7 @@ export const ReportChartV2 = ({
               titleTooltip={report.titleTooltip}
               syncId={syncId}
               sql={queryResult?.query}
+              highlightActions={highlightActions}
             />
           </div>
         )}

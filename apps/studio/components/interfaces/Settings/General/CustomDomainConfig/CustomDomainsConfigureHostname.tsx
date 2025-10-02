@@ -11,6 +11,7 @@ import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mut
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Form, Input } from 'ui'
 
 const schema = yup.object({
@@ -77,7 +78,7 @@ const CustomDomainsConfigureHostname = () => {
                       !canConfigureCustomDomain ? (
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
-                        <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+                        <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
                       )
                     }
                   />

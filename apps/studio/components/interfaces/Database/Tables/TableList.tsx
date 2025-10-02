@@ -63,6 +63,7 @@ import {
 } from 'ui'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 
 interface TableListProps {
   onAddTable: () => void
@@ -488,7 +489,9 @@ export const TableList = ({
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
                                     onClick={() =>
-                                      router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                      router.push(
+                                        `/project/${project?.ref}/editor/${x.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`
+                                      )
                                     }
                                     onMouseEnter={() =>
                                       prefetchEditorTablePage({

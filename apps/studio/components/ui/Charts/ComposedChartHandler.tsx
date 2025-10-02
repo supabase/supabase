@@ -1,9 +1,10 @@
-import { Loader2 } from 'lucide-react'
+import { List, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-import { cn, WarningIcon } from 'ui'
+import { Card, cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
+import type { ChartHighlightAction } from './ChartHighlightActions'
 import { ComposedChart } from './ComposedChart'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
@@ -231,20 +232,33 @@ const ComposedChartHandler = ({
           : (firstData.data[firstData.data.length - 1] as any)?.[firstAttr.attribute]
   }, [highlightedValue, attributes, attributeQueries])
 
+  const highlightActions: ChartHighlightAction[] = useMemo(() => {
+    return [
+      {
+        id: 'open-logs',
+        label: 'Open in Postgres Logs',
+        icon: <List size={12} />,
+        onSelect: ({ start, end }) => {
+          const projectRef = ref as string
+          if (!projectRef) return
+          const url = `/project/${projectRef}/logs/postgres-logs?its=${start}&ite=${end}`
+          router.push(url)
+        },
+      },
+    ]
+  }, [ref])
+
   if (loading) {
     return (
-      <Panel
+      <Card
         className={cn(
           'flex min-h-[280px] w-full flex-col items-center justify-center gap-y-2',
           className
         )}
-        wrapWithLoading={false}
-        noMargin
-        noHideOverflow
       >
         <Loader2 size={18} className="animate-spin text-border-strong" />
         <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
-      </Panel>
+      </Card>
     )
   }
 
@@ -288,6 +302,7 @@ const ComposedChartHandler = ({
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
           syncId={syncId}
+          highlightActions={highlightActions}
           {...otherProps}
         />
       </Panel.Content>

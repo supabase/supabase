@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useMemo, useState } from 'react'
+import { PropsWithChildren, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ProjectClaimBenefits } from 'components/interfaces/Organization/ProjectClaim/benefits'
@@ -10,9 +10,23 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimQuery } from 'data/organizations/organization-project-claim-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
+
+const ClaimProjectPageLayout = ({ children }: PropsWithChildren) => {
+  const { appTitle } = useCustomContent(['app:title'])
+
+  return (
+    <>
+      <Head>
+        <title>Claim project | {appTitle || 'Supabase'}</title>
+      </Head>
+      {children}
+    </>
+  )
+}
 
 const ClaimProjectPage: NextPageWithLayout = () => {
   const { auth_id, token: claimToken } = useParams()
@@ -111,12 +125,9 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 }
 
 ClaimProjectPage.getLayout = (page) => (
-  <>
-    <Head>
-      <title>Claim project | Supabase</title>
-    </Head>
+  <ClaimProjectPageLayout>
     <main className="flex flex-col w-full min-h-screen overflow-y-auto">{page}</main>
-  </>
+  </ClaimProjectPageLayout>
 )
 
 export default withAuth(ClaimProjectPage)

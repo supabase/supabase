@@ -59,7 +59,6 @@ const TextBlock = ({
     <div className={`inline-block ${bgColor}`}>
       <span
         className={`${textColor} text-[2rem] md:text-[4rem] px-2.5 md:px-8 py-1.5 md:py-3 inline-block leading-none tracking-tight`}
-        // style={{ fontFamily: SUISSE_FONT_FAMILY }}
       >
         {text}
       </span>

@@ -27,6 +27,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
@@ -195,6 +196,19 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       name: table.name,
       schema: table.schema,
       payload: payload,
+    })
+
+    sendEvent({
+      action: 'table_rls_enabled',
+      properties: {
+        method: 'table_editor',
+        schema_name: table.schema,
+        table_name: table.name,
+      },
+      groups: {
+        project: projectRef,
+        ...(org?.slug && { organization: org.slug }),
+      },
     })
   }
 
@@ -432,7 +446,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
+                        href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
                       >
                         Learn more
                       </Link>

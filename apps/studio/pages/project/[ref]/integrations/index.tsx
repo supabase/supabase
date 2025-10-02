@@ -14,6 +14,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -50,7 +51,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
           subtitle:
             'Connect to external data sources and services by querying APIs, databases, and files as if they were Postgres tables.',
           secondaryActions: (
-            <DocsButton href="https://supabase.com/docs/guides/database/extensions/wrappers/overview" />
+            <DocsButton href={`${DOCS_URL}/guides/database/extensions/wrappers/overview`} />
           ),
         }
       case 'postgres_extension':

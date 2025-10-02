@@ -30,6 +30,7 @@ import {
   IconSecurity,
   IconSupport,
   IconTroubleshooting,
+  IconUI,
 } from './MenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {
@@ -102,6 +103,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <Clock width={width} height={height} className={className} />
     case 'queues':
       return <SquareStack width={width} height={height} className={className} />
+    case 'ui':
+      return <IconUI width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }

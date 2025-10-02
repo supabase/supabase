@@ -14,6 +14,16 @@ type TelemetryGroups = {
   organization: string
 }
 
+export const TABLE_EVENT_ACTIONS = {
+  TableCreated: 'table_created',
+  TableDataAdded: 'table_data_added',
+  TableRLSEnabled: 'table_rls_enabled',
+} as const
+
+export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
+
+export const TABLE_EVENT_VALUES: TableEventAction[] = Object.values(TABLE_EVENT_ACTIONS)
+
 /**
  * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
  *
@@ -1423,6 +1433,287 @@ export interface DpaPdfOpenedEvent {
 }
 
 /**
+ * User selected a workflow in the Getting Started section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedWorkflowClickedEvent {
+  action: 'home_getting_started_workflow_clicked'
+  properties: {
+    /**
+     * The workflow selected by the user
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * Whether this is switching from another workflow
+     */
+    is_switch: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a step in the Getting Started section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedStepClickedEvent {
+  action: 'home_getting_started_step_clicked'
+  properties: {
+    /**
+     * The workflow type (code or no-code)
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * The step number (1-based index)
+     */
+    step_number: number
+    /**
+     * The title of the step
+     */
+    step_title: string
+    /**
+     * The action type of the button clicked
+     */
+    action_type: 'primary' | 'ai_assist' | 'external_link'
+    /**
+     * Whether the step was already completed
+     */
+    was_completed: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on an activity stat in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeActivityStatClickedEvent {
+  action: 'home_activity_stat_clicked'
+  properties: {
+    /**
+     * The type of activity stat clicked
+     */
+    stat_type: 'migrations' | 'backups' | 'branches'
+    /**
+     * The current value of the stat
+     */
+    stat_value: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the main Ask Assistant button in the Advisor section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorAskAssistantClickedEvent {
+  action: 'home_advisor_ask_assistant_clicked'
+  properties: {
+    /**
+     * Number of issues found by the advisor
+     */
+    issues_count: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on an issue card in the Advisor section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorIssueCardClickedEvent {
+  action: 'home_advisor_issue_card_clicked'
+  properties: {
+    /**
+     * Category of the issue (SECURITY or PERFORMANCE)
+     */
+    issue_category: string
+    /**
+     * Name/key of the lint issue
+     */
+    issue_name: string
+    issues_count: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Fix Issue button on an advisor card in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorFixIssueClickedEvent {
+  action: 'home_advisor_fix_issue_clicked'
+  properties: {
+    /**
+     * Category of the issue (SECURITY or PERFORMANCE)
+     */
+    issue_category: string
+    /**
+     * Name/key of the lint issue
+     */
+    issue_name: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a service title in Project Usage section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeProjectUsageServiceClickedEvent {
+  action: 'home_project_usage_service_clicked'
+  properties: {
+    /**
+     * The service that was clicked
+     */
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    /**
+     * Total requests for this service
+     */
+    total_requests: number
+    /**
+     * Number of errors for this service
+     */
+    error_count: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a bar in the usage chart in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeProjectUsageChartClickedEvent {
+  action: 'home_project_usage_chart_clicked'
+  properties: {
+    /**
+     * The service type for this chart
+     */
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    /**
+     * Timestamp of the bar clicked
+     */
+    bar_timestamp: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User added a block to the custom report in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeCustomReportBlockAddedEvent {
+  action: 'home_custom_report_block_added'
+  properties: {
+    /**
+     * ID of the snippet/block added
+     */
+    block_id: string
+    /**
+     * If position is 0 it is equivalent to 'Add your first chart'.
+     */
+    position: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User removed a block from the custom report in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeCustomReportBlockRemovedEvent {
+  action: 'home_custom_report_block_removed'
+  properties: {
+    /**
+     * ID of the block removed
+     */
+    block_id: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the Getting Started section in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedClosedEvent {
+  action: 'home_getting_started_closed'
+  properties: {
+    /**
+     * The current workflow when dismissed
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * Number of steps completed when dismissed
+     */
+    steps_completed: number
+    /**
+     * Total number of steps in the workflow
+     */
+    total_steps: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User reordered sections in HomeV2 using drag and drop.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeSectionRowsMovedEvent {
+  action: 'home_section_rows_moved'
+  properties: {
+    /**
+     * The section that was moved
+     */
+    section_moved: string
+    /**
+     * The old position of the section (0-based index)
+     */
+    old_position: number
+    /**
+     * The new position of the section (0-based index)
+     */
+    new_position: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Request DPA button to open the confirmation modal.
  *
  * @group Events
@@ -1461,6 +1752,84 @@ export interface DocumentViewButtonClickedEvent {
 export interface HipaaRequestButtonClickedEvent {
   action: 'hipaa_request_button_clicked'
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User successfully created a table in the project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableCreatedEvent {
+  action: 'table_created'
+  properties: {
+    /**
+     * Method used to create the table
+     */
+    method: 'sql_editor' | 'table_editor'
+    /**
+     * Schema where table was created
+     */
+    schema_name?: string
+    /**
+     * Name of the table created
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User successfully added data to a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableDataAddedEvent {
+  action: 'table_data_added'
+  properties: {
+    /**
+     * Method used to insert data
+     */
+    method: 'sql_editor' | 'table_editor' | 'spreadsheet_import'
+    /**
+     * Schema of the table
+     */
+    schema_name?: string
+    /**
+     * Name of the table
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User successfully enabled RLS on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableRLSEnabledEvent {
+  action: 'table_rls_enabled'
+  properties: {
+    /**
+     * Method used to enable RLS
+     */
+    method: 'sql_editor' | 'table_editor'
+    /**
+     * Schema of the table
+     */
+    schema_name?: string
+    /**
+     * Name of the table
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1555,6 +1924,21 @@ export type TelemetryEvent =
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
   | DpaPdfOpenedEvent
+  | HomeGettingStartedWorkflowClickedEvent
+  | HomeGettingStartedStepClickedEvent
+  | HomeGettingStartedClosedEvent
+  | HomeSectionRowsMovedEvent
+  | HomeActivityStatClickedEvent
+  | HomeAdvisorAskAssistantClickedEvent
+  | HomeAdvisorIssueCardClickedEvent
+  | HomeAdvisorFixIssueClickedEvent
+  | HomeProjectUsageServiceClickedEvent
+  | HomeProjectUsageChartClickedEvent
+  | HomeCustomReportBlockAddedEvent
+  | HomeCustomReportBlockRemovedEvent
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
+  | TableCreatedEvent
+  | TableDataAddedEvent
+  | TableRLSEnabledEvent

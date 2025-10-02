@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
-import { TableState } from './ReplicationPipelineStatus.types'
-import { isValidRetryPolicy } from './ReplicationPipelineStatus.utils'
+import { TableState } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
+import { isValidRetryPolicy } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RetryCountdown } from './RetryCountdown'
 import { RetryOptionsDropdown } from './RetryOptionsDropdown'
 

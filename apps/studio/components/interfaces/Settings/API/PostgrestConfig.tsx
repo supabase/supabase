@@ -17,6 +17,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -170,7 +171,7 @@ export const PostgrestConfig = () => {
       <CardHeader className="flex-row items-center justify-between">
         Data API Settings
         <div className="flex items-center gap-x-2">
-          <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#data-apis" />
+          <DocsButton href={`${DOCS_URL}/guides/database/connecting-to-postgres#data-apis`} />
           <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
             Harden Data API
           </Button>

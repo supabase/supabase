@@ -19,7 +19,7 @@ import {
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
-import ChartHighlightActions from './ChartHighlightActions'
+import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -64,6 +64,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   syncId?: string
   docsUrl?: string
   sql?: string
+  highlightActions?: ChartHighlightAction[]
 }
 
 export function ComposedChart({
@@ -101,6 +102,7 @@ export function ComposedChart({
   syncId,
   docsUrl,
   sql,
+  highlightActions,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -336,6 +338,7 @@ export function ComposedChart({
         <RechartComposedChart
           data={data}
           syncId={syncId}
+          style={{ cursor: 'crosshair' }}
           onMouseMove={(e: any) => {
             setIsActiveHoveredChart(true)
             if (e.activeTooltipIndex !== focusDataIndex) {
@@ -390,7 +393,7 @@ export function ComposedChart({
           />
           <Tooltip
             content={(props) =>
-              showTooltip ? (
+              showTooltip && !showHighlightActions ? (
                 <CustomTooltip
                   {...props}
                   format={format}
@@ -491,7 +494,11 @@ export function ComposedChart({
             />
           )}
         </RechartComposedChart>
-        <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
+        <ChartHighlightActions
+          chartHighlight={chartHighlight}
+          updateDateRange={updateDateRange}
+          actions={highlightActions}
+        />
       </Container>
       {data && (
         <div

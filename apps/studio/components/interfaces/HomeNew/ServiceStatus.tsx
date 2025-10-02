@@ -12,6 +12,7 @@ import {
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { InfoIcon, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 
 /**
@@ -200,7 +201,7 @@ export const ServiceStatus = () => {
           {
             name: 'Edge Functions',
             error: undefined,
-            docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
+            docsUrl: `${DOCS_URL}/guides/functions/troubleshooting`,
             isLoading,
             isHealthy: !!edgeFunctionsStatus?.healthy,
             status: edgeFunctionsStatus?.healthy
@@ -274,7 +275,7 @@ export const ServiceStatus = () => {
               ))}
             </div>
           }
-          label={<span>Health</span>}
+          label={<span>Status</span>}
           value={<span>{overallStatusLabel}</span>}
         />
       </PopoverTrigger_Shadcn_>

@@ -2,6 +2,7 @@ import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billi
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
+import { DOCS_URL } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
 
 export const COLOR_MAP = {
@@ -97,7 +98,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       links: [
         {
           name: 'Documentation',
-          url: 'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
+          url: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
         },
       ],
     },
@@ -116,7 +117,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       links: [
         {
           name: 'Documentation',
-          url: 'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
+          url: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
         },
       ],
     })
@@ -147,7 +148,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
               links: [
                 {
                   name: 'Documentation',
-                  url: 'https://supabase.com/docs/guides/platform/database-size',
+                  url: `${DOCS_URL}/guides/platform/database-size`,
                 },
               ],
               chartDescription: 'The data refreshes every 24 hours.',
@@ -205,11 +206,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
               links: [
                 {
                   name: 'Documentation',
-                  url: 'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
+                  url: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
                 },
                 {
                   name: 'Disk Management',
-                  url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+                  url: `${DOCS_URL}/guides/platform/database-size#disk-management`,
                 },
               ],
               chartDescription: '',
@@ -227,7 +228,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Storage',
-              url: 'https://supabase.com/docs/guides/storage',
+              url: `${DOCS_URL}/guides/storage`,
             },
           ],
         },
@@ -253,7 +254,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Auth',
-              url: 'https://supabase.com/docs/guides/auth',
+              url: `${DOCS_URL}/guides/auth`,
             },
           ],
         },
@@ -274,7 +275,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'SSO with SAML 2.0',
-              url: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+              url: `${DOCS_URL}/guides/auth/sso/auth-sso-saml`,
             },
           ],
         },
@@ -295,7 +296,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Documentation',
-              url: 'https://supabase.com/docs/guides/storage/image-transformations',
+              url: `${DOCS_URL}/guides/storage/image-transformations`,
             },
           ],
         },
@@ -311,7 +312,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Edge Functions',
-              url: 'https://supabase.com/docs/guides/functions',
+              url: `${DOCS_URL}/guides/functions`,
             },
           ],
         },
@@ -327,7 +328,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Realtime Quotas',
-              url: 'https://supabase.com/docs/guides/realtime/quotas',
+              url: `${DOCS_URL}/guides/realtime/quotas`,
             },
           ],
         },
@@ -346,7 +347,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Realtime Quotas',
-              url: 'https://supabase.com/docs/guides/realtime/quotas',
+              url: `${DOCS_URL}/guides/realtime/quotas`,
             },
           ],
         },
