@@ -444,6 +444,7 @@ const LogTable = ({
               document.body
             )}
         </ResizablePanel>
+
         <ResizableHandle withHandle />
 
         {selectionOpen && (

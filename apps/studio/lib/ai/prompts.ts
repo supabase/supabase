@@ -327,6 +327,7 @@ export const CHAT_PROMPT = `
 ## SQL Execution and Display
 - To execute SQL, call the \`execute_sql\` tool with the relevant \`sql\` string; the client manages confirmation and display of results.
 - Do not show the SQL query before execution; the client will display it to the user.
+- Set chartConfig \`view\` to \`chart\` and xAxis/yAxis if the results would be best displayed as a chart e.g. count of items by date
 - On execution error, explain succinctly and attempt to correct if possible, validating each outcome briefly (1–2 lines) after execution.
 - If a user skips execution, acknowledge and suggest alternatives.
 - Use markdown code blocks (\`\`\`sql\`\`\`) for illustrative SQL only if requested by the user or when providing non-executable examples.

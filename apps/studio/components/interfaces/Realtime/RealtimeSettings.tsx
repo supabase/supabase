@@ -9,7 +9,8 @@ import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { InlineLink } from 'components/ui/InlineLink'
+import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
@@ -61,6 +62,7 @@ export const RealtimeSettings = () => {
     schema: 'realtime',
   })
 
+  const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
 
   // Check if RLS policies exist for realtime.messages table
@@ -255,21 +257,27 @@ export const RealtimeSettings = () => {
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
                         {isSuccessOrganization && !isUsageBillingEnabled && (
-                          <Admonition
-                            showIcon={false}
-                            type="default"
-                            title="Spend cap needs to be disabled to configure this value"
-                            description={
-                              <>
-                                You may adjust this setting in the{' '}
-                                <InlineLink
-                                  href={`/org/${organization?.slug}/billing?panel=costControl`}
-                                >
-                                  organization billing settings
-                                </InlineLink>
-                              </>
-                            }
-                          />
+                          <Admonition showIcon={false} type="default">
+                            <div className="flex items-center gap-x-2">
+                              <div>
+                                <h5 className="text-foreground mb-1">
+                                  Spend cap needs to be disabled to configure this value
+                                </h5>
+                                <p className="text-foreground-light">
+                                  {isFreePlan
+                                    ? 'Upgrade to the Pro plan first to disable spend cap'
+                                    : 'You may adjust this setting in the organization billing settings'}
+                                </p>
+                              </div>
+                              <div className="flex-grow flex items-center justify-end">
+                                {false ? (
+                                  <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                ) : (
+                                  <ToggleSpendCapButton />
+                                )}
+                              </div>
+                            </div>
+                          </Admonition>
                         )}
                       </FormSectionContent>
                     </FormSection>

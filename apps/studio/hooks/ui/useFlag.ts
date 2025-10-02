@@ -1,8 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
-import { useFeatureFlags, useFlag } from 'common'
+import { useFeatureFlags } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { trackFeatureFlag } from 'lib/posthog'
 
 const isObjectEmpty = (obj: Object) => {
