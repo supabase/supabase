@@ -197,6 +197,19 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       schema: table.schema,
       payload: payload,
     })
+
+    sendEvent({
+      action: 'table_rls_enabled',
+      properties: {
+        method: 'table_editor',
+        schema_name: table.schema,
+        table_name: table.name,
+      },
+      groups: {
+        project: projectRef,
+        ...(org?.slug && { organization: org.slug }),
+      },
+    })
   }
 
   return (
