@@ -56,7 +56,7 @@ import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSetti
 
 const FormSchema = z
   .object({
-    bucketName: z
+    name: z
       .string()
       .trim()
       .min(1, 'Please provide a name for your bucket')
@@ -79,10 +79,10 @@ const FormSchema = z
     allowed_mime_types: z.string().trim().default(''),
   })
   .superRefine((data, ctx) => {
-    if (!validBucketNameRegex.test(data.bucketName)) {
-      const [match] = data.bucketName.match(inverseValidBucketNameRegex) ?? []
+    if (!validBucketNameRegex.test(data.name)) {
+      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
       ctx.addIssue({
-        path: ['bucketName'],
+        path: ['name'],
         code: z.ZodIssueCode.custom,
         message: !!match
           ? `Bucket name cannot contain the "${match}" character`
@@ -120,7 +120,7 @@ export const CreateBucketModal = () => {
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      bucketName: '',
+      name: '',
       public: false,
       type: 'STANDARD',
       has_file_size_limit: false,
@@ -130,7 +130,7 @@ export const CreateBucketModal = () => {
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
 
-  const bucketName = snakeCase(form.watch('bucketName'))
+  const bucketName = snakeCase(form.watch('name'))
   const isPublicBucket = form.watch('public')
   const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
@@ -168,7 +168,7 @@ export const CreateBucketModal = () => {
 
       await createBucket({
         projectRef: ref,
-        id: values.bucketName,
+        id: values.name,
         type: values.type,
         isPublic: values.public,
         file_size_limit: fileSizeLimit,
@@ -181,15 +181,15 @@ export const CreateBucketModal = () => {
       })
 
       if (values.type === 'ANALYTICS' && icebergWrapperExtensionState === 'installed') {
-        await createIcebergWrapper({ bucketName: values.bucketName })
+        await createIcebergWrapper({ bucketName: values.name })
       }
 
-      toast.success(`Successfully created bucket ${values.bucketName}`)
+      toast.success(`Successfully created bucket ${values.name}`)
       form.reset()
 
       setSelectedUnit(StorageSizeUnits.MB)
       setVisible(false)
-      router.push(`/project/${ref}/storage/buckets/${values.bucketName}`)
+      router.push(`/project/${ref}/storage/buckets/${values.name}`)
     } catch (error: any) {
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''
@@ -257,17 +257,25 @@ export const CreateBucketModal = () => {
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="flex flex-col gap-y-2">
               <FormField_Shadcn_
-                key="bucketName"
-                name="bucketName"
+                key="name"
+                name="name"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
-                    name="bucketName"
+                    name="name"
                     label="Name of bucket"
                     labelOptional="Buckets cannot be renamed once created."
                   >
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ id="bucketName" {...field} placeholder="Enter bucket name" />
+                      <Input_Shadcn_
+                        id="name"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        {...field}
+                        placeholder="Enter bucket name"
+                      />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
