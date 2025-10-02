@@ -61,7 +61,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
   )
 
   const showStatusIcon = !HEALTHY_STATUSES.includes(status)
-  const isUnhealthy = !UNHEALTHY_STATUSES.includes(status)
+  const isUnhealthy = UNHEALTHY_STATUSES.includes(status)
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -88,7 +88,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
         <DialogSectionSeparator />
 
         <DialogSection className={cn('px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '!py-0')}>
-          {selectedWorkflowRun ? (
+          {!selectedWorkflowRun ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-4" />}
               {isWorkflowRunsError && (
