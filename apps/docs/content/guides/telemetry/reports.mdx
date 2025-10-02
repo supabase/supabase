@@ -4,6 +4,8 @@ title: 'Reports'
 description: 'Built-in observability for your Supabase project'
 ---
 
+{/* last LW we added that same report to every report page (pre-filtered) so, API Gateway report filtered by Auth will show the same data as going to Auth Report in the API Gateway section */}
+
 Supabase Reports provide comprehensive observability for your project through dedicated monitoring dashboards that visualize key metrics across your database, auth, storage, realtime, and API systems. Each report offers self-debugging tools to gain actionable insights for optimizing performance and troubleshooting issues.
 
 <Admonition type="note">
@@ -56,15 +58,14 @@ The Auth reports focus on user authentication patterns and behaviors within your
 
 ### Auth API Gateway
 
-The Auth API Gateway reports focus on …
-{/* TODO: Description */}
+The Auth API Gateway reports focus on API requests related to authentication and user management.
 
-| Chart           | Description                                   | Key Insights                                    |
-| --------------- | --------------------------------------------- | ----------------------------------------------- |
-| Total Requests  | Count of unique users performing auth actions | User engagement and retention patterns, including top routes |
-| Response Errors | Error rates with 4XX and 5XX status codes | API reliability and user experience issues, including top routes       |
-| Response speed  | Average response time for auth requests | Performance bottlenecks and optimization opportunities, including top routes |
-| Network Traffic | Ingress and egress usage                   | Data transfer costs and CDN effectiveness                                    |
+| Chart           | Description                                   | Key Insights                                                                 |
+| --------------- | --------------------------------------------- | ---------------------------------------------------------------------------- |
+| Total Requests  | Count of unique users performing auth actions | User engagement and retention patterns, including top routes                 |
+| Response Errors | Error rates with 4XX and 5XX status codes     | API reliability and user experience issues, including top routes             |
+| Response speed  | Average response time for auth requests       | Performance bottlenecks and optimization opportunities, including top routes |
+| Network Traffic | Ingress and egress usage                      | Data transfer costs and CDN effectiveness                                    |
 
 ## Database
 
@@ -72,21 +73,22 @@ The Database report provides the most comprehensive view into your Postgres inst
 
 The following charts are available for Free and Pro plans:
 
-| Chart                        | Available Plans | Description                                  | Key Insights                                  |
-| ---------------------------- | --------------- | -------------------------------------------- | --------------------------------------------- |
-| Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization      |
-| CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification            |
-| Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis |
-| Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                    |
-| Dedicated Pooler connections | All             | Client connections to PgBouncer              | Dedicated pooler connection monitoring        |
-| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                  |
-| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                  |
-| Disk usage                   | Free, Pro       | Disk space consumption breakdown             | Storage capacity planning                      |
+| Chart                        | Available Plans | Description                                  | Key Insights                                                   |
+| ---------------------------- | --------------- | -------------------------------------------- | -------------------------------------------------------------- |
+| Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization                       |
+| CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification                             |
+| Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis                  |
+| Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                                     |
+| Dedicated Pooler connections | All             | Client connections to PgBouncer              | Dedicated pooler connection monitoring                         |
+| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                                   |
+| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                                   |
+| Disk usage                   | Free, Pro       | Disk space consumption breakdown             | Storage capacity planning                                      |
 | Database size                | Free, Pro       | Total database size and growth trends        | Space consumption monitoring, including list of largest tables |
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Advanced Telemetry
+
 {/* TODO: This is confusing and feels contradictory */}
 The following charts provide a more advanced and detailed view of your database performance and are available only for Teams and Enterprise plans.
 
@@ -308,17 +310,19 @@ The Edge Functions report provides insights into serverless function performance
 | Edge Function Invocations by Region  | Geographic distribution of function calls | Global usage patterns and latency optimization |
 
 ## Query Performance
-{/* TODO: Popout */}
+
+Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examine-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
+
 ## PostgREST
 
 The PostgREST report provides insights into RESTful API performance, request patterns, and response characteristics.
 
-| Chart                                | Description                               | Key Insights                                   |
-| ------------------------------------ | ----------------------------------------- | ---------------------------------------------- |
-| Total Requests  | HTTP requests to PostgREST endpoints   | API usage alongside WebSocket activity    |
-| Response Errors | Error rates with 4XX and 5XX status codes | API reliability and user experience issues, including top routes       |
+| Chart           | Description                                  | Key Insights                                                                 |
+| --------------- | -------------------------------------------- | ---------------------------------------------------------------------------- |
+| Total Requests  | HTTP requests to PostgREST endpoints         | API usage alongside WebSocket activity                                       |
+| Response Errors | Error rates with 4XX and 5XX status codes    | API reliability and user experience issues, including top routes             |
 | Response Speed  | Average response time for PostgREST requests | Performance bottlenecks and optimization opportunities, including top routes |
-| Network Traffic | Ingress and egress usage                   | Data transfer costs and CDN effectiveness                                   |
+| Network Traffic | Ingress and egress usage                     | Data transfer costs and CDN effectiveness                                    |
 
 ## Realtime
 
@@ -332,10 +336,10 @@ The Realtime report tracks WebSocket connections, channel activity, and real-tim
 
 ### Realtime API Gateway
 
-The Realtime API Gateway reports focus on …
-{/* TODO: Fill in */}
-| Chart           | Description                           | Key Insights                              |
-| --------------- | ------------------------------------- | ----------------------------------------- |
+The Realtime API Gateway reports focus on API requests related to Realtime functionality.
+
+| Chart           | Description                           | Key Insights                                                    |
+| --------------- | ------------------------------------- | --------------------------------------------------------------- |
 | Total Requests  | HTTP requests to Realtime endpoints   | API usage alongside WebSocket activity, including top routes    |
 | Response Errors | HTTP requests to Realtime endpoints   | API usage alongside WebSocket activity, including top routes    |
 | Response Speed  | Performance of Realtime API endpoints | Infrastructure optimization opportunities, including top routes |
