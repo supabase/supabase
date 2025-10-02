@@ -14,7 +14,6 @@
   "authentication:attack_protection": true,
   "authentication:advanced": true,
 
-
   "authentication:show_email_phone_columns": true,
   "authentication:show_manual_linking": true,
   "authentication:show_provider_filter": true,
