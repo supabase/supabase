@@ -1,6 +1,7 @@
-import { ActionName, ActionStatus } from 'data/actions/action-runs-query'
-import { Badge } from 'ui'
-import { StatusIcon } from 'ui'
+import type { PropsWithChildren } from 'react'
+
+import { ActionName, ActionStatus, type ActionRunStep } from 'data/actions/action-runs-query'
+import { Badge, StatusIcon, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export interface ActionStatusBadgeProps {
   name: ActionName
@@ -10,7 +11,7 @@ export interface ActionStatusBadgeProps {
 const UNHEALTHY_STATUES: ActionStatus[] = ['DEAD', 'REMOVING']
 const WAITING_STATUSES: ActionStatus[] = ['CREATED', 'RESTARTING', 'RUNNING']
 
-const STATUS_TO_LABEL: Record<ActionStatus, string> = {
+export const STATUS_TO_LABEL: Record<ActionStatus, string> = {
   CREATED: 'pending',
   DEAD: 'failed',
   EXITED: 'succeeded',
@@ -30,7 +31,46 @@ const NAME_TO_LABEL: Record<ActionName, string> = {
   deploy: 'Functions deployment',
 }
 
-const ActionStatusBadge = ({ name, status }: ActionStatusBadgeProps) => {
+export const ActionStatusBadgeCondensed = ({
+  children,
+  status,
+  details,
+}: PropsWithChildren<{
+  status: ActionStatus
+  details: Array<ActionRunStep>
+}>) => {
+  if (status === 'EXITED') {
+    return null
+  }
+
+  const isUnhealthy = UNHEALTHY_STATUES.includes(status)
+  const isWaiting = WAITING_STATUSES.includes(status)
+
+  return (
+    <Tooltip>
+      <TooltipTrigger>
+        <Badge variant={isUnhealthy ? 'destructive' : 'default'} className="gap-1.5">
+          {(isUnhealthy || isWaiting) && (
+            <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
+          )}
+          {children}
+        </Badge>
+      </TooltipTrigger>
+      <TooltipContent>
+        Additional {STATUS_TO_LABEL[status]} steps:
+        <ul>
+          {details.map((step) => (
+            <li key={step.name} className="before:content-['-'] before:mr-0.5">
+              {NAME_TO_LABEL[step.name]}
+            </li>
+          ))}
+        </ul>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+export const ActionStatusBadge = ({ name, status }: ActionStatusBadgeProps) => {
   if (status === 'EXITED') {
     return null
   }
@@ -47,5 +87,3 @@ const ActionStatusBadge = ({ name, status }: ActionStatusBadgeProps) => {
     </Badge>
   )
 }
-
-export default ActionStatusBadge

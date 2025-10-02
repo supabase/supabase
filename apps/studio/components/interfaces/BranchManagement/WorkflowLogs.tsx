@@ -1,10 +1,17 @@
-import type { Branch } from 'data/branches/branches-query'
 import dayjs from 'dayjs'
+import { groupBy } from 'lodash'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
-import { StatusIcon } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
+import { ActionRunData } from 'data/actions/action-detail-query'
+import { useActionRunLogsQuery } from 'data/actions/action-logs-query'
+import {
+  useActionsQuery,
+  type ActionRunStep,
+  type ActionStatus,
+} from 'data/actions/action-runs-query'
+import type { Branch } from 'data/branches/branches-query'
 import {
   Button,
   cn,
@@ -16,13 +23,11 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  StatusIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { ActionStatusBadge, ActionStatusBadgeCondensed, STATUS_TO_LABEL } from './ActionStatusBadge'
 import BranchStatusBadge from './BranchStatusBadge'
-import ActionStatusBadge from './ActionStatusBadge'
-import { useActionsQuery } from 'data/actions/action-runs-query'
-import { useActionRunLogsQuery } from 'data/actions/action-logs-query'
-import { ActionRunData } from 'data/actions/action-detail-query'
 
 interface WorkflowLogsProps {
   projectRef: string
@@ -108,9 +113,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                         >
                           <div className="flex items-center gap-4">
                             {workflowRun.run_steps.length > 0 ? (
-                              workflowRun.run_steps.map((s) => (
-                                <ActionStatusBadge name={s.name} status={s.status} />
-                              ))
+                              <RunSteps steps={workflowRun.run_steps} />
                             ) : (
                               <BranchStatusBadge status={status} />
                             )}
@@ -160,5 +163,31 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
         </DialogSection>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function RunSteps({ steps }: { steps: Array<ActionRunStep> }) {
+  const stepsByStatus = groupBy(steps, 'status') as Record<ActionStatus, Array<ActionRunStep>>
+  const firstFailedStep = stepsByStatus.DEAD?.[0]
+  const numberFailedSteps = stepsByStatus.DEAD?.length ?? 0
+
+  return (
+    <>
+      {firstFailedStep && (
+        <ActionStatusBadge name={firstFailedStep.name} status={firstFailedStep.status} />
+      )}
+      {numberFailedSteps > 1 && (
+        <ActionStatusBadgeCondensed status={'DEAD'} details={stepsByStatus.DEAD.slice(1)}>
+          {numberFailedSteps - 1} more
+        </ActionStatusBadgeCondensed>
+      )}
+      {(Object.keys(stepsByStatus) as Array<ActionStatus>)
+        .filter((status) => status !== 'DEAD')
+        .map((status) => (
+          <ActionStatusBadgeCondensed key={status} status={status} details={stepsByStatus[status]}>
+            {stepsByStatus[status].length} {STATUS_TO_LABEL[status]}
+          </ActionStatusBadgeCondensed>
+        ))}
+    </>
   )
 }
