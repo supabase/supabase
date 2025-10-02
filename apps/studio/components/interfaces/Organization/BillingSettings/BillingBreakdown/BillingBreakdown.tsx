@@ -71,9 +71,16 @@ const BillingBreakdown = () => {
           <p className="prose text-sm">
             {selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ? (
               <>
-                AWS Marketplace sends two invoices each month: one for your fixed subscription fee,
-                billed on the day you subscribed, and one for your usage charges from the previous
-                month, billed by the 3rd.
+                <p>
+                  AWS Marketplace sends two invoices each month: one for your fixed subscription
+                  fee, billed on the day you subscribed, and one for your usage charges from the
+                  previous month, billed by the 3rd.
+                </p>
+
+                <p>
+                  For a more detailed breakdown, visit the{' '}
+                  <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
+                </p>
               </>
             ) : (
               <>
@@ -82,7 +89,6 @@ const BillingBreakdown = () => {
                 breakdown, visit the <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
               </>
             )}
-            <></>
           </p>
           <br />
           <p className="text-sm text-foreground-light mt-4">
