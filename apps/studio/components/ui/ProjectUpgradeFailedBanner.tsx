@@ -21,7 +21,6 @@ export const ProjectUpgradeFailedBanner = () => {
 
   const [hasDismissed, setHasDismissed] = useState(false)
   useEffect(() => {
-    if (typeof window === 'undefined') return
     setHasDismissed(localStorage?.getItem(key) === 'true')
   }, [key])
 
