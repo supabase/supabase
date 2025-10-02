@@ -6,11 +6,14 @@ import {
 import { Card, CardContent, Skeleton, cn } from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Loader2 } from 'lucide-react'
 import { Reports } from 'icons'
 import { getChangeSign, getChangeColor, executeAuthQueries } from './OverviewUsage.constants'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 import { useMemo } from 'react'
+import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
+import { createAuthReportConfig } from 'data/reports/v2/auth.config'
+import dayjs from 'dayjs'
 
 const StatCard = ({
   title,
@@ -29,14 +32,23 @@ const StatCard = ({
   const changeSign = getChangeSign(previous)
   return (
     <Card>
-      <CardContent className="flex flex-col my-1 gap-1">
-        <h4 className="text-sm text-foreground-lighter mb-1">{title}</h4>
-        <p className="text-2xl">
-          {loading ? <Skeleton className="w-24 h-7" /> : `${current}${suffix}`}
-        </p>
-        <p className={cn('text-sm text-foregroudn-lighter', changeColor)}>
-          {loading ? <Skeleton className="w-16 h-5" /> : `${changeSign}${previous}${suffix}       `}
-        </p>
+      <CardContent
+        className={cn(
+          'flex flex-col my-1 gap-1',
+          loading && 'opacity-50 items-center justify-center min-h-[108px]'
+        )}
+      >
+        {loading ? (
+          <Loader2 className="size-5 animate-spin text-foreground-light" />
+        ) : (
+          <>
+            <h4 className="text-sm text-foreground-lighter font-normal mb-0">{title}</h4>
+            <p className="text-xl">{`${current}${suffix}`}</p>
+            <p className={cn('text-sm text-foregroudn-lighter', changeColor)}>
+              {`${changeSign}${previous}${suffix}`}
+            </p>
+          </>
+        )}
       </CardContent>
     </Card>
   )
@@ -87,6 +99,36 @@ export const OverviewUsage = () => {
   const currentSignUpLatency = signUpLatencyCurrent?.[0]?.avg_latency_ms || 0
   const previousSignUpLatency = signUpLatencyPrevious?.[0]?.avg_latency_ms || 0
 
+  const endDate = dayjs().toISOString()
+  const startDate = dayjs().subtract(24, 'hour').toISOString()
+
+  const signUpChartConfig = useMemo(() => {
+    const config = createAuthReportConfig({
+      projectRef: ref as string,
+      startDate,
+      endDate,
+      interval: '1h',
+      filters: { status_code: null },
+    })
+    return config.find((c) => c.id === 'signups')
+  }, [ref, startDate, endDate])
+
+  const signInChartConfig = useMemo(() => {
+    const config = createAuthReportConfig({
+      projectRef: ref as string,
+      startDate,
+      endDate,
+      interval: '1h',
+      filters: { status_code: null },
+    })
+    return config.find((c) => c.id === 'sign-in-attempts')
+  }, [ref, startDate, endDate])
+
+  const updateDateRange = (from: string, to: string) => {
+    // This would typically update the date range, but for now we'll use the fixed range
+    console.log('Date range update:', from, to)
+  }
+
   return (
     <ScaffoldSection isFullWidth>
       <div className="flex items-center justify-between mb-4">
@@ -132,8 +174,26 @@ export const OverviewUsage = () => {
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Card className="aspect-video" />
-          <Card className="aspect-video" />
+          {signUpChartConfig && (
+            <ReportChartV2
+              report={signUpChartConfig}
+              projectRef={ref as string}
+              startDate={startDate}
+              endDate={endDate}
+              interval="1h"
+              updateDateRange={updateDateRange}
+            />
+          )}
+          {signInChartConfig && (
+            <ReportChartV2
+              report={signInChartConfig}
+              projectRef={ref as string}
+              startDate={startDate}
+              endDate={endDate}
+              interval="1h"
+              updateDateRange={updateDateRange}
+            />
+          )}
         </div>
       </ScaffoldSectionContent>
     </ScaffoldSection>
