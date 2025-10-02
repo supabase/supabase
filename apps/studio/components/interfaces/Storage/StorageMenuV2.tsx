@@ -1,11 +1,19 @@
-import { useParams } from 'common'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+
+import { useParams } from 'common'
 import { Menu } from 'ui'
 import { BUCKET_TYPES, BUCKET_TYPE_KEYS, DEFAULT_BUCKET_TYPE } from './Storage.constants'
 
 export const StorageMenuV2 = () => {
-  const { ref, bucketType } = useParams()
-  const selectedBucketType = bucketType || DEFAULT_BUCKET_TYPE
+  const router = useRouter()
+  const { ref } = useParams()
+
+  const selectedBucketType = router.asPath.includes('/analytics')
+    ? 'analytics'
+    : router.asPath.includes('/vectors')
+      ? 'vectors'
+      : DEFAULT_BUCKET_TYPE
 
   return (
     <Menu type="pills" className="mt-6 flex flex-grow flex-col">

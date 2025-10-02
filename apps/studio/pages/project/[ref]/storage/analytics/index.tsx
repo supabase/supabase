@@ -1,0 +1,46 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
+import { useParams } from 'common'
+import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { AnalyticsBuckets } from 'components/interfaces/Storage/AnalyticsBuckets'
+import { EmptyBucketState } from 'components/interfaces/Storage/EmptyBucketState'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import type { NextPageWithLayout } from 'types'
+
+const StorageAnalyticsPage: NextPageWithLayout = () => {
+  const { ref } = useParams()
+  const router = useRouter()
+  const isStorageV2 = useIsNewStorageUIEnabled()
+
+  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
+  const analyticsBuckets = buckets.filter((bucket) => bucket.type === 'ANALYTICS')
+
+  useEffect(() => {
+    if (!isStorageV2) router.replace(`/project/${ref}/storage`)
+  }, [isStorageV2, ref, router])
+
+  if (isLoadingBuckets) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground" />
+      </div>
+    )
+  }
+
+  if (analyticsBuckets.length === 0) {
+    return <EmptyBucketState bucketType="analytics" />
+  }
+
+  return <AnalyticsBuckets />
+}
+
+StorageAnalyticsPage.getLayout = (page) => (
+  <DefaultLayout>
+    <StorageLayout title="Storage">{page}</StorageLayout>
+  </DefaultLayout>
+)
+
+export default StorageAnalyticsPage

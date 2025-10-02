@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { snakeCase } from 'lodash'
-import { Edit } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -51,6 +51,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
@@ -96,25 +97,24 @@ const formId = 'create-storage-bucket-form'
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
 interface CreateBucketModalProps {
-  hideAnalyticsOption?: boolean
-  visible?: boolean
-  onOpenChange?: (open: boolean) => void
+  buttonSize?: 'tiny' | 'small'
+  buttonType?: 'default' | 'primary'
+  buttonClassName?: string
+  label?: string
 }
 
 export const CreateBucketModal = ({
-  hideAnalyticsOption = false,
-  visible: externalVisible,
-  onOpenChange: externalOnOpenChange,
-}: CreateBucketModalProps = {}) => {
+  buttonSize = 'tiny',
+  buttonType = 'default',
+  buttonClassName,
+  label = 'New bucket',
+}: CreateBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+  const isStorageV2 = useIsNewStorageUIEnabled()
 
-  const [internalVisible, setInternalVisible] = useState(false)
-
-  // Use external control if provided, otherwise use internal state
-  const visible = externalVisible !== undefined ? externalVisible : internalVisible
-  const setVisible = externalOnOpenChange || setInternalVisible
+  const [visible, setVisible] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
 
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -203,7 +203,7 @@ export const CreateBucketModal = ({
 
       setSelectedUnit(StorageSizeUnits.MB)
       setVisible(false)
-      router.push(`/project/${ref}/storage/buckets/${values.name}`)
+      if (!isStorageV2) router.push(`/project/${ref}/storage/buckets/${values.name}`)
     } catch (error: any) {
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''
@@ -239,29 +239,28 @@ export const CreateBucketModal = ({
         }
       }}
     >
-      {/* Only show trigger button when not using external control */}
-      {externalVisible === undefined && (
-        <DialogTrigger asChild>
-          <ButtonTooltip
-            block
-            type="default"
-            icon={<Edit />}
-            disabled={!canCreateBuckets}
-            style={{ justifyContent: 'start' }}
-            onClick={() => setVisible(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canCreateBuckets
-                  ? 'You need additional permissions to create buckets'
-                  : undefined,
-              },
-            }}
-          >
-            New bucket
-          </ButtonTooltip>
-        </DialogTrigger>
-      )}
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          block
+          size={buttonSize}
+          type={buttonType}
+          className={buttonClassName}
+          icon={<Plus size={14} />}
+          disabled={!canCreateBuckets}
+          style={{ justifyContent: 'start' }}
+          onClick={() => setVisible(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canCreateBuckets
+                ? 'You need additional permissions to create buckets'
+                : undefined,
+            },
+          }}
+        >
+          {label}
+        </ButtonTooltip>
+      </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
@@ -298,7 +297,7 @@ export const CreateBucketModal = ({
                 )}
               />
 
-              {!hideAnalyticsOption && (
+              {!isStorageV2 && (
                 <FormField_Shadcn_
                   key="type"
                   name="type"
