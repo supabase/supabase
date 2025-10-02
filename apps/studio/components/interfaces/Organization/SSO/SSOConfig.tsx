@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import Link from 'next/link'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
@@ -8,6 +7,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useSSOConfigCreateMutation } from 'data/sso/sso-config-create-mutation'
 import { useOrgSSOConfigQuery } from 'data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
@@ -67,7 +67,7 @@ export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 export const SSOConfig = () => {
   const FORM_ID = 'sso-config-form'
 
-  const { data: organization, isLoading: isLoadingOrganization } = useSelectedOrganizationQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan.id
   const canSetupSSOConfig = ['team', 'enterprise'].includes(plan ?? '')
 
@@ -179,13 +179,7 @@ export const SSOConfig = () => {
               </div>
 
               <div className="flex items-center">
-                <Button type="primary" asChild>
-                  <Link
-                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=sso`}
-                  >
-                    Upgrade to Team
-                  </Link>
-                </Button>
+                <UpgradePlanButton type="primary" source="sso" plan="Team" />
               </div>
             </div>
           </Alert_Shadcn_>

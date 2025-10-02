@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { sqlEventParser } from 'lib/sql-event-parser'
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
 import { invalidateDataGranularly } from 'lib/granular-data-invalidation'
 
@@ -32,6 +35,8 @@ export const useExecuteSqlMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { data: org } = useSelectedOrganizationQuery()
 
   return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>(
     (args) => executeSql(args),
@@ -39,7 +44,34 @@ export const useExecuteSqlMutation = ({
       async onSuccess(data, variables, context) {
         const { contextualInvalidation, sql, projectRef } = variables
 
-        if (contextualInvalidation && projectRef) {
+        // Track all table-related events from SQL execution
+        try {
+          const tableEvents = sqlEventParser.getTableEvents(sql)
+          tableEvents.forEach((event) => {
+            if (projectRef) {
+              sendEvent({
+                action: event.type,
+                properties: {
+                  method: 'sql_editor',
+                  schema_name: event.schema,
+                  table_name: event.tableName,
+                },
+                groups: {
+                  project: projectRef,
+                  ...(org?.slug && { organization: org.slug }),
+                },
+              })
+            }
+          })
+        } catch (error) {
+          console.error('Failed to parse SQL for telemetry:', error)
+        }
+
+        // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
+        const sqlLower = sql.toLowerCase()
+        const isMutationSQL =
+          sqlLower.includes('create ') || sqlLower.includes('alter ') || sqlLower.includes('drop ')
+        if (contextualInvalidation && projectRef && isMutationSQL) {
           const invalidationActions = await invalidateDataGranularly(sql, projectRef)
           const promises = invalidationActions.map((action) =>
             queryClient.invalidateQueries({
