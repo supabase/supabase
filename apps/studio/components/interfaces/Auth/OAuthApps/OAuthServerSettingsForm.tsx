@@ -14,7 +14,7 @@ import {
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Card,
@@ -83,11 +83,11 @@ const OAuthServerSettingsForm = () => {
   const [showDisableOAuthServerConfirmation, setShowDisableOAuthServerConfirmation] =
     useState(false)
 
-  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )

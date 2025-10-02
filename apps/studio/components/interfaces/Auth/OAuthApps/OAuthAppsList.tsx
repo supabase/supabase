@@ -30,7 +30,7 @@ import UpdateOAuthAppSidePanel from './UpdateOAuthAppSidePanel'
 import DeleteOAuthAppModal from './DeleteOAuthAppModal'
 import { Admonition } from 'ui-patterns'
 
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useParams } from 'common'
 
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
@@ -140,7 +140,7 @@ const OAuthAppsList = () => {
   const [isOAuthServerEnabled, setIsOAuthServerEnabled] = useState(false)
   const [filterString, setFilterString] = useState<string>('')
 
-  const { can: canCreateTriggers } = useAsyncCheckProjectPermissions(
+  const { can: canCreateTriggers } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'triggers'
   )
