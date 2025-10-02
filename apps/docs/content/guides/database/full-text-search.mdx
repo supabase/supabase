@@ -91,7 +91,7 @@ Converts a query string into tokens to match. `to_tsquery()` stands for "to text
 This conversion step is important because we will want to "fuzzy match" on keywords.
 For example if a user searches for `eggs`, and a column has the value `egg`, we probably still want to return a match.
 
-PostgreSQL provides several functions to create tsquery objects:
+Postgres provides several functions to create tsquery objects:
 
 - **`to_tsquery()`** - Requires manual specification of operators (`&`, `|`, `!`)
 - **`plainto_tsquery()`** - Converts plain text to an AND query: `plainto_tsquery('english', 'fat rats')` → `'fat' & 'rat'`
