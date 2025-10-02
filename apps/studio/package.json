@@ -99,7 +99,7 @@
     "monaco-editor": "0.52.2",
     "next": "catalog:",
     "next-themes": "^0.3.0",
-    "nuqs": "^2.4.1",
+    "nuqs": "2.7.0",
     "openai": "^4.75.1",
     "openapi-fetch": "0.12.4",
     "papaparse": "^5.3.1",
