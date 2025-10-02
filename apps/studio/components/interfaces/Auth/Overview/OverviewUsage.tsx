@@ -8,7 +8,12 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { ChevronRight, Loader2 } from 'lucide-react'
 import { Reports } from 'icons'
-import { getChangeSign, getChangeColor, executeAuthQueries } from './OverviewUsage.constants'
+import {
+  getChangeSign,
+  getChangeColor,
+  executeAuthQueries,
+  calculatePercentageChange,
+} from './OverviewUsage.constants'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 import { useMemo } from 'react'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
@@ -20,7 +25,7 @@ const StatCard = ({
   current,
   previous,
   loading,
-  suffix,
+  suffix = '',
 }: {
   title: string
   current: number
@@ -45,7 +50,7 @@ const StatCard = ({
             <h4 className="text-sm text-foreground-lighter font-normal mb-0">{title}</h4>
             <p className="text-xl">{`${current}${suffix}`}</p>
             <p className={cn('text-sm text-foregroudn-lighter', changeColor)}>
-              {`${changeSign}${previous}${suffix}`}
+              {`${changeSign}${previous.toFixed(1)}%`}
             </p>
           </>
         )}
@@ -99,6 +104,15 @@ export const OverviewUsage = () => {
   const currentSignUpLatency = signUpLatencyCurrent?.[0]?.avg_latency_ms || 0
   const previousSignUpLatency = signUpLatencyPrevious?.[0]?.avg_latency_ms || 0
 
+  // Calculate percentage changes
+  const activeUsersChange = calculatePercentageChange(currentUserCount, previousUserCount)
+  const passwordResetChange = calculatePercentageChange(
+    currentPasswordResets,
+    previousPasswordResets
+  )
+  const signInLatencyChange = calculatePercentageChange(currentSignInLatency, previousSignInLatency)
+  const signUpLatencyChange = calculatePercentageChange(currentSignUpLatency, previousSignUpLatency)
+
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
 
@@ -147,28 +161,26 @@ export const OverviewUsage = () => {
           <StatCard
             title="Active Users"
             current={currentUserCount}
-            previous={previousUserCount}
+            previous={activeUsersChange}
             loading={activeUsersCurrentLoading}
-            suffix=""
           />
           <StatCard
             title="Password Reset Requests"
             current={currentPasswordResets}
-            previous={previousPasswordResets}
+            previous={passwordResetChange}
             loading={passwordResetCurrentLoading}
-            suffix=""
           />
           <StatCard
             title="Sign up Latency"
             current={currentSignUpLatency}
-            previous={previousSignUpLatency}
+            previous={signUpLatencyChange}
             loading={signUpLatencyCurrentLoading}
             suffix="ms"
           />
           <StatCard
             title="Sign in Latency"
             current={currentSignInLatency}
-            previous={previousSignInLatency}
+            previous={signInLatencyChange}
             loading={signInLatencyCurrentLoading}
             suffix="ms"
           />
