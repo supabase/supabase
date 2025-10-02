@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
@@ -271,15 +272,7 @@ const PITRSidePanel = () => {
                   variant="info"
                   className="mb-4"
                   title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
-                  actions={
-                    <Button asChild type="default">
-                      <Link
-                        href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=pitrSidePanel`}
-                      >
-                        View available plans
-                      </Link>
-                    </Button>
-                  }
+                  actions={<UpgradePlanButton source="pitrSidePanel" plan="Pro" />}
                 >
                   Upgrade your plan to change PITR for your project
                 </Alert>

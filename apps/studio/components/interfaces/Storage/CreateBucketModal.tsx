@@ -267,7 +267,15 @@ export const CreateBucketModal = () => {
                     labelOptional="Buckets cannot be renamed once created."
                   >
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ id="name" {...field} placeholder="Enter bucket name" />
+                      <Input_Shadcn_
+                        id="name"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        {...field}
+                        placeholder="Enter bucket name"
+                      />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}

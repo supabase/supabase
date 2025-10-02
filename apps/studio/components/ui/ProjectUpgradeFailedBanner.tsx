@@ -2,7 +2,7 @@ import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import dayjs from 'dayjs'
 import { X } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
@@ -18,9 +18,11 @@ export const ProjectUpgradeFailedBanner = () => {
   const { status, initiated_at, latest_status_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
-  const isAcknowledged =
-    typeof window !== 'undefined' ? localStorage?.getItem(key) === 'true' : false
-  const [showMessage, setShowMessage] = useState(!isAcknowledged)
+
+  const [hasDismissed, setHasDismissed] = useState(false)
+  useEffect(() => {
+    setHasDismissed(localStorage?.getItem(key) === 'true')
+  }, [key])
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const initiatedAt = dayjs
@@ -43,11 +45,11 @@ export const ProjectUpgradeFailedBanner = () => {
   const timestampFilter = `its=${initiatedAtEncoded}&ite=${latestStatusAtEncoded}`
 
   const acknowledgeMessage = () => {
-    setShowMessage(false)
+    setHasDismissed(true)
     localStorage.setItem(key, 'true')
   }
 
-  if (!isFailed || !showMessage) return null
+  if (!isFailed || hasDismissed) return null
 
   return (
     <div className="max-w-7xl">

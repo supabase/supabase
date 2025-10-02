@@ -214,12 +214,9 @@ const CustomTooltip = ({
       >
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
-          {payload
-            .reverse()
-            .filter((entry: any) => entry.value !== 0)
-            .map((entry: any, index: number) => (
-              <LabelItem key={`${entry.name}-${index}`} entry={entry} />
-            ))}
+          {payload.reverse().map((entry: any, index: number) => (
+            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+          ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="flex-grow text-foreground-lighter">Total</span>

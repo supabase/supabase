@@ -156,6 +156,15 @@ export interface CustomTypePropertyType {
   type: TypeDetails | undefined
 }
 
+// The meaning of kind flags from `typedoc`:
+// https://github.com/TypeStrong/typedoc/blob/2953b0148253589448176881a7acb46090f941bd/src/lib/output/themes/default/assets/typedoc/Application.ts#L36
+const KIND_MODULE = 2
+const KIND_CLASS = 128
+const KIND_INTERFACE = 256
+const KIND_CONSTRUCTOR = 512
+const KIND_METHOD = 2048
+const KIND_TYPE_LITERAL = 65536
+
 /**
  *
  * New versions of `typedoc` added the variant property, so this is a quick and
@@ -205,7 +214,7 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
     return original
   }
 
-  let comment: Comment = {}
+  const comment: Comment = {}
 
   if ('summary' in original) {
     comment.shortText = original.summary.map((part) => part.text).join('')
@@ -217,13 +226,6 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
 
   return comment
 }
-
-// The meaning of kind flags from `typedoc`:
-// https://github.com/TypeStrong/typedoc/blob/2953b0148253589448176881a7acb46090f941bd/src/lib/output/themes/default/assets/typedoc/Application.ts#L36
-const KIND_CLASS = 128
-const KIND_CONSTRUCTOR = 512
-const KIND_METHOD = 2048
-const KIND_TYPE_LITERAL = 65536
 
 export function parseTypeSpec() {
   const modules = (typeSpec.children ?? []).map(parseMod)
@@ -294,7 +296,7 @@ function parseModInternal(
       node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
       return
     case 'declaration':
-      if (node.kind === KIND_CLASS) {
+      if (node.kind === KIND_CLASS || node.kind === KIND_MODULE) {
         updatedPath = [...currentPath, node.name]
         node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
       } else if (node.kind === KIND_CONSTRUCTOR) {
@@ -540,6 +542,8 @@ function parseReferenceType(type: any, map: Map<number, any>) {
 
     if (maybeType) {
       return maybeType
+    } else if (isNewTypedoc(referenced) && referenced.kind === KIND_INTERFACE) {
+      return parseInterface(referenced, map)
     } else if (isNewTypedoc(referenced) && referenced.kind === KIND_CLASS) {
       // Class is too complicated to display here, just return its name
       return {
@@ -673,7 +677,9 @@ function parseTypeLiteral(type: any, map: Map<number, any>): TypeDetails | undef
   const name = nameOrAnonymous(type)
 
   if ('children' in type.declaration) {
-    const properties = type.declaration.children.map((child: any) => parseTypeInternals(child, map))
+    const properties = type.declaration.children
+      .map((child: any) => parseTypeInternals(child, map))
+      .filter(Boolean)
     return {
       name,
       type: 'object',
@@ -725,7 +731,9 @@ function parseTypeOperatorType(type: any, map: Map<number, any>) {
 }
 
 function parseInterface(type: any, map: Map<number, any>): CustomObjectType {
-  const properties = (type.children ?? []).map((child) => parseTypeInternals(child, map))
+  const properties = (type.children ?? [])
+    .map((child) => parseTypeInternals(child, map))
+    .filter(Boolean)
 
   return {
     type: 'object',
@@ -766,6 +774,10 @@ function parseTypeInternals(elem: any, map: Map<number, any>) {
 
 function parseInternalProperty(elem: any, map: Map<number, any>) {
   const name = nameOrAnonymous(elem)
+  if (!elem.type) {
+    return undefined
+  }
+
   const type = parseType(elem.type, map)
 
   const res = {
