@@ -80,6 +80,10 @@
       "type": "boolean",
       "description": "Show the user type filter in the authentication users page"
     },
+    "authentication:show_email_phone_columns": {
+      "type": "boolean",
+      "description": "Show the email and phone columns in the authentication users page"
+    },
 
     "billing:all": {
       "type": "boolean",
@@ -114,6 +118,14 @@
     "database:roles": {
       "type": "boolean",
       "description": "Enable the database roles page"
+    },
+    "database:restore_to_new_project": {
+      "type": "boolean",
+      "description": "Enable the restore to new project page under backups"
+    },
+    "database:network_restrictions": {
+      "type": "boolean",
+      "description": "Show the network restrictions setting under database settings"
     },
 
     "docs:auth_architecture": {
@@ -211,13 +223,18 @@
       "type": "boolean",
       "description": "Show all third-party-managed integrations"
     },
-    "integrations:show_stripe_wrapper": {
+    "integrations:wrappers": {
       "type": "boolean",
-      "description": "Show the Stripe wrapper under project integrations"
+      "description": "Show all wrappers (FDW) under project integrations"
     },
     "integrations:vercel": {
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
+    },
+
+    "infrastructure:read_replicas": {
+      "type": "boolean",
+      "description": "Enable read replicas management"
     },
 
     "logs:templates": {
@@ -227,6 +244,14 @@
     "logs:collections": {
       "type": "boolean",
       "description": "Enable the logs collections page"
+    },
+    "logs:metadata": {
+      "type": "boolean",
+      "description": "Show the metadata field for logs in logs explorer"
+    },
+    "logs:show_metadata_ip_template": {
+      "type": "boolean",
+      "description": "Show the Metadata IP template in the logs explorer"
     },
 
     "organization:show_sso_settings": {
@@ -315,6 +340,14 @@
       "type": "boolean",
       "description": "Enable the log drains page in project settings"
     },
+    "project_settings:restart_project": {
+      "type": "boolean",
+      "description": "Show the option to restart project in project settings (If off, only fast database reboot will be shown)"
+    },
+    "project_settings:database_upgrades": {
+      "type": "boolean",
+      "description": "Show database upgrade callouts in the project settings infrastructure page"
+    },
 
     "quickstarts:hide_nimbus": {
       "type": "boolean",
@@ -366,20 +399,21 @@
     "ai:opt_in_level_schema",
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
-    "authentication:sign_in_providers",
-    "authentication:third_party_auth",
-    "authentication:rate_limits",
+    "authentication:advanced",
+    "authentication:attack_protection",
     "authentication:emails",
     "authentication:multi_factor",
-    "authentication:attack_protection",
-    "authentication:advanced",
-    "authentication:show_providers",
+    "authentication:rate_limits",
+    "authentication:show_email_phone_columns",
     "authentication:show_manual_linking",
     "authentication:show_provider_filter",
+    "authentication:show_providers",
     "authentication:show_send_invitation",
     "authentication:show_sort_by_email",
     "authentication:show_sort_by_phone",
     "authentication:show_user_type_filter",
+    "authentication:sign_in_providers",
+    "authentication:third_party_auth",
     "billing:all",
     "dashboard_auth:sign_up",
     "dashboard_auth:sign_in_with_github",
@@ -387,6 +421,8 @@
     "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
+    "database:restore_to_new_project",
+    "database:network_restrictions",
     "docs:auth_architecture",
     "docs:auth_configuration",
     "docs:auth_flows",
@@ -408,14 +444,17 @@
     "docs:web_apps",
     "feedback:docs",
     "integrations:partners",
-    "integrations:show_stripe_wrapper",
+    "integrations:wrappers",
     "integrations:vercel",
+    "infrastructure:read_replicas",
     "profile:show_email",
     "profile:show_information",
     "profile:show_analytics_and_marketing",
     "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
+    "logs:metadata",
+    "logs:show_metadata_ip_template",
     "organization:show_sso_settings",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
@@ -426,6 +465,8 @@
     "project_settings:show_disable_legacy_api_keys",
     "project_settings:legacy_jwt_keys",
     "project_settings:log_drains",
+    "project_settings:restart_project",
+    "project_settings:database_upgrades",
     "project_connection:javascript_example",
     "project_connection:dart_example",
     "project_connection:show_app_frameworks",

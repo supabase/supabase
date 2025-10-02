@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { useFlag } from 'common'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import AlertError from 'components/ui/AlertError'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { Menu, Separator } from 'ui'
@@ -20,6 +20,7 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 const IntegrationsLayout = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
+  const { integrationsWrappers: showWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
   const segments = router.asPath.split('/')
   // construct the page url to be used to determine the active state for the sidebar
@@ -65,7 +66,7 @@ const IntegrationsLayout = ({ children }: PropsWithChildren) => {
                   : 'integrations'
                 : page
             }
-            menu={generateIntegrationsMenu({ projectRef: project?.ref })}
+            menu={generateIntegrationsMenu({ projectRef: project?.ref, flags: { showWrappers } })}
           />
           <Separator />
           <div className="px-4 py-6 md:px-6">
@@ -110,7 +111,15 @@ const IntegrationsLayout = ({ children }: PropsWithChildren) => {
 // Wrap component with authentication HOC before exporting
 export default withAuth(IntegrationsLayout)
 
-const generateIntegrationsMenu = ({ projectRef }: { projectRef?: string }): ProductMenuGroup[] => {
+const generateIntegrationsMenu = ({
+  projectRef,
+  flags,
+}: {
+  projectRef?: string
+  flags?: { showWrappers: boolean }
+}): ProductMenuGroup[] => {
+  const { showWrappers } = flags ?? {}
+
   return [
     {
       title: 'Explore',
@@ -122,13 +131,17 @@ const generateIntegrationsMenu = ({ projectRef }: { projectRef?: string }): Prod
           pages: ['integrations'],
           items: [],
         },
-        {
-          name: 'Wrappers',
-          key: 'integrations-wrapper',
-          url: `/project/${projectRef}/integrations?category=wrapper`,
-          pages: ['integrations?category=wrapper'],
-          items: [],
-        },
+        ...(showWrappers
+          ? [
+              {
+                name: 'Wrappers',
+                key: 'integrations-wrapper',
+                url: `/project/${projectRef}/integrations?category=wrapper`,
+                pages: ['integrations?category=wrapper'],
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'Postgres Modules',
           key: 'integrations-postgres_extension',

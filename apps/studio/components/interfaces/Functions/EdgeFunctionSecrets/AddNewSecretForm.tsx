@@ -191,6 +191,10 @@ const AddNewSecretForm = () => {
                           <Input
                             {...field}
                             type={showSecretValue ? 'text' : 'password'}
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
                             actions={
                               <div className="mr-1">
                                 <Button
