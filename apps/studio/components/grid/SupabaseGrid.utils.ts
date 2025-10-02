@@ -131,7 +131,8 @@ export function loadTableEditorStateFromLocalStorage(
   schema?: string | null
 ): SavedState | undefined {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
-  const jsonStr = localStorage.getItem(storageKey)
+  // Prefer sessionStorage (scoped to current tab) over localStorage
+  const jsonStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
   const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
@@ -154,7 +155,7 @@ export function saveTableEditorStateToLocalStorage({
   filters?: string[]
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
-  const savedStr = localStorage.getItem(storageKey)
+  const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
   const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
 
   const config = {
@@ -171,7 +172,9 @@ export function saveTableEditorStateToLocalStorage({
   } else {
     savedJson = { [tableKey]: config }
   }
+  // Save to both localStorage and sessionStorage so it's consistent to current tab
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
+  sessionStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
 export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromise(

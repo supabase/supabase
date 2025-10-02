@@ -67,7 +67,7 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   </ButtonTooltip>
 )
 
-const NetworkRestrictions = () => {
+export const NetworkRestrictions = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
@@ -300,5 +300,3 @@ const NetworkRestrictions = () => {
     </>
   )
 }
-
-export default NetworkRestrictions

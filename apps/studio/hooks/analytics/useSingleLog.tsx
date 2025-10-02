@@ -8,6 +8,7 @@ import type {
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import { genSingleLogQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 interface SingleLogHook {
   data: LogData | undefined
@@ -34,6 +35,8 @@ function useSingleLog({
   const params: LogsEndpointParams = { ...paramsToMerge, sql }
 
   const enabled = Boolean(id && table)
+
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
   const {
     data,
@@ -67,8 +70,11 @@ function useSingleLog({
 
   let error: null | string | object = rcError ? (rcError as any).message : null
   const result = data?.result ? data.result[0] : undefined
+
   return {
-    data: result,
+    data: !!result
+      ? { ...result, metadata: logsMetadata ? result?.metadata : undefined }
+      : undefined,
     isLoading: (enabled && isLoading) || isRefetching,
     error,
     refresh: () => refetch(),
