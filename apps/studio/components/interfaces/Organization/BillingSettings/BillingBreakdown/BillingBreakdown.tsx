@@ -71,22 +71,24 @@ const BillingBreakdown = () => {
           <p className="prose text-sm">
             {selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ? (
               <>
-                You'll receive two invoices from AWS Marketplace: one on the 3rd of{' '}
-                {billingCycleEnd.format('MMMM')} for your usage in{' '}
-                {billingCycleStart.format('MMMM')} and one on {billingCycleEnd.format('MMMM DD')}{' '}
-                for the fixed subscription fee.
+                <p>
+                  AWS Marketplace sends two invoices each month: one for your fixed subscription
+                  fee, billed on the day you subscribed, and one for your usage charges from the
+                  previous month, billed by the 3rd.
+                </p>
+
+                <p>
+                  For a more detailed breakdown, visit the{' '}
+                  <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
+                </p>
               </>
             ) : (
               <>
                 Your upcoming invoice (excluding credits) will continue to update until the end of
-                your billing cycle on {billingCycleEnd.format('MMMM DD')}.
+                your billing cycle on {billingCycleEnd.format('MMMM DD')}. For a more detailed
+                breakdown, visit the <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
               </>
             )}
-            <>
-              {' '}
-              For a more detailed breakdown, visit the{' '}
-              <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
-            </>
           </p>
           <br />
           <p className="text-sm text-foreground-light mt-4">
