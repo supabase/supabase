@@ -105,23 +105,11 @@ export const AUTH_QUERIES = {
   },
 }
 
-// Debug queries - simpler versions to test if we can get any data at all
-export const DEBUG_QUERIES = {
-  totalAuthLogs: (startDate: string, endDate: string) => `
-    select count(*) as count
-    from auth_logs
-    where timestamp >= '${startDate}' and timestamp <= '${endDate}'
-  `,
+export const executeAuthQueries = (projectRef: string) => {
+  if (!projectRef) {
+    throw new Error('Project reference is required')
+  }
 
-  authLogSample: (startDate: string, endDate: string) => `
-    select event_message, timestamp
-    from auth_logs
-    where timestamp >= '${startDate}' and timestamp <= '${endDate}'
-    limit 5
-  `,
-}
-
-export const executeAuthQueries = async (projectRef: string) => {
   const { current, previous } = getDateRanges()
 
   const queries = [
@@ -173,7 +161,7 @@ export const formatStatValue = (value: number, suffix: string = ''): string => {
 }
 
 export const getChangeColor = (percentageChange: number): string => {
-  return percentageChange >= 0 ? 'text-green-500' : 'text-red-500'
+  return percentageChange >= 0 ? 'text-brand' : 'text-destructive'
 }
 
 export const getChangeSign = (percentageChange: number): string => {

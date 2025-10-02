@@ -3,12 +3,12 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, CardHeader, CardTitle, Skeleton } from 'ui'
+import { Card, CardContent, Skeleton, cn } from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
 import { ChevronRight } from 'lucide-react'
 import { Reports } from 'icons'
-import { AUTH_QUERIES, getDateRanges } from './OverviewUsage.constants'
+import { getChangeSign, getChangeColor, executeAuthQueries } from './OverviewUsage.constants'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 import { useMemo } from 'react'
 
@@ -17,19 +17,25 @@ const StatCard = ({
   current,
   previous,
   loading,
+  suffix,
 }: {
   title: string
   current: number
   previous: number
   loading: boolean
+  suffix?: string
 }) => {
+  const changeColor = getChangeColor(previous)
+  const changeSign = getChangeSign(previous)
   return (
     <Card>
       <CardContent className="flex flex-col my-1 gap-1">
         <h4 className="text-sm text-foreground-lighter mb-1">{title}</h4>
-        <p className="text-2xl">{loading ? <Skeleton className="w-24 h-7" /> : current}</p>
-        <p className="text-sm text-foregroudn-lighter">
-          {loading ? <Skeleton className="w-16 h-5" /> : previous}
+        <p className="text-2xl">
+          {loading ? <Skeleton className="w-24 h-7" /> : `${current}${suffix}`}
+        </p>
+        <p className={cn('text-sm text-foregroudn-lighter', changeColor)}>
+          {loading ? <Skeleton className="w-16 h-5" /> : `${changeSign}${previous}${suffix}       `}
         </p>
       </CardContent>
     </Card>
@@ -38,19 +44,48 @@ const StatCard = ({
 
 export const OverviewUsage = () => {
   const { ref } = useParams()
-  const dateRanges = useMemo(() => getDateRanges(), [])
-  const { current, previous } = dateRanges
+  const queries = useMemo(() => executeAuthQueries(ref as string), [ref])
 
-  const { data: currentActiveUsers, isLoading: currentLoading } = useDbQuery({
-    sql: AUTH_QUERIES.activeUsers.current(current.startDate, current.endDate),
+  const { data: activeUsersCurrent, isLoading: activeUsersCurrentLoading } = useDbQuery({
+    sql: queries.find((q) => q.key === 'activeUsersCurrent')?.sql || '',
   })
 
-  const { data: previousActiveUsers, isLoading: previousLoading } = useDbQuery({
-    sql: AUTH_QUERIES.activeUsers.previous(previous.startDate, previous.endDate),
+  const { data: activeUsersPrevious, isLoading: activeUsersPreviousLoading } = useDbQuery({
+    sql: queries.find((q) => q.key === 'activeUsersPrevious')?.sql || '',
   })
 
-  const currentCount = currentActiveUsers?.[0]?.count || 0
-  const previousCount = previousActiveUsers?.[0]?.count || 0
+  const { data: passwordResetCurrent, isLoading: passwordResetCurrentLoading } = useDbQuery({
+    sql: queries.find((q) => q.key === 'passwordResetCurrent')?.sql || '',
+  })
+
+  const { data: passwordResetPrevious, isLoading: passwordResetPreviousLoading } = useDbQuery({
+    sql: queries.find((q) => q.key === 'passwordResetPrevious')?.sql || '',
+  })
+
+  const { data: signInLatencyCurrent, isLoading: signInLatencyCurrentLoading } = useDbQuery({
+    sql: queries.find((q) => q.key === 'signInLatencyCurrent')?.sql || '',
+  })
+
+  const { data: signInLatencyPrevious, isLoading: signInLatencyPreviousLoading } = useDbQuery({
+    sql: queries.find((q) => q.key === 'signInLatencyPrevious')?.sql || '',
+  })
+
+  const { data: signUpLatencyCurrent, isLoading: signUpLatencyCurrentLoading } = useDbQuery({
+    sql: queries.find((q) => q.key === 'signUpLatencyCurrent')?.sql || '',
+  })
+
+  const { data: signUpLatencyPrevious, isLoading: signUpLatencyPreviousLoading } = useDbQuery({
+    sql: queries.find((q) => q.key === 'signUpLatencyPrevious')?.sql || '',
+  })
+
+  const currentUserCount = activeUsersCurrent?.[0]?.count || 0
+  const previousUserCount = activeUsersPrevious?.[0]?.count || 0
+  const currentPasswordResets = passwordResetCurrent?.[0]?.count || 0
+  const previousPasswordResets = passwordResetPrevious?.[0]?.count || 0
+  const currentSignInLatency = signInLatencyCurrent?.[0]?.avg_latency_ms || 0
+  const previousSignInLatency = signInLatencyPrevious?.[0]?.avg_latency_ms || 0
+  const currentSignUpLatency = signUpLatencyCurrent?.[0]?.avg_latency_ms || 0
+  const previousSignUpLatency = signUpLatencyPrevious?.[0]?.avg_latency_ms || 0
 
   return (
     <ScaffoldSection isFullWidth>
@@ -69,13 +104,32 @@ export const OverviewUsage = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard
             title="Active Users"
-            current={currentCount}
-            previous={previousCount}
-            loading={currentLoading}
+            current={currentUserCount}
+            previous={previousUserCount}
+            loading={activeUsersCurrentLoading}
+            suffix=""
           />
-          <StatCard title="Password Reset Requests" current={0} previous={0} loading={false} />
-          <StatCard title="Sign up Latency" current={0} previous={0} loading={false} />
-          <StatCard title="Sign in Latency" current={0} previous={0} loading={false} />
+          <StatCard
+            title="Password Reset Requests"
+            current={currentPasswordResets}
+            previous={previousPasswordResets}
+            loading={passwordResetCurrentLoading}
+            suffix=""
+          />
+          <StatCard
+            title="Sign up Latency"
+            current={currentSignUpLatency}
+            previous={previousSignUpLatency}
+            loading={signUpLatencyCurrentLoading}
+            suffix="ms"
+          />
+          <StatCard
+            title="Sign in Latency"
+            current={currentSignInLatency}
+            previous={previousSignInLatency}
+            loading={signInLatencyCurrentLoading}
+            suffix="ms"
+          />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Card className="aspect-video" />
