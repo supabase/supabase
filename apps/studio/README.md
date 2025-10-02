@@ -28,13 +28,13 @@ Project settings are managed outside of the Dashboard. If you use docker compose
     - Type: `chore | fix | feature`
     - The branch name is arbitrary — just make sure it summarizes the work.
 - When you send a PR to `master`, it will automatically tag members of the frontend team for review.
-- Review the [contributing checklists](contributing/contributing-checklists.md) to help test your feature before sending a PR.
+- Review the [contributing checklists](https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md) to help test your feature before sending a PR.
 - The Dashboard is under active development. You should run `git pull` frequently to make sure you're up to date.
 
 ### Developer Quickstart
 
 > [!NOTE]  
-> **Supabase internal use:** To develop on Studio locally with the backend services, see the instructions in the [internal `infrastructure` repo](https://github.com/supabase/infrastructure/blob/develop/docs/contributing.md).
+> **Supabase internal use:** To develop on Studio locally with the backend services, see the instructions in the [internal `infrastructure` repo](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md).
 
 ```bash
 # You'll need to be on Node v20
