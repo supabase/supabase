@@ -9,6 +9,7 @@ import { McpConfigurationOptions } from './components/McpConfigurationOptions'
 import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
 import type { McpClient } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
+import { InfoTooltip } from '../info-tooltip'
 
 export interface McpConfigPanelProps {
   basePath: string
@@ -81,7 +82,14 @@ export function McpConfigPanel({
         <div className={innerPanelSpacing}>
           <CodeBlock
             focusable={false}
-            title="Server URL"
+            title={
+              <div className="flex items-center gap-2">
+                Server URL
+                <InfoTooltip>
+                  MCP clients should support the Streamable HTTP transport and OAuth authentication
+                </InfoTooltip>
+              </div>
+            }
             hideLineNumbers
             language="http"
             className="max-h-64 overflow-y-auto"
