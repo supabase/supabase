@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
 Every time this Edge Function is run it:
 
 1. Read 5 messages off the queue
-1. Call the `processMessage` function
+2. Call the `processMessage` function
 1. At the end of `processMessage`, the message is deleted from the queue
 1. If `processMessage` throws an error, the error is logged. In this case the message will still be on the queue, so the next time this Edge Function runs it will read the message again.
 
