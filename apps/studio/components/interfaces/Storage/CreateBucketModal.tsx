@@ -269,7 +269,6 @@ export const CreateBucketModal = () => {
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
                         id="name"
-                        // [Danny] Prevent password managers from appearing in field
                         data-1p-ignore
                         data-lpignore="true"
                         data-form-type="other"
