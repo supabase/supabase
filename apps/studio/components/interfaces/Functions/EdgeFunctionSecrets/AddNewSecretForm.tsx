@@ -191,6 +191,11 @@ const AddNewSecretForm = () => {
                           <Input
                             {...field}
                             type={showSecretValue ? 'text' : 'password'}
+                            // [Danny] Prevent password managers from appearing in field
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
                             actions={
                               <div className="mr-1">
                                 <Button
