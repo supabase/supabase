@@ -501,6 +501,10 @@ services:
         condition: service_healthy
       analytics:
         condition: service_healthy
+    ulimits:
+       nofile:
+       soft: 100000
+       hard: 100000
     environment:
       PORT: 4000
       POSTGRES_PORT: ${POSTGRES_PORT}
@@ -519,6 +523,8 @@ services:
       POOLER_MAX_CLIENT_CONN: ${POOLER_MAX_CLIENT_CONN}
       POOLER_POOL_MODE: transaction
       DB_POOL_SIZE: ${POOLER_DB_POOL_SIZE}
+
+      
     command:
       [
         "/bin/sh",
