@@ -5,6 +5,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { sqlEventParser } from 'lib/sql-event-parser'
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
+import { invalidateDataGranularly } from 'lib/granular-data-invalidation'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better
@@ -71,12 +72,15 @@ export const useExecuteSqlMutation = ({
         const isMutationSQL =
           sqlLower.includes('create ') || sqlLower.includes('alter ') || sqlLower.includes('drop ')
         if (contextualInvalidation && projectRef && isMutationSQL) {
-          const databaseRelatedKeys = queryClient
-            .getQueryCache()
-            .findAll(['projects', projectRef])
-            .map((x) => x.queryKey)
-            .filter((x) => !INVALIDATION_KEYS_IGNORE.some((a) => x.includes(a)))
-          await Promise.all(databaseRelatedKeys.map((key) => queryClient.invalidateQueries(key)))
+          const invalidationActions = await invalidateDataGranularly(sql, projectRef)
+          const promises = invalidationActions.map((action) =>
+            queryClient.invalidateQueries({
+              queryKey: action.key,
+              exact: action.exact,
+              refetchType: action.refetchType,
+            })
+          )
+          await Promise.allSettled(promises)
         }
         await onSuccess?.(data, variables, context)
       },

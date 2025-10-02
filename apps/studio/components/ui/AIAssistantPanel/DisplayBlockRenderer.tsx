@@ -156,7 +156,7 @@ export const DisplayBlockRenderer = ({
       setIsWriteQuery(true)
     }
     executeSql(
-      { projectRef: ref, connectionString, sql: sqlQuery },
+      { projectRef: ref, connectionString, sql: sqlQuery, contextualInvalidation: true },
       {
         onSuccess: (data) => {
           setRows(Array.isArray(data.result) ? data.result : undefined)
