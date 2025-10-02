@@ -21,15 +21,7 @@ Once a project is deleted all associated data will be permanently removed, inclu
 
 Database backups can be categorized into two types: **logical** and **physical**. You can learn more about them [here](/blog/postgresql-physical-logical-backups).
 
-As a general rule of thumb, projects either have logical or physical backups based on plan, database size, and add-ons:
-
-| Plan       | Database Size (0-15GB) | [Database Size (>15GB)](#backup-process-for-large-databases) | [PITR](#point-in-time-recovery) | [Read Replicas](./read-replicas#prerequisites) |
-| ---------- | ---------------------- | ------------------------------------------------------------ | ------------------------------- | ---------------------------------------------- |
-| Pro        | logical                | physical                                                     | physical                        | physical                                       |
-| Team       | logical                | physical                                                     | physical                        | physical                                       |
-| Enterprise | physical               | physical                                                     | physical                        | physical                                       |
-
-<Admonition type="caution" label="Physical backups are not enabled by default">
+<Admonition type="note" label="Physical backups are not enabled by default">
 
 To enable physical backups, you have three options:
 
