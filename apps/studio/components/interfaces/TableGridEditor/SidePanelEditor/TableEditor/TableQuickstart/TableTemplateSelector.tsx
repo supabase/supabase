@@ -1,5 +1,4 @@
-import { useState, useCallback } from 'react'
-import { ArrowLeft, ChevronRight } from 'lucide-react'
+import { useState, useCallback, useEffect } from 'react'
 import { Button, cn } from 'ui'
 import { tableTemplates } from './templates'
 import { QuickstartVariant } from './types'
@@ -20,7 +19,7 @@ export const TableTemplateSelector = ({
   onDismiss,
   disabled,
 }: TableTemplateSelectorProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [activeCategory, setActiveCategory] = useState<string | null>(null) // null => All
   const [selectedTemplate, setSelectedTemplate] = useState<TableSuggestion | null>(null)
 
   const handleSelectTemplate = useCallback(
@@ -32,86 +31,60 @@ export const TableTemplateSelector = ({
     [onSelectTemplate]
   )
 
-  const handleBack = useCallback(() => {
-    setSelectedCategory(null)
-    setSelectedTemplate(null)
-  }, [])
-
   const categories = Object.keys(tableTemplates)
 
-  // Category selection view
-  if (!selectedCategory) {
-    return (
-      <div className="rounded-lg border border-default bg-surface-75 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h3 className="text-sm font-medium">Quick start with a template</h3>
-            <p className="text-xs text-foreground-lighter mt-1">
-              Choose a category to explore pre-built table templates
-            </p>
-          </div>
-          {onDismiss && (
-            <Button type="text" size="tiny" onClick={onDismiss}>
-              Dismiss
-            </Button>
-          )}
-        </div>
+  useEffect(() => {
+    if (activeCategory === null && categories.length > 0) {
+      setActiveCategory(categories[0])
+    }
+  }, [categories, activeCategory])
 
-        <div className="grid grid-cols-2 gap-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              disabled={disabled}
-              className={cn(
-                'text-left p-3 rounded-md border transition-colors',
-                'border-default hover:border-foreground-muted hover:bg-surface-100',
-                'disabled:opacity-50 disabled:cursor-not-allowed'
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-sm capitalize">{category}</span>
-                <ChevronRight size={14} className="text-foreground-muted" />
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  // Template selection view
-  const templates = tableTemplates[selectedCategory] || []
+  const displayed = activeCategory ? tableTemplates[activeCategory] || [] : []
 
   return (
     <div className="rounded-lg border border-default bg-surface-75 p-4">
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Button
-            type="text"
-            size="tiny"
-            icon={<ArrowLeft size={14} />}
-            onClick={handleBack}
-            disabled={disabled}
-          >
-            Back
-          </Button>
-          <div className="text-sm">
-            <span className="text-foreground-lighter">Category: </span>
-            <span className="capitalize">{selectedCategory}</span>
-          </div>
+        <div>
+          <h3 className="text-sm font-medium">Quickstart: choose a template</h3>
+          <p className="text-xs text-foreground-lighter mt-1">
+            Pick a table template and pre-fill the editor
+          </p>
         </div>
+        {onDismiss && (
+          <Button type="text" size="tiny" onClick={onDismiss}>
+            Dismiss
+          </Button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-3">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setActiveCategory(category)}
+            disabled={disabled}
+            className={cn(
+              'px-2 py-1 rounded-md text-xs capitalize border',
+              activeCategory === category
+                ? 'border-foreground bg-surface-200'
+                : 'border-default hover:border-foreground-muted hover:bg-surface-100',
+              'disabled:opacity-50 disabled:cursor-not-allowed'
+            )}
+          >
+            {category}
+          </button>
+        ))}
       </div>
 
       <div className="grid gap-2">
-        {templates.map((template) => (
+        {displayed.map((t) => (
           <button
-            key={template.tableName}
-            onClick={() => handleSelectTemplate(template)}
+            key={`${activeCategory}:${t.tableName}`}
+            onClick={() => handleSelectTemplate(t)}
             disabled={disabled}
             className={cn(
               'text-left p-3 rounded-md border transition-all w-full',
-              selectedTemplate?.tableName === template.tableName
+              selectedTemplate?.tableName === t.tableName
                 ? 'border-foreground bg-surface-200'
                 : 'border-default hover:border-foreground-muted hover:bg-surface-100',
               'disabled:opacity-50 disabled:cursor-not-allowed'
@@ -119,13 +92,18 @@ export const TableTemplateSelector = ({
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="text-sm font-medium">{template.tableName}</div>
-                {template.rationale && (
-                  <div className="text-xs text-foreground-light mt-1">{template.rationale}</div>
+                <div className="text-sm font-medium">{t.tableName}</div>
+                {activeCategory && (
+                  <div className="text-[11px] text-foreground-muted mt-0.5 capitalize">
+                    {activeCategory}
+                  </div>
+                )}
+                {t.rationale && (
+                  <div className="text-xs text-foreground-light mt-1">{t.rationale}</div>
                 )}
               </div>
               <div className="flex items-center gap-1 text-xs text-foreground-muted ml-3">
-                <span>{template.fields.length} columns</span>
+                <span>{t.fields.length} columns</span>
               </div>
             </div>
           </button>

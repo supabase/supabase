@@ -305,7 +305,6 @@ export const TableEditor = ({
         {isNewRecord &&
           !isDuplicating &&
           tableQuickstartVariant === QuickstartVariant.TEMPLATES &&
-          !hasTables &&
           !quickstartDismissed && (
             <TableTemplateSelector
               variant={tableQuickstartVariant}
