@@ -95,9 +95,9 @@ export const TableEditor = ({
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
   const tableQuickstartVariant = usePHFlag('tableQuickstart') as
-    | QuickstartVariant
-    | false
-    | undefined
+    | QuickstartVariant   // user variation (if bucketed)
+    | false               // user not yet bucketed or targeted
+    | undefined           // posthog still loading
 
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
