@@ -20,6 +20,7 @@ export const EmptyBucketState = ({ bucketType }: EmptyBucketStateProps) => {
           </p>
         </div>
 
+        {/* [Joshen] We can render the individual bucket modals here instead - where each modal has its own trigger */}
         {bucketType === 'files' && (
           <CreateBucketModal
             buttonSize="small"
