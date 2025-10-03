@@ -3,7 +3,7 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, Skeleton, cn } from 'ui'
+import { Card, CardContent, cn } from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
 import { ChevronRight, Loader2 } from 'lucide-react'
@@ -104,7 +104,6 @@ export const OverviewUsage = () => {
   const currentSignUpLatency = signUpLatencyCurrent?.[0]?.avg_latency_ms || 0
   const previousSignUpLatency = signUpLatencyPrevious?.[0]?.avg_latency_ms || 0
 
-  // Calculate percentage changes
   const activeUsersChange = calculatePercentageChange(currentUserCount, previousUserCount)
   const passwordResetChange = calculatePercentageChange(
     currentPasswordResets,
@@ -139,7 +138,6 @@ export const OverviewUsage = () => {
   }, [ref, startDate, endDate])
 
   const updateDateRange = (from: string, to: string) => {
-    // This would typically update the date range, but for now we'll use the fixed range
     console.log('Date range update:', from, to)
   }
 
@@ -148,7 +146,7 @@ export const OverviewUsage = () => {
       <div className="flex items-center justify-between mb-4">
         <ScaffoldSectionTitle>Usage</ScaffoldSectionTitle>
         <Link
-          href={`/project/${ref}/reports/auth`}
+          href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
           className="text-sm text-link inline-flex items-center gap-x-1.5"
         >
           <Reports size={14} />
