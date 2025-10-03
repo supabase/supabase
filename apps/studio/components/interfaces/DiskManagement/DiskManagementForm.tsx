@@ -3,7 +3,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -11,6 +10,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
@@ -30,6 +30,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import {
   useIsAwsCloudProvider,
   useIsAwsK8sCloudProvider,
+  useIsAwsNimbusCloudProvider,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
@@ -78,6 +79,7 @@ export function DiskManagementForm() {
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -156,7 +158,10 @@ export function DiskManagementForm() {
 
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(
-      CreateDiskStorageSchema(defaultValues.totalSize, project?.cloud_provider as CloudProvider)
+      CreateDiskStorageSchema({
+        defaultTotalSize: defaultValues.totalSize,
+        cloudProvider: project?.cloud_provider as CloudProvider,
+      })
     ),
     defaultValues,
     mode: 'onBlur',
@@ -241,12 +246,14 @@ export function DiskManagementForm() {
     let willUpdateDiskConfiguration = false
     setMessageState(null)
 
+    // [Joshen] Skip disk configuration related stuff for AWS Nimbus
     try {
       if (
-        payload.storageType !== form.formState.defaultValues?.storageType ||
-        payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
-        payload.throughput !== form.formState.defaultValues?.throughput ||
-        payload.totalSize !== form.formState.defaultValues?.totalSize
+        !isAwsNimbus &&
+        (payload.storageType !== form.formState.defaultValues?.storageType ||
+          payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
+          payload.throughput !== form.formState.defaultValues?.throughput ||
+          payload.totalSize !== form.formState.defaultValues?.totalSize)
       ) {
         willUpdateDiskConfiguration = true
 
@@ -260,9 +267,10 @@ export function DiskManagementForm() {
       }
 
       if (
-        payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
-        payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
-        payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb
+        !isAwsNimbus &&
+        (payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
+          payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
+          payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb)
       ) {
         await updateDiskAutoscaleConfig({
           projectRef,
@@ -310,15 +318,7 @@ export function DiskManagementForm() {
             type="default"
             visible={isPlanUpgradeRequired}
             title="Compute and Disk configuration is not available on the Free Plan"
-            actions={
-              <Button type="default" asChild>
-                <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementConfigure`}
-                >
-                  Upgrade plan
-                </Link>
-              </Button>
-            }
+            actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
           />
 
@@ -344,12 +344,16 @@ export function DiskManagementForm() {
             </div>
           ) : null}
           <Separator />
+
           <ComputeSizeField form={form} disabled={disableComputeInputs} />
-          <Separator />
+
+          {!(isAws || isAwsNimbus) && <Separator />}
+
           <SpendCapDisabledSection />
+
           <NoticeBar
             type="default"
-            visible={!isAws}
+            visible={!(isAws || isAwsNimbus)}
             title="Disk configuration is only available for projects in the AWS cloud provider"
             description={
               isAwsK8s
