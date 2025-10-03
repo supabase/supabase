@@ -26,6 +26,7 @@ import { useDocsSearch, useParams, type DocsSearchResult as Page } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import CopyButton from 'components/ui/CopyButton'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { PLAN_REQUEST_EMPTY_PLACEHOLDER } from 'components/ui/UpgradePlanButton'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -92,21 +93,41 @@ const createFormSchema = (showClientLibraries: boolean) => {
   })
 
   if (showClientLibraries) {
-    return baseSchema.refine(
-      (data) => {
-        return !(data.category === 'Problem' && data.library === '')
-      },
-      {
-        message: "Please select the library that you're facing issues with",
-        path: ['library'],
-      }
-    )
+    return baseSchema
+      .refine(
+        (data) => {
+          return !(data.category === 'Problem' && data.library === '')
+        },
+        {
+          message: "Please select the library that you're facing issues with",
+          path: ['library'],
+        }
+      )
+      .refine(
+        (data) => {
+          return !data.message.includes(PLAN_REQUEST_EMPTY_PLACEHOLDER)
+        },
+        {
+          message: `Please let us know which plan you'd like to upgrade to for your organization`,
+          path: ['message'],
+        }
+      )
   }
 
   // When showClientLibraries is false, make library optional and remove the refine validation
-  return baseSchema.extend({
-    library: z.string().optional(),
-  })
+  return baseSchema
+    .extend({
+      library: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        return !data.message.includes(PLAN_REQUEST_EMPTY_PLACEHOLDER)
+      },
+      {
+        message: `Please let us know which plan you'd like to upgrade to for your organization`,
+        path: ['message'],
+      }
+    )
 }
 
 const defaultValues = {
@@ -128,8 +149,6 @@ interface SupportFormV2Props {
   setSentCategory: (value: string) => void
 }
 
-// [Joshen] Just naming it as V2 for now for PR review purposes so its easier to view
-// This is a rewrite of the old SupportForm to use the new form components
 export const SupportFormV2 = ({
   onProjectSelected: setSelectedProject,
   onOrganizationSelected: setSelectedOrganization,
@@ -161,7 +180,10 @@ export const SupportFormV2 = ({
         option.value === SupportCategories.SALES_ENQUIRY
       ) {
         return isBillingEnabled
+      } else if (option.value === 'Plan_upgrade') {
+        return !isBillingEnabled
       }
+
       return true
     })
   }, [isBillingEnabled])
@@ -323,7 +345,7 @@ export const SupportFormV2 = ({
       if (isSuccessOrganizations) {
         if (organizations.length === 0) {
           form.setValue('organizationSlug', 'no-org')
-        } else if (urlRef) {
+        } else if (urlRef && urlRef !== 'no-project') {
           // Check validity of project via project details
           const selectedProject = await getProjectDetail({ ref: urlRef })
           if (!!selectedProject) {
@@ -750,7 +772,7 @@ export const SupportFormV2 = ({
 
         {library && library.length > 0 && <LibrarySuggestions library={library} />}
 
-        {category !== 'Login_issues' && (
+        {category !== 'Login_issues' && category !== 'Plan_upgrade' && (
           <FormField_Shadcn_
             name="affectedServices"
             control={form.control}

@@ -14,14 +14,14 @@
   "authentication:attack_protection": true,
   "authentication:advanced": true,
 
-  "authentication:show_providers": true,
+  "authentication:show_email_phone_columns": true,
   "authentication:show_manual_linking": true,
-  "authentication:show_send_invitation": true,
   "authentication:show_provider_filter": true,
+  "authentication:show_providers": true,
+  "authentication:show_send_invitation": true,
   "authentication:show_sort_by_email": true,
   "authentication:show_sort_by_phone": true,
   "authentication:show_user_type_filter": true,
-
   "billing:all": true,
 
   "dashboard_auth:sign_up": true,
@@ -32,6 +32,8 @@
 
   "database:replication": true,
   "database:roles": true,
+  "database:restore_to_new_project": true,
+  "database:network_restrictions": true,
 
   "docs:auth_architecture": true,
   "docs:auth_configuration": true,
@@ -59,11 +61,15 @@
   "feedback:docs": true,
 
   "integrations:partners": true,
-  "integrations:show_stripe_wrapper": true,
+  "integrations:wrappers": true,
   "integrations:vercel": true,
+
+  "infrastructure:read_replicas": true,
 
   "logs:templates": true,
   "logs:collections": true,
+  "logs:metadata": true,
+  "logs:show_metadata_ip_template": true,
 
   "organization:show_sso_settings": true,
   "organization:show_security_settings": true,
@@ -91,6 +97,8 @@
   "project_settings:show_disable_legacy_api_keys": true,
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
+  "project_settings:database_upgrades": true,
+  "project_settings:restart_project": true,
 
   "quickstarts:hide_nimbus": true,
 
