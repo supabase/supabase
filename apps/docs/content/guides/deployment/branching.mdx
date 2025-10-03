@@ -17,22 +17,17 @@ Supabase branches create separate environments that spin off from your main proj
 
 ## Deployment workflow overview
 
-When you push changes to a connected branch, Supabase automatically runs a sequential deployment workflow. Each step must complete successfully before the next step begins. If any step fails, the entire deployment stops, and subsequent steps (including Edge Function deployments) will not execute.
+When you push changes to a connected branch, Supabase automatically runs a deployment workflow consisting some or all of the following deployment steps.
 
-### Deployment steps (in order)
+1. **Clone** - Checks out your repository at the specified git branch (optional for [Branching via Dashboard](/docs/guides/deployment/branching/dashboard))
+2. **Pull** - Retrieves database migrations from your base project (also initialises the migration history table when [Branching via Dashboard](/docs/guides/deployment/branching/dashboard))
+3. **Health** - Waits up to 2 minutes for all Supabase services on your branch to be running and healthy, including Auth, API, Database, Storage, and Realtime
+4. **Configure** - Updates service configurations based on your config.toml file (not available for [Branching via Dashboard](/docs/guides/deployment/branching/dashboard) at the moment)
+5. **Migrate** - Applies pending database migrations and vault secrets to your branch
+6. **Seed** - Runs seed files to populate your branch with initial data (must be [enabled in config.toml](https://supabase.com/docs/guides/deployment/branching/configuration#branch-configuration-with-remotes) for persistent branches)
+7. **Deploy** - Deploys any changed Edge Functions and updates function secrets
 
-1. **Clone** - Downloads your repository and checks out the specified branch
-2. **Pull** - Retrieves database migrations from your branch to ensure consistency
-3. **Health** - Verifies that all required Supabase services (Auth, API, Storage, Realtime) of the branch are running and healthy
-4. **Configure** - Updates service configurations (Auth settings, API settings, Storage settings, etc.) based on your `config.toml`
-5. **Migrate** - Applies pending database migrations to update your branch's schema
-6. **Seed** - Runs seed files to populate your branch with initial data (if enabled and non persistent branch)
-7. **Deploy** - Deploys Edge Functions and updates function secrets
-
-### Important deployment behavior
-
-- **Sequential execution**: Steps run in strict order and cannot be parallelized
-- **Failure cascading**: If any step fails, all subsequent steps are skipped
+The deployment workflow is expressed as a Directed Acyclic Graph where each node represents a single deployment step. This means we can execute independent steps in parallel and skip children nodes when the parent fails. For eg. if your database migrations failed at step 5, we will skip step 6 and not seed your branch.
 
 ### Monitoring deployments
 
