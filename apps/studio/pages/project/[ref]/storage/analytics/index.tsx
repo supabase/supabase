@@ -23,6 +23,7 @@ const StorageAnalyticsPage: NextPageWithLayout = () => {
     if (!isStorageV2) router.replace(`/project/${ref}/storage`)
   }, [isStorageV2, ref, router])
 
+  // TODO: Make consistent with storage/files/index.tsx
   if (isLoadingBuckets) {
     return (
       <div className="w-full h-full flex items-center justify-center gap-x-2">

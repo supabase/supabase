@@ -27,10 +27,10 @@ const StorageFilesPage: NextPageWithLayout = () => {
     return <EmptyBucketState bucketType="files" />
   }
 
-  if (isLoading) {
-    // Prevent 1+ bucket layout from loading in case there are no buckets to load
-    return null
-  }
+  // if (isLoading) {
+  //   // Prevent 1+ bucket layout from loading in case there are no buckets to load
+  //   return null
+  // }
 
   return (
     <StorageFilesLayout>
