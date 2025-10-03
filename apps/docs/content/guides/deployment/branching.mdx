@@ -24,7 +24,7 @@ When you push changes to a connected branch, Supabase automatically runs a deplo
 3. **Health** - Waits up to 2 minutes for all Supabase services on your branch to be running and healthy, including Auth, API, Database, Storage, and Realtime
 4. **Configure** - Updates service configurations based on your config.toml file (not available for [Branching via Dashboard](/docs/guides/deployment/branching/dashboard) at the moment)
 5. **Migrate** - Applies pending database migrations and vault secrets to your branch
-6. **Seed** - Runs seed files to populate your branch with initial data (must be [enabled in config.toml](https://supabase.com/docs/guides/deployment/branching/configuration#branch-configuration-with-remotes) for persistent branches)
+6. **Seed** - Runs seed files to populate your branch with initial data (must be [enabled in config.toml](/docs/guides/deployment/branching/configuration#branch-configuration-with-remotes) for persistent branches)
 7. **Deploy** - Deploys any changed Edge Functions and updates function secrets
 
 The deployment workflow is expressed as a Directed Acyclic Graph where each node represents a single deployment step. This means we can execute independent steps in parallel and skip children nodes when the parent fails. For e.g.. if your database migrations failed at step 5, we will skip step 6 and not seed your branch.
