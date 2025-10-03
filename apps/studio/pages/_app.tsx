@@ -36,11 +36,11 @@ import { ErrorBoundary } from 'react-error-boundary'
 import {
   FeatureFlagProvider,
   getFlags,
+  MetaFaviconsPagesRouter,
   TelemetryTagManager,
   ThemeProvider,
   useThemeSandbox,
 } from 'common'
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'

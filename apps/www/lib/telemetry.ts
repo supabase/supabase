@@ -1,7 +1,7 @@
 'use client'
 
 import { sendTelemetryEvent } from 'common'
-import type { TelemetryEvent } from 'common/telemetry-constants'
+import type { TelemetryEvent } from 'common'
 import { API_URL } from 'lib/constants'
 import { usePathname, useSearchParams } from 'next/navigation'
 

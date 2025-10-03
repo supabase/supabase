@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 export const DEFAULT_FAVICON_THEME_COLOR = '1E1E1E'
 export const DEFAULT_FAVICON_ROUTE = '/favicon'
 
-const MetaFaviconsPagesRouter = ({
+export const MetaFaviconsPagesRouter = ({
   applicationName,
   route = DEFAULT_FAVICON_ROUTE,
   themeColor = DEFAULT_FAVICON_THEME_COLOR,
@@ -88,5 +88,3 @@ const MetaFaviconsPagesRouter = ({
     </Head>
   )
 }
-
-export default MetaFaviconsPagesRouter
