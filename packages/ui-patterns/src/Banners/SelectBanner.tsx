@@ -3,8 +3,12 @@ import Link from 'next/link'
 
 export function SelectBanner() {
   const selectSiteUrl = 'https://select.supabase.com/'
-  const desc = ['Our first user conference', 'Oct 3 2025', 'Guillermo Rauch, Dylan Field, and more']
-  const cta = 'Save your seat'
+  const desc = [
+    'Our first user conference',
+    'Oct 3 2025',
+    'Patrick Collison, Dylan Field, and more',
+  ]
+  const cta = 'Watch live'
 
   const baseStyles = 'flex flex-col justify-center border-l border-muted py-8 '
   const textBlockStyles =
