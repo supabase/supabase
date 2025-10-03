@@ -252,34 +252,11 @@ export const RealtimeSettings = () => {
                           <Input_Shadcn_
                             {...field}
                             type="number"
-                            disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                            // disabled={!isUsageBillingEnabled || !canUpdateConfig}
                             value={field.value || ''}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
-                        {isSuccessOrganization && !isUsageBillingEnabled && (
-                          <Admonition showIcon={false} type="default">
-                            <div className="flex items-center gap-x-2">
-                              <div>
-                                <h5 className="text-foreground mb-1">
-                                  Spend cap needs to be disabled to configure this value
-                                </h5>
-                                <p className="text-foreground-light">
-                                  {isFreePlan
-                                    ? 'Upgrade to the Pro plan first to disable spend cap'
-                                    : 'You may adjust this setting in the organization billing settings'}
-                                </p>
-                              </div>
-                              <div className="flex-grow flex items-center justify-end">
-                                {false ? (
-                                  <UpgradePlanButton source="realtimeSettings" plan="Pro" />
-                                ) : (
-                                  <ToggleSpendCapButton />
-                                )}
-                              </div>
-                            </div>
-                          </Admonition>
-                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}
@@ -310,34 +287,11 @@ export const RealtimeSettings = () => {
                           <Input_Shadcn_
                             {...field}
                             type="number"
-                            disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                            // disabled={!isUsageBillingEnabled || !canUpdateConfig}
                             value={field.value || ''}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
-                        {isSuccessOrganization && !isUsageBillingEnabled && (
-                          <Admonition showIcon={false} type="default">
-                            <div className="flex items-center gap-x-2">
-                              <div>
-                                <h5 className="text-foreground mb-1">
-                                  Spend cap needs to be disabled to configure this value
-                                </h5>
-                                <p className="text-foreground-light">
-                                  {isFreePlan
-                                    ? 'Upgrade to the Pro plan first to disable spend cap'
-                                    : 'You may adjust this setting in the organization billing settings'}
-                                </p>
-                              </div>
-                              <div className="flex-grow flex items-center justify-end">
-                                {false ? (
-                                  <UpgradePlanButton source="realtimeSettings" plan="Pro" />
-                                ) : (
-                                  <ToggleSpendCapButton />
-                                )}
-                              </div>
-                            </div>
-                          </Admonition>
-                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}
