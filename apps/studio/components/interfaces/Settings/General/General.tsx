@@ -10,6 +10,7 @@ import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
@@ -30,6 +31,10 @@ const General = () => {
 
   const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
+
+  const { projectSettingsRestartProject } = useIsFeatureEnabled([
+    'project_settings:restart_project',
+  ])
 
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
@@ -122,7 +127,9 @@ const General = () => {
               <div className="flex flex-col px-8 py-4">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm">Restart project</p>
+                    <p className="text-sm">
+                      {projectSettingsRestartProject ? 'Restart project' : 'Restart database'}
+                    </p>
                     <div className="max-w-[420px]">
                       <p className="text-sm text-foreground-light">
                         Your project will not be available for a few minutes.

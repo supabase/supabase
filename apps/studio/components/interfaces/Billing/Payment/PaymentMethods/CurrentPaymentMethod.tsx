@@ -67,7 +67,7 @@ const CurrentPaymentMethod = () => {
       <Button type="outline" asChild>
         {subscription?.payment_method_type === 'invoice' ? (
           <Link
-            href={`/support/new?slug=${slug}&ref=no-project&message=${encodeURIComponent('I would like to change my payment method')}&category=${SupportCategories.BILLING}`}
+            href={`/support/new?slug=${slug}&projectRef=no-project&message=${encodeURIComponent('I would like to change my payment method')}&category=${SupportCategories.BILLING}`}
           >
             Contact support
           </Link>

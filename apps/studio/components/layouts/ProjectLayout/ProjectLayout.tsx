@@ -9,6 +9,7 @@ import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -94,6 +95,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
+    const { appTitle } = useCustomContent(['app:title'])
+    const titleSuffix = appTitle || 'Supabase'
+
     useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap])
 
     const editor = useEditorType()
@@ -124,14 +128,14 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         <Head>
           <title>
             {title
-              ? `${title} | Supabase`
+              ? `${title} | ${titleSuffix}`
               : selectedTable
-                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                ? `${selectedTable} | ${projectName} | ${organizationName} | ${titleSuffix}`
                 : projectName
-                  ? `${projectName} | ${organizationName} | Supabase`
+                  ? `${projectName} | ${organizationName} | ${titleSuffix}`
                   : organizationName
-                    ? `${organizationName} | Supabase`
-                    : 'Supabase'}
+                    ? `${organizationName} | ${titleSuffix}`
+                    : titleSuffix}
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>

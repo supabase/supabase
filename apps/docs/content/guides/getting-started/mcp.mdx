@@ -6,211 +6,31 @@ description: 'Connect your AI tools to Supabase using MCP'
 sidebar_label: 'Model context protocol (MCP)'
 ---
 
-The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to platforms like Supabase. This guide covers how to connect Supabase to the following AI tools using MCP:
+The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to platforms like Supabase. Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
 
-- [Cursor](#cursor)
-- [Windsurf](#windsurf) (Codium)
-- [Visual Studio Code](#visual-studio-code-copilot) (Copilot)
-- [Cline](#cline) (VS Code extension)
-- [Claude desktop](#claude-desktop)
-- [Claude code](#claude-code)
-- [Amp](#amp)
+## Remote MCP installation
 
-Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
-
-## Step 1: Create an access token
-
-First, go to your [Supabase settings](/dashboard/account/tokens) and create an access token to authenticate the MCP server with your Supabase account. Give it a name that describes its purpose, like "Cursor MCP Server".
-
-## Step 2: Follow our security best practices
+### Step 1: Follow our security best practices
 
 Before running the MCP server, we recommend you read our [security best practices](#security-risks) to understand the risks of connecting an LLM to your Supabase projects and how to mitigate them.
 
-## Step 3: Configure your AI tool
+### Step 2: Configure your AI tool
 
-MCP compatible tools connect to Supabase using the [Supabase MCP server](https://github.com/supabase-community/supabase-mcp).
+Choose your Supabase platform, project, and MCP client and follow the installation instructions:
 
-Follow the instructions for your AI tool to connect the Supabase MCP server. The configuration below uses read-only, project-scoped mode by default. We recommend these settings to prevent the agent from making unintended changes to your database.
+<McpConfigPanel />
 
-<Admonition type="note" title="Read-only mode">
+<Admonition type="note" title="Authentication" className="mt-3">
 
-Read-only mode applies only to database operations. Write operations on project-management tools,
-such as `create_project`, are still available.
+Your MCP client will automatically prompt you to login to Supabase during setup. This will open a browser window where you can login to your Supabase account and grant access to the MCP client. Be sure to choose the organization that contains the project you wish to work with. In the future, we'll offer more fine grain control over these permissions.
 
-</Admonition>
-
-### Cursor
-
-1.  Open [Cursor](https://www.cursor.com/) and create a `.cursor` directory in your project root if it doesn't exist.
-2.  Create a `.cursor/mcp.json` file if it doesn't exist and open it.
-3.  Add the following configuration:
-
-    <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Cursor" }} />
-
-4.  Save the configuration file.
-5.  Open Cursor and navigate to **Settings > Cursor Settings > MCP & Integrations**. You should see a green active status after the server is successfully connected.
-
-### Windsurf
-
-1. Open [Windsurf](https://docs.codeium.com/windsurf) and open the Cascade assistant.
-2. Tap on the box (**Customizations**) icon, then the **Configure** icon in the top right of the panel to open the configuration file.
-3. Add the following configuration:
-
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Windsurf" }} />
-
-4. Save the configuration file and reload by tapping **Refresh** in the Cascade assistant.
-5. You should see a green active status after the server is successfully connected.
-
-### Visual Studio Code (Copilot)
-
-<div className="mb-8 not-prose [&>p]:flex [&>p]:flex-col [&>p]:gap-2">
-  [![Install with NPX in VS
-  Code](https://img.shields.io/badge/VS_Code-NPM-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=supabase&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22supabase-access-token%22%2C%22description%22%3A%22Supabase%20personal%20access%20token%22%2C%22password%22%3Atrue%7D%5D&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40supabase%2Fmcp-server-supabase%40latest%22%2C%22--readonly%22%2C%22--project-ref%3D%24SUPABASE_MCP_PROJECT_REF%22%5D%2C%22env%22%3A%7B%22SUPABASE_ACCESS_TOKEN%22%3A%22%24%7Binput%3Asupabase-access-token%7D%22%2C%22SUPABASE_MCP_PROJECT_REF%22%3A%22%24%7Binput%3Asupabase-project-ref%7D%22%7D%7D)
-  [![Install with NPX in VS Code
-  Insiders](https://img.shields.io/badge/VS_Code_Insiders-NPM-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=supabase&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22supabase-access-token%22%2C%22description%22%3A%22Supabase%20personal%20access%20token%22%2C%22password%22%3Atrue%7D%5D&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40supabase%2Fmcp-server-supabase%40latest%22%2C%22--readonly%22%2C%22--project-ref%3D%24SUPABASE_MCP_PROJECT_REF%22%5D%2C%22env%22%3A%7B%22SUPABASE_ACCESS_TOKEN%22%3A%22%24%7Binput%3Asupabase-access-token%7D%22%2C%22SUPABASE_MCP_PROJECT_REF%22%3A%22%24%7Binput%3Asupabase-project-ref%7D%22%7D%7D&quality=insiders)
-</div>
-
-1.  Open [VS Code](https://code.visualstudio.com/) and create a `.vscode` directory in your project root if it doesn't exist.
-2.  Create a `.vscode/mcp.json` file if it doesn't exist and open it.
-3.  Add the following configuration:
-
-    <$Partial path="mcp_supabase_vscode_config.mdx" />
-
-4.  Save the configuration file and click the **Start** button that appears inline above the Supabase server definition. VS Code prompts you to enter your personal access token. Enter the token that you created earlier.
-5.  Open Copilot chat and switch to "Agent" mode. You should see a tool icon that you can tap to confirm the MCP tools are available.
-
-<Admonition type="note">
-
-For more info on using MCP in VS Code, read the [Copilot documentation](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
+Previously Supabase MCP required you to generate a personal access token (PAT), but this is no longer required.
 
 </Admonition>
-
-### Cline
-
-1. Open the [Cline](https://github.com/cline/cline) extension in VS Code and tap the **MCP Servers** icon.
-2. Tap **MCP Servers**, open the **Installed** tab, then click "Configure MCP Servers" to open the configuration file.
-3. Add the following configuration:
-
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "VS Code" }} />
-
-4. Save the configuration file. Cline should automatically reload the configuration.
-5. You should see a green active status after the server is successfully connected.
-
-### Claude desktop
-
-1. Open [Claude desktop](https://claude.ai/download) and navigate to **Settings**.
-2. Under the **Developer** tab, tap **Edit Config** to open the configuration file.
-3. Add the following configuration:
-
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude desktop" }} />
-
-4. Save the configuration file and restart Claude desktop.
-5. From the new chat screen, you should see a settings (Search and tools) icon appear with the new MCP server available.
-
-### Claude code
-
-You can add the Supabase MCP server to Claude Code in two ways:
-
-#### Option 1: Project-scoped server (via .mcp.json file)
-
-1. Create a `.mcp.json` file in your project root if it doesn't exist.
-2. Add the following configuration:
-
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude code" }} />
-
-3. Save the configuration file.
-4. Restart [Claude code](https://claude.ai/code) to apply the new configuration.
-
-#### Option 2: Locally-scoped server (via CLI command)
-
-You can also add the Supabase MCP server as a locally-scoped server, which is only available to you in the current project:
-
-1. Run the following command in your terminal:
-
-   ```bash
-   claude mcp add supabase -s local -e SUPABASE_ACCESS_TOKEN=your_token_here -- npx -y @supabase/mcp-server-supabase@latest
-   ```
-
-Locally-scoped servers take precedence over project-scoped servers with the same name and are stored in your project-specific user settings.
-
-### Amp
-
-You can add the Supabase MCP server to [Amp](https://ampcode.com) in two ways:
-
-#### Option 1: VSCode settings.json
-
-1. Open VSCode's `settings.json` file.
-2. Add the following configuration:
-
-   ```json
-   {
-     "amp.mcpServers": {
-       "supabase": {
-         "command": "npx",
-         "args": [
-           "-y",
-           "@supabase/mcp-server-supabase@latest",
-           "--read-only",
-           "--project-ref=<project-ref>"
-         ],
-         "env": {
-           "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
-         }
-       }
-     }
-   }
-   ```
-
-   Replace `project-ref` and `personal-access-token` with your project ref and personal access token.
-
-3. Save the configuration file.
-4. Restart VS Code to apply the new configuration.
-
-#### Option 2: Amp CLI
-
-1. Edit `~/.config/amp/settings.json`
-2. Add the following configuration:
-
-   ```json
-   {
-     "amp.mcpServers": {
-       "supabase": {
-         "command": "npx",
-         "args": [
-           "-y",
-           "@supabase/mcp-server-supabase",
-           "--read-only",
-           "--project-ref=<project-ref>"
-         ],
-         "env": {
-           "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
-         }
-       }
-     }
-   }
-   ```
-
-   Replace `project-ref` and `personal-access-token` with your project ref and personal access token.
-
-3. Save the configuration file.
-4. Restart Amp to apply the new configuration.
-
-### Qodo Gen
-
-1. Open [Qodo Gen](https://docs.qodo.ai/qodo-documentation/qodo-gen) chat panel in VSCode or IntelliJ.
-2. Click **Connect more tools**.
-3. Click **+ Add new MCP**.
-4. Add the following configuration:
-
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Qodo Gen" }} />
-
-5. Click **Save**.
 
 ### Next steps
 
-Your AI tool is now connected to Supabase using MCP. Try asking your AI assistant to create a new project, create a table, or fetch project config.
-
-For a full list of tools available, see the [GitHub README](https://github.com/supabase-community/supabase-mcp#tools). If you experience any issues, [submit an bug report](https://github.com/supabase-community/supabase-mcp/issues/new?template=1.Bug_report.md).
+Your AI tool is now connected to your Supabase project or account using remote MCP. Try asking the AI tool to query your database using natural language commands.
 
 ## Security risks
 
