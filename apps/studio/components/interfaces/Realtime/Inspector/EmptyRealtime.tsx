@@ -24,7 +24,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
           <AnimatedCursors />
           <h2 className="heading-section mb-1">Create realtime experiences</h2>
           <p className="text-foreground-light mb-6">
-            Send your first realtime event from your database, application code or edge function
+            Send your first realtime message from your database, application code or edge function
           </p>
           <Button
             type="default"
@@ -48,7 +48,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
               <h3 className="heading-default">Broadcast messages</h3>
             </div>
             <p className="text-foreground-light text-sm mb-4 flex-1">
-              Send events to a channel from your client application or database via triggers.
+              Send messages to a channel from your client application or database via triggers.
             </p>
             <Button type="default" className="w-full">
               <Link href={`/project/${projectRef}/database/triggers`}>Create a trigger</Link>
@@ -86,7 +86,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
               <h3 className="heading-default">Subscribe to a channel</h3>
             </div>
             <p className="text-foreground-light text-sm mb-4 flex-1">
-              Receive realtime events in your application by listening to a channel
+              Receive realtime messages in your application by listening to a channel
             </p>
             <Button type="default" asChild>
               <Link href="https://supabase.com/docs/guides/realtime/subscribing-to-database-changes#listening-on-client-side">
