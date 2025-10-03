@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.45.5
+  version: 2.48.3
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2359,6 +2359,10 @@ commands:
         name: --exp <time>
         description: Expiry timestamp for this token.
         default_value: ''
+      - id: payload
+        name: --payload <string>
+        description: Custom claims in JSON format.
+        default_value: '{}'
       - id: role
         name: --role <string>
         description: Postgres role to use.
