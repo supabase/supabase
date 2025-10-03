@@ -1,7 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import { convertToModelMessages, type ModelMessage, stepCountIs } from 'ai'
 import * as ai from 'ai'
-import { source } from 'common-tags'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
@@ -10,15 +9,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import {
-  CHAT_PROMPT,
-  EDGE_FUNCTION_PROMPT,
-  GENERAL_PROMPT,
-  PG_BEST_PRACTICES,
-  RLS_PROMPT,
-  SECURITY_PROMPT,
-  LIMITATIONS_PROMPT,
-} from 'lib/ai/prompts'
+import { buildAssistantContextContent, buildSystemPrompt } from 'lib/ai/engine/messages'
 import { getTools } from 'lib/ai/tools'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -179,16 +170,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         ? `The available database schema names are: ${JSON.stringify(schemas)}`
         : "You don't have access to any schemas."
 
-    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
-    const system = source`
-      ${GENERAL_PROMPT}
-      ${CHAT_PROMPT}
-      ${PG_BEST_PRACTICES}
-      ${RLS_PROMPT}
-      ${EDGE_FUNCTION_PROMPT}
-      ${SECURITY_PROMPT}
-      ${LIMITATIONS_PROMPT}
-    `
+    const system = buildSystemPrompt({ includeLimitations: true })
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
@@ -196,14 +178,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        ...(promptProviderOptions && {
-          providerOptions: promptProviderOptions,
-        }),
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
       },
       {
         role: 'assistant',
-        // Add any dynamic context here
-        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
+        content: buildAssistantContextContent({
+          projectRef,
+          schemasString,
+          chatName: chatName ?? 'Unnamed chat',
+        }),
       },
       ...convertToModelMessages(messages),
     ]
