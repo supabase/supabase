@@ -1217,7 +1217,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
       type: 'string',
       isSecret: true,
     },
-    EXTERNAL_TWITCH_EMAIL_OPTIONAL: {
+    EXTERNAL_TWITTER_EMAIL_OPTIONAL: {
       title: 'Allow users without an email',
       description:
         'Allows the user to successfully authenticate when the provider does not return an email address.',
@@ -1236,7 +1236,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
       then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_TWITCH_EMAIL_OPTIONAL: boolean().optional(),
+    EXTERNAL_TWITTER_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'twitter-icon',
