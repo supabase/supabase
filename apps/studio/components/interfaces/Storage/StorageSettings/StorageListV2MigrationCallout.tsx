@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useState } from 'react'
 import {
@@ -30,11 +31,11 @@ export const StorageListV2MigrationCallout = () => {
   return (
     <Admonition
       type={remainingMonths <= 1 ? 'warning' : 'note'}
-      title="A new version of Storage is available for your project!"
+      title="A new version of Storage is available for your project"
     >
       <p className="!leading-normal prose max-w-full text-sm !mb-0">
-        Get access to Analytics buckets to handle Iceberg files, along with a more efficient{' '}
-        <code>list</code> method for fetching files via the client library.
+        Get access to the List-V2 endpoint for improved performance and the ability to enable
+        Analytics buckets to your storage system
       </p>
       {remainingMonths <= 1 && (
         <p className="!leading-normal prose max-w-full text-sm">
@@ -109,11 +110,28 @@ const StorageListV2MigrationDialog = () => {
           description="We recommend running the update during periods of lower activity, although minimal to no disruption is expected."
         />
 
-        <DialogSection>
+        <DialogSection className="flex flex-col gap-y-2">
+          {/* [Joshen] Ideally we show the minimum time taken as 24 hours can sound daunting and is likely not applicable to 90% use case */}
           <p className="text-sm">
-            This migration should only take a few minutes, but note that it will increase your
-            Postgres disk size by about 5 - 10%. The upgrade is also backwards compatible so no
-            changes to your client applications are required.
+            Depending on the number of objects in your Storage, the migration can take up to 24
+            hours to finish.
+          </p>
+
+          <p className="text-sm">
+            The upgrade will increase your disk size to about 15 - 25% and IOPS will be used to
+            create new efficient indexes as well as denormalising tables.
+          </p>
+
+          <p className="text-sm">
+            Ensure that your database instance has not{' '}
+            <InlineLink href={`/project/${ref}/settings/compute-and-disk#disk-size`}>
+              scaled disk
+            </InlineLink>{' '}
+            within the last 6h and you have at least 60%{' '}
+            <InlineLink href={`/project/${ref}/settings/infrastructure#infrastructure-activity`}>
+              CPU capacity
+            </InlineLink>{' '}
+            before proceeding.
           </p>
         </DialogSection>
 
