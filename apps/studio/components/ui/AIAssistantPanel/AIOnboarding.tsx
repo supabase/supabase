@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { BarChart, FileText, Shield } from 'lucide-react'
+// End of third-party imports
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
@@ -7,7 +8,7 @@ import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.uti
 import { type Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { Button, Skeleton } from 'ui'
 import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
-import { type SqlSnippet } from './AIAssistant.types'
+import type { SqlSnippet } from './AIAssistant.types'
 
 interface AIOnboardingProps {
   sqlSnippets?: SqlSnippet[]
@@ -137,7 +138,7 @@ export const AIOnboarding = ({
                               onFocusInput?.()
                             }}
                           >
-                            {lint.detail ? lint.detail.replace(/`/g, '') : lint.title}
+                            {lint.detail ? lint.detail.replace(/\\`/g, '') : lint.title}
                           </Button>
                         )
                       })}
