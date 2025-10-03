@@ -86,7 +86,7 @@ export function McpConfigPanel({
               <div className="flex items-center gap-2">
                 Server URL
                 <InfoTooltip>
-                  MCP clients should support the Streamable HTTP transport and OAuth authentication
+                  {`MCP clients should support the Streamable HTTP transport${isPlatform ? ' and OAuth 2.1 with dynamic client registration' : ''}`}
                 </InfoTooltip>
               </div>
             }
