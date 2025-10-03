@@ -29,7 +29,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { sortBy } from 'lodash'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
@@ -128,16 +127,10 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       enabled: isTable,
     }
   )
-  const tableTriggers = useMemo(
-    () =>
-      sortBy(
-        (triggersData ?? []).filter(
-          (trigger) => trigger.schema === table.schema && trigger.table === table.name
-        ),
-        (trigger) => (trigger.name || '').toLowerCase()
-      ),
-    [triggersData, table.schema, table.name]
+  const tableTriggers = (triggersData ?? []).filter(
+    (trigger) => trigger.schema === table.schema && trigger.table === table.name
   )
+
   const tableTriggersCount = tableTriggers.length
 
   const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
