@@ -2882,7 +2882,7 @@ export interface components {
        * @description Resource indicator for MCP (Model Context Protocol) clients
        * @enum {string}
        */
-      resource?: 'http://localhost:8080/mcp' | 'http://localhost:8080/mcp'
+      resource?: 'https://api.supabase.green/mcp' | 'https://mcp.supabase.green/mcp'
     }
     OAuthTokenResponse: {
       access_token: string
@@ -4280,7 +4280,7 @@ export interface operations {
         organization_slug?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
-        resource?: 'http://localhost:8080/mcp' | 'http://localhost:8080/mcp'
+        resource?: 'https://api.supabase.green/mcp' | 'https://mcp.supabase.green/mcp'
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
