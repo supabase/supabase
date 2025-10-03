@@ -1,4 +1,3 @@
-import { S3Connection } from 'components/interfaces/Storage/StorageSettings/S3Connection'
 import { StorageSettings } from 'components/interfaces/Storage/StorageSettings/StorageSettings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
@@ -12,16 +11,13 @@ import type { NextPageWithLayout } from 'types'
 
 const FilesSettingsPage: NextPageWithLayout = () => {
   return (
-    <>
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle>General Settings</ScaffoldSectionTitle>
-        <ScaffoldSectionDescription>
-          Configure upload limits and toggle storage features for your project
-        </ScaffoldSectionDescription>
-        <StorageSettings />
-      </ScaffoldSection>
-      <S3Connection />
-    </>
+    <ScaffoldSection isFullWidth>
+      <ScaffoldSectionTitle>File settings</ScaffoldSectionTitle>
+      <ScaffoldSectionDescription>
+        Global settings across all file buckets.
+      </ScaffoldSectionDescription>
+      <StorageSettings />
+    </ScaffoldSection>
   )
 }
 

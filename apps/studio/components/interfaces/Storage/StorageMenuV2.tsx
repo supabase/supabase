@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { Menu } from 'ui'
 import { BUCKET_TYPES, BUCKET_TYPE_KEYS, DEFAULT_BUCKET_TYPE } from './Storage.constants'
 
@@ -9,29 +9,39 @@ export const StorageMenuV2 = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const selectedBucketType = router.asPath.includes('/analytics')
-    ? 'analytics'
-    : router.asPath.includes('/vectors')
-      ? 'vectors'
-      : DEFAULT_BUCKET_TYPE
+  const page = router.pathname.split('/')[4] as undefined | 'files' | 'analytics' | 'vectors' | 's3'
 
   return (
-    <Menu type="pills" className="mt-6 flex flex-grow flex-col">
-      <div className="mx-3">
-        <Menu.Group title={<span className="uppercase font-mono">Bucket Types</span>} />
+    <Menu type="pills" className="my-6 flex flex-grow flex-col">
+      <div className="space-y-6">
+        <div className="mx-3">
+          <Menu.Group title={<span className="uppercase font-mono">Bucket Types</span>} />
 
-        {BUCKET_TYPE_KEYS.map((bucketTypeKey) => {
-          const isSelected = selectedBucketType === bucketTypeKey
-          const config = BUCKET_TYPES[bucketTypeKey]
+          {BUCKET_TYPE_KEYS.map((bucketTypeKey) => {
+            const isSelected = page === bucketTypeKey
+            const config = BUCKET_TYPES[bucketTypeKey]
 
-          return (
-            <Link key={bucketTypeKey} href={`/project/${ref}/storage/${bucketTypeKey}`}>
-              <Menu.Item rounded active={isSelected}>
-                <p className="truncate">{config.displayName}</p>
+            return (
+              <Link key={bucketTypeKey} href={`/project/${ref}/storage/${bucketTypeKey}`}>
+                <Menu.Item rounded active={isSelected}>
+                  <p className="truncate">{config.displayName}</p>
+                </Menu.Item>
+              </Link>
+            )
+          })}
+        </div>
+
+        <div className="h-px w-full bg-border" />
+        <div className="mx-3">
+          <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
+          {IS_PLATFORM && (
+            <Link href={`/project/${ref}/storage/s3`}>
+              <Menu.Item rounded active={page === 's3'}>
+                <p className="truncate">S3 Settings</p>
               </Menu.Item>
             </Link>
-          )
-        })}
+          )}
+        </div>
       </div>
     </Menu>
   )
