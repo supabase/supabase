@@ -14,3 +14,35 @@ Supabase branches create separate environments that spin off from your main proj
 - **Persistent Branches**: Persistent branches are long-lived branches. They aren't automatically paused or deleted due to non-inactivity or merging.
 - **Managing Branches**: You can create, review, and merge branches either automatically via our [GitHub integration](/docs/guides/deployment/branching/github-integration) or directly [through the dashboard](/docs/guides/deployment/branching/dashboard) (currently in beta). All branches show up in the branches page in the dashboard, regardless of how they were created.
 - **Data-less**: New branches do not start with any data from your main project. This is meant to better protect your sensitive production data. To start your branches with data, you can use a [seed file](/docs/guides/deployment/branching/github-integration#seeding) if using the GitHub integration.
+
+## Deployment workflow overview
+
+When you push changes to a connected branch, Supabase automatically runs a sequential deployment workflow. Each step must complete successfully before the next step begins. If any step fails, the entire deployment stops, and subsequent steps (including Edge Function deployments) will not execute.
+
+### Deployment steps (in order)
+
+1. **Clone** - Downloads your repository and checks out the specified branch
+2. **Pull** - Retrieves database migrations from your branch to ensure consistency
+3. **Health** - Verifies that all required Supabase services (Auth, API, Storage, Realtime) of the branch are running and healthy
+4. **Configure** - Updates service configurations (Auth settings, API settings, Storage settings, etc.) based on your `config.toml`
+5. **Migrate** - Applies pending database migrations to update your branch's schema
+6. **Seed** - Runs seed files to populate your branch with initial data (if enabled and non persistent branch)
+7. **Deploy** - Deploys Edge Functions and updates function secrets
+
+### Important deployment behavior
+
+- **Sequential execution**: Steps run in strict order and cannot be parallelized
+- **Failure cascading**: If any step fails, all subsequent steps are skipped
+
+### Monitoring deployments
+
+To check deployment status and troubleshoot failures:
+
+1. Go to your project dashboard
+2. Navigate to "Manage Branches"
+3. Click on your branch to view deployment logs
+4. Check the "View logs" section for detailed error messages
+
+For programmatic monitoring, you can use the [Management API](https://api.supabase.com/api/v1#tag/environments/post/v1/projects/{ref}/branches) to poll branch status.
+
+For detailed troubleshooting guidance, see our [Troubleshooting guide](/docs/guides/deployment/branching/troubleshooting).
