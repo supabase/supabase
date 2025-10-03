@@ -45,7 +45,13 @@ export const FilesBuckets = () => {
             <div className="col-span-12">
               <FormHeader
                 title="File buckets"
-                actions={<CreateBucketModal buttonType="primary" label="New file bucket" />}
+                actions={
+                  <CreateBucketModal
+                    buttonType="primary"
+                    buttonClassName="w-fit"
+                    label="New file bucket"
+                  />
+                }
               />
 
               <Card>

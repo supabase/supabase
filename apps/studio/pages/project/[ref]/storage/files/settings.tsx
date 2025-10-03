@@ -14,7 +14,7 @@ const FilesSettingsPage: NextPageWithLayout = () => {
     <ScaffoldSection isFullWidth>
       <ScaffoldSectionTitle>File settings</ScaffoldSectionTitle>
       <ScaffoldSectionDescription>
-        Global settings across all file buckets.
+        Settings that apply to all file buckets.
       </ScaffoldSectionDescription>
       <StorageSettings />
     </ScaffoldSection>
