@@ -35,7 +35,9 @@ export interface GetTableRowsArgs {
 const getDefaultOrderByColumns = (table: SupaTable) => {
   const primaryKeyColumns = table.columns.filter((col) => col?.isPrimaryKey).map((col) => col.name)
   if (primaryKeyColumns.length === 0) {
-    return [table.columns[0]?.name]
+    const eligibleColumnsForSorting = table.columns.filter((x) => !x.dataType.includes('json'))
+    if (eligibleColumnsForSorting.length > 0) return [eligibleColumnsForSorting[0]?.name]
+    else return []
   } else {
     return primaryKeyColumns
   }

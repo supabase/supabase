@@ -3,7 +3,6 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
@@ -15,6 +14,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import {
   AuditLog,
@@ -231,11 +231,9 @@ export const AuditLogs = () => {
                     </div>
 
                     <div className="flex items-center">
-                      <Button type="primary" asChild>
-                        <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=auditLogs`}>
-                          Upgrade subscription
-                        </Link>
-                      </Button>
+                      <UpgradePlanButton source="auditLogs" plan="Team" type="primary">
+                        Upgrade subscription
+                      </UpgradePlanButton>
                     </div>
                   </div>
                 </Alert_Shadcn_>
