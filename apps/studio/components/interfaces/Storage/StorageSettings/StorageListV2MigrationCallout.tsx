@@ -20,8 +20,8 @@ import {
 } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 
-// [Joshen] Will be decided by Storage team, temp setting to 1st Jan 2026 UTC (3 months buffer)
-const MIGRATION_DEADLINE = '2026-01-01T00:00:00'
+// [Joshen] Will be decided by Storage team, temp setting to 15th December 2025 UTC (3 months buffer)
+const MIGRATION_DEADLINE = '2025-12-15T00:00:00'
 
 export const StorageListV2MigrationCallout = () => {
   const deadline = dayjs(MIGRATION_DEADLINE).utc(true)
@@ -111,7 +111,6 @@ const StorageListV2MigrationDialog = () => {
         />
 
         <DialogSection className="flex flex-col gap-y-2">
-          {/* [Joshen] Ideally we show the minimum time taken as 24 hours can sound daunting and is likely not applicable to 90% use case */}
           <p className="text-sm">
             Depending on the number of objects in your Storage, the migration can take up to 24
             hours to finish.
