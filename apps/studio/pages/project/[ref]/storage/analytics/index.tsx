@@ -9,6 +9,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import type { NextPageWithLayout } from 'types'
+import { Loader2 } from 'lucide-react'
 
 const StorageAnalyticsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -24,8 +25,9 @@ const StorageAnalyticsPage: NextPageWithLayout = () => {
 
   if (isLoadingBuckets) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground" />
+      <div className="w-full h-full flex items-center justify-center gap-x-2">
+        <Loader2 className="animate-spin text-foreground-light" size={16} />
+        <p className="text-sm text-foreground-light">Loading buckets</p>
       </div>
     )
   }

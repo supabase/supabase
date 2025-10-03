@@ -1,6 +1,8 @@
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { Loader2 } from 'lucide-react'
+
 import { useParams } from 'common'
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EmptyBucketState } from 'components/interfaces/Storage/EmptyBucketState'
@@ -25,8 +27,9 @@ const StorageFilesPage: NextPageWithLayout = () => {
 
   if (isLoadingBuckets) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground" />
+      <div className="w-full h-full flex items-center justify-center gap-x-2">
+        <Loader2 className="animate-spin text-foreground-light" size={16} />
+        <p className="text-sm text-foreground-light">Loading buckets</p>
       </div>
     )
   }
