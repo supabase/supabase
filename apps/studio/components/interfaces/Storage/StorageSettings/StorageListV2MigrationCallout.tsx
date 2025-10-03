@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useState } from 'react'
@@ -50,7 +49,6 @@ export const StorageListV2MigrationCallout = () => {
         </p>
       )}
       <div className="flex items-center gap-x-2 mt-3">
-        <DocsButton href="https://supabase.com/docs" />
         <StorageListV2MigrationDialog />
       </div>
     </Admonition>
@@ -63,9 +61,6 @@ export const StorageListV2MigratingCallout = () => {
       <p className="!leading-normal prose max-w-full text-sm !mb-0">
         This notice will be closed once the upgrade has been completed - hang tight!
       </p>
-      <div className="flex items-center gap-x-2 mt-3">
-        <DocsButton href="https://supabase.com/docs" />
-      </div>
     </Admonition>
   )
 }
