@@ -3,6 +3,7 @@ TEAM
 Supabase is 100% remote.
 
 Aaron Byrne
+Adam Mokan
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
@@ -14,6 +15,7 @@ Ant Wilson
 Ariuna K
 Artur Zakirov
 Artyom Borissov
+Barco Fourie
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
