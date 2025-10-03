@@ -16,9 +16,10 @@ const MobileSheetNav: React.FC<{
   const router = useRouter()
   const { width } = useWindowSize()
 
+  const pathWithoutQuery = router?.asPath?.split('?')?.[0]
   useEffect(() => {
     onOpenChange(false)
-  }, [router?.asPath])
+  }, [pathWithoutQuery])
 
   useEffect(() => {
     onOpenChange(false)
