@@ -32,12 +32,12 @@ export const FilesBuckets = () => {
   const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
   const [selectedBucket, setSelectedBucket] = useState<Bucket>()
 
-  const { data: buckets = [] } = useBucketsQuery({ projectRef: ref })
+  const { data: buckets = [], isLoading } = useBucketsQuery({ projectRef: ref })
   const filesBuckets = buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')
 
   return (
     <>
-      {filesBuckets.length === 0 ? (
+      {!isLoading && filesBuckets.length === 0 ? (
         <EmptyBucketState bucketType="files" />
       ) : (
         <div className="space-y-12">
