@@ -169,16 +169,17 @@ function applyFilters(query: string, filters: Filter[]) {
       // Handle composite values
       if (Array.isArray(filter.column)) {
         switch (filter.operator) {
-          case 'is':
-          case '~~':
-          case '~~*':
-          case '!~~':
-          case '!~~*':
-            throw new Error(`Cannot use ${filter.operator} operator in a tuple filter`)
           case 'in':
             return inTupleFilterSql(filter)
-          default:
+          case '=':
+          case '<>':
+          case '>':
+          case '<':
+          case '>=':
+          case '<=':
             return defaultTupleFilterSql(filter)
+          default:
+            throw new Error(`Cannot use ${filter.operator} operator in a tuple filter`)
         }
       }
 
