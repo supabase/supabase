@@ -173,7 +173,7 @@ const TriggersList = ({
 
       {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
-      {(schemaTriggers ?? []).length === 0 ? (
+      {!isSchemaLocked && (schemaTriggers ?? []).length === 0 ? (
         <Card className="grid grid-cols-1 @xl:grid-cols-3 bg divide-x @container">
           <div className="flex flex-col h-full p-6">
             <div className="flex items-center gap-3 mb-2">
