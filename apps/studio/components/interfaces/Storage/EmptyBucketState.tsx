@@ -12,7 +12,7 @@ export const EmptyBucketState = ({ bucketType }: EmptyBucketStateProps) => {
   return (
     <div className="flex flex-col justify-center h-full w-full">
       {/* TODO: pt-[8rem] or similar and include illustration */}
-      <div className="w-full max-w-sm mx-auto bg-surface-100 rounded-lg px-8 pt-10 pb-8 flex flex-col gap-6 border">
+      <div className="w-full max-w-sm mx-auto bg-surface-100 rounded-lg px-8 pt-10 pb-8 flex flex-col gap-6 border transition-all duration-200 opacity-0 animate-fade-in">
         <div className="flex flex-col gap-1 text-balance">
           <h3 className="text-foreground text-xl">{config.displayName}</h3>
           <p className="text-foreground-light text-sm">

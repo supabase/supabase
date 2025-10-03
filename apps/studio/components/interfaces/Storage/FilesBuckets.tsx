@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CreateBucketModal } from './CreateBucketModal'
 import { DeleteBucketModal } from './DeleteBucketModal'
 import { EditBucketModal } from './EditBucketModal'
@@ -53,78 +54,82 @@ export const FilesBuckets = () => {
                   />
                 }
               />
-
-              <Card>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Visibility</TableHead>
-                      <TableHead />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filesBuckets.map((bucket) => (
-                      <TableRow key={bucket.id}>
-                        <TableCell>
-                          <p className="text-foreground">{bucket.name}</p>
-                        </TableCell>
-                        <TableCell>
-                          <p className="text-foreground-light">
-                            {bucket.public ? 'Public' : 'Private'}
-                          </p>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button type="default" onClick={() => {}}>
-                              View files
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent side="bottom" align="end" className="w-40">
-                                <DropdownMenuItem
-                                  className="flex items-center space-x-2"
-                                  onClick={() => {
-                                    setModal('edit')
-                                    setSelectedBucket(bucket)
-                                  }}
-                                >
-                                  <Edit size={12} />
-                                  <p>Edit bucket</p>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="flex items-center space-x-2"
-                                  onClick={() => {
-                                    setModal('empty')
-                                    setSelectedBucket(bucket)
-                                  }}
-                                >
-                                  <FolderOpen size={12} />
-                                  <p>Empty bucket</p>
-                                </DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                  className="flex items-center space-x-2"
-                                  onClick={() => {
-                                    setModal('delete')
-                                    setSelectedBucket(bucket)
-                                  }}
-                                >
-                                  <Trash2 size={12} />
-                                  <p>Delete bucket</p>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </TableCell>
+              {/* TODO: the below loading state is ignored because buckets are loaded in parent component */}
+              {isLoading ? (
+                <GenericSkeletonLoader />
+              ) : (
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Visibility</TableHead>
+                        <TableHead />
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {filesBuckets.map((bucket) => (
+                        <TableRow key={bucket.id}>
+                          <TableCell>
+                            <p className="text-foreground">{bucket.name}</p>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-foreground-light">
+                              {bucket.public ? 'Public' : 'Private'}
+                            </p>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex justify-end gap-2">
+                              <Button type="default" onClick={() => {}}>
+                                View files
+                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button type="default" className="px-1" icon={<MoreVertical />} />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent side="bottom" align="end" className="w-40">
+                                  <DropdownMenuItem
+                                    className="flex items-center space-x-2"
+                                    onClick={() => {
+                                      setModal('edit')
+                                      setSelectedBucket(bucket)
+                                    }}
+                                  >
+                                    <Edit size={12} />
+                                    <p>Edit bucket</p>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    className="flex items-center space-x-2"
+                                    onClick={() => {
+                                      setModal('empty')
+                                      setSelectedBucket(bucket)
+                                    }}
+                                  >
+                                    <FolderOpen size={12} />
+                                    <p>Empty bucket</p>
+                                  </DropdownMenuItem>
+
+                                  <DropdownMenuItem
+                                    className="flex items-center space-x-2"
+                                    onClick={() => {
+                                      setModal('delete')
+                                      setSelectedBucket(bucket)
+                                    }}
+                                  >
+                                    <Trash2 size={12} />
+                                    <p>Delete bucket</p>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Card>
+              )}
             </div>
           </ScaffoldSection>
         </div>
