@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { cronPattern, parseCronJobCommand, secondsPattern } from './CronJobs.utils'
+import { cronPattern, secondsPattern } from './CronJobs.constants'
+import { parseCronJobCommand } from './CronJobs.utils'
 
 describe('parseCronJobCommand', () => {
   it('should return a default object when the command is null', () => {

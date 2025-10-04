@@ -1,5 +1,4 @@
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import type { ServerOption, WrapperMeta } from './Wrappers.types'
 
 export const WRAPPER_HANDLERS = {
@@ -2175,7 +2174,7 @@ export const WRAPPERS: WrapperMeta[] = [
     label: 'Iceberg',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/iceberg`,
     minimumExtensionVersion: '0.5.3',
-    createComponent: CreateIcebergWrapperSheet,
+    customComponent: true,
     server: {
       // The fields are intentionally not required. The required flag is enforced in the create iceberg wrapper sheet.
       // In the edit wrapper sheet, all fields are shown and not required.

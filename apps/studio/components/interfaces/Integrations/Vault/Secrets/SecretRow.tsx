@@ -18,7 +18,7 @@ import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-rea
 import type { VaultSecret } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import EditSecretModal from './EditSecretModal'
-import type { SecretTableColumn } from './Secrets.utils'
+import { SecretTableColumn } from './Secrets.types'
 
 interface SecretRowProps {
   row: VaultSecret

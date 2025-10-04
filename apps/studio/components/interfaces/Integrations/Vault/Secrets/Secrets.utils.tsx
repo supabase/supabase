@@ -3,16 +3,7 @@ import type { Column } from 'react-data-grid'
 import type { VaultSecret } from 'types'
 import { cn } from 'ui'
 import SecretRow from './SecretRow'
-
-export type SecretColumnId = 'secret' | 'id' | 'secret_value' | 'updated_at' | 'actions'
-
-export interface SecretTableColumn {
-  id: SecretColumnId
-  name: string
-  minWidth?: number
-  width?: number
-  maxWidth?: number
-}
+import { SecretTableColumn } from './Secrets.types'
 
 export const SECRET_TABLE_COLUMNS: SecretTableColumn[] = [
   { id: 'secret', name: 'Secret', minWidth: 300, width: 360 },

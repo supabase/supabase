@@ -12,8 +12,7 @@ import {
 } from 'state/replication-pipeline-request-status'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { getStatusName } from './Pipeline.utils'
-import { PipelineStatusName } from './PipelineStatus'
-import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 
 interface UpdateVersionModalProps {
   visible: boolean
@@ -26,8 +25,6 @@ interface UpdateVersionModalProps {
 export const UpdateVersionModal = ({
   visible,
   pipeline,
-  // currentVersionName,
-  // newVersionName,
   confirmLabel = 'Update and restart',
   confirmLabelLoading = 'Updating',
   onClose,

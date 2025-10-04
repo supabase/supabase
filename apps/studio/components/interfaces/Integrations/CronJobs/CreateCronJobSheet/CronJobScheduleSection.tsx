@@ -23,9 +23,9 @@ import {
   Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { CreateCronJobForm } from './CreateCronJobSheet'
-import { formatScheduleString, getScheduleMessage } from './CronJobs.utils'
-import CronSyntaxChart from './CronSyntaxChart'
+import { formatScheduleString, getScheduleMessage } from '../CronJobs.utils'
+import CronSyntaxChart from '../CronSyntaxChart'
+import { type CreateCronJobForm } from './CreateCronJobSheet.constants'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>

@@ -39,8 +39,8 @@ import {
   PIPELINE_ERROR_MESSAGES,
   getStatusName,
 } from '../Pipeline.utils'
-import { PipelineStatus, PipelineStatusName } from '../PipelineStatus'
-import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import { PipelineStatus } from '../PipelineStatus'
+import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { UpdateVersionModal } from '../UpdateVersionModal'
 import { SlotLagMetrics, TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
