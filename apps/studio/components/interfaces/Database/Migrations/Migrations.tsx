@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useState } from 'react'
 
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { ContactSupport } from 'components/ui/ContactSupport'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Search } from 'lucide-react'
@@ -63,13 +63,17 @@ const Migrations = () => {
               </>
             }
           >
-            <Button key="contact-support" asChild type="default">
-              <Link
-                href={`/support/new?projectRef=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
-              >
-                Contact support
-              </Link>
-            </Button>
+            <ContactSupport
+              key="contact-support"
+              category={'dashboard_bug'}
+              subject="Unable to view database migrations"
+              error={(error as any)?.message ?? 'Unknown'}
+              eventProperties={{
+                page: 'database_migrations',
+                errorType: 'migration_fetch_error',
+                error: error as any,
+              }}
+            />
           </Admonition>
         )}
         {isSuccess && (

@@ -1,7 +1,7 @@
 import { useParams } from 'common'
-import Link from 'next/link'
 import type { ResponseError } from 'types'
-import { Alert, Button } from 'ui'
+import { Alert } from 'ui'
+import { ContactSupport } from 'components/ui/ContactSupport'
 
 export interface StorageBucketsErrorProps {
   error: ResponseError
@@ -18,13 +18,17 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
           variant="warning"
           title="Failed to fetch buckets"
           actions={[
-            <Button key="contact-support" asChild type="default" className="ml-4">
-              <Link
-                href={`/support/new?projectRef=${ref}&category=dashboard_bug&subject=Unable%20to%20fetch%20storage%20buckets`}
-              >
-                Contact support
-              </Link>
-            </Button>,
+            <ContactSupport
+              key="contact-support"
+              category={'dashboard_bug'}
+              subject="Unable to fetch storage buckets"
+              error={(error as any)?.message}
+              className="ml-4"
+              eventProperties={{
+                page: 'storage_buckets',
+                errorType: 'buckets_fetch_error',
+              }}
+            />,
           ]}
         >
           <p className="mb-1">
