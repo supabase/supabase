@@ -72,6 +72,6 @@
 
   /* Link */
   .text-link {
-    @apply text-foreground-light underline underline-offset-4 decoration-border hover:decoration-foreground transition-colors hover:text-foreground;
+    @apply text-foreground-light underline underline-offset-4 decoration-inherit hover:decoration-foreground transition-colors hover:text-foreground;
   }
 }

@@ -1,5 +1,7 @@
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { MousePointer2 } from 'lucide-react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -7,6 +9,7 @@ import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
+import { EmptyRealtime } from './EmptyRealtime'
 
 /**
  * Acts as a container component for the entire log display
@@ -40,12 +43,16 @@ export const RealtimeInspector = () => {
       <Header config={realtimeConfig} onChangeConfig={setRealtimeConfig} />
       <div className="relative flex flex-col grow">
         <div className="flex grow">
-          <MessagesTable
-            hasChannelSet={realtimeConfig.channelName.length > 0}
-            enabled={realtimeConfig.enabled}
-            data={logData}
-            showSendMessage={() => setSendMessageShown(true)}
-          />
+          {(logData ?? []).length > 0 ? (
+            <MessagesTable
+              hasChannelSet={realtimeConfig.channelName.length > 0}
+              enabled={realtimeConfig.enabled}
+              data={logData}
+              showSendMessage={() => setSendMessageShown(true)}
+            />
+          ) : (
+            <EmptyRealtime projectRef={ref!} />
+          )}
         </div>
       </div>
       <SendMessageModal
