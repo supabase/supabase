@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
@@ -17,6 +17,7 @@ import {
 } from 'state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { Button, SidePanel } from 'ui'
+import { formatSortURLParams, sortsToUrlParams } from 'components/grid/SupabaseGrid.utils'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { convertByteaToHex } from '../RowEditor.utils'
@@ -106,6 +107,42 @@ const ForeignRowSelector = ({
       keepPreviousData: true,
     }
   )
+
+  // Persist sort preferences to sessionStorage for this browser session only
+  useEffect(() => {
+    if (!project?.ref || !table?.name) return
+    if (sorts.length > 0) return
+
+    try {
+      const key = `supabase_frselector_sorts_${project.ref}_${table.schema ?? 'public'}.${
+        table.name
+      }`
+      const stored = typeof window !== 'undefined' ? sessionStorage.getItem(key) : null
+      if (!stored) return
+      const urlSorts = JSON.parse(stored) as string[]
+      const parsedSorts = formatSortURLParams(table.name, urlSorts)
+      if (parsedSorts.length > 0) {
+        setFiltersAndSorts((prev) => ({ ...prev, sort: parsedSorts }))
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }, [project?.ref, table?.schema, table?.name, sorts.length])
+
+  useEffect(() => {
+    if (!project?.ref || !table?.name) return
+    try {
+      const key = `supabase_frselector_sorts_${project.ref}_${table.schema ?? 'public'}.${
+        table.name
+      }`
+      const urlSorts = sortsToUrlParams(sorts)
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(key, JSON.stringify(urlSorts))
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }, [sorts, project?.ref, table?.schema, table?.name])
 
   return (
     <SidePanel
