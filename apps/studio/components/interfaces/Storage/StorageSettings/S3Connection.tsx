@@ -120,7 +120,7 @@ export const S3Connection = () => {
           <div>
             <ScaffoldSectionTitle>S3 Connection</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
-              Connect to your bucket using any S3-compatible service via the S3 protocol
+              Connect to your bucket using any S3-compatible service via the S3 protocol.
             </ScaffoldSectionDescription>
           </div>
           <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />

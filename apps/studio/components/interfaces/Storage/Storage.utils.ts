@@ -1,4 +1,4 @@
-import { groupBy, difference } from 'lodash'
+import { difference, groupBy } from 'lodash'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
 
