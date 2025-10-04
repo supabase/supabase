@@ -18,6 +18,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
 import { useProjectsQuery } from '~/lib/fetch/projects'
 
@@ -193,28 +194,44 @@ export function McpConfigPanel() {
   const project = isPlatform ? selectedProject : null
 
   return (
-    <div className="not-prose">
-      <div className="flex gap-3 mb-3">
-        <PlatformSelector
-          selectedPlatform={selectedPlatform}
-          onPlatformSelect={setSelectedPlatform}
+    <>
+      <div className="not-prose">
+        <div className="flex flex-wrap gap-3 mb-3">
+          <PlatformSelector
+            selectedPlatform={selectedPlatform}
+            onPlatformSelect={setSelectedPlatform}
+          />
+          {isPlatform && (
+            <ProjectSelector selectedProject={project} onProjectSelect={setSelectedProject} />
+          )}
+        </div>
+        <p className="text-xs text-foreground-lighter">
+          {isPlatform
+            ? 'Scope the MCP server to a project. If no project is selected, all projects will be accessible.'
+            : 'Project selection is only available for the hosted platform.'}
+        </p>
+        <McpConfigPanelBase
+          basePath="/docs"
+          className="mt-6"
+          projectRef={project?.ref}
+          theme={theme as 'light' | 'dark'}
+          isPlatform={isPlatform}
         />
-        {isPlatform && (
-          <ProjectSelector selectedProject={project} onProjectSelect={setSelectedProject} />
-        )}
       </div>
-      <p className="text-xs text-foreground-lighter">
-        {isPlatform
-          ? 'Scope the MCP server to a project. If no project is selected, all projects will be accessible.'
-          : 'Project selection is only available for the hosted platform.'}
-      </p>
-      <McpConfigPanelBase
-        basePath="/docs"
-        className="mt-6"
-        projectRef={project?.ref}
-        theme={theme as 'light' | 'dark'}
-        isPlatform={isPlatform}
-      />
-    </div>
+      {isPlatform && (
+        <Admonition type="note" title="Authentication" className="mt-3">
+          <p>
+            {
+              "Your MCP client will automatically prompt you to login to Supabase during setup. This will open a browser window where you can login to your Supabase account and grant access to the MCP client. Be sure to choose the organization that contains the project you wish to work with. In the future, we'll offer more fine grain control over these permissions."
+            }
+          </p>
+          <p>
+            {
+              'Previously Supabase MCP required you to generate a personal access token (PAT), but this is no longer required.'
+            }
+          </p>
+        </Admonition>
+      )}
+    </>
   )
 }

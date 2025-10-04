@@ -77,7 +77,7 @@ export const ClientSelectDropdown = ({
           </Button>
         </PopoverTrigger_Shadcn_>
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
+      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start" portal>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search..." />
           <CommandList_Shadcn_>

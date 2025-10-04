@@ -65,6 +65,7 @@ export function McpConfigurationDisplay({
         value={JSON.stringify(clientConfig, null, 2)}
         language="json"
         className="max-h-64 overflow-y-auto"
+        focusable={false}
       />
 
       {selectedClient.alternateInstructions && selectedClient.alternateInstructions(clientConfig)}
