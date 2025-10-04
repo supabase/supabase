@@ -22,6 +22,8 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { usePHFlag } from 'hooks/ui/useFlag'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { DOCS_URL } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
@@ -44,6 +46,10 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { TableTemplateSelector } from './TableQuickstart/TableTemplateSelector'
+import { QuickstartVariant } from './TableQuickstart/types'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -88,6 +94,24 @@ export const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
+
+  /**
+   * Returns:
+   * - `QuickstartVariant`: user variation (if bucketed)
+   * - `false`: user not yet bucketed or targeted
+   * - `undefined`: posthog still loading
+   */
+  const tableQuickstartVariant = usePHFlag<QuickstartVariant | false | undefined>('tableQuickstart')
+
+  const { data: tables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const [quickstartDismissed, setQuickstartDismissed] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
+    false
+  )
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -277,6 +301,23 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
+        {isNewRecord &&
+          !isDuplicating &&
+          tableQuickstartVariant === QuickstartVariant.TEMPLATES &&
+          !quickstartDismissed && (
+            <TableTemplateSelector
+              variant={tableQuickstartVariant}
+              onSelectTemplate={(template) => {
+                const updates: Partial<TableField> = {}
+                if (template.name) updates.name = template.name
+                if (template.comment) updates.comment = template.comment
+                if (template.columns) updates.columns = template.columns
+                onUpdateField(updates)
+              }}
+              onDismiss={() => setQuickstartDismissed(true)}
+              disabled={false}
+            />
+          )}
         <Input
           data-testid="table-name-input"
           label="Name"
