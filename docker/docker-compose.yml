@@ -63,6 +63,7 @@ services:
       analytics:
         condition: service_healthy
     environment:
+      KONG_PORT_MAPS: ${KONG_HTTP_PORT}:8000
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
@@ -259,8 +260,7 @@ services:
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
-      POSTGREST_URL: http://rest:3000
-      PGRST_JWT_SECRET: ${JWT_SECRET}
+      AUTH_JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
@@ -271,6 +271,13 @@ services:
       GLOBAL_S3_BUCKET: stub
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
+
+      # S3 Protocol - the region is the same as above "stub"
+      S3_ALLOW_FORWARDED_HEADER: true
+      S3_PROTOCOL_PREFIX: /storage/v1
+      S3_PROTOCOL_ACCESS_KEY_ID: 625729a08b95bf1b7ff351a663f3a23c
+      S3_PROTOCOL_ACCESS_KEY_SECRET: 850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907
+
 
   imgproxy:
     container_name: supabase-imgproxy
