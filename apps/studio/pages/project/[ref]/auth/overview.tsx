@@ -45,7 +45,14 @@ AuthOverview.getLayout = (page) => (
     <AuthLayout>
       <PageLayout
         title="Overview"
-        secondaryActions={<DocsButton href={`${DOCS_URL}/guides/auth`} />}
+        secondaryActions={
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-foreground-light">
+              All reports <span className="text-foreground">Last 24 hours</span>
+            </span>
+            <DocsButton href={`${DOCS_URL}/guides/auth`} />
+          </div>
+        }
         size="large"
       >
         {page}
