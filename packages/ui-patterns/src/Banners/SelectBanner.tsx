@@ -8,7 +8,7 @@ export function SelectBanner() {
     'Oct 3 2025',
     'Patrick Collison, Dylan Field, and more',
   ]
-  const cta = 'Watch live'
+  const cta = 'Watch replay'
 
   const baseStyles = 'flex flex-col justify-center border-l border-muted py-8 '
   const textBlockStyles =
