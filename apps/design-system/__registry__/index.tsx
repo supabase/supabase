@@ -918,6 +918,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "nav-menu-demo": {
+      name: "nav-menu-demo",
+      type: "components:example",
+      registryDependencies: ["nav-menu"],
+      component: React.lazy(() => import("@/registry/default/example/nav-menu-demo")),
+      source: "",
+      files: ["registry/default/example/nav-menu-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "nav-menu-badges": {
+      name: "nav-menu-badges",
+      type: "components:example",
+      registryDependencies: ["nav-menu"],
+      component: React.lazy(() => import("@/registry/default/example/nav-menu-badges")),
+      source: "",
+      files: ["registry/default/example/nav-menu-badges.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "nav-menu-icons": {
+      name: "nav-menu-icons",
+      type: "components:example",
+      registryDependencies: ["nav-menu"],
+      component: React.lazy(() => import("@/registry/default/example/nav-menu-icons")),
+      source: "",
+      files: ["registry/default/example/nav-menu-icons.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "popover-demo": {
       name: "popover-demo",
       type: "components:example",

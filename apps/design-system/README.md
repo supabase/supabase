@@ -4,21 +4,21 @@ Design resources for building consistent user experiences at Supabase.
 
 ## Getting Started
 
-First, make a copy of _.env.local.example_ and name it _env.local_. Then run the development server as described below.
-
-From within this _design-system_ directory, run:
+First, make a copy of _.env.local.example_ and name it _env.local_. Then install any required packages and start the development server:
 
 ```bash
+cd apps/design-system
+pnpm i
 pnpm dev
 ```
 
-Or from the root directory run:
+You can also run the development server from the root directory:
 
 ```bash
 pnpm dev:design-system
 ```
 
-Open [http://localhost:3003](http://localhost:3003) with your browser to see the result.
+Open [http://localhost:3003](http://localhost:3003) in your browser to see the result.
 
 ### Watching for MDX changes
 
