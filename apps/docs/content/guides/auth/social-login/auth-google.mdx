@@ -194,14 +194,14 @@ To use the Google provider in local development:
 
 1. Add a new environment variable:
    ```env
-   SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET="<client-secret>"
+   GOOGLE_CLIENT_SECRET="<client-secret>"
    ```
 2. Configure the provider:
    ```toml
    [auth.external.google]
    enabled = true
    client_id = "<client-id>"
-   secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+   secret = "env(GOOGLE_CLIENT_SECRET)"
    skip_nonce_check = false
    ```
 
