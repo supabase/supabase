@@ -246,6 +246,7 @@ allow_list = [
     "PostQUEL",
     "PostgREST",
     "Postgres",
+    "postgres-meta",
     # We prefer Postgres, but check for vocabulary preference in a separate rule
     "PostgreSQL",
     "ProGuard",

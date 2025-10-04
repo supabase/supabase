@@ -23,8 +23,8 @@ export function getDatabaseOperations({
 }: GetDatabaseOperationsOptions): DatabaseOperations {
   return {
     async executeSql<T>(_projectRef: string, options: ExecuteSqlOptions) {
-      const { query } = options
-      const { data, error } = await executeQuery<T>({ query, headers })
+      const { query, read_only: readOnly } = options
+      const { data, error } = await executeQuery<T>({ query, headers, readOnly })
 
       if (error) {
         throw error
