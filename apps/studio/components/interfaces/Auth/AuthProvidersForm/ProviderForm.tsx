@@ -166,7 +166,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       </ResourceItem>
 
       <Sheet open={open} onOpenChange={handleOpenChange}>
-        <SheetContent size="content" className="flex flex-col gap-0">
+        <SheetContent className="flex flex-col gap-0">
           <SheetHeader className="shrink-0 flex items-center gap-4">
             <img
               src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
