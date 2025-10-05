@@ -9,7 +9,7 @@ const CONFIRMATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'CONFIRMATION',
   type: 'object',
-  title: 'Confirm signup',
+  title: 'Confirm Signup',
   properties: {
     MAILER_SUBJECTS_CONFIRMATION: {
       title: 'Subject heading',
@@ -44,7 +44,7 @@ const INVITE: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'INVITE',
   type: 'object',
-  title: 'Invite user',
+  title: 'Invite User',
   properties: {
     MAILER_SUBJECTS_INVITE: {
       title: 'Subject heading',
