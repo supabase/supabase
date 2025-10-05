@@ -17,7 +17,12 @@ import {
 } from 'state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { Button, SidePanel } from 'ui'
-import { formatSortURLParams, sortsToUrlParams } from 'components/grid/SupabaseGrid.utils'
+import {
+  formatSortURLParams,
+  sortsToUrlParams,
+  loadTableEditorStateFromLocalStorage,
+  saveTableEditorStateToLocalStorage,
+} from 'components/grid/SupabaseGrid.utils'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { convertByteaToHex } from '../RowEditor.utils'
@@ -108,18 +113,19 @@ const ForeignRowSelector = ({
     }
   )
 
-  // Persist sort preferences to sessionStorage for this browser session only
+  // Load previously saved sorts from shared table-editor storage when none are applied yet
   useEffect(() => {
     if (!project?.ref || !table?.name) return
     if (sorts.length > 0) return
 
     try {
-      const key = `supabase_frselector_sorts_${project.ref}_${table.schema ?? 'public'}.${
-        table.name
-      }`
-      const stored = typeof window !== 'undefined' ? sessionStorage.getItem(key) : null
-      if (!stored) return
-      const urlSorts = JSON.parse(stored) as string[]
+      const persistenceTableName = `${table.name}__frselector`
+      const savedState = loadTableEditorStateFromLocalStorage(
+        project.ref,
+        persistenceTableName,
+        table.schema
+      )
+      const urlSorts = savedState?.sorts ?? []
       const parsedSorts = formatSortURLParams(table.name, urlSorts)
       if (parsedSorts.length > 0) {
         setFiltersAndSorts((prev) => ({ ...prev, sort: parsedSorts }))
@@ -132,13 +138,14 @@ const ForeignRowSelector = ({
   useEffect(() => {
     if (!project?.ref || !table?.name) return
     try {
-      const key = `supabase_frselector_sorts_${project.ref}_${table.schema ?? 'public'}.${
-        table.name
-      }`
       const urlSorts = sortsToUrlParams(sorts)
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem(key, JSON.stringify(urlSorts))
-      }
+      const persistenceTableName = `${table.name}__frselector`
+      saveTableEditorStateToLocalStorage({
+        projectRef: project.ref,
+        tableName: persistenceTableName,
+        schema: table.schema,
+        sorts: urlSorts,
+      })
     } catch (e) {
       console.error(e)
     }
