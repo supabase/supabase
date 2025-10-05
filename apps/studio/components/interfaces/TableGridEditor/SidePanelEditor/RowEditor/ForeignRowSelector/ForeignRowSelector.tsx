@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
@@ -113,10 +113,11 @@ const ForeignRowSelector = ({
     }
   )
 
-  // Load previously saved sorts from shared table-editor storage when none are applied yet
+  // Hydrate persisted sorts only once on mount to avoid re-applying after user clears
+  const hasHydratedPersistedSorts = useRef(false)
   useEffect(() => {
     if (!project?.ref || !table?.name) return
-    if (sorts.length > 0) return
+    if (hasHydratedPersistedSorts.current) return
 
     try {
       const persistenceTableName = `${table.name}__frselector`
@@ -132,8 +133,10 @@ const ForeignRowSelector = ({
       }
     } catch (e) {
       console.error(e)
+    } finally {
+      hasHydratedPersistedSorts.current = true
     }
-  }, [project?.ref, table?.schema, table?.name, sorts.length])
+  }, [project?.ref, table?.schema, table?.name])
 
   useEffect(() => {
     if (!project?.ref || !table?.name) return
