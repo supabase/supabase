@@ -1,14 +1,73 @@
-import { CLIENT_LIBRARIES } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import type { UseFormReturn } from 'react-hook-form'
+// End of third-party imports
 
-import { Button } from 'ui'
+import { CLIENT_LIBRARIES } from 'common/constants'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import type { ExtendedSupportCategories } from './Support.constants'
+import type { SupportFormValues } from './SupportForm.schema'
+
+interface ClientLibraryInfoProps {
+  form: UseFormReturn<SupportFormValues>
+  category: ExtendedSupportCategories
+  library: string | undefined
+}
+
+export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfoProps) {
+  const showClientLibraries = useIsFeatureEnabled('support:show_client_libraries')
+
+  if (!showClientLibraries) return null
+  if (category !== 'Problem') return null
+
+  return (
+    <>
+      <FormField_Shadcn_
+        name="library"
+        control={form.control}
+        render={({ field }) => (
+          <FormItemLayout layout="vertical" label="Which library are you having issues with">
+            <FormControl_Shadcn_>
+              <Select_Shadcn_ {...field} defaultValue={field.value} onValueChange={field.onChange}>
+                <SelectTrigger_Shadcn_ className="w-full" aria-label="Select a library">
+                  <SelectValue_Shadcn_ placeholder="Select a library" />
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectGroup_Shadcn_>
+                    {CLIENT_LIBRARIES.map((option) => (
+                      <SelectItem_Shadcn_ key={option.language} value={option.language}>
+                        {option.language}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectGroup_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+            </FormControl_Shadcn_>
+          </FormItemLayout>
+        )}
+      />
+      {library && library.length > 0 && <LibrarySuggestions library={library} />}
+    </>
+  )
+}
 
 interface LibrarySuggestionsProps {
   library: string
 }
 
-export const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
+const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
   const selectedLibrary = CLIENT_LIBRARIES.find((lib) => lib.language === library)
   const selectedClientLibraries = selectedLibrary?.libraries.filter((library) =>
     library.name.includes('supabase-')
