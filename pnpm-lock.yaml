@@ -937,8 +937,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nuqs:
-        specifier: ^2.4.1
-        version: 2.4.1(next@15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        specifier: 2.7.0
+        version: 2.7.0(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.75.1
         version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
@@ -15609,16 +15609,19 @@ packages:
     peerDependencies:
       next: '>=13.4 <14.0.2 || ^14.0.3'
 
-  nuqs@2.4.1:
-    resolution: {integrity: sha512-u6sngTspqDe3jWHtcmqHQg3dl35niizCZAsm5gy7PBlgG2rwl71Dp2QUv5hwBaWKI9qz0wqILZY86TsRxq66SQ==}
+  nuqs@2.7.0:
+    resolution: {integrity: sha512-p6j6AuOVbnIlMSOlymKVDQtDkSCgjKxikwrqE9zThEOrP0UMfB/dwHuc6nKCuBPveoNghbh15zwoyTTv0XLp+A==}
     peerDependencies:
       '@remix-run/react': '>=2'
+      '@tanstack/react-router': ^1
       next: '>=14.2.0'
       react: '>=18.2.0 || ^19.0.0-0'
       react-router: ^6 || ^7
       react-router-dom: ^6 || ^7
     peerDependenciesMeta:
       '@remix-run/react':
+        optional: true
+      '@tanstack/react-router':
         optional: true
       next:
         optional: true
@@ -37451,11 +37454,12 @@ snapshots:
       mitt: 3.0.1
       next: 15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
 
-  nuqs@2.4.1(next@15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  nuqs@2.7.0(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
-      mitt: 3.0.1
+      '@standard-schema/spec': 1.0.0
       react: 18.3.1
     optionalDependencies:
+      '@tanstack/react-router': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next: 15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       react-router: 7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
