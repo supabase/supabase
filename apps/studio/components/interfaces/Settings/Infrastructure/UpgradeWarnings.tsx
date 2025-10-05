@@ -33,7 +33,7 @@ export const ObjectsToBeDroppedWarning = ({
           <p className="mb-1">
             The following objects are not supported and must be removed before upgrading.{' '}
             <InlineLink
-              className="text-foreground-lighter hover:text-foreground transition-colorsrs"
+              className="text-foreground-lighter hover:text-foreground transition-colors"
               href={`${DOCS_URL}/guides/platform/upgrading#extensions`}
               target="_blank"
               rel="noopener noreferrer"
