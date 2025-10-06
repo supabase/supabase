@@ -19,7 +19,6 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CreateBucketModal } from './CreateBucketModal'
 import { DeleteBucketModal } from './DeleteBucketModal'
