@@ -1,15 +1,13 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { IS_PLATFORM, useParams } from 'common'
 import { Menu } from 'ui'
-import { BUCKET_TYPES, BUCKET_TYPE_KEYS, DEFAULT_BUCKET_TYPE } from './Storage.constants'
+import { BUCKET_TYPES, BUCKET_TYPE_KEYS } from './Storage.constants'
+import { useStorageV2Page } from './Storage.utils'
 
 export const StorageMenuV2 = () => {
-  const router = useRouter()
   const { ref } = useParams()
-
-  const page = router.pathname.split('/')[4] as undefined | 'files' | 'analytics' | 'vectors' | 's3'
+  const page = useStorageV2Page()
 
   return (
     <Menu type="pills" className="my-6 flex flex-grow flex-col">
@@ -31,17 +29,20 @@ export const StorageMenuV2 = () => {
           })}
         </div>
 
-        <div className="h-px w-full bg-border" />
-        <div className="mx-3">
-          <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
-          {IS_PLATFORM && (
-            <Link href={`/project/${ref}/storage/s3`}>
-              <Menu.Item rounded active={page === 's3'}>
-                <p className="truncate">S3</p>
-              </Menu.Item>
-            </Link>
-          )}
-        </div>
+        {IS_PLATFORM && (
+          <>
+            <div className="h-px w-full bg-border" />
+            <div className="mx-3">
+              <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
+
+              <Link href={`/project/${ref}/storage/s3`}>
+                <Menu.Item rounded active={page === 's3'}>
+                  <p className="truncate">S3</p>
+                </Menu.Item>
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </Menu>
   )

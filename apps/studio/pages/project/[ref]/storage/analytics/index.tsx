@@ -6,8 +6,8 @@ import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePrevi
 import { AnalyticsBuckets } from 'components/interfaces/Storage/AnalyticsBuckets'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { StorageUILayout } from 'components/layouts/StorageLayout/StorageUILayout'
 import type { NextPageWithLayout } from 'types'
-import { StorageSpecializedLayout } from 'components/layouts/StorageLayout/StorageSpecializedLayout'
 
 const StorageAnalyticsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -19,9 +19,9 @@ const StorageAnalyticsPage: NextPageWithLayout = () => {
   }, [isStorageV2, ref, router])
 
   return (
-    <StorageSpecializedLayout bucketType="analytics">
+    <StorageUILayout>
       <AnalyticsBuckets />
-    </StorageSpecializedLayout>
+    </StorageUILayout>
   )
 }
 

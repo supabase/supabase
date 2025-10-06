@@ -5,8 +5,8 @@ import {
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-import { StorageFilesLayout } from 'components/layouts/StorageLayout/StorageFilesLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { StorageUILayout } from 'components/layouts/StorageLayout/StorageUILayout'
 import type { NextPageWithLayout } from 'types'
 
 const FilesSettingsPage: NextPageWithLayout = () => {
@@ -24,7 +24,7 @@ const FilesSettingsPage: NextPageWithLayout = () => {
 FilesSettingsPage.getLayout = (page) => (
   <DefaultLayout>
     <StorageLayout title="Storage">
-      <StorageFilesLayout>{page}</StorageFilesLayout>
+      <StorageUILayout>{page}</StorageUILayout>
     </StorageLayout>
   </DefaultLayout>
 )
