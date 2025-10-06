@@ -295,70 +295,65 @@ export function CustomReportSection() {
         ) : null}
       </div>
       <div className="relative">
-        {(() => {
-          if (layout.length === 0) {
-            return (
-              <div className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 border-default">
-                <h4>Build a custom report</h4>
-                <p className="text-sm text-foreground-light mb-4">
-                  Keep track of your most important metrics
-                </p>
-                {canUpdateReport || canCreateReport ? (
-                  <SnippetDropdown
-                    projectRef={ref}
-                    onSelect={addSnippetToReport}
-                    trigger={
-                      <Button type="default" iconRight={<Plus size={14} />}>
-                        Add your first block
-                      </Button>
-                    }
-                    side="bottom"
-                    align="center"
-                    autoFocus
-                  />
-                ) : (
-                  <p className="text-sm text-foreground-light">No charts set up yet in report</p>
-                )}
-              </div>
-            )
-          }
-          return (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
+        {layout.length === 0 ? (
+          <div className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 border-default">
+            <h4>Build a custom report</h4>
+            <p className="text-sm text-foreground-light mb-4">
+              Keep track of your most important metrics
+            </p>
+            {canUpdateReport || canCreateReport ? (
+              <SnippetDropdown
+                projectRef={ref}
+                onSelect={addSnippetToReport}
+                trigger={
+                  <Button type="default" iconRight={<Plus size={14} />}>
+                    Add your first block
+                  </Button>
+                }
+                side="bottom"
+                align="center"
+                autoFocus
+              />
+            ) : (
+              <p className="text-sm text-foreground-light">No charts set up yet in report</p>
+            )}
+          </div>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={(editableReport?.layout ?? []).map((x) => String(x.id))}
+              strategy={rectSortingStrategy}
             >
-              <SortableContext
-                items={(editableReport?.layout ?? []).map((x) => String(x.id))}
-                strategy={rectSortingStrategy}
-              >
-                <Row columns={[3, 2, 1]}>
-                  {layout.map((item) => (
-                    <SortableReportBlock key={item.id} id={String(item.id)}>
-                      <div className="h-64">
-                        <ReportBlock
-                          key={item.id}
-                          item={item}
-                          startDate={startDate}
-                          endDate={endDate}
-                          interval={
-                            (editableReport?.interval as AnalyticsInterval) ??
-                            ('1d' as AnalyticsInterval)
-                          }
-                          disableUpdate={false}
-                          isRefreshing={false}
-                          onRemoveChart={handleRemoveChart}
-                          onUpdateChart={(config) => handleUpdateChart(item.id, config)}
-                        />
-                      </div>
-                    </SortableReportBlock>
-                  ))}
-                </Row>
-              </SortableContext>
-            </DndContext>
-          )
-        })()}
+              <Row columns={[3, 2, 1]}>
+                {layout.map((item) => (
+                  <SortableReportBlock key={item.id} id={String(item.id)}>
+                    <div className="h-64">
+                      <ReportBlock
+                        key={item.id}
+                        item={item}
+                        startDate={startDate}
+                        endDate={endDate}
+                        interval={
+                          (editableReport?.interval as AnalyticsInterval) ??
+                          ('1d' as AnalyticsInterval)
+                        }
+                        disableUpdate={false}
+                        isRefreshing={false}
+                        onRemoveChart={handleRemoveChart}
+                        onUpdateChart={(config) => handleUpdateChart(item.id, config)}
+                      />
+                    </div>
+                  </SortableReportBlock>
+                ))}
+              </Row>
+            </SortableContext>
+          </DndContext>
+        )}
       </div>
     </div>
   )
