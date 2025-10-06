@@ -1,19 +1,19 @@
-import React, { PropsWithChildren, useState, useEffect, useRef } from 'react'
 import { Loader2 } from 'lucide-react'
+import React, { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import { ComposedChart } from './ComposedChart'
 
-import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
+import { AnalyticsInterval } from 'data/analytics/constants'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
-import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
+import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
+import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import { useChartHighlight } from './useChartHighlight'
 
-import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { ChartData } from './Charts.types'
 import type { MultiAttribute } from './ComposedChart.utils'
 
 interface LogChartHandlerProps {
@@ -22,7 +22,6 @@ interface LogChartHandlerProps {
   attributes: MultiAttribute[]
   startDate: string
   endDate: string
-  interval: string
   customDateFormat?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hideChartType?: boolean
@@ -196,8 +195,6 @@ export const useAttributeQueries = (
     ref,
     startDate,
     endDate,
-    interval,
-    databaseIdentifier,
     data,
     isVisible
   )
