@@ -1,9 +1,10 @@
 # ./packages/icons
 
-This package is for custom Supabase icons
-They can be used alongside any other icon packages
+This package is for custom Supabase icons. These custom icons can be used alongside any other icon packages.
 
-## example use
+> **Documentation**: This README is for developers working on the icons package. For design system documentation and usage examples, see `apps/design-system/content/docs/icons.mdx`.
+
+## Example use
 
 ```jsx
 import { ReplaceCode, InsertCode } from 'icons'
@@ -18,16 +19,18 @@ function app() {
 }
 ```
 
-## adding new icons
+**Default props**: All icons have `strokeWidth={2}` and `size={24}` by default. Override these props as needed for your use case.
+
+## Adding new icons
 
 Add new icons into ./src/raw-icons
 
 Make sure there are no inline stroke/border/fill colors (see below)
 
-run this in ./packages/build-icons
+run this in ./packages/icons
 
 ```bash
-npm run build
+npm run build:icons
 ```
 
 This will output icons into ./src/icons and update import names/paths
