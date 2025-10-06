@@ -5,8 +5,8 @@ import { useParams } from 'common'
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FilesBuckets } from 'components/interfaces/Storage/FilesBuckets'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { StorageUILayout } from 'components/layouts/StorageLayout/StorageBucketsLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { StorageUILayout } from 'components/layouts/StorageLayout/StorageUILayout'
 import type { NextPageWithLayout } from 'types'
 
 const StorageFilesPage: NextPageWithLayout = () => {
