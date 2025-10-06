@@ -41,6 +41,7 @@ export const AUTH_QUERIES = {
         'login', 'user_signedup', 'token_refreshed', 'user_modified',
         'user_recovery_requested', 'user_reauthenticate_requested'
       )
+      and not regexp_contains(metadata.path, "/admin")
       group by timestamp
       order by timestamp desc
     `,
@@ -53,6 +54,7 @@ export const AUTH_QUERIES = {
         'login', 'user_signedup', 'token_refreshed', 'user_modified',
         'user_recovery_requested', 'user_reauthenticate_requested'
       )
+      and not regexp_contains(metadata.path, "/admin")
       group by timestamp
       order by timestamp desc
     `,
