@@ -5,7 +5,7 @@ import { cn, WarningIcon } from 'ui'
 import Panel from 'components/ui/Panel'
 import { ComposedChart } from './ComposedChart'
 
-import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
+import { AnalyticsInterval } from 'data/analytics/constants'
 import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
 import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
@@ -196,8 +196,6 @@ export const useAttributeQueries = (
     ref,
     startDate,
     endDate,
-    interval,
-    databaseIdentifier,
     data,
     isVisible
   )
