@@ -23,7 +23,13 @@ export async function getProjectStorageConfig(
     signal,
   })
 
-  if (error) handleError(error)
+  if (error) {
+    if (error.code === 404) {
+      handleError({ ...error, message: 'Storage configuration not found.' })
+    } else {
+      handleError(error)
+    }
+  }
   return data
 }
 
