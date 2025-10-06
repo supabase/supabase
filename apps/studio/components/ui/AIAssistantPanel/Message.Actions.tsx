@@ -18,11 +18,16 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-export function MessageActions({ children }: PropsWithChildren<{}>) {
+export function MessageActions({
+  children,
+  alwaysShow = false,
+}: PropsWithChildren<{ alwaysShow?: boolean }>) {
   return (
     <div className="flex items-center gap-4 mt-2 mb-1">
       <span className="h-0.5 w-5 bg-muted" />
-      <div className="opacity-0 group-hover:opacity-100 transition-opacity">{children}</div>
+      <div className={cn('group-hover:opacity-100 transition-opacity', !alwaysShow && 'opacity-0')}>
+        {children}
+      </div>
     </div>
   )
 }

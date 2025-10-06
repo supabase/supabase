@@ -10,7 +10,7 @@ import { MessageDisplay } from './Message.Display'
 import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 
 function AssistantMessage({ message }: { message: VercelMessage }) {
-  const { id, variant, state, isLastMessage, readOnly, rating } = useMessageInfoContext()
+  const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
   const { onCancelEdit, onRate } = useMessageActionsContext()
 
   const handleRate = (newRating: 'positive' | 'negative', reason?: string) => {
@@ -28,8 +28,8 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
       <MessageDisplay.MainArea>
         <MessageDisplay.Content message={message} />
       </MessageDisplay.MainArea>
-      {!readOnly && isLastMessage && onRate && (
-        <MessageActions>
+      {!readOnly && isLastMessage && onRate && !isLoading && (
+        <MessageActions alwaysShow>
           <MessageActions.ThumbsUp
             onClick={() => handleRate('positive')}
             isActive={rating === 'positive'}
