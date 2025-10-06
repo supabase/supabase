@@ -7,6 +7,7 @@ import { CreateBucketModal } from 'components/interfaces/Storage/CreateBucketMod
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
 import {
@@ -16,10 +17,9 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import { IS_PLATFORM } from 'lib/constants'
 import { BucketRow } from './BucketRow'
 
-const StorageMenu = () => {
+export const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const { data: projectDetails } = useSelectedProjectQuery()
@@ -169,5 +169,3 @@ const StorageMenu = () => {
     </>
   )
 }
-
-export default StorageMenu

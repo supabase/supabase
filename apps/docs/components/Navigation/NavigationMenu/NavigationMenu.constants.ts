@@ -41,13 +41,13 @@ const {
   'docs:compliance',
   'docs:contribution',
   'docs:fdw',
-  'docs:self-hosting',
   'docs:framework_quickstarts',
   'docs:full_platform',
   'docs:local_development',
   'docs:mobile_tutorials',
   'docs:pgtap',
   'docs:production_checklist',
+  'docs:self-hosting',
   'docs:web_apps',
   'integrations:partners',
   'sdk:csharp',
@@ -2450,8 +2450,6 @@ export const platform: NavMenuConstant = {
           name: 'Manage your usage',
           url: '/guides/platform/manage-your-usage' as `/${string}`,
           items: [
-            { name: 'Usage limits', url: '/guides/platform/usage-limits' as `/${string}` },
-            { name: 'Overages', url: '/guides/platform/overages' as `/${string}` },
             {
               name: 'Compute',
               url: '/guides/platform/manage-your-usage/compute' as `/${string}`,

@@ -9,6 +9,7 @@ import { boolean, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -117,11 +118,10 @@ export const BasicAuthSettingsForm = () => {
       <ScaffoldSectionTitle className="mb-4">User Signups</ScaffoldSectionTitle>
 
       {isError && (
-        <Alert_Shadcn_ variant="destructive">
-          <WarningIcon />
-          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+        <AlertError
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration for hooks"
+        />
       )}
 
       {isPermissionsLoaded && !canReadConfig && (

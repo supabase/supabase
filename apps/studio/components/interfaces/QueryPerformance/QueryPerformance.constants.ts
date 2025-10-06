@@ -62,4 +62,9 @@ export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
     description:
       'An internal role Supabase uses for administrative tasks, such as running upgrades and automations.',
   },
+  {
+    name: 'pgbouncer',
+    description:
+      'PgBouncer is a lightweight connection pooler for PostgreSQL. Available on paid plans only.',
+  },
 ] as const

@@ -50,7 +50,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { InlineLink } from '../InlineLink'
-import SqlWarningAdmonition from '../SqlWarningAdmonition'
+import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 
 type Template = {
   name: string

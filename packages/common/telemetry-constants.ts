@@ -14,6 +14,16 @@ type TelemetryGroups = {
   organization: string
 }
 
+export const TABLE_EVENT_ACTIONS = {
+  TableCreated: 'table_created',
+  TableDataAdded: 'table_data_added',
+  TableRLSEnabled: 'table_rls_enabled',
+} as const
+
+export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
+
+export const TABLE_EVENT_VALUES: TableEventAction[] = Object.values(TABLE_EVENT_ACTIONS)
+
 /**
  * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
  *
@@ -1745,6 +1755,84 @@ export interface HipaaRequestButtonClickedEvent {
 }
 
 /**
+ * User successfully created a table in the project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableCreatedEvent {
+  action: 'table_created'
+  properties: {
+    /**
+     * Method used to create the table
+     */
+    method: 'sql_editor' | 'table_editor'
+    /**
+     * Schema where table was created
+     */
+    schema_name?: string
+    /**
+     * Name of the table created
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User successfully added data to a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableDataAddedEvent {
+  action: 'table_data_added'
+  properties: {
+    /**
+     * Method used to insert data
+     */
+    method: 'sql_editor' | 'table_editor' | 'spreadsheet_import'
+    /**
+     * Schema of the table
+     */
+    schema_name?: string
+    /**
+     * Name of the table
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User successfully enabled RLS on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableRLSEnabledEvent {
+  action: 'table_rls_enabled'
+  properties: {
+    /**
+     * Method used to enable RLS
+     */
+    method: 'sql_editor' | 'table_editor'
+    /**
+     * Schema of the table
+     */
+    schema_name?: string
+    /**
+     * Name of the table
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1851,3 +1939,6 @@ export type TelemetryEvent =
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
+  | TableCreatedEvent
+  | TableDataAddedEvent
+  | TableRLSEnabledEvent
