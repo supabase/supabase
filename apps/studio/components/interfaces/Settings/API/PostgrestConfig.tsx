@@ -84,15 +84,26 @@ export const PostgrestConfig = () => {
 
   const [showModal, setShowModal] = useState(false)
 
-  const { data: config, isError, isLoading } = useProjectPostgrestConfigQuery({ projectRef })
+  const {
+    data: config,
+    isError,
+    isLoading: isLoadingConfig,
+  } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: allSchemas = [], isLoading: isLoadingSchemas } = useSchemasQuery({
+  const {
+    data: allSchemas = [],
+    isLoading: isLoadingSchemas,
+    isSuccess: isSuccessSchemas,
+  } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const isLoading = isLoadingConfig || isLoadingSchemas
+
   const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
@@ -112,9 +123,14 @@ export const PostgrestConfig = () => {
   const defaultValues = {
     dbSchema,
     maxRows: config?.max_rows,
-    dbExtraSearchPath: (config?.db_extra_search_path ?? '').split(',').map((x) => x.trim()),
+    dbExtraSearchPath: (config?.db_extra_search_path ?? '')
+      .split(',')
+      .map((x) => x.trim())
+      .filter((x) => x.length > 0 && allSchemas.find((y) => y.name === x)),
     dbPool: config?.db_pool,
   }
+
+  console.log(config?.db_extra_search_path)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -155,14 +171,14 @@ export const PostgrestConfig = () => {
   }
 
   useEffect(() => {
-    if (config) {
+    if (config && isSuccessSchemas) {
       /**
        * Checks if enableDataApi should be enabled or disabled
        * based on the db_schema value being empty string
        */
       resetForm()
     }
-  }, [config])
+  }, [config, isSuccessSchemas])
 
   const isDataApiEnabledInForm = form.getValues('enableDataApi')
 
