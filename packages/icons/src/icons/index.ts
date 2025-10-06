@@ -3,6 +3,7 @@ export { default as ExampleTemplate } from './_example-template';
 export { default as ApiDocs } from './api-docs';
 export { default as Auth } from './auth';
 export { default as BucketNew } from './bucket-new';
+export { default as Bucket } from './bucket';
 export { default as Database } from './database';
 export { default as Datadog } from './datadog';
 export { default as EdgeFunctions } from './edge-functions';

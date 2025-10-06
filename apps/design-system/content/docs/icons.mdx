@@ -51,22 +51,20 @@ function app() {
 
 To add a new custom icon to the Supabase icon library:
 
-1. **Create SVG file**: Add your SVG file to `packages/icons/src/raw-icons/` with a kebab-case name (e.g., `my-new-icon.svg`)
+1. **Create SVG file**: Add your SVG file to `packages/icons/src/raw-icons/` with a kebab-case name (e.g., `my-new-icon.svg`). Make sure it has follows these exact requirements:
 
-2. **SVG Requirements**:
+   - Exported at 24x24px with `viewBox="0 0 24 24"`
+   - Uses `stroke="currentColor"` for strokes (no hardcoded colors)
+   - Uses `fill="none"` for fills (no hardcoded colors)
+   - Icon content is optically centered and around 18x18px within the 24x24 frame
+   - Any unnecessary elements like `<clipPath>`, `<defs>`, and `<g>` wrappers have been removed
+   - SVG structure is as simple as possible with just `<path>` elements
 
-   - Export as 24x24px with `viewBox="0 0 24 24"`
-   - Use `stroke="currentColor"` for strokes (no hardcoded colors)
-   - Use `fill="none"` for fills (no hardcoded colors)
-   - Keep icon content around 18x18px within the 24x24 frame
-   - Remove unnecessary elements like `<clipPath>`, `<defs>`, and `<g>` wrappers
-   - Keep SVG structure simple with just `<path>` elements
+Just leave attributes like `stroke-width` as they are. The conversion to camel-case (for React compatibility) is handled by the below build process.
 
-You don't need to change SVG attributes to suit React. Just leave attributes like `stroke-width` as they are, not camel-cased.
+2. **Build the component**: Run `npm run build:icons` from inside the `packages/icons` directory
 
-3. **Build the component**: Run `npm run build:icons` in the `packages/icons` directory
-
-4. **Use the icon**: Import and use like any other icon:
+3. **Use the icon**: Import and use like any other icon:
 
    ```jsx
    import { MyNewIcon } from 'icons'

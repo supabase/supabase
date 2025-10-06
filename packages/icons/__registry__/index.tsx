@@ -55,6 +55,16 @@ export const Index: Record<string, any> = [
   jsx: "import { BucketNew } from \"icons\"\n  <BucketNew/>\n  "
 },
 {
+  name: "bucket",
+  componentName: "Bucket",
+  deprecated: false,
+  raw: "import createSupabaseIcon from '../createSupabaseIcon';\n\n/**\n * @component @name Bucket\n * @description Supabase SVG icon component, renders SVG Element with children.\n *\n * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNiA3QzYgNC4yIDguMiAyIDExIDJIMTNDMTUuOCAyIDE4IDQuMiAxOCA3IiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTQuNSAxMUgxOS41IiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNMTggMTFMMTcuMiAyMEMxNy4xIDIxLjEgMTYuMSAyMiAxNSAyMkg5QzcuOSAyMiA2LjkgMjEuMSA2LjggMjBMNiAxMSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==)\n *\n * @param {Object} props - Supabase icons props and any valid SVG attribute\n * @returns {JSX.Element} JSX Element\n *\n */\nconst Bucket = createSupabaseIcon('Bucket', [\n  [\n    'path',\n    {\n      d: 'M6 7C6 4.2 8.2 2 11 2H13C15.8 2 18 4.2 18 7',\n      stroke: 'currentColor',\n      'stroke-width': '1.5',\n      'stroke-linecap': 'round',\n      'stroke-linejoin': 'round',\n      key: '9nyc2k',\n    },\n  ],\n  [\n    'path',\n    {\n      d: 'M4.5 11H19.5',\n      stroke: 'currentColor',\n      'stroke-width': '1.5',\n      'stroke-linecap': 'round',\n      'stroke-linejoin': 'round',\n      key: 'fq7r7q',\n    },\n  ],\n  [\n    'path',\n    {\n      d: 'M18 11L17.2 20C17.1 21.1 16.1 22 15 22H9C7.9 22 6.9 21.1 6.8 20L6 11',\n      stroke: 'currentColor',\n      'stroke-width': '1.5',\n      'stroke-linecap': 'round',\n      'stroke-linejoin': 'round',\n      key: 'nfdgw2',\n    },\n  ],\n]);\n\nexport default Bucket;\n",
+  component: React.lazy(() => import('icons/src/icons/bucket')),
+  import: "import { Bucket } from 'icons'",
+  svg: "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M6 7C6 4.2 8.2 2 11 2H13C15.8 2 18 4.2 18 7\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n<path d=\"M4.5 11H19.5\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n<path d=\"M18 11L17.2 20C17.1 21.1 16.1 22 15 22H9C7.9 22 6.9 21.1 6.8 20L6 11\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>\n",
+  jsx: "import { Bucket } from \"icons\"\n  <Bucket/>\n  "
+},
+{
   name: "database",
   componentName: "Database",
   deprecated: false,
