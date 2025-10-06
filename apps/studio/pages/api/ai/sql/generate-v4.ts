@@ -15,6 +15,7 @@ import {
   GENERAL_PROMPT,
   PG_BEST_PRACTICES,
   RLS_PROMPT,
+  REALTIME_PROMPT,
   SECURITY_PROMPT,
   LIMITATIONS_PROMPT,
 } from 'lib/ai/prompts'
@@ -177,6 +178,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ${PG_BEST_PRACTICES}
       ${RLS_PROMPT}
       ${EDGE_FUNCTION_PROMPT}
+      ${REALTIME_PROMPT}
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
     `
