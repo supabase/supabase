@@ -95,7 +95,7 @@ export const useGettingStartedProgress = (): GettingStartedStatuses => {
     const allowSignupsEnabled = authConfig ? !authConfig.DISABLE_SIGNUP : false
     const emailProviderEnabled = !!authConfig?.EXTERNAL_EMAIL_ENABLED
     const hasConfiguredAuth = allowSignupsEnabled && emailProviderEnabled
-    const hasFirstUser = (usersCountData?.count ?? 0) > 0
+    const hasFirstUser = !!usersCountData && !usersCountData.is_estimate && usersCountData.count > 0
     const hasStorageObjects = (storageTablesData ?? []).some(
       (table) => table.name === 'objects' && Number(table?.live_rows_estimate ?? 0) > 0
     )
