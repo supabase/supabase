@@ -1,3 +1,5 @@
+// Update your AuthRenderers.tsx file:
+
 import { Fragment, useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 import { useParams } from 'common'
@@ -24,17 +26,17 @@ import dayjs from 'dayjs'
 export const SignUpChartRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
-    count: number
+    TotalSignUps: number
   }>
 ) => {
   const total = props.data.reduce((acc, datum) => {
-    return acc + datum.count
+    return acc + (datum.TotalSignUps || 0)
   }, 0)
 
   const { data, error, isError } = useFillTimeseriesSorted(
     props.data,
     'timestamp',
-    'count',
+    'TotalSignUps',
     0,
     props.params?.iso_timestamp_start,
     props.params?.iso_timestamp_end
@@ -62,7 +64,55 @@ export const SignUpChartRenderer = (
       highlightedValue={total}
       className="w-full"
       data={data}
-      yAxisKey="count"
+      yAxisKey="TotalSignUps"
+      xAxisKey="timestamp"
+      displayDateInUtc
+    />
+  )
+}
+
+export const SignInChartRenderer = (
+  props: ReportWidgetProps<{
+    timestamp: string
+    SignInAttempts: number
+  }>
+) => {
+  const total = props.data.reduce((acc, datum) => {
+    return acc + (datum.SignInAttempts || 0)
+  }, 0)
+
+  const { data, error, isError } = useFillTimeseriesSorted(
+    props.data,
+    'timestamp',
+    'SignInAttempts',
+    0,
+    props.params?.iso_timestamp_start,
+    props.params?.iso_timestamp_end
+  )
+
+  if (!!props.error) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve sign in data" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve sign in data</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  }
+
+  return (
+    <BarChart
+      size="small"
+      minimalHeader
+      highlightedValue={total}
+      className="w-full"
+      data={data}
+      yAxisKey="SignInAttempts"
       xAxisKey="timestamp"
       displayDateInUtc
     />
