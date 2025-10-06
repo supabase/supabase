@@ -3,12 +3,10 @@ import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-// import { EmptyBucketState } from 'components/interfaces/Storage/EmptyBucketState'
 import { FilesBuckets } from 'components/interfaces/Storage/FilesBuckets'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { StorageFilesLayout } from 'components/layouts/StorageLayout/StorageFilesLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-// import { useBucketsQuery } from 'data/storage/buckets-query'
 import type { NextPageWithLayout } from 'types'
 
 const StorageFilesPage: NextPageWithLayout = () => {

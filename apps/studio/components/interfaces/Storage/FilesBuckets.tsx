@@ -35,11 +35,17 @@ export const FilesBuckets = () => {
   const [filterString, setFilterString] = useState('')
 
   const { data: buckets = [], isLoading } = useBucketsQuery({ projectRef: ref })
-  const filesBuckets = buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')
-
+  const filesBuckets = buckets
+    .filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')
+    .filter((bucket) =>
+      filterString.length === 0
+        ? true
+        : bucket.name.toLowerCase().includes(filterString.toLowerCase())
+    )
   return (
     <>
-      {!isLoading && filesBuckets.length === 0 ? (
+      {!isLoading &&
+      buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD').length === 0 ? (
         <EmptyBucketState bucketType="files" />
       ) : (
         <div className="pt-12 flex flex-col gap-y-4">
@@ -52,11 +58,7 @@ export const FilesBuckets = () => {
               onChange={(e) => setFilterString(e.target.value)}
               icon={<Search size={12} />}
             />
-            <CreateBucketModal
-              buttonType="primary"
-              buttonClassName="w-fit"
-              label="New file bucket"
-            />
+            <CreateBucketModal buttonType="primary" buttonClassName="w-fit" />
           </div>
 
           {isLoading ? (
@@ -72,6 +74,16 @@ export const FilesBuckets = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {filesBuckets.length === 0 && filterString.length > 0 && (
+                    <TableRow>
+                      <TableCell colSpan={3}>
+                        <p className="text-sm text-foreground">No results found</p>
+                        <p className="text-sm text-foreground-light">
+                          Your search for "{filterString}" did not return any results
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  )}
                   {filesBuckets.map((bucket) => (
                     <TableRow key={bucket.id}>
                       <TableCell>

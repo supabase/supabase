@@ -107,7 +107,7 @@ export const CreateBucketModal = ({
   buttonSize = 'tiny',
   buttonType = 'default',
   buttonClassName,
-  label = 'New bucket',
+  label = 'Create bucket',
 }: CreateBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
