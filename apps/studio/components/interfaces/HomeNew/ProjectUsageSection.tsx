@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { Archive, ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
+import { ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
+import { Bucket } from 'icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -182,7 +183,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'storage',
         title: 'Storage requests',
-        icon: <Archive strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        icon: <Bucket strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/storage/buckets`,
         route: '/logs/storage-logs',
         enabled: storageEnabled,

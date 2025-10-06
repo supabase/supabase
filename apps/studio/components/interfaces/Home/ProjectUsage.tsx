@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import sumBy from 'lodash/sumBy'
-import { Archive, ChevronDown, Database, Key, Zap } from 'lucide-react'
+import { ChevronDown, Database, Key, Zap } from 'lucide-react'
+import { Bucket } from 'icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -252,7 +253,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <Archive strokeWidth={2} size={16} />
+                    <Bucket strokeWidth={2} size={16} />
                   </div>
                 }
                 title="Storage"
