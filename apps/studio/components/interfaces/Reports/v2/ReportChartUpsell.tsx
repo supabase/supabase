@@ -1,8 +1,7 @@
+import { LogChartHandler } from 'components/ui/Charts/LogChartHandler'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 
-import { LogChartHandler } from 'components/ui/Charts/LogChartHandler'
-import { ReportConfig } from 'data/reports/v2/reports.types'
 import { Button, Card, cn } from 'ui'
 
 export function ReportChartUpsell({
@@ -78,7 +77,6 @@ export function ReportChartUpsell({
           label={''}
           startDate={startDate}
           endDate={endDate}
-          interval={'1d'}
           data={demoData as any}
           isLoading={false}
           highlightedValue={0}
