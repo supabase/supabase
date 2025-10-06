@@ -12,7 +12,7 @@ export const OverviewLearnMore = () => {
   const LearnMoreCards = [
     {
       label: 'Docs',
-      title: 'Authentication documentation',
+      title: 'Authentication docs',
       description: 'Read more on authentication and benefits of using Supabase policies.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
@@ -25,7 +25,7 @@ export const OverviewLearnMore = () => {
     },
     {
       label: 'Assistant',
-      title: 'Need help with authentication errors?',
+      title: 'Explain authentication errors',
       description: 'Our Assistant can help you debug and fix authentication errors.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
@@ -40,7 +40,7 @@ export const OverviewLearnMore = () => {
     },
     {
       label: 'Logs',
-      title: 'Dive into our authentication logs',
+      title: 'Authentication logs',
       description:
         'Our authentication logs provide a deeper view into your auth requests and errors.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
