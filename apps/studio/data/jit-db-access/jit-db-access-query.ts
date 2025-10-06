@@ -24,7 +24,7 @@ export async function getJitDbAccessConfiguration(
     if (isNotAvailableError) {
       return {
         appliedSuccessfully: false,
-        state: 'unavailable',
+        state: 'unavailable' as string,
         isUnavailable: true,
       } as const
     } else {
@@ -43,7 +43,7 @@ export const useJitDbAccessQuery = <TData = JitDbAccessData>(
   { enabled = true, ...options }: UseQueryOptions<JitDbAccessData, JitDbAccessError, TData> = {}
 ) =>
   useQuery<JitDbAccessData, JitDbAccessError, TData>(
-    jitDbAccessKeys.list(projectRef),
+    jitDbAccessKeys.status(projectRef),
     ({ signal }) => getJitDbAccessConfiguration({ projectRef }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )

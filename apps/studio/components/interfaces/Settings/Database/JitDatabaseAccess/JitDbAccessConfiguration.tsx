@@ -1,12 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { template } from 'lodash'
-import { Download, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
@@ -14,17 +12,19 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useJitDbAccessQuery } from 'data/jit-db-access/jit-db-access-query'
 import { useJitDbAccessUpdateMutation } from 'data/jit-db-access/jit-db-access-update-mutation'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import MembersView from './JitDbAccessMembersView'
+import { ManageJitAccessPanel } from './ManageJitAccessPanel'
 
 const JitDbAccessConfiguration = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isEnabled, setIsEnabled] = useState(false)
+  const [isSettingAccess, setIsSettingAccess] = useState(false)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const {
     data: jitDbAccessConfiguration,
     isLoading,
@@ -63,14 +63,6 @@ const JitDbAccessConfiguration = () => {
     jitDbAccessConfiguration.isUnavailable
   )
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
-  const hasSSLCertificate =
-    settings?.inserted_at !== undefined && new Date(settings.inserted_at) >= new Date('2021-04-30')
-
-  const { sslCertificateUrl: sslCertificateUrlTemplate } = useCustomContent(['ssl:certificate_url'])
-  const sslCertificateUrl = useMemo(
-    () => template(sslCertificateUrlTemplate ?? '')({ env }),
-    [sslCertificateUrlTemplate, env]
-  )
 
   useEffect(() => {
     if (!isLoading && jitDbAccessConfiguration) {
@@ -90,12 +82,25 @@ const JitDbAccessConfiguration = () => {
   return (
     <div id="jit-db-access-configuration">
       <div className="flex items-center justify-between mb-6">
-        <FormHeader
-          className="mb-0"
-          title="Just-in-time (JIT) database access Configuration"
-          description=""
-        />
+        <FormHeader className="mb-0" title="Just-in-time (JIT) database access" description="" />
         <DocsButton href="https://supabase.com/docs/guides/platform/just-in-time-database-access" />
+        {jitDbAccessConfiguration?.state === 'enabled' && (
+          <ButtonTooltip
+            disabled={!canUpdateJitDbAccess}
+            type="primary"
+            onClick={() => setIsSettingAccess(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateJitDbAccess
+                  ? 'You need additional permissions to update JIT access'
+                  : undefined,
+              },
+            }}
+          >
+            Add JIT access
+          </ButtonTooltip>
+        )}
       </div>
       <FormPanel>
         <FormSection
@@ -105,7 +110,7 @@ const JitDbAccessConfiguration = () => {
               description={
                 <div className="space-y-4">
                   <p className="text-sm text-foreground-light">
-                    Allow Just-in-time (JIT) authenticated connections to your database
+                    Allow just-in-time authenticated connections to your database
                   </p>
                   {isSuccess && !jitDbAccessConfiguration?.appliedSuccessfully && (
                     <Alert
@@ -128,7 +133,7 @@ const JitDbAccessConfiguration = () => {
                 </div>
               }
             >
-              Enabled Just-in-time (JIT) database authentication
+              Enabled just-in-time database authentication
             </FormSectionLabel>
           }
         >
@@ -179,10 +184,13 @@ const JitDbAccessConfiguration = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-end justify-end"></div>
+            <div className="flex items-end justify-end">
+              <MembersView />
+            </div>
           </div>
         )}
       </FormPanel>
+      <ManageJitAccessPanel visible={isSettingAccess} onClose={() => setIsSettingAccess(false)} />
     </div>
   )
 }

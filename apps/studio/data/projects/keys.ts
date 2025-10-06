@@ -27,7 +27,7 @@ export const projectKeys = {
     ['projects', projectRef, 'pause-status'] as const,
 
   orgProjects: (slug: string | undefined) => ['projects', 'org', slug] as const,
-
+  projectmembers: (projectRef: string | undefined) => ['project', projectRef, 'members'] as const,
   // Clone to new project
   listCloneBackups: (projectRef: string | undefined) =>
     ['projects', projectRef, 'clone-backups'] as const,

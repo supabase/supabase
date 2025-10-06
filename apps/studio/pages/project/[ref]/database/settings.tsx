@@ -6,7 +6,7 @@ import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSet
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
-import JitDbAccessConfiguration from 'components/interfaces/Settings/Database/JitDbAccessConfiguration'
+import JitDbAccessConfiguration from 'components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
