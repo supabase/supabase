@@ -2,7 +2,7 @@
 
 Design resources for building consistent user experiences at Supabase.
 
-## Getting Started
+## Getting started
 
 First, make a copy of _.env.local.example_ and name it _env.local_. Then run the development server as described below.
 

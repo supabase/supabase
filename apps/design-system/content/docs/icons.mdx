@@ -81,7 +81,7 @@ Icons should:
 - Have an icon inside that frame that’s around 18x18px(ish)
 - Use clean, simple paths without unnecessary wrapper elements
 
-#### ❌ Bad example
+#### Bad example ❌
 
 Notice the hardcoded colors, unnecessary backgrounds, and complex structure:
 
@@ -93,7 +93,7 @@ Notice the hardcoded colors, unnecessary backgrounds, and complex structure:
 </svg>
 ```
 
-#### ✅ Good example
+#### Good example ✅
 
 Clean structure with `currentColor` and proper attributes:
 
@@ -105,8 +105,16 @@ Clean structure with `currentColor` and proper attributes:
 </svg>
 ```
 
+{/* This is still wrong: */}
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path d="M6 7C6 4.2 8.2 2 11 2H13C15.8 2 18 4.2 18 7" />
+  <path d="M4.5 11H19.5" />
+  <path d="M6 11L6.8 20C6.9 21.1 7.9 22 9 22H12" />
+</svg>
+```
+
 ### Troubleshooting
 
-**Build errors**: If you encounter JSON import errors, remove any `.json` files from `packages/icons/src/raw-icons/` - they're optional and can cause build issues.
-
-**strokeWidth not working**: If your SVG specifies `stroke-width` attributes, they will override the component's `strokeWidth` prop. Remove stroke attributes from individual paths to let the component control them.
+If your SVG specifies `stroke-width` attributes, they will override the component's `strokeWidth` prop. Remove stroke attributes from individual paths to let the component control them.
