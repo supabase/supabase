@@ -23,7 +23,6 @@ import { Dashboards } from 'types'
 import { WarningIcon } from 'ui'
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
-import { startOfDay } from 'date-fns'
 
 interface ChartBlockProps {
   label: string
