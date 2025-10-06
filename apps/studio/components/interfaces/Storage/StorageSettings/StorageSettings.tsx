@@ -82,9 +82,9 @@ export const StorageSettings = () => {
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
   const isListV2UpgradeAvailable =
-    !!config?.capabilities.list_v2 && config.external.upstreamTarget === 'main'
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'main'
   const isListV2Upgrading =
-    !!config?.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
 
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreeTier = organization?.plan.id === 'free'

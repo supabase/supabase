@@ -33,7 +33,7 @@ export const StorageMenu = () => {
     { enabled: showMigrationCallout }
   )
   const isListV2UpgradeAvailable =
-    !!config?.capabilities.list_v2 && config.external.upstreamTarget === 'main'
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'main'
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
 
