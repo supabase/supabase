@@ -12,9 +12,9 @@ import type { NextPageWithLayout } from 'types'
 const FilesSettingsPage: NextPageWithLayout = () => {
   return (
     <ScaffoldSection isFullWidth>
-      <ScaffoldSectionTitle>File settings</ScaffoldSectionTitle>
+      <ScaffoldSectionTitle>Global settings</ScaffoldSectionTitle>
       <ScaffoldSectionDescription>
-        Settings that apply to all file buckets.
+        Set limits or transformations across all file buckets.
       </ScaffoldSectionDescription>
       <StorageSettings />
     </ScaffoldSection>

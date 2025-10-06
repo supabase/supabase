@@ -7,6 +7,8 @@ import { EmptyBucketState } from 'components/interfaces/Storage/EmptyBucketState
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import type { NextPageWithLayout } from 'types'
+import { StorageSpecializedLayout } from 'components/layouts/StorageLayout/StorageSpecializedLayout'
+import { VectorsBuckets } from 'components/interfaces/Storage/VectorsBuckets'
 
 const StorageVectorsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -17,8 +19,11 @@ const StorageVectorsPage: NextPageWithLayout = () => {
     if (!isStorageV2) router.replace(`/project/${ref}/storage`)
   }, [isStorageV2, ref, router])
 
-  // Vectors buckets don't exist yet, so always show empty state
-  return <EmptyBucketState bucketType="vectors" />
+  return (
+    <StorageSpecializedLayout bucketType="vectors">
+      <VectorsBuckets />
+    </StorageSpecializedLayout>
+  )
 }
 
 StorageVectorsPage.getLayout = (page) => (
