@@ -11,19 +11,43 @@ description: Icons make actions and navigation across Supabase easier.
 
 ## Tints
 
-Use classes just like you would for text to tint icons. For example, `text-foreground-muted`.
+Use classes just like you would for [text](color-usage#text) to tint icons. For example:
 
-Destructive actions, such as deleting an API key, don’t need to be [tinted](color-usage#text) with `text-destructive` because there should be a confirmation dialog as a failsafe right after.
+```jsx
+<BucketNew className="text-foreground-muted" />
+```
 
-## UI Icons
+Just like text, don’t tint icons with `text-destructive` for destructive actions. There should be a confirmation dialog right after which can handle the destructive styling.
 
-We rely on Lucide icons for most of our UI icons.
+## UI icons
 
-## Custom Icons
+We rely on [Lucide](https://lucide.dev/icons/) for any standard UI icon needs.
 
-Tap on an icon below to copy the JSX, SVG, or import path.
+## Custom icons
 
-### Adding New Custom Icons
+Create and use custom icons when Lucide doesn’t have the icon you need. Tap on an icon below to copy the JSX, SVG, or import path.
+
+<Icons />
+
+### Usage
+
+```jsx
+import { ReplaceCode, InsertCode, BucketNew } from 'icons'
+
+function app() {
+  return (
+    <>
+      <ReplaceCode className="text-light" strokeWidth={1} size={16} />
+      <InsertCode className="text-light" strokeWidth={1} size={16} />
+      <BucketNew size={24} className="text-foreground-muted" />
+    </>
+  )
+}
+```
+
+**Default props**: All icons have `strokeWidth={2}` and `size={24}` by default. Override these props as needed for your use case.
+
+### Adding new custom icons
 
 To add a new custom icon to the Supabase icon library:
 
@@ -31,7 +55,7 @@ To add a new custom icon to the Supabase icon library:
 
 2. **SVG Requirements**:
 
-   - Export as 24x24px with viewBox="0 0 24 24"
+   - Export as 24x24px with `viewBox="0 0 24 24"`
    - Use `stroke="currentColor"` for strokes (no hardcoded colors)
    - Use `fill="none"` for fills (no hardcoded colors)
    - Keep icon content around 18x18px within the 24x24 frame
@@ -49,10 +73,40 @@ You don't need to change SVG attributes to suit React. Just leave attributes lik
    ;<MyNewIcon size={16} strokeWidth={1} />
    ```
 
-   **Default props**: Icons have `strokeWidth={2}` and `size={24}` by default. You can override these as needed.
+### SVG design guidelines
+
+Icons should:
+
+- Always be exported 24x24px
+- Have an icon inside that frame that’s around 18x18px(ish)
+- Use clean, simple paths without unnecessary wrapper elements
+
+#### ❌ Bad example
+
+Notice the hardcoded colors, unnecessary backgrounds, and complex structure:
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" fill="#1E1E1E" /> <!-- ❌ Hardcoded color -->
+  <path d="M..." fill="#404040" /> <!-- ❌ Hardcoded color -->
+  <path d="M..." stroke="#EDEDED" stroke-linecap="round" /> <!-- ❌ Hardcoded color -->
+</svg>
+```
+
+#### ✅ Good example
+
+Clean structure with `currentColor` and proper attributes:
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 7C6 4.2 8.2 2 11 2H13C15.8 2 18 4.2 18 7" />
+  <path d="M4.5 11H19.5" />
+  <path d="M6 11L6.8 20C6.9 21.1 7.9 22 9 22H12" />
+</svg>
+```
 
 ### Troubleshooting
 
 **Build errors**: If you encounter JSON import errors, remove any `.json` files from `packages/icons/src/raw-icons/` - they're optional and can cause build issues.
 
-<Icons />
+**strokeWidth not working**: If your SVG specifies `stroke-width` attributes, they will override the component's `strokeWidth` prop. Remove stroke attributes from individual paths to let the component control them.
