@@ -11,8 +11,8 @@ const S3SettingsPage: NextPageWithLayout = () => {
 
 S3SettingsPage.getLayout = (page) => (
   <DefaultLayout>
-    <StorageLayout title="S3 Settings">
-      <PageLayout title="S3 Settings">
+    <StorageLayout title="S3 Configuration">
+      <PageLayout title="S3 Configuration">
         <ScaffoldContainer>{page}</ScaffoldContainer>
       </PageLayout>
     </StorageLayout>

@@ -37,7 +37,7 @@ export const StorageMenuV2 = () => {
           {IS_PLATFORM && (
             <Link href={`/project/${ref}/storage/s3`}>
               <Menu.Item rounded active={page === 's3'}>
-                <p className="truncate">S3 Settings</p>
+                <p className="truncate">S3</p>
               </Menu.Item>
             </Link>
           )}
