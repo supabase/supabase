@@ -3,7 +3,6 @@ import type {
   ClaudeCodeMcpConfig,
   McpClient,
   McpFeatureGroup,
-  OtherMcpConfig,
   VSCodeMcpConfig,
   WindsurfMcpConfig,
 } from './types'
@@ -12,7 +11,7 @@ export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
   {
     id: 'docs',
     name: 'Documentation',
-    description: 'Access project documentation and guides',
+    description: 'Access Supabase documentation and guides',
   },
   {
     id: 'account',
