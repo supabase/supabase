@@ -2,10 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
 import { Check, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 
-import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
@@ -15,11 +14,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  TableRow,
-  TableCell,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
@@ -53,7 +52,7 @@ const TriggerList = ({
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()
   )
-  const { can: canUpdateTriggers } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'triggers'
   )

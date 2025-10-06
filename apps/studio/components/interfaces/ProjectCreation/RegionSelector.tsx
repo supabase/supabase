@@ -45,13 +45,7 @@ export const RegionSelector = ({
   )
 
   const { data: availableRegionsData, isLoading: isLoadingAvailableRegions } =
-    useOrganizationAvailableRegionsQuery(
-      {
-        slug,
-        cloudProvider,
-      },
-      { enabled: smartRegionEnabled }
-    )
+    useOrganizationAvailableRegionsQuery({ slug, cloudProvider }, { enabled: smartRegionEnabled })
 
   const smartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []
@@ -87,7 +81,7 @@ export const RegionSelector = ({
         <>
           <p>Select the region closest to your users for the best performance.</p>
           {showNonProdFields && (
-            <div className="mt-2 text-warning-600">
+            <div className="mt-2 text-warning">
               <p>Only these regions are supported for local/staging projects:</p>
               <ul className="list-disc list-inside mt-1">
                 <li>East US (North Virginia)</li>
@@ -154,23 +148,28 @@ export const RegionSelector = ({
                   value={value.name}
                   className="w-full [&>:nth-child(2)]:w-full"
                 >
-                  <div className="flex flex-row items-center justify-between w-full">
+                  <div className="flex flex-row items-center justify-between w-full gap-x-2">
                     <div className="flex items-center gap-x-3">
                       <img
                         alt="region icon"
                         className="w-5 rounded-sm"
                         src={`${BASE_PATH}/img/regions/${value.code}.svg`}
                       />
-                      <span className="text-foreground">{value.name}</span>
+                      <div className="flex items-center gap-x-2">
+                        <span className="text-foreground">{value.name}</span>
+                        <span className="text-xs text-foreground-lighter font-mono">
+                          {value.code}
+                        </span>
+                      </div>
                     </div>
 
-                    <div>
-                      {recommendedSpecificRegions.has(value.code) && (
+                    {recommendedSpecificRegions.has(value.code) && (
+                      <div>
                         <Badge variant="success" className="mr-1">
                           Recommended
                         </Badge>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </SelectItem_Shadcn_>
               )

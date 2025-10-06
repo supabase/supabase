@@ -39,7 +39,7 @@ Create a `.env.local` file in your project root directory.
 Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`:
 
 <ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="anonKey" />
+<ProjectConfigVariables variable="publishableKey" />
 
 </StepHikeCompact.Details>
 
@@ -406,7 +406,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
 </StepHikeCompact.Details>
 
@@ -560,7 +560,7 @@ Create a `.env.local` file in your project root directory.
 Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`:
 
 <ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="anonKey" />
+<ProjectConfigVariables variable="publishableKey" />
 
 </StepHikeCompact.Details>
 
@@ -804,7 +804,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
 </StepHikeCompact.Details>
 
@@ -941,7 +941,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 You can also fetch static data at build time using Supabase. Note that there's no session or user at build time, so the data will be the same for everyone who sees the page.
 
-Add some colors data to your database by running the [Colors Quickstart](https://supabase.com/dashboard/project/_/sql/quickstarts) in the dashboard.
+Add some colors data to your database by running the [Colors Quickstart](/dashboard/project/_/sql/quickstarts) in the dashboard.
 
 Then fetch the colors data using `getStaticProps` with the client from `@/utils/supabase/static-props.ts`.
 

@@ -4,7 +4,7 @@ import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
 import { useParams } from 'common'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
@@ -15,7 +15,7 @@ interface ItemContextMenuProps {
   id: string
 }
 
-const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
+export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   const { ref: projectRef, bucketId } = useParams()
   const snap = useStorageExplorerStateSnapshot()
   const { setSelectedFileCustomExpiry } = snap
@@ -28,7 +28,7 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
   const isPublic = selectedBucket.public
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const onHandleClick = async (event: any, item: StorageItemWithColumn, expiresIn?: number) => {
     if (item.isCorrupted) return
@@ -106,5 +106,3 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     </Menu>
   )
 }
-
-export default ItemContextMenu

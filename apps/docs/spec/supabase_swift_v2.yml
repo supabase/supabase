@@ -931,6 +931,42 @@ functions:
             // custom URL opening logic
           }
           ```
+  - id: link-identity-with-id-token
+    title: 'linkIdentityWithIdToken()'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentityWithIdToken()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentityWithIdToken()` will fail.
+      - This method allows you to link an OIDC identity using an ID token obtained from a provider like Apple, Google, etc.
+    examples:
+      - id: link-identity-with-id-token
+        name: Link an OIDC identity using an ID token
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentityWithIdToken(
+            credentials: OpenIDConnectCredentials(
+              provider: .apple,
+              idToken: idToken
+            )
+          )
+          ```
+        description: |
+          Link an OpenID Connect identity to the current user using an ID token. This is useful when you've obtained an ID token from a provider's SDK (like Sign in with Apple) and want to link it to the current user's account.
+      - id: link-identity-with-id-token-and-nonce
+        name: Link an OIDC identity with nonce
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentityWithIdToken(
+            credentials: OpenIDConnectCredentials(
+              provider: .apple,
+              idToken: idToken,
+              nonce: nonce
+            )
+          )
+          ```
+        description: |
+          For providers that support nonce verification (like Apple), you can include the nonce used during authentication.
   - id: unlink-identity
     title: 'unlinkIdentity()'
     notes: |
@@ -3750,6 +3786,57 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
+  - id: max-affected
+    title: maxAffected()
+    description: |
+      Set the maximum number of rows that can be affected by the query.
+
+      Only available in PostgREST v13+ and only works with PATCH, DELETE methods and RPC calls.
+    notes: |
+      - This method sets `handling=strict` and `max-affected=<value>` headers for row limit enforcement.
+      - Only use with UPDATE (PATCH), DELETE operations, or RPC calls that modify data.
+      - If the query would affect more rows than specified, PostgREST will return an error.
+      - This is useful for preventing accidental bulk updates or deletes.
+    examples:
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```swift
+          try await supabase
+            .from("users")
+            .update(["status": "active"])
+            .eq("id", value: 1)
+            .maxAffected(1)
+            .execute()
+          ```
+        description: |
+          Ensure that only one row is updated. If the query would update more than one row, an error is returned.
+        isSpotlight: true
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```swift
+          try await supabase
+            .from("users")
+            .delete()
+            .in("id", values: [1, 2, 3])
+            .maxAffected(3)
+            .execute()
+          ```
+        description: |
+          Ensure that only three rows are deleted. If the query would delete more than three rows, an error is returned.
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```swift
+          try await supabase
+            .rpc("delete_inactive_users")
+            .maxAffected(10)
+            .execute()
+          ```
+        description: |
+          Ensure that the RPC call affects at most 10 rows. Useful for limiting the impact of stored procedures.
+
   - id: single
     title: single()
     description: |
@@ -4856,7 +4943,7 @@ functions:
         code: |
           ```swift
           let fileData = "Hello World".data(using: .utf8)!
-          
+
           try await supabase.storage
             .from("avatars")
             .uploadToSignedURL(
@@ -4873,7 +4960,7 @@ functions:
         code: |
           ```swift
           let fileURL = URL(fileURLWithPath: "/path/to/file.txt")
-          
+
           try await supabase.storage
             .from("avatars")
             .uploadToSignedURL(

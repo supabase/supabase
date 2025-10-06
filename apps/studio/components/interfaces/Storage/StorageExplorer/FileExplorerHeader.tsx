@@ -1,11 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, debounce, isEqual, noop } from 'lodash'
-import { useCallback, useEffect, useRef, useState } from 'react'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import APIDocsButton from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Check,
   ChevronLeft,
@@ -20,6 +14,12 @@ import {
   Upload,
   X,
 } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -137,10 +137,10 @@ const HeaderBreadcrumbs = ({
 interface FileExplorerHeader {
   itemSearchString: string
   setItemSearchString: (value: string) => void
-  onFilesUpload: (event: any, columnIndex: number) => void
+  onFilesUpload: (event: any, columnIndex?: number) => void
 }
 
-const FileExplorerHeader = ({
+export const FileExplorerHeader = ({
   itemSearchString = '',
   setItemSearchString = noop,
   onFilesUpload = noop,
@@ -179,7 +179,7 @@ const FileExplorerHeader = ({
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
-  const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)
@@ -423,7 +423,6 @@ const FileExplorerHeader = ({
         <div className="h-6 border-r border-control" />
         <div className="flex items-center space-x-1 px-2">
           <div className="hidden">
-            {/* @ts-ignore */}
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
           </div>
           <ButtonTooltip
@@ -505,5 +504,3 @@ const FileExplorerHeader = ({
     </div>
   )
 }
-
-export default FileExplorerHeader

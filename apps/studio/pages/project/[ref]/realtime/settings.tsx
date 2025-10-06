@@ -6,6 +6,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import RealtimeLayout from 'components/layouts/RealtimeLayout/RealtimeLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 
 const RealtimePoliciesPage: NextPageWithLayout = () => {
   return (
@@ -22,9 +23,7 @@ RealtimePoliciesPage.getLayout = (page) => (
         title="Realtime Settings"
         subtitle="Configure your project's Realtime settings"
         // [Joshen] Scaffolding for now - once docs for this is ready
-        primaryActions={
-          <DocsButton href="https://supabase.com/docs/guides/realtime/authorization" />
-        }
+        primaryActions={<DocsButton href={`${DOCS_URL}/guides/realtime/authorization`} />}
       >
         {page}
       </PageLayout>

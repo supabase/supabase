@@ -9,7 +9,8 @@ import { useOrgDailyComputeStatsQuery } from 'data/analytics/org-daily-compute-s
 import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import SectionContent from './SectionContent'
+import { DOCS_URL } from 'lib/constants'
+import { SectionContent } from './SectionContent'
 import { Attribute, AttributeColor } from './Usage.constants'
 import UsageBarChart from './UsageBarChart'
 
@@ -86,11 +87,11 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
             ? [
                 {
                   name: 'Compute Add-ons',
-                  url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+                  url: `${DOCS_URL}/guides/platform/compute-add-ons`,
                 },
                 {
                   name: 'Usage-billing for Compute',
-                  url: 'https://supabase.com/docs/guides/platform/manage-your-usage/compute',
+                  url: `${DOCS_URL}/guides/platform/manage-your-usage/compute`,
                 },
               ]
             : [],

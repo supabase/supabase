@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -13,8 +14,10 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SSLConfiguration = () => {
@@ -42,7 +45,7 @@ const SSLConfiguration = () => {
     }
   )
 
-  const { can: canUpdateSSLEnforcement } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {
@@ -65,6 +68,12 @@ const SSLConfiguration = () => {
   const hasSSLCertificate =
     settings?.inserted_at !== undefined && new Date(settings.inserted_at) >= new Date('2021-04-30')
 
+  const { sslCertificateUrl: sslCertificateUrlTemplate } = useCustomContent(['ssl:certificate_url'])
+  const sslCertificateUrl = useMemo(
+    () => template(sslCertificateUrlTemplate ?? '')({ env }),
+    [sslCertificateUrlTemplate, env]
+  )
+
   useEffect(() => {
     if (!isLoading && sslEnforcementConfiguration) {
       setIsEnforced(initialIsEnforced)
@@ -81,7 +90,7 @@ const SSLConfiguration = () => {
     <div id="ssl-configuration">
       <div className="flex items-center justify-between mb-6">
         <FormHeader className="mb-0" title="SSL Configuration" description="" />
-        <DocsButton href="https://supabase.com/docs/guides/platform/ssl-enforcement" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
       </div>
       <FormPanel>
         <FormSection
@@ -183,11 +192,7 @@ const SSLConfiguration = () => {
               </ButtonTooltip>
             ) : (
               <Button type="default" icon={<Download />}>
-                <a
-                  href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
-                >
-                  Download certificate
-                </a>
+                <a href={sslCertificateUrl}>Download certificate</a>
               </Button>
             )}
           </div>

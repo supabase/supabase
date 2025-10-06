@@ -723,7 +723,7 @@ functions:
         name: Native Facebook Sign in
         description: |
           You can perform native Facebook sign in using [flutter_facebook_auth](https://pub.dev/packages/flutter_facebook_auth).
-          
+
           First, set up your Facebook app in the [Facebook Developer Console](https://developers.facebook.com) and configure it in your Supabase dashboard under `Authentication -> Providers -> Facebook`.
         code: |
           ```dart
@@ -1351,6 +1351,106 @@ functions:
 
           // unlink the google identity
           await supabase.auth.unlinkIdentity(googleIdentity);
+          ```
+  - id: link-identity-with-id-token
+    title: 'linkIdentityWithIdToken()'
+    description: |
+      Links an identity to an existing user using an ID token obtained from a third-party OAuth provider. This allows linking identities using native OAuth flows (Google, Apple, Facebook, etc.) similar to `signInWithIdToken()` but for linking rather than signing in.
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentityWithIdToken()`.
+      - Supports the same OAuth providers as `signInWithIdToken()`: Google, Apple, Facebook, Kakao, and Keycloak.
+      - If the candidate identity is already linked to another user, the operation will fail.
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider to link the identity from.
+      - name: idToken
+        isOptional: false
+        type: String
+        description: The identity token obtained from the third-party provider.
+      - name: accessToken
+        isOptional: true
+        type: String
+        description: Access token obtained from the third-party provider. Required for Google sign in.
+      - name: nonce
+        isOptional: true
+        type: String
+        description: Raw nonce value used to perform the third-party sign in. Required for Apple sign-in.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+    examples:
+      - id: link-google-identity
+        name: Link Google identity
+        isSpotlight: true
+        description: |
+          Link a Google identity to the currently signed-in user using native Google Sign-In.
+        code: |
+          ```dart
+          import 'package:google_sign_in/google_sign_in.dart';
+          import 'package:supabase_flutter/supabase_flutter.dart';
+
+          const webClientId = '<web client ID>';
+          const iosClientId = '<iOS client ID>';
+
+          final GoogleSignIn googleSignIn = GoogleSignIn(
+            clientId: iosClientId,
+            serverClientId: webClientId,
+          );
+          final googleUser = await googleSignIn.signIn();
+          final googleAuth = await googleUser!.authentication;
+          final accessToken = googleAuth.accessToken;
+          final idToken = googleAuth.idToken;
+
+          if (accessToken == null) {
+            throw 'No Access Token found.';
+          }
+          if (idToken == null) {
+            throw 'No ID Token found.';
+          }
+
+          final response = await supabase.auth.linkIdentityWithIdToken(
+            provider: OAuthProvider.google,
+            idToken: idToken,
+            accessToken: accessToken,
+          );
+          ```
+      - id: link-apple-identity
+        name: Link Apple identity
+        description: |
+          Link an Apple identity to the currently signed-in user using native Apple Sign In.
+        code: |
+          ```dart
+          import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+          import 'package:supabase_flutter/supabase_flutter.dart';
+          import 'package:crypto/crypto.dart';
+
+          final rawNonce = supabase.auth.generateRawNonce();
+          final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+          final credential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+            nonce: hashedNonce,
+          );
+
+          final idToken = credential.identityToken;
+          if (idToken == null) {
+            throw const AuthException(
+              'Could not find ID Token from generated credential.',
+            );
+          }
+
+          final response = await supabase.auth.linkIdentityWithIdToken(
+            provider: OAuthProvider.apple,
+            idToken: idToken,
+            nonce: rawNonce,
+          );
           ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
@@ -4917,6 +5017,60 @@ functions:
             }
           ]
           ```
+  - id: max-affected
+    title: maxAffected()
+    description: |
+      Sets the maximum number of rows that can be affected by the query. Only effective with PATCH and DELETE operations. Requires PostgREST v13 or higher.
+
+      When the limit is exceeded, the query will fail with an error. This provides a safety mechanism to prevent accidentally affecting more rows than intended.
+    notes: |
+      - This method is only effective with UPDATE and DELETE operations.
+      - Requires PostgREST v13 or higher on your Supabase instance.
+      - If the number of affected rows exceeds the limit, the query will fail and no rows will be modified.
+    params:
+      - name: count
+        isOptional: false
+        type: int
+        description: The maximum number of rows that can be affected by the query.
+    examples:
+      - id: with-update
+        name: With update()
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase
+            .from('users')
+            .update({'active': false})
+            .eq('status', 'inactive')
+            .maxAffected(5);
+          ```
+        description: |
+          Limit the number of rows that can be updated. If more than 5 rows match the filter, the operation will fail.
+      - id: with-delete
+        name: With delete()
+        code: |
+          ```dart
+          await supabase
+            .from('users')
+            .delete()
+            .eq('active', false)
+            .maxAffected(10);
+          ```
+        description: |
+          Limit the number of rows that can be deleted. If more than 10 rows match the filter, the operation will fail.
+      - id: with-select
+        name: With select()
+        code: |
+          ```dart
+          final data = await supabase
+            .from('users')
+            .update({'status': 'INACTIVE'})
+            .eq('id', 1)
+            .maxAffected(1)
+            .select();
+          ```
+        description: |
+          Combine maxAffected with select() to limit affected rows and return the updated data.
   - id: single
     title: single()
     description: |

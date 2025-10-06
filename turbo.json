@@ -56,6 +56,7 @@
         "NEXT_PUBLIC_IS_PLATFORM",
         "NEXT_PUBLIC_SITE_URL",
         "NEXT_PUBLIC_API_URL",
+        "NEXT_PUBLIC_DOCS_URL",
         "NEXT_PUBLIC_CONFIGCAT_SDK_KEY",
         "NEXT_PUBLIC_CONFIGCAT_PROXY_URL",
         "NEXT_PUBLIC_HCAPTCHA_SITE_KEY",
@@ -77,6 +78,7 @@
         "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
+        "NEXT_PUBLIC_MCP_URL",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
@@ -114,8 +116,11 @@
       "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
+        "CF_ACCESS_CLIENT_ID",
+        "CF_ACCESS_CLIENT_SECRET",
         "CMS_API_KEY",
         "CMS_PREVIEW_SECRET",
+        "CMS_SITE_ORIGIN",
         "NEXT_PUBLIC_MISC_USE_URL",
         "NEXT_PUBLIC_MISC_USE_ANON_KEY",
         "NEXT_PUBLIC_STUDIO_URL",
@@ -165,7 +170,14 @@
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
-        "LUMA_API_KEY"
+        "LUMA_API_KEY",
+        // These env vars are used by some community and marketing integrations
+        "SENTRY_DSN_COMMUNITY",
+        "NOTION_SUPASQUAD_API_KEY",
+        "NOTION_SUPASQUAD_APPLICATIONS_DB_ID",
+        "CUSTOMERIO_SITE_ID",
+        "CUSTOMERIO_API_KEY",
+        "CUSTOMERIO_APP_API_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

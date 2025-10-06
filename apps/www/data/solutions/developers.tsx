@@ -83,18 +83,7 @@ const data: () => {
           foundation for building powerful applications.
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/developers/developers-hero-dark.svg',
-            light: '/images/solutions/developers/developers-hero-light.svg',
-          }}
-          alt="Supabase for Developers"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',
@@ -606,12 +595,12 @@ const data: () => {
         "Supabase ensures optimal database performance at any scale, so you can focus on innovating and growing without worrying about infrastructure limitations — whether you're handling high-traffic applications, complex queries, or massive data volumes.",
       highlights: [
         {
-          heading: 'databases managed',
-          subheading: companyStats.databasesManaged,
+          heading: companyStats.databasesManaged.label,
+          subheading: companyStats.databasesManaged.text,
         },
         {
-          heading: 'databases launched daily',
-          subheading: companyStats.databasesLaunchedDaily,
+          heading: companyStats.databasesLaunchedDaily.label,
+          subheading: companyStats.databasesLaunchedDaily.text,
         },
       ],
     },

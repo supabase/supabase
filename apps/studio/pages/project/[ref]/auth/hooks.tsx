@@ -4,15 +4,19 @@ import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import NoPermission from 'components/ui/NoPermission'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
 const Hooks: NextPageWithLayout = () => {
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's auth hooks" />
@@ -20,13 +24,17 @@ const Hooks: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainer>
-      <HooksListing />
+      {!isPermissionsLoaded ? (
+        <ScaffoldSection isFullWidth>
+          <GenericSkeletonLoader />
+        </ScaffoldSection>
+      ) : (
+        <HooksListing />
+      )}
     </ScaffoldContainer>
   )
 }
-const secondaryActions = [
-  <DocsButton key="docs" href="https://supabase.com/docs/guides/auth/auth-hooks" />,
-]
+const secondaryActions = [<DocsButton key="docs" href={`${DOCS_URL}/guides/auth/auth-hooks`} />]
 
 Hooks.getLayout = (page) => (
   <DefaultLayout>

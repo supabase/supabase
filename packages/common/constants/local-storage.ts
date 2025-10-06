@@ -6,15 +6,16 @@ export const LOCAL_STORAGE_KEYS = {
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
+  PROJECTS_VIEW: 'projects-view',
 
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
-  UI_PREVIEW_REALTIME_SETTINGS: 'supabase-ui-realtime-settings',
   UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
+  UI_PREVIEW_NEW_STORAGE_UI: 'new-storage-ui',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -38,6 +39,7 @@ export const LOCAL_STORAGE_KEYS = {
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
   CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
+  LINTER_SHOW_FOOTER: 'supabase-linter-show-footer',
   // Key to track account deletion requests
   ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
   // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
@@ -107,8 +109,8 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
+  LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
 ]
 
 export function clearLocalStorage() {

@@ -15,7 +15,7 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/migrate.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3030",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "vercel-build": "pnpm migrate && pnpm build",
     "typecheck_IGNORED": "tsc --noEmit"
   },
@@ -56,7 +56,7 @@
     "sharp": "0.32.6",
     "tailwind-merge": "^1.13.2",
     "tsx": "^4.19.3",
-    "typescript": "~5.5.0"
+    "typescript": "catalog:"
   },
   "externals": {
     "sharp": "commonjs sharp"

@@ -8,12 +8,12 @@ import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
-import CustomExpiryModal from './CustomExpiryModal'
-import FileExplorer from './FileExplorer'
-import FileExplorerHeader from './FileExplorerHeader'
-import FileExplorerHeaderSelection from './FileExplorerHeaderSelection'
-import MoveItemsModal from './MoveItemsModal'
-import PreviewPane from './PreviewPane'
+import { CustomExpiryModal } from './CustomExpiryModal'
+import { FileExplorer } from './FileExplorer'
+import { FileExplorerHeader } from './FileExplorerHeader'
+import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
+import { MoveItemsModal } from './MoveItemsModal'
+import { PreviewPane } from './PreviewPane'
 
 interface StorageExplorerProps {
   bucket: Bucket
@@ -126,7 +126,7 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   /** File manipulation methods */
 
-  const onFilesUpload = async (event: any, columnIndex = -1) => {
+  const onFilesUpload = async (event: any, columnIndex: number = -1) => {
     event.persist()
     const items = event.target.files || event.dataTransfer.items
     const isDrop = !isEmpty(get(event, ['dataTransfer', 'items'], []))

@@ -1,11 +1,17 @@
 import Link from 'next/link'
 
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-export const UnknownInterface = ({ urlBack }: { urlBack: string }) => {
+export const UnknownInterface = ({
+  urlBack,
+  fullHeight = true,
+}: {
+  urlBack: string
+  fullHeight?: boolean
+}) => {
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div className={cn('w-full flex items-center justify-center', fullHeight && 'h-full')}>
       <Admonition
         type="note"
         className="max-w-xl"

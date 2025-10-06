@@ -5,6 +5,7 @@ on:
     branches: ['master']
     paths:
       - 'apps/docs/**/*.ts*'
+      - 'apps/docs/spec/**/*.json'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -19,7 +20,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - uses: actions/checkout@v4

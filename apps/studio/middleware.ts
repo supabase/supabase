@@ -13,6 +13,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/title-v2',
   '/ai/onboarding/design',
   '/ai/feedback/classify',
+  '/ai/docs',
   '/get-ip-address',
   '/get-utc-time',
   '/get-deployment-commit',

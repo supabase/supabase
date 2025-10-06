@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { useIsMFAEnabled } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from 'components/interfaces/HomePageActions'
@@ -10,7 +8,6 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
@@ -19,18 +16,11 @@ const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
-  const [search, setSearch] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string[]>([
-    PROJECT_STATUS.ACTIVE_HEALTHY,
-    PROJECT_STATUS.INACTIVE,
-  ])
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
-
   useAutoProjectsPrefetch()
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection isFullWidth>
+    <ScaffoldContainer className="flex-grow flex">
+      <ScaffoldSection isFullWidth className="flex-grow pb-0">
         {disableAccessMfa ? (
           <Admonition type="note" title={`The organization "${org?.name}" has MFA enforced`}>
             <p className="!m-0">
@@ -40,23 +30,11 @@ const ProjectsPage: NextPageWithLayout = () => {
             </p>
           </Admonition>
         ) : (
-          <div className="flex flex-col gap-y-4">
-            <HomePageActions
-              search={search}
-              setSearch={setSearch}
-              filterStatus={filterStatus}
-              setFilterStatus={setFilterStatus}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              showViewToggle={true}
-            />
-
-            <ProjectList
-              search={search}
-              filterStatus={filterStatus}
-              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
-              viewMode={viewMode}
-            />
+          // [Joshen] Very odd, but the h-px here is required for ProjectList to have a max
+          // height based on the remaining space that it can grow to
+          <div className="flex flex-col gap-y-4 flex-grow h-px">
+            <HomePageActions showViewToggle={true} />
+            <ProjectList />
           </div>
         )}
       </ScaffoldSection>

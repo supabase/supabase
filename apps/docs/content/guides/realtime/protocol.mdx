@@ -111,7 +111,7 @@ This is the initial message required to join a channel. The client sends this me
     - `event`: Database change event to listen to, accepts `INSERT`, `UPDATE`, `DELETE`, or `*` to listen to all events.
     - `schema`: Schema of the table to listen to, accepts `*` wildcard to listen to all schemas
     - `table`: Table of the database to listen to, accepts `*` wildcard to listen to all tables
-    - `filter`: Filter to be used when pulling changes from database. Read more about filters in the usage docs for [Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes?queryGroups=language&language=js#filtering-for-specific-changes)
+    - `filter`: Filter to be used when pulling changes from database. Read more about filters in the usage docs for [Postgres Changes](/docs/guides/realtime/postgres-changes?queryGroups=language&language=js#filtering-for-specific-changes)
 - `access_token`: Optional access token for authentication, if not provided, the server will use the default access token.
 
 #### Payload of phx_close
@@ -191,7 +191,7 @@ System messages are sent by the server to inform the client about the status of 
 
 #### Payload of heartbeat
 
-The heartbeat message should be sent at least every 30 seconds to avoid a connection timeout. Payload should be empty object.
+The heartbeat message should be sent at least every 25 seconds to avoid a connection timeout. Payload should be empty object.
 
 #### Payload of access_token
 

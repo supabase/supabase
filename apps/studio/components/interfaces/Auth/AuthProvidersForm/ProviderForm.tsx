@@ -14,7 +14,8 @@ import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -33,12 +34,13 @@ const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
 
 export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
   const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
   const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
 
   const [open, setOpen] = useState(false)
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -62,6 +64,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     )
   }
 
+  const isFreePlan = organization?.plan.id === 'free'
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
@@ -163,7 +166,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       </ResourceItem>
 
       <Sheet open={open} onOpenChange={handleOpenChange}>
-        <SheetContent className="flex flex-col gap-0">
+        <SheetContent size="content" className="flex flex-col gap-0">
           <SheetHeader className="shrink-0 flex items-center gap-4">
             <img
               src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
@@ -191,25 +194,37 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                         title={provider.title}
                         isHookSendSMSEnabled={config.HOOK_SEND_SMS_ENABLED}
                       />
-                      {Object.keys(provider.properties).map((x: string) => (
-                        <FormField
-                          key={x}
-                          name={x}
-                          setFieldValue={setFieldValue}
-                          properties={provider.properties[x]}
-                          formValues={values}
-                          disabled={shouldDisableField(x) || !canUpdateConfig}
-                        />
-                      ))}
+
+                      {Object.keys(provider.properties).map((x: string) => {
+                        const properties = {
+                          ...provider.properties[x],
+                          description:
+                            provider.properties[x].isPaid && isFreePlan
+                              ? `${provider.properties[x].description} Only available on [Pro plan](/org/${organization.slug}/billing?panel=subscriptionPlan) and above.`
+                              : provider.properties[x].description,
+                        }
+                        const isDisabledDueToPlan = properties.isPaid && isFreePlan
+
+                        return (
+                          <FormField
+                            key={x}
+                            name={x}
+                            setFieldValue={setFieldValue}
+                            properties={properties}
+                            formValues={values}
+                            disabled={
+                              shouldDisableField(x) || !canUpdateConfig || isDisabledDueToPlan
+                            }
+                          />
+                        )
+                      })}
 
                       {provider?.misc?.alert && (
                         <Admonition
                           type="warning"
                           title={provider.misc.alert.title}
                           description={
-                            <>
-                              <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                            </>
+                            <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
                           }
                         />
                       )}

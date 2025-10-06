@@ -3,7 +3,7 @@ import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ChevronRight, ChevronsDown, ChevronsUp, Clipboard, Eye, FolderPlus } from 'lucide-react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
@@ -17,18 +17,18 @@ interface ColumnContextMenuProps {
   id: string
 }
 
-const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+export const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
   const {
     columns,
     selectedItems,
     setSelectedItems,
+    setView,
     setSortBy,
     setSortByOrder,
     addNewFolderPlaceholder,
   } = useStorageExplorerStateSnapshot()
 
-  const snap = useStorageExplorerStateSnapshot()
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const onSelectCreateFolder = (columnIndex = -1) => {
     addNewFolderPlaceholder(columnIndex)
@@ -80,10 +80,10 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
         }
         arrow={<ChevronRight size="14" strokeWidth={1} />}
       >
-        <Item onClick={() => snap.setView(STORAGE_VIEWS.COLUMNS)}>
+        <Item onClick={() => setView(STORAGE_VIEWS.COLUMNS)}>
           <span className="ml-2 text-xs">As columns</span>
         </Item>
-        <Item onClick={() => snap.setView(STORAGE_VIEWS.LIST)}>
+        <Item onClick={() => setView(STORAGE_VIEWS.LIST)}>
           <span className="ml-2 text-xs">As list</span>
         </Item>
       </Submenu>
@@ -128,5 +128,3 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
     </Menu>
   )
 }
-
-export default ColumnContextMenu

@@ -1,0 +1,171 @@
+---
+title = "How to delete Vercel linked projects"
+topics = [ "platform" ]
+keywords = [ "vercel", "delete", "marketplace", "projects", "organization" ]
+database_id = "9d08aa12-3456-789a-bcde-f012345678ab"
+
+[api]
+---
+
+When you create Supabase projects through the Vercel Marketplace, complete deletion requires action on both platforms.
+
+## Deleting projects
+
+### Method 1: Delete from Supabase first, then clean up in Vercel
+
+This method requires two steps - first delete in Supabase, then clean up in Vercel.
+
+1. **Delete from Supabase Dashboard**
+
+   Go to your [project settings](/dashboard/project/_/settings/general) and click **"Delete project"**. This permanently removes your database and marks it as "uninstalled" in Vercel.
+
+   <Image
+     alt="Delete project button in Supabase project settings"
+     src="/docs/img/troubleshooting/54428354-a1f4-4c44-bd03-d87f4b925d94.png"
+     zoomable
+   />
+
+2. **Clean up in Vercel**
+
+   After deleting from Supabase, clean up in Vercel:
+
+   - Navigate to your [Vercel dashboard](https://vercel.com/dashboard)
+   - Go to the **Storage** tab
+   - Click on the Supabase project (it will show as "uninstalled")
+
+   <Image
+     alt="Uninstalled Supabase project in Vercel Storage"
+     src="/docs/img/troubleshooting/cf450bca-aad3-4783-ae3b-5cc83e0afa54.png"
+     zoomable
+   />
+
+   - Scroll down and find the **Settings** tab in the sidebar
+
+   <Image
+     alt="Vercel project settings navigation"
+     src="/docs/img/troubleshooting/da70bc33-f123-4567-8901-abcdef123456.png"
+     zoomable
+   />
+
+   - Click **Delete Database** to completely remove it
+
+   <Image
+     alt="Delete Database button in Vercel settings"
+     src="/docs/img/troubleshooting/c4e7b193-4567-8901-abcd-ef1234567890.png"
+     zoomable
+   />{' '}
+
+### Method 2: Delete directly from Vercel (removes from both platforms)
+
+This method deletes the project from both Vercel and Supabase in one action.
+
+1. **Open Vercel dashboard**
+
+   Navigate to your [Vercel dashboard](https://vercel.com/dashboard) and go to the **Storage** tab.
+
+2. **Select your project**
+
+   Click on your Supabase project to open it.
+
+3. **Navigate to Settings**
+
+   Find and click the **Settings** tab in the sidebar.
+
+   <Image
+     alt="Vercel project settings navigation"
+     src="/docs/img/troubleshooting/da70bc33-f123-4567-8901-abcdef123456.png"
+     zoomable
+   />
+
+4. **Delete the project**
+
+   Scroll down and click **Delete Database**. This removes the project from both Vercel and Supabase simultaneously.
+
+   <Image
+     alt="Delete Database button in Vercel settings"
+     src="/docs/img/troubleshooting/c4e7b193-4567-8901-abcd-ef1234567890.png"
+     zoomable
+   />
+
+## Transferring projects from Vercel organizations
+
+<Admonition type="note">
+
+**Important:** You cannot directly "unlink" a project from a Vercel organization. Instead, you need to transfer the project to another organization.
+
+</Admonition>
+
+If you want to move a Vercel-linked project to a different organization:
+
+1. **Transfer the project**
+
+   Go to your [project settings](/dashboard/project/_/settings/general) and look for **"Transfer Project"**. Transfer your project to a different organization.
+
+   <Image
+     alt="Transfer project option in Supabase project settings"
+     src="/docs/img/troubleshooting/627c1a3e-153e-40b5-9a91-a4f7bd7673a4.png"
+     zoomable
+   />
+
+   Note: The owner must be a member of both the source and target organizations. Transferring a Vercel-managed project will remove its linked Vercel storage from your team.
+
+2. **Clean up in Vercel**
+
+   After transferring, the project will show as "uninstalled" in Vercel but still appear under Storage. You need to manually delete it:
+
+   - Navigate to your [Vercel dashboard](https://vercel.com/dashboard)
+   - Go to the **Storage** tab
+   - Click on the Supabase project (it will show as "uninstalled")
+   - Go to **Settings** and click **Delete Database**
+
+3. **Reconnect if needed**
+
+   To reconnect the transferred project after the transfer, use the standard Vercel integration.
+
+## Deleting the organization
+
+<Admonition type="caution">
+
+Delete all associated projects before deleting the organization.
+
+</Admonition>
+
+1. **Navigate to organization settings and delete**
+
+   Go to your [organization settings](/dashboard/org/_/general) and click **"Delete organization in Vercel Marketplace"**. This opens the Vercel settings page.
+
+   <Image
+     alt="Delete organization in Vercel Marketplace button"
+     src="/docs/img/troubleshooting/ff01bba8-abcd-ef12-3456-7890abcdef12.png"
+     zoomable
+   />
+
+2. **Uninstall integration**
+
+   Scroll down and click **Uninstall Integration** to fully remove the organization and disconnect it from Vercel.
+
+   <Image
+     alt="Uninstall Integration button in Vercel settings"
+     src="/docs/img/troubleshooting/f294a4d6-ef12-3456-7890-abcdef123456.png"
+     zoomable
+   />
+
+## Important notes
+
+- Projects created through Vercel Marketplace can be deleted from either platform (Supabase or Vercel), with cleanup required on Vercel if deleting from Supabase first.
+- Deletion permanently removes all project data.
+- After uninstalling the integration, non-Vercel users invited to the organization retain their access.
+
+## Troubleshooting
+
+If you encounter issues:
+
+1. Verify you have necessary permissions in both platforms
+2. Refresh your browser and retry
+3. Ensure all projects are deleted before deleting the organization
+4. [Contact support](/dashboard/support/new) if problems persist
+
+## Related resources
+
+- [Vercel Marketplace integration guide](/docs/guides/integrations/vercel-marketplace)
+- [Managing Supabase organizations](/docs/guides/platform/access-control)

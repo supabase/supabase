@@ -16,6 +16,7 @@ import { BASE_PATH } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 import { newEditLink } from './GuidesMdx.template'
+import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
 
 const PUBLISHED_SECTIONS = [
   'ai',
@@ -42,6 +43,8 @@ const PUBLISHED_SECTIONS = [
 const getGuidesMarkdownInternal = async (slug: string[]) => {
   const relPath = slug.join(sep).replace(/\/$/, '')
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
+  const guidesPath = `/guides/${slug.join('/')}`
+
   /**
    * SAFETY CHECK:
    * Prevent accessing anything outside of published sections and GUIDES_DIRECTORY
@@ -50,6 +53,15 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
     !fullPath.startsWith(GUIDES_DIRECTORY) ||
     !PUBLISHED_SECTIONS.some((section) => relPath.startsWith(section))
   ) {
+    notFound()
+  }
+
+  /**
+   * DISABLED PAGE CHECK:
+   * Check if this page is disabled in the navigation configuration
+   */
+  if (!checkGuidePageEnabled(guidesPath)) {
+    console.log('Page is disabled: %s', guidesPath)
     notFound()
   }
 
@@ -121,12 +133,25 @@ const genGuidesStaticParams = (directory?: string) => async () => {
           )
       )
 
+  // Flattening earlier will not work because there is nothing to flatten
+  // until the promises resolve.
+  const allParams = (await Promise.all(promises)).flat()
+
   /**
-   * Flattening earlier will not work because there is nothing to flatten
-   * until the promises resolve.
+   * Filter out disabled pages from static generation
    */
-  const result = (await Promise.all(promises)).flat()
-  return result
+  const enabledParams = allParams.filter((param) => {
+    const guidesPath = `/guides/${directory ? `${directory}/` : ''}${param.slug.join('/')}`
+    const isEnabled = checkGuidePageEnabled(guidesPath)
+
+    if (!isEnabled) {
+      console.log('Excluding disabled page from static generation: %s', guidesPath)
+    }
+
+    return isEnabled
+  })
+
+  return enabledParams
 }
 
 const genGuideMeta =

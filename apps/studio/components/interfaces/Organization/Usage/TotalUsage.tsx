@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { useBreakpoint } from 'common'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
@@ -10,11 +11,12 @@ import {
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
-import BillingMetric from '../BillingSettings/BillingBreakdown/BillingMetric'
-import ComputeMetric from '../BillingSettings/BillingBreakdown/ComputeMetric'
-import SectionContent from './SectionContent'
+import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
+import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
+import { SectionContent } from './SectionContent'
 
 export interface ComputeProps {
   orgSlug: string
@@ -41,6 +43,7 @@ export const TotalUsage = ({
   endDate,
   currentBillingCycleSelected,
 }: ComputeProps) => {
+  const isMobile = useBreakpoint('md')
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
@@ -123,7 +126,7 @@ export const TotalUsage = ({
             ? [
                 {
                   name: 'How billing works',
-                  url: 'https://supabase.com/docs/guides/platform/billing-on-supabase',
+                  url: `${DOCS_URL}/guides/platform/billing-on-supabase`,
                 },
                 {
                   name: 'Supabase Plans',
@@ -184,16 +187,12 @@ export const TotalUsage = ({
                 )}
               </p>
             )}
-            <div className="grid grid-cols-12 mt-3">
+            <div className="grid grid-cols-2 mt-3 gap-[1px] bg-border">
               {sortedBillingMetrics.map((metric, i) => {
                 return (
                   <div
-                    className={cn(
-                      'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                      i % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
-                      'border-b'
-                    )}
                     key={metric.key}
+                    className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
                   >
                     <BillingMetric
                       idx={i}
@@ -202,35 +201,41 @@ export const TotalUsage = ({
                       usage={usage}
                       subscription={subscription!}
                       relativeToSubscription={showRelationToSubscription}
+                      className={cn(i % 2 === 0 ? 'md:pr-4' : 'md:pl-4')}
                     />
                   </div>
                 )
               })}
 
-              {computeMetrics.map((metric, i) => (
-                <div
-                  className={cn(
-                    'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                    (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
-                    'border-b'
-                  )}
-                  key={metric}
-                >
-                  <ComputeMetric
-                    slug={orgSlug}
-                    metric={{
-                      key: metric,
-                      name: computeUsageMetricLabel(metric) + ' Compute Hours' || metric,
-                      units: 'hours',
-                      anchor: 'compute',
-                      category: 'Compute',
-                      unitName: 'GB',
-                    }}
-                    relativeToSubscription={showRelationToSubscription}
-                    usage={usage}
-                  />
-                </div>
-              ))}
+              {computeMetrics.map((metric, i) => {
+                return (
+                  <div
+                    key={metric}
+                    className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
+                  >
+                    <ComputeMetric
+                      slug={orgSlug}
+                      metric={{
+                        key: metric,
+                        name: computeUsageMetricLabel(metric) + ' Compute Hours' || metric,
+                        units: 'hours',
+                        anchor: 'compute',
+                        category: 'Compute',
+                        unitName: 'GB',
+                      }}
+                      relativeToSubscription={showRelationToSubscription}
+                      usage={usage}
+                      className={cn(
+                        (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
+                      )}
+                    />
+                  </div>
+                )
+              })}
+
+              {!isMobile && (sortedBillingMetrics.length + computeMetrics.length) % 2 === 1 && (
+                <div className="col-span-2 md:col-span-1 bg-sidebar" />
+              )}
             </div>
           </div>
         )}

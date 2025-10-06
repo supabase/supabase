@@ -8,11 +8,12 @@ import { toast } from 'sonner'
 import * as yup from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -27,7 +28,6 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Switch,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { urlRegex } from '../Auth.constants'
@@ -45,7 +45,7 @@ interface SmtpFormValues {
   ENABLE_SMTP: boolean
 }
 
-const SmtpForm = () => {
+export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
@@ -53,11 +53,11 @@ const SmtpForm = () => {
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [hidden, setHidden] = useState(true)
 
-  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -179,298 +179,295 @@ const SmtpForm = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
     )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view SMTP settings" />
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view SMTP settings" />
+      </ScaffoldSection>
+    )
   }
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection isFullWidth>
-        <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <Card>
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="ENABLE_SMTP"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Enable Custom SMTP"
-                      description={
-                        <p className="max-w-full prose text-sm text-foreground-lighter">
-                          Emails will be sent using your custom SMTP provider. Email rate limits can
-                          be adjusted{' '}
-                          <Link
-                            className="underline"
-                            href={`/project/${projectRef}/auth/rate-limits`}
-                          >
-                            here
-                          </Link>
-                          .
-                        </p>
-                      }
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-
-                {enableSmtp && !isSmtpEnabled(form.getValues() as any) && (
-                  <div className="mt-4">
-                    <Alert_Shadcn_ variant="warning">
-                      <AlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        The following fields must be filled before custom SMTP can be properly
-                        enabled
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  </div>
+    <ScaffoldSection isFullWidth>
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Card>
+            <CardContent>
+              <FormField_Shadcn_
+                control={form.control}
+                name="ENABLE_SMTP"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Enable Custom SMTP"
+                    description={
+                      <p className="max-w-full prose text-sm text-foreground-lighter">
+                        Emails will be sent using your custom SMTP provider. Email rate limits can
+                        be adjusted{' '}
+                        <Link
+                          className="underline"
+                          href={`/project/${projectRef}/auth/rate-limits`}
+                        >
+                          here
+                        </Link>
+                        .
+                      </p>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!canUpdateConfig}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
                 )}
-              </CardContent>
+              />
 
-              {enableSmtp && (
-                <>
-                  <CardContent className="py-6">
-                    <div className="grid grid-cols-12 gap-6">
-                      <div className="col-span-4">
-                        <h3 className="text-sm mb-1">Sender details</h3>
-                        <p className="text-sm text-foreground-lighter">
-                          Configure the sender information for your emails.
-                        </p>
-                      </div>
-                      <div className="col-span-8 space-y-4">
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="SMTP_ADMIN_EMAIL"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Sender email"
-                              description="This is the email address the emails are sent from"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  placeholder="noreply@yourdomain.com"
-                                  disabled={!canUpdateConfig}
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
+              {enableSmtp && !isSmtpEnabled(form.getValues() as any) && (
+                <div className="mt-4">
+                  <Alert_Shadcn_ variant="warning">
+                    <AlertTriangle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      The following fields must be filled before custom SMTP can be properly enabled
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                </div>
+              )}
+            </CardContent>
 
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="SMTP_SENDER_NAME"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Sender name"
-                              description="Name displayed in the recipient's inbox"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  placeholder="The name shown on the email"
-                                  disabled={!canUpdateConfig}
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
+            {enableSmtp && (
+              <>
+                <CardContent className="py-6">
+                  <div className="grid grid-cols-12 gap-6">
+                    <div className="col-span-4">
+                      <h3 className="text-sm mb-1">Sender details</h3>
+                      <p className="text-sm text-foreground-lighter">
+                        Configure the sender information for your emails.
+                      </p>
                     </div>
-                  </CardContent>
-
-                  <CardContent className="py-6">
-                    <div className="grid grid-cols-12 gap-6">
-                      <div className="col-span-4">
-                        <h3 className="text-sm mb-1">SMTP Provider Settings</h3>
-                        <p className="text-sm text-foreground-lighter">
-                          Your SMTP Credentials will always be encrypted in our database.
-                        </p>
-                      </div>
-                      <div className="col-span-8 space-y-4">
-                        {form.watch('SMTP_HOST')?.endsWith('.gmail.com') && (
-                          <Alert_Shadcn_ variant="warning" className="mb-4">
-                            <AlertTriangle strokeWidth={2} />
-                            <AlertTitle_Shadcn_>Check your SMTP provider</AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_>
-                              Not all SMTP providers are designed for the email sending required by
-                              Supabase Auth. It looks like the SMTP provider you entered is designed
-                              for sending personal email messages and not for sending transactional
-                              messages. Although you can ignore this warning, email deliverability
-                              may be impacted.
-                            </AlertDescription_Shadcn_>
-                          </Alert_Shadcn_>
+                    <div className="col-span-8 space-y-4">
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="SMTP_ADMIN_EMAIL"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Sender email"
+                            description="This is the email address the emails are sent from"
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                placeholder="noreply@yourdomain.com"
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
                         )}
+                      />
 
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="SMTP_HOST"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Host"
-                              description="Hostname or IP address of your SMTP server."
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  placeholder="your.smtp.host.com"
-                                  disabled={!canUpdateConfig}
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="SMTP_SENDER_NAME"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Sender name"
+                            description="Name displayed in the recipient's inbox"
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                placeholder="The name shown on the email"
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
 
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="SMTP_PORT"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Port number"
-                              description={
-                                <>
-                                  <span className="block">
-                                    Port used by your SMTP server. Common ports include 25, 465, and
-                                    587.{' '}
-                                  </span>
-                                  <span className="mt-2 block">
-                                    Avoid using port 25 as modern SMTP email clients shouldn't use
-                                    this port, it is traditionally blocked by residential ISPs and
-                                    Cloud Hosting Providers, to curb the amount of spam.
-                                  </span>
-                                </>
-                              }
-                            >
-                              <FormControl_Shadcn_>
+                <CardContent className="py-6">
+                  <div className="grid grid-cols-12 gap-6">
+                    <div className="col-span-4">
+                      <h3 className="text-sm mb-1">SMTP Provider Settings</h3>
+                      <p className="text-sm text-foreground-lighter">
+                        Your SMTP Credentials will always be encrypted in our database.
+                      </p>
+                    </div>
+                    <div className="col-span-8 space-y-4">
+                      {form.watch('SMTP_HOST')?.endsWith('.gmail.com') && (
+                        <Alert_Shadcn_ variant="warning" className="mb-4">
+                          <AlertTriangle strokeWidth={2} />
+                          <AlertTitle_Shadcn_>Check your SMTP provider</AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            Not all SMTP providers are designed for the email sending required by
+                            Supabase Auth. It looks like the SMTP provider you entered is designed
+                            for sending personal email messages and not for sending transactional
+                            messages. Although you can ignore this warning, email deliverability may
+                            be impacted.
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
+
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="SMTP_HOST"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Host"
+                            description="Hostname or IP address of your SMTP server."
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                placeholder="your.smtp.host.com"
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="SMTP_PORT"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Port number"
+                            description={
+                              <>
+                                <span className="block">
+                                  Port used by your SMTP server. Common ports include 25, 465, and
+                                  587.{' '}
+                                </span>
+                                <span className="mt-2 block">
+                                  Avoid using port 25 as modern SMTP email clients shouldn't use
+                                  this port, it is traditionally blocked by residential ISPs and
+                                  Cloud Hosting Providers, to curb the amount of spam.
+                                </span>
+                              </>
+                            }
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                type="number"
+                                value={field.value}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                placeholder="587"
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="SMTP_MAX_FREQUENCY"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Minimum interval between emails being sent"
+                            description="How long between each email can a new email be sent via your SMTP server."
+                          >
+                            <FormControl_Shadcn_>
+                              <PrePostTab postTab="seconds">
                                 <Input_Shadcn_
                                   type="number"
                                   value={field.value}
                                   onChange={(e) => field.onChange(Number(e.target.value))}
-                                  placeholder="587"
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
+                              </PrePostTab>
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
 
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="SMTP_MAX_FREQUENCY"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Minimum interval between emails being sent"
-                              description="How long between each email can a new email be sent via your SMTP server."
-                            >
-                              <FormControl_Shadcn_>
-                                <PrePostTab postTab="seconds">
-                                  <Input_Shadcn_
-                                    type="number"
-                                    value={field.value}
-                                    onChange={(e) => field.onChange(Number(e.target.value))}
-                                    disabled={!canUpdateConfig}
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="SMTP_USER"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Username"
+                            description="Username for your SMTP server"
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                placeholder="SMTP Username"
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="SMTP_PASS"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Password"
+                            description="For security reasons, the password is write-only. Once saved, it cannot be retrieved or displayed."
+                          >
+                            <FormControl_Shadcn_>
+                              <PrePostTab
+                                postTab={
+                                  <Button
+                                    type="text"
+                                    className="p-0"
+                                    onClick={() => setHidden(!hidden)}
+                                    icon={hidden ? <Eye /> : <EyeOff />}
                                   />
-                                </PrePostTab>
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="SMTP_USER"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Username"
-                              description="Username for your SMTP server"
-                            >
-                              <FormControl_Shadcn_>
+                                }
+                              >
                                 <Input_Shadcn_
                                   {...field}
-                                  placeholder="SMTP Username"
+                                  type={hidden ? 'password' : 'text'}
+                                  placeholder={
+                                    authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'
+                                  }
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="SMTP_PASS"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Password"
-                              description="For security reasons, the password is write-only. Once saved, it cannot be retrieved or displayed."
-                            >
-                              <FormControl_Shadcn_>
-                                <PrePostTab
-                                  postTab={
-                                    <Button
-                                      type="text"
-                                      className="p-0"
-                                      onClick={() => setHidden(!hidden)}
-                                      icon={hidden ? <Eye /> : <EyeOff />}
-                                    />
-                                  }
-                                >
-                                  <Input_Shadcn_
-                                    {...field}
-                                    type={hidden ? 'password' : 'text'}
-                                    placeholder={
-                                      authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'
-                                    }
-                                    disabled={!canUpdateConfig}
-                                  />
-                                </PrePostTab>
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
+                              </PrePostTab>
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
                     </div>
-                  </CardContent>
-                </>
-              )}
+                  </div>
+                </CardContent>
+              </>
+            )}
 
-              <CardFooter className="justify-end space-x-2">
-                {form.formState.isDirty && (
-                  <Button type="default" onClick={() => form.reset()}>
-                    Cancel
-                  </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isUpdatingConfig}
-                  disabled={!canUpdateConfig || !form.formState.isDirty}
-                >
-                  Save changes
+            <CardFooter className="justify-end space-x-2">
+              {form.formState.isDirty && (
+                <Button type="default" onClick={() => form.reset()}>
+                  Cancel
                 </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+              )}
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isUpdatingConfig}
+                disabled={!canUpdateConfig || !form.formState.isDirty}
+              >
+                Save changes
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+      </Form_Shadcn_>
+    </ScaffoldSection>
   )
 }
-
-export default SmtpForm

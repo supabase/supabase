@@ -8,15 +8,16 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
-import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
+import { GridHeaderActions } from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
@@ -47,7 +48,7 @@ export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
   <>
     Sorry! We're unable to support exporting row counts larger than $
     {MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment. Alternatively, you may consider using
-    <Link href="https://supabase.com/docs/reference/cli/supabase-db-dump" target="_blank">
+    <Link href={`${DOCS_URL}/reference/cli/supabase-db-dump`} target="_blank">
       pg_dump
     </Link>{' '}
     via our CLI instead.
@@ -56,9 +57,10 @@ export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
 
 export type HeaderProps = {
   customHeader: ReactNode
+  isRefetching: boolean
 }
 
-const Header = ({ customHeader }: HeaderProps) => {
+export const Header = ({ customHeader, isRefetching }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
 
   return (
@@ -71,13 +73,11 @@ const Header = ({ customHeader }: HeaderProps) => {
         ) : (
           <DefaultHeader />
         )}
-        <GridHeaderActions table={snap.originalTable} />
+        <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
       </div>
     </div>
   )
 }
-
-export default Header
 
 const DefaultHeader = () => {
   const { ref: projectRef } = useParams()
@@ -85,7 +85,7 @@ const DefaultHeader = () => {
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
-  const { can: canCreateColumns } = useAsyncCheckProjectPermissions(
+  const { can: canCreateColumns } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'columns'
   )

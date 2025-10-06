@@ -1,116 +1,92 @@
 ---
-id: 'channels'
+id: 'concepts'
 title: 'Realtime Concepts'
-description: 'Learn about Channels and other extensions in Supabase Realtime'
-subtitle: 'Learn about Channels and other extensions in Supabase Realtime'
-sidebar_label: 'Concepts'
+description: 'Useful concepts to understand Realtime and how it works'
 ---
 
-You can use Supabase Realtime to build real-time applications with collaborative/multiplayer functionality. It includes 3 core extensions:
+## Concepts
 
-- [Broadcast](/docs/guides/realtime/broadcast): sends rapid, ephemeral messages to other connected clients. You can use it to track mouse movements, for example.
-- [Presence](/docs/guides/realtime/presence): sends user state between connected clients. You can use it to show an "online" status, which disappears when a user is disconnected.
-- [Postgres Changes](/docs/guides/realtime/postgres-changes): receives database changes in real-time.
+There are several concepts and terminology that is useful to understand how Realtime works.
+
+- **Channels**: the foundation of Realtime. Think of them as rooms where clients can communicate and listen to events. Channels are identified by a topic name and if they are public or private.
+- **Topics**: the name of the channel. They are used to identify the channel and are a string used to identify the channel.
+- **Events**: the type of messages that can be sent and received.
+- **Payload**: the actual data that is sent and received and that the user will act upon.
+- **Concurrent Connections**: number of total channels subscribed for all clients.
 
 ## Channels
 
-A Channel is the basic building block of Realtime. You can think of a Channel as a chatroom, similar to a Discord or Slack channel, where participants are able to see who's online and send and receive messages.
+Channels are the foundation of Realtime. Think of them as rooms where clients can communicate and listen to events. Channels are identified by a topic name and if they are public or private.
 
-When you initialize your Supabase Realtime client, you define a `topic` that uniquely references a channel. Clients can bi-directionally send and receive messages over a Channel.
+For private channels, you need to use [Realtime Authorization](/docs/guides/realtime/authorization) to control access to the channel and if they are able to send messages.
+For public channels, any user can subscribe to the channel, send and receive messages.
 
-```js
-import { createClient } from '@supabase/supabase-js'
+You can set your project to use only private channels or both private and public channels in the [Realtime Settings](/docs/guides/realtime/settings).
 
-const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
+<Admonition type="note">
 
-const roomOne = supabase.channel('room-one') // set your topic here
-```
+If you have a private channel and a public channel with the same topic name, Realtime sees them as unique channels and won't send messages between them.
 
-## Authorization
+</Admonition>
 
-Authorization is done via RLS policies against the table `realtime.messages` which will determine if a user can connect to a Channel and if they are allowed to send messages to a Channel.
+## Database resources
 
-By default, channels are public and you need to set that you want to use a private channel.
+Realtime uses several database connections to perform several operations. As a user, you are able to tune some of them using [Realtime Settings](/docs/guides/realtime/settings).
 
-```js
-import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
-const roomOne = supabase.channel('private-room-one', { config: { private: true } })
-```
+### Database connections
 
-## Broadcast
+Realtime uses several database connections to do several operations. Some of them, as a user, you are able to tune them.
 
-Realtime Broadcast follows the [publish-subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where a client publishes messages to a channel based on a unique topic. For example, a user could send a message to a channel with topic `room-one`.
+The connections are:
 
-```js
-import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
-const roomOne = supabase.channel('room-one') // set your topic here
+- **Migrations**: Two temporary connections to run database migrations when needed
+- **Authorization**: Configurable connection pool to check authorization policies on join
+- **Postgres Changes**: 3 connection pools required
+  - **Subscription management**: To manage the subscribers to Postgres Changes
+  - **Subscription cleanup**: To cleanup the subscribers to Postgres Changes
+  - **WAL pull**: To pull the changes from the database
 
-// ---cut---
-roomOne.send({
-  type: 'broadcast',
-  event: 'test',
-  payload: { message: 'hello, world' },
-})
-```
+The number of connections varies based on the instance size and your configuration in [Realtime Settings](/docs/guides/realtime/settings).
 
-Other clients can receive the message in real-time by subscribing to the Channel with topic `room-one`. These clients continue to receive messages as long as they are subscribed and connected to the same Channel topic.
+### Replication slots
 
-You can also use [Broadcast using the REST API](https://supabase.com/docs/guides/realtime/broadcast#broadcast-using-the-rest-api) and [Broadcast using the Database](/docs/guides/realtime/broadcast#broadcast-using-the-database) to send messages to a Channel which allows you to do more advanced use-cases.
+Realtime also uses, at maximum, 2 replication slots.
 
-An example use-case is sharing a user's cursor position with other clients in an online game.
+- **Broadcast from database**: To broadcast the changes from the database to the clients
+- **Postgres Changes**: To listen to changes from the database
 
-## Presence
+### Schema and tables
 
-Presence can be used to share an individual's state with others within a Channel.
+The `realtime` schema creates the following tables:
 
-```js
-import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
-const roomOne = supabase.channel('room-one') // set your topic here
+- `schema_migrations` - To track the migrations that have been run on the database from Realtime
+- `subscription` - Track the subscribers to Postgres Changes
+- `messages` - Partitioned table per day that's used for Authorization and Broadcast from database
+  - **Authorization**: To check the authorization policies on join by checking if a given user can read and write to this table
+  - **Broadcast from database**: Replication slot tracks a publication to this table to broadcast the changes to the connected clients.
+  - The schema from the table is the following:
+    ```sql
+    create table realtime.messages (
+    topic text not null, -- The topic of the message
+    extension text not null, -- The extension of the message (presence, broadcast)
+    payload jsonb null, -- The payload of the message
+    event text null, -- The event of the message
+    private boolean null default false, -- If the message is going to use a private channel
+    updated_at timestamp without time zone not null default now(), -- The timestamp of the message
+    inserted_at timestamp without time zone not null default now(), -- The timestamp of the message
+    id uuid not null default gen_random_uuid (), -- The id of the message
+    constraint messages_pkey primary key (id, inserted_at)) partition by RANGE (inserted_at);
+    ```
 
-// ---cut---
-const presenceTrackStatus = await roomOne.track({
-  user: 'user-1',
-  online_at: new Date().toISOString(),
-})
-```
+<Admonition type="note">
 
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
-Each client maintains their own state, and this is then combined into a "shared state" for that Channel topic. It's commonly used for sharing statuses (e.g. "online" or "inactive"). The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state is automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
-When a new client subscribes to a channel, it will immediately receive the channel's latest state in a single message because the state is held by the Realtime server.
+Realtime has a cleanup process that will delete tables older than 3 days.
 
-## Postgres Changes
+</Admonition>
 
-The Postgres Changes extension listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/database/postgres/row-level-security).
+### Functions
 
-```js
-import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('your_project_url', 'your_supabase_api_key')
+Realtime creates two functions on your database:
 
-// ---cut---
-const allChanges = supabase
-  .channel('schema-db-changes')
-  .on(
-    'postgres_changes',
-    {
-      event: '*',
-      schema: 'public',
-    },
-    (payload) => console.log(payload)
-  )
-  .subscribe()
-```
-
-Anyone with access to a valid JWT signed with the project's JWT secret is able to listen to your database's changes, unless tables have [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled and policies in place.
-
-Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes for all changes in a schema, a table in a schema, or a column's value in a table. Your clients should only listen to tables in the `public` schema and you must first enable the tables you want your clients to listen to.
-
-## Choosing between Broadcast and Postgres Changes for database changes
-
-We recommend using Broadcast by default and using Broadcast from Database specifically as it will allow you to scale your application compared to Postgres Changes.
-
-## Choosing between Broadcast and Presence
-
-We recommend using Broadcast by default, and then Presence when required. Presence utilizes an in-memory conflict-free replicated data type (CRDT) to track and synchronize shared state in an eventually consistent manner. It computes the difference between existing state and new state changes and sends the necessary updates to clients via Broadcast. This is computationally heavy, so you should use it sparingly. If you use Presence, it's best to throttle your changes so that you are sending updates less frequently.
+- `realtime.send` - Inserts an entry into `realtime.messages` table that will trigger the replication slot to broadcast the changes to the clients. It also captures errors to prevent the trigger from breaking.
+- `realtime.broadcast_changes` - uses `realtime.send` to broadcast the changes with a format that is compatible with Postgres Changes

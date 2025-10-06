@@ -30,6 +30,7 @@ export const authKeys = {
       keywords: string | undefined
       filter: string | undefined
       providers: string[] | undefined
+      forceExactCount?: boolean
     }
   ) =>
     ['projects', projectRef, 'users-count', ...(params ? [params].filter(Boolean) : [])] as const,

@@ -1,13 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useParams, useFlag } from 'common'
+import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import APIDocsButton from 'components/ui/APIDocsButton'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -21,11 +23,12 @@ import {
 } from 'data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
@@ -45,9 +48,10 @@ import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
   table: Entity
+  isRefetching: boolean
 }
 
-const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
+export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -65,6 +69,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
+  const triggersInsteadOfRealtime = useFlag<boolean>('triggersInsteadOfRealtime')
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
@@ -113,9 +118,26 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       },
     })
 
-  const { can: canSqlWriteTables, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const { can: canSqlWriteColumns } = useAsyncCheckProjectPermissions(
+  const { data: triggersData } = useDatabaseTriggersQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: isTable,
+    }
+  )
+  const tableTriggers = (triggersData ?? []).filter(
+    (trigger) => trigger.schema === table.schema && trigger.table === table.name
+  )
+
+  const tableTriggersCount = tableTriggers.length
+
+  const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+  const { can: canSqlWriteColumns } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'columns'
   )
@@ -141,6 +163,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     )
 
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
   const toggleRealtime = async () => {
     if (!project) return console.error('Project is required')
@@ -191,6 +215,19 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       name: table.name,
       schema: table.schema,
       payload: payload,
+    })
+
+    sendEvent({
+      action: 'table_rls_enabled',
+      properties: {
+        method: 'table_editor',
+        schema_name: table.schema,
+        table_name: table.name,
+      },
+      groups: {
+        project: projectRef,
+        ...(org?.slug && { organization: org.slug }),
+      },
     })
   }
 
@@ -277,13 +314,13 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 <PopoverContent_Shadcn_
                   // using `portal` for a safari fix. issue with rendering outside of body element
                   portal
-                  className="min-w-[395px] text-sm"
+                  className="w-80 text-sm"
                   align="end"
                 >
-                  <h3 className="flex items-center gap-2">
+                  <h4 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
-                  </h3>
-                  <div className="grid gap-2 mt-4 text-foreground-light text-sm">
+                  </h4>
+                  <div className="grid gap-2 mt-4 text-foreground-light text-xs">
                     <p>
                       You can restrict and control who can read, write and update data in this table
                       using Row Level Security.
@@ -293,20 +330,68 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       table.
                     </p>
                     {!isSchemaLocked && (
-                      <div className="mt-2">
-                        <Button
-                          type="default"
-                          onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
-                        >
-                          Enable RLS for this table
-                        </Button>
-                      </div>
+                      <Button
+                        type="default"
+                        className="mt-2 w-min"
+                        onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
+                      >
+                        Enable RLS for this table
+                      </Button>
                     )}
                   </div>
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
             )
           ) : null}
+
+          {isTable && triggersInsteadOfRealtime ? (
+            <Button
+              asChild
+              type={'default'}
+              size="tiny"
+              icon={
+                <div
+                  className={cn(
+                    'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                    tableTriggersCount > 9 ? 'px-1' : 'w-[16px]'
+                  )}
+                >
+                  <span className="text-[11px] text-foreground font-mono text-center">
+                    {tableTriggersCount}
+                  </span>
+                </div>
+              }
+            >
+              <Link href={manageTriggersHref}>
+                {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
+              </Link>
+            </Button>
+          ) : (
+            realtimeEnabled && (
+              <ButtonTooltip
+                type="default"
+                size="tiny"
+                icon={
+                  <MousePointer2
+                    strokeWidth={1.5}
+                    className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
+                  />
+                }
+                onClick={() => setShowEnableRealtime(true)}
+                className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: isRealtimeEnabled
+                      ? 'Click to disable realtime for this table'
+                      : 'Click to enable realtime for this table',
+                  },
+                }}
+              >
+                {!isRealtimeEnabled && 'Enable Realtime'}
+              </ButtonTooltip>
+            )
+          )}
 
           {isView && viewHasLints && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
@@ -429,7 +514,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
+                        href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
                       >
                         Learn more
                       </Link>
@@ -442,21 +527,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
 
           <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
-          {isTable && realtimeEnabled && (
-            <Button
-              type="default"
-              icon={
-                <MousePointer2
-                  strokeWidth={1.5}
-                  className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
-                />
-              }
-              onClick={() => setShowEnableRealtime(true)}
-            >
-              Realtime {isRealtimeEnabled ? 'on' : 'off'}
-            </Button>
-          )}
           {doesHaveAutoGeneratedAPIDocs && <APIDocsButton section={['entities', table.name]} />}
+
+          <RefreshButton tableId={table.id} isRefetching={isRefetching} />
         </div>
       )}
       <ConfirmationModal
@@ -506,5 +579,3 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     </div>
   )
 }
-
-export default GridHeaderActions

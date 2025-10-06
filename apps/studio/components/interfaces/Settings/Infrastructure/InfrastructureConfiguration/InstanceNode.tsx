@@ -14,7 +14,8 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -113,6 +114,8 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
+  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
+  const providerLabel = provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : provider
 
   return (
     <>
@@ -137,7 +140,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{provider}</span>
+                <span className="text-sm text-foreground-light">{providerLabel}</span>
                 {projectHomepageShowInstanceSize && (
                   <>
                     <span className="text-sm text-foreground-light">•</span>
@@ -191,10 +194,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   } = data
   const { ref } = useParams()
   const dbSelectorState = useDatabaseSelectorStateSnapshot()
-  const { can: canManageReplicas } = useAsyncCheckProjectPermissions(
-    PermissionAction.CREATE,
-    'projects'
-  )
+  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
@@ -233,6 +233,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
         REPLICA_STATUS.INIT_READ_REPLICA,
       ] as string[]
     ).includes(status) || initStatus === ReplicaInitializationStatus.InProgress
+
+  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
+  const providerLabel = provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : provider
 
   return (
     <>
@@ -301,7 +304,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{provider}</span>
+                <span>{providerLabel}</span>
                 {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span>•</span>

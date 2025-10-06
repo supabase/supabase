@@ -1,19 +1,19 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
 
 import { useParams } from 'common'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
-import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
@@ -21,20 +21,11 @@ const BuildingState = () => {
   const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
 
-  const {
-    projectHomepageShowAllClientLibraries: showAllClientLibraries,
-    projectHomepageShowExamples: showExamples,
-  } = useIsFeatureEnabled([
-    'project_homepage:show_all_client_libraries',
-    'project_homepage:show_examples',
-  ])
+  const showExamples = useIsFeatureEnabled('project_homepage:show_examples')
 
-  const clientLibraries = useMemo(() => {
-    if (showAllClientLibraries) {
-      return CLIENT_LIBRARIES
-    }
-    return CLIENT_LIBRARIES.filter((library) => library.language === 'JavaScript')
-  }, [showAllClientLibraries])
+  const { projectHomepageClientLibraries: clientLibraries } = useCustomContent([
+    'project_homepage:client_libraries',
+  ])
 
   useProjectStatusQuery(
     { projectRef: ref },
@@ -90,7 +81,7 @@ const BuildingState = () => {
                     <p className="text-sm text-foreground-light">
                       Browse the Supabase{' '}
                       <Link
-                        href="https://supabase.com/docs"
+                        href={`${DOCS_URL}`}
                         className="mb-0 text-brand transition-colors hover:text-brand-600"
                         target="_blank"
                         rel="noreferrer"
@@ -142,7 +133,7 @@ const BuildingState = () => {
               <h4 className="text-lg">Client libraries</h4>
             </div>
             <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mx-6 mb-12 md:grid-cols-3">
-              {clientLibraries.map((library) => (
+              {clientLibraries!.map((library) => (
                 <ClientLibrary key={library.language} {...library} />
               ))}
             </div>

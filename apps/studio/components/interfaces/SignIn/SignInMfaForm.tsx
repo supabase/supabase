@@ -175,7 +175,12 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
             </li>
           )}
           <li>
-            <Link href="/logout">Force sign out and clear cookies</Link>
+            <Link
+              href="/logout"
+              className="text-sm transition text-foreground-light hover:text-foreground"
+            >
+              Force sign out and clear cookies
+            </Link>
           </li>
           <li>
             <Link

@@ -1,9 +1,13 @@
-import { Filter, Grid, List, Plus, Search } from 'lucide-react'
+import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
+import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -17,28 +21,36 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 interface HomePageActionsProps {
-  search: string
-  filterStatus: string[]
+  slug?: string
   hideNewProject?: boolean
-  viewMode?: 'grid' | 'table'
   showViewToggle?: boolean
-  setSearch: (value: string) => void
-  setFilterStatus: (value: string[]) => void
-  setViewMode?: (value: 'grid' | 'table') => void
 }
 
 export const HomePageActions = ({
-  search,
-  filterStatus,
+  slug: _slug,
   hideNewProject = false,
-  viewMode,
   showViewToggle = false,
-  setSearch,
-  setFilterStatus,
-  setViewMode,
 }: HomePageActionsProps) => {
-  const { slug } = useParams()
+  const { slug: urlSlug } = useParams()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
+
+  const slug = _slug ?? urlSlug
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const debouncedSearch = useDebounce(search, 500)
+  const [filterStatus, setFilterStatus] = useQueryState(
+    'status',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
+  const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
+
+  const { isFetching: isFetchingProjects } = useOrgProjectsInfiniteQuery(
+    {
+      slug,
+      search: search.length === 0 ? search : debouncedSearch,
+      statuses: filterStatus,
+    },
+    { keepPreviousData: true }
+  )
 
   return (
     <div className="flex items-center justify-between">
@@ -47,15 +59,26 @@ export const HomePageActions = ({
           placeholder="Search for a project"
           icon={<Search size={12} />}
           size="tiny"
-          className="w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          className="w-32 md:w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          actions={[
+            search && (
+              <Button
+                size="tiny"
+                type="text"
+                icon={<X />}
+                onClick={() => setSearch('')}
+                className="p-0 h-5 w-5"
+              />
+            ),
+          ]}
         />
 
         <Popover_Shadcn_>
           <PopoverTrigger_Shadcn_ asChild>
             <Button
-              type={filterStatus.length !== 2 ? 'secondary' : 'dashed'}
+              type={filterStatus.length === 0 ? 'dashed' : 'secondary'}
               className="h-[26px] w-[26px]"
               icon={<Filter />}
             />
@@ -73,10 +96,12 @@ export const HomePageActions = ({
                       <Checkbox_Shadcn_
                         id={key}
                         name={key}
-                        checked={filterStatus.includes(key)}
+                        checked={filterStatus.length === 0 || filterStatus.includes(key)}
                         onCheckedChange={() => {
                           if (filterStatus.includes(key)) {
                             setFilterStatus(filterStatus.filter((y) => y !== key))
+                          } else if (filterStatus.length === 1) {
+                            setFilterStatus([])
                           } else {
                             setFilterStatus(filterStatus.concat([key]))
                           }
@@ -100,6 +125,8 @@ export const HomePageActions = ({
             </div>
           </PopoverContent_Shadcn_>
         </Popover_Shadcn_>
+
+        {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>
 
       <div className="flex items-center gap-2">

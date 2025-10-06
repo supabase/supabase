@@ -5,28 +5,22 @@ import { toast } from 'sonner'
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref, slug, id } = useParams()
-
-  const isLoggedIn = useIsLoggedIn()
-  const snap = useAppStateSnapshot()
-  const isUserMFAEnabled = useIsMFAEnabled()
-
   const { data: organization } = useSelectedOrganizationQuery()
 
-  const [dashboardHistory, _, { isSuccess: isSuccessStorage }] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref ?? ''),
-    { editor: undefined, sql: undefined }
-  )
+  const isLoggedIn = useIsLoggedIn()
+  const isUserMFAEnabled = useIsMFAEnabled()
 
+  const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
   const [__, setLastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
@@ -106,22 +100,13 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {
       if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
-        snap.setDashboardHistory(ref, 'sql', id)
+        setLastVisitedSnippet(id)
+      } else if (router.pathname.endsWith('/editor/[id]')) {
+        setLastVisitedTable(id)
       }
-      if (router.pathname.endsWith('/editor/[id]')) {
-        snap.setDashboardHistory(ref, 'editor', id)
-      }
-    }
-  }, [ref, id])
-
-  useEffect(() => {
-    // Load dashboard history into app state
-    if (isSuccessStorage && ref) {
-      snap.setDashboardHistory(ref, 'editor', dashboardHistory.editor)
-      snap.setDashboardHistory(ref, 'sql', dashboardHistory.sql)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessStorage, ref])
+  }, [ref, id])
 
   useEffect(() => {
     if (organization) {

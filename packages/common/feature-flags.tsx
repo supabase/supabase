@@ -5,6 +5,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 
 import { components } from 'api-types'
 import { useUser } from './auth'
+import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
 import { ensurePlatformSuffix } from './helpers'
@@ -13,9 +14,15 @@ type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody
 export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
 
 export async function getFeatureFlags(API_URL: string) {
-  const data = await get(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags`)
-
-  return data as CallFeatureFlagsResponse
+  try {
+    const data = await get(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags`)
+    return data as CallFeatureFlagsResponse
+  } catch (error: any) {
+    if (error.message.includes('Failed to fetch')) {
+      console.error('Failed to fetch PH flags: API is not available')
+    }
+    throw error
+  }
 }
 
 export async function trackFeatureFlag(API_URL: string, body: TrackFeatureFlagVariables) {
@@ -57,8 +64,10 @@ export const FeatureFlagProvider = ({
   getConfigCatFlags,
   children,
 }: PropsWithChildren<{
-  API_URL: string
-  enabled?: boolean
+  API_URL?: string
+  /** Accepts either `boolean` which controls all feature flags or `{ cc: boolean, ph: boolean }` for individual providers */
+  enabled?: boolean | { cc: boolean; ph: boolean }
+  /** Custom fetcher for ConfigCat flags if passing in custom attributes */
   getConfigCatFlags?: (
     userEmail?: string
   ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
@@ -78,23 +87,29 @@ export const FeatureFlagProvider = ({
     async function processFlags() {
       if (!enabled) return
 
+      const loadPHFlags =
+        (enabled === true || (typeof enabled === 'object' && enabled.ph)) && !!API_URL
+      const loadCCFlags = enabled === true || (typeof enabled === 'object' && enabled.cc)
+
       let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
 
       // Run both async operations in parallel
       const [flags, flagValues] = await Promise.all([
-        getFeatureFlags(API_URL),
-        typeof getConfigCatFlags === 'function'
-          ? getConfigCatFlags(user?.email)
+        loadPHFlags ? getFeatureFlags(API_URL) : Promise.resolve({}),
+        loadCCFlags
+          ? typeof getConfigCatFlags === 'function'
+            ? getConfigCatFlags(user?.email)
+            : getDefaultConfigCatFlags(user?.email)
           : Promise.resolve([]),
       ])
 
-      // Process PostHog flags
-      if (flags) {
+      // Process PostHog flags if loaded
+      if (Object.keys(flags).length > 0) {
         flagStore.posthog = flags
       }
 
-      // Process ConfigCat flags
-      if (typeof getConfigCatFlags === 'function') {
+      // Process ConfigCat flags if loaded
+      if (flagValues.length > 0) {
         let overridesCookieValue: Record<string, boolean> = {}
         try {
           const cookies = getCookies()

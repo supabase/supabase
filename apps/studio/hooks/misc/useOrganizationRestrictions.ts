@@ -4,6 +4,9 @@ import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restric
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useBillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useIsFeatureEnabled } from './useIsFeatureEnabled'
 
 export type WarningBannerProps = {
   type: 'danger' | 'warning' | 'note'
@@ -17,8 +20,14 @@ export function useOrganizationRestrictions() {
 
   const { data: overdueInvoices } = useOverdueInvoicesQuery()
   const { data: organizations } = useOrganizationsQuery()
+  const { data: billingCustomer } = useOrganizationCustomerProfileQuery({ slug: org?.slug })
 
   const warnings: WarningBannerProps[] = []
+
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+  if (!billingEnabled) {
+    return { warnings, org }
+  }
 
   const overdueInvoicesFromOtherOrgs = overdueInvoices?.filter(
     (invoice) => invoice.organization_id !== org?.id
@@ -26,6 +35,21 @@ export function useOrganizationRestrictions() {
   const thisOrgHasOverdueInvoices = overdueInvoices?.filter(
     (invoice) => invoice.organization_id === org?.id
   )
+
+  if (
+    org &&
+    org.plan.id !== 'free' &&
+    billingCustomer &&
+    !billingCustomer.address?.line1 &&
+    !org.billing_partner
+  ) {
+    warnings.push({
+      type: 'warning',
+      title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
+      message: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.message,
+      link: `/org/${org?.slug}/billing#address`,
+    })
+  }
 
   if (thisOrgHasOverdueInvoices?.length) {
     warnings.push({

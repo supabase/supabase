@@ -3,12 +3,14 @@ id: 'nextjs-pages'
 title: 'Supabase Auth with Next.js Pages Directory'
 description: 'Authentication helpers for Next.js API routes, middleware, and SSR in the Pages Directory.'
 sidebar_label: 'Next.js (pages)'
-sitemapPriority: 0.5
+sitemapPriority: 0.3
 ---
 
 <Admonition type="caution">
 
-The `auth-helpers` package has been replaced with the `@supabase/ssr` package. We recommend setting up Auth for your Next.js app with `@supabase/ssr` instead. See the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs?router=pages) to learn how.
+The Auth helpers package is deprecated. Use the new `@supabase/ssr` package for Server Side Authentication. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Read the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
+
+We recommend setting up Auth for your Next.js app with `@supabase/ssr` instead. Read the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs?router=pages) to learn how.
 
 </Admonition>
 
@@ -53,7 +55,7 @@ npm install @supabase/auth-helpers-react
 
 ## Set up environment variables
 
-Retrieve your project URL and anon key in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
+Retrieve your project URL and anon key in your project's [API settings](/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
@@ -132,7 +134,7 @@ You can now determine if a user is authenticated by checking that the `user` obj
 
 ### Code Exchange API route
 
-The `Code Exchange` API route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the Next.js Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The `Code Exchange` API route is required for the [server-side auth flow](/docs/guides/auth/server-side-rendering) implemented by the Next.js Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
 
 <Tabs
   scrollable

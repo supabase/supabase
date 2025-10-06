@@ -24,7 +24,6 @@ export type UpdateDestinationPipelineParams = {
   pipelineConfig: {
     publicationName: string
     batch?: {
-      maxSize: number
       maxFillMs: number
     }
   }
@@ -64,7 +63,6 @@ async function updateDestinationPipeline(
           publication_name: publicationName,
           ...(batch && {
             batch: {
-              max_size: batch.maxSize,
               max_fill_ms: batch.maxFillMs,
             },
           }),
@@ -97,11 +95,15 @@ export const useUpdateDestinationPipelineMutation = ({
     (vars) => updateDestinationPipeline(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+        const { projectRef, destinationId, pipelineId } = variables
 
         await Promise.all([
+          // Invalidate lists
           queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
           queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
+          // Invalidate item-level caches used by the editor panel
+          queryClient.invalidateQueries(replicationKeys.destinationById(projectRef, destinationId)),
+          queryClient.invalidateQueries(replicationKeys.pipelineById(projectRef, pipelineId)),
         ])
 
         await onSuccess?.(data, variables, context)

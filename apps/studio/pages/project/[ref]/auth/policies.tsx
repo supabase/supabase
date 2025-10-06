@@ -20,10 +20,11 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -98,8 +99,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   })
 
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
-  const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'policies'
+  )
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
@@ -238,7 +241,7 @@ AuthPoliciesPage.getLayout = (page) => (
         title="Policies"
         subtitle="Manage Row Level Security policies for your tables"
         secondaryActions={
-          <DocsButton href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security" />
+          <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
         }
         size="large"
       >

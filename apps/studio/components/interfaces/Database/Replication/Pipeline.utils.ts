@@ -1,5 +1,6 @@
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
+import { PipelineStatusName } from './PipelineStatus'
 
 export const PIPELINE_ERROR_MESSAGES = {
   RETRIEVE_PIPELINE: 'Failed to retrieve pipeline information',
@@ -24,7 +25,7 @@ export const getStatusName = (
 
 export const PIPELINE_ENABLE_ALLOWED_FROM = ['stopped'] as const
 export const PIPELINE_DISABLE_ALLOWED_FROM = ['started', 'failed'] as const
-export const PIPELINE_ACTIONABLE_STATES = ['failed', 'started', 'stopped'] as const
+export const PIPELINE_ACTIONABLE_STATES = ['failed', 'started', 'stopped'] as PipelineStatusName[]
 
 const PIPELINE_STATE_MESSAGES = {
   enabling: {

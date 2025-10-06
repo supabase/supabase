@@ -11,7 +11,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export function ApiKeyPill({
@@ -28,8 +28,10 @@ export function ApiKeyPill({
   const isSecret = apiKey.type === 'secret'
 
   // Permission check for revealing/copying secret API keys
-  const { can: canManageSecretKeys, isLoading: isLoadingPermission } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'service_api_keys')
+  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
 
   // This query only runs when show=true (enabled: show)
   // It fetches the fully revealed API key when needed
