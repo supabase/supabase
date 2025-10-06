@@ -1,38 +1,47 @@
 import Link from 'next/link'
+import { ReactFlowProvider } from 'reactflow'
 
 import { ActivityStats } from 'components/interfaces/HomeNew/ActivityStats'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
-import { DOCS_URL } from 'lib/constants'
-import { ReactFlowProvider } from 'reactflow'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsOrioleDb,
+  useProjectByRefQuery,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 
-interface TopSectionProps {
-  projectName: string
-  isMainBranch?: boolean
-  parentProject?: { ref?: string; name?: string } | null
-  isOrioleDb?: boolean
-  project: any
-  organization: any
-  projectRef?: string
-  isPaused: boolean
-}
+export const TopSection = () => {
+  const isOrioleDb = useIsOrioleDb()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
 
-export const TopSection = ({
-  projectName,
-  isMainBranch,
-  parentProject,
-  isOrioleDb,
-  project,
-  organization,
-  isPaused,
-}: TopSectionProps) => {
+  const { data: branches } = useBranchesQuery({
+    projectRef: project?.parent_project_ref ?? project?.ref,
+  })
+
+  const mainBranch = branches?.find((branch) => branch.is_default)
+  const currentBranch = branches?.find((branch) => branch.project_ref === project?.ref)
+  const isMainBranch = currentBranch?.name === mainBranch?.name
+
+  const isPaused = project?.status === PROJECT_STATUS.INACTIVE
+  const projectName =
+    currentBranch && !isMainBranch
+      ? currentBranch.name
+      : project?.name
+        ? project.name
+        : 'Welcome to your project'
+
   if (isPaused) {
     return (
-      <div>
+      <div className="w-full">
         <div className="mb-8">
           {!isMainBranch && (
             <Link href={`/project/${parentProject?.ref}`} className="text-sm text-foreground-light">
