@@ -282,7 +282,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         })
 
         sendEvent({
-          action: 'assistant_message_rated',
+          action: 'assistant_message_rating_submitted',
           properties: {
             rating,
             category: result.category,

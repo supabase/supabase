@@ -1195,8 +1195,8 @@ export interface AiAssistantInSupportFormClickedEvent {
  * @group Events
  * @source studio
  */
-export interface AssistantMessageRatedEvent {
-  action: 'assistant_message_rated'
+export interface AssistantMessageRatingSubmittedEvent {
+  action: 'assistant_message_rating_submitted'
   properties: {
     /**
      * The rating given by the user: positive (thumbs up) or negative (thumbs down)
@@ -1900,7 +1900,7 @@ export type TelemetryEvent =
   | AssistantSuggestionRunQueryClickedEvent
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
-  | AssistantMessageRatedEvent
+  | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
