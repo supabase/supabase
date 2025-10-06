@@ -1,9 +1,9 @@
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, Button, AiIconAnimation, Image } from 'ui'
 import Link from 'next/link'
 import { BookOpen } from 'lucide-react'
 import { Logs } from 'icons'
-import { AiIconAnimation } from 'ui'
+import { BASE_PATH } from 'lib/constants'
 
 export const OverviewLearnMore = () => {
   const LearnMoreCards = [
@@ -11,10 +11,11 @@ export const OverviewLearnMore = () => {
       label: 'Docs',
       title: 'Authentication documentation',
       description: 'Read more on authentication and benefits of using Supabase policies.',
+      image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
         {
           label: 'Docs',
-          href: 'https://docs.supabase.com',
+          href: 'https://supabase.com/docs/guides/auth',
           icon: <BookOpen />,
         },
       ],
@@ -23,6 +24,7 @@ export const OverviewLearnMore = () => {
       label: 'Assistant',
       title: 'Need help with authentication errors?',
       description: 'Our Assistant can help you debug and fix authentication errors.',
+      image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
         {
           label: 'Ask Assistant',
@@ -38,6 +40,7 @@ export const OverviewLearnMore = () => {
       title: 'Dive into our authentication logs',
       description:
         'Our authentication logs provide a deeper view into your auth requests and errors.',
+      image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
         {
           label: 'Go to logs',
@@ -51,14 +54,22 @@ export const OverviewLearnMore = () => {
   return (
     <ScaffoldSection isFullWidth>
       <ScaffoldSectionTitle className="mb-4">Learn more</ScaffoldSectionTitle>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {LearnMoreCards.map((card) => (
           <Card key={card.label} className="relative">
             <CardHeader className="absolute top-0 left-0 right-0 border-b-0">
-              <CardTitle className="text-foreground-light">{card.label}</CardTitle>
+              <CardTitle className="text-foreground-lighter">{card.label}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="bg-black/20 aspect-video flex w-full"></div>
+              <div className="bg-black/20 flex w-full">
+                <Image
+                  src={card.image && card?.image}
+                  alt={card.title}
+                  width={620}
+                  height={324}
+                  className="object-fit"
+                />
+              </div>
               <div className="p-4">
                 <div className="flex flex-col gap-1 mb-4">
                   <h4>{card.title}</h4>
