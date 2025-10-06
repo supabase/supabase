@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import SidePanelVercelProjectLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldDivider, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
@@ -12,7 +12,7 @@ import VercelSection from './VercelIntegration/VercelSection'
 export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
     <img
-      className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
+      className="border rounded-lg shadow w-full sm:w-32 border-body"
       src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
       alt={`${title} cover`}
     />
@@ -29,7 +29,7 @@ const IntegrationSettings = () => {
   return (
     <>
       {isBranch && (
-        <ScaffoldContainer>
+        <ScaffoldSection isFullWidth>
           <Alert_Shadcn_ variant="default" className="mt-6">
             <WarningIcon />
             <AlertTitle_Shadcn_>
@@ -43,12 +43,11 @@ const IntegrationSettings = () => {
               .
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-        </ScaffoldContainer>
+        </ScaffoldSection>
       )}
       <GitHubSection />
       {showVercelIntegration && (
         <>
-          <ScaffoldDivider />
           <VercelSection isProjectScoped={true} />
           <SidePanelVercelProjectLinker />
         </>
