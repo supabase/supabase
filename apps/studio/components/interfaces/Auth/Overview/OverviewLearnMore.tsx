@@ -4,8 +4,11 @@ import Link from 'next/link'
 import { BookOpen } from 'lucide-react'
 import { Logs } from 'icons'
 import { BASE_PATH } from 'lib/constants'
+import { useParams } from 'common'
 
 export const OverviewLearnMore = () => {
+  const { ref } = useParams()
+
   const LearnMoreCards = [
     {
       label: 'Docs',
@@ -44,7 +47,7 @@ export const OverviewLearnMore = () => {
       actions: [
         {
           label: 'Go to logs',
-          href: '#',
+          href: `/project/${ref}/logs/auth-logs`,
           icon: <Logs />,
         },
       ],
