@@ -104,6 +104,7 @@ export const SnippetDropdown = ({
                   {snippets.map((snippet) => (
                     <CommandItem_Shadcn_
                       key={snippet.id}
+                      value={snippet.id}
                       onSelect={() => onSelect({ id: snippet.id, name: snippet.name })}
                     >
                       {snippet.name}
