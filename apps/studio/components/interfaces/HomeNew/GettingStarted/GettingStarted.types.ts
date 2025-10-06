@@ -1,20 +1,20 @@
-import type React from 'react'
+import { ComponentProps, ReactNode } from 'react'
 
 import { Button } from 'ui'
 
 export type GettingStartedAction = {
   label: string
   href?: string
+  variant?: ComponentProps<typeof Button>['type']
+  icon?: ReactNode
+  component?: ReactNode
   onClick?: () => void
-  variant?: React.ComponentProps<typeof Button>['type']
-  icon?: React.ReactNode
-  component?: React.ReactNode
 }
 
 export type GettingStartedStep = {
   key: string
   status: 'complete' | 'incomplete'
-  icon?: React.ReactNode
+  icon?: ReactNode
   title: string
   description: string
   image?: string

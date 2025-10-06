@@ -1,42 +1,41 @@
-import { useParams } from 'common'
+import { Code, Table2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 
+import { useParams } from 'common'
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
-import { Code, Table2 } from 'lucide-react'
-import { GettingStarted } from './GettingStarted'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { Button, Card, CardContent, ToggleGroup, ToggleGroupItem } from 'ui'
 import { FrameworkSelector } from './FrameworkSelector'
-import {
-  DEFAULT_FRAMEWORK_KEY,
-  getCodeWorkflowSteps,
-  getNoCodeWorkflowSteps,
-} from './GettingStarted.utils'
+import { GettingStarted } from './GettingStarted'
 import {
   GettingStartedAction,
   GettingStartedState,
   GettingStartedStep,
 } from './GettingStarted.types'
+import {
+  DEFAULT_FRAMEWORK_KEY,
+  getCodeWorkflowSteps,
+  getNoCodeWorkflowSteps,
+} from './GettingStarted.utils'
 import { useGettingStartedProgress } from './useGettingStartedProgress'
-import { Button, Card, CardContent, ToggleGroup, ToggleGroupItem } from 'ui'
-import { BASE_PATH } from 'lib/constants'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
-export function GettingStartedSection({
-  value,
-  onChange,
-}: {
+interface GettingStartedSectionProps {
   value: GettingStartedState
   onChange: (v: GettingStartedState) => void
-}) {
+}
+
+export function GettingStartedSection({ value, onChange }: GettingStartedSectionProps) {
+  const router = useRouter()
+  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { ref } = useParams()
-  const aiSnap = useAiAssistantStateSnapshot()
-  const router = useRouter()
   const { mutate: sendEvent } = useSendEventMutation()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const [selectedFramework, setSelectedFramework] = useState<string>(DEFAULT_FRAMEWORK_KEY)
   const workflow: 'no-code' | 'code' | null = value === 'code' || value === 'no-code' ? value : null

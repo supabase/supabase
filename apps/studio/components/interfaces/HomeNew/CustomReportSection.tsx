@@ -50,9 +50,11 @@ export function CustomReportSection() {
     reportContent
   )
 
-  useEffect(() => {
-    if (reportContent) setEditableReport(reportContent)
-  }, [reportContent])
+  const { can: canCreateReport } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    { resource: { type: 'report', owner_id: profile?.id }, subject: { id: profile?.id } }
+  )
 
   const { can: canUpdateReport } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -65,12 +67,6 @@ export function CustomReportSection() {
       },
       subject: { id: profile?.id },
     }
-  )
-
-  const { can: canCreateReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    { resource: { type: 'report', owner_id: profile?.id }, subject: { id: profile?.id } }
   )
 
   const { mutate: upsertContent } = useContentUpsertMutation()
@@ -275,10 +271,14 @@ export function CustomReportSection() {
 
   const layout = useMemo(() => editableReport?.layout ?? [], [editableReport])
 
+  useEffect(() => {
+    if (reportContent) setEditableReport(reportContent)
+  }, [reportContent])
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="heading-section">Report</h3>
+        <h3 className="heading-section">Reports</h3>
         {canUpdateReport || canCreateReport ? (
           <SnippetDropdown
             projectRef={ref}
@@ -301,7 +301,7 @@ export function CustomReportSection() {
               <div className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 border-default">
                 <h4>Build a custom report</h4>
                 <p className="text-sm text-foreground-light mb-4">
-                  Keep track of your most important metrics{' '}
+                  Keep track of your most important metrics
                 </p>
                 {canUpdateReport || canCreateReport ? (
                   <SnippetDropdown

@@ -12,7 +12,6 @@ import {
 
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
 import { AiIconAnimation, CodeBlock } from 'ui'
-
 import type { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 import type { GettingStartedStatuses } from './useGettingStartedProgress'
 
