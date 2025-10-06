@@ -27,7 +27,7 @@ export const OverviewLearnMore = () => {
       label: 'Assistant',
       title: 'Explain authentication errors',
       description: 'Our Assistant can help you debug and fix authentication errors.',
-      image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
+      image: `${BASE_PATH}/img/auth-overview/auth-overview-assistant.jpg`,
       actions: [
         {
           label: 'Ask Assistant',
@@ -40,10 +40,10 @@ export const OverviewLearnMore = () => {
     },
     {
       label: 'Logs',
-      title: 'Authentication logs',
+      title: 'Dive into the logs',
       description:
         'Our authentication logs provide a deeper view into your auth requests and errors.',
-      image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
+      image: `${BASE_PATH}/img/auth-overview/auth-overview-logs.jpg`,
       actions: [
         {
           label: 'Go to logs',
