@@ -11,10 +11,10 @@ import { Reports } from 'icons'
 import {
   getChangeSign,
   getChangeColor,
-  executeAuthQueries,
+  fetchAuthData,
   calculatePercentageChange,
 } from './OverviewUsage.constants'
-import useDbQuery from 'hooks/analytics/useDbQuery'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import { createAuthReportConfig } from 'data/reports/v2/auth.config'
@@ -61,48 +61,64 @@ const StatCard = ({
 
 export const OverviewUsage = () => {
   const { ref } = useParams()
-  const queries = useMemo(() => executeAuthQueries(ref as string), [ref])
 
-  const { data: activeUsersCurrent, isLoading: activeUsersCurrentLoading } = useDbQuery({
-    sql: queries.find((q) => q.key === 'activeUsersCurrent')?.sql || '',
+  // Use the analytics endpoint for auth data
+  const { data: activeUsersCurrent, isLoading: activeUsersCurrentLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'activeUsersCurrent'],
+    queryFn: () => fetchAuthData(ref as string, 'activeUsersCurrent'),
+    enabled: !!ref,
   })
 
-  const { data: activeUsersPrevious, isLoading: activeUsersPreviousLoading } = useDbQuery({
-    sql: queries.find((q) => q.key === 'activeUsersPrevious')?.sql || '',
+  const { data: activeUsersPrevious, isLoading: activeUsersPreviousLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'activeUsersPrevious'],
+    queryFn: () => fetchAuthData(ref as string, 'activeUsersPrevious'),
+    enabled: !!ref,
   })
 
-  const { data: passwordResetCurrent, isLoading: passwordResetCurrentLoading } = useDbQuery({
-    sql: queries.find((q) => q.key === 'passwordResetCurrent')?.sql || '',
+  const { data: passwordResetCurrent, isLoading: passwordResetCurrentLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'passwordResetCurrent'],
+    queryFn: () => fetchAuthData(ref as string, 'passwordResetCurrent'),
+    enabled: !!ref,
   })
 
-  const { data: passwordResetPrevious, isLoading: passwordResetPreviousLoading } = useDbQuery({
-    sql: queries.find((q) => q.key === 'passwordResetPrevious')?.sql || '',
+  const { data: passwordResetPrevious, isLoading: passwordResetPreviousLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'passwordResetPrevious'],
+    queryFn: () => fetchAuthData(ref as string, 'passwordResetPrevious'),
+    enabled: !!ref,
   })
 
-  const { data: signInLatencyCurrent, isLoading: signInLatencyCurrentLoading } = useDbQuery({
-    sql: queries.find((q) => q.key === 'signInLatencyCurrent')?.sql || '',
+  const { data: signInLatencyCurrent, isLoading: signInLatencyCurrentLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'signInLatencyCurrent'],
+    queryFn: () => fetchAuthData(ref as string, 'signInLatencyCurrent'),
+    enabled: !!ref,
   })
 
-  const { data: signInLatencyPrevious, isLoading: signInLatencyPreviousLoading } = useDbQuery({
-    sql: queries.find((q) => q.key === 'signInLatencyPrevious')?.sql || '',
+  const { data: signInLatencyPrevious, isLoading: signInLatencyPreviousLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'signInLatencyPrevious'],
+    queryFn: () => fetchAuthData(ref as string, 'signInLatencyPrevious'),
+    enabled: !!ref,
   })
 
-  const { data: signUpLatencyCurrent, isLoading: signUpLatencyCurrentLoading } = useDbQuery({
-    sql: queries.find((q) => q.key === 'signUpLatencyCurrent')?.sql || '',
+  const { data: signUpLatencyCurrent, isLoading: signUpLatencyCurrentLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'signUpLatencyCurrent'],
+    queryFn: () => fetchAuthData(ref as string, 'signUpLatencyCurrent'),
+    enabled: !!ref,
   })
 
-  const { data: signUpLatencyPrevious, isLoading: signUpLatencyPreviousLoading } = useDbQuery({
-    sql: queries.find((q) => q.key === 'signUpLatencyPrevious')?.sql || '',
+  const { data: signUpLatencyPrevious, isLoading: signUpLatencyPreviousLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'signUpLatencyPrevious'],
+    queryFn: () => fetchAuthData(ref as string, 'signUpLatencyPrevious'),
+    enabled: !!ref,
   })
 
-  const currentUserCount = activeUsersCurrent?.[0]?.count || 0
-  const previousUserCount = activeUsersPrevious?.[0]?.count || 0
-  const currentPasswordResets = passwordResetCurrent?.[0]?.count || 0
-  const previousPasswordResets = passwordResetPrevious?.[0]?.count || 0
-  const currentSignInLatency = signInLatencyCurrent?.[0]?.avg_latency_ms || 0
-  const previousSignInLatency = signInLatencyPrevious?.[0]?.avg_latency_ms || 0
-  const currentSignUpLatency = signUpLatencyCurrent?.[0]?.avg_latency_ms || 0
-  const previousSignUpLatency = signUpLatencyPrevious?.[0]?.avg_latency_ms || 0
+  const currentUserCount = activeUsersCurrent?.result?.[0]?.count || 0
+  const previousUserCount = activeUsersPrevious?.result?.[0]?.count || 0
+  const currentPasswordResets = passwordResetCurrent?.result?.[0]?.count || 0
+  const previousPasswordResets = passwordResetPrevious?.result?.[0]?.count || 0
+  const currentSignInLatency = signInLatencyCurrent?.result?.[0]?.avg_latency_ms || 0
+  const previousSignInLatency = signInLatencyPrevious?.result?.[0]?.avg_latency_ms || 0
+  const currentSignUpLatency = signUpLatencyCurrent?.result?.[0]?.avg_latency_ms || 0
+  const previousSignUpLatency = signUpLatencyPrevious?.result?.[0]?.avg_latency_ms || 0
 
   const activeUsersChange = calculatePercentageChange(currentUserCount, previousUserCount)
   const passwordResetChange = calculatePercentageChange(
