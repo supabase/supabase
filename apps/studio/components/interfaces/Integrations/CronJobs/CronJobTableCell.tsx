@@ -1,3 +1,4 @@
+import parser from 'cron-parser'
 import dayjs from 'dayjs'
 import { Clipboard, Edit, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -41,7 +42,34 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-import { getNextRun } from './CronJobs.utils'
+
+const getNextRun = (schedule: string, lastRun?: string) => {
+  // cron-parser can only deal with the traditional cron syntax but technically users can also
+  // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
+  // (can't guarantee as scope is quite big)
+  if (schedule.includes('*')) {
+    try {
+      const interval = parser.parseExpression(schedule, { tz: 'UTC' })
+      return interval.next().getTime()
+    } catch (error) {
+      return undefined
+    }
+  } else {
+    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n second" or "n seconds"
+    // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
+    const [value, unit] = schedule.toLocaleLowerCase().split(' ')
+    if (
+      ['second', 'seconds'].includes(unit) &&
+      !Number.isNaN(Number(value)) &&
+      lastRun !== undefined
+    ) {
+      const parsedLastRun = dayjs(lastRun).add(Number(value), unit as dayjs.ManipulateType)
+      return parsedLastRun.valueOf()
+    } else {
+      return undefined
+    }
+  }
+}
 
 interface CronJobTableCellProps {
   col: any

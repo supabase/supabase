@@ -467,6 +467,7 @@ export const SupportFormV2 = ({
               <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
                 <FormControl_Shadcn_>
                   <OrganizationProjectSelector
+                    key={organizationSlug}
                     sameWidthAsTrigger
                     checkPosition="left"
                     slug={organizationSlug}
