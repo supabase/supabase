@@ -31,6 +31,12 @@ export const generateAuthMenu = (
           ? [{ name: 'Overview', key: 'overview', url: `/project/${ref}/auth/overview`, items: [] }]
           : []),
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
+        {
+          name: 'OAuth Apps',
+          key: 'oauth-apps',
+          url: `/project/${ref}/auth/oauth-apps`,
+          items: [],
+        },
       ],
     },
     {
@@ -55,6 +61,12 @@ export const generateAuthMenu = (
                     },
                   ]
                 : []),
+              {
+                name: 'OAuth Server',
+                key: 'oauth-server',
+                url: `/project/${ref}/auth/oauth-server`,
+                label: 'BETA',
+              },
               {
                 name: 'Sessions',
                 key: 'sessions',
