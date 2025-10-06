@@ -5,9 +5,11 @@ import { BookOpen } from 'lucide-react'
 import { Logs } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import { useParams } from 'common'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 
 export const OverviewLearnMore = () => {
   const { ref } = useParams()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const LearnMoreCards = [
     {
@@ -32,7 +34,32 @@ export const OverviewLearnMore = () => {
         {
           label: 'Ask Assistant',
           onClick: () => {
-            console.log('Ask Assistant')
+            aiSnap.newChat({
+              name: 'Authentication Help',
+              open: true,
+              initialInput: 'Help me debug and fix authentication errors in my Supabase project',
+              suggestions: {
+                title: 'I can help you with authentication issues. Here are some common problems:',
+                prompts: [
+                  {
+                    label: 'Login Issues',
+                    description: 'Why are users unable to log in to my app?',
+                  },
+                  {
+                    label: 'JWT Problems',
+                    description: 'Help me understand and fix JWT token issues',
+                  },
+                  {
+                    label: 'RLS Policies',
+                    description: 'Explain my Row Level Security policies and fix issues',
+                  },
+                  {
+                    label: 'Provider Setup',
+                    description: 'Help me configure OAuth providers correctly',
+                  },
+                ],
+              },
+            })
           },
           icon: <AiIconAnimation size={14} />,
         },
