@@ -8,9 +8,8 @@ Branching in Supabase (Branching 2.0) relies on the current migration files in y
 
 #### 1. Prerequisites: Prepare local Supabase environment
 
-- Install Docker and the Supabase CLI (latest version).
 - If you do not have a local environment set up already, follow the Supabase local development getting started guide:
-  - [Running Supabase Locally](/docs/guides/local-development/cli/getting-started#running-supabase-locally).
+  - [Running Supabase Locally](/docs/guides/local-development/cli/getting-started).
 
 Execute the following commands to initialize and start a local project:
 
@@ -29,7 +28,7 @@ With your project linked, run:
 supabase db pull --linked
 ```
 
-This command generates a migration file in your `supabase/migrations` folder which reflects your remote schema.
+This command generates a migration file in your `supabase/migrations` folder which reflects your remote schema. This will not run the migration locally or overwrite anything.
 
 ---
 
