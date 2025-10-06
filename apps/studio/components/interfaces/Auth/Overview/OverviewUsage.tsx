@@ -13,6 +13,8 @@ import {
   getChangeColor,
   fetchAuthData,
   calculatePercentageChange,
+  sumTimeSeriesData,
+  averageTimeSeriesData,
 } from './OverviewUsage.constants'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
@@ -111,14 +113,27 @@ export const OverviewUsage = () => {
     enabled: !!ref,
   })
 
-  const currentUserCount = activeUsersCurrent?.result?.[0]?.count || 0
-  const previousUserCount = activeUsersPrevious?.result?.[0]?.count || 0
-  const currentPasswordResets = passwordResetCurrent?.result?.[0]?.count || 0
-  const previousPasswordResets = passwordResetPrevious?.result?.[0]?.count || 0
-  const currentSignInLatency = signInLatencyCurrent?.result?.[0]?.avg_latency_ms || 0
-  const previousSignInLatency = signInLatencyPrevious?.result?.[0]?.avg_latency_ms || 0
-  const currentSignUpLatency = signUpLatencyCurrent?.result?.[0]?.avg_latency_ms || 0
-  const previousSignUpLatency = signUpLatencyPrevious?.result?.[0]?.avg_latency_ms || 0
+  // Extract data from time-series response and sum/average as needed
+  const currentUserCount = sumTimeSeriesData(activeUsersCurrent?.result || [], 'count')
+  const previousUserCount = sumTimeSeriesData(activeUsersPrevious?.result || [], 'count')
+  const currentPasswordResets = sumTimeSeriesData(passwordResetCurrent?.result || [], 'count')
+  const previousPasswordResets = sumTimeSeriesData(passwordResetPrevious?.result || [], 'count')
+  const currentSignInLatency = averageTimeSeriesData(
+    signInLatencyCurrent?.result || [],
+    'avg_latency_ms'
+  )
+  const previousSignInLatency = averageTimeSeriesData(
+    signInLatencyPrevious?.result || [],
+    'avg_latency_ms'
+  )
+  const currentSignUpLatency = averageTimeSeriesData(
+    signUpLatencyCurrent?.result || [],
+    'avg_latency_ms'
+  )
+  const previousSignUpLatency = averageTimeSeriesData(
+    signUpLatencyPrevious?.result || [],
+    'avg_latency_ms'
+  )
 
   const activeUsersChange = calculatePercentageChange(currentUserCount, previousUserCount)
   const passwordResetChange = calculatePercentageChange(

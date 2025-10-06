@@ -29,71 +29,95 @@ export const getDateRanges = () => {
   }
 }
 
-// SQL Queries - Updated to match the working auth report structure (no manual date filtering)
+// SQL Queries - Updated to return time-series data like the working auth reports
 export const AUTH_QUERIES = {
   activeUsers: {
     current: () => `
       select 
+        timestamp_trunc(timestamp, hour) as timestamp,
         count(distinct json_value(f.event_message, "$.auth_event.actor_id")) as count
       from auth_logs f
       where json_value(f.event_message, "$.auth_event.action") in (
         'login', 'user_signedup', 'token_refreshed', 'user_modified',
         'user_recovery_requested', 'user_reauthenticate_requested'
       )
+      group by timestamp
+      order by timestamp desc
     `,
     previous: () => `
       select 
+        timestamp_trunc(timestamp, hour) as timestamp,
         count(distinct json_value(f.event_message, "$.auth_event.actor_id")) as count
       from auth_logs f
       where json_value(f.event_message, "$.auth_event.action") in (
         'login', 'user_signedup', 'token_refreshed', 'user_modified',
         'user_recovery_requested', 'user_reauthenticate_requested'
       )
+      group by timestamp
+      order by timestamp desc
     `,
   },
 
   passwordResetRequests: {
     current: () => `
       select 
+        timestamp_trunc(timestamp, hour) as timestamp,
         count(*) as count
       from auth_logs f
       where json_value(f.event_message, "$.auth_event.action") = 'user_recovery_requested'
+      group by timestamp
+      order by timestamp desc
     `,
     previous: () => `
       select 
+        timestamp_trunc(timestamp, hour) as timestamp,
         count(*) as count
       from auth_logs f
       where json_value(f.event_message, "$.auth_event.action") = 'user_recovery_requested'
+      group by timestamp
+      order by timestamp desc
     `,
   },
 
   signInLatency: {
     current: () => `
       select 
+        timestamp_trunc(timestamp, hour) as timestamp,
         round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms
       from auth_logs
       where json_value(event_message, "$.auth_event.action") = 'login'
+      group by timestamp
+      order by timestamp desc
     `,
     previous: () => `
       select 
+        timestamp_trunc(timestamp, hour) as timestamp,
         round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms
       from auth_logs
       where json_value(event_message, "$.auth_event.action") = 'login'
+      group by timestamp
+      order by timestamp desc
     `,
   },
 
   signUpLatency: {
     current: () => `
       select 
+        timestamp_trunc(timestamp, hour) as timestamp,
         round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms
       from auth_logs
       where json_value(event_message, "$.auth_event.action") = 'user_signedup'
+      group by timestamp
+      order by timestamp desc
     `,
     previous: () => `
       select 
+        timestamp_trunc(timestamp, hour) as timestamp,
         round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms
       from auth_logs
       where json_value(event_message, "$.auth_event.action") = 'user_signedup'
+      group by timestamp
+      order by timestamp desc
     `,
   },
 }
@@ -154,6 +178,19 @@ export const fetchAuthData = async (
   }
 
   return await fetchLogs(projectRef, sql, dateRange.startDate, dateRange.endDate)
+}
+
+// Helper function to sum up time-series data for total counts
+export const sumTimeSeriesData = (data: any[], field: string): number => {
+  if (!data || !Array.isArray(data)) return 0
+  return data.reduce((sum, item) => sum + (item[field] || 0), 0)
+}
+
+// Helper function to get average from time-series data
+export const averageTimeSeriesData = (data: any[], field: string): number => {
+  if (!data || !Array.isArray(data) || data.length === 0) return 0
+  const sum = data.reduce((sum, item) => sum + (item[field] || 0), 0)
+  return sum / data.length
 }
 
 // Utility functions
