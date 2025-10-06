@@ -130,7 +130,6 @@ export const PostgrestConfig = () => {
     dbPool: config?.db_pool,
   }
 
-  console.log(config?.db_extra_search_path)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
