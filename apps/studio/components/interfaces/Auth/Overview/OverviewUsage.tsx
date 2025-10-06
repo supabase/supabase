@@ -21,6 +21,11 @@ import { useMemo } from 'react'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import dayjs from 'dayjs'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import {
+  SignUpChartRenderer,
+  RecentSignUpsRenderer,
+} from 'components/interfaces/Reports/renderers/AuthRenderers'
 
 const StatCard = ({
   title,
@@ -115,11 +120,11 @@ export const OverviewUsage = () => {
     enabled: !!ref,
   })
 
-  // const { data: recentSignUps, isLoading: recentSignUpsLoading } = useQuery({
-  //   queryKey: ['auth-data', ref, 'recentSignUps'],
-  //   queryFn: () => fetchAuthData(ref as string, 'recentSignUps'),
-  //   enabled: !!ref,
-  // })
+  const { data: recentSignUps, isLoading: recentSignUpsLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'recentSignUps'],
+    queryFn: () => fetchAuthData(ref as string, 'recentSignUps'),
+    enabled: !!ref,
+  })
 
   // Extract data from time-series response and sum/average as needed
   const currentUserCount = sumTimeSeriesData(activeUsersCurrent?.result || [], 'count')
@@ -165,6 +170,18 @@ export const OverviewUsage = () => {
     return config.find((c) => c.id === 'signups')
   }, [ref, startDate, endDate])
 
+  // Add this query for signup chart data
+  const { data: signUpChartData, isLoading: signUpChartLoading } = useQuery({
+    queryKey: ['auth-signup-chart', ref, startDate, endDate],
+    queryFn: async () => {
+      if (!signUpChartConfig) return { data: [] }
+      return await signUpChartConfig.dataProvider(ref as string, startDate, endDate, '1h', {
+        status_code: null,
+      })
+    },
+    enabled: !!ref && !!signUpChartConfig,
+  })
+
   const signInChartConfig = useMemo(() => {
     const config = createAuthReportConfig({
       projectRef: ref as string,
@@ -175,6 +192,17 @@ export const OverviewUsage = () => {
     })
     return config.find((c) => c.id === 'sign-in-attempts')
   }, [ref, startDate, endDate])
+
+  const { data: signInChartData, isLoading: signInChartLoading } = useQuery({
+    queryKey: ['auth-signin-chart', ref, startDate, endDate],
+    queryFn: async () => {
+      if (!signInChartConfig) return { data: [] }
+      return await signInChartConfig.dataProvider(ref as string, startDate, endDate, '1h', {
+        status_code: null,
+      })
+    },
+    enabled: !!ref && !!signInChartConfig,
+  })
 
   const updateDateRange = (from: string, to: string) => {
     console.log('Date range update:', from, to)
@@ -224,23 +252,40 @@ export const OverviewUsage = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {signUpChartConfig && (
-            <ReportChartV2
-              report={signUpChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
+            <ReportWidget
+              isLoading={signUpChartLoading}
+              title="Sign Ups"
+              description="User registrations over time"
+              data={signUpChartData?.data || []}
+              error={null}
+              renderer={SignUpChartRenderer}
+              append={RecentSignUpsRenderer}
+              appendProps={{
+                data: recentSignUps?.result || [],
+                isLoading: recentSignUpsLoading,
+              }}
+              queryType="logs"
+              params={{
+                sql: signUpChartData?.query, // Use the query from the dataProvider result
+                iso_timestamp_start: startDate,
+                iso_timestamp_end: endDate,
+              }}
             />
           )}
           {signInChartConfig && (
-            <ReportChartV2
-              report={signInChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
+            <ReportWidget
+              isLoading={signInChartLoading}
+              title="Sign In Attempts"
+              description="User sign in attempts by type"
+              data={signInChartData?.data || []}
+              error={null}
+              renderer={SignUpChartRenderer} // You can reuse this or create a specific one
+              queryType="logs"
+              params={{
+                sql: signInChartData?.query,
+                iso_timestamp_start: startDate,
+                iso_timestamp_end: endDate,
+              }}
             />
           )}
         </div>
