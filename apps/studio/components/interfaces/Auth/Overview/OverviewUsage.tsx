@@ -21,7 +21,6 @@ import { useMemo } from 'react'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import dayjs from 'dayjs'
-import { Table, TableBody, TableHead, TableRow, TableCell } from 'ui'
 
 const StatCard = ({
   title,
@@ -61,44 +60,6 @@ const StatCard = ({
         )}
       </CardContent>
     </Card>
-  )
-}
-
-const RecentSignUpsTable = ({ data, isLoading }: { data: any[]; isLoading: boolean }) => {
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
-  const cellClasses = '!text-xs !py-2 !border-x-0 !rounded-none align-middle'
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <Loader2 className="size-5 animate-spin text-foreground-light" />
-      </div>
-    )
-  }
-
-  if (!data || data.length === 0) return null
-
-  return (
-    <Table className="rounded-t-none">
-      <TableHead>
-        <TableRow>
-          <TableHead className={headerClasses}>Email</TableHead>
-          <TableHead className={headerClasses}>Provider</TableHead>
-          <TableHead className={headerClasses}>Time</TableHead>
-        </TableRow>
-      </TableHead>
-      <Table>
-        {data.map((row, index) => (
-          <TableRow key={index}>
-            <TableCell className={cellClasses}>{row.email || 'N/A'}</TableCell>
-            <TableCell className={cellClasses}>{row.provider || 'N/A'}</TableCell>
-            <TableCell className={cellClasses}>
-              {dayjs(row.timestamp).format('MMM D, YYYY h:mm A')}
-            </TableCell>
-          </TableRow>
-        ))}
-      </Table>
-    </Table>
   )
 }
 
@@ -154,11 +115,11 @@ export const OverviewUsage = () => {
     enabled: !!ref,
   })
 
-  const { data: recentSignUps, isLoading: recentSignUpsLoading } = useQuery({
-    queryKey: ['auth-data', ref, 'recentSignUps'],
-    queryFn: () => fetchAuthData(ref as string, 'recentSignUps'),
-    enabled: !!ref,
-  })
+  // const { data: recentSignUps, isLoading: recentSignUpsLoading } = useQuery({
+  //   queryKey: ['auth-data', ref, 'recentSignUps'],
+  //   queryFn: () => fetchAuthData(ref as string, 'recentSignUps'),
+  //   enabled: !!ref,
+  // })
 
   // Extract data from time-series response and sum/average as needed
   const currentUserCount = sumTimeSeriesData(activeUsersCurrent?.result || [], 'count')
@@ -262,28 +223,16 @@ export const OverviewUsage = () => {
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="flex flex-col">
-            {signUpChartConfig && (
-              <ReportChartV2
-                report={signUpChartConfig}
-                projectRef={ref as string}
-                startDate={startDate}
-                endDate={endDate}
-                interval="1h"
-                updateDateRange={updateDateRange}
-              />
-            )}
-            {recentSignUps?.result && recentSignUps.result.length > 0 && (
-              <Card className="-mt-3 rounded-t-none border-t-0">
-                <CardContent className="p-0">
-                  <RecentSignUpsTable
-                    data={recentSignUps.result}
-                    isLoading={recentSignUpsLoading}
-                  />
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          {signUpChartConfig && (
+            <ReportChartV2
+              report={signUpChartConfig}
+              projectRef={ref as string}
+              startDate={startDate}
+              endDate={endDate}
+              interval="1h"
+              updateDateRange={updateDateRange}
+            />
+          )}
           {signInChartConfig && (
             <ReportChartV2
               report={signInChartConfig}
