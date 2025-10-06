@@ -21,6 +21,7 @@ import { useMemo } from 'react'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import dayjs from 'dayjs'
+import { Table, TableBody, TableHead, TableRow, TableCell } from 'ui'
 
 const StatCard = ({
   title,
@@ -37,6 +38,8 @@ const StatCard = ({
 }) => {
   const changeColor = getChangeColor(previous)
   const changeSign = getChangeSign(previous)
+  const formattedCurrent = suffix === 'ms' ? current.toFixed(2) : current
+
   return (
     <Card>
       <CardContent
@@ -50,7 +53,7 @@ const StatCard = ({
         ) : (
           <>
             <h4 className="text-sm text-foreground-lighter font-normal mb-0">{title}</h4>
-            <p className="text-xl">{`${current}${suffix}`}</p>
+            <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
             <p className={cn('text-sm text-foregroudn-lighter', changeColor)}>
               {`${changeSign}${previous.toFixed(1)}%`}
             </p>
@@ -58,6 +61,44 @@ const StatCard = ({
         )}
       </CardContent>
     </Card>
+  )
+}
+
+const RecentSignUpsTable = ({ data, isLoading }: { data: any[]; isLoading: boolean }) => {
+  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
+  const cellClasses = '!text-xs !py-2 !border-x-0 !rounded-none align-middle'
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <Loader2 className="size-5 animate-spin text-foreground-light" />
+      </div>
+    )
+  }
+
+  if (!data || data.length === 0) return null
+
+  return (
+    <Table className="rounded-t-none">
+      <TableHead>
+        <TableRow>
+          <TableHead className={headerClasses}>Email</TableHead>
+          <TableHead className={headerClasses}>Provider</TableHead>
+          <TableHead className={headerClasses}>Time</TableHead>
+        </TableRow>
+      </TableHead>
+      <Table>
+        {data.map((row, index) => (
+          <TableRow key={index}>
+            <TableCell className={cellClasses}>{row.email || 'N/A'}</TableCell>
+            <TableCell className={cellClasses}>{row.provider || 'N/A'}</TableCell>
+            <TableCell className={cellClasses}>
+              {dayjs(row.timestamp).format('MMM D, YYYY h:mm A')}
+            </TableCell>
+          </TableRow>
+        ))}
+      </Table>
+    </Table>
   )
 }
 
@@ -110,6 +151,12 @@ export const OverviewUsage = () => {
   const { data: signUpLatencyPrevious, isLoading: signUpLatencyPreviousLoading } = useQuery({
     queryKey: ['auth-data', ref, 'signUpLatencyPrevious'],
     queryFn: () => fetchAuthData(ref as string, 'signUpLatencyPrevious'),
+    enabled: !!ref,
+  })
+
+  const { data: recentSignUps, isLoading: recentSignUpsLoading } = useQuery({
+    queryKey: ['auth-data', ref, 'recentSignUps'],
+    queryFn: () => fetchAuthData(ref as string, 'recentSignUps'),
     enabled: !!ref,
   })
 
@@ -201,30 +248,42 @@ export const OverviewUsage = () => {
           />
           <StatCard
             title="Sign up Latency"
-            current={currentSignUpLatency}
+            current={Number(currentSignUpLatency.toFixed(2))}
             previous={signUpLatencyChange}
             loading={signUpLatencyCurrentLoading}
             suffix="ms"
           />
           <StatCard
             title="Sign in Latency"
-            current={currentSignInLatency}
+            current={Number(currentSignInLatency.toFixed(2))}
             previous={signInLatencyChange}
             loading={signInLatencyCurrentLoading}
             suffix="ms"
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {signUpChartConfig && (
-            <ReportChartV2
-              report={signUpChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
-            />
-          )}
+          <div className="flex flex-col">
+            {signUpChartConfig && (
+              <ReportChartV2
+                report={signUpChartConfig}
+                projectRef={ref as string}
+                startDate={startDate}
+                endDate={endDate}
+                interval="1h"
+                updateDateRange={updateDateRange}
+              />
+            )}
+            {recentSignUps?.result && recentSignUps.result.length > 0 && (
+              <Card className="-mt-3 rounded-t-none border-t-0">
+                <CardContent className="p-0">
+                  <RecentSignUpsTable
+                    data={recentSignUps.result}
+                    isLoading={recentSignUpsLoading}
+                  />
+                </CardContent>
+              </Card>
+            )}
+          </div>
           {signInChartConfig && (
             <ReportChartV2
               report={signInChartConfig}

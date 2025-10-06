@@ -79,6 +79,27 @@ export const AUTH_QUERIES = {
     `,
   },
 
+  signUpCount: {
+    current: () => `
+      select 
+        timestamp_trunc(timestamp, hour) as timestamp,
+        count(*) as count
+      from auth_logs f
+      where json_value(f.event_message, "$.auth_event.action") = 'user_signedup'
+      group by timestamp
+      order by timestamp desc
+    `,
+    previous: () => `
+      select 
+        timestamp_trunc(timestamp, hour) as timestamp,
+        count(*) as count
+      from auth_logs f
+      where json_value(f.event_message, "$.auth_event.action") = 'user_signedup'
+      group by timestamp
+      order by timestamp desc
+    `,
+  },
+
   signInLatency: {
     current: () => `
       select 
@@ -120,6 +141,18 @@ export const AUTH_QUERIES = {
       order by timestamp desc
     `,
   },
+
+  recentSignUps: () => `
+    select 
+      timestamp,
+      json_value(event_message, "$.auth_event.actor_id") as user_id,
+      json_value(event_message, "$.auth_event.actor_email") as email,
+      json_value(event_message, "$.auth_event.provider") as provider
+    from auth_logs
+    where json_value(event_message, "$.auth_event.action") = 'user_signedup'
+    order by timestamp desc
+    limit 3
+  `,
 }
 
 // Function to fetch auth data using the analytics endpoint
@@ -130,10 +163,13 @@ export const fetchAuthData = async (
     | 'activeUsersPrevious'
     | 'passwordResetCurrent'
     | 'passwordResetPrevious'
+    | 'signUpCountCurrent'
+    | 'signUpCountPrevious'
     | 'signInLatencyCurrent'
     | 'signInLatencyPrevious'
     | 'signUpLatencyCurrent'
     | 'signUpLatencyPrevious'
+    | 'recentSignUps'
 ) => {
   const { current, previous } = getDateRanges()
 
@@ -157,6 +193,14 @@ export const fetchAuthData = async (
       sql = AUTH_QUERIES.passwordResetRequests.previous()
       dateRange = previous
       break
+    case 'signUpCountCurrent':
+      sql = AUTH_QUERIES.signUpCount.current()
+      dateRange = current
+      break
+    case 'signUpCountPrevious':
+      sql = AUTH_QUERIES.signUpCount.previous()
+      dateRange = previous
+      break
     case 'signInLatencyCurrent':
       sql = AUTH_QUERIES.signInLatency.current()
       dateRange = current
@@ -172,6 +216,10 @@ export const fetchAuthData = async (
     case 'signUpLatencyPrevious':
       sql = AUTH_QUERIES.signUpLatency.previous()
       dateRange = previous
+      break
+    case 'recentSignUps':
+      sql = AUTH_QUERIES.recentSignUps()
+      dateRange = current
       break
     default:
       throw new Error(`Unknown query type: ${queryType}`)
