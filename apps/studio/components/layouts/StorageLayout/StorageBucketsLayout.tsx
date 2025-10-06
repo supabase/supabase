@@ -7,7 +7,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { PageLayout } from '../PageLayout/PageLayout'
 import { ScaffoldContainer } from '../Scaffold'
 
-export const StorageUILayout = ({ children }: PropsWithChildren) => {
+export const StorageBucketsLayout = ({ children }: PropsWithChildren) => {
   const { ref } = useParams()
   const page = useStorageV2Page()
 
