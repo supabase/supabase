@@ -179,8 +179,19 @@ export const getCodeWorkflowSteps = ({
       title: 'Upload a file',
       icon: <Upload strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
-        'Integrate file storage by creating a bucket and uploading a file, starting from the buckets dashboard linked below.',
-      actions: [{ label: 'Buckets', href: `/project/${ref}/storage/buckets`, variant: 'default' }],
+        'Integrate file storage by creating a bucket via SQL and uploading a file using our client libraries.',
+      actions: [
+        {
+          label: 'Create a bucket via SQL',
+          href: 'https://supabase.com/docs/guides/storage/buckets/creating-buckets?queryGroups=language&language=sql',
+          variant: 'default',
+        },
+        {
+          label: 'Upload a file',
+          href: 'https://supabase.com/docs/guides/storage/uploads/standard-uploads',
+          variant: 'default',
+        },
+      ],
     },
     {
       key: 'create-edge-function',
@@ -191,8 +202,8 @@ export const getCodeWorkflowSteps = ({
         'Add server-side logic by creating and deploying your first Edge Function—a lightweight TypeScript or JavaScript function that runs close to your users—then revisit the list to monitor and iterate on it.',
       actions: [
         {
-          label: 'Create a function',
-          href: `/project/${ref}/functions/new`,
+          label: 'Create and deploy via CLI',
+          href: `https://supabase.com/docs/guides/functions/quickstart`,
           variant: 'default',
         },
         { label: 'View functions', href: `/project/${ref}/functions`, variant: 'default' },
