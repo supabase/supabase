@@ -4,6 +4,7 @@ import { cn } from 'ui'
 import type { Feature } from '~/data/open-source/contributing/supasquad.utils'
 import {
   Award,
+  Bot,
   Zap,
   MessageSquare,
   DollarSign,
@@ -13,10 +14,12 @@ import {
   LifeBuoy,
   Wrench,
   Shield,
+  Lock,
 } from 'lucide-react'
 
 const ICONS = {
   award: Award,
+  bot: Bot,
   zap: Zap,
   'message-square': MessageSquare,
   'dollar-sign': DollarSign,
@@ -26,6 +29,7 @@ const ICONS = {
   'life-buoy': LifeBuoy,
   wrench: Wrench,
   shield: Shield,
+  lock: Lock,
 } as const
 
 type IconName = keyof typeof ICONS

@@ -142,15 +142,27 @@ export const RateLimits = () => {
   }, [isSuccess])
 
   if (isError) {
-    return <AlertError subject="Failed to retrieve auth config rate limits" error={error} />
+    return (
+      <ScaffoldSection isFullWidth>
+        <AlertError error={error} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
+    )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view auth configuration settings" />
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view auth configuration settings" />
+      </ScaffoldSection>
+    )
   }
 
   if (isLoading) {
-    return <GenericSkeletonLoader />
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
+    )
   }
 
   return (

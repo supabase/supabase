@@ -1,6 +1,8 @@
 {
   "$schema": "./custom-content.schema.json",
 
+  "app:title": null,
+
   "dashboard_auth:custom_provider": null,
 
   "organization:legal_documents": null,

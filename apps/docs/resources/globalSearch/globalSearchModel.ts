@@ -4,7 +4,7 @@ import { Result } from '~/features/helpers.fn'
 import { openAI } from '~/lib/openAi'
 import { supabase, type DatabaseCorrected } from '~/lib/supabase'
 
-import { isFeatureEnabled } from 'common/enabled-features'
+import { isFeatureEnabled } from '../../../../packages/common/enabled-features'
 import { GuideModel } from '../guide/guideModel'
 import {
   DB_METADATA_TAG_PLATFORM_CLI,

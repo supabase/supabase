@@ -1,9 +1,9 @@
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
+import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
@@ -12,14 +12,8 @@ import {
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  Button,
-  InfoIcon,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
-} from 'ui'
+import { DOCS_URL } from 'lib/constants'
+import { InfoIcon, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 
 /**
  * [Joshen] JFYI before we go live with this, we need to revisit the migrations section
@@ -85,7 +79,6 @@ const StatusIcon = ({
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [open, setOpen] = useState(false)
 
   const {
     projectAuthAll: authEnabled,
@@ -208,7 +201,7 @@ export const ServiceStatus = () => {
           {
             name: 'Edge Functions',
             error: undefined,
-            docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
+            docsUrl: `${DOCS_URL}/guides/functions/troubleshooting`,
             isLoading,
             isHealthy: !!edgeFunctionsStatus?.healthy,
             status: edgeFunctionsStatus?.healthy
@@ -262,27 +255,29 @@ export const ServiceStatus = () => {
         : 'Healthy'
 
   return (
-    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type="outline"
-          className="text-base h-auto px-2"
-          iconRight={<ChevronDown size={14} strokeWidth={1.5} />}
+    <Popover_Shadcn_>
+      <PopoverTrigger_Shadcn_>
+        <SingleStat
           icon={
-            isLoadingChecks || anyComingUp || isMigrationLoading ? (
-              <Loader2 className="animate-spin ml-1" size={12} strokeWidth={1.5} />
-            ) : (
-              <div
-                className={cn(
-                  'w-2 h-2 rounded-full ml-1.5',
-                  allServicesOperational ? 'bg-brand' : 'bg-warning'
-                )}
-              />
-            )
+            <div className="grid grid-cols-3 gap-1">
+              {services.map((service, index) => (
+                <div
+                  key={`${service.name}-${index}`}
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full',
+                    service.isLoading || service.status === 'COMING_UP'
+                      ? 'bg-foreground-lighter animate-pulse'
+                      : service.isHealthy
+                        ? 'bg-brand'
+                        : 'bg-selection'
+                  )}
+                />
+              ))}
+            </div>
           }
-        >
-          {overallStatusLabel}
-        </Button>
+          label={<span>Status</span>}
+          value={<span>{overallStatusLabel}</span>}
+        />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="start">
         {services.map((service) => (

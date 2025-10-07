@@ -20,6 +20,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -150,7 +151,9 @@ export const ConnectionPooling = () => {
                 <Badge>Shared/Dedicated Pooler</Badge>
               )}
             </div>
-            <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler" />
+            <DocsButton
+              href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
+            />
           </div>
         }
         footer={
@@ -277,7 +280,9 @@ export const ConnectionPooling = () => {
                           </p>
                           <p className="mt-2">
                             Please refer to our{' '}
-                            <InlineLink href="https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size">
+                            <InlineLink
+                              href={`${DOCS_URL}/guides/database/connection-management#configuring-supavisors-pool-size`}
+                            >
                               documentation
                             </InlineLink>{' '}
                             to find out more.

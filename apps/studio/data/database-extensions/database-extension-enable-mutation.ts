@@ -4,6 +4,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
+import { configKeys } from 'data/config/keys'
 import type { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
 
@@ -57,7 +58,10 @@ export const useDatabaseExtensionEnableMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseExtensionsKeys.list(projectRef))
+        await Promise.all([
+          queryClient.invalidateQueries(databaseExtensionsKeys.list(projectRef)),
+          queryClient.invalidateQueries(configKeys.upgradeEligibility(projectRef)),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

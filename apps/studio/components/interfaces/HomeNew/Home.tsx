@@ -3,6 +3,7 @@ import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-ki
 import { useEffect, useRef } from 'react'
 
 import { IS_PLATFORM, useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
 import { TopSection } from 'components/interfaces/HomeNew/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -31,6 +32,7 @@ export const HomeV2 = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -69,6 +71,22 @@ export const HomeV2 = () => {
       const oldIndex = items.indexOf(String(active.id))
       const newIndex = items.indexOf(String(over.id))
       if (oldIndex === -1 || newIndex === -1) return items
+
+      if (project?.ref && organization?.slug) {
+        sendEvent({
+          action: 'home_section_rows_moved',
+          properties: {
+            section_moved: String(active.id),
+            old_position: oldIndex,
+            new_position: newIndex,
+          },
+          groups: {
+            project: project.ref,
+            organization: organization.slug,
+          },
+        })
+      }
+
       return arrayMove(items, oldIndex, newIndex)
     })
   }

@@ -9,6 +9,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -135,7 +136,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             target="_blank"
                             rel="noreferrer"
                             className="underline hover:text-foreground transition"
-                            href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                            href={`${DOCS_URL}/guides/realtime/concepts#channels`}
                           >
                             our docs
                           </a>
@@ -173,7 +174,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                   <DocsButton
                     abbrev={false}
                     className="w-min"
-                    href="https://supabase.com/docs/guides/realtime/authorization"
+                    href={`${DOCS_URL}/guides/realtime/authorization`}
                   />
                 </form>
               </Form_Shadcn_>

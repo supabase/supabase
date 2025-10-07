@@ -16,7 +16,10 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useIsNewStorageUIEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -148,6 +151,7 @@ export const FileExplorerHeader = ({
   const debounceDuration = 300
   const snap = useStorageExplorerStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const isNewStorageUIEnabled = useIsNewStorageUIEnabled()
 
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
@@ -286,12 +290,12 @@ export const FileExplorerHeader = ({
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
-        {breadcrumbs.length > 0 && (
+        {breadcrumbs.length > 1 && (
           <Button
             icon={<ChevronLeft size={16} strokeWidth={2} />}
             size="tiny"
             type="text"
-            className={`${breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'} px-1`}
+            className="opacity-100 px-1"
             disabled={backDisabled}
             onClick={() => {
               setIsEditingPath(false)
@@ -330,20 +334,37 @@ export const FileExplorerHeader = ({
             />
           </form>
         ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
-          <HeaderPathEdit
-            loading={loading}
-            isSearching={snap.isSearching}
-            breadcrumbs={breadcrumbs}
-            togglePathEdit={togglePathEdit}
-          />
-        ) : (
+          breadcrumbs.length > 1 ? (
+            <HeaderPathEdit
+              loading={loading}
+              isSearching={snap.isSearching}
+              breadcrumbs={breadcrumbs}
+              togglePathEdit={togglePathEdit}
+            />
+          ) : isNewStorageUIEnabled ? (
+            <div className="flex items-center group">
+              <div className="flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
+                <Button type="text" icon={<Edit2 />} onClick={togglePathEdit}>
+                  Navigate
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <HeaderPathEdit
+              loading={loading}
+              isSearching={snap.isSearching}
+              breadcrumbs={breadcrumbs}
+              togglePathEdit={togglePathEdit}
+            />
+          )
+        ) : breadcrumbs.length > 1 ? (
           <HeaderBreadcrumbs
             loading={loading}
             isSearching={snap.isSearching}
             breadcrumbs={breadcrumbs}
             selectBreadcrumb={selectBreadcrumb}
           />
-        )}
+        ) : null}
       </div>
 
       {/* Actions */}

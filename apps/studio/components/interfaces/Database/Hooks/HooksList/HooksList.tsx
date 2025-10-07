@@ -12,6 +12,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { noop } from 'lib/void'
 import { Input } from 'ui'
 import { HooksListEmpty } from './HooksListEmpty'
@@ -63,7 +64,7 @@ export const HooksList = ({
           onChange={(e) => setFilterString(e.target.value)}
         />
         <div className="flex items-center gap-x-2">
-          <DocsButton href="https://supabase.com/docs/guides/database/webhooks" />
+          <DocsButton href={`${DOCS_URL}/guides/database/webhooks`} />
           <ButtonTooltip
             onClick={() => createHook()}
             disabled={!isPermissionsLoaded || !canCreateWebhooks}

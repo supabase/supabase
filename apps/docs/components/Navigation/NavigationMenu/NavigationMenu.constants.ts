@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+// End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'
 import type { IconPanel } from 'ui-patterns/IconPanel'
@@ -7,8 +8,23 @@ import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Naviga
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
   billingAll: billingEnabled,
+  docsAuthArchitecture: authArchitectureEnabled,
+  docsAuthConfiguration: authConfigurationEnabled,
+  docsAuthFlows: authFlowsEnabled,
+  docsAuthFullSecurity: authFullSecurityEnabled,
+  docsAuthTroubleshooting: authTroubleshootingEnabled,
   docsCompliance: complianceEnabled,
+  docsContribution: contributionEnabled,
+  docsFdw: fdwEnabled,
+  docsFrameworkQuickstarts: frameworkQuickstartsEnabled,
+  docsFullPlatform: fullPlatformEnabled,
+  docsLocalDevelopment: localDevelopmentEnabled,
+  docsMobileTutorials: mobileTutorialsEnabled,
+  docsPgtap: pgTapEnabled,
+  docsProductionChecklist: productionChecklistEnabled,
   'docsSelf-hosting': selfHostingEnabled,
+  docsWebApps: webAppsEnabled,
+  integrationsPartners: integrationsEnabled,
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
   sdkKotlin: sdkKotlinEnabled,
@@ -17,8 +33,23 @@ const {
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
+  'docs:auth_architecture',
+  'docs:auth_configuration',
+  'docs:auth_flows',
+  'docs:auth_full_security',
+  'docs:auth_troubleshooting',
   'docs:compliance',
+  'docs:contribution',
+  'docs:fdw',
+  'docs:framework_quickstarts',
+  'docs:full_platform',
+  'docs:local_development',
+  'docs:mobile_tutorials',
+  'docs:pgtap',
+  'docs:production_checklist',
   'docs:self-hosting',
+  'docs:web_apps',
+  'integrations:partners',
   'sdk:csharp',
   'sdk:dart',
   'sdk:kotlin',
@@ -108,6 +139,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'dev-cli',
             href: '/guides/local-development' as `/${string}`,
             level: 'local_development',
+            enabled: localDevelopmentEnabled,
           },
           {
             label: 'Deployment',
@@ -128,6 +160,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             hasLightIcon: true,
             href: '/guides/integrations' as `/${string}`,
             level: 'integrations',
+            enabled: integrationsEnabled,
           },
         ],
       ],
@@ -231,6 +264,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/reference/api/introduction' as `/${string}`,
             level: 'reference_javascript',
           },
+          {
+            label: 'UI Library',
+            icon: 'ui',
+            href: 'https://supabase.com/ui' as `/${string}`,
+            level: 'ui',
+          },
         ],
         [
           { label: 'Data API' },
@@ -277,6 +316,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'Contributing',
             icon: 'contributing',
             href: '/contributing' as `/${string}`,
+            enabled: contributionEnabled,
           },
         ],
       ],
@@ -293,26 +333,39 @@ export const gettingstarted: NavMenuConstant = {
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
       name: 'Framework Quickstarts',
+      enabled: frameworkQuickstartsEnabled,
       items: [
-        { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
-        { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'Nuxt', url: '/guides/getting-started/quickstarts/nuxtjs' },
-        { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
-        { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
+        {
+          name: 'Next.js',
+          url: '/guides/getting-started/quickstarts/nextjs',
+        },
+        {
+          name: 'React',
+          url: '/guides/getting-started/quickstarts/reactjs',
+        },
+        {
+          name: 'Nuxt',
+          url: '/guides/getting-started/quickstarts/nuxtjs',
+        },
+        {
+          name: 'Vue',
+          url: '/guides/getting-started/quickstarts/vue',
+        },
+        {
+          name: 'Hono',
+          url: '/guides/getting-started/quickstarts/hono',
+        },
         {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
-          enabled: sdkDartEnabled,
         },
         {
           name: 'iOS SwiftUI',
           url: '/guides/getting-started/quickstarts/ios-swiftui',
-          enabled: sdkSwiftEnabled,
         },
         {
           name: 'Android Kotlin',
           url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
-          enabled: sdkKotlinEnabled,
         },
         {
           name: 'SvelteKit',
@@ -329,16 +382,23 @@ export const gettingstarted: NavMenuConstant = {
           enabled: !jsOnly,
         },
 
-        { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
+        {
+          name: 'SolidJS',
+          url: '/guides/getting-started/quickstarts/solidjs',
+        },
         {
           name: 'RedwoodJS',
           url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
         },
-        { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
+        {
+          name: 'refine',
+          url: '/guides/getting-started/quickstarts/refine',
+        },
       ],
     },
     {
       name: 'Web app demos',
+      enabled: webAppsEnabled,
       items: [
         {
           name: 'Next.js',
@@ -384,6 +444,7 @@ export const gettingstarted: NavMenuConstant = {
     },
     {
       name: 'Mobile tutorials',
+      enabled: mobileTutorialsEnabled,
       items: [
         {
           name: 'Flutter',
@@ -604,9 +665,11 @@ export const auth: NavMenuConstant = {
     {
       name: 'Architecture',
       url: '/guides/auth/architecture',
+      enabled: authArchitectureEnabled,
     },
     {
       name: 'Getting Started',
+      enabled: frameworkQuickstartsEnabled,
       items: [
         {
           name: 'Next.js',
@@ -616,6 +679,10 @@ export const auth: NavMenuConstant = {
         {
           name: 'React Native',
           url: '/guides/auth/quickstarts/react-native' as `/${string}`,
+        },
+        {
+          name: 'React Native with Expo & Social Auth',
+          url: '/guides/auth/quickstarts/with-expo-react-native-social-auth',
         },
       ],
     },
@@ -637,6 +704,7 @@ export const auth: NavMenuConstant = {
     },
     {
       name: 'Flows (How-tos)',
+      enabled: authFlowsEnabled,
       items: [
         {
           name: 'Server-Side Rendering',
@@ -726,7 +794,11 @@ export const auth: NavMenuConstant = {
       name: 'Debugging',
       items: [
         { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
-        { name: 'Troubleshooting', url: '/guides/auth/troubleshooting' },
+        {
+          name: 'Troubleshooting',
+          url: '/guides/auth/troubleshooting',
+          enabled: authTroubleshootingEnabled,
+        },
       ],
     },
     {
@@ -743,6 +815,7 @@ export const auth: NavMenuConstant = {
     },
     {
       name: 'Configuration',
+      enabled: authConfigurationEnabled,
       items: [
         {
           name: 'General Configuration',
@@ -790,16 +863,29 @@ export const auth: NavMenuConstant = {
     {
       name: 'Security',
       items: [
-        { name: 'Password Security', url: '/guides/auth/password-security' },
-        { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
-        { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
-        { name: 'Audit Logs', url: '/guides/auth/audit-logs' },
+        {
+          name: 'Password Security',
+          url: '/guides/auth/password-security',
+          enabled: authFullSecurityEnabled,
+        },
+        { name: 'Rate Limits', url: '/guides/auth/rate-limits', enabled: authFullSecurityEnabled },
+        {
+          name: 'Bot Detection (CAPTCHA)',
+          url: '/guides/auth/auth-captcha',
+          enabled: authFullSecurityEnabled,
+        },
+        { name: 'Audit Logs', url: '/guides/auth/audit-logs', enabled: authFullSecurityEnabled },
         {
           name: 'JSON Web Tokens (JWT)',
           url: '/guides/auth/jwts',
+          enabled: authFullSecurityEnabled,
           items: [{ name: 'Claims Reference', url: '/guides/auth/jwt-fields' }],
         },
-        { name: 'JWT Signing Keys', url: '/guides/auth/signing-keys' },
+        {
+          name: 'JWT Signing Keys',
+          url: '/guides/auth/signing-keys',
+          enabled: authFullSecurityEnabled,
+        },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         {
           name: 'Column Level Security',
@@ -1177,6 +1263,7 @@ export const database: NavMenuConstant = {
     {
       name: 'Foreign Data Wrappers',
       url: undefined,
+      enabled: fdwEnabled,
       items: [
         {
           name: 'Overview',
@@ -1303,7 +1390,13 @@ export const queues: NavMenuConstant = {
     {
       name: 'Getting Started',
       url: undefined,
-      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+      items: [
+        { name: 'Quickstart', url: '/guides/queues/quickstart' },
+        {
+          name: 'Consuming Messages with Edge Functions',
+          url: '/guides/queues/consuming-messages-with-edge-functions',
+        },
+      ],
     },
     {
       name: 'References',
@@ -1507,6 +1600,7 @@ export const functions: NavMenuConstant = {
         {
           name: 'Limits',
           url: '/guides/functions/limits' as `/${string}`,
+          enabled: billingEnabled,
         },
         {
           name: 'Pricing',
@@ -1659,8 +1753,8 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime',
     },
     {
-      name: 'Concepts',
-      url: '/guides/realtime/concepts',
+      name: 'Getting Started',
+      url: '/guides/realtime/getting_started',
     },
     {
       name: 'Usage',
@@ -1706,13 +1800,14 @@ export const realtime: NavMenuConstant = {
       name: 'Deep dive',
       url: undefined,
       items: [
-        { name: 'Quotas', url: '/guides/realtime/quotas' },
+        { name: 'Quotas', url: '/guides/realtime/quotas', enabled: billingEnabled },
         {
           name: 'Pricing',
           url: '/guides/realtime/pricing' as `/${string}`,
           enabled: billingEnabled,
         },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
+        { name: 'Concepts', url: '/guides/realtime/concepts' },
         { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],
@@ -1776,7 +1871,7 @@ export const storage: NavMenuConstant = {
           name: 'S3 Uploads',
           url: '/guides/storage/uploads/s3-uploads' as `/${string}`,
         },
-        { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
+        { name: 'Limits', url: '/guides/storage/uploads/file-limits', enabled: billingEnabled },
       ],
     },
     {
@@ -1791,6 +1886,7 @@ export const storage: NavMenuConstant = {
         {
           name: 'Bandwidth & Storage Egress',
           url: '/guides/storage/serving/bandwidth' as `/${string}`,
+          enabled: billingEnabled,
         },
       ],
     },
@@ -1831,6 +1927,7 @@ export const storage: NavMenuConstant = {
         {
           name: 'Limits',
           url: '/guides/storage/analytics/limits' as `/${string}`,
+          enabled: billingEnabled,
         },
       ],
     },
@@ -2046,6 +2143,7 @@ export const ai: NavMenuConstant = {
 export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
+  enabled: localDevelopmentEnabled,
   url: '/guides/local-development',
   items: [
     { name: 'Overview', url: '/guides/local-development' },
@@ -2093,6 +2191,7 @@ export const local_development: NavMenuConstant = {
         {
           name: 'pgTAP advanced guide',
           url: '/guides/local-development/testing/pgtap-extended' as `/${string}`,
+          enabled: pgTapEnabled,
         },
         { name: 'Database testing', url: '/guides/database/testing' },
         {
@@ -2108,6 +2207,7 @@ export const contributing: NavMenuConstant = {
   icon: 'contributing',
   title: 'Contributing',
   url: '/contributing',
+  enabled: contributionEnabled,
   items: [{ name: 'Overview', url: '/contributing' }],
 }
 
@@ -2205,7 +2305,11 @@ export const security: NavMenuConstant = {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Production Checklist', url: '/guides/deployment/going-into-prod' },
+        {
+          name: 'Production Checklist',
+          url: '/guides/deployment/going-into-prod',
+          enabled: productionChecklistEnabled,
+        },
         {
           name: 'Shared Responsibility Model',
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
@@ -2235,6 +2339,7 @@ export const platform: NavMenuConstant = {
     {
       name: 'Upgrades & Migrations',
       url: undefined,
+      enabled: fullPlatformEnabled,
       items: [
         { name: 'Upgrading', url: '/guides/platform/upgrading' },
         {
@@ -2269,6 +2374,7 @@ export const platform: NavMenuConstant = {
         {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
+          enabled: fullPlatformEnabled,
           items: [
             {
               name: 'Enforce MFA on organization',
@@ -2279,6 +2385,7 @@ export const platform: NavMenuConstant = {
         {
           name: 'Transfer Project',
           url: '/guides/platform/project-transfer' as `/${string}`,
+          enabled: fullPlatformEnabled,
         },
         {
           name: 'Restore to a new project',
@@ -2287,6 +2394,7 @@ export const platform: NavMenuConstant = {
         {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
+          enabled: fullPlatformEnabled,
           items: [
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
             {
@@ -2303,8 +2411,16 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Regions', url: '/guides/platform/regions' as `/${string}` },
-        { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' as `/${string}` },
-        { name: 'Database Size', url: '/guides/platform/database-size' as `/${string}` },
+        {
+          name: 'Compute and Disk',
+          url: '/guides/platform/compute-and-disk' as `/${string}`,
+          enabled: fullPlatformEnabled,
+        },
+        {
+          name: 'Database Size',
+          url: '/guides/platform/database-size' as `/${string}`,
+          enabled: fullPlatformEnabled,
+        },
         { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' as `/${string}` },
         {
           name: 'Network Restrictions',
@@ -2340,8 +2456,6 @@ export const platform: NavMenuConstant = {
           name: 'Manage your usage',
           url: '/guides/platform/manage-your-usage' as `/${string}`,
           items: [
-            { name: 'Usage limits', url: '/guides/platform/usage-limits' as `/${string}` },
-            { name: 'Overages', url: '/guides/platform/overages' as `/${string}` },
             {
               name: 'Compute',
               url: '/guides/platform/manage-your-usage/compute' as `/${string}`,
@@ -2603,7 +2717,11 @@ export const deployment: NavMenuConstant = {
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
-        { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        {
+          name: 'Production checklist',
+          url: '/guides/deployment/going-into-prod',
+          enabled: productionChecklistEnabled,
+        },
         { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
       ],
     },
@@ -2625,6 +2743,7 @@ export const integrations: NavMenuConstant = {
   title: 'Integrations',
   icon: 'integrations',
   url: '/guides/integrations',
+  enabled: integrationsEnabled,
   items: [
     {
       name: 'Overview',

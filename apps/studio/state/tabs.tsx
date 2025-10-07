@@ -1,3 +1,4 @@
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { partition } from 'lodash'
@@ -286,7 +287,7 @@ function createTabsState(projectRef: string) {
         case 'f':
         case 'p':
           router.push(
-            `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}`
+            `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`
           )
           break
       }
@@ -347,7 +348,7 @@ function createTabsState(projectRef: string) {
               router.push(`/project/${router.query.ref}/editor`)
               break
             default:
-              router.push(`/project/${router.query.ref}/${editor}`)
+              router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
           }
         }
       }
