@@ -42,7 +42,7 @@ async function getProjects(
   })
 
   if (error) handleError(error)
-  return data
+  return data as unknown as components['schemas']['ListProjectsPaginatedResponse']
 }
 
 export type ProjectsInfiniteData = Awaited<ReturnType<typeof getProjects>>
