@@ -99,8 +99,11 @@ export const useProjectCreateMutation = ({
     (vars) => createProject(vars),
     {
       async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(projectKeys.list()),
-          await onSuccess?.(data, variables, context)
+        await Promise.all([
+          queryClient.invalidateQueries(projectKeys.list()),
+          queryClient.invalidateQueries(projectKeys.infiniteListByOrg(variables.organizationSlug)),
+        ])
+        await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {

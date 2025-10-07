@@ -1,5 +1,10 @@
 export const projectKeys = {
   list: () => ['all-projects'] as const,
+  infiniteList: (params?: {
+    limit: number
+    sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+    search?: string
+  }) => ['all-projects-infinite', params].filter(Boolean),
   infiniteListByOrg: (
     slug: string | undefined,
     params?: {
