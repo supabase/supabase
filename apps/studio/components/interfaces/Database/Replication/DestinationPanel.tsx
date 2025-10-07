@@ -664,7 +664,7 @@ export const DestinationPanel = ({
                               <FormControl_Shadcn_>
                                 <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                                   <SelectTrigger_Shadcn_>
-                                    {field.value || 'Select a bucket'}
+                                    {field.value || 'Select a warehouse'}
                                   </SelectTrigger_Shadcn_>
                                   <SelectContent_Shadcn_>
                                     <SelectGroup_Shadcn_>
@@ -701,41 +701,40 @@ export const DestinationPanel = ({
                               description="Select a namespace from your Analytics Bucket warehouse"
                             >
                               <FormControl_Shadcn_>
-                                {!warehouseName || !serviceApiKey ? (
-                                  <Input_Shadcn_
-                                    {...field}
-                                    placeholder="Enter warehouse name first"
-                                    disabled
-                                  />
-                                ) : (
-                                  <Select_Shadcn_
-                                    value={field.value}
-                                    onValueChange={field.onChange}
-                                  >
-                                    <SelectTrigger_Shadcn_>
-                                      {field.value || 'Select a namespace'}
-                                    </SelectTrigger_Shadcn_>
-                                    <SelectContent_Shadcn_>
-                                      <SelectGroup_Shadcn_>
-                                        {isLoadingNamespaces ? (
-                                          <SelectItem_Shadcn_ value="__loading__" disabled>
-                                            Loading namespaces...
+                                <Select_Shadcn_
+                                  value={field.value}
+                                  onValueChange={field.onChange}
+                                  disabled={!warehouseName || !serviceApiKey}
+                                >
+                                  <SelectTrigger_Shadcn_>
+                                    {!warehouseName || !serviceApiKey
+                                      ? 'Select warehouse first'
+                                      : field.value || 'Select a namespace'}
+                                  </SelectTrigger_Shadcn_>
+                                  <SelectContent_Shadcn_>
+                                    <SelectGroup_Shadcn_>
+                                      {!warehouseName || !serviceApiKey ? (
+                                        <SelectItem_Shadcn_ value="__disabled__" disabled>
+                                          Select warehouse first
+                                        </SelectItem_Shadcn_>
+                                      ) : isLoadingNamespaces ? (
+                                        <SelectItem_Shadcn_ value="__loading__" disabled>
+                                          Loading namespaces...
+                                        </SelectItem_Shadcn_>
+                                      ) : namespaces.length === 0 ? (
+                                        <SelectItem_Shadcn_ value="__no_namespaces__" disabled>
+                                          No namespaces available
+                                        </SelectItem_Shadcn_>
+                                      ) : (
+                                        namespaces.map((namespace) => (
+                                          <SelectItem_Shadcn_ key={namespace} value={namespace}>
+                                            {namespace}
                                           </SelectItem_Shadcn_>
-                                        ) : namespaces.length === 0 ? (
-                                          <SelectItem_Shadcn_ value="__no_namespaces__" disabled>
-                                            No namespaces available
-                                          </SelectItem_Shadcn_>
-                                        ) : (
-                                          namespaces.map((namespace) => (
-                                            <SelectItem_Shadcn_ key={namespace} value={namespace}>
-                                              {namespace}
-                                            </SelectItem_Shadcn_>
-                                          ))
-                                        )}
-                                      </SelectGroup_Shadcn_>
-                                    </SelectContent_Shadcn_>
-                                  </Select_Shadcn_>
-                                )}
+                                        ))
+                                      )}
+                                    </SelectGroup_Shadcn_>
+                                  </SelectContent_Shadcn_>
+                                </Select_Shadcn_>
                               </FormControl_Shadcn_>
                             </FormItemLayout>
                           )}
