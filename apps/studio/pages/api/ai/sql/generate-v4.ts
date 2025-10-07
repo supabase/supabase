@@ -1,7 +1,7 @@
 import pgMeta from '@supabase/pg-meta'
 import { convertToModelMessages, type ModelMessage, stepCountIs, streamText } from 'ai'
 import { source } from 'common-tags'
-import type { NextApiRequest, NextApiResponse, PageConfig } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
 import { IS_PLATFORM } from 'common'
@@ -26,7 +26,7 @@ import { executeQuery } from 'lib/api/self-hosted/query'
 
 export const maxDuration = 120
 
-export const config: PageConfig = {
+export const config = {
   api: {
     bodyParser: {
       sizeLimit: '5mb',
