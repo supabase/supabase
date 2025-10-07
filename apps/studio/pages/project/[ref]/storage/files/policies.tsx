@@ -1,6 +1,6 @@
 import { StoragePolicies } from 'components/interfaces/Storage/StoragePolicies/StoragePolicies'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { StorageFilesLayout } from 'components/layouts/StorageLayout/StorageFilesLayout'
+import { StorageBucketsLayout } from 'components/layouts/StorageLayout/StorageBucketsLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import type { NextPageWithLayout } from 'types'
 
@@ -11,7 +11,7 @@ const FilesPoliciesPage: NextPageWithLayout = () => {
 FilesPoliciesPage.getLayout = (page) => (
   <DefaultLayout>
     <StorageLayout title="Storage">
-      <StorageFilesLayout>{page}</StorageFilesLayout>
+      <StorageBucketsLayout>{page}</StorageBucketsLayout>
     </StorageLayout>
   </DefaultLayout>
 )

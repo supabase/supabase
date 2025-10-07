@@ -1,8 +1,10 @@
 import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
-import { useState } from 'react'
 import {
   Button,
   Card,
@@ -19,7 +21,6 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CreateBucketModal } from './CreateBucketModal'
 import { DeleteBucketModal } from './DeleteBucketModal'
 import { EditBucketModal } from './EditBucketModal'
@@ -47,8 +48,8 @@ export const FilesBuckets = () => {
       buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD').length === 0 ? (
         <EmptyBucketState bucketType="files" />
       ) : (
-        <div className="pt-12 flex flex-col gap-y-4">
-          <div className="flex flex-grow justify-between gap-2 items-center">
+        <ScaffoldSection isFullWidth className="gap-y-4">
+          <div className="flex flex-grow justify-between gap-x-2 items-center">
             <Input
               size="tiny"
               className="flex-grow lg:flex-grow-0 w-52"
@@ -145,7 +146,7 @@ export const FilesBuckets = () => {
               </Table>
             </Card>
           )}
-        </div>
+        </ScaffoldSection>
       )}
 
       {selectedBucket && (

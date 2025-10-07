@@ -5,15 +5,11 @@ import { CloneStatus } from 'data/projects/clone-status-query'
 import { TimestampInfo } from 'ui-patterns'
 import { StatusBadge } from './StatusBadge'
 
-export const PreviousRestoreItem = ({
-  clone,
-}: {
-  clone: NonNullable<CloneStatus['clones']>[number]
-}) => {
+export const PreviousRestoreItem = ({ clone }: { clone: CloneStatus['clones'][number] }) => {
   if (clone.status === 'REMOVED') {
     return (
       <div className="grid grid-cols-4 gap-2 text-sm p-4 group">
-        <div className="min-w-24 truncate">{(clone.target_project as any).name}</div>
+        <div className="min-w-24 truncate">{clone.target_project?.name ?? 'Unknown project'}</div>
         <div>
           <StatusBadge status={clone.status} />
         </div>
@@ -28,10 +24,10 @@ export const PreviousRestoreItem = ({
   } else {
     return (
       <Link
-        href={`/project/${clone.target_project.ref}`}
+        href={`/project/${clone.target_project?.ref ?? '_'}`}
         className="grid grid-cols-4 gap-2 text-sm p-4 group"
       >
-        <div className="min-w-24 truncate">{(clone.target_project as any).name}</div>
+        <div className="min-w-24 truncate">{clone.target_project?.name ?? 'Unknown project'}</div>
         <div>
           <StatusBadge status={clone.status} />
         </div>

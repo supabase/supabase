@@ -65,21 +65,21 @@ export const CONTEXT_MENU_KEYS = {
 export const BUCKET_TYPES = {
   files: {
     displayName: 'Files',
-    bucketName: 'a file bucket',
+    label: 'a file bucket',
     description: 'General file storage for most types of digital content.',
     valueProp: 'Store images, videos, documents, and any other file type.',
     docsUrl: `${DOCS_URL}/guides/storage/buckets/fundamentals`,
   },
   analytics: {
     displayName: 'Analytics',
-    bucketName: 'an analytics bucket',
+    label: 'an analytics bucket',
     description: 'Purpose-built storage for analytical workloads.',
     valueProp: 'Store large datasets for analytics and reporting.',
     docsUrl: `${DOCS_URL}/guides/storage/analytics/introduction`,
   },
   vectors: {
     displayName: 'Vectors',
-    bucketName: 'a vector bucket',
+    label: 'a vector bucket',
     description: 'Purpose-built storage for vector data.',
     valueProp: 'Store, index, and query your vector embeddings at scale.',
     docsUrl: `${DOCS_URL}/guides/storage/vectors`,
