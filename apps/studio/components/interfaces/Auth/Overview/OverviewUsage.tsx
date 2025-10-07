@@ -66,14 +66,13 @@ const StatCard = ({
 export const OverviewUsage = () => {
   const { ref } = useParams()
 
-  // Use the analytics endpoint for auth data
   const { data: activeUsersCurrent, isLoading: activeUsersCurrentLoading } = useQuery({
     queryKey: ['auth-data', ref, 'activeUsersCurrent'],
     queryFn: () => fetchAuthData(ref as string, 'activeUsersCurrent'),
     enabled: !!ref,
   })
 
-  const { data: activeUsersPrevious, isLoading: activeUsersPreviousLoading } = useQuery({
+  const { data: activeUsersPrevious } = useQuery({
     queryKey: ['auth-data', ref, 'activeUsersPrevious'],
     queryFn: () => fetchAuthData(ref as string, 'activeUsersPrevious'),
     enabled: !!ref,
@@ -85,7 +84,7 @@ export const OverviewUsage = () => {
     enabled: !!ref,
   })
 
-  const { data: passwordResetPrevious, isLoading: passwordResetPreviousLoading } = useQuery({
+  const { data: passwordResetPrevious } = useQuery({
     queryKey: ['auth-data', ref, 'passwordResetPrevious'],
     queryFn: () => fetchAuthData(ref as string, 'passwordResetPrevious'),
     enabled: !!ref,
@@ -97,7 +96,7 @@ export const OverviewUsage = () => {
     enabled: !!ref,
   })
 
-  const { data: signInLatencyPrevious, isLoading: signInLatencyPreviousLoading } = useQuery({
+  const { data: signInLatencyPrevious } = useQuery({
     queryKey: ['auth-data', ref, 'signInLatencyPrevious'],
     queryFn: () => fetchAuthData(ref as string, 'signInLatencyPrevious'),
     enabled: !!ref,
@@ -109,19 +108,12 @@ export const OverviewUsage = () => {
     enabled: !!ref,
   })
 
-  const { data: signUpLatencyPrevious, isLoading: signUpLatencyPreviousLoading } = useQuery({
+  const { data: signUpLatencyPrevious } = useQuery({
     queryKey: ['auth-data', ref, 'signUpLatencyPrevious'],
     queryFn: () => fetchAuthData(ref as string, 'signUpLatencyPrevious'),
     enabled: !!ref,
   })
 
-  const { data: recentSignUps, isLoading: recentSignUpsLoading } = useQuery({
-    queryKey: ['auth-data', ref, 'recentSignUps'],
-    queryFn: () => fetchAuthData(ref as string, 'recentSignUps'),
-    enabled: !!ref,
-  })
-
-  // Extract data from time-series response and sum/average as needed
   const currentUserCount = sumTimeSeriesData(activeUsersCurrent?.result || [], 'count')
   const previousUserCount = sumTimeSeriesData(activeUsersPrevious?.result || [], 'count')
   const currentPasswordResets = sumTimeSeriesData(passwordResetCurrent?.result || [], 'count')

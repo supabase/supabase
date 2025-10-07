@@ -228,13 +228,11 @@ export const fetchAuthData = async (
   return await fetchLogs(projectRef, sql, dateRange.startDate, dateRange.endDate)
 }
 
-// Helper function to sum up time-series data for total counts
 export const sumTimeSeriesData = (data: any[], field: string): number => {
   if (!data || !Array.isArray(data)) return 0
   return data.reduce((sum, item) => sum + (item[field] || 0), 0)
 }
 
-// Helper function to get average from time-series data
 export const averageTimeSeriesData = (data: any[], field: string): number => {
   if (!data || !Array.isArray(data) || data.length === 0) return 0
   const sum = data.reduce((sum, item) => sum + (item[field] || 0), 0)
