@@ -6,6 +6,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
@@ -13,6 +14,8 @@ import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
@@ -50,19 +53,61 @@ import PublicationsComboBox from './PublicationsComboBox'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 
 const formId = 'destination-editor'
-const types = ['BigQuery'] as const
+const types = ['BigQuery', 'Analytics Bucket'] as const
 const TypeEnum = z.enum(types)
 
-const FormSchema = z.object({
-  type: TypeEnum,
-  name: z.string().min(1, 'Name is required'),
-  projectId: z.string().min(1, 'Project id is required'),
-  datasetId: z.string().min(1, 'Dataset id is required'),
-  serviceAccountKey: z.string().min(1, 'Service account key is required'),
-  publicationName: z.string().min(1, 'Publication is required'),
-  maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
-  maxStalenessMins: z.number().nonnegative().optional(),
-})
+const FormSchema = z
+  .object({
+    type: TypeEnum,
+    name: z.string().min(1, 'Name is required'),
+    // BigQuery fields
+    projectId: z.string().optional(),
+    datasetId: z.string().optional(),
+    serviceAccountKey: z.string().optional(),
+    // Analytics Bucket fields
+    warehouseName: z.string().optional(),
+    namespace: z.string().optional(),
+    catalogToken: z.string().optional(),
+    s3AccessKeyId: z.string().optional(),
+    s3SecretAccessKey: z.string().optional(),
+    s3Region: z.string().optional(),
+    // Common fields
+    publicationName: z.string().min(1, 'Publication is required'),
+    maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
+    maxStalenessMins: z.number().nonnegative().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type === 'BigQuery') {
+        return (
+          data.projectId &&
+          data.projectId.length > 0 &&
+          data.datasetId &&
+          data.datasetId.length > 0 &&
+          data.serviceAccountKey &&
+          data.serviceAccountKey.length > 0
+        )
+      } else if (data.type === 'Analytics Bucket') {
+        return (
+          data.warehouseName &&
+          data.warehouseName.length > 0 &&
+          data.namespace &&
+          data.namespace.length > 0 &&
+          data.s3AccessKeyId &&
+          data.s3AccessKeyId.length > 0 &&
+          data.s3SecretAccessKey &&
+          data.s3SecretAccessKey.length > 0 &&
+          data.s3Region &&
+          data.s3Region.length > 0
+        )
+      }
+      return true
+    },
+    {
+      message: 'All fields are required for the selected destination type',
+      path: ['projectId'], // This will be overridden based on the actual validation failure
+    }
+  )
 
 interface DestinationPanelProps {
   visible: boolean
@@ -123,19 +168,40 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
+  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({
+    projectRef,
+  })
+
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { serviceKey } = getKeys(apiKeys)
+  const serviceApiKey = serviceKey?.api_key ?? ''
+
   const defaultValues = useMemo(
     () => ({
-      type: TypeEnum.enum.BigQuery,
+      type: (destinationData?.config?.big_query
+        ? TypeEnum.enum.BigQuery
+        : destinationData?.config?.analytics_bucket
+          ? TypeEnum.enum['Analytics Bucket']
+          : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>,
       name: destinationData?.name ?? '',
+      // BigQuery fields
       projectId: destinationData?.config?.big_query?.project_id ?? '',
       datasetId: destinationData?.config?.big_query?.dataset_id ?? '',
       // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
+      // Analytics Bucket fields
+      warehouseName: destinationData?.config?.analytics_bucket?.warehouse_name ?? '',
+      namespace: destinationData?.config?.analytics_bucket?.namespace ?? '',
+      catalogToken: serviceApiKey, // Auto-populated from service API key
+      s3AccessKeyId: '', // Always empty for security
+      s3SecretAccessKey: '', // Always empty for security
+      s3Region: destinationData?.config?.analytics_bucket?.s3_region ?? '',
+      // Common fields
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
       maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
     }),
-    [destinationData, pipelineData]
+    [destinationData, pipelineData, serviceApiKey]
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -145,7 +211,29 @@ export const DestinationPanel = ({
     defaultValues,
   })
   const publicationName = form.watch('publicationName')
+  const selectedType = form.watch('type')
+  const warehouseName = form.watch('warehouseName')
+  const catalogToken = form.watch('catalogToken')
   const isSaving = creatingDestinationPipeline || updatingDestinationPipeline || startingPipeline
+
+  // Construct catalog URI for iceberg namespaces query
+  const catalogUri = useMemo(() => {
+    if (!project?.ref) return ''
+    // return `https://${project.ref}.supabase.co/storage/v1/iceberg`
+    return `http://localhost:8080/storage/v1/iceberg`
+  }, [project?.ref])
+
+  const { data: namespaces = [], isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
+    {
+      catalogUri,
+      warehouse: warehouseName || '',
+      token: serviceApiKey || '',
+    },
+    {
+      enabled:
+        selectedType === 'Analytics Bucket' && !!catalogUri && !!warehouseName && !!serviceApiKey,
+    }
+  )
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
@@ -176,17 +264,32 @@ export const DestinationPanel = ({
       if (editMode && existingDestination) {
         if (!existingDestination.pipelineId) return console.error('Pipeline id is required')
 
-        const bigQueryConfig: any = {
-          projectId: data.projectId,
-          datasetId: data.datasetId,
-          serviceAccountKey: data.serviceAccountKey,
-        }
-        if (!!data.maxStalenessMins) {
-          bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+        let destinationConfig: any = {}
+
+        if (data.type === 'BigQuery') {
+          const bigQueryConfig: any = {
+            projectId: data.projectId,
+            datasetId: data.datasetId,
+            serviceAccountKey: data.serviceAccountKey,
+          }
+          if (!!data.maxStalenessMins) {
+            bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+          }
+          destinationConfig = { bigQuery: bigQueryConfig }
+        } else if (data.type === 'Analytics Bucket') {
+          const analyticsBucketConfig: any = {
+            warehouseName: data.warehouseName,
+            namespace: data.namespace,
+            catalogToken: data.catalogToken,
+            s3AccessKeyId: data.s3AccessKeyId,
+            s3SecretAccessKey: data.s3SecretAccessKey,
+            s3Region: data.s3Region,
+          }
+          destinationConfig = { analyticsBucket: analyticsBucketConfig }
         }
 
         const batchConfig: any = {}
-        if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
+        if (data.type === 'BigQuery' && !!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
         const hasBatchFields = Object.keys(batchConfig).length > 0
 
         await updateDestinationPipeline({
@@ -194,7 +297,7 @@ export const DestinationPanel = ({
           pipelineId: existingDestination.pipelineId,
           projectRef,
           destinationName: data.name,
-          destinationConfig: { bigQuery: bigQueryConfig },
+          destinationConfig,
           pipelineConfig: {
             publicationName: data.publicationName,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
@@ -222,23 +325,37 @@ export const DestinationPanel = ({
         startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
-        const bigQueryConfig: any = {
-          projectId: data.projectId,
-          datasetId: data.datasetId,
-          serviceAccountKey: data.serviceAccountKey,
-        }
-        if (!!data.maxStalenessMins) {
-          bigQueryConfig.maxStalenessMins = data.maxStalenessMins
-        }
+        let destinationConfig: any = {}
 
+        if (data.type === 'BigQuery') {
+          const bigQueryConfig: any = {
+            projectId: data.projectId,
+            datasetId: data.datasetId,
+            serviceAccountKey: data.serviceAccountKey,
+          }
+          if (!!data.maxStalenessMins) {
+            bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+          }
+          destinationConfig = { bigQuery: bigQueryConfig }
+        } else if (data.type === 'Analytics Bucket') {
+          const analyticsBucketConfig: any = {
+            warehouseName: data.warehouseName,
+            namespace: data.namespace,
+            catalogToken: data.catalogToken,
+            s3AccessKeyId: data.s3AccessKeyId,
+            s3SecretAccessKey: data.s3SecretAccessKey,
+            s3Region: data.s3Region,
+          }
+          destinationConfig = { analyticsBucket: analyticsBucketConfig }
+        }
         const batchConfig: any = {}
-        if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
+        if (data.type === 'BigQuery' && !!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
         const hasBatchFields = Object.keys(batchConfig).length > 0
 
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
           destinationName: data.name,
-          destinationConfig: { bigQuery: bigQueryConfig },
+          destinationConfig,
           sourceId,
           pipelineConfig: {
             publicationName: data.publicationName,
@@ -407,11 +524,14 @@ export const DestinationPanel = ({
                           description="The type of destination to send the data to"
                         >
                           <FormControl_Shadcn_>
-                            <Select_Shadcn_ value={field.value}>
+                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
                                 <SelectGroup_Shadcn_>
                                   <SelectItem_Shadcn_ value="BigQuery">BigQuery</SelectItem_Shadcn_>
+                                  <SelectItem_Shadcn_ value="Analytics Bucket">
+                                    Analytics Bucket
+                                  </SelectItem_Shadcn_>
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
@@ -420,119 +540,292 @@ export const DestinationPanel = ({
                       )}
                     />
 
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="projectId"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          label="Project ID"
-                          layout="vertical"
-                          description="Which BigQuery project to send data to"
-                        >
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Project ID" />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
+                    {selectedType === 'BigQuery' && (
+                      <>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="projectId"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="Project ID"
+                              layout="vertical"
+                              description="Which BigQuery project to send data to"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_ {...field} placeholder="Project ID" />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
 
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="datasetId"
-                      render={({ field }) => (
-                        <FormItemLayout label="Project's Dataset ID" layout="vertical">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Dataset ID" />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="datasetId"
+                          render={({ field }) => (
+                            <FormItemLayout label="Project's Dataset ID" layout="vertical">
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_ {...field} placeholder="Dataset ID" />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
 
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="serviceAccountKey"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          label="Service Account Key"
-                          layout="vertical"
-                          description="The service account key for BigQuery"
-                        >
-                          <FormControl_Shadcn_>
-                            <TextArea_Shadcn_
-                              {...field}
-                              rows={4}
-                              maxLength={5000}
-                              placeholder="Service account key"
-                            />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-                  </div>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="serviceAccountKey"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="Service Account Key"
+                              layout="vertical"
+                              description="The service account key for BigQuery"
+                            >
+                              <FormControl_Shadcn_>
+                                <TextArea_Shadcn_
+                                  {...field}
+                                  rows={4}
+                                  maxLength={5000}
+                                  placeholder="Service account key"
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </>
+                    )}
 
-                  <DialogSectionSeparator />
+                    {selectedType === 'Analytics Bucket' && (
+                      <>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="warehouseName"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="Warehouse Name"
+                              layout="vertical"
+                              description="Select a storage bucket to use as your Analytics Bucket warehouse"
+                            >
+                              <FormControl_Shadcn_>
+                                <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                                  <SelectTrigger_Shadcn_>
+                                    {field.value || 'Select a bucket'}
+                                  </SelectTrigger_Shadcn_>
+                                  <SelectContent_Shadcn_>
+                                    <SelectGroup_Shadcn_>
+                                      {isLoadingBuckets ? (
+                                        <SelectItem_Shadcn_ value="__loading__" disabled>
+                                          Loading buckets...
+                                        </SelectItem_Shadcn_>
+                                      ) : buckets.length === 0 ? (
+                                        <SelectItem_Shadcn_ value="__no_buckets__" disabled>
+                                          No buckets available
+                                        </SelectItem_Shadcn_>
+                                      ) : (
+                                        buckets.map((bucket) => (
+                                          <SelectItem_Shadcn_ key={bucket.id} value={bucket.name}>
+                                            {bucket.name}
+                                          </SelectItem_Shadcn_>
+                                        ))
+                                      )}
+                                    </SelectGroup_Shadcn_>
+                                  </SelectContent_Shadcn_>
+                                </Select_Shadcn_>
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
 
-                  <div className="px-5">
-                    <Accordion_Shadcn_ type="single" collapsible>
-                      <AccordionItem_Shadcn_ value="item-1" className="border-none">
-                        <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-between text-sm">
-                          Advanced Settings
-                        </AccordionTrigger_Shadcn_>
-                        <AccordionContent_Shadcn_ asChild className="!pb-0">
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="maxFillMs"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                className="mb-4"
-                                label="Max fill milliseconds"
-                                layout="vertical"
-                                description="The maximum amount of time to fill the data in milliseconds. Leave empty to use default value."
-                              >
-                                <FormControl_Shadcn_>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="namespace"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="Namespace"
+                              layout="vertical"
+                              description="Select a namespace from your Analytics Bucket warehouse"
+                            >
+                              <FormControl_Shadcn_>
+                                {!warehouseName || !serviceApiKey ? (
                                   <Input_Shadcn_
                                     {...field}
-                                    type="number"
-                                    value={field.value ?? ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value
-                                      field.onChange(val === '' ? undefined : Number(val))
-                                    }}
-                                    placeholder="Leave empty for default"
+                                    placeholder="Enter warehouse name first"
+                                    disabled
                                   />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
+                                ) : (
+                                  <Select_Shadcn_
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                  >
+                                    <SelectTrigger_Shadcn_>
+                                      {field.value || 'Select a namespace'}
+                                    </SelectTrigger_Shadcn_>
+                                    <SelectContent_Shadcn_>
+                                      <SelectGroup_Shadcn_>
+                                        {isLoadingNamespaces ? (
+                                          <SelectItem_Shadcn_ value="__loading__" disabled>
+                                            Loading namespaces...
+                                          </SelectItem_Shadcn_>
+                                        ) : namespaces.length === 0 ? (
+                                          <SelectItem_Shadcn_ value="__no_namespaces__" disabled>
+                                            No namespaces available
+                                          </SelectItem_Shadcn_>
+                                        ) : (
+                                          namespaces.map((namespace) => (
+                                            <SelectItem_Shadcn_ key={namespace} value={namespace}>
+                                              {namespace}
+                                            </SelectItem_Shadcn_>
+                                          ))
+                                        )}
+                                      </SelectGroup_Shadcn_>
+                                    </SelectContent_Shadcn_>
+                                  </Select_Shadcn_>
+                                )}
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+
+                        <FormItemLayout
+                          label="Catalog Token"
+                          layout="vertical"
+                          description="Automatically retrieved from your project's service API key"
+                        >
+                          <Input_Shadcn_
+                            value={serviceApiKey ? '••••••••••••••••' : 'Loading...'}
+                            disabled
+                            type="password"
+                            placeholder="Auto-populated"
                           />
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="maxStalenessMins"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                className="mb-4"
-                                label="Max staleness minutes"
-                                layout="vertical"
-                                description="Maximum staleness time allowed in minutes. Leave empty to use default value."
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_
-                                    {...field}
-                                    type="number"
-                                    value={field.value ?? ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value
-                                      field.onChange(val === '' ? undefined : Number(val))
-                                    }}
-                                    placeholder="Leave empty for default"
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </AccordionContent_Shadcn_>
-                      </AccordionItem_Shadcn_>
-                    </Accordion_Shadcn_>
+                        </FormItemLayout>
+
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="s3AccessKeyId"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="S3 Access Key ID"
+                              layout="vertical"
+                              description="Your S3 access key ID"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  type="password"
+                                  placeholder="S3 Access Key ID"
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="s3SecretAccessKey"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="S3 Secret Access Key"
+                              layout="vertical"
+                              description="Your S3 secret access key"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  type="password"
+                                  placeholder="S3 Secret Access Key"
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="s3Region"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="S3 Region"
+                              layout="vertical"
+                              description="The AWS region for your S3 bucket"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  placeholder="S3 Region (e.g., us-east-1)"
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </>
+                    )}
                   </div>
+
+                  {selectedType === 'BigQuery' && (
+                    <>
+                      <DialogSectionSeparator />
+
+                      <div className="px-5">
+                        <Accordion_Shadcn_ type="single" collapsible>
+                          <AccordionItem_Shadcn_ value="item-1" className="border-none">
+                            <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-between text-sm">
+                              Advanced Settings
+                            </AccordionTrigger_Shadcn_>
+                            <AccordionContent_Shadcn_ asChild className="!pb-0">
+                              <FormField_Shadcn_
+                                control={form.control}
+                                name="maxFillMs"
+                                render={({ field }) => (
+                                  <FormItemLayout
+                                    className="mb-4"
+                                    label="Max fill milliseconds"
+                                    layout="vertical"
+                                    description="The maximum amount of time to fill the data in milliseconds. Leave empty to use default value."
+                                  >
+                                    <FormControl_Shadcn_>
+                                      <Input_Shadcn_
+                                        {...field}
+                                        type="number"
+                                        value={field.value ?? ''}
+                                        onChange={(e) => {
+                                          const val = e.target.value
+                                          field.onChange(val === '' ? undefined : Number(val))
+                                        }}
+                                        placeholder="Leave empty for default"
+                                      />
+                                    </FormControl_Shadcn_>
+                                  </FormItemLayout>
+                                )}
+                              />
+                              <FormField_Shadcn_
+                                control={form.control}
+                                name="maxStalenessMins"
+                                render={({ field }) => (
+                                  <FormItemLayout
+                                    className="mb-4"
+                                    label="Max staleness minutes"
+                                    layout="vertical"
+                                    description="Maximum staleness time allowed in minutes. Leave empty to use default value."
+                                  >
+                                    <FormControl_Shadcn_>
+                                      <Input_Shadcn_
+                                        {...field}
+                                        type="number"
+                                        value={field.value ?? ''}
+                                        onChange={(e) => {
+                                          const val = e.target.value
+                                          field.onChange(val === '' ? undefined : Number(val))
+                                        }}
+                                        placeholder="Leave empty for default"
+                                      />
+                                    </FormControl_Shadcn_>
+                                  </FormItemLayout>
+                                )}
+                              />
+                            </AccordionContent_Shadcn_>
+                          </AccordionItem_Shadcn_>
+                        </Accordion_Shadcn_>
+                      </div>
+                    </>
+                  )}
                 </form>
               </Form_Shadcn_>
             </SheetSection>
