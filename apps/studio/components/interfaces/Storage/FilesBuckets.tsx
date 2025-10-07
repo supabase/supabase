@@ -1,11 +1,11 @@
 import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import {
+  Badge,
   Button,
   Card,
   DropdownMenu,
@@ -69,7 +69,13 @@ export const FilesBuckets = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Visibility</TableHead>
+                    <TableHead>Created at</TableHead>
+                    {/* <TableHead>Visibility</TableHead> */}
+                    <TableHead>Updated at</TableHead>
+                    <TableHead>allowed_mime_types</TableHead>
+                    <TableHead>file_size_limit</TableHead>
+                    {/* <TableHead>type</TableHead> */}
+                    {/* <TableHead>owner</TableHead> */}
                     <TableHead />
                   </TableRow>
                 </TableHeader>
@@ -86,13 +92,21 @@ export const FilesBuckets = () => {
                   )}
                   {filesBuckets.map((bucket) => (
                     <TableRow key={bucket.id}>
-                      <TableCell>
-                        <p className="text-foreground">{bucket.name}</p>
+                      <TableCell className="flex gap-2">
+                        <p className="text-foreground">{bucket.name}</p>{' '}
+                        {bucket.public && <Badge variant="warning">Public</Badge>}
                       </TableCell>
                       <TableCell>
-                        <p className="text-foreground-light">
-                          {bucket.public ? 'Public' : 'Private'}
-                        </p>
+                        <p className="text-foreground-light">{bucket.created_at}</p>
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-foreground-light">{bucket.updated_at}</p>
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-foreground-light">{bucket.allowed_mime_types}</p>
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-foreground-light">{bucket.file_size_limit}</p>
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-end gap-2">
