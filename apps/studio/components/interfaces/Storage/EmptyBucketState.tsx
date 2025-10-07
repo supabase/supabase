@@ -1,6 +1,6 @@
+import { BucketAdd } from 'icons'
 import { CreateBucketModal } from './CreateBucketModal'
 import { BUCKET_TYPES } from './Storage.constants'
-import { BucketAdd } from 'icons'
 
 interface EmptyBucketStateProps {
   bucketType: keyof typeof BUCKET_TYPES
@@ -10,7 +10,7 @@ export const EmptyBucketState = ({ bucketType }: EmptyBucketStateProps) => {
   const config = BUCKET_TYPES[bucketType]
 
   return (
-    <aside className="mt-12 border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-6 items-center text-center gap-1 text-balance">
+    <aside className="mt-12 border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-4 items-center text-center gap-1 text-balance">
       <div className="flex flex-col gap-3 items-center text-center">
         <BucketAdd size={24} strokeWidth={1.5} className="text-foreground-muted" />
         <div className="flex flex-col gap-1">
