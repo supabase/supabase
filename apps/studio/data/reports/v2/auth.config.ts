@@ -8,6 +8,7 @@ import z from 'zod'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
+  transformCategoricalCountData,
   transformStatusCodeData,
 } from 'components/interfaces/Reports/Reports.utils'
 import { AUTH_ERROR_CODES } from 'data/reports/v2/auth.utils'
@@ -732,10 +733,6 @@ export const createErrorsReportConfig = ({
         timestamp: point.timestamp,
       }))
 
-      // Reuse the status-code pivot util by category name
-      const { transformCategoricalCountData } = await import(
-        'components/interfaces/Reports/Reports.utils'
-      )
       const pivoted = transformCategoricalCountData(rawData.result, 'error_code', distinct)
 
       return { data: pivoted, attributes, query: sql }
