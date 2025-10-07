@@ -1,15 +1,15 @@
-import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { useParams } from 'common'
+import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { IS_PLATFORM } from 'lib/constants'
+import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   Badge,
   Button,

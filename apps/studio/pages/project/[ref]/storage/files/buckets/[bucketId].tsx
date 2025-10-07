@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import Link from 'next/link'
 import { Edit, Shield } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 
-import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
+import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -14,8 +14,8 @@ import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
-import { Button, Badge } from 'ui'
 import type { NextPageWithLayout } from 'types'
+import { Badge, Button } from 'ui'
 
 const BucketPage: NextPageWithLayout = () => {
   const { bucketId, ref } = useParams()
