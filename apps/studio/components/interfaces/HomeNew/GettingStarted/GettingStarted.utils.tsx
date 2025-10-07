@@ -143,7 +143,7 @@ export const getCodeWorkflowSteps = ({
     {
       key: 'setup-auth',
       status: hasConfiguredAuth ? 'complete' : 'incomplete',
-      title: 'Configure authentication',
+      title: 'Allow user signups',
       icon: <User strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
         "It's time to configure your authentication providers and settings for Supabase Auth, so jump into the configuration page and tailor the providers you need.",
@@ -326,7 +326,7 @@ export const getNoCodeWorkflowSteps = ({
     {
       key: 'setup-auth',
       status: hasConfiguredAuth ? 'complete' : 'incomplete',
-      title: 'Set up authentication',
+      title: 'Allow user signups',
       icon: <User strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
         "It's time to set up authentication so you can start signing up users, configuring providers and settings from the auth dashboard.",
