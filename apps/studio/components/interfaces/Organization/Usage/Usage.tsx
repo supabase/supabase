@@ -25,6 +25,9 @@ import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
 
+// [Joshen] JFYI this component could use nuqs to handle `projectRef` state which will help
+// simplify some of the implementation here.
+
 export const Usage = () => {
   const { slug, projectRef } = useParams()
 
