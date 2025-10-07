@@ -16,7 +16,6 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button, Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
-import { DynamicStatus } from './ProjectLoadingStatus'
 
 const BuildingState = () => {
   const { ref } = useParams()
