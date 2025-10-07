@@ -16,6 +16,7 @@
     "@supabase/supabase-js": "^2.49.1"
   },
   "devDependencies": {
+    "shadcn": "^3.0.0",
     "tsconfig": "workspace:*",
     "vite": "catalog:"
   }
