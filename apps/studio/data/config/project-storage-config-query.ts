@@ -2,9 +2,9 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { IS_PLATFORM } from 'lib/constants'
 
 export type ProjectStorageConfigVariables = {
   projectRef?: string
@@ -24,8 +24,10 @@ export async function getProjectStorageConfig(
   })
 
   if (error) {
-    if (error.code === 404) {
-      handleError({ ...error, message: 'Storage configuration not found.' })
+    // [Joshen] This is due to API not returning an error message on this endpoint if a 404 is returned
+    // Should only be a temporary patch, needs to be addressed on the API end
+    if ((error as any).code === 404) {
+      handleError({ ...(error as any), message: 'Storage configuration not found.' })
     } else {
       handleError(error)
     }
