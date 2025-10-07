@@ -193,7 +193,7 @@ System messages are sent by the server to inform the client about the status of 
 
 The heartbeat message should be sent at least every 25 seconds to avoid a connection timeout. Payload should be empty object.
 
-For heartbeat, the topic to be used is `phoenix` as it needs to be sent to the WebSocket server itself and not to a channel:
+For heartbeat, use the topic `phoenix` as it needs to be sent to the WebSocket server itself and not to a channel:
 
 ```json
 { "topic": "phoenix", "event": "heartbeat", "payload": {}, "ref": "8" }
