@@ -125,6 +125,15 @@ export const S3Connection = () => {
           </div>
           <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />
         </div>
+
+        {isErrorStorageConfig && (
+          <AlertError
+            className="mb-4"
+            subject="Failed to retrieve storage configuration"
+            error={configError}
+          />
+        )}
+
         <Form_Shadcn_ {...form}>
           <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
             {projectIsLoading ? (
@@ -153,15 +162,6 @@ export const S3Connection = () => {
                       </FormItemLayout>
                     )}
                   />
-
-                  {isErrorStorageConfig && (
-                    <div className="px-8 pb-8">
-                      <AlertError
-                        subject="Failed to retrieve storage configuration"
-                        error={configError}
-                      />
-                    </div>
-                  )}
                 </CardContent>
 
                 <CardContent className="py-6">
