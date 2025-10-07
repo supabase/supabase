@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { ArrowRight, Loader2 } from 'lucide-react'
+import dayjs from 'dayjs'
+import { ArrowRight, Loader2, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
@@ -14,7 +15,8 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import { Badge, Button } from 'ui'
+import { Badge, Button, Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { DynamicStatus } from './ProjectLoadingStatus'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -26,6 +28,14 @@ const BuildingState = () => {
   const { projectHomepageClientLibraries: clientLibraries } = useCustomContent([
     'project_homepage:client_libraries',
   ])
+
+  // Check if project startup is stalled (taking longer than 5 minutes)
+  // inserted_at is stored as UTC without timezone indicator, so we need to parse it as UTC
+  const minutesSinceInserted = project?.inserted_at
+    ? dayjs().diff(dayjs.utc(project.inserted_at), 'minute')
+    : 0
+  const comingupStalled =
+    project?.status === PROJECT_STATUS.COMING_UP && project?.inserted_at && minutesSinceInserted > 5
 
   useProjectStatusQuery(
     { projectRef: ref },
@@ -62,13 +72,56 @@ const BuildingState = () => {
               </div>
             </Badge>
           </div>
-          <div>
-            <p className="text-sm text-foreground-light">
-              {' '}
-              We are provisioning your database and API endpoints
-            </p>
-            <p className="text-sm text-foreground-light"> This may take a few minutes</p>
-          </div>
+          {project.status === PROJECT_STATUS.COMING_UP ? (
+            <>
+              {comingupStalled ? (
+                <Alert_Shadcn_ className=" rounded-none mb-0 border-b border-t" variant="warning">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>
+                    This process is taking longer than expected.
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    <p className="text-sm text-foreground-light"></p>
+                    <p className="text-sm text-foreground-light">
+                      Please check our{' '}
+                      <Link
+                        href="https://status.supabase.com"
+                        className="text-brand transition-colors hover:text-brand-600"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        incident page
+                      </Link>{' '}
+                      for any ongoing issues, or{' '}
+                      <Link
+                        href="/support/new?subject=Project%20setup%20stalled"
+                        className="text-brand transition-colors hover:text-brand-600"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Contact support
+                      </Link>{' '}
+                      if the issue persists.
+                    </p>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
+                <div>
+                  <p className="text-sm text-foreground-light">
+                    We are provisioning your database and API endpoints
+                  </p>
+                  <p className="text-sm text-foreground-light"> This may take a few minutes</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div>
+              <p className="text-sm text-foreground-light">
+                We are provisioning your database and API endpoints
+              </p>
+              <p className="text-sm text-foreground-light"> This may take a few minutes</p>
+            </div>
+          )}
         </div>
         <div>
           <div className="w-full grid grid-cols-12 gap-12">
