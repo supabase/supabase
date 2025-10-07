@@ -1,15 +1,16 @@
+import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+
 import { useParams } from 'common'
-import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { IS_PLATFORM } from 'lib/constants'
-import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { formatBytes } from 'lib/helpers'
 import {
   Badge,
   Button,
@@ -41,16 +42,9 @@ export const FilesBuckets = () => {
   const [selectedBucket, setSelectedBucket] = useState<Bucket>()
   const [filterString, setFilterString] = useState('')
 
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
   const { getPolicyCount, isLoading: isLoadingPolicies } = useStoragePolicyCounts(buckets)
-
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-
-  // Helper function to format bytes consistently
-  const formatBytes = (bytes: number) => {
-    const { value, unit } = convertFromBytes(bytes)
-    return `${value} ${unit}`
-  }
 
   const formattedGlobalUploadLimit = formatBytes(data?.fileSizeLimit ?? 0)
 
@@ -90,13 +84,8 @@ export const FilesBuckets = () => {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Policies</TableHead>
-                    {/* <TableHead>Visibility</TableHead> */}
-                    {/* <TableHead>Created at</TableHead>
-                    <TableHead>Updated at</TableHead> */}
                     <TableHead>File size limit</TableHead>
                     <TableHead>Allowed MIME types</TableHead>
-                    {/* <TableHead>type</TableHead> */}
-                    {/* <TableHead>owner</TableHead> */}
                     <TableHead />
                   </TableRow>
                 </TableHeader>
@@ -114,12 +103,12 @@ export const FilesBuckets = () => {
                   {filesBuckets.map((bucket) => (
                     <TableRow
                       key={bucket.id}
-                      onClick={() => {
-                        router.push(
-                          `/project/${ref}/storage/files/buckets/${encodeURIComponent(bucket.id)}`
-                        )
-                      }}
                       className="cursor-pointer"
+                      onClick={(event) => {
+                        const url = `/project/${ref}/storage/files/buckets/${bucket.id}`
+                        if (event.metaKey) window.open(url, '_blank')
+                        else router.push(url)
+                      }}
                     >
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -127,6 +116,7 @@ export const FilesBuckets = () => {
                           {bucket.public && <Badge variant="warning">Public</Badge>}
                         </div>
                       </TableCell>
+
                       <TableCell>
                         <p className="text-foreground-light">{getPolicyCount(bucket.name)}</p>
                       </TableCell>
@@ -144,6 +134,7 @@ export const FilesBuckets = () => {
                             : `Unset (${formattedGlobalUploadLimit})`}
                         </p>
                       </TableCell>
+
                       <TableCell>
                         <p
                           className={

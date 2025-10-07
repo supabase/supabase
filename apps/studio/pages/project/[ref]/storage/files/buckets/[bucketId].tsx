@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-
 import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
@@ -28,14 +27,10 @@ const BucketPage: NextPageWithLayout = () => {
   const policyCount = bucket ? getPolicyCount(bucket.name) : 0
 
   // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
-  if (!project || !projectRef) return null
+  if (!project || !projectRef || !isSuccess) return null
 
   if (isError) {
     return <StorageBucketsError error={error as any} />
-  }
-
-  if (!isSuccess) {
-    return <div />
   }
 
   // If the bucket is not found or the bucket type is ANALYTICS or VECTOR, show an error message

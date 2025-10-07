@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
+
+import { formatPoliciesForStorage } from 'components/interfaces/Storage/Storage.utils'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { Bucket } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatPoliciesForStorage } from 'components/interfaces/Storage/Storage.utils'
 
 export const useStoragePolicyCounts = (buckets: Bucket[]) => {
   const { data: project } = useSelectedProjectQuery()
