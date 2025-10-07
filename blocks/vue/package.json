@@ -13,7 +13,7 @@
     "h3": "^1.15.4",
     "nuxt": "^4.0.3",
     "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.1"
+    "@supabase/supabase-js": "catalog:"
   },
   "devDependencies": {
     "shadcn": "^2.10.0",
