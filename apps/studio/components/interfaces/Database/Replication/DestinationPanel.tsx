@@ -425,11 +425,17 @@ export const DestinationPanel = ({
     await submitPipeline(values)
   }
 
-  // Create S3 keys when warehouse name changes (only once per bucket)
+  // Create S3 keys for new destinations when both warehouse name and namespace are selected
+  const namespace = form.watch('namespace')
+
   useEffect(() => {
+    // Only create S3 keys for new destinations (not edit mode)
+    if (editMode) return
+
     if (
       selectedType === 'Analytics Bucket' &&
       warehouseName &&
+      namespace &&
       projectRef &&
       (!s3Keys || s3Keys.bucketName !== warehouseName)
     ) {
@@ -461,7 +467,16 @@ export const DestinationPanel = ({
 
       createKeys()
     }
-  }, [selectedType, warehouseName, projectRef, s3Keys, createS3AccessKey, form])
+  }, [
+    selectedType,
+    warehouseName,
+    namespace,
+    projectRef,
+    s3Keys,
+    createS3AccessKey,
+    form,
+    editMode,
+  ])
 
   useEffect(() => {
     if (editMode && destinationData && pipelineData && !isFormInteracting) {
