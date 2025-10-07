@@ -30,7 +30,7 @@ const PageLayout: NextPageWithLayout = () => {
             <p className="text-sm text-foreground-light">Bucket “{bucketId}” cannot be found</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 h-full">
             <BucketHeader bucket={bucket} />
             <StorageExplorer bucket={bucket} />
           </div>
