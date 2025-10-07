@@ -4,6 +4,7 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 const projectApiKeys = {
   api: (projectRef: string | undefined) => ['projects', projectRef, 'api'] as const,
+  settings: (projectRef: string | undefined) => ['projects', projectRef, 'settings'] as const,
 }
 
 export interface ProjectApiVariables {
@@ -72,7 +73,7 @@ export function useProjectSettingsQuery<TData = ProjectSettings>(
   }: Omit<UseQueryOptions<ProjectSettings, ProjectApiError, TData>, 'queryKey'> = {}
 ) {
   return useQuery<ProjectSettings, ProjectApiError, TData>({
-    queryKey: projectApiKeys.api(projectRef),
+    queryKey: projectApiKeys.settings(projectRef),
     queryFn: ({ signal }) => getProjectSettings({ projectRef }, signal),
     enabled,
     ...options,
