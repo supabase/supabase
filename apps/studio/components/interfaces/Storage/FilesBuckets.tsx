@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
+import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import {
   Badge,
   Button,
@@ -35,7 +36,10 @@ export const FilesBuckets = () => {
   const [selectedBucket, setSelectedBucket] = useState<Bucket>()
   const [filterString, setFilterString] = useState('')
 
-  const { data: buckets = [], isLoading } = useBucketsQuery({ projectRef: ref })
+  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
+  const { getPolicyCount, isLoading: isLoadingPolicies } = useStoragePolicyCounts(buckets)
+
+  const isLoading = isLoadingBuckets || isLoadingPolicies
   const filesBuckets = buckets
     .filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')
     .filter((bucket) =>
@@ -70,8 +74,9 @@ export const FilesBuckets = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Created at</TableHead>
+                    <TableHead>Policies</TableHead>
                     {/* <TableHead>Visibility</TableHead> */}
+                    <TableHead>Created at</TableHead>
                     <TableHead>Updated at</TableHead>
                     <TableHead>allowed_mime_types</TableHead>
                     <TableHead>file_size_limit</TableHead>
@@ -93,9 +98,14 @@ export const FilesBuckets = () => {
                   )}
                   {filesBuckets.map((bucket) => (
                     <TableRow key={bucket.id}>
-                      <TableCell className="flex gap-2">
-                        <p className="text-foreground">{bucket.name}</p>{' '}
-                        {bucket.public && <Badge variant="warning">Public</Badge>}
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <p className="text-foreground">{bucket.name}</p>
+                          {bucket.public && <Badge variant="warning">Public</Badge>}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-foreground-light">{getPolicyCount(bucket.name)}</p>
                       </TableCell>
                       <TableCell>
                         <p className="text-foreground-light">{bucket.created_at}</p>
