@@ -34,6 +34,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useParams } from 'common'
 
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
+import { get, post } from 'common/fetchWrappers'
 
 export const OAUTH_APP_SCOPES_OPTIONS = [
   { name: 'email', value: 'email' },
@@ -60,6 +61,24 @@ const OAuthAppsList = () => {
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
   const error = { message: 'Failed to retrieve oauth apps' }
+
+  // [Fran]: Test auth.admin.oauth.createClient endpoint
+  const createClient = async () => {
+    const response = await post('/api/platform/auth/oauth-clients', {
+      client_name: 'New Client',
+      client_uri: 'https://new-client.com',
+      redirect_uris: ['https://new-client.com'],
+      scope: 'email',
+    })
+
+    console.log('createClient post', response)
+  }
+
+  // [Fran]: Test auth.admin.oauth.listClients endpoint
+  const getClients = async () => {
+    const { data, error } = await get('/api/platform/auth/oauth-clients')
+    console.log('getClients response', data, error)
+  }
 
   // Load OAuth apps from localStorage on component mount
   useEffect(() => {
@@ -245,6 +264,8 @@ const OAuthAppsList = () => {
             >
               New OAuth App
             </ButtonTooltip>
+            <Button onClick={createClient}>New Client</Button>
+            <Button onClick={getClients}>List Clients</Button>
           </div>
         </div>
 
