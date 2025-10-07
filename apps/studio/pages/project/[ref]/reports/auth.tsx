@@ -176,9 +176,10 @@ const AuthUsage = () => {
 
         if (chartId?.includes('errors')) {
           url += `&f={"product":{"auth":true},"status_code":{"error":true,"warning":true}}`
+        } else {
+          url += `&f={"product":{"auth":true}}`
         }
 
-        url += `&f={"product":{"auth":true}}`
         router.push(url)
       },
     },
