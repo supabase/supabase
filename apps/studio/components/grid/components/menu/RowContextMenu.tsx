@@ -3,11 +3,11 @@ import { useCallback } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
 import { toast } from 'sonner'
 
+import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
 import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { copyToClipboard, DialogSectionSeparator } from 'ui'
-import { ROW_CONTEXT_MENU_ID } from '.'
 import { formatClipboardValue } from '../../utils/common'
 
 export type RowContextMenuProps = {

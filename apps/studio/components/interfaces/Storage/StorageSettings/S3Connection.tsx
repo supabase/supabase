@@ -118,9 +118,9 @@ export const S3Connection = () => {
       <ScaffoldSection isFullWidth>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <ScaffoldSectionTitle>S3 Connection</ScaffoldSectionTitle>
+            <ScaffoldSectionTitle>Connection</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
-              Connect to your bucket using any S3-compatible service via the S3 protocol
+              Connect to your bucket using any S3-compatible service via the S3 protocol.
             </ScaffoldSectionDescription>
           </div>
           <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />
@@ -227,7 +227,7 @@ export const S3Connection = () => {
       <ScaffoldSection isFullWidth>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <ScaffoldSectionTitle>S3 Access Keys</ScaffoldSectionTitle>
+            <ScaffoldSectionTitle>Access keys</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
               Manage your access keys for this project.
             </ScaffoldSectionDescription>
