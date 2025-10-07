@@ -162,7 +162,11 @@ export const OverviewUsage = () => {
       interval: '1h',
       filters: { status_code: null },
     })
-    return config.find((c) => c.id === 'signups')
+    const chart = config.find((c) => c.id === 'signups')
+    if (chart) {
+      return { ...chart, defaultChartStyle: 'bar' }
+    }
+    return chart
   }, [ref, startDate, endDate])
 
   const signInChartConfig = useMemo(() => {
@@ -173,7 +177,11 @@ export const OverviewUsage = () => {
       interval: '1h',
       filters: { status_code: null },
     })
-    return config.find((c) => c.id === 'sign-in-attempts')
+    const chart = config.find((c) => c.id === 'sign-in-attempts')
+    if (chart) {
+      return { ...chart, defaultChartStyle: 'bar' }
+    }
+    return chart
   }, [ref, startDate, endDate])
 
   const updateDateRange = (from: string, to: string) => {
