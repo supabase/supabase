@@ -9,12 +9,12 @@ This package contains custom Supabase icons that can be used alongside other ico
 ## Quick start
 
 ```jsx
-import { BucketNew, Database, Auth } from 'icons'
+import { BucketAdd, Database, Auth } from 'icons'
 
 function MyComponent() {
   return (
     <>
-      <BucketNew size={24} className="text-foreground-muted" />
+      <BucketAdd size={24} className="text-foreground-muted" />
       <Database size={16} strokeWidth={1} />
       <Auth size={20} />
     </>

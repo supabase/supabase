@@ -14,7 +14,7 @@ description: Icons make actions and navigation across Supabase easier.
 Use classes just like you would for [text](color-usage#text) to tint icons. For example:
 
 ```jsx
-<BucketNew className="text-foreground-muted" />
+<BucketAdd className="text-foreground-muted" />
 ```
 
 Just like text, don’t tint icons with `text-destructive` for destructive actions. There should be a confirmation dialog right after which can handle the destructive styling.
@@ -32,14 +32,14 @@ Create and use custom icons when Lucide doesn’t have the icon you need. Tap on
 ### Usage
 
 ```jsx
-import { ReplaceCode, InsertCode, BucketNew } from 'icons'
+import { ReplaceCode, InsertCode, BucketAdd } from 'icons'
 
 function app() {
   return (
     <>
       <ReplaceCode className="text-light" strokeWidth={1} size={16} />
       <InsertCode className="text-light" strokeWidth={1} size={16} />
-      <BucketNew size={24} className="text-foreground-muted" />
+      <BucketAdd size={24} className="text-foreground-muted" />
     </>
   )
 }
