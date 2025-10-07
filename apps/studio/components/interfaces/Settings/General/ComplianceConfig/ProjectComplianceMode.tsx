@@ -14,6 +14,7 @@ import { useComplianceConfigUpdateMutation } from 'data/config/project-complianc
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const ComplianceConfig = () => {
@@ -67,7 +68,7 @@ const ComplianceConfig = () => {
           title="High Compliance Configuration"
           description="For projects storing and processing sensitive data (HIPAA)"
         />
-        <DocsButton href="https://supabase.com/docs/guides/platform/hipaa-projects" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/hipaa-projects`} />
       </div>
       <FormPanel>
         <FormSection

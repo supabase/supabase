@@ -17,7 +17,7 @@ info:
 functions:
   - id: initializing
     title: 'Initializing'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    $ref: '@supabase/supabase-js.SupabaseClient.constructor'
     description: |
       You can initialize a new Supabase client using the `createClient()` method.
 
@@ -1197,14 +1197,14 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          const { error } = await supabase.auth.signOut('local')
+          const { error } = await supabase.auth.signOut({ scope: 'local' })
           ```
       - id: sign-out-other-sessions
         name: Sign out (other sessions)
         isSpotlight: false
         code: |
           ```js
-          const { error } = await supabase.auth.signOut('others')
+          const { error } = await supabase.auth.signOut({ scope: 'others' })
           ```
   - id: verify-otp
     title: 'verifyOtp()'
@@ -2250,7 +2250,7 @@ functions:
       Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
     title: 'mfa.enroll()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.enroll'
     notes: |
       - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
@@ -2324,7 +2324,7 @@ functions:
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
@@ -2392,7 +2392,7 @@ functions:
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.verify'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
     examples:
@@ -2468,7 +2468,7 @@ functions:
           ```
   - id: mfa-challenge-and-verify
     title: 'mfa.challengeAndVerify()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.challengeAndVerify'
     notes: |
       - Intended for use with only TOTP factors.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
@@ -2545,7 +2545,7 @@ functions:
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.unenroll'
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -2567,7 +2567,7 @@ functions:
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
@@ -7384,7 +7384,7 @@ functions:
           ```
   - id: get-channels
     title: getChannels()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
+    $ref: '@supabase/supabase-js.SupabaseClient.getChannels'
     examples:
       - id: get-all-channels
         name: Get all channels
@@ -7396,7 +7396,7 @@ functions:
 
   - id: remove-channel
     title: removeChannel()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
+    $ref: '@supabase/supabase-js.SupabaseClient.removeChannel'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
@@ -7410,7 +7410,7 @@ functions:
 
   - id: remove-all-channels
     title: removeAllChannels()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
+    $ref: '@supabase/supabase-js.SupabaseClient.removeAllChannels'
     notes: |
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:

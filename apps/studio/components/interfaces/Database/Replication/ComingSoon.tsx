@@ -1,5 +1,13 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, Circle, Database, MoreVertical, Plus, Search } from 'lucide-react'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Circle,
+  Database,
+  MoreVertical,
+  Plus,
+  Search,
+} from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo } from 'react'
@@ -9,7 +17,7 @@ import 'reactflow/dist/style.css'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import { BASE_PATH } from 'lib/constants'
-import { Button, Input_Shadcn_ } from 'ui'
+import { Badge, Button, Card, CardContent, Input_Shadcn_ } from 'ui'
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [
@@ -64,15 +72,15 @@ const STATIC_EDGES = [
   { id: 'e1-4', source: '1', target: '4', type: 'smoothstep', animated: true },
 ]
 
-export const ReplicationComingSoon = () => {
+export const ReplicationComingSoon = ({ projectRef }: { projectRef: string }) => {
   return (
     <ReactFlowProvider>
-      <ReplicationStaticMockup />
+      <ReplicationStaticMockup projectRef={projectRef} />
     </ReactFlowProvider>
   )
 }
 
-const ReplicationStaticMockup = () => {
+const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
   const nodes = useMemo(() => STATIC_NODES, [])
   const edges = useMemo(() => STATIC_EDGES, [])
 
@@ -86,7 +94,7 @@ const ReplicationStaticMockup = () => {
       primary: PrimaryNode,
       replica: ReplicaNode,
       blank: BlankNode,
-      cta: CTANode,
+      cta: () => CTANode({ projectRef }),
     }),
     []
   )
@@ -200,45 +208,32 @@ const BlankNode = () => {
   )
 }
 
-const CTANode = () => {
+const CTANode = ({ projectRef }: { projectRef: string }) => {
   return (
-    <motion.div
-      className="bg-surface-100 rounded-lg p-8 shadow-lg"
-      style={{
-        border: '1px solid',
-        borderColor: 'hsl(var(--foreground-default) / var(--border-opacity, 0.6))',
-      }}
-      animate={{
-        '--border-opacity': [0.6, 0.4, 0.2, 0.1, 0.2, 0.4, 0.6],
-      }}
-      transition={{
-        duration: 4,
-        ease: 'linear',
-        repeat: Number.POSITIVE_INFINITY,
-      }}
-    >
-      <div className="grid gap-4  w-[425px] relative">
-        <span className="text-xs uppercase text-foreground-light">Early Access</span>
-        <h2 className="text-lg">Replicate Your Data in Real Time</h2>
-        <p>
-          Stream changes from your Postgres database into your data warehouse—no manual exports, no
-          lag.
+    <Card className="w-[500px] p-6">
+      <CardContent>
+        <div className="flex items-center gap-x-2 justify-between mb-2">
+          <h2 className="text-lg">Replicate your data in real time</h2>
+          <Badge variant="warning">Early Access</Badge>
+        </div>
+        <p className="text-foreground-light">
+          Stream database changes to multiple destinations - no manual exports, no lag. Limited
+          rollout for external destinations has begun, read replicas available now.
         </p>
-        <p>
-          We're rolling this out to a limited group of early adopters. Sign up to get early access.
-        </p>
-        <p>
-          <Button asChild type="secondary">
+        <div className="flex items-center gap-x-2 mt-6">
+          <Button asChild type="secondary" iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}>
             <Link href="https://forms.supabase.com/pg_replicate" target="_blank" rel="noreferrer">
-              <span className="flex items-center gap-x-1">
-                Request Early Access
-                <ArrowUpRight size={16} />
-              </span>
+              Request early access
             </Link>
           </Button>
-        </p>
-      </div>
-    </motion.div>
+          <Button asChild type="default" iconRight={<ArrowRight size={16} strokeWidth={1.5} />}>
+            <Link href={`/project/${projectRef}/settings/infrastructure?createReplica=true`}>
+              Create a read replica
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 

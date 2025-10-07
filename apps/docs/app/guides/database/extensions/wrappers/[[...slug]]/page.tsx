@@ -1,28 +1,30 @@
 import matter from 'gray-matter'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
-import Link from 'next/link'
+// End of third-party imports
+
+import { IS_PROD, isFeatureEnabled } from 'common'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
-
-import { Guide, GuideArticle, GuideHeader, GuideFooter, GuideMdxContent } from '~/features/ui/guide'
-import { newEditLink } from '~/features/helpers.edit-link'
 import {
   genGuideMeta,
   genGuidesStaticParams,
   removeRedundantH1,
 } from '~/features/docs/GuidesMdx.utils'
+import { newEditLink } from '~/features/helpers.edit-link'
 import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
+import { Guide, GuideArticle, GuideFooter, GuideHeader, GuideMdxContent } from '~/features/ui/guide'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { linkTransform, type UrlTransformFunction } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { octokit } from '~/lib/octokit'
-import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-import { IS_PROD } from 'common'
+import type { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -85,7 +87,10 @@ async function getLatestRelease(after: string | null = null) {
       after,
       request: {
         fetch: (url: RequestInfo | URL, options?: RequestInit) =>
-          fetch(url, { ...options, next: { tags: [REVALIDATION_TAGS.WRAPPERS] } }),
+          fetch(url, {
+            ...options,
+            next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
+          }),
       },
     })
 
@@ -243,6 +248,10 @@ interface Params {
 }
 
 const WrappersDocs = async (props: { params: Promise<Params> }) => {
+  if (!isFeatureEnabled('docs:fdw')) {
+    notFound()
+  }
+
   const params = await props.params
   const { isExternal, meta, assetsBaseUrl, ...data } = await getContent(params)
 

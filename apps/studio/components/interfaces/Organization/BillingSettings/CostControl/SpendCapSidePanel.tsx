@@ -10,7 +10,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
@@ -108,7 +108,7 @@ const SpendCapSidePanel = () => {
           <h4>Spend cap</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/cost-control#spend-cap"
+              href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
               target="_blank"
               rel="noreferrer"
             >

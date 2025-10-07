@@ -55,13 +55,17 @@ export const ActivityStats = () => {
 
   return (
     <div className="@container">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-wrap">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-6 flex-wrap">
         <ServiceStatus />
 
         <SingleStat
           href={`/project/${ref}/database/migrations`}
           icon={<Database size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last migration</span>}
+          trackingProperties={{
+            stat_type: 'migrations',
+            stat_value: migrationsData?.length ?? 0,
+          }}
           value={
             isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
@@ -81,6 +85,10 @@ export const ActivityStats = () => {
           href={`/project/${ref}/database/backups/scheduled`}
           icon={<Archive size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last backup</span>}
+          trackingProperties={{
+            stat_type: 'backups',
+            stat_value: backupsData?.backups?.length ?? 0,
+          }}
           value={
             isLoadingBackups ? (
               <Skeleton className="h-6 w-24" />
@@ -89,6 +97,7 @@ export const ActivityStats = () => {
             ) : latestBackup ? (
               <TimestampInfo
                 className="text-base"
+                displayAs="utc"
                 label={dayjs(latestBackup.inserted_at).fromNow()}
                 utcTimestamp={latestBackup.inserted_at}
               />
@@ -102,6 +111,10 @@ export const ActivityStats = () => {
           href={`/project/${ref}/branches`}
           icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
+          trackingProperties={{
+            stat_type: 'branches',
+            stat_value: branchesData?.length ?? 0,
+          }}
           value={
             isLoadingBranches ? (
               <Skeleton className="h-6 w-24" />

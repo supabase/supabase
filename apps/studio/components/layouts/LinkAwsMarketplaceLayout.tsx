@@ -1,3 +1,4 @@
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
@@ -12,10 +13,12 @@ const LinkAwsMarketplaceLayout = ({
   children,
 }: PropsWithChildren<LinkAwsMarketplaceLayoutProps>) => {
   const { resolvedTheme } = useTheme()
+  const { appTitle } = useCustomContent(['app:title'])
+
   return (
     <>
       <Head>
-        <title>AWS Marketplace Setup | Supabase</title>
+        <title>AWS Marketplace Setup | {appTitle || 'Supabase'}</title>
       </Head>
       <main className="flex flex-col flex-grow w-full h-full overflow-y-auto">
         <div>

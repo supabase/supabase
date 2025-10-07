@@ -143,7 +143,7 @@ const AUTH_REPORT_SQL: Record<
     cross join unnest(metadata) as m
     cross join unnest(m.request) as request
     cross join unnest(m.response) as response
-  where path like '%/auth%'
+  where path like '%auth/v1%'
     and response.status_code >= 400 and response.status_code <= 599
   group by timestamp, status_code
   order by timestamp desc
@@ -352,7 +352,7 @@ export const createAuthReportConfig = ({
   },
   {
     id: 'auth-errors',
-    label: 'Auth Errors',
+    label: 'API Gateway Auth Errors',
     valuePrecision: 0,
     hide: false,
     showTooltip: true,
@@ -360,7 +360,7 @@ export const createAuthReportConfig = ({
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
-    titleTooltip: 'The total number of auth errors by status code.',
+    titleTooltip: 'The total number of auth errors by status code from the API Gateway.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async () => {
       const attributes = [

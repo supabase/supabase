@@ -1,6 +1,8 @@
 {
   "$schema": "./custom-content.schema.json",
 
+  "app:title": "Test Title",
+
   "dashboard_auth:custom_provider": "Nimbus",
 
   "organization:legal_documents": [

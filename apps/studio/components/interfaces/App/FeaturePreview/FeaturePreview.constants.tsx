@@ -2,8 +2,15 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI,
+    name: 'New Storage interface',
+    discussionsUrl: undefined,
+    isNew: true,
+    isPlatformOnly: false,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
-    name: 'New Logs Interface',
+    name: 'New Logs interface',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
     isNew: true,
     isPlatformOnly: true,
@@ -12,13 +19,6 @@ export const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
     name: 'Branching via dashboard',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
-    isNew: true,
-    isPlatformOnly: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
-    name: 'Realtime settings',
-    discussionsUrl: undefined,
     isNew: true,
     isPlatformOnly: true,
   },

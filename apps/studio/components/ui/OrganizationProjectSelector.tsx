@@ -113,11 +113,13 @@ export const OrganizationProjectSelector = ({
   ])
 
   useEffect(() => {
-    if (isSuccessProjects && !isFetching && !isFetchingNextPage && !!onInitialLoad) {
-      onInitialLoad(projects)
+    // isLoadingProjects is true only during initial load. If the variables for the query change (slug), isLoadingProjects
+    // will be true again.
+    if (!isLoadingProjects && isSuccessProjects) {
+      onInitialLoad?.(projects)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessProjects, isFetching, isFetchingNextPage, slug])
+  }, [isLoadingProjects, isSuccessProjects])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>

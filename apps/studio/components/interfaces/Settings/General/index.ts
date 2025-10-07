@@ -1,5 +1,5 @@
 export { default as ComplianceConfig } from './ComplianceConfig/ProjectComplianceMode'
-export { default as CustomDomainConfig } from './CustomDomainConfig/CustomDomainConfig'
+export { CustomDomainConfig } from './CustomDomainConfig/CustomDomainConfig'
 export { default as DeleteProjectButton } from './DeleteProjectPanel/DeleteProjectButton'
 export { default as General } from './General'
 export { default as TransferProjectButton } from './TransferProjectPanel/TransferProjectButton'

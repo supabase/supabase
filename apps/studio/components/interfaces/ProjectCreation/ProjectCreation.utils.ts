@@ -15,8 +15,12 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
   switch (cloudProvider) {
     case 'AWS':
     case 'AWS_K8S':
-    case 'AWS_NIMBUS':
       return AWS_REGIONS
+    case 'AWS_NIMBUS':
+      // Only allow US East for Nimbus
+      return {
+        EAST_US: AWS_REGIONS.EAST_US,
+      }
     case 'FLY':
       return FLY_REGIONS
     default:

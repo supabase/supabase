@@ -56,27 +56,16 @@
     "supabase": "^1.151.1",
     "supports-color": "^8.0.0",
     "turbo": "2.3.3",
-    "typescript": "~5.5.0"
+    "typescript": "catalog:"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
   },
-  "pnpm": {
-    "overrides": {
-      "@supabase/supabase-js>@supabase/auth-js": "catalog:",
-      "@tanstack/directive-functions-plugin>vite": "catalog:",
-      "@tanstack/react-start-plugin>vite": "catalog:",
-      "esbuild": "^0.25.2",
-      "@redocly/respect-core>form-data": "^4.0.4",
-      "tmp": "^0.2.4"
-    },
-    "neverBuiltDependencies": ["libpg-query"]
-  },
   "engines": {
-    "pnpm": ">=10.16",
+    "pnpm": "10.18",
     "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@10.16.1"
+  "packageManager": "pnpm@10.18.0"
 }
