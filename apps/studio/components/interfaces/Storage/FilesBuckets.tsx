@@ -134,13 +134,19 @@ export const FilesBuckets = () => {
                           <Button asChild type="default">
                             <Link
                               href={`/project/${ref}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
+                              onClick={(e) => e.stopPropagation()}
                             >
                               View files
                             </Link>
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1" icon={<MoreVertical />} />
+                              <Button
+                                type="default"
+                                className="px-1"
+                                icon={<MoreVertical />}
+                                onClick={(e) => e.stopPropagation()}
+                              />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-40">
                               <DropdownMenuItem
