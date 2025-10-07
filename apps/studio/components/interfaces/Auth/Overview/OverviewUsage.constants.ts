@@ -15,124 +15,96 @@ export const getDateRanges = () => {
 }
 
 export const AUTH_COMBINED_QUERY = () => `
-  WITH periods AS (
-    SELECT 'current' AS period, 
-           timestamp >= timestamp_sub(current_timestamp(), interval 24 hour) 
-           AND timestamp < current_timestamp() AS in_period
-    UNION ALL
-    SELECT 'previous' AS period,
-           timestamp >= timestamp_sub(current_timestamp(), interval 48 hour)
-           AND timestamp < timestamp_sub(current_timestamp(), interval 24 hour) AS in_period
+  with base as (
+    select
+      timestamp_trunc(timestamp, hour) as ts_hour,
+      json_value(event_message, "$.auth_event.action") as action,
+      json_value(event_message, "$.auth_event.actor_id") as actor_id,
+      cast(json_value(event_message, "$.duration") as int64) as duration_ns
+    from auth_logs
   ),
-  base AS (
-    SELECT
-      CASE 
-        WHEN timestamp >= timestamp_sub(current_timestamp(), interval 24 hour) THEN 'current'
-        ELSE 'previous'
-      END AS period,
-      TIMESTAMP_TRUNC(timestamp, HOUR) AS ts_hour,
-      JSON_VALUE(event_message, '$.auth_event.action') AS action,
-      JSON_VALUE(event_message, '$.auth_event.actor_id') AS actor_id,
-      CAST(JSON_VALUE(event_message, '$.duration') AS INT64) AS duration_ns
-    FROM auth_logs
-    WHERE timestamp >= timestamp_sub(current_timestamp(), interval 48 hour)
-      AND timestamp < current_timestamp()
-  ),
-  agg AS (
-    SELECT
-      period,
+  agg as (
+    select
       ts_hour,
-      COUNT(DISTINCT CASE 
-        WHEN action IN (
+      count(distinct case 
+        when action in (
           'login','user_signedup','token_refreshed','user_modified',
           'user_recovery_requested','user_reauthenticate_requested'
-        ) THEN actor_id 
-        ELSE NULL 
-      END) AS active_users,
-      COUNT(CASE WHEN action = 'user_recovery_requested' THEN 1 ELSE NULL END) AS password_reset_requests,
-      COUNT(CASE WHEN action = 'user_signedup' THEN 1 ELSE NULL END) AS signups,
-      ROUND(AVG(CASE WHEN action = 'login' THEN duration_ns ELSE NULL END) / 1000000, 2) AS signin_avg_ms,
-      ROUND(AVG(CASE WHEN action = 'user_signedup' THEN duration_ns ELSE NULL END) / 1000000, 2) AS signup_avg_ms
-    FROM base
-    GROUP BY period, ts_hour
+        ) then actor_id 
+        else null 
+      end) as active_users,
+      count(case when action = 'user_recovery_requested' then 1 else null end) as password_reset_requests,
+      count(case when action = 'user_signedup' then 1 else null end) as signups,
+      round(avg(case when action = 'login' then duration_ns else null end) / 1000000, 2) as signin_avg_ms,
+      round(avg(case when action = 'user_signedup' then duration_ns else null end) / 1000000, 2) as signup_avg_ms
+    from base
+    group by ts_hour
   )
   
-  SELECT period, ts_hour AS timestamp, 'activeUsers' AS metric, CAST(active_users AS FLOAT64) AS value
-  FROM agg
-  UNION ALL
-  SELECT period, ts_hour, 'passwordResetRequests' AS metric, CAST(password_reset_requests AS FLOAT64)
-  FROM agg
-  UNION ALL
-  SELECT period, ts_hour, 'signUpCount' AS metric, CAST(signups AS FLOAT64)
-  FROM agg
-  UNION ALL
-  SELECT period, ts_hour, 'signInLatency' AS metric, COALESCE(signin_avg_ms, 0)
-  FROM agg
-  UNION ALL
-  SELECT period, ts_hour, 'signUpLatency' AS metric, COALESCE(signup_avg_ms, 0)
-  FROM agg
-  ORDER BY timestamp DESC, period, metric
+  select ts_hour as timestamp, 'activeUsers' as metric, cast(active_users as float64) as value
+  from agg
+  union all
+  select ts_hour, 'passwordResetRequests' as metric, cast(password_reset_requests as float64)
+  from agg
+  union all
+  select ts_hour, 'signUpCount' as metric, cast(signups as float64)
+  from agg
+  union all
+  select ts_hour, 'signInLatency' as metric, coalesce(signin_avg_ms, 0)
+  from agg
+  union all
+  select ts_hour, 'signUpLatency' as metric, coalesce(signup_avg_ms, 0)
+  from agg
+  order by timestamp desc, metric
 `
 
-export const fetchAllAuthMetrics = async (projectRef: string) => {
+export const fetchAllAuthMetrics = async (projectRef: string, period: 'current' | 'previous') => {
   const sql = AUTH_COMBINED_QUERY()
-  const startDate = dayjs().subtract(48, 'hour').toISOString()
-  const endDate = dayjs().toISOString()
+  const { current, previous } = getDateRanges()
+  const dateRange = period === 'current' ? current : previous
 
-  return await fetchLogs(projectRef, sql, startDate, endDate)
+  return await fetchLogs(projectRef, sql, dateRange.startDate, dateRange.endDate)
 }
 
-export const processAllAuthMetrics = (data: any[]) => {
-  if (!data || !Array.isArray(data)) {
+export const processAllAuthMetrics = (currentData: any[], previousData: any[]) => {
+  const processData = (data: any[]) => {
+    if (!data || !Array.isArray(data)) {
+      return { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 }
+    }
+
+    const grouped = data.reduce(
+      (acc, row) => {
+        const { metric, value } = row
+        if (!acc[metric]) acc[metric] = []
+        acc[metric].push(value || 0)
+        return acc
+      },
+      {} as Record<string, number[]>
+    )
+
     return {
-      current: { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 },
-      previous: { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 },
+      activeUsers: (grouped.activeUsers || []).reduce((sum: number, v: number) => sum + v, 0),
+      passwordResets: (grouped.passwordResetRequests || []).reduce(
+        (sum: number, v: number) => sum + v,
+        0
+      ),
+      signInLatency:
+        (grouped.signInLatency || []).length > 0
+          ? (grouped.signInLatency || []).reduce((sum: number, v: number) => sum + v, 0) /
+            grouped.signInLatency.length
+          : 0,
+      signUpLatency:
+        (grouped.signUpLatency || []).length > 0
+          ? (grouped.signUpLatency || []).reduce((sum: number, v: number) => sum + v, 0) /
+            grouped.signUpLatency.length
+          : 0,
     }
   }
 
-  const metrics = {
-    current: { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 },
-    previous: { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 },
+  return {
+    current: processData(currentData),
+    previous: processData(previousData),
   }
-
-  // Group by period and metric
-  const grouped = data.reduce(
-    (acc, row) => {
-      const { period, metric, value } = row
-      if (!acc[period]) acc[period] = {}
-      if (!acc[period][metric]) acc[period][metric] = []
-      acc[period][metric].push(value || 0)
-      return acc
-    },
-    {} as Record<string, Record<string, number[]>>
-  )
-
-  for (const period of ['current', 'previous'] as const) {
-    if (grouped[period]) {
-      metrics[period].activeUsers = (grouped[period].activeUsers || []).reduce(
-        (sum: number, v: number) => sum + v,
-        0
-      )
-      metrics[period].passwordResets = (grouped[period].passwordResetRequests || []).reduce(
-        (sum: number, v: number) => sum + v,
-        0
-      )
-
-      const signInValues = grouped[period].signInLatency || []
-      metrics[period].signInLatency =
-        signInValues.length > 0
-          ? signInValues.reduce((sum: number, v: number) => sum + v, 0) / signInValues.length
-          : 0
-
-      const signUpValues = grouped[period].signUpLatency || []
-      metrics[period].signUpLatency =
-        signUpValues.length > 0
-          ? signUpValues.reduce((sum: number, v: number) => sum + v, 0) / signUpValues.length
-          : 0
-    }
-  }
-
-  return metrics
 }
 
 // Utility functions

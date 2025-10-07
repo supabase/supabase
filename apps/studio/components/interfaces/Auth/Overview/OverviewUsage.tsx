@@ -65,13 +65,20 @@ const StatCard = ({
 export const OverviewUsage = () => {
   const { ref } = useParams()
 
-  const { data: authData, isLoading } = useQuery({
-    queryKey: ['auth-metrics', ref],
-    queryFn: () => fetchAllAuthMetrics(ref as string),
+  const { data: currentData, isLoading: currentLoading } = useQuery({
+    queryKey: ['auth-metrics', ref, 'current'],
+    queryFn: () => fetchAllAuthMetrics(ref as string, 'current'),
     enabled: !!ref,
   })
 
-  const metrics = processAllAuthMetrics(authData?.result || [])
+  const { data: previousData, isLoading: previousLoading } = useQuery({
+    queryKey: ['auth-metrics', ref, 'previous'],
+    queryFn: () => fetchAllAuthMetrics(ref as string, 'previous'),
+    enabled: !!ref,
+  })
+
+  const metrics = processAllAuthMetrics(currentData?.result || [], previousData?.result || [])
+  const isLoading = currentLoading || previousLoading
 
   const activeUsersChange = calculatePercentageChange(
     metrics.current.activeUsers,
