@@ -198,13 +198,13 @@ export const DestinationPanel = ({
       // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
       // Analytics Bucket fields
-      warehouseName: (destinationData?.config as any)?.iceberg?.warehouse_name ?? '',
-      namespace: (destinationData?.config as any)?.iceberg?.namespace ?? '',
-      catalogToken: serviceApiKey, // Auto-populated from service API key
-      s3AccessKeyId: s3Keys?.accessKey ?? '', // Auto-generated S3 access key
-      s3SecretAccessKey: s3Keys?.secretKey ?? '', // Auto-generated S3 secret key
+      warehouseName: (destinationData?.config as any)?.iceberg?.supabase?.warehouse_name ?? '',
+      namespace: (destinationData?.config as any)?.iceberg?.supabase?.namespace ?? '',
+      catalogToken: (destinationData?.config as any)?.iceberg?.supabase?.catalog_token ?? serviceApiKey, // From existing config or auto-populated from service API key
+      s3AccessKeyId: s3Keys?.accessKey ?? (destinationData?.config as any)?.iceberg?.supabase?.s3_access_key_id ?? '', // Auto-generated or existing S3 access key
+      s3SecretAccessKey: s3Keys?.secretKey ?? (destinationData?.config as any)?.iceberg?.supabase?.s3_secret_access_key ?? '', // Auto-generated or existing S3 secret key
       s3Region:
-        projectSettings?.region ?? (destinationData?.config as any)?.iceberg?.s3_region ?? '',
+        projectSettings?.region ?? (destinationData?.config as any)?.iceberg?.supabase?.s3_region ?? '',
       // Common fields
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
@@ -336,7 +336,7 @@ export const DestinationPanel = ({
           )
           toast.success('Settings applied. Starting the pipeline...')
         }
-        startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
+        // startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
         let destinationConfig: any = {}
@@ -380,7 +380,7 @@ export const DestinationPanel = ({
         // Set request status only right before starting, then fire and close
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
         toast.success('Destination created. Starting the pipeline...')
-        startPipeline({ projectRef, pipelineId })
+        // startPipeline({ projectRef, pipelineId })
         onClose()
       }
     } catch (error) {
@@ -752,7 +752,7 @@ export const DestinationPanel = ({
                         >
                           <Input_Shadcn_
                             value={
-                              s3Keys?.accessKey
+                              s3Keys?.accessKey || form.getValues('s3AccessKeyId')
                                 ? '••••••••••••••••'
                                 : isCreatingS3AccessKey
                                   ? 'Generating...'
@@ -771,7 +771,7 @@ export const DestinationPanel = ({
                         >
                           <Input_Shadcn_
                             value={
-                              s3Keys?.secretKey
+                              s3Keys?.secretKey || form.getValues('s3SecretAccessKey')
                                 ? '••••••••••••••••'
                                 : isCreatingS3AccessKey
                                   ? 'Generating...'
