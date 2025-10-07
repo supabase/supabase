@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
-import { ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
-import { Bucket } from 'icons'
+import { ChevronDown, Code } from 'lucide-react'
+import { Auth, Database, Realtime, Storage } from 'icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -175,7 +175,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'auth',
         title: 'Auth requests',
-        icon: <Key strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        icon: <Auth strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/auth/users`,
         route: '/logs/auth-logs',
         enabled: authEnabled,
@@ -183,7 +183,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'storage',
         title: 'Storage requests',
-        icon: <Bucket strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        icon: <Storage strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/storage/buckets`,
         route: '/logs/storage-logs',
         enabled: storageEnabled,
@@ -191,7 +191,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'realtime',
         title: 'Realtime requests',
-        icon: <Zap strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        icon: <Realtime strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         route: '/logs/realtime-logs',
         enabled: true,
       },
