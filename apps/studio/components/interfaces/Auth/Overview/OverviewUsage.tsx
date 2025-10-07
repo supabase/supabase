@@ -53,7 +53,7 @@ const StatCard = ({
           <>
             <h4 className="text-sm text-foreground-lighter font-normal mb-0">{title}</h4>
             <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
-            <p className={cn('text-sm text-foregroudn-lighter', changeColor)}>
+            <p className={cn('text-sm text-foreground-lighter', changeColor)}>
               {`${changeSign}${previous.toFixed(1)}%`}
             </p>
           </>
