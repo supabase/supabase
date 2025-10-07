@@ -3,7 +3,7 @@ import { Filter, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { useBreakpoint } from 'common/hooks'
 import { ExportDialog } from 'components/grid/components/header/ExportDialog'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { SupaTable } from 'components/grid/types'
