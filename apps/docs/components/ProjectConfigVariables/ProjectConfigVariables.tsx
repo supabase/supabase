@@ -6,7 +6,7 @@ import type {
   Project,
   Variable,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
-import type { ProjectApiData } from '~/lib/fetch/projectApi'
+import type { ProjectKeys, ProjectSettings } from '~/lib/fetch/projectApi'
 
 import { Check, Copy } from 'lucide-react'
 import Link from 'next/link'
@@ -34,7 +34,7 @@ import { useCopy } from '~/hooks/useCopy'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
 import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
-import { useProjectApiQuery } from '~/lib/fetch/projectApi'
+import { useProjectSettingsQuery, useProjectKeysQuery } from '~/lib/fetch/projectApi'
 import { isProjectPaused, useProjectsQuery } from '~/lib/fetch/projects'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
@@ -124,15 +124,15 @@ function OrgProjectSelector() {
       stateSummary !== 'loggedIn.dataSuccess.hasData'
         ? []
         : (projects!
-            .map((project) => {
-              const organization = organizations!.find((org) => org.id === project.organization_id)!
-              return {
-                id: project.ref,
-                value: toOrgProjectValue(organization, project),
-                displayName: toDisplayNameOrgProject(organization, project),
-              }
-            })
-            .filter(Boolean) as ComboBoxOption[]),
+          .map((project) => {
+            const organization = organizations!.find((org) => org.id === project.organization_id)!
+            return {
+              id: project.ref,
+              value: toOrgProjectValue(organization, project),
+              displayName: toDisplayNameOrgProject(organization, project),
+            }
+          })
+          .filter(Boolean) as ComboBoxOption[]),
     [organizations, projects, stateSummary]
   )
 
@@ -218,10 +218,10 @@ function BranchSelector() {
     stateSummary !== 'loggedIn.branches.dataSuccess.hasData'
       ? []
       : data!.map((branch) => ({
-          id: branch.id,
-          displayName: branch.name,
-          value: toBranchValue(branch),
-        }))
+        id: branch.id,
+        displayName: branch.name,
+        value: toBranchValue(branch),
+      }))
 
   useEffect(() => {
     if (stateSummary === 'loggedIn.branches.dataSuccess.hasData' && !selectedBranch) {
@@ -279,10 +279,21 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const needsSupavisorQuery = variable === 'sessionPooler'
 
   const {
-    data: apiData,
-    isPending: isApiPending,
-    isError: isApiError,
-  } = useProjectApiQuery(
+    data: apiSettingsData,
+    isPending: isApiSettingsPending,
+    isError: isApiSettingsError,
+  } = useProjectSettingsQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: isLoggedIn && !!ref && !projectPaused && needsApiQuery }
+  )
+
+  const {
+    data: apiKeysData,
+    isPending: isApiKeysPending,
+    isError: isApiKeysError,
+  } = useProjectKeysQuery(
     {
       projectRef: ref,
     },
@@ -299,8 +310,8 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     },
     { enabled: isLoggedIn && !!ref && !projectPaused && needsSupavisorQuery }
   )
-
-  function isInvalidApiData(apiData: ProjectApiData) {
+  // Currently not used
+  function isInvalidKeysData(apiData: ProjectKeys) {
     console.log(variable)
     switch (variable) {
       case 'url':
@@ -308,11 +319,11 @@ function VariableView({ variable, className }: { variable: Variable; className?:
       case 'publishable':
         console.log(apiData)
         return !apiData.api_key?.some((key) => key.type === 'publishable')
-        
-        // service_api_keys?.some((key) => key.tags === 'publishable')
-    
+
+      // service_api_keys?.some((key) => key.tags === 'publishable')
+
       case 'anon':
-        console.log(!apiData.api_key?.some((key) => key.type === 'legacy'))
+        // console.log(!apiData.api_key?.some((key) => key.type === 'legacy'))
         return !apiData.api_key?.some((key) => key.type === 'legacy')
     }
   }
@@ -330,32 +341,35 @@ function VariableView({ variable, className }: { variable: Variable; className?:
         ? 'loggedIn.noSelectedProject'
         : projectPaused
           ? 'loggedIn.selectedProject.projectPaused'
-          : (needsApiQuery ? isApiPending : isSupavisorPending)
+          : (needsApiQuery ? (isApiSettingsPending || isApiKeysPending) : isSupavisorPending)
             ? 'loggedIn.selectedProject.dataPending'
             : (
-                  needsApiQuery
-                  ? isApiError
-
-                    : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
-                )
+              needsApiQuery
+                ? (isApiSettingsError || isApiKeysError)
+                : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
+            )
               ? 'loggedIn.selectedProject.dataError'
               : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = ''
   console.log(stateSummary)
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
-                    console.log("I made it")
+    console.log("I made it" + variable)
 
     switch (variable) {
       case 'url':
-        variableValue = `https://${apiData?.app_config?.endpoint}`
+        console.log(apiSettingsData)
+        variableValue = `https://${apiSettingsData?.app_config?.endpoint}`
         break
       case 'anon':
-        variableValue = apiData?.service_api_keys?.find((key) => key.tags === 'anon')?.api_key || ''
+        console.log(apiKeysData)
+
+        variableValue = apiSettingsData?.service_api_keys?.find((key) => key.tags === 'anon')?.api_key || ''
         break
-              case 'publishable':
-                console.log("I made it")
-        variableValue = apiData?.service_api_keys?.find((key) => key.tags === 'publishable')?.api_key || ''
+      case 'publishable':
+        console.log("I made it again" + variable)
+        console.log(apiKeysData)
+        // variableValue = apiSettingsData?.service_api_keys?.find((key) => key.tags === 'publishable')?.api_key || ''
         break
       case 'sessionPooler':
         variableValue = supavisorConfig?.[0]?.connection_string || ''
@@ -375,7 +389,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
           className="font-mono"
           value={
             stateSummary === 'userLoading' ||
-            stateSummary === 'loggedIn.selectedProject.dataPending'
+              stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
               : stateSummary === 'loggedIn.selectedProject.projectPaused'
                 ? 'PROJECT PAUSED'
@@ -411,7 +425,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
         </p>
       )}
 
-      
+
     </>
   )
 }

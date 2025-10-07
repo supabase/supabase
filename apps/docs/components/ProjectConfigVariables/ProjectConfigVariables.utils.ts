@@ -30,7 +30,8 @@ function unescapeDoubleQuotes(str: string) {
 
 export const prettyFormatVariable: Record<Variable, string> = {
   url: 'Project URL',
-  publishableKey: 'Publishable key',
+  anon: 'Anon key',
+  publishable: 'Publishable key',
   sessionPooler: 'Connection string (pooler session mode)',
 }
 

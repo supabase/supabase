@@ -9,8 +9,13 @@ const projectApiKeys = {
 export interface ProjectApiVariables {
   projectRef?: string
 }
+type ProjectApiError = ResponseError
 
-async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: AbortSignal) {
+export type ProjectKeys = Awaited<ReturnType<typeof getProjectKeys>>
+
+export type ProjectSettings = Awaited<ReturnType<typeof getProjectSettings>>
+
+async function getProjectKeys({ projectRef }: ProjectApiVariables, signal?: AbortSignal) {
   if (!projectRef) {
     throw Error('projectRef is required')
   }
@@ -22,23 +27,53 @@ async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: Abort
     signal,
   })
   if (error) throw error
-console.log(data)
+  console.log('Fetching project keys for projectRef:', projectRef)
+  console.log(data)
   return data
 }
 
-export type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
-type ProjectApiError = ResponseError
+async function getProjectSettings({ projectRef }: ProjectApiVariables, signal?: AbortSignal) {
+  if (!projectRef) {
+    throw Error('projectRef is required')
+  }
 
-export function useProjectApiQuery<TData = ProjectApiData>(
+  const { data, error } = await get('/platform/projects/{ref}/settings', {
+    params: {
+      path: { ref: projectRef },
+    },
+    signal,
+  })
+  if (error) throw error
+  console.log('Fetching project settings for projectRef:', projectRef)
+  console.log(data)
+  return data
+}
+
+export function useProjectKeysQuery<TData = ProjectKeys>(
   { projectRef }: ProjectApiVariables,
   {
     enabled = true,
     ...options
-  }: Omit<UseQueryOptions<ProjectApiData, ProjectApiError, TData>, 'queryKey'> = {}
+  }: Omit<UseQueryOptions<ProjectKeys, ProjectApiError, TData>, 'queryKey'> = {}
 ) {
-  return useQuery<ProjectApiData, ProjectApiError, TData>({
+  return useQuery<ProjectKeys, ProjectApiError, TData>({
     queryKey: projectApiKeys.api(projectRef),
-    queryFn: ({ signal }) => getProjectApi({ projectRef }, signal),
+    queryFn: ({ signal }) => getProjectKeys({ projectRef }, signal),
+    enabled,
+    ...options,
+  })
+}
+
+export function useProjectSettingsQuery<TData = ProjectSettings>(
+  { projectRef }: ProjectApiVariables,
+  {
+    enabled = true,
+    ...options
+  }: Omit<UseQueryOptions<ProjectSettings, ProjectApiError, TData>, 'queryKey'> = {}
+) {
+  return useQuery<ProjectSettings, ProjectApiError, TData>({
+    queryKey: projectApiKeys.api(projectRef),
+    queryFn: ({ signal }) => getProjectSettings({ projectRef }, signal),
     enabled,
     ...options,
   })
