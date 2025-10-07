@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import sumBy from 'lodash/sumBy'
-import { ChevronDown, Database, Key, Zap } from 'lucide-react'
-import { Bucket } from 'icons'
+import { ChevronDown } from 'lucide-react'
+import { Auth, Database, Realtime, Storage } from 'icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -201,7 +201,7 @@ const ProjectUsage = () => {
             <PanelHeader
               icon={
                 <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                  <Database strokeWidth={2} size={16} />
+                  <Database strokeWidth={1.5} size={16} />
                 </div>
               }
               title="Database"
@@ -227,7 +227,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <Key strokeWidth={2} size={16} />
+                    <Auth strokeWidth={1.5} size={16} />
                   </div>
                 }
                 title="Auth"
@@ -253,7 +253,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <Bucket strokeWidth={2} size={16} />
+                    <Storage strokeWidth={1.5} size={16} />
                   </div>
                 }
                 title="Storage"
@@ -279,7 +279,7 @@ const ProjectUsage = () => {
             <PanelHeader
               icon={
                 <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                  <Zap strokeWidth={2} size={16} />
+                  <Realtime strokeWidth={1.5} size={16} />
                 </div>
               }
               title="Realtime"
