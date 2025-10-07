@@ -141,21 +141,8 @@ export const AUTH_QUERIES = {
       order by timestamp desc
     `,
   },
-
-  recentSignUps: () => `
-    select 
-      timestamp,
-      json_value(event_message, "$.auth_event.actor_id") as user_id,
-      json_value(event_message, "$.auth_event.actor_email") as email,
-      json_value(event_message, "$.auth_event.provider") as provider
-    from auth_logs
-    where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-    order by timestamp desc
-    limit 3
-  `,
 }
 
-// Function to fetch auth data using the analytics endpoint
 export const fetchAuthData = async (
   projectRef: string,
   queryType:
@@ -169,7 +156,6 @@ export const fetchAuthData = async (
     | 'signInLatencyPrevious'
     | 'signUpLatencyCurrent'
     | 'signUpLatencyPrevious'
-    | 'recentSignUps'
 ) => {
   const { current, previous } = getDateRanges()
 
@@ -216,10 +202,6 @@ export const fetchAuthData = async (
     case 'signUpLatencyPrevious':
       sql = AUTH_QUERIES.signUpLatency.previous()
       dateRange = previous
-      break
-    case 'recentSignUps':
-      sql = AUTH_QUERIES.recentSignUps()
-      dateRange = current
       break
     default:
       throw new Error(`Unknown query type: ${queryType}`)
