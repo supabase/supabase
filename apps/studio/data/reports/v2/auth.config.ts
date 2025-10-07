@@ -11,7 +11,12 @@ import {
   transformCategoricalCountData,
   transformStatusCodeData,
 } from 'components/interfaces/Reports/Reports.utils'
-import { AUTH_ERROR_CODES } from 'data/reports/v2/auth.utils'
+import { AUTH_ERROR_CODES } from 'common/constants/auth-error-codes'
+
+const AUTH_ERROR_CODE_LIST = Object.entries(AUTH_ERROR_CODES).map(([key, value]) => ({
+  key,
+  description: value.description,
+}))
 
 const METRIC_KEYS = [
   'ActiveUsers',
@@ -725,7 +730,7 @@ export const createErrorsReportConfig = ({
       const attributes = distinct.map((c: string) => ({
         attribute: c,
         label: c,
-        tooltip: AUTH_ERROR_CODES.find((e) => e.key === c)?.description,
+        tooltip: AUTH_ERROR_CODE_LIST.find((e) => e.key === c)?.description,
       }))
 
       const data = rawData.result.map((point: any) => ({
