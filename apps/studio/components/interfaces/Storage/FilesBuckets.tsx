@@ -5,8 +5,11 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -40,6 +43,16 @@ export const FilesBuckets = () => {
 
   const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
   const { getPolicyCount, isLoading: isLoadingPolicies } = useStoragePolicyCounts(buckets)
+
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+
+  // Helper function to format bytes consistently
+  const formatBytes = (bytes: number) => {
+    const { value, unit } = convertFromBytes(bytes)
+    return `${value} ${unit}`
+  }
+
+  const formattedGlobalUploadLimit = formatBytes(data?.fileSizeLimit ?? 0)
 
   const isLoading = isLoadingBuckets || isLoadingPolicies
   const filesBuckets = buckets
@@ -78,8 +91,8 @@ export const FilesBuckets = () => {
                     <TableHead>Name</TableHead>
                     <TableHead>Policies</TableHead>
                     {/* <TableHead>Visibility</TableHead> */}
-                    <TableHead>Created at</TableHead>
-                    <TableHead>Updated at</TableHead>
+                    {/* <TableHead>Created at</TableHead>
+                    <TableHead>Updated at</TableHead> */}
                     <TableHead>File size limit</TableHead>
                     <TableHead>Allowed MIME types</TableHead>
                     {/* <TableHead>type</TableHead> */}
@@ -117,18 +130,32 @@ export const FilesBuckets = () => {
                       <TableCell>
                         <p className="text-foreground-light">{getPolicyCount(bucket.name)}</p>
                       </TableCell>
+
                       <TableCell>
-                        <p className="text-foreground-light">{bucket.created_at}</p>
+                        <p
+                          className={
+                            bucket.file_size_limit
+                              ? 'text-foreground-light'
+                              : 'text-foreground-muted'
+                          }
+                        >
+                          {bucket.file_size_limit
+                            ? formatBytes(bucket.file_size_limit)
+                            : `Unset (${formattedGlobalUploadLimit})`}
+                        </p>
                       </TableCell>
                       <TableCell>
-                        <p className="text-foreground-light">{bucket.updated_at}</p>
+                        <p
+                          className={
+                            bucket.allowed_mime_types
+                              ? 'text-foreground-light'
+                              : 'text-foreground-muted'
+                          }
+                        >
+                          {bucket.allowed_mime_types ? bucket.allowed_mime_types.join(', ') : 'Any'}
+                        </p>
                       </TableCell>
-                      <TableCell>
-                        <p className="text-foreground-light">{bucket.allowed_mime_types}</p>
-                      </TableCell>
-                      <TableCell>
-                        <p className="text-foreground-light">{bucket.file_size_limit}</p>
-                      </TableCell>
+
                       <TableCell>
                         <div className="flex justify-end gap-2">
                           <Button asChild type="default">
