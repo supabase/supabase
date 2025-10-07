@@ -40,9 +40,7 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/mcp-server-supabase'
   - '@supabase/mcp-utils'
-  - '@supabase/auth-js'
-  - '@supabase/supabase-js'
-  - '@supabase/realtime-js'
+  - '@supabase/*'
 
 onlyBuiltDependencies:
   - supabase
