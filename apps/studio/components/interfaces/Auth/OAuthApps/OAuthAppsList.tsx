@@ -264,8 +264,8 @@ const OAuthAppsList = () => {
             >
               New OAuth App
             </ButtonTooltip>
-            <Button onClick={createClient}>New Client</Button>
-            <Button onClick={getClients}>List Clients</Button>
+            <Button onClick={createClient}>Create Client (DELETE ME)</Button>
+            <Button onClick={getClients}>List Clients (DELETE ME)</Button>
           </div>
         </div>
 
