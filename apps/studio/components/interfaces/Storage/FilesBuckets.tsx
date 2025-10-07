@@ -1,5 +1,6 @@
 import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
@@ -30,6 +31,7 @@ import { EmptyBucketModal } from './EmptyBucketModal'
 import { EmptyBucketState } from './EmptyBucketState'
 
 export const FilesBuckets = () => {
+  const router = useRouter()
   const { ref } = useParams()
 
   const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
@@ -97,7 +99,15 @@ export const FilesBuckets = () => {
                     </TableRow>
                   )}
                   {filesBuckets.map((bucket) => (
-                    <TableRow key={bucket.id}>
+                    <TableRow
+                      key={bucket.id}
+                      onClick={() => {
+                        router.push(
+                          `/project/${ref}/storage/files/buckets/${encodeURIComponent(bucket.id)}`
+                        )
+                      }}
+                      className="cursor-pointer"
+                    >
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <p className="text-foreground">{bucket.name}</p>
