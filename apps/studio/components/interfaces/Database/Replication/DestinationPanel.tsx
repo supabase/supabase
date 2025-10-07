@@ -16,6 +16,7 @@ import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutati
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
+import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
@@ -93,10 +94,6 @@ const FormSchema = z
           data.warehouseName.length > 0 &&
           data.namespace &&
           data.namespace.length > 0 &&
-          data.s3AccessKeyId &&
-          data.s3AccessKeyId.length > 0 &&
-          data.s3SecretAccessKey &&
-          data.s3SecretAccessKey.length > 0 &&
           data.s3Region &&
           data.s3Region.length > 0
         )
@@ -138,6 +135,11 @@ export const DestinationPanel = ({
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
+  const [s3Keys, setS3Keys] = useState<{
+    accessKey: string
+    secretKey: string
+    bucketName: string
+  } | null>(null)
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -150,6 +152,9 @@ export const DestinationPanel = ({
     })
 
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+
+  const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
+    useS3AccessKeyCreateMutation()
 
   const {
     data: publications = [],
@@ -193,15 +198,15 @@ export const DestinationPanel = ({
       warehouseName: destinationData?.config?.analytics_bucket?.warehouse_name ?? '',
       namespace: destinationData?.config?.analytics_bucket?.namespace ?? '',
       catalogToken: serviceApiKey, // Auto-populated from service API key
-      s3AccessKeyId: '', // Always empty for security
-      s3SecretAccessKey: '', // Always empty for security
+      s3AccessKeyId: s3Keys?.accessKey ?? '', // Auto-generated S3 access key
+      s3SecretAccessKey: s3Keys?.secretKey ?? '', // Auto-generated S3 secret key
       s3Region: destinationData?.config?.analytics_bucket?.s3_region ?? '',
       // Common fields
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
       maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
     }),
-    [destinationData, pipelineData, serviceApiKey]
+    [destinationData, pipelineData, serviceApiKey, s3Keys]
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -214,7 +219,11 @@ export const DestinationPanel = ({
   const selectedType = form.watch('type')
   const warehouseName = form.watch('warehouseName')
   const catalogToken = form.watch('catalogToken')
-  const isSaving = creatingDestinationPipeline || updatingDestinationPipeline || startingPipeline
+  const isSaving =
+    creatingDestinationPipeline ||
+    updatingDestinationPipeline ||
+    startingPipeline ||
+    isCreatingS3AccessKey
 
   // Construct catalog URI for iceberg namespaces query
   const catalogUri = useMemo(() => {
@@ -399,6 +408,39 @@ export const DestinationPanel = ({
     setShowDisclaimerDialog(false)
     await submitPipeline(values)
   }
+
+  // Create S3 keys when warehouse name changes (only once per bucket)
+  useEffect(() => {
+    if (
+      selectedType === 'Analytics Bucket' &&
+      warehouseName &&
+      projectRef &&
+      (!s3Keys || s3Keys.bucketName !== warehouseName)
+    ) {
+      const createKeys = async () => {
+        try {
+          const { snakeCase } = await import('lodash')
+          const createS3KeyData = await createS3AccessKey({
+            projectRef,
+            description: `${snakeCase(warehouseName)}_keys`,
+          })
+
+          if (createS3KeyData?.access_key && createS3KeyData?.secret_key) {
+            setS3Keys({
+              accessKey: createS3KeyData.access_key,
+              secretKey: createS3KeyData.secret_key,
+              bucketName: warehouseName,
+            })
+          }
+        } catch (error) {
+          console.error('Failed to create S3 access keys:', error)
+          toast.error('Failed to create S3 access keys')
+        }
+      }
+
+      createKeys()
+    }
+  }, [selectedType, warehouseName, projectRef, s3Keys, createS3AccessKey])
 
   useEffect(() => {
     if (editMode && destinationData && pipelineData) {
@@ -697,45 +739,43 @@ export const DestinationPanel = ({
                           />
                         </FormItemLayout>
 
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="s3AccessKeyId"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="S3 Access Key ID"
-                              layout="vertical"
-                              description="Your S3 access key ID"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="password"
-                                  placeholder="S3 Access Key ID"
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
+                        <FormItemLayout
+                          label="S3 Access Key ID"
+                          layout="vertical"
+                          description="Automatically generated S3 access key ID"
+                        >
+                          <Input_Shadcn_
+                            value={
+                              s3Keys?.accessKey
+                                ? '••••••••••••••••'
+                                : isCreatingS3AccessKey
+                                  ? 'Generating...'
+                                  : 'Select warehouse first'
+                            }
+                            disabled
+                            type="password"
+                            placeholder="Auto-generated"
+                          />
+                        </FormItemLayout>
 
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="s3SecretAccessKey"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="S3 Secret Access Key"
-                              layout="vertical"
-                              description="Your S3 secret access key"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="password"
-                                  placeholder="S3 Secret Access Key"
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
+                        <FormItemLayout
+                          label="S3 Secret Access Key"
+                          layout="vertical"
+                          description="Automatically generated S3 secret access key"
+                        >
+                          <Input_Shadcn_
+                            value={
+                              s3Keys?.secretKey
+                                ? '••••••••••••••••'
+                                : isCreatingS3AccessKey
+                                  ? 'Generating...'
+                                  : 'Select warehouse first'
+                            }
+                            disabled
+                            type="password"
+                            placeholder="Auto-generated"
+                          />
+                        </FormItemLayout>
 
                         <FormField_Shadcn_
                           control={form.control}
