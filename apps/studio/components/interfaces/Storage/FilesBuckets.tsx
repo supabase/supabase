@@ -80,8 +80,8 @@ export const FilesBuckets = () => {
                     {/* <TableHead>Visibility</TableHead> */}
                     <TableHead>Created at</TableHead>
                     <TableHead>Updated at</TableHead>
-                    <TableHead>allowed_mime_types</TableHead>
-                    <TableHead>file_size_limit</TableHead>
+                    <TableHead>File size limit</TableHead>
+                    <TableHead>Allowed MIME types</TableHead>
                     {/* <TableHead>type</TableHead> */}
                     {/* <TableHead>owner</TableHead> */}
                     <TableHead />
@@ -151,7 +151,8 @@ export const FilesBuckets = () => {
                             <DropdownMenuContent side="bottom" align="end" className="w-40">
                               <DropdownMenuItem
                                 className="flex items-center space-x-2"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation()
                                   setModal('edit')
                                   setSelectedBucket(bucket)
                                 }}
@@ -162,7 +163,8 @@ export const FilesBuckets = () => {
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 className="flex items-center space-x-2"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation()
                                   setModal('empty')
                                   setSelectedBucket(bucket)
                                 }}
@@ -173,7 +175,8 @@ export const FilesBuckets = () => {
 
                               <DropdownMenuItem
                                 className="flex items-center space-x-2"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation()
                                   setModal('delete')
                                   setSelectedBucket(bucket)
                                 }}
