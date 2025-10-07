@@ -79,6 +79,9 @@ export const AuditLogs = () => {
         },
       }
     )
+  const isLogsNotAvailableBasedOnPlan = isError && error.message.endsWith(logsUpgradeError)
+  const isRangeExceededError = isError && error.message.includes('range exceeded')
+  const showFilters = !isLoading && !isLogsNotAvailableBasedOnPlan
 
   const {
     data: projectsData,
@@ -89,11 +92,13 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true, enabled: isSuccess }
+    { keepPreviousData: true, enabled: showFilters }
   )
-  const { data: organizations } = useOrganizationsQuery({ enabled: isSuccess })
-  const { data: members } = useOrganizationMembersQuery({ slug }, { enabled: isSuccess })
-  const { data: rolesData } = useOrganizationRolesV2Query({ slug }, { enabled: isSuccess })
+  const { data: organizations } = useOrganizationsQuery({
+    enabled: showFilters,
+  })
+  const { data: members } = useOrganizationMembersQuery({ slug }, { enabled: showFilters })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug }, { enabled: showFilters })
 
   const activeMembers = (members ?? []).filter((x) => !x.invited_at)
   const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
@@ -121,9 +126,6 @@ export const AuditLogs = () => {
         return log
       }
     })
-
-  const isLogsNotAvailableBasedOnPlan = isError && error.message.endsWith(logsUpgradeError)
-  const isRangeExceededError = isError && error.message.includes('range exceeded')
 
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
@@ -181,7 +183,7 @@ export const AuditLogs = () => {
       <ScaffoldContainer>
         <ScaffoldSection isFullWidth>
           <div className="space-y-4 flex flex-col">
-            {(isSuccess || (isError && !isLogsNotAvailableBasedOnPlan)) && (
+            {showFilters && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <p className="text-xs prose">Filter by</p>
