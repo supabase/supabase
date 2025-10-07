@@ -214,7 +214,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     hideMessage
                     name="name"
                     label="Name of bucket"
-                    labelOptional="Buckets cannot be renamed once created."
+                    labelOptional="Cannot be changed after creation"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ id="name" {...field} disabled />

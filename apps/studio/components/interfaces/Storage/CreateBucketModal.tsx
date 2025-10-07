@@ -280,7 +280,7 @@ export const CreateBucketModal = ({
                   <FormItemLayout
                     name="name"
                     label="Name of bucket"
-                    labelOptional="Buckets cannot be renamed once created."
+                    labelOptional="Cannot be changed after creation"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_

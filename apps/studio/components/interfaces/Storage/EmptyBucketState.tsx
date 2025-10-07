@@ -1,4 +1,5 @@
 import { CreateBucketModal } from './CreateBucketModal'
+import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
 import { BUCKET_TYPES } from './Storage.constants'
 
 interface EmptyBucketStateProps {
@@ -16,10 +17,27 @@ export const EmptyBucketState = ({ bucketType }: EmptyBucketStateProps) => {
       </div>
 
       {/* [Joshen] We can render the individual bucket modals here instead - where each modal has its own trigger */}
-      {/* [Danny] CreateBucketModal needs to be split into CreateFileBucketModal, CreateAnalyticsBucketModal, CreateVectorsBucketModal */}
       {bucketType === 'files' && (
         <CreateBucketModal buttonSize="tiny" buttonType="primary" buttonClassName="w-fit" />
       )}
+      {/* [Danny] Convert above and below into single ternary after vector bucket is supported */}
+      {/* i.e. bucketType === 'files' ? <CreateFileBucketModal /> : <CreateSpecializedBucketModal bucketType={bucketType} />  */}
+      {bucketType === 'analytics' && (
+        <CreateSpecializedBucketModal
+          bucketType="analytics"
+          buttonSize="tiny"
+          buttonType="primary"
+          buttonClassName="w-fit"
+        />
+      )}
+      {/* {bucketType === 'vectors' && (
+        <CreateSpecializedBucketModal
+          bucketType="vectors"
+          buttonSize="tiny"
+          buttonType="primary"
+          buttonClassName="w-fit"
+        />
+      )} */}
     </aside>
   )
 }
