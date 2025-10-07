@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -33,6 +34,7 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Input,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -141,6 +143,9 @@ export const DestinationPanel = ({
     secretKey: string
     bucketName: string
   } | null>(null)
+  const [showCatalogToken, setShowCatalogToken] = useState(false)
+  const [showS3AccessKey, setShowS3AccessKey] = useState(false)
+  const [showS3SecretKey, setShowS3SecretKey] = useState(false)
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -745,11 +750,29 @@ export const DestinationPanel = ({
                           layout="vertical"
                           description="Automatically retrieved from your project's service API key"
                         >
-                          <Input_Shadcn_
-                            value={serviceApiKey ? '••••••••••••••••' : 'Loading...'}
+                          <Input
+                            value={
+                              serviceApiKey
+                                ? showCatalogToken
+                                  ? serviceApiKey
+                                  : '••••••••••••••••'
+                                : 'Loading...'
+                            }
                             disabled
-                            type="password"
+                            type={showCatalogToken ? 'text' : 'password'}
                             placeholder="Auto-populated"
+                            copy={!!(serviceApiKey && showCatalogToken)}
+                            actions={
+                              serviceApiKey ? (
+                                <div className="flex items-center justify-center mr-1">
+                                  <Button
+                                    type="default"
+                                    icon={showCatalogToken ? <Eye /> : <EyeOff />}
+                                    onClick={() => setShowCatalogToken(!showCatalogToken)}
+                                  />
+                                </div>
+                              ) : null
+                            }
                           />
                         </FormItemLayout>
 
@@ -758,17 +781,36 @@ export const DestinationPanel = ({
                           layout="vertical"
                           description="Automatically generated S3 access key ID"
                         >
-                          <Input_Shadcn_
+                          <Input
                             value={
                               s3Keys?.accessKey || form.getValues('s3AccessKeyId')
-                                ? '••••••••••••••••'
+                                ? showS3AccessKey
+                                  ? s3Keys?.accessKey || form.getValues('s3AccessKeyId')
+                                  : '••••••••••••••••'
                                 : isCreatingS3AccessKey
                                   ? 'Generating...'
                                   : 'Select warehouse first'
                             }
                             disabled
-                            type="password"
+                            type={showS3AccessKey ? 'text' : 'password'}
                             placeholder="Auto-generated"
+                            copy={
+                              !!(
+                                (s3Keys?.accessKey || form.getValues('s3AccessKeyId')) &&
+                                showS3AccessKey
+                              )
+                            }
+                            actions={
+                              s3Keys?.accessKey || form.getValues('s3AccessKeyId') ? (
+                                <div className="flex items-center justify-center mr-1">
+                                  <Button
+                                    type="default"
+                                    icon={showS3AccessKey ? <Eye /> : <EyeOff />}
+                                    onClick={() => setShowS3AccessKey(!showS3AccessKey)}
+                                  />
+                                </div>
+                              ) : null
+                            }
                           />
                         </FormItemLayout>
 
@@ -777,17 +819,36 @@ export const DestinationPanel = ({
                           layout="vertical"
                           description="Automatically generated S3 secret access key"
                         >
-                          <Input_Shadcn_
+                          <Input
                             value={
                               s3Keys?.secretKey || form.getValues('s3SecretAccessKey')
-                                ? '••••••••••••••••'
+                                ? showS3SecretKey
+                                  ? s3Keys?.secretKey || form.getValues('s3SecretAccessKey')
+                                  : '••••••••••••••••'
                                 : isCreatingS3AccessKey
                                   ? 'Generating...'
                                   : 'Select warehouse first'
                             }
                             disabled
-                            type="password"
+                            type={showS3SecretKey ? 'text' : 'password'}
                             placeholder="Auto-generated"
+                            copy={
+                              !!(
+                                (s3Keys?.secretKey || form.getValues('s3SecretAccessKey')) &&
+                                showS3SecretKey
+                              )
+                            }
+                            actions={
+                              s3Keys?.secretKey || form.getValues('s3SecretAccessKey') ? (
+                                <div className="flex items-center justify-center mr-1">
+                                  <Button
+                                    type="default"
+                                    icon={showS3SecretKey ? <Eye /> : <EyeOff />}
+                                    onClick={() => setShowS3SecretKey(!showS3SecretKey)}
+                                  />
+                                </div>
+                              ) : null
+                            }
                           />
                         </FormItemLayout>
                       </>
