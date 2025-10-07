@@ -1,21 +1,6 @@
 import dayjs from 'dayjs'
 import { fetchLogs } from 'data/reports/report.utils'
 
-export interface AuthStats {
-  activeUsers: { current: number; previous: number }
-  passwordResetRequests: { current: number; previous: number }
-  signInLatency: { current: number; previous: number }
-  signUpLatency: { current: number; previous: number }
-}
-
-export interface StatCardProps {
-  title: string
-  current: number
-  previous: number
-  loading?: boolean
-  suffix?: string
-}
-
 // Date range helpers
 export const getDateRanges = () => {
   const endDate = dayjs().toISOString()
@@ -29,206 +14,131 @@ export const getDateRanges = () => {
   }
 }
 
-// SQL Queries - Updated to return time-series data like the working auth reports
-export const AUTH_QUERIES = {
-  activeUsers: {
-    current: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        count(distinct json_value(f.event_message, "$.auth_event.actor_id")) as count
-      from auth_logs f
-      where json_value(f.event_message, "$.auth_event.action") in (
-        'login', 'user_signedup', 'token_refreshed', 'user_modified',
-        'user_recovery_requested', 'user_reauthenticate_requested'
-      )
-      group by timestamp
-      order by timestamp desc
-    `,
-    previous: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        count(distinct json_value(f.event_message, "$.auth_event.actor_id")) as count
-      from auth_logs f
-      where json_value(f.event_message, "$.auth_event.action") in (
-        'login', 'user_signedup', 'token_refreshed', 'user_modified',
-        'user_recovery_requested', 'user_reauthenticate_requested'
-      )
-      group by timestamp
-      order by timestamp desc
-    `,
-  },
+export const AUTH_COMBINED_QUERY = () => `
+  WITH periods AS (
+    SELECT 'current' AS period, 
+           timestamp >= timestamp_sub(current_timestamp(), interval 24 hour) 
+           AND timestamp < current_timestamp() AS in_period
+    UNION ALL
+    SELECT 'previous' AS period,
+           timestamp >= timestamp_sub(current_timestamp(), interval 48 hour)
+           AND timestamp < timestamp_sub(current_timestamp(), interval 24 hour) AS in_period
+  ),
+  base AS (
+    SELECT
+      CASE 
+        WHEN timestamp >= timestamp_sub(current_timestamp(), interval 24 hour) THEN 'current'
+        ELSE 'previous'
+      END AS period,
+      TIMESTAMP_TRUNC(timestamp, HOUR) AS ts_hour,
+      JSON_VALUE(event_message, '$.auth_event.action') AS action,
+      JSON_VALUE(event_message, '$.auth_event.actor_id') AS actor_id,
+      CAST(JSON_VALUE(event_message, '$.duration') AS INT64) AS duration_ns
+    FROM auth_logs
+    WHERE timestamp >= timestamp_sub(current_timestamp(), interval 48 hour)
+      AND timestamp < current_timestamp()
+  ),
+  agg AS (
+    SELECT
+      period,
+      ts_hour,
+      COUNT(DISTINCT CASE 
+        WHEN action IN (
+          'login','user_signedup','token_refreshed','user_modified',
+          'user_recovery_requested','user_reauthenticate_requested'
+        ) THEN actor_id 
+        ELSE NULL 
+      END) AS active_users,
+      COUNT(CASE WHEN action = 'user_recovery_requested' THEN 1 ELSE NULL END) AS password_reset_requests,
+      COUNT(CASE WHEN action = 'user_signedup' THEN 1 ELSE NULL END) AS signups,
+      ROUND(AVG(CASE WHEN action = 'login' THEN duration_ns ELSE NULL END) / 1000000, 2) AS signin_avg_ms,
+      ROUND(AVG(CASE WHEN action = 'user_signedup' THEN duration_ns ELSE NULL END) / 1000000, 2) AS signup_avg_ms
+    FROM base
+    GROUP BY period, ts_hour
+  )
+  
+  SELECT period, ts_hour AS timestamp, 'activeUsers' AS metric, CAST(active_users AS FLOAT64) AS value
+  FROM agg
+  UNION ALL
+  SELECT period, ts_hour, 'passwordResetRequests' AS metric, CAST(password_reset_requests AS FLOAT64)
+  FROM agg
+  UNION ALL
+  SELECT period, ts_hour, 'signUpCount' AS metric, CAST(signups AS FLOAT64)
+  FROM agg
+  UNION ALL
+  SELECT period, ts_hour, 'signInLatency' AS metric, COALESCE(signin_avg_ms, 0)
+  FROM agg
+  UNION ALL
+  SELECT period, ts_hour, 'signUpLatency' AS metric, COALESCE(signup_avg_ms, 0)
+  FROM agg
+  ORDER BY timestamp DESC, period, metric
+`
 
-  passwordResetRequests: {
-    current: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        count(*) as count
-      from auth_logs f
-      where json_value(f.event_message, "$.auth_event.action") = 'user_recovery_requested'
-      group by timestamp
-      order by timestamp desc
-    `,
-    previous: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        count(*) as count
-      from auth_logs f
-      where json_value(f.event_message, "$.auth_event.action") = 'user_recovery_requested'
-      group by timestamp
-      order by timestamp desc
-    `,
-  },
+export const fetchAllAuthMetrics = async (projectRef: string) => {
+  const sql = AUTH_COMBINED_QUERY()
+  const startDate = dayjs().subtract(48, 'hour').toISOString()
+  const endDate = dayjs().toISOString()
 
-  signUpCount: {
-    current: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        count(*) as count
-      from auth_logs f
-      where json_value(f.event_message, "$.auth_event.action") = 'user_signedup'
-      group by timestamp
-      order by timestamp desc
-    `,
-    previous: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        count(*) as count
-      from auth_logs f
-      where json_value(f.event_message, "$.auth_event.action") = 'user_signedup'
-      group by timestamp
-      order by timestamp desc
-    `,
-  },
-
-  signInLatency: {
-    current: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms
-      from auth_logs
-      where json_value(event_message, "$.auth_event.action") = 'login'
-      group by timestamp
-      order by timestamp desc
-    `,
-    previous: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms
-      from auth_logs
-      where json_value(event_message, "$.auth_event.action") = 'login'
-      group by timestamp
-      order by timestamp desc
-    `,
-  },
-
-  signUpLatency: {
-    current: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms
-      from auth_logs
-      where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-      group by timestamp
-      order by timestamp desc
-    `,
-    previous: () => `
-      select 
-        timestamp_trunc(timestamp, hour) as timestamp,
-        round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms
-      from auth_logs
-      where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-      group by timestamp
-      order by timestamp desc
-    `,
-  },
+  return await fetchLogs(projectRef, sql, startDate, endDate)
 }
 
-export const fetchAuthData = async (
-  projectRef: string,
-  queryType:
-    | 'activeUsersCurrent'
-    | 'activeUsersPrevious'
-    | 'passwordResetCurrent'
-    | 'passwordResetPrevious'
-    | 'signUpCountCurrent'
-    | 'signUpCountPrevious'
-    | 'signInLatencyCurrent'
-    | 'signInLatencyPrevious'
-    | 'signUpLatencyCurrent'
-    | 'signUpLatencyPrevious'
-) => {
-  const { current, previous } = getDateRanges()
-
-  let sql: string
-  let dateRange: { startDate: string; endDate: string }
-
-  switch (queryType) {
-    case 'activeUsersCurrent':
-      sql = AUTH_QUERIES.activeUsers.current()
-      dateRange = current
-      break
-    case 'activeUsersPrevious':
-      sql = AUTH_QUERIES.activeUsers.previous()
-      dateRange = previous
-      break
-    case 'passwordResetCurrent':
-      sql = AUTH_QUERIES.passwordResetRequests.current()
-      dateRange = current
-      break
-    case 'passwordResetPrevious':
-      sql = AUTH_QUERIES.passwordResetRequests.previous()
-      dateRange = previous
-      break
-    case 'signUpCountCurrent':
-      sql = AUTH_QUERIES.signUpCount.current()
-      dateRange = current
-      break
-    case 'signUpCountPrevious':
-      sql = AUTH_QUERIES.signUpCount.previous()
-      dateRange = previous
-      break
-    case 'signInLatencyCurrent':
-      sql = AUTH_QUERIES.signInLatency.current()
-      dateRange = current
-      break
-    case 'signInLatencyPrevious':
-      sql = AUTH_QUERIES.signInLatency.previous()
-      dateRange = previous
-      break
-    case 'signUpLatencyCurrent':
-      sql = AUTH_QUERIES.signUpLatency.current()
-      dateRange = current
-      break
-    case 'signUpLatencyPrevious':
-      sql = AUTH_QUERIES.signUpLatency.previous()
-      dateRange = previous
-      break
-    default:
-      throw new Error(`Unknown query type: ${queryType}`)
+export const processAllAuthMetrics = (data: any[]) => {
+  if (!data || !Array.isArray(data)) {
+    return {
+      current: { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 },
+      previous: { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 },
+    }
   }
 
-  return await fetchLogs(projectRef, sql, dateRange.startDate, dateRange.endDate)
-}
+  const metrics = {
+    current: { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 },
+    previous: { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 },
+  }
 
-export const sumTimeSeriesData = (data: any[], field: string): number => {
-  if (!data || !Array.isArray(data)) return 0
-  return data.reduce((sum, item) => sum + (item[field] || 0), 0)
-}
+  // Group by period and metric
+  const grouped = data.reduce(
+    (acc, row) => {
+      const { period, metric, value } = row
+      if (!acc[period]) acc[period] = {}
+      if (!acc[period][metric]) acc[period][metric] = []
+      acc[period][metric].push(value || 0)
+      return acc
+    },
+    {} as Record<string, Record<string, number[]>>
+  )
 
-export const averageTimeSeriesData = (data: any[], field: string): number => {
-  if (!data || !Array.isArray(data) || data.length === 0) return 0
-  const sum = data.reduce((sum, item) => sum + (item[field] || 0), 0)
-  return sum / data.length
+  for (const period of ['current', 'previous'] as const) {
+    if (grouped[period]) {
+      metrics[period].activeUsers = (grouped[period].activeUsers || []).reduce(
+        (sum: number, v: number) => sum + v,
+        0
+      )
+      metrics[period].passwordResets = (grouped[period].passwordResetRequests || []).reduce(
+        (sum: number, v: number) => sum + v,
+        0
+      )
+
+      const signInValues = grouped[period].signInLatency || []
+      metrics[period].signInLatency =
+        signInValues.length > 0
+          ? signInValues.reduce((sum: number, v: number) => sum + v, 0) / signInValues.length
+          : 0
+
+      const signUpValues = grouped[period].signUpLatency || []
+      metrics[period].signUpLatency =
+        signUpValues.length > 0
+          ? signUpValues.reduce((sum: number, v: number) => sum + v, 0) / signUpValues.length
+          : 0
+    }
+  }
+
+  return metrics
 }
 
 // Utility functions
 export const calculatePercentageChange = (current: number, previous: number): number => {
   if (previous === 0) return current > 0 ? 100 : 0
   return ((current - previous) / previous) * 100
-}
-
-export const formatStatValue = (value: number, suffix: string = ''): string => {
-  return `${value.toLocaleString()}${suffix}`
 }
 
 export const getChangeColor = (percentageChange: number): string => {

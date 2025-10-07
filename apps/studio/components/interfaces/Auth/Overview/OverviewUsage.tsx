@@ -11,10 +11,9 @@ import { Reports } from 'icons'
 import {
   getChangeSign,
   getChangeColor,
-  fetchAuthData,
+  fetchAllAuthMetrics,
+  processAllAuthMetrics,
   calculatePercentageChange,
-  sumTimeSeriesData,
-  averageTimeSeriesData,
 } from './OverviewUsage.constants'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
@@ -66,82 +65,30 @@ const StatCard = ({
 export const OverviewUsage = () => {
   const { ref } = useParams()
 
-  const { data: activeUsersCurrent, isLoading: activeUsersCurrentLoading } = useQuery({
-    queryKey: ['auth-data', ref, 'activeUsersCurrent'],
-    queryFn: () => fetchAuthData(ref as string, 'activeUsersCurrent'),
+  const { data: authData, isLoading } = useQuery({
+    queryKey: ['auth-metrics', ref],
+    queryFn: () => fetchAllAuthMetrics(ref as string),
     enabled: !!ref,
   })
 
-  const { data: activeUsersPrevious } = useQuery({
-    queryKey: ['auth-data', ref, 'activeUsersPrevious'],
-    queryFn: () => fetchAuthData(ref as string, 'activeUsersPrevious'),
-    enabled: !!ref,
-  })
+  const metrics = processAllAuthMetrics(authData?.result || [])
 
-  const { data: passwordResetCurrent, isLoading: passwordResetCurrentLoading } = useQuery({
-    queryKey: ['auth-data', ref, 'passwordResetCurrent'],
-    queryFn: () => fetchAuthData(ref as string, 'passwordResetCurrent'),
-    enabled: !!ref,
-  })
-
-  const { data: passwordResetPrevious } = useQuery({
-    queryKey: ['auth-data', ref, 'passwordResetPrevious'],
-    queryFn: () => fetchAuthData(ref as string, 'passwordResetPrevious'),
-    enabled: !!ref,
-  })
-
-  const { data: signInLatencyCurrent, isLoading: signInLatencyCurrentLoading } = useQuery({
-    queryKey: ['auth-data', ref, 'signInLatencyCurrent'],
-    queryFn: () => fetchAuthData(ref as string, 'signInLatencyCurrent'),
-    enabled: !!ref,
-  })
-
-  const { data: signInLatencyPrevious } = useQuery({
-    queryKey: ['auth-data', ref, 'signInLatencyPrevious'],
-    queryFn: () => fetchAuthData(ref as string, 'signInLatencyPrevious'),
-    enabled: !!ref,
-  })
-
-  const { data: signUpLatencyCurrent, isLoading: signUpLatencyCurrentLoading } = useQuery({
-    queryKey: ['auth-data', ref, 'signUpLatencyCurrent'],
-    queryFn: () => fetchAuthData(ref as string, 'signUpLatencyCurrent'),
-    enabled: !!ref,
-  })
-
-  const { data: signUpLatencyPrevious } = useQuery({
-    queryKey: ['auth-data', ref, 'signUpLatencyPrevious'],
-    queryFn: () => fetchAuthData(ref as string, 'signUpLatencyPrevious'),
-    enabled: !!ref,
-  })
-
-  const currentUserCount = sumTimeSeriesData(activeUsersCurrent?.result || [], 'count')
-  const previousUserCount = sumTimeSeriesData(activeUsersPrevious?.result || [], 'count')
-  const currentPasswordResets = sumTimeSeriesData(passwordResetCurrent?.result || [], 'count')
-  const previousPasswordResets = sumTimeSeriesData(passwordResetPrevious?.result || [], 'count')
-  const currentSignInLatency = averageTimeSeriesData(
-    signInLatencyCurrent?.result || [],
-    'avg_latency_ms'
+  const activeUsersChange = calculatePercentageChange(
+    metrics.current.activeUsers,
+    metrics.previous.activeUsers
   )
-  const previousSignInLatency = averageTimeSeriesData(
-    signInLatencyPrevious?.result || [],
-    'avg_latency_ms'
-  )
-  const currentSignUpLatency = averageTimeSeriesData(
-    signUpLatencyCurrent?.result || [],
-    'avg_latency_ms'
-  )
-  const previousSignUpLatency = averageTimeSeriesData(
-    signUpLatencyPrevious?.result || [],
-    'avg_latency_ms'
-  )
-
-  const activeUsersChange = calculatePercentageChange(currentUserCount, previousUserCount)
   const passwordResetChange = calculatePercentageChange(
-    currentPasswordResets,
-    previousPasswordResets
+    metrics.current.passwordResets,
+    metrics.previous.passwordResets
   )
-  const signInLatencyChange = calculatePercentageChange(currentSignInLatency, previousSignInLatency)
-  const signUpLatencyChange = calculatePercentageChange(currentSignUpLatency, previousSignUpLatency)
+  const signInLatencyChange = calculatePercentageChange(
+    metrics.current.signInLatency,
+    metrics.previous.signInLatency
+  )
+  const signUpLatencyChange = calculatePercentageChange(
+    metrics.current.signUpLatency,
+    metrics.previous.signUpLatency
+  )
 
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
@@ -197,28 +144,28 @@ export const OverviewUsage = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard
             title="Active Users"
-            current={currentUserCount}
+            current={metrics.current.activeUsers}
             previous={activeUsersChange}
-            loading={activeUsersCurrentLoading}
+            loading={isLoading}
           />
           <StatCard
             title="Password Reset Requests"
-            current={currentPasswordResets}
+            current={metrics.current.passwordResets}
             previous={passwordResetChange}
-            loading={passwordResetCurrentLoading}
+            loading={isLoading}
           />
           <StatCard
             title="Sign up Latency"
-            current={Number(currentSignUpLatency.toFixed(2))}
+            current={Number(metrics.current.signUpLatency.toFixed(2))}
             previous={signUpLatencyChange}
-            loading={signUpLatencyCurrentLoading}
+            loading={isLoading}
             suffix="ms"
           />
           <StatCard
             title="Sign in Latency"
-            current={Number(currentSignInLatency.toFixed(2))}
+            current={Number(metrics.current.signInLatency.toFixed(2))}
             previous={signInLatencyChange}
-            loading={signInLatencyCurrentLoading}
+            loading={isLoading}
             suffix="ms"
           />
         </div>
