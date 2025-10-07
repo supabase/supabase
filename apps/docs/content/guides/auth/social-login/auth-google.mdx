@@ -246,9 +246,31 @@ supabase.auth.signInWithOAuth({
 })
 ```
 
+<Admonition type="tip">
+
+**Using PKCE with Google OAuth?** If you're implementing the PKCE flow, make sure to configure your Supabase client with `auth: { flowType: 'pkce' }`. See the [PKCE configuration guide](/docs/guides/auth/social-login#using-pkce-with-social-logins) for complete setup instructions.
+
+</Admonition>
+
 For an implicit flow, that's all you need to do. The user will be taken to Google's consent screen, and finally redirected to your app with an access and refresh token pair representing their session.
 
 <$Partial path="oauth_pkce_flow.mdx" />
+
+**Important for PKCE flows:** The examples above will only work if you've configured your Supabase client with `flowType: 'pkce'`:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  {
+    auth: {
+      flowType: 'pkce'
+    }
+  }
+)
+```
 
 After a successful code exchange, the user's session will be saved to cookies.
 
