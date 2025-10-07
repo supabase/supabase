@@ -249,12 +249,7 @@ export const RealtimeSettings = () => {
                     >
                       <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            // disabled={!isUsageBillingEnabled || !canUpdateConfig}
-                            value={field.value || ''}
-                          />
+                          <Input_Shadcn_ {...field} type="number" value={field.value || ''} />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
                       </FormSectionContent>
@@ -287,16 +282,40 @@ export const RealtimeSettings = () => {
                           <Input_Shadcn_
                             {...field}
                             type="number"
-                            // disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                            disabled={!isUsageBillingEnabled || !canUpdateConfig}
                             value={field.value || ''}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
+                        {isSuccessOrganization && !isUsageBillingEnabled && (
+                          <Admonition showIcon={false} type="default">
+                            <div className="flex items-center gap-x-2">
+                              <div>
+                                <h5 className="text-foreground mb-1">
+                                  Spend cap needs to be disabled to configure this value
+                                </h5>
+                                <p className="text-foreground-light">
+                                  {isFreePlan
+                                    ? 'Upgrade to the Pro plan first to disable spend cap'
+                                    : 'You may adjust this setting in the organization billing settings'}
+                                </p>
+                              </div>
+                              <div className="flex-grow flex items-center justify-end">
+                                {isFreePlan ? (
+                                  <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                ) : (
+                                  <ToggleSpendCapButton />
+                                )}
+                              </div>
+                            </div>
+                          </Admonition>
+                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}
                 />
               </CardContent>
+
               {/*
                 [Joshen] The following fields are hidden from the UI temporarily while we figure out what settings to expose to the users
                 - Max bytes per second
@@ -417,6 +436,7 @@ export const RealtimeSettings = () => {
                   )}
                 />
               </CardContent> */}
+
               <CardFooter className="justify-between">
                 <div>
                   {isPermissionsLoaded && !canUpdateConfig && (
