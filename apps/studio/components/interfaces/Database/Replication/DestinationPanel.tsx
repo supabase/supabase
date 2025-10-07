@@ -146,6 +146,7 @@ export const DestinationPanel = ({
   const [showCatalogToken, setShowCatalogToken] = useState(false)
   const [showS3AccessKey, setShowS3AccessKey] = useState(false)
   const [showS3SecretKey, setShowS3SecretKey] = useState(false)
+  const [isFormInteracting, setIsFormInteracting] = useState(false)
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -207,14 +208,9 @@ export const DestinationPanel = ({
       namespace: (destinationData?.config as any)?.iceberg?.supabase?.namespace ?? '',
       catalogToken:
         (destinationData?.config as any)?.iceberg?.supabase?.catalog_token ?? serviceApiKey, // From existing config or auto-populated from service API key
-      s3AccessKeyId:
-        s3Keys?.accessKey ??
-        (destinationData?.config as any)?.iceberg?.supabase?.s3_access_key_id ??
-        '', // Auto-generated or existing S3 access key
+      s3AccessKeyId: (destinationData?.config as any)?.iceberg?.supabase?.s3_access_key_id ?? '', // Existing S3 access key from saved config
       s3SecretAccessKey:
-        s3Keys?.secretKey ??
-        (destinationData?.config as any)?.iceberg?.supabase?.s3_secret_access_key ??
-        '', // Auto-generated or existing S3 secret key
+        (destinationData?.config as any)?.iceberg?.supabase?.s3_secret_access_key ?? '', // Existing S3 secret key from saved config
       s3Region:
         projectSettings?.region ??
         (destinationData?.config as any)?.iceberg?.supabase?.s3_region ??
@@ -224,7 +220,7 @@ export const DestinationPanel = ({
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
       maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
     }),
-    [destinationData, pipelineData, serviceApiKey, s3Keys, projectSettings]
+    [destinationData, pipelineData, serviceApiKey, projectSettings]
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -446,11 +442,16 @@ export const DestinationPanel = ({
           })
 
           if (createS3KeyData?.access_key && createS3KeyData?.secret_key) {
-            setS3Keys({
+            const newS3Keys = {
               accessKey: createS3KeyData.access_key,
               secretKey: createS3KeyData.secret_key,
               bucketName: warehouseName,
-            })
+            }
+            setS3Keys(newS3Keys)
+
+            // Update form fields directly without resetting the entire form
+            form.setValue('s3AccessKeyId', newS3Keys.accessKey)
+            form.setValue('s3SecretAccessKey', newS3Keys.secretKey)
           }
         } catch (error) {
           console.error('Failed to create S3 access keys:', error)
@@ -460,18 +461,21 @@ export const DestinationPanel = ({
 
       createKeys()
     }
-  }, [selectedType, warehouseName, projectRef, s3Keys, createS3AccessKey])
+  }, [selectedType, warehouseName, projectRef, s3Keys, createS3AccessKey, form])
 
   useEffect(() => {
-    if (editMode && destinationData && pipelineData) {
+    if (editMode && destinationData && pipelineData && !isFormInteracting) {
       form.reset(defaultValues)
     }
-  }, [destinationData, pipelineData, editMode, defaultValues, form])
+  }, [destinationData, pipelineData, editMode, defaultValues, form, isFormInteracting])
 
   // Ensure the form always reflects the freshest data whenever the panel opens
   useEffect(() => {
     if (visible) {
       form.reset(defaultValues)
+      // Clear any previously generated S3 keys when opening the panel
+      setS3Keys(null)
+      setIsFormInteracting(false)
     }
   }, [visible, defaultValues, form])
 
@@ -586,7 +590,13 @@ export const DestinationPanel = ({
                           description="The type of destination to send the data to"
                         >
                           <FormControl_Shadcn_>
-                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                            <Select_Shadcn_
+                              value={field.value}
+                              onValueChange={(value) => {
+                                setIsFormInteracting(true)
+                                field.onChange(value)
+                              }}
+                            >
                               <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
                                 <SelectGroup_Shadcn_>
@@ -667,7 +677,13 @@ export const DestinationPanel = ({
                               description="Select a storage bucket to use as your Analytics Bucket warehouse"
                             >
                               <FormControl_Shadcn_>
-                                <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                                <Select_Shadcn_
+                                  value={field.value}
+                                  onValueChange={(value) => {
+                                    setIsFormInteracting(true)
+                                    field.onChange(value)
+                                  }}
+                                >
                                   <SelectTrigger_Shadcn_>
                                     {field.value || 'Select a warehouse'}
                                   </SelectTrigger_Shadcn_>
