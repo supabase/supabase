@@ -1,4 +1,5 @@
 import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
@@ -110,8 +111,12 @@ export const FilesBuckets = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-end gap-2">
-                          <Button type="default" onClick={() => {}}>
-                            View files
+                          <Button asChild type="default">
+                            <Link
+                              href={`/project/${ref}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
+                            >
+                              View files
+                            </Link>
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
