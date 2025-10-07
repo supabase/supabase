@@ -50,7 +50,7 @@ const StatCard = ({
           <Loader2 className="size-5 animate-spin text-foreground-light" />
         ) : (
           <>
-            <h4 className="text-sm text-foreground-lighter font-normal mb-0">{title}</h4>
+            <h4 className="text-sm text-foreground-lighter font-normal mb-0 truncate">{title}</h4>
             <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
             <p className={cn('text-sm text-foreground-lighter', changeColor)}>
               {`${changeSign}${previous.toFixed(1)}%`}
@@ -147,7 +147,7 @@ export const OverviewUsage = () => {
           <ChevronRight size={14} />
         </Link>
       </div>
-      <ScaffoldSectionContent className="gap-3">
+      <ScaffoldSectionContent className="gap-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard
             title="Active Users"
@@ -176,7 +176,7 @@ export const OverviewUsage = () => {
             suffix="ms"
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {signUpChartConfig && (
             <ReportChartV2
               report={signUpChartConfig}
