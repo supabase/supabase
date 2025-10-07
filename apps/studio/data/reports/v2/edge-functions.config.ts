@@ -153,7 +153,6 @@ order by
   },
 }
 
-
 /**
  * Transforms raw invocation data by normalizing timestamps and adding function names
  * @param data - Raw data from the database
