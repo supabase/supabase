@@ -13,7 +13,7 @@ export const StorageMenuV2 = () => {
     <Menu type="pills" className="my-6 flex flex-grow flex-col">
       <div className="space-y-6">
         <div className="mx-3">
-          <Menu.Group title={<span className="uppercase font-mono">Bucket Types</span>} />
+          <Menu.Group title={<span className="uppercase font-mono">Manage</span>} />
 
           {BUCKET_TYPE_KEYS.map((bucketTypeKey) => {
             const isSelected = page === bucketTypeKey
