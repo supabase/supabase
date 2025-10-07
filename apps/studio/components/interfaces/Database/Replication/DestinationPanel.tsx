@@ -188,7 +188,7 @@ export const DestinationPanel = ({
     () => ({
       type: (destinationData?.config?.big_query
         ? TypeEnum.enum.BigQuery
-        : (destinationData?.config as any)?.analytics_bucket
+        : (destinationData?.config as any)?.iceberg
           ? TypeEnum.enum['Analytics Bucket']
           : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>,
       name: destinationData?.name ?? '',
@@ -198,15 +198,13 @@ export const DestinationPanel = ({
       // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
       // Analytics Bucket fields
-      warehouseName: (destinationData?.config as any)?.analytics_bucket?.warehouse_name ?? '',
-      namespace: (destinationData?.config as any)?.analytics_bucket?.namespace ?? '',
+      warehouseName: (destinationData?.config as any)?.iceberg?.warehouse_name ?? '',
+      namespace: (destinationData?.config as any)?.iceberg?.namespace ?? '',
       catalogToken: serviceApiKey, // Auto-populated from service API key
       s3AccessKeyId: s3Keys?.accessKey ?? '', // Auto-generated S3 access key
       s3SecretAccessKey: s3Keys?.secretKey ?? '', // Auto-generated S3 secret key
       s3Region:
-        projectSettings?.region ??
-        (destinationData?.config as any)?.analytics_bucket?.s3_region ??
-        '',
+        projectSettings?.region ?? (destinationData?.config as any)?.iceberg?.s3_region ?? '',
       // Common fields
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
@@ -292,7 +290,8 @@ export const DestinationPanel = ({
           }
           destinationConfig = { bigQuery: bigQueryConfig }
         } else if (data.type === 'Analytics Bucket') {
-          const analyticsBucketConfig: any = {
+          const icebergConfig: any = {
+            projectRef: projectRef,
             warehouseName: data.warehouseName,
             namespace: data.namespace,
             catalogToken: data.catalogToken,
@@ -300,7 +299,7 @@ export const DestinationPanel = ({
             s3SecretAccessKey: data.s3SecretAccessKey,
             s3Region: data.s3Region,
           }
-          destinationConfig = { analyticsBucket: analyticsBucketConfig }
+          destinationConfig = { iceberg: icebergConfig }
         }
 
         const batchConfig: any = {}
@@ -353,7 +352,8 @@ export const DestinationPanel = ({
           }
           destinationConfig = { bigQuery: bigQueryConfig }
         } else if (data.type === 'Analytics Bucket') {
-          const analyticsBucketConfig: any = {
+          const icebergConfig: any = {
+            projectRef: projectRef,
             warehouseName: data.warehouseName,
             namespace: data.namespace,
             catalogToken: data.catalogToken,
@@ -361,7 +361,7 @@ export const DestinationPanel = ({
             s3SecretAccessKey: data.s3SecretAccessKey,
             s3Region: data.s3Region,
           }
-          destinationConfig = { analyticsBucket: analyticsBucketConfig }
+          destinationConfig = { iceberg: icebergConfig }
         }
         const batchConfig: any = {}
         if (data.type === 'BigQuery' && !!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs

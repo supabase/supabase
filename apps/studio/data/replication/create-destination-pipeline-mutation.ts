@@ -12,12 +12,26 @@ export type BigQueryDestinationConfig = {
   maxStalenessMins?: number
 }
 
+export type IcebergDestinationConfig = {
+  projectRef: string
+  warehouseName: string
+  namespace: string
+  catalogToken: string
+  s3AccessKeyId: string
+  s3SecretAccessKey: string
+  s3Region: string
+}
+
 export type CreateDestinationPipelineParams = {
   projectRef: string
   destinationName: string
-  destinationConfig: {
-    bigQuery: BigQueryDestinationConfig
-  }
+  destinationConfig:
+    | {
+        bigQuery: BigQueryDestinationConfig
+      }
+    | {
+        iceberg: IcebergDestinationConfig
+      }
   sourceId: number
   pipelineConfig: {
     publicationName: string
@@ -31,9 +45,7 @@ async function createDestinationPipeline(
   {
     projectRef,
     destinationName: destinationName,
-    destinationConfig: {
-      bigQuery: { projectId, datasetId, serviceAccountKey, maxStalenessMins },
-    },
+    destinationConfig,
     pipelineConfig: { publicationName, batch },
     sourceId,
   }: CreateDestinationPipelineParams,
@@ -41,19 +53,49 @@ async function createDestinationPipeline(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
+  // Build destination_config based on the type
+  let destination_config: any
+  if ('bigQuery' in destinationConfig) {
+    const { projectId, datasetId, serviceAccountKey, maxStalenessMins } = destinationConfig.bigQuery
+    destination_config = {
+      big_query: {
+        project_id: projectId,
+        dataset_id: datasetId,
+        service_account_key: serviceAccountKey,
+        ...(maxStalenessMins != null && { max_staleness_mins: maxStalenessMins }),
+      },
+    }
+  } else if ('iceberg' in destinationConfig) {
+    const {
+      projectRef: icebergProjectRef,
+      warehouseName,
+      namespace,
+      catalogToken,
+      s3AccessKeyId,
+      s3SecretAccessKey,
+      s3Region,
+    } = destinationConfig.iceberg
+    destination_config = {
+      iceberg: {
+        project_ref: icebergProjectRef,
+        warehouse_name: warehouseName,
+        namespace: namespace,
+        catalog_token: catalogToken,
+        s3_access_key_id: s3AccessKeyId,
+        s3_secret_access_key: s3SecretAccessKey,
+        s3_region: s3Region,
+      },
+    }
+  } else {
+    throw new Error('Invalid destination config: must specify either bigQuery or iceberg')
+  }
+
   const { data, error } = await post('/platform/replication/{ref}/destinations-pipelines', {
     params: { path: { ref: projectRef } },
     body: {
       source_id: sourceId,
       destination_name: destinationName,
-      destination_config: {
-        big_query: {
-          project_id: projectId,
-          dataset_id: datasetId,
-          service_account_key: serviceAccountKey,
-          ...(maxStalenessMins != null && { max_staleness_mins: maxStalenessMins }),
-        },
-      },
+      destination_config,
       pipeline_config: {
         publication_name: publicationName,
         ...(batch
