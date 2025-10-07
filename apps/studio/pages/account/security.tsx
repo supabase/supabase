@@ -134,8 +134,13 @@ const Security: NextPageWithLayout = () => {
 
                   <div className="flex flex-row gap-3 items-center">
                     {data ? (
-                      <Badge variant={data.webauthn.length === 0 ? 'default' : 'brand'}>
-                        {data.webauthn.length} key{data.webauthn.length === 1 ? '' : 's'} configured
+                      <Badge
+                        variant={
+                          !!data.webauthn && data.webauthn?.length !== 0 ? 'brand' : 'default'
+                        }
+                      >
+                        {data.webauthn?.length ?? '0'} key{data.webauthn?.length === 1 ? '' : 's'}{' '}
+                        configured
                       </Badge>
                     ) : null}
                     <ChevronRightIcon
