@@ -126,7 +126,7 @@ export const Usage = () => {
           <ScaffoldTitle>Usage</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <div className="sticky top-0 border-b bg-sidebar z-[1] overflow-hidden">
+      <div className="sticky top-0 border-b bg-sidebar z-[1]">
         <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription || isLoadingPermissions ? (
