@@ -3,8 +3,9 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -22,7 +23,7 @@ import {
 } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
@@ -43,6 +44,7 @@ const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit log
 export const AuditLogs = () => {
   const { slug } = useParams()
   const currentTime = dayjs().utc().set('millisecond', 0)
+
   const [dateSortDesc, setDateSortDesc] = useState(true)
   const [dateRange, setDateRange] = useState({
     from: currentTime.subtract(1, 'day').toISOString(),
@@ -54,16 +56,14 @@ export const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
+
   const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'notifications'
   )
 
-  const { data: projectsData } = useProjectsQuery()
-  const projects = projectsData?.projects ?? []
-  const { data: organizations } = useOrganizationsQuery()
-  const { data: members } = useOrganizationMembersQuery({ slug })
-  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(
       {
@@ -79,9 +79,31 @@ export const AuditLogs = () => {
         },
       }
     )
+  const isLogsNotAvailableBasedOnPlan = isError && error.message.endsWith(logsUpgradeError)
+  const isRangeExceededError = isError && error.message.includes('range exceeded')
+  const showFilters = !isLoading && !isLogsNotAvailableBasedOnPlan
+
+  const {
+    data: projectsData,
+    isLoading: isLoadingProjects,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useOrgProjectsInfiniteQuery(
+    { slug, search: search.length === 0 ? search : debouncedSearch },
+    { keepPreviousData: true, enabled: showFilters }
+  )
+  const { data: organizations } = useOrganizationsQuery({
+    enabled: showFilters,
+  })
+  const { data: members } = useOrganizationMembersQuery({ slug }, { enabled: showFilters })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug }, { enabled: showFilters })
 
   const activeMembers = (members ?? []).filter((x) => !x.invited_at)
   const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
+  const projects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const logs = data?.result ?? []
   const sortedLogs = logs
@@ -105,8 +127,6 @@ export const AuditLogs = () => {
       }
     })
 
-  const currentOrganization = organizations?.find((o) => o.slug === slug)
-
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
   // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
@@ -124,81 +144,122 @@ export const AuditLogs = () => {
     return () => clearInterval(interval)
   }, [dateRange.from, dateRange.to])
 
+  if (isLogsNotAvailableBasedOnPlan) {
+    return (
+      <ScaffoldContainer>
+        <ScaffoldSection isFullWidth>
+          <Alert_Shadcn_
+            variant="default"
+            title="Organization Audit Logs are not available on Free or Pro plans"
+          >
+            <WarningIcon />
+            <div className="flex flex-col md:flex-row pt-1 gap-4">
+              <div className="grow">
+                <AlertTitle_Shadcn_>
+                  Organization Audit Logs are not available on Free or Pro plans
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
+                  <p>
+                    Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
+                    organization.
+                  </p>
+                </AlertDescription_Shadcn_>
+              </div>
+
+              <div className="flex items-center">
+                <UpgradePlanButton source="auditLogs" plan="Team" type="primary">
+                  Upgrade subscription
+                </UpgradePlanButton>
+              </div>
+            </div>
+          </Alert_Shadcn_>
+        </ScaffoldSection>
+      </ScaffoldContainer>
+    )
+  }
+
   return (
     <>
       <ScaffoldContainer>
         <ScaffoldSection isFullWidth>
           <div className="space-y-4 flex flex-col">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <p className="text-xs prose">Filter by</p>
-                <FilterPopover
-                  name="Users"
-                  options={activeMembers}
-                  labelKey="username"
-                  valueKey="gotrue_id"
-                  activeOptions={filters.users}
-                  onSaveFilters={(values) => setFilters({ ...filters, users: values })}
-                />
-                <FilterPopover
-                  name="Projects"
-                  options={
-                    projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
-                  }
-                  labelKey="name"
-                  valueKey="ref"
-                  activeOptions={filters.projects}
-                  onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-                />
-                <LogsDatePicker
-                  hideWarnings
-                  value={dateRange}
-                  onSubmit={(value) => setDateRange(value)}
-                  helpers={[
-                    {
-                      text: 'Last 1 hour',
-                      calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
-                      calcTo: () => dayjs().toISOString(),
-                    },
-                    {
-                      text: 'Last 3 hours',
-                      calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
-                      calcTo: () => dayjs().toISOString(),
-                    },
+            {showFilters && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <p className="text-xs prose">Filter by</p>
+                  <FilterPopover
+                    name="Users"
+                    options={activeMembers}
+                    labelKey="username"
+                    valueKey="gotrue_id"
+                    activeOptions={filters.users}
+                    onSaveFilters={(values) => setFilters({ ...filters, users: values })}
+                  />
+                  <FilterPopover
+                    name="Projects"
+                    options={projects}
+                    labelKey="name"
+                    valueKey="ref"
+                    activeOptions={filters.projects}
+                    onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+                    search={search}
+                    setSearch={setSearch}
+                    hasNextPage={hasNextPage}
+                    isLoading={isLoadingProjects}
+                    isFetching={isFetching}
+                    isFetchingNextPage={isFetchingNextPage}
+                    fetchNextPage={fetchNextPage}
+                  />
+                  <LogsDatePicker
+                    hideWarnings
+                    value={dateRange}
+                    onSubmit={(value) => setDateRange(value)}
+                    helpers={[
+                      {
+                        text: 'Last 1 hour',
+                        calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
+                        calcTo: () => dayjs().toISOString(),
+                      },
+                      {
+                        text: 'Last 3 hours',
+                        calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
+                        calcTo: () => dayjs().toISOString(),
+                      },
 
-                    {
-                      text: 'Last 6 hours',
-                      calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
-                      calcTo: () => dayjs().toISOString(),
-                    },
-                    {
-                      text: 'Last 12 hours',
-                      calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
-                      calcTo: () => dayjs().toISOString(),
-                    },
-                    {
-                      text: 'Last 24 hours',
-                      calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
-                      calcTo: () => dayjs().toISOString(),
-                    },
-                  ]}
-                />
-                {isSuccess && (
-                  <>
-                    <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
-                    <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
-                  </>
-                )}
+                      {
+                        text: 'Last 6 hours',
+                        calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
+                        calcTo: () => dayjs().toISOString(),
+                      },
+                      {
+                        text: 'Last 12 hours',
+                        calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
+                        calcTo: () => dayjs().toISOString(),
+                      },
+                      {
+                        text: 'Last 24 hours',
+                        calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
+                        calcTo: () => dayjs().toISOString(),
+                      },
+                    ]}
+                  />
+                  {isSuccess && (
+                    <>
+                      <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
+                      <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
+                    </>
+                  )}
+                </div>
+                <Button
+                  type="default"
+                  disabled={isLoading || isRefetching}
+                  icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                  onClick={() => refetch()}
+                >
+                  {isRefetching ? 'Refreshing' : 'Refresh'}
+                </Button>
               </div>
-              <Button
-                type="default"
-                disabled={isLoading || isRefetching}
-                icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-                onClick={() => refetch()}
-              >
-                {isRefetching ? 'Refreshing' : 'Refresh'}
-              </Button>
-            </div>
+            )}
 
             {isLoading || isLoadingPermissions ? (
               <div className="space-y-2">
@@ -210,34 +271,8 @@ export const AuditLogs = () => {
               <NoPermission resourceText="view organization audit logs" />
             ) : null}
 
-            {isError ? (
-              error.message.endsWith(logsUpgradeError) ? (
-                <Alert_Shadcn_
-                  variant="default"
-                  title="Organization Audit Logs are not available on Free or Pro plans"
-                >
-                  <WarningIcon />
-                  <div className="flex flex-col md:flex-row pt-1 gap-4">
-                    <div className="grow">
-                      <AlertTitle_Shadcn_>
-                        Organization Audit Logs are not available on Free or Pro plans
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                        <p>
-                          Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
-                          organization.
-                        </p>
-                      </AlertDescription_Shadcn_>
-                    </div>
-
-                    <div className="flex items-center">
-                      <UpgradePlanButton source="auditLogs" plan="Team" type="primary">
-                        Upgrade subscription
-                      </UpgradePlanButton>
-                    </div>
-                  </div>
-                </Alert_Shadcn_>
-              ) : error.message.includes('range exceeded') ? (
+            {isError &&
+              (isRangeExceededError ? (
                 <Alert_Shadcn_ variant="destructive" title="Date range too large">
                   <WarningIcon />
                   <AlertTitle_Shadcn_>Date range too large</AlertTitle_Shadcn_>
@@ -248,8 +283,7 @@ export const AuditLogs = () => {
                 </Alert_Shadcn_>
               ) : (
                 <AlertError error={error} subject="Failed to retrieve audit logs" />
-              )
-            ) : null}
+              ))}
 
             {isSuccess && (
               <>

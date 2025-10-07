@@ -640,7 +640,7 @@ function getErrorCondition(table: LogsTableName): string {
     case 'postgres_logs':
       return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
     case 'auth_logs':
-      return "metadata.level = 'error' OR metadata.status >= 400"
+      return "metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400"
     case 'function_edge_logs':
       return 'response.status_code >= 500'
     case 'function_logs':

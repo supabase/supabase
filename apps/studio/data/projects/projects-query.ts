@@ -34,6 +34,7 @@ export async function getProjects({
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
 export type ProjectsError = ResponseError
 
+/** @deprecated Use useProjectsInfiniteQuery or useOrgProjectsInfiniteQuery instead as this endpoint is not paginated */
 export const useProjectsQuery = <TData = ProjectsData>({
   enabled = true,
   ...options

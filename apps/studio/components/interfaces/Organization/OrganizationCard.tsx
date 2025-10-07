@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { useIsMFAEnabled } from 'common'
 import { ActionCard } from 'components/ui/ActionCard'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { Organization } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -15,10 +15,8 @@ export const OrganizationCard = ({
   href?: string
 }) => {
   const isUserMFAEnabled = useIsMFAEnabled()
-  const { data } = useProjectsQuery()
-  const allProjects = data?.projects ?? []
-
-  const numProjects = allProjects.filter((x) => x.organization_slug === organization.slug).length
+  const { data } = useOrgProjectsInfiniteQuery({ slug: organization.slug })
+  const numProjects = data?.pages[0].pagination.count ?? 0
   const isMfaRequired = organization.organization_requires_mfa
 
   return (
