@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": "./index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "prettier --cache --write registry.json && rimraf -G public/r && shadcn build && tsx scripts/clean-registry.ts",
