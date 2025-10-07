@@ -17,6 +17,7 @@ import { useUpdateDestinationPipelineMutation } from 'data/replication/update-de
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
@@ -181,11 +182,13 @@ export const DestinationPanel = ({
   const { serviceKey } = getKeys(apiKeys)
   const serviceApiKey = serviceKey?.api_key ?? ''
 
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
+
   const defaultValues = useMemo(
     () => ({
       type: (destinationData?.config?.big_query
         ? TypeEnum.enum.BigQuery
-        : destinationData?.config?.analytics_bucket
+        : (destinationData?.config as any)?.analytics_bucket
           ? TypeEnum.enum['Analytics Bucket']
           : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>,
       name: destinationData?.name ?? '',
@@ -195,18 +198,21 @@ export const DestinationPanel = ({
       // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
       // Analytics Bucket fields
-      warehouseName: destinationData?.config?.analytics_bucket?.warehouse_name ?? '',
-      namespace: destinationData?.config?.analytics_bucket?.namespace ?? '',
+      warehouseName: (destinationData?.config as any)?.analytics_bucket?.warehouse_name ?? '',
+      namespace: (destinationData?.config as any)?.analytics_bucket?.namespace ?? '',
       catalogToken: serviceApiKey, // Auto-populated from service API key
       s3AccessKeyId: s3Keys?.accessKey ?? '', // Auto-generated S3 access key
       s3SecretAccessKey: s3Keys?.secretKey ?? '', // Auto-generated S3 secret key
-      s3Region: destinationData?.config?.analytics_bucket?.s3_region ?? '',
+      s3Region:
+        projectSettings?.region ??
+        (destinationData?.config as any)?.analytics_bucket?.s3_region ??
+        '',
       // Common fields
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
       maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
     }),
-    [destinationData, pipelineData, serviceApiKey, s3Keys]
+    [destinationData, pipelineData, serviceApiKey, s3Keys, projectSettings]
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -776,25 +782,6 @@ export const DestinationPanel = ({
                             placeholder="Auto-generated"
                           />
                         </FormItemLayout>
-
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="s3Region"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="S3 Region"
-                              layout="vertical"
-                              description="The AWS region for your S3 bucket"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  placeholder="S3 Region (e.g., us-east-1)"
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
                       </>
                     )}
                   </div>
