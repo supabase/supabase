@@ -5,7 +5,7 @@ packages:
   - e2e/*
 
 catalog:
-  '@supabase/auth-js': 2.72.0-rc.11
+  '@supabase/auth-js': 2.79.1-canary.2
   '@supabase/realtime-js': ^2.11.3
   '@supabase/supabase-js': ^2.47.14
   '@types/node': ^22.0.0

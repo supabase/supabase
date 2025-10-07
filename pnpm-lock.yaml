@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@supabase/auth-js':
-      specifier: 2.72.0-rc.11
-      version: 2.72.0-rc.11
+      specifier: 2.79.1-canary.2
+      version: 2.79.1-canary.2
     '@supabase/realtime-js':
       specifier: ^2.11.3
       version: 2.11.3
@@ -50,11 +50,11 @@ catalogs:
       version: 3.25.76
 
 overrides:
-  '@supabase/supabase-js>@supabase/auth-js': 2.72.0-rc.11
+  '@redocly/respect-core>form-data': ^4.0.4
+  '@supabase/supabase-js>@supabase/auth-js': 2.79.1-canary.2
   '@tanstack/directive-functions-plugin>vite': ^6.2.7
   '@tanstack/react-start-plugin>vite': ^6.2.7
   esbuild: ^0.25.2
-  '@redocly/respect-core>form-data': ^4.0.4
   tmp: ^0.2.4
 
 importers:
@@ -1942,7 +1942,7 @@ importers:
     dependencies:
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.72.0-rc.11
+        version: 2.79.1-canary.2
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3
@@ -8797,8 +8797,8 @@ packages:
     resolution: {integrity: sha512-Cq3KKe+G1o7PSBMbmrgpT2JgBeyH2THHr3RdIX2MqF7AnBuspIMgtZ3ktcCgP7kZsTMvnmWymr7zZCT1zeWbMw==}
     engines: {node: '>=12.16'}
 
-  '@supabase/auth-js@2.72.0-rc.11':
-    resolution: {integrity: sha512-7C0xC6ZXbIB8GAoO6saWNMRhKox9OeYvMmpfPJyxFiECg9z78SMhMotiyI3U1Ws47iGiaDonEUnuxDuHAG04nQ==}
+  '@supabase/auth-js@2.79.1-canary.2':
+    resolution: {integrity: sha512-Uo+fMec/r7Z8F0b4C3GJ9lVGmUZi+G1u2McT5sASDcqok9OCU5yE0g9GRrwWmokteO/NAOuyOE0TbOeGsQlS1A==}
 
   '@supabase/auth-js@https://pkg.pr.new/supabase/supabase-js/@supabase/auth-js@1582':
     resolution: {tarball: https://pkg.pr.new/supabase/supabase-js/@supabase/auth-js@1582}
@@ -28621,7 +28621,7 @@ snapshots:
 
   '@stripe/stripe-js@7.5.0': {}
 
-  '@supabase/auth-js@2.72.0-rc.11':
+  '@supabase/auth-js@2.79.1-canary.2':
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
@@ -28812,7 +28812,7 @@ snapshots:
 
   '@supabase/supabase-js@2.49.3':
     dependencies:
-      '@supabase/auth-js': 2.72.0-rc.11
+      '@supabase/auth-js': 2.79.1-canary.2
       '@supabase/functions-js': 2.4.4
       '@supabase/node-fetch': 2.6.15
       '@supabase/postgrest-js': 1.19.2
@@ -28824,7 +28824,7 @@ snapshots:
 
   '@supabase/supabase-js@2.79.1-canary.0':
     dependencies:
-      '@supabase/auth-js': 2.72.0-rc.11
+      '@supabase/auth-js': 2.79.1-canary.2
       '@supabase/functions-js': 2.79.1-canary.0
       '@supabase/node-fetch': 2.6.15
       '@supabase/postgrest-js': 2.79.1-canary.0
