@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useIntersectionObserver } from '@uidotdev/usehooks'
+import { noop } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -9,6 +11,7 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface FilterPopoverProps<T> {
   title?: string
@@ -26,6 +29,13 @@ interface FilterPopoverProps<T> {
   clearButtonText?: string
   className?: string
   onSaveFilters: (options: string[]) => void
+
+  // [Joshen] These props are to support async infinite loading if applicable
+  hasNextPage?: boolean
+  isLoading?: boolean
+  isFetching?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
 }
 
 export const FilterPopover = <T extends Record<string, any>>({
@@ -44,9 +54,22 @@ export const FilterPopover = <T extends Record<string, any>>({
   maxHeightClass = 'h-[205px]',
   clearButtonText = 'Clear',
   onSaveFilters,
+
+  hasNextPage = false,
+  isLoading = false,
+  isFetching = false,
+  isFetchingNextPage = false,
+  fetchNextPage = noop,
 }: FilterPopoverProps<T>) => {
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
+
+  const scrollRootRef = useRef<HTMLDivElement | null>(null)
+  const [sentinelRef, entry] = useIntersectionObserver({
+    root: scrollRootRef.current,
+    threshold: 0,
+    rootMargin: '0px',
+  })
 
   const formattedOptions = activeOptions.map((option) => {
     const base = options.find((x) => x[valueKey] === option)
@@ -59,6 +82,12 @@ export const FilterPopover = <T extends Record<string, any>>({
   useEffect(() => {
     if (!open && activeOptions.length > 0) setSelectedOptions(activeOptions)
   }, [open, activeOptions])
+
+  useEffect(() => {
+    if (entry?.isIntersecting && hasNextPage && !isLoading && !isFetching && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [entry?.isIntersecting, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
@@ -90,13 +119,16 @@ export const FilterPopover = <T extends Record<string, any>>({
           </span>
         </div>
         <ScrollArea className={options.length > 7 ? maxHeightClass : ''}>
-          <div className="p-3 flex flex-col gap-y-2">
+          <div className="px-3 pt-3 flex flex-col gap-y-2">
             {options.map((option) => {
               const value = option[valueKey]
               const icon = iconKey ? option[iconKey] : undefined
 
               return (
-                <div key={value} className="flex items-center gap-x-2">
+                <div
+                  key={value}
+                  className={cn('flex items-center gap-x-2', !hasNextPage && 'last:pb-3')}
+                >
                   <Checkbox_Shadcn_
                     id={value}
                     checked={selectedOptions.includes(value)}
@@ -125,6 +157,12 @@ export const FilterPopover = <T extends Record<string, any>>({
               )
             })}
           </div>
+          <div ref={sentinelRef} className="h-1 -mt-1" />
+          {hasNextPage && (
+            <div className="px-3 py-2">
+              <ShimmeringLoader className="py-2" />
+            </div>
+          )}
         </ScrollArea>
         <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
           <Button

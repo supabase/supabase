@@ -88,6 +88,8 @@ const AuditLogs = () => {
               valueKey="ref"
               activeOptions={filters.projects}
               onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+              hasNextPage={true}
+              fetchNextPage={() => console.log('Fetchy')}
             />
             <LogsDatePicker
               hideWarnings
