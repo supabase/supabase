@@ -3,7 +3,6 @@ import type {
   ClaudeCodeMcpConfig,
   McpClient,
   McpFeatureGroup,
-  OtherMcpConfig,
   VSCodeMcpConfig,
   WindsurfMcpConfig,
 } from './types'
@@ -12,7 +11,7 @@ export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
   {
     id: 'docs',
     name: 'Documentation',
-    description: 'Access project documentation and guides',
+    description: 'Access Supabase documentation and guides',
   },
   {
     id: 'account',
@@ -148,29 +147,6 @@ export const MCP_CLIENTS: McpClient[] = [
             className="block"
           />
         </div>
-      )
-    },
-  },
-  {
-    key: 'other',
-    label: 'Other',
-    transformConfig: (config): OtherMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    alternateInstructions: (_config) => {
-      return (
-        <p className="text-xs text-foreground-light">
-          These generic MCP settings may work with other MCP clients, but there are no guarantees,
-          due to differences between clients. Refer to your specific client docs for where to input
-          the configuration.
-        </p>
       )
     },
   },
