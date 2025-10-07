@@ -53,9 +53,6 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
   const [itemSearchString, setItemSearchString] = useState('')
 
-  // Requires a fixed height to ensure that explorer is constrained to the viewport
-  const fileExplorerHeight = window.innerHeight - 122
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchContents = async () => {
@@ -178,7 +175,7 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       ) : (
         <FileExplorerHeaderSelection />
       )}
-      <div className="flex h-full" style={{ height: fileExplorerHeight }}>
+      <div className="flex flex-1 min-h-0">
         <FileExplorer
           columns={columns}
           selectedItems={selectedItems}
