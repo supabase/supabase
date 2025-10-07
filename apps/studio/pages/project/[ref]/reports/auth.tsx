@@ -236,7 +236,6 @@ const AuthUsage = () => {
                 </div>
               )}
             </div>
-            <div className="w-full flex items-center gap-2 flex-wrap"></div>
           </div>
         }
       >
