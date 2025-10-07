@@ -77,13 +77,15 @@ async function createDestinationPipeline(
     } = destinationConfig.iceberg
     destination_config = {
       iceberg: {
-        project_ref: icebergProjectRef,
-        warehouse_name: warehouseName,
-        namespace: namespace,
-        catalog_token: catalogToken,
-        s3_access_key_id: s3AccessKeyId,
-        s3_secret_access_key: s3SecretAccessKey,
-        s3_region: s3Region,
+        supabase: {
+          project_ref: icebergProjectRef,
+          warehouse_name: warehouseName,
+          namespace: namespace,
+          catalog_token: catalogToken,
+          s3_access_key_id: s3AccessKeyId,
+          s3_secret_access_key: s3SecretAccessKey,
+          s3_region: s3Region,
+        },
       },
     }
   } else {
