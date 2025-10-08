@@ -241,7 +241,6 @@ export const DestinationPanel = ({
   const catalogUri = useMemo(() => {
     if (!project?.ref) return ''
     return `https://${project.ref}.supabase.co/storage/v1/iceberg`
-    // return `http://localhost:8080/storage/v1/iceberg`
   }, [project?.ref])
 
   const { data: namespaces = [], isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
