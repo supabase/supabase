@@ -1,22 +1,19 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import { invoicesKeys } from './keys'
+import { IS_PLATFORM } from 'lib/constants'
+import { useIsLoggedIn } from 'common'
 
-export type OverdueInvoicesResponse = {
-  id: string
-  organization_id: number
-}
+export type OverdueInvoicesResponse = components['schemas']['OverdueInvoiceCount']
 
 export async function getOverdueInvoices(signal?: AbortSignal) {
-  const response = await get(`${API_URL}/stripe/invoices/overdue`, {
+  const { data, error } = await get('/platform/stripe/invoices/overdue', {
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response as OverdueInvoicesResponse[]
+  if (error) handleError(error)
+  return data
 }
 
 export type OverdueInvoicesData = Awaited<ReturnType<typeof getOverdueInvoices>>
@@ -25,9 +22,15 @@ export type OverdueInvoicesError = unknown
 export const useOverdueInvoicesQuery = <TData = OverdueInvoicesData>({
   enabled = true,
   ...options
-}: UseQueryOptions<OverdueInvoicesData, OverdueInvoicesError, TData> = {}) =>
-  useQuery<OverdueInvoicesData, OverdueInvoicesError, TData>(
+}: UseQueryOptions<OverdueInvoicesData, OverdueInvoicesError, TData> = {}) => {
+  const isLoggedIn = useIsLoggedIn()
+  return useQuery<OverdueInvoicesData, OverdueInvoicesError, TData>(
     invoicesKeys.overdueInvoices(),
     ({ signal }) => getOverdueInvoices(signal),
-    { enabled, ...options }
+    {
+      enabled: enabled && isLoggedIn && IS_PLATFORM,
+      staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
+    }
   )
+}

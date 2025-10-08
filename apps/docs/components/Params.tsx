@@ -1,10 +1,17 @@
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+
 type IParamProps = any
 
-const Param = ({ name, isOptional, type, description, children }: IParamProps) => {
+/**
+ * isPrimitive: Indicates whether the value is a basic type such as string or number. It does not refer to an object param.
+ * */
+const Param = ({ name, isOptional, type, description, children, isPrimitive }: IParamProps) => {
   return (
     <div className="border-t border-b py-5 flex flex-col gap-3 debugger">
-      <div className="flex gap-3 items-center">
-        <span className="text-sm text-foreground font-mono font-medium">{name ?? 'no-name'}</span>
+      <div className="flex gap-3 items-center flex-wrap">
+        {!isPrimitive && (
+          <span className="text-sm text-foreground font-mono font-medium">{name ?? 'no-name'}</span>
+        )}
         <span>
           {isOptional ? (
             <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">
@@ -18,7 +25,9 @@ const Param = ({ name, isOptional, type, description, children }: IParamProps) =
         </span>
         <span className="text-foreground-muted text-xs">{type ?? 'no type'}</span>
       </div>
-      {description && <p className="text-sm text-foreground-lighter m-0">{description} </p>}
+      {description && (
+        <ReactMarkdown className="text-sm text-foreground-lighter m-0">{description}</ReactMarkdown>
+      )}
       {children}
     </div>
   )

@@ -1,49 +1,47 @@
-import { observer } from 'mobx-react-lite'
-import Link from 'next/link'
-import { useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconSearch,
-  IconTrash,
-  Input,
-  Modal,
-  SidePanel,
-} from 'ui'
+import { sortBy } from 'lodash'
+import { AlertCircle, Search, Trash } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
+import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
+import { DatabaseIndex, useIndexesQuery } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useStore } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { partition, sortBy } from 'lodash'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import {
+  Button,
+  Input,
+  SidePanel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableHeader,
+  Card,
+} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 
 const Indexes = () => {
-  const { ui } = useStore()
+  const { data: project } = useSelectedProjectQuery()
+  const { schema: urlSchema, table } = useParams()
+
   const [search, setSearch] = useState('')
-  const [selectedSchema, setSelectedSchema] = useState('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [showCreateIndex, setShowCreateIndex] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<DatabaseIndex>()
   const [selectedIndexToDelete, setSelectedIndexToDelete] = useState<DatabaseIndex>()
 
-  const { project } = useProjectContext()
   const {
     data: allIndexes,
-    refetch: refetchIndexes,
     error: indexesError,
     isLoading: isLoadingIndexes,
     isSuccess: isSuccessIndexes,
@@ -63,28 +61,16 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess() {
-      refetchIndexes()
+  const { mutate: deleteIndex, isLoading: isExecuting } = useDatabaseIndexDeleteMutation({
+    onSuccess: async () => {
       setSelectedIndexToDelete(undefined)
-      ui.setNotification({ category: 'success', message: `Successfully deleted index` })
-    },
-    onError(error) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to delete index: ${error.message}`,
-      })
+      toast.success('Successfully deleted index')
     },
   })
 
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
-  const sortedIndexes = sortBy(allIndexes?.result ?? [], (index) => index.name.toLocaleLowerCase())
+  const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
   const indexes =
     search.length > 0
       ? sortedIndexes.filter((index) => index.name.includes(search) || index.table.includes(search))
@@ -92,75 +78,59 @@ const Indexes = () => {
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
     if (!project) return console.error('Project is required')
-    execute({
+
+    deleteIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      sql: `drop index if exists "${index.name}"`,
+      name: index.name,
+      schema: selectedSchema,
     })
   }
+
+  useEffect(() => {
+    if (urlSchema !== undefined) {
+      const schema = schemas?.find((s) => s.name === urlSchema)
+      if (schema !== undefined) setSelectedSchema(schema.name)
+    }
+  }, [urlSchema, isSuccessSchemas])
+
+  useEffect(() => {
+    if (table !== undefined) setSearch(table)
+  }, [table])
 
   return (
     <>
       <div className="pb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="space-y-1">
-            <h3 className="text-xl text-foreground">Database Indexes</h3>
-            <div className="text-sm text-foreground-lighter">
-              Improve query performance against your database
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/query-optimization"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/extensions/index_advisor"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Optimization with index_advisor
-              </Link>
-            </Button>
-          </div>
-        </div>
-
         <div className="flex flex-col gap-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
-              {isErrorSchemas && (
-                <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
-                  <IconAlertCircle strokeWidth={2} size={16} />
-                  <p>Failed to load schemas</p>
-                </div>
-              )}
-              {isSuccessSchemas && (
-                <SchemaSelector
-                  className="w-[260px]"
-                  size="small"
-                  showError={false}
-                  selectedSchemaName={selectedSchema}
-                  onSelectSchema={setSelectedSchema}
-                />
-              )}
-              <Input
-                size="small"
-                value={search}
-                className="w-64"
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search for an index"
-                icon={<IconSearch size={14} />}
+          <div className="flex items-center gap-2 flex-wrap">
+            {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
+            {isErrorSchemas && (
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+                <AlertCircle strokeWidth={2} size={16} />
+                <p>Failed to load schemas</p>
+              </div>
+            )}
+            {isSuccessSchemas && (
+              <SchemaSelector
+                className="w-full lg:w-[180px]"
+                size="tiny"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
               />
-            </div>
-            {!isLocked && (
+            )}
+            <Input
+              size="tiny"
+              value={search}
+              className="w-full lg:w-52"
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search for an index"
+              icon={<Search size={14} />}
+            />
+
+            {!isSchemaLocked && (
               <Button
+                className="ml-auto flex-grow lg:flex-grow-0"
                 type="primary"
                 onClick={() => setShowCreateIndex(true)}
                 disabled={!isSuccessSchemas}
@@ -170,7 +140,7 @@ const Indexes = () => {
             )}
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="indexes" />}
+          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="indexes" />}
 
           {isLoadingIndexes && <GenericSkeletonLoader />}
 
@@ -179,67 +149,72 @@ const Indexes = () => {
           )}
 
           {isSuccessIndexes && (
-            <Table
-              head={[
-                <Table.th key="schema">Schema</Table.th>,
-                <Table.th key="table">Table</Table.th>,
-                <Table.th key="name">Name</Table.th>,
-                <Table.th key="buttons"></Table.th>,
-              ]}
-              body={
-                <>
-                  {sortedIndexes.length === 0 && search.length === 0 && (
-                    <Table.tr>
-                      <Table.td colSpan={4}>
-                        <p className="text-sm text-foreground">No indexes created yet</p>
-                        <p className="text-sm text-foreground-light">
-                          There are no indexes found in the schema "{selectedSchema}"
-                        </p>
-                      </Table.td>
-                    </Table.tr>
-                  )}
-                  {sortedIndexes.length === 0 && search.length > 0 && (
-                    <Table.tr>
-                      <Table.td colSpan={4}>
-                        <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-foreground-light">
-                          Your search for "{search}" did not return any results
-                        </p>
-                      </Table.td>
-                    </Table.tr>
-                  )}
-                  {indexes.length > 0 &&
-                    indexes.map((index) => (
-                      <Table.tr key={index.name}>
-                        <Table.td>
-                          <p title={index.schema}>{index.schema}</p>
-                        </Table.td>
-                        <Table.td>
-                          <p title={index.table}>{index.table}</p>
-                        </Table.td>
-                        <Table.td>
-                          <p title={index.name}>{index.name}</p>
-                        </Table.td>
-                        <Table.td>
-                          <div className="flex justify-end items-center space-x-2">
-                            <Button type="default" onClick={() => setSelectedIndex(index)}>
-                              View definition
-                            </Button>
-                            {!isLocked && (
-                              <Button
-                                type="text"
-                                className="px-1"
-                                icon={<IconTrash />}
-                                onClick={() => setSelectedIndexToDelete(index)}
-                              />
-                            )}
-                          </div>
-                        </Table.td>
-                      </Table.tr>
-                    ))}
-                </>
-              }
-            />
+            <div className="w-full overflow-hidden">
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead key="schema">Schema</TableHead>
+                      <TableHead key="table">Table</TableHead>
+                      <TableHead key="name">Name</TableHead>
+                      <TableHead key="buttons"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sortedIndexes.length === 0 && search.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={4}>
+                          <p className="text-sm text-foreground">No indexes created yet</p>
+                          <p className="text-sm text-foreground-light">
+                            There are no indexes found in the schema "{selectedSchema}"
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {sortedIndexes.length === 0 && search.length > 0 && (
+                      <TableRow>
+                        <TableCell colSpan={4}>
+                          <p className="text-sm text-foreground">No results found</p>
+                          <p className="text-sm text-foreground-light">
+                            Your search for "{search}" did not return any results
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {indexes.length > 0 &&
+                      indexes.map((index) => (
+                        <TableRow key={index.name}>
+                          <TableCell>
+                            <p title={index.schema}>{index.schema}</p>
+                          </TableCell>
+                          <TableCell>
+                            <p title={index.table}>{index.table}</p>
+                          </TableCell>
+                          <TableCell>
+                            <p title={index.name}>{index.name}</p>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex justify-end items-center space-x-2">
+                              <Button type="default" onClick={() => setSelectedIndex(index)}>
+                                View definition
+                              </Button>
+                              {!isSchemaLocked && (
+                                <Button
+                                  aria-label="Delete index"
+                                  type="text"
+                                  className="px-1"
+                                  icon={<Trash />}
+                                  onClick={() => setSelectedIndexToDelete(index)}
+                                />
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </Card>
+            </div>
           )}
         </div>
       </div>
@@ -270,51 +245,44 @@ const Indexes = () => {
       <CreateIndexSidePanel visible={showCreateIndex} onClose={() => setShowCreateIndex(false)} />
 
       <ConfirmationModal
-        danger
+        variant="warning"
         size="medium"
         loading={isExecuting}
         visible={selectedIndexToDelete !== undefined}
-        header={
+        title={
           <>
             Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
           </>
         }
-        buttonLabel="Confirm delete"
-        buttonLoadingLabel="Deleting..."
-        onSelectConfirm={() =>
+        confirmLabel="Confirm delete"
+        confirmLabelLoading="Deleting..."
+        onConfirm={() =>
           selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
         }
-        onSelectCancel={() => setSelectedIndexToDelete(undefined)}
+        onCancel={() => setSelectedIndexToDelete(undefined)}
+        alert={{
+          title: 'This action cannot be undone',
+          description:
+            'Deleting an index that is still in use will cause queries to slow down, and in some cases causing significant performance issues.',
+        }}
       >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Deleting an index that is still in use will cause queries to slow down, and in some
-                cases causing significant performance issues.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-            <ul className="mt-4 space-y-5">
-              <li className="flex gap-3">
-                <div>
-                  <strong className="text-sm">Before deleting this index, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
-                    <li className="list-disc ml-6">This index is no longer in use</li>
-                    <li className="list-disc ml-6">
-                      The table which the index is on is not currently in use, as dropping an index
-                      requires a short exclusive access lock on the table.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </Modal.Content>
+        <ul className="mt-4 space-y-5">
+          <li className="flex gap-3">
+            <div>
+              <strong className="text-sm">Before deleting this index, consider:</strong>
+              <ul className="space-y-2 mt-2 text-sm text-foreground-light">
+                <li className="list-disc ml-6">This index is no longer in use</li>
+                <li className="list-disc ml-6">
+                  The table which the index is on is not currently in use, as dropping an index
+                  requires a short exclusive access lock on the table.
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
       </ConfirmationModal>
     </>
   )
 }
 
-export default observer(Indexes)
+export default Indexes

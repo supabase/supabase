@@ -1,4 +1,4 @@
-import { DiffOnMount, OnMount } from '@monaco-editor/react'
+import type { DiffOnMount, OnMount } from '@monaco-editor/react'
 import { Dispatch, SetStateAction } from 'react'
 
 export interface SQLTemplate {
@@ -22,8 +22,7 @@ export type SQLEditorContextValues = {
   setAiInput: Dispatch<SetStateAction<string>>
   sqlDiff?: ContentDiff
   setSqlDiff: Dispatch<SetStateAction<ContentDiff | undefined>>
-  debugSolution?: string
-  setDebugSolution: Dispatch<SetStateAction<string | undefined>>
+  setSelectedDiffType: Dispatch<SetStateAction<DiffType | undefined>>
 }
 
 export enum DiffType {

@@ -1,55 +1,71 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { CheckCircle, Download, Loader } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
+import { useState } from 'react'
 
-import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useStore } from 'hooks'
-import { getWithTimeout } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useProjectContext } from './ProjectContext'
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from 'data/database/backup-query'
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
+import { Button } from 'ui'
 
 const RestoringState = () => {
   const { ref } = useParams()
-  const { meta } = useStore()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
-  const checkServerInterval = useRef<number>()
+  const { data: project } = useSelectedProjectQuery()
 
   const [loading, setLoading] = useState(false)
-  const [isFailed, setIsFailed] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
 
-  useEffect(() => {
-    checkServerInterval.current = window.setInterval(checkServer, 4000)
-    return () => clearInterval(checkServerInterval.current)
-  }, [])
+  const { data } = useDownloadableBackupQuery({ projectRef: ref })
+  const backups = data?.backups ?? []
+  const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
 
-  async function checkServer() {
-    if (!project) return
-
-    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
-      timeout: 2000,
-    })
-    if (projectStatus && !projectStatus.error) {
-      const { status } = projectStatus
-      if (status === PROJECT_STATUS.RESTORATION_FAILED) {
-        clearInterval(checkServerInterval.current)
-        setIsFailed(true)
-      } else if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-        clearInterval(checkServerInterval.current)
-        setIsCompleted(true)
-      }
+  useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
+      refetchInterval: (res) => {
+        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
+      },
+      onSuccess: async (res) => {
+        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+          setIsCompleted(true)
+        } else {
+          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+        }
+      },
     }
+  )
+
+  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+    onSuccess: (res) => {
+      const { fileUrl } = res
+
+      // Trigger browser download by create,trigger and remove tempLink
+      const tempLink = document.createElement('a')
+      tempLink.href = fileUrl
+      document.body.appendChild(tempLink)
+      tempLink.click()
+      document.body.removeChild(tempLink)
+    },
+  })
+
+  const onClickDownloadBackup = () => {
+    if (!ref) return console.error('Project ref is required')
+    if (logicalBackups.length === 0) return console.error('No available backups to download')
+
+    downloadBackup({ ref, backup: logicalBackups[0] })
   }
 
   const onConfirm = async () => {
     if (!project) return console.error('Project is required')
 
     setLoading(true)
-    const projectDetail = await getProjectDetail({ ref: project?.ref })
-    if (projectDetail) meta.setProjectDetails(projectDetail)
     if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
@@ -60,7 +76,7 @@ const RestoringState = () => {
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <IconCheckCircle className="text-brand" size={18} strokeWidth={2} />
+                <CheckCircle className="text-brand" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
@@ -75,47 +91,49 @@ const RestoringState = () => {
               </Button>
             </div>
           </div>
-        ) : isFailed ? (
-          <div className="space-y-6 pt-6">
-            <div className="flex px-8 space-x-8">
-              <div className="mt-1">
-                <IconAlertCircle size={18} strokeWidth={2} />
-              </div>
-              <div className="space-y-1">
-                <p>Something went wrong while restoring your project</p>
-                <p className="text-sm text-foreground-light">
-                  Our engineers have already been notified of this, do hang tight while we are
-                  investigating into the issue.
-                </p>
-              </div>
-            </div>
-            {isFailed && (
-              <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
-                <Button asChild type="default">
-                  <Link
-                    href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
-                  >
-                    Contact support
-                  </Link>
-                </Button>
-              </div>
-            )}
-          </div>
         ) : (
-          <div className="space-y-6 py-6">
-            <div className="flex px-8 space-x-8">
-              <div className="mt-1">
-                <IconLoader className="animate-spin" size={18} />
-              </div>
-              <div className="space-y-1">
-                <p>Restoration in progress</p>
-                <p className="text-sm text-foreground-light">
-                  Restoration can take from a few minutes up to several hours depending on the size
-                  of your database. Your project will be offline while the restoration is running.
-                </p>
+          <>
+            <div className="space-y-6 py-6">
+              <div className="flex px-8 space-x-8">
+                <div className="mt-1">
+                  <Loader className="animate-spin" size={18} />
+                </div>
+                <div className="space-y-1">
+                  <p>Restoration in progress</p>
+                  <p className="text-sm text-foreground-light">
+                    Restoration can take from a few minutes up to several hours depending on the
+                    size of your database. Your project will be offline while the restoration is
+                    running.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+            <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
+              <Button asChild type="default">
+                <Link
+                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                >
+                  Contact support
+                </Link>
+              </Button>
+              <ButtonTooltip
+                type="default"
+                icon={<Download />}
+                loading={isDownloading}
+                disabled={logicalBackups.length === 0}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text:
+                      logicalBackups.length === 0 ? 'No available backups to download' : undefined,
+                  },
+                }}
+                onClick={onClickDownloadBackup}
+              >
+                Download latest backup
+              </ButtonTooltip>
+            </div>
+          </>
         )}
       </div>
     </div>

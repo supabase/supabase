@@ -1,16 +1,21 @@
+import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useUrlState } from 'hooks'
+import { useParams } from 'common'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTable } from 'data/table-editor/table-editor-types'
+import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { Button, IconArrowLeft, IconArrowRight, IconLoader, InputNumber, Modal } from 'ui'
-import { useDispatch, useTrackedState } from '../../../store'
-import { DropdownControl } from '../../common'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DropdownControl } from '../../common/DropdownControl'
+import { formatEstimatedCount } from './Pagination.utils'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -18,67 +23,60 @@ const rowsPerPageOptions = [
   { value: 1000, label: '1000 rows' },
 ]
 
-export interface PaginationProps {
-  isLoading?: boolean
-}
+const Pagination = () => {
+  const { id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
 
-const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
-  const state = useTrackedState()
-  const dispatch = useDispatch()
+  const { data: project } = useSelectedProjectQuery()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
-  const snap = useTableEditorStateSnapshot()
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+
+  // rowsCountEstimate is only applicable to table entities
+  const rowsCountEstimate = isTable(selectedTable) ? selectedTable.live_rows_estimate : null
+
+  const { filters } = useTableFilter()
   const page = snap.page
 
-  const [{ filter }] = useUrlState({
-    arrayKeys: ['filter'],
-  })
-  const filters = formatFilterURLParams(filter as string[])
-  const table = state.table ?? undefined
-
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
+  const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
+  const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
 
-  const { project } = useProjectContext()
-  const { data, isLoading, isSuccess, isError } = useTableRowsCountQuery(
+  const [value, setValue] = useState<string>(page.toString())
+
+  // keep input value in-sync with actual page
+  useEffect(() => {
+    setValue(String(page))
+  }, [page])
+
+  const { data, isLoading, isSuccess, isError, isFetching, error } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: snap.table.id,
       filters,
-      impersonatedRole: roleImpersonationState.role,
+      enforceExactCount: snap.enforceExactCount,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
       keepPreviousData: true,
-      onSuccess(data) {
-        dispatch({
-          type: 'SET_ROWS_COUNT',
-          payload: data.count,
-        })
-      },
     }
   )
 
-  const maxPages = Math.ceil((data?.count ?? 0) / snap.rowsPerPage)
-  const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
-
-  useEffect(() => {
-    if (page && page > totalPages) {
-      snap.setPage(totalPages)
-    }
-  }, [page, totalPages])
-
-  // [Joshen] Oddly without this, state.selectedRows will be stale
-  useEffect(() => {}, [state.selectedRows])
-
-  // [Joshen] Note: I've made pagination buttons disabled while rows are being fetched for now
-  // at least until we can send an abort signal to cancel requests if users are mashing the
-  // pagination buttons to find the data they want
-
-  const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
+  const count = data?.count ?? 0
+  const countString = data?.is_estimate ? formatEstimatedCount(count) : count.toLocaleString()
+  const maxPages = Math.ceil(count / tableEditorSnap.rowsPerPage)
+  const totalPages = count > 0 ? maxPages : 1
 
   const onPreviousPage = () => {
     if (page > 1) {
-      if (state.selectedRows.size >= 1) {
+      if (snap.selectedRows.size >= 1) {
         setIsConfirmPreviousModalOpen(true)
       } else {
         goToPreviousPage()
@@ -88,17 +86,11 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
 
   const onConfirmPreviousPage = () => {
     goToPreviousPage()
-    dispatch({
-      type: 'SELECTED_ROWS_CHANGE',
-      payload: { selectedRows: new Set() },
-    })
   }
-
-  const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
   const onNextPage = () => {
     if (page < maxPages) {
-      if (state.selectedRows.size >= 1) {
+      if (snap.selectedRows.size >= 1) {
         setIsConfirmNextModalOpen(true)
       } else {
         goToNextPage()
@@ -108,13 +100,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
 
   const onConfirmNextPage = () => {
     goToNextPage()
-    dispatch({
-      type: 'SELECTED_ROWS_CHANGE',
-      payload: { selectedRows: new Set() },
-    })
   }
-
-  // TODO: look at aborting useTableRowsQuery if the user presses the button quickly
 
   const goToPreviousPage = () => {
     const previousPage = page - 1
@@ -126,101 +112,128 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
     snap.setPage(nextPage)
   }
 
-  function onPageChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const value = event.target.value
-    const pageNum = Number(value) > maxPages ? maxPages : Number(value)
+  const onPageChange = (page: number) => {
+    const pageNum = page > maxPages ? maxPages : page
     snap.setPage(pageNum || 1)
   }
 
-  function onRowsPerPageChange(value: string | number) {
+  const onRowsPerPageChange = (value: string | number) => {
     const rowsPerPage = Number(value)
-
-    snap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
+    tableEditorSnap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
   }
 
+  useEffect(() => {
+    if (page && page > totalPages) {
+      snap.setPage(totalPages)
+    }
+  }, [page, totalPages])
+
+  useEffect(() => {
+    if (id !== undefined) {
+      snap.setEnforceExactCount(rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT)
+    }
+  }, [id])
+
+  useEffect(() => {
+    // If the count query encountered a timeout error with exact count
+    // turn off the exact count to rely on approximate
+    if (isError && snap.enforceExactCount && error?.code === 408) {
+      snap.setEnforceExactCount(false)
+    }
+  }, [isError, snap.enforceExactCount, error?.code])
+
   return (
-    <div className="sb-grid-pagination">
+    <div className="flex items-center gap-x-4">
       {isLoading && <p className="text-sm text-foreground-light">Loading records count...</p>}
 
       {isSuccess && (
         <>
-          <Button
-            icon={<IconArrowLeft />}
-            type="outline"
-            disabled={page <= 1 || isLoading}
-            onClick={onPreviousPage}
-            style={{ padding: '3px 10px' }}
-          />
-          <p className="text-sm text-foreground-light">Page</p>
-          <div className="sb-grid-pagination-input-container">
-            <InputNumber
-              // [Fran] we'll have to upgrade the UI component types to accept the null value when users delete the input content
-              // @ts-ignore
-              value={page}
-              onChange={onPageChange}
-              size="tiny"
-              style={{
-                width: '3rem',
-              }}
-              max={maxPages}
-              min={1}
+          <div className="flex items-center gap-x-2">
+            <Button
+              aria-label="Previous page"
+              icon={<ArrowLeft />}
+              type="outline"
+              className="px-1.5"
+              disabled={page <= 1 || isLoading}
+              onClick={onPreviousPage}
             />
+            <p className="text-xs text-foreground-light">Page</p>
+            <Input
+              className="w-12"
+              size="tiny"
+              min={1}
+              max={maxPages}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => {
+                const parsedValue = Number(value)
+                if (
+                  (e.code === 'Enter' || e.code === 'NumpadEnter') &&
+                  !Number.isNaN(parsedValue) &&
+                  parsedValue >= 1 &&
+                  parsedValue <= maxPages
+                ) {
+                  onPageChange(parsedValue)
+                }
+              }}
+            />
+
+            <p className="text-xs text-foreground-light">of {totalPages.toLocaleString()}</p>
+
+            <Button
+              aria-label="Next page"
+              icon={<ArrowRight />}
+              type="outline"
+              className="px-1.5"
+              disabled={page >= maxPages || isLoading}
+              onClick={onNextPage}
+            />
+
+            <DropdownControl
+              options={rowsPerPageOptions}
+              onSelect={onRowsPerPageChange}
+              side="top"
+              align="start"
+            >
+              <Button asChild type="outline" style={{ padding: '3px 10px' }}>
+                <span>{`${tableEditorSnap.rowsPerPage} rows`}</span>
+              </Button>
+            </DropdownControl>
           </div>
-          <p className="text-sm text-foreground-light">{`of ${totalPages}`}</p>
-          <Button
-            icon={<IconArrowRight />}
-            type="outline"
-            disabled={page >= maxPages || isLoading}
-            onClick={onNextPage}
-            style={{ padding: '3px 10px' }}
-          />
 
-          <DropdownControl
-            options={rowsPerPageOptions}
-            onSelect={onRowsPerPageChange}
-            side="top"
-            align="start"
-          >
-            <Button asChild type="outline" style={{ padding: '3px 10px' }}>
-              <span>{`${snap.rowsPerPage} rows`}</span>
-            </Button>
-          </DropdownControl>
-          <p className="text-sm text-foreground-light">{`${data.count.toLocaleString()} ${
-            data.count === 0 || data.count > 1 ? `records` : 'record'
-          }`}</p>
-          {isLoadingRows && <IconLoader size={14} className="animate-spin" />}
+          <div className="flex items-center gap-x-2">
+            <p className="text-xs text-foreground-light">
+              {`${countString} ${count === 0 || count > 1 ? `records` : 'record'}`}{' '}
+              {data.is_estimate ? '(estimated)' : ''}
+            </p>
 
-          <ConfirmationModal
-            visible={isConfirmPreviousModalOpen}
-            header="Confirm moving to previous page"
-            buttonLabel="Confirm"
-            onSelectCancel={() => setIsConfirmPreviousModalOpen(false)}
-            onSelectConfirm={() => {
-              onConfirmPreviousPage()
-            }}
-          >
-            <Modal.Content>
-              <p className="py-4 text-sm text-foreground-light">
-                The currently selected lines will be deselected, do you want to proceed?
-              </p>
-            </Modal.Content>
-          </ConfirmationModal>
-
-          <ConfirmationModal
-            visible={isConfirmNextModalOpen}
-            header="Confirm moving to next page"
-            buttonLabel="Confirm"
-            onSelectCancel={() => setIsConfirmNextModalOpen(false)}
-            onSelectConfirm={() => {
-              onConfirmNextPage()
-            }}
-          >
-            <Modal.Content>
-              <p className="py-4 text-sm text-foreground-light">
-                The currently selected lines will be deselected, do you want to proceed?
-              </p>
-            </Modal.Content>
-          </ConfirmationModal>
+            {data.is_estimate && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="tiny"
+                    type="text"
+                    className="px-1.5"
+                    loading={isFetching}
+                    icon={<HelpCircle />}
+                    onClick={() => {
+                      // Show warning if either NOT a table entity, or table rows estimate is beyond threshold
+                      if (rowsCountEstimate === null || count > THRESHOLD_COUNT) {
+                        setIsConfirmFetchExactCountModalOpen(true)
+                      } else snap.setEnforceExactCount(true)
+                    }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="w-72">
+                  This is an estimated value as your table has more than{' '}
+                  {THRESHOLD_COUNT.toLocaleString()} rows. <br />
+                  <span className="text-brand">
+                    Click to retrieve the exact count of the table.
+                  </span>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </>
       )}
 
@@ -229,6 +242,54 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
           Error fetching records count. Please refresh the page.
         </p>
       )}
+
+      <ConfirmationModal
+        visible={isConfirmPreviousModalOpen}
+        title="Confirm moving to previous page"
+        confirmLabel="Confirm"
+        onCancel={() => setIsConfirmPreviousModalOpen(false)}
+        onConfirm={() => {
+          onConfirmPreviousPage()
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          The currently selected lines will be deselected, do you want to proceed?
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        visible={isConfirmNextModalOpen}
+        title="Confirm moving to next page"
+        confirmLabel="Confirm"
+        onCancel={() => setIsConfirmNextModalOpen(false)}
+        onConfirm={() => {
+          onConfirmNextPage()
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          The currently selected lines will be deselected, do you want to proceed?
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        variant="warning"
+        visible={isConfirmFetchExactCountModalOpen}
+        title="Confirm to fetch exact count for table"
+        confirmLabel="Retrieve exact count"
+        onCancel={() => setIsConfirmFetchExactCountModalOpen(false)}
+        onConfirm={() => {
+          snap.setEnforceExactCount(true)
+          setIsConfirmFetchExactCountModalOpen(false)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          {rowsCountEstimate === null
+            ? `If your table has a row count of greater than ${THRESHOLD_COUNT.toLocaleString()} rows,
+          retrieving the exact count of the table may cause performance issues on your database.`
+            : `Your table has a row count of greater than ${THRESHOLD_COUNT.toLocaleString()} rows, and
+          retrieving the exact count of the table may cause performance issues on your database.`}
+        </p>
+      </ConfirmationModal>
     </div>
   )
 }

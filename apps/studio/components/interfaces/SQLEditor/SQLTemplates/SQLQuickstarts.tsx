@@ -1,94 +1,94 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 
-import { useParams, useTelemetryProps } from 'common'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { useParams } from 'common'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+import { ActionCard } from 'components/layouts/Tabs/ActionCard'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
-import SQLCard from './SQLCard'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { cn, SQL_ICON } from 'ui'
+import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 
-const SQLQuickstarts = observer(() => {
-  const { ui } = useStore()
-  const { ref } = useParams()
+const SQLQuickstarts = () => {
   const router = useRouter()
+  const { ref } = useParams()
   const { profile } = useProfile()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const [, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
-  const telemetryProps = useTelemetryProps()
-  const snap = useSqlEditorStateSnapshot()
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const snapV2 = useSqlEditorV2StateSnapshot()
+
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const handleNewQuery = async (sql: string, name: string) => {
     if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
+
     if (!canCreateSQLSnippet) {
-      return ui.setNotification({
-        category: 'info',
-        message: 'Your queries will not be saved as you do not have sufficient permissions',
-      })
+      return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({
+      const snippet = createSqlSnippetSkeletonV2({
         id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,
         project_id: project?.id,
       })
-      snap.addSnippet(snippet as SqlSnippet, ref)
-      snap.addNeedsSaving(snippet.id!)
+      snapV2.addSnippet({ projectRef: ref, snippet })
+      snapV2.addNeedsSaving(snippet.id)
+
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
+      toast.error(`Failed to create new query: ${error.message}`)
     }
   }
 
   return (
-    <div className="block h-full space-y-8 overflow-y-auto p-6">
+    <div className="block h-full space-y-8 overflow-y-auto p-6 px-10 bg-dash-sidebar dark:bg-surface-100">
       <div className="mb-8">
-        <div className="mb-4">
-          <h1 className="text-foreground mb-3 text-xl">Quickstarts</h1>
-          <p className="text-foreground-light text-sm">
-            While we're in beta, we want to offer a quick way to explore Supabase. While we build
-            importers, check out these simple starters.
-          </p>
+        <div className="mb-6">
+          <h2 className="mb-1">Quickstarts</h2>
           <p className="text-foreground-light text-sm">
             Click on any script to fill the query box, modify the script, then click
             <span className="text-code">Run</span>.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {quickStart.map((x) => (
-            <SQLCard
-              key={x.title}
+        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          {quickStart.map((x, i) => (
+            <ActionCard
               title={x.title}
               description={x.description}
-              sql={x.sql}
-              onClick={(sql, title) => {
-                handleNewQuery(sql, title)
-                Telemetry.sendEvent(
-                  {
-                    category: 'quickstart',
-                    action: 'quickstart_clicked',
-                    label: x.title,
-                  },
-                  telemetryProps,
-                  router
-                )
+              bgColor="bg-alternative border"
+              key={`action-card-${i}`}
+              icon={<SQL_ICON className={cn('fill-foreground', 'w-4 h-4')} strokeWidth={1.5} />}
+              // sql={x.sql}
+              onClick={() => {
+                handleNewQuery(x.sql, x.title)
+                sendEvent({
+                  action: 'sql_editor_quickstart_clicked',
+                  properties: { quickstartName: x.title },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                })
               }}
             />
           ))}
@@ -96,6 +96,6 @@ const SQLQuickstarts = observer(() => {
       </div>
     </div>
   )
-})
+}
 
 export default SQLQuickstarts

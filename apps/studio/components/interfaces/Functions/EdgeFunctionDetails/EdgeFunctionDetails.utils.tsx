@@ -1,8 +1,14 @@
-export const generateCLICommands = (
-  selectedFunction: any,
-  functionUrl: string,
+import { EdgeFunction } from 'data/edge-functions/edge-function-query'
+
+export const generateCLICommands = ({
+  selectedFunction,
+  functionUrl,
+  anonKey,
+}: {
+  selectedFunction?: EdgeFunction
+  functionUrl: string
   anonKey: string
-) => {
+}) => {
   const managementCommands: any = [
     {
       command: `supabase functions deploy ${selectedFunction?.slug}`,
@@ -80,8 +86,12 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-600">curl</span> -L -X POST '{functionUrl}' -H
-            'Authorization: Bearer [YOUR ANON KEY]' {`--data '{"name":"Functions"}'`}
+            <span className="text-brand-600">curl</span> -L -X POST '{functionUrl}'{' '}
+            {selectedFunction?.verify_jwt
+              ? `-H
+            'Authorization: Bearer [YOUR ANON KEY]' `
+              : ''}
+            {`--data '{"name":"Functions"}'`}
           </>
         )
       },

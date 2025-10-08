@@ -24,7 +24,7 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 **_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
-Set the details in the `/lib/supabase.js` file.
+Run `cp .env.example .env` and fill your URL and anon key in the newly created `.env` file.
 
 ### 4. Install the dependencies & run the project:
 
@@ -39,7 +39,7 @@ npm install
 In order to get the file picker to work you must first prebuild the project before running it.
 
 ```bash
-expo prebuild
+npm run prebuild
 ```
 
 ### 5. Run the application
@@ -50,7 +50,7 @@ Run the application: `npm start`.
 
 ### Postgres Row level security
 
-This project uses very high-level Authorization using Postgres' Role Level Security.
+This project uses very high-level Authorization using Postgres' Row Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
@@ -82,11 +82,11 @@ select
 
 create policy "Users can insert their own profile." on profiles for insert
 with
-  check (auth.uid () = id);
+  check ((select auth.uid()) = id);
 
 create policy "Users can update own profile." on profiles for
 update
-  using (auth.uid () = id);
+  using ((select auth.uid()) = id);
 
 -- Set up Realtime!
 begin;

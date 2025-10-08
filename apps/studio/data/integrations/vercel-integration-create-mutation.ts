@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { toast } from 'sonner'
+
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
-import { toast } from 'react-hot-toast'
-import { ResponseError } from 'types'
 
 export type VercelIntegrationCreateVariables = {
   code: string
@@ -24,19 +24,21 @@ export async function createVercelIntegration({
   source,
   teamId,
 }: VercelIntegrationCreateVariables) {
-  const response = await post(`${API_URL}/integrations/vercel`, {
-    code,
-    configuration_id: configurationId,
-    organization_slug: orgSlug,
-    metadata,
-    source,
-    teamId,
+  const { data, error } = await post('/platform/integrations/vercel', {
+    body: {
+      code,
+      configuration_id: configurationId,
+      organization_slug: orgSlug,
+      metadata: metadata as Record<string, never>,
+      source,
+      teamId,
+    },
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response
+  if (error) handleError(error)
+  // [Joshen] API isn't typed on this endpoint
+  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/integrations/vercel/vercel-integration.controller.ts#L50
+  return data as { id: string }
 }
 
 type VercelIntegrationCreateData = Awaited<ReturnType<typeof createVercelIntegration>>

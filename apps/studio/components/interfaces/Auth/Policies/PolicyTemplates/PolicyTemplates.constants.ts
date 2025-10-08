@@ -1,5 +1,6 @@
 export interface PolicyTemplate {
   id: string
+  preview: boolean
   templateName: string
   description: string
   name: string

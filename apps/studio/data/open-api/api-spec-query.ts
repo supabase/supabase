@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { openApiKeys } from './keys'
 
 export type OpenAPISpecVariables = {
@@ -21,10 +21,12 @@ export async function getOpenAPISpec({ projectRef }: OpenAPISpecVariables, signa
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) throw error
 
-  const tables = data.definitions
-    ? Object.entries(data.definitions).map(([key, table]: any) => ({
+  if (error) handleError(error)
+
+  const definitions = (data as any).definitions
+  const tables = definitions
+    ? Object.entries(definitions).map(([key, table]: any) => ({
         ...table,
         name: key,
         fields: Object.entries(table.properties || {}).map(([key, field]: any) => ({
@@ -34,8 +36,9 @@ export async function getOpenAPISpec({ projectRef }: OpenAPISpecVariables, signa
       }))
     : []
 
-  const functions = data.paths
-    ? Object.entries(data.paths)
+  const paths = (data as any).paths
+  const functions = paths
+    ? Object.entries(paths)
         .map(([path, value]: any) => ({
           ...value,
           path,

@@ -1,48 +1,62 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import AISettingsModal from 'components/ui/AISettingsModal'
-import Connecting from 'components/ui/Loading/Loading'
-import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
+import { Loading } from 'components/ui/Loading'
+import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useHotKey } from 'hooks/ui/useHotKey'
+import { PROJECT_STATUS } from 'lib/constants'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import AppLayout from '../AppLayout/AppLayout'
-import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import LayoutHeader from './LayoutHeader'
-import LoadingState from './LoadingState'
-import NavigationBar from './NavigationBar/NavigationBar'
+import { LoadingState } from './LoadingState'
+import { ProjectPausedState } from './PausedState/ProjectPausedState'
+import { PauseFailedState } from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
-import { ProjectContextProvider } from './ProjectContext'
-import ProjectPausedState from './ProjectPausedState'
+import { ResizingState } from './ResizingState'
+import RestartingState from './RestartingState'
+import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
-import UpgradingState from './UpgradingState'
+import { UpgradingState } from './UpgradingState'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
 const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
-  '/project/[ref]/settings/storage',
+  '/project/[ref]/database/settings',
+  '/project/[ref]/storage/settings',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
   '/project/[ref]/database/backups/scheduled',
+  '/project/[ref]/database/backups/pitr',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
+  '/project/[ref]/database/settings',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 export interface ProjectLayoutProps {
@@ -51,86 +65,200 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
-  hideHeader?: boolean
-  hideIconBar?: boolean
   selectedTable?: string
+  resizableSidebar?: boolean
+  stickySidebarBottom?: boolean
+  productMenuClassName?: string
 }
 
-const ProjectLayout = ({
-  title,
-  isLoading = false,
-  isBlocking = true,
-  product = '',
-  productMenu,
-  children,
-  hideHeader = false,
-  hideIconBar = false,
-  selectedTable,
-}: PropsWithChildren<ProjectLayoutProps>) => {
-  const router = useRouter()
-  const { ref: projectRef } = useParams()
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-  const projectName = selectedProject?.name
-  const organizationName = selectedOrganization?.name
+const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
+  (
+    {
+      title,
+      isLoading = false,
+      isBlocking = true,
+      product = '',
+      productMenu,
+      children,
+      selectedTable,
+      resizableSidebar = false,
+      stickySidebarBottom = false,
+      productMenuClassName,
+    },
+    ref
+  ) => {
+    const router = useRouter()
+    const [isClient, setIsClient] = useState(false)
+    const { data: selectedOrganization } = useSelectedOrganizationQuery()
+    const { data: selectedProject } = useSelectedProjectQuery()
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+    const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
+    const aiSnap = useAiAssistantStateSnapshot()
 
-  const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
-  const ignorePausedState =
-    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
-  const showPausedState = isPaused && !ignorePausedState
+    const { appTitle } = useCustomContent(['app:title'])
+    const titleSuffix = appTitle || 'Supabase'
 
-  return (
-    <AppLayout>
-      <ProjectContextProvider projectRef={projectRef}>
+    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap])
+
+    const editor = useEditorType()
+    const forceShowProductMenu = editor === undefined
+    const sideBarIsOpen = forceShowProductMenu || showSidebar
+
+    const projectName = selectedProject?.name
+    const organizationName = selectedOrganization?.name
+
+    const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+    const showProductMenu = selectedProject
+      ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+        (selectedProject.status === PROJECT_STATUS.COMING_UP &&
+          router.pathname.includes('/project/[ref]/settings')) ||
+        router.pathname.includes('/project/[ref]/branches')
+      : true
+
+    const ignorePausedState =
+      router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+    const showPausedState = isPaused && !ignorePausedState
+
+    useEffect(() => {
+      setIsClient(true)
+    }, [])
+
+    return (
+      <>
         <Head>
           <title>
             {title
-              ? `${title} | Supabase`
+              ? `${title} | ${titleSuffix}`
               : selectedTable
-              ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-              : projectName
-              ? `${projectName} | ${organizationName} | Supabase`
-              : organizationName
-              ? `${organizationName} | Supabase`
-              : 'Supabase'}
+                ? `${selectedTable} | ${projectName} | ${organizationName} | ${titleSuffix}`
+                : projectName
+                  ? `${projectName} | ${organizationName} | ${titleSuffix}`
+                  : organizationName
+                    ? `${organizationName} | ${titleSuffix}`
+                    : titleSuffix}
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
-        <div className="flex h-full">
-          {/* Left-most navigation side bar to access products */}
-          {!hideIconBar && <NavigationBar />}
-          {/* Product menu bar */}
-          {!showPausedState && (
-            <MenuBarWrapper isLoading={isLoading} isBlocking={isBlocking} productMenu={productMenu}>
-              <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-            </MenuBarWrapper>
-          )}
-          <main className="flex flex-col flex-1 w-full overflow-x-hidden">
-            {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-            {showPausedState ? (
-              <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                <div className="w-full">
-                  <ProjectPausedState product={product} />
-                </div>
-              </div>
-            ) : (
-              <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                <ResourceExhaustionWarningBanner />
-                {children}
-              </ContentWrapper>
+        <div className="flex flex-row h-full w-full">
+          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
+            {showProductMenu && productMenu && (
+              <ResizablePanel
+                order={1}
+                maxSize={33}
+                defaultSize={1}
+                id="panel-left"
+                className={cn(
+                  'hidden md:block',
+                  'transition-all duration-[120ms]',
+                  sideBarIsOpen
+                    ? resizableSidebar
+                      ? 'min-w-64 max-w-[32rem]'
+                      : 'min-w-64 max-w-64'
+                    : 'w-0 flex-shrink-0 max-w-0'
+                )}
+              >
+                {sideBarIsOpen && (
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      initial={{ width: 0, opacity: 0, height: '100%' }}
+                      animate={{ width: 'auto', opacity: 1, height: '100%' }}
+                      exit={{ width: 0, opacity: 0, height: '100%' }}
+                      className="h-full"
+                      transition={{ duration: 0.12 }}
+                    >
+                      <MenuBarWrapper
+                        isLoading={isLoading}
+                        isBlocking={isBlocking}
+                        productMenu={productMenu}
+                      >
+                        <ProductMenuBar title={product} className={productMenuClassName}>
+                          {productMenu}
+                        </ProductMenuBar>
+                      </MenuBarWrapper>
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+              </ResizablePanel>
             )}
-          </main>
+            {showProductMenu && productMenu && sideBarIsOpen && (
+              <ResizableHandle
+                withHandle
+                disabled={resizableSidebar ? false : true}
+                className="hidden md:flex"
+              />
+            )}
+            <ResizablePanel
+              defaultSize={1}
+              order={2}
+              id="panel-right"
+              className="h-full flex flex-col w-full"
+            >
+              <ResizablePanelGroup
+                direction="horizontal"
+                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                autoSaveId="project-layout-content"
+              >
+                <ResizablePanel
+                  id="panel-content"
+                  defaultSize={1}
+                  className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
+                >
+                  <main
+                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
+                    ref={ref}
+                  >
+                    {showPausedState ? (
+                      <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                        <div className="w-full">
+                          <ProjectPausedState product={product} />
+                        </div>
+                      </div>
+                    ) : (
+                      <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                        <ResourceExhaustionWarningBanner />
+                        {children}
+                      </ContentWrapper>
+                    )}
+                  </main>
+                </ResizablePanel>
+                {isClient && aiSnap.open && (
+                  <>
+                    <ResizableHandle withHandle />
+                    <ResizablePanel
+                      id="panel-assistant"
+                      defaultSize={30}
+                      minSize={30}
+                      maxSize={50}
+                      className={cn(
+                        'border-l bg fixed z-40 right-0 top-0 bottom-0',
+                        'w-screen h-[100dvh]',
+                        'md:absolute md:h-auto md:w-3/4',
+                        'xl:relative xl:border-l-0'
+                      )}
+                    >
+                      <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
+                    </ResizablePanel>
+                  </>
+                )}
+              </ResizablePanelGroup>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
-
-        <EnableBranchingModal />
-        <AISettingsModal />
+        <CreateBranchModal />
         <ProjectAPIDocs />
-      </ProjectContextProvider>
-    </AppLayout>
-  )
-}
+        <MobileSheetNav
+          open={mobileMenuOpen}
+          onOpenChange={setMobileMenuOpen}
+          stickyBottom={stickySidebarBottom}
+        >
+          {productMenu}
+        </MobileSheetNav>
+      </>
+    )
+  }
+)
+
+ProjectLayout.displayName = 'ProjectLayout'
 
 export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
 
@@ -150,7 +278,7 @@ const MenuBarWrapper = ({
   children,
 }: MenuBarWrapperProps) => {
   const router = useRouter()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   if (!isBlocking) {
@@ -185,24 +313,30 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const router = useRouter()
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
+  const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
+  const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
+  const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
+  const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
+  const isProjectRestoreFailed = selectedProject?.status === PROJECT_STATUS.RESTORE_FAILED
   const isProjectBuilding =
     selectedProject?.status === PROJECT_STATUS.COMING_UP ||
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
   const isProjectPausing =
     selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
     selectedProject?.status === PROJECT_STATUS.PAUSING
+  const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
   useEffect(() => {
@@ -210,15 +344,27 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   }, [ref])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
-    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Connecting />
+    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
   }
 
-  if (isProjectUpgrading) {
+  if (isRestarting && !isBackupsPage) {
+    return <RestartingState />
+  }
+
+  if (isResizing && !isBackupsPage) {
+    return <ResizingState />
+  }
+
+  if (isProjectUpgrading && !isBackupsPage) {
     return <UpgradingState />
   }
 
   if (isProjectPausing) {
     return <PausingState project={selectedProject} />
+  }
+
+  if (isProjectPauseFailed) {
+    return <PauseFailedState />
   }
 
   if (requiresPostgrestConnection && isProjectOffline) {
@@ -229,7 +375,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoringState />
   }
 
-  if (requiresDbConnection && isProjectBuilding) {
+  if (isProjectRestoreFailed && !isBackupsPage) {
+    return <RestoreFailedState />
+  }
+
+  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
     return <BuildingState />
   }
 

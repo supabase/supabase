@@ -1,83 +1,62 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
+import { AlertCircle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import Telemetry from 'lib/telemetry'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import type { AddonVariantId } from 'data/subscriptions/types'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
+import { formatCurrency } from 'lib/helpers'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertTriangle,
-  IconExternalLink,
   Radio,
   SidePanel,
+  cn,
 } from 'ui'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const CustomDomainSidePanel = () => {
-  const { ui } = useStore()
-  const router = useRouter()
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
-  const canUpdateCustomDomain = useCheckPermissions(
+  const { can: canUpdateCustomDomain } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'customDomain'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const { panel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'customDomain'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully enabled custom domain`,
-      })
-      onClose()
+      toast.success(`Successfully enabled custom domain`)
+      closePanel()
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to enable custom domain: ${error.message}`,
-      })
+      toast.error(`Unable to enable custom domain: ${error.message}`)
     },
   })
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully disabled custom domain`,
-      })
-      onClose()
+      toast.success(`Successfully disabled custom domain`)
+      closePanel()
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to disable custom domain: ${error.message}`,
-      })
+      toast.error(`Unable to disable custom domain: ${error.message}`)
     },
   })
   const isSubmitting = isUpdating || isRemoving
@@ -88,7 +67,7 @@ const CustomDomainSidePanel = () => {
   const availableOptions =
     (addons?.available_addons ?? []).find((addon) => addon.type === 'custom_domain')?.variants ?? []
 
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionCDOption?.variant.identifier ?? 'cd_none')
   const selectedCustomDomain = availableOptions.find(
     (option) => option.identifier === selectedOption
@@ -101,18 +80,6 @@ const CustomDomainSidePanel = () => {
       } else {
         setSelectedOption('cd_none')
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Custom domains',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
@@ -121,7 +88,7 @@ const CustomDomainSidePanel = () => {
     if (selectedOption === 'cd_none' && subscriptionCDOption !== undefined) {
       removeAddon({ projectRef, variant: subscriptionCDOption.variant.identifier })
     } else {
-      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption })
+      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption as AddonVariantId })
     }
   }
 
@@ -129,23 +96,31 @@ const CustomDomainSidePanel = () => {
     <SidePanel
       size="large"
       visible={visible}
-      onCancel={onClose}
+      onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateCustomDomain}
+      disabled={
+        isFreePlan ||
+        isLoading ||
+        !hasChanges ||
+        isSubmitting ||
+        !canUpdateCustomDomain ||
+        // Allow disabling, but do not allow opting in
+        (subscriptionCDOption === undefined && customDomainsDisabledDueToQuota)
+      }
       tooltip={
         isFreePlan
-          ? 'Unable to enable custom domain on a free plan'
+          ? 'Unable to enable custom domain on a Free Plan'
           : !canUpdateCustomDomain
-          ? 'You do not have permission to update custom domain'
-          : undefined
+            ? 'You do not have permission to update custom domain'
+            : undefined
       }
       header={
         <div className="flex items-center justify-between">
           <h4>Custom domains</h4>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/custom-domains"
+              href={`${DOCS_URL}/guides/platform/custom-domains`}
               target="_blank"
               rel="noreferrer"
             >
@@ -157,6 +132,20 @@ const CustomDomainSidePanel = () => {
     >
       <SidePanel.Content>
         <div className="py-6 space-y-4">
+          {subscriptionCDOption === undefined &&
+            selectedCustomDomain !== undefined &&
+            customDomainsDisabledDueToQuota && (
+              <Alert_Shadcn_ variant="default" className="mb-2">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle_Shadcn_>
+                  Adding new custom domains temporarily disabled
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                  We are working with our upstream DNS provider before we are able to sign up new
+                  custom domains. Please check back in a few hours.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
@@ -166,27 +155,12 @@ const CustomDomainSidePanel = () => {
             page after enabling the add-on.
           </p>
 
-          <div className={clsx('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"
               id="custom-domain"
-              onChange={(event: any) => {
-                setSelectedOption(event.target.value)
-                Telemetry.sendActivity(
-                  {
-                    activity: 'Option Selected',
-                    source: 'Dashboard',
-                    data: {
-                      title: 'Custom domains',
-                      section: 'Add ons',
-                      option: event.target.label,
-                    },
-                    projectRef,
-                  },
-                  router
-                )
-              }}
+              onChange={(event: any) => setSelectedOption(event.target.value)}
             >
               <Radio
                 name="custom-domain"
@@ -204,7 +178,9 @@ const CustomDomainSidePanel = () => {
                       Use the default supabase domain for your API
                     </p>
                     <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-foreground text-sm">$0</p>
+                      <p className="text-foreground text-sm" translate="no">
+                        $0
+                      </p>
                       <p className="text-foreground-light translate-y-[1px]"> / month</p>
                     </div>
                   </div>
@@ -229,7 +205,9 @@ const CustomDomainSidePanel = () => {
                         Present a branded experience to your users
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">${option.price}</p>
+                        <p className="text-foreground text-sm" translate="no">
+                          {formatCurrency(option.price)}
+                        </p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -239,47 +217,23 @@ const CustomDomainSidePanel = () => {
             </Radio.Group>
           </div>
 
-          {hasChanges && (
-            <>
-              {selectedOption === 'cd_none' ||
-              (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0) ? (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of that's unused during the current billing
-                  cycle will be returned as credits that can be used for subsequent billing cycles
-                </p>
-              ) : (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">
-                    ${selectedCustomDomain?.price.toLocaleString()}
-                  </span>{' '}
-                  will be added to your monthly invoice. You're immediately charged for the
-                  remaining days of your billing cycle. The addon is prepaid per month and in case
-                  of a downgrade, you get credits for the remaining time.
-                </p>
-              )}
-
-              {subscription?.billing_via_partner &&
-                subscription.scheduled_plan_change?.target_plan !== undefined && (
-                  <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                    <IconAlertTriangle className="h-4 w-4" />
-                    <AlertDescription_Shadcn_>
-                      You have a scheduled subscription change that will be canceled if you change
-                      your custom domain add on.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-            </>
+          {hasChanges && selectedOption !== 'cd_none' && (
+            <p className="text-sm text-foreground-light">
+              There are no immediate charges. The addon is billed at the end of your billing cycle
+              based on your usage and prorated to the hour.
+            </p>
           )}
 
           {isFreePlan && (
             <Alert
               withIcon
               variant="info"
-              title="Custom domains are unavailable on the free plan"
+              title="Custom domains are unavailable on the Free Plan"
               actions={
                 <Button asChild type="default">
-                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                  <Link
+                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=customDomainSidePanel`}
+                  >
                     View available plans
                   </Link>
                 </Button>

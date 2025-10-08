@@ -58,7 +58,7 @@ Supabase 是一個開源工具的组合。我們正在使用企業級的開源�
 Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註冊並開始使用 Supabase，無需安裝任何東西。
 你也可以[自行托管](https://supabase.com/docs/guides/hosting/overview)和[本地開發](https://supabase.com/docs/guides/local-development)。
 
-![架構](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![架構](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/)是一個物件關係型資料庫系統，經過 30 多年的積極開發，它在可靠性、功能穩健性和性能方面赢得了良好的聲譽。
 - [Realtime](https://github.com/supabase/realtime)是一個 Elixir 服務器，允許你使用 websockets 監聽 PostgreSQL 的插入、更新和刪除。Realtime 對 Postgres 内置的複製功能進行投票，以了解資料庫的數位化，將變化轉换為 JSON，然后通過 websockets 將 JSON 廣播邊授權客户。

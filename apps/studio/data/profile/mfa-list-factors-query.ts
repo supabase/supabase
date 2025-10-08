@@ -1,4 +1,4 @@
-import { AuthMFAListFactorsResponse, Factor } from '@supabase/supabase-js'
+import type { AuthMFAListFactorsResponse, Factor } from '@supabase/supabase-js'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'

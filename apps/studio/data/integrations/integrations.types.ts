@@ -137,6 +137,8 @@ export type Imetadata = {
       preview: boolean
     }
     supabaseDirectory?: string
+    supabaseChangesOnly?: boolean
+    branchLimit?: number
   }
   link?: VercelGitLink
   name: string
@@ -151,11 +153,9 @@ export type IntegrationProjectConnection = {
   supabase_project_ref: string
   foreign_project_id: string
   organization_integration_id: string
+  env_sync_targets?: string[]
+  public_env_var_prefix?: string
   metadata: Imetadata
-}
-
-export type IntegrationsVariables = {
-  orgSlug?: string
 }
 
 export type IntegrationProjectConnectionPayload = {
@@ -171,7 +171,6 @@ export type userDetails = {
   primary_email: string
 }
 type addedBy = userDetails
-type updatedBy = userDetails
 
 export type IntegrationName = 'Vercel' | 'GitHub' // | 'Netlify'
 export type VercelAccountType = 'Team' | 'Personal'
@@ -245,13 +244,41 @@ export type IntegrationConnectionsCreateVariables = {
   connection: {
     foreign_project_id: string
     supabase_project_ref: string
+    integration_id: string
     metadata: any
   }
   orgSlug: string | undefined
+  new?: {
+    installation_id: number
+    project_ref: string
+    repository_id: number
+  }
 }
 
-export type UpdateConnectionPayload = {
-  id: string
-  organizationIntegrationId: string
-  metadata: Imetadata
+export type EnvironmentTargets = 'production' | 'preview' | 'development'
+
+// GitHub specific connection type based on the API response
+export type GitHubConnection = {
+  id: number
+  inserted_at: string
+  updated_at: string
+  branch_limit: number
+  installation_id: number
+  new_branch_per_pr: boolean
+  supabase_changes_only: boolean
+  workdir: string
+  project: {
+    id: number
+    name: string
+    ref: string
+  }
+  repository: {
+    id: number
+    name: string
+  }
+  user: {
+    id: number
+    primary_email: string | null
+    username: string
+  } | null
 }

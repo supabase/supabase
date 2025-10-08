@@ -1,13 +1,11 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { IconChevronLeft } from 'ui'
+
+import { ChevronLeft } from 'lucide-react'
+import { BASE_PATH } from '~/lib/constants'
+import clientLibsCommon from '~/spec/common-cli.yml' with { type: 'yml' }
 import * as NavItems from './NavigationMenu.constants'
 
-import clientLibsCommon from '~/../../spec/common-cli.yml' assert { type: 'yml' }
-
 const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
-  const router = useRouter()
-
   const menu = NavItems[id]
 
   const FunctionLink = ({
@@ -24,9 +22,9 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
       <li key={id} className="function-link-item text-foreground-lighter leading-3">
         <Link
           href={`#${id}`}
-          className="cursor-pointer transition text-foreground-lighter text-sm hover:text-brand flex gap-3"
+          className="cursor-pointer transition text-foreground-lighter text-sm hover:text-brand-link flex gap-3"
         >
-          {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
+          {icon && <img className="w-3" src={`${BASE_PATH}${icon}`} />}
           {title}
         </Link>
       </li>
@@ -101,19 +99,19 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
           href={`${menu.parent ?? '/'}`}
           className={[
             'flex items-center gap-1 text-xs group mb-3',
-            'text-base transition-all duration-200 text-brand hover:text-brand-600 hover:cursor-pointer ',
+            'text-base transition-all duration-200 text-brand-link hover:text-brand-600 hover:cursor-pointer ',
           ].join(' ')}
         >
           <div className="relative w-2">
             <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-              <IconChevronLeft size={10} strokeWidth={3} />
+              <ChevronLeft size={10} strokeWidth={3} />
             </div>
           </div>
           <span>Back to menu</span>
         </Link>
         <div className="flex items-center gap-3 my-3">
           <img
-            src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+            src={`${BASE_PATH}` + (menu.icon ?? `/img/icons/menu/${id}.svg`)}
             className="w-5 rounded"
           />
 

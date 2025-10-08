@@ -2,73 +2,151 @@ TEAM
 
 Supabase is 100% remote.
 
+Aaron Byrne
+Adam Mokan
 Alaister Young
+Alan De Los Santos
+Aleksi Immonen
 Alexander Korotkov
 Amy Q
-Andrew Smith
+Andrew Valleteau
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
+Artur Zakirov
+Artyom Borissov
+Barco Fourie
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
-Bruno Andrade
+Brent Newson
+Carel de Waal
+Cameron Blackwood
+Cemal Kılıç
 Chandana Anumula
 Charis Lam
 Chase Granberry
+Chris Caruso
+Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Martin
+Chris Stockton
+Chris Ward
+Craig Cannon
+Cuong Do
+Danny White
+Darren Cunningham
 Dave Wilson
+David A. Ventimiglia
+David Weitzman
+Deepthi Sigireddi
+Deji I
 Div Arora
 Divit D
+Douglas Hunley
+Dustin Keib
+Eduardo Gurgel
 Egor Romanov
+Eleftheria Trivyzaki
+Emmett Folger
+Eric Kharitonashvili
+Etienne Stalmans
 Fabrizio Fenoglio
+Fady A
+Felipe Stival
 Francesco Sansalvadore
+Greg Kress
+Greg P
 Greg Richardson
+Guilherme Souza
+Hardik Maheshwari
 Haydn Maley
 Hieu Pham
+Ignacio Dobronich
+Illia Basalaiev
 Inian P
-Isaiah Hamilton
+Ivan Vasilov
+Jeff Smick
+Jenny Kibiri
 Jess Shears
-Joel Lee
+Jim Chanco Jr
+John Pena
 Jon M
 Jonny Summers-Muir
+Jordi Enric
+José Luis Ledesma
 Joshen Lim
+Julien Goux
+Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
+Karan S
 Karlo Ison
+Katerina Skroumpelou
+Kemal Y
 Kevin Brolly
 Kevin Grüneberg
-Lakshmipathi G
+Lakshan Perera
 Laura C
-Leo T
+Laurence Isla
+Lenny Urbanowski
+Leonardo Santiago
 Long Hoang
+Luca Forstner
+Łukasz Niemier
+Manan Gupta
 Margarita Sandomirskaia
-Marijana Pavlinić
 Mark Burggraf
-Monica El Khoury
-Nikita Kotlyarov
+Matt Johnston
+Matt Rossman
+Monica Khoury
+Mykhailo Mischa Lieibenson
+Nyannyacha
 Oli R
 Pamela Chia
+Paul Caselton
 Paul Cioanca
 Paul Copplestone
 Pavel Borisov
+Paweł Gulbinowicz
+Peter Lyn
 Qiao Han
+Rafael Chacón
 Raminder Singh
-Ramiro Nuñez Dosio
-Rodrigo Martins Mansueli
+Raúl Barroso
+Riccardo Busetti
+Rodrigo Mansueli
+Ronan Lehane
 Rory Wilding
+Ryan Goulet
+Sam Meech-Ward
+Sam Rome
+Sam Rose
+Sean Oliver
+Sergio Cioban Filho
 Sreyas Udayavarman
 Stanislav M
+Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
+Taryn King
 Terry Sutton
+Thomas E
 Thor Schaeff
+Timothy Lim
+Tom Ashley
+Tom G
+Tomás Pozo
+Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
+Yorvi Arias
+Yuliya Marinova
 Yuri Santana
 ____________
 
@@ -83,10 +161,11 @@ TECHNOLOGIES
 
 Supabase would not be possible without the work of some other amazing open source contributors.
 
-- Postgres - https://www.postgresql.org/docs/devel/git.html
+- Postgres - https://www.postgresql.org/
 - PostgREST - https://github.com/PostgREST
 - Kong - https://github.com/kong/
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
+- shadcn/ui - https://ui.shadcn.com/
 - Phoenix - https://www.phoenixframework.org/
 - GoTrue - https://github.com/netlify/gotrue

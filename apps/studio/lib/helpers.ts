@@ -1,7 +1,11 @@
-import { post } from 'lib/common/fetch'
-import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
-import { toast } from 'react-hot-toast'
-import { v4 as _uuidV4 } from 'uuid'
+export { default as passwordStrength } from './password-strength'
+export { default as uuidv4 } from './uuid'
+import { UIEvent } from 'react'
+import type { TablesData } from '../data/tables/tables-query'
+
+export const isAtBottom = ({ currentTarget }: UIEvent<HTMLElement>): boolean => {
+  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
+}
 
 export const tryParseJson = (jsonString: any) => {
   try {
@@ -42,8 +46,12 @@ export const prettifyJSON = (minifiedJSON: string) => {
   }
 }
 
-export const uuidv4 = () => {
-  return _uuidV4()
+export const removeJSONTrailingComma = (jsonString: string) => {
+  /**
+   * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
+   * bracket ']' using a regular expression.
+   */
+  return jsonString.replace(/,\s*(?=[\}\]])/g, '')
 }
 
 export const timeout = (ms: number) => {
@@ -54,9 +62,10 @@ export const getURL = () => {
   const url =
     process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL
-      : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
-      ? process.env.VERCEL_URL
-      : 'https://supabase.com/dashboard'
+      : process?.env?.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
+          process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL !== ''
+        ? process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
+        : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -87,41 +96,12 @@ export const pluckObjectFields = (model: any, fields: any[]) => {
 }
 
 /**
- * Trims down a JSON Schema only to the fields that a user wants.
- * @param {object} jsonSchema
- * @param {array} fields a list of properties to pluck. eg: ['first_name', 'last_name']
- */
-export const pluckJsonSchemaFields = (jsonSchema: any, fields: any) => {
-  let schema: any = {
-    type: 'object',
-    required: [],
-    properties: {},
-  }
-  fields.forEach((field: any) => {
-    if (jsonSchema.properties[field]) {
-      schema.properties[field] = jsonSchema.properties[field]
-      if (jsonSchema.required.includes(field)) schema.required.push(field)
-    }
-  })
-  return schema
-}
-
-/**
- * Before return to frontend, we should filter sensitive project props
- */
-export const filterSensitiveProjectProps = (project: any) => {
-  project.db_user_supabase = undefined
-  project.db_pass_supabase = undefined
-
-  return project
-}
-
-/**
  * Returns undefined if the string isn't parse-able
  */
 export const tryParseInt = (str: string) => {
   try {
-    return parseInt(str, 10)
+    const int = parseInt(str, 10)
+    return isNaN(int) ? undefined : int
   } catch (error) {
     return undefined
   }
@@ -153,80 +133,21 @@ export const formatBytes = (
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
   if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'
-  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+
+  // Handle negative values
+  const isNegative = bytes < 0
+  const absBytes = Math.abs(bytes)
+
+  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(absBytes) / Math.log(k))
+  const formattedValue = parseFloat((absBytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+
+  return isNegative ? '-' + formattedValue : formattedValue
 }
 
 export const snakeToCamel = (str: string) =>
   str.replace(/([-_][a-z])/g, (group: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
   )
-
-/**
- * Copy text content (string or Promise<string>) into Clipboard.
- * Safari doesn't support write text into clipboard async, so if you need to load
- * text content async before coping, please use Promise<string> for the 1st arg.
- */
-export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
-  const focused = window.document.hasFocus()
-  if (focused) {
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-      const text = await Promise.resolve(str)
-      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
-
-      return
-    }
-
-    Promise.resolve(str)
-      .then((text) => window.navigator?.clipboard?.writeText(text))
-      .then(callback)
-  } else {
-    console.warn('Unable to copy to clipboard')
-  }
-}
-
-export async function passwordStrength(value: string) {
-  let message: string = ''
-  let warning: string = ''
-  let strength: number = 0
-
-  if (value && value !== '') {
-    if (value.length > 99) {
-      message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
-      warning = `Password should be less than 100 characters`
-    } else {
-      // [Joshen] Unable to use RQ atm due to our Jest tests being in JS
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
-        const resultScore = result?.score ?? 0
-
-        const score = (PASSWORD_STRENGTH as any)[resultScore]
-        const suggestions = result.feedback?.suggestions
-          ? result.feedback.suggestions.join(' ')
-          : ''
-
-        message = `${score} ${suggestions}`
-        strength = resultScore
-
-        // warning message for anything below 4 strength :string
-        if (resultScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-          warning = `${
-            result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
-          } You need a stronger password.`
-        }
-      } else {
-        toast.error(`Failed to check password strength: ${response.error.message}`)
-      }
-    }
-  }
-
-  return {
-    message,
-    warning,
-    strength,
-  }
-}
 
 export const detectBrowser = () => {
   if (!navigator) return undefined
@@ -241,6 +162,7 @@ export const detectBrowser = () => {
 }
 
 export const detectOS = () => {
+  if (typeof window === 'undefined' || !window) return undefined
   if (typeof navigator === 'undefined' || !navigator) return undefined
 
   const userAgent = window.navigator.userAgent.toLowerCase()
@@ -254,6 +176,64 @@ export const detectOS = () => {
   } else {
     return undefined
   }
+}
+
+/**
+ * Convert a list of tables to SQL
+ * @param t - The list of tables
+ * @returns The SQL string
+ */
+export function tablesToSQL(t: TablesData) {
+  if (!Array.isArray(t)) return ''
+  const warning =
+    '-- WARNING: This schema is for context only and is not meant to be run.\n-- Table order and constraints may not be valid for execution.\n\n'
+  const sql = t
+    .map((table) => {
+      if (!table || !Array.isArray((table as any).columns)) return ''
+
+      const columns = (table as { columns?: any[] }).columns ?? []
+      const columnLines = columns.map((c) => {
+        let line = `  ${c.name} ${c.data_type}`
+        if (c.is_identity) {
+          line += ' GENERATED ALWAYS AS IDENTITY'
+        }
+        if (c.is_nullable === false) {
+          line += ' NOT NULL'
+        }
+        if (c.default_value !== null && c.default_value !== undefined) {
+          line += ` DEFAULT ${c.default_value}`
+        }
+        if (c.is_unique) {
+          line += ' UNIQUE'
+        }
+        if (c.check) {
+          line += ` CHECK (${c.check})`
+        }
+        return line
+      })
+
+      const constraints: string[] = []
+
+      if (Array.isArray(table.primary_keys) && table.primary_keys.length > 0) {
+        const pkCols = table.primary_keys.map((pk: any) => pk.name).join(', ')
+        constraints.push(`  CONSTRAINT ${table.name}_pkey PRIMARY KEY (${pkCols})`)
+      }
+
+      if (Array.isArray(table.relationships)) {
+        table.relationships.forEach((rel: any) => {
+          if (rel && rel.source_table_name === table.name) {
+            constraints.push(
+              `  CONSTRAINT ${rel.constraint_name} FOREIGN KEY (${rel.source_column_name}) REFERENCES ${rel.target_table_schema}.${rel.target_table_name}(${rel.target_column_name})`
+            )
+          }
+        })
+      }
+
+      const allLines = [...columnLines, ...constraints]
+      return `CREATE TABLE ${table.schema}.${table.name} (\n${allLines.join(',\n')}\n);`
+    })
+    .join('\n')
+  return warning + sql
 }
 
 /**
@@ -287,9 +267,7 @@ export const removeCommentsFromSql = (sql: string) => {
   return cleanedSql
 }
 
-export const getSemanticVersion = (version: string) => {
-  if (!version) return 0
-
+const formatSemver = (version: string) => {
   // e.g supabase-postgres-14.1.0.88
   // There's 4 segments instead so we can't use the semver package
   const segments = version.split('supabase-postgres-')
@@ -298,5 +276,75 @@ export const getSemanticVersion = (version: string) => {
   // e.g supabase-postgres-14.1.0.99-vault-rc1
   const formattedSemver = semver.split('-')[0]
 
+  return formattedSemver
+}
+
+export const getSemanticVersion = (version: string) => {
+  if (!version) return 0
+
+  const formattedSemver = formatSemver(version)
   return Number(formattedSemver.split('.').join(''))
+}
+
+export const getDatabaseMajorVersion = (version: string) => {
+  if (!version) return 0
+
+  const formattedSemver = formatSemver(version)
+  return Number(formattedSemver.split('.')[0])
+}
+
+const deg2rad = (deg: number) => {
+  return deg * (Math.PI / 180)
+}
+
+export const getDistanceLatLonKM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const R = 6371 // Radius of the earth in kilometers
+  const dLat = deg2rad(lat2 - lat1) // deg2rad below
+  const dLon = deg2rad(lon2 - lon1)
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const d = R * c // Distance in KM
+  return d
+}
+
+const currencyFormatterDefault = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+})
+
+export const formatCurrency = (amount: number | undefined | null): string | null => {
+  if (amount === undefined || amount === null) {
+    return null
+  } else if (amount > 0 && amount < 0.01) {
+    return currencyFormatterSmallValues.format(amount)
+  } else {
+    return currencyFormatterDefault.format(amount)
+  }
+}
+
+/**
+ * [Joshen] This is to address an incredibly weird bug that's happening between Data Grid + Shadcn ContextMenu + Shadcn Overlay
+ * This trifecta is causing a pointer events none style getting left behind on the body element which makes the dashboard become
+ * unresponsive, hence the attempt to clean things up here
+ *
+ * Timeout is made configurable as I've observed it requires a higher timeout sometimes (e.g when closing the cron job sheet)
+ */
+export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 300) => {
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      if (document.body.style.pointerEvents === 'none') {
+        document.body.style.pointerEvents = ''
+      }
+    }, timeoutMs)
+  }
 }

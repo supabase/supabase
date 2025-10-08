@@ -1,27 +1,32 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { partition } from 'lodash'
-import { useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconSearch, Input } from 'ui'
+import { Search } from 'lucide-react'
+import { useState } from 'react'
 
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Policies } from 'components/interfaces/Auth/Policies'
-import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
-import { AuthLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { Policies } from 'components/interfaces/Auth/Policies/Policies'
+import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
+import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { NextPageWithLayout } from 'types'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 /**
  * Filter tables by table name and policy name
@@ -59,28 +64,22 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
-  const { search } = useParams()
-  const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
-  const [searchString, setSearchString] = useState<string>('')
+  const [params, setParams] = useUrlState<{
+    schema?: string
+    search?: string
+  }>()
+  const { schema = 'public', search: searchString = '' } = params
+  const { data: project } = useSelectedProjectQuery()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
+  const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
-  useEffect(() => {
-    if (search) setSearchString(search)
-  }, [search])
+  // Local editor panel state
+  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
 
-  const { data: schemas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const [protectedSchemas] = partition(schemas, (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
 
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
@@ -96,117 +95,160 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: snap.selectedSchemaName,
+    schema: schema,
   })
 
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
-  const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
-  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
+  const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'policies'
+  )
 
-  if (!canReadPolicies) {
+  if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <SchemaSelector
-              className="w-[260px]"
-              size="small"
-              showError={false}
-              selectedSchemaName={snap.selectedSchemaName}
-              onSelectSchema={(schema: string) => {
-                snap.setSelectedSchemaName(schema)
-                setSearchString('')
-              }}
-            />
-            <Input
-              size="small"
-              placeholder="Filter tables and policies"
-              className="block w-64 text-sm placeholder-border-muted"
-              value={searchString}
-              onChange={(e) => setSearchString(e.target.value)}
-              icon={<IconSearch size="tiny" />}
-            />
-          </div>
-          <div className="flex items-center gap-x-2">
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-            >
-              <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-                Documentation
-              </Button>
-            </a>
-            {isAiAssistantEnabled && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    type="primary"
-                    disabled={!canCreatePolicies}
-                    onClick={() => setShowPolicyAiEditor(true)}
-                  >
-                    Create a new policy
-                  </Button>
-                </Tooltip.Trigger>
-                {!canCreatePolicies && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create RLS policies
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            )}
-          </div>
+    <ScaffoldContainer size="large">
+      <ScaffoldSection isFullWidth>
+        <div className="mb-4 flex flex-row gap-2 justify-between">
+          <Input
+            size="tiny"
+            placeholder="Filter tables and policies"
+            className="block w-full lg:w-52"
+            containerClassName="[&>div>svg]:-mt-0.5"
+            value={searchString || ''}
+            onChange={(e) => {
+              const str = e.target.value
+              setParams({ ...params, search: str === '' ? undefined : str })
+            }}
+            icon={<Search size={14} />}
+          />
+          <SchemaSelector
+            className="w-full lg:w-[180px]"
+            size="tiny"
+            align="end"
+            showError={false}
+            selectedSchemaName={schema}
+            onSelectSchema={(schema) => {
+              setParams({ ...params, search: undefined, schema })
+            }}
+          />
         </div>
-      </div>
 
-      {isLoading && <GenericSkeletonLoader />}
+        {isLoading && <GenericSkeletonLoader />}
 
-      {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+        {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
-      {isSuccess && (
-        <Policies
-          tables={filteredTables}
-          hasTables={tables.length > 0}
-          isLocked={isLocked}
-          onSelectEditPolicy={(policy) => {
-            setSelectedPolicyToEdit(policy)
-            setShowPolicyAiEditor(true)
+        {isSuccess && (
+          <Policies
+            search={searchString}
+            schema={schema}
+            tables={filteredTables}
+            hasTables={tables.length > 0}
+            isLocked={isSchemaLocked}
+            onSelectCreatePolicy={(table: string) => {
+              setSelectedTable(table)
+              setSelectedPolicyToEdit(undefined)
+              if (isInlineEditorEnabled) {
+                setEditorPanelOpen(true)
+              } else {
+                setShowPolicyAiEditor(true)
+              }
+            }}
+            onSelectEditPolicy={(policy) => {
+              setSelectedPolicyToEdit(policy)
+              setSelectedTable(undefined)
+              if (isInlineEditorEnabled) {
+                setEditorPanelOpen(true)
+              } else {
+                setShowPolicyAiEditor(true)
+              }
+            }}
+            onResetSearch={() => setParams({ ...params, search: undefined })}
+          />
+        )}
+
+        <PolicyEditorPanel
+          visible={showPolicyAiEditor}
+          schema={schema}
+          searchString={searchString}
+          selectedTable={selectedTable}
+          selectedPolicy={selectedPolicyToEdit}
+          onSelectCancel={() => {
+            setSelectedTable(undefined)
+            setShowPolicyAiEditor(false)
+            setSelectedPolicyToEdit(undefined)
           }}
+          authContext="database"
         />
-      )}
 
-      <AIPolicyEditorPanel
-        visible={showPolicyAiEditor}
-        selectedPolicy={selectedPolicyToEdit}
-        onSelectCancel={() => {
-          setShowPolicyAiEditor(false)
-          setSelectedPolicyToEdit(undefined)
-        }}
-      />
-    </div>
+        <EditorPanel
+          open={editorPanelOpen}
+          onClose={() => {
+            setEditorPanelOpen(false)
+            setSelectedPolicyToEdit(undefined)
+            setSelectedTable(undefined)
+          }}
+          onRunSuccess={() => {
+            setEditorPanelOpen(false)
+            setSelectedPolicyToEdit(undefined)
+            setSelectedTable(undefined)
+          }}
+          initialValue={
+            selectedPolicyToEdit
+              ? generatePolicyUpdateSQL(selectedPolicyToEdit)
+              : selectedTable
+                ? `create policy "replace_with_policy_name"\n  on ${schema}.${selectedTable}\n  for select\n  to authenticated\n  using (\n    true  -- Write your policy condition here\n);`
+                : ''
+          }
+          label={
+            selectedPolicyToEdit
+              ? 'RLS policies are just SQL statements that you can alter'
+              : selectedTable
+                ? `Create new RLS policy on "${selectedTable}"`
+                : ''
+          }
+          initialPrompt={
+            selectedPolicyToEdit
+              ? `Update the policy with name "${selectedPolicyToEdit.name}" in the ${selectedPolicyToEdit.schema} schema on the ${selectedPolicyToEdit.table} table. It should...`
+              : selectedTable
+                ? `Create and name a entirely new RLS policy for the "${selectedTable}" table in the ${schema} schema. The policy should...`
+                : ''
+          }
+          templates={
+            selectedPolicyToEdit
+              ? getGeneralPolicyTemplates(
+                  selectedPolicyToEdit.schema,
+                  selectedPolicyToEdit.table
+                ).map((template) => ({
+                  name: template.templateName,
+                  description: template.description,
+                  content: template.statement,
+                }))
+              : []
+          }
+        />
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
 
 AuthPoliciesPage.getLayout = (page) => (
-  <AuthLayout title="Auth">
-    <div className="h-full p-4">{page}</div>
-  </AuthLayout>
+  <DefaultLayout>
+    <AuthLayout>
+      <PageLayout
+        title="Policies"
+        subtitle="Manage Row Level Security policies for your tables"
+        secondaryActions={
+          <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+        }
+        size="large"
+      >
+        {page}
+      </PageLayout>
+    </AuthLayout>
+  </DefaultLayout>
 )
 
 export default AuthPoliciesPage

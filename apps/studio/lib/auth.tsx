@@ -1,52 +1,57 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { PropsWithChildren, useCallback, useEffect } from 'react'
-
 import {
-  AuthContext as AuthContextInternal,
   AuthProvider as AuthProviderInternal,
+  clearLocalStorage,
   gotrueClient,
+  useAuthError,
 } from 'common'
-import { useStore } from 'hooks'
+import { PropsWithChildren, useCallback, useEffect } from 'react'
+import { toast } from 'sonner'
+
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
-import { clearLocalStorage, resetSignInClicks } from './local-storage'
 
-export const AuthContext = AuthContextInternal
+const AuthErrorToaster = ({ children }: PropsWithChildren) => {
+  const error = useAuthError()
 
-export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
-  const { ui } = useStore()
-
-  // Check for unverified GitHub users after a GitHub sign in
   useEffect(() => {
-    async function handleEmailVerificationError() {
-      const { error } = await gotrueClient.initialize()
-
-      if (error?.message === GOTRUE_ERRORS.UNVERIFIED_GITHUB_USER) {
-        ui.setNotification({
-          category: 'error',
-          message:
-            'Please verify your email on GitHub first, then reach out to us at support@supabase.io to log into the dashboard',
-        })
+    if (error !== null) {
+      // Check for unverified GitHub users after a GitHub sign in
+      if (error.message === GOTRUE_ERRORS.UNVERIFIED_GITHUB_USER) {
+        toast.error(
+          'Please verify your email on GitHub first, then reach out to us at support@supabase.io to log into the dashboard'
+        )
+        return
       }
+
+      toast.error(error.message)
     }
+  }, [error])
 
-    handleEmailVerificationError()
-  }, [])
+  return children
+}
 
-  return <AuthProviderInternal alwaysLoggedIn={!IS_PLATFORM}>{children}</AuthProviderInternal>
+export const AuthProvider = ({ children }: PropsWithChildren) => {
+  return (
+    <AuthProviderInternal alwaysLoggedIn={!IS_PLATFORM}>
+      <AuthErrorToaster>{children}</AuthErrorToaster>
+    </AuthProviderInternal>
+  )
 }
 
 export { useAuth, useIsLoggedIn, useSession, useUser } from 'common'
 
 export function useSignOut() {
   const queryClient = useQueryClient()
+  const { clearStorage: clearAssistantStorage } = useAiAssistantStateSnapshot()
 
   return useCallback(async () => {
-    resetSignInClicks()
-
     const result = await gotrueClient.signOut()
     clearLocalStorage()
+    // Clear Assistant IndexedDB
+    await clearAssistantStorage()
     await queryClient.clear()
 
     return result
-  }, [queryClient])
+  }, [queryClient, clearAssistantStorage])
 }

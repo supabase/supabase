@@ -15,7 +15,7 @@ function includes(array: string[], element: string) {
  *                                  trigger shortcut event
  */
 export function useKeyboardShortcuts(
-  keyMap: { [id: string]: (event: KeyboardEvent) => void },
+  keyMap: { [id: KeyboardEvent['key']]: (event: KeyboardEvent) => void },
   whitelistNodes: string[] = [],
   whitelistClasses: string[] = []
 ) {
@@ -62,12 +62,12 @@ export function useKeyboardShortcuts(
     return event.metaKey && event.shiftKey
       ? `Command+Shift+${event.key}`
       : event.metaKey
-      ? `Command+${event.key}`
-      : event.shiftKey && event.key === 'Enter'
-      ? `Shift+${event.key}`
-      : event.ctrlKey && event.key
-      ? `Control+${event.key}`
-      : event.key
+        ? `Command+${event.key}`
+        : event.shiftKey && event.key === 'Enter'
+          ? `Shift+${event.key}`
+          : event.ctrlKey && event.key
+            ? `Control+${event.key}`
+            : event.key
   }
 
   React.useEffect(() => {

@@ -1,0 +1,91 @@
+# The spec is divided into 2 main sections:
+#   info: general information about the tool
+#   functions: public functions which the user can access
+
+configspec: '001'
+
+# This section outlines the general information for the tool.
+info:
+  id: 'gotrue' # {string} A unique ID for this tool.
+  version: 'next' # {string} The current version number of the tool.
+  title: 'GoTrue' # {string} A readable name.
+  source: 'https://github.com/supabase/gotrue' # {string} Where developers can find the source code.
+  bugs: 'https://github.com/supabase/gotrue/issues' # {string} Where developers can file bugs.
+  spec: 'https://github.com/supabase/supabase/blob/master/docs/spec/gotrue_v1_config.yaml' # {string} Where developers can find this spec (to link directly in the docs).
+  description: |
+    In a self-hosted environment, you do not have access to the Auth configuration such as third party OAuth provider settings through the Supabase dashboard. Instead, you configure them through the `docker-compose.yml` file. You can read more about the configuration in the [Self-hosting guide](/docs/guides/self-hosting/docker#configuring-services).
+
+    You can find the complete list of available configuration parameters on the README of the [Auth repository](https://github.com/supabase/auth?tab=readme-ov-file#configuration).
+  tags:
+    - id: general
+      title: General
+      description: General settings.
+
+# This section is an array of public functions which a user might need to execute.
+parameters:
+  - id: 'GOTRUE_SITE_URL' # {string} A unique identifier for this param.
+    title: 'GOTRUE_SITE_URL' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    description: |
+      The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
+  - id: 'GOTRUE_EXTERNAL_GITHUB_ENABLED' # {string} A unique identifier for this param.
+    title: 'GOTRUE_EXTERNAL_GITHUB_ENABLED' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: false
+    description: |
+      Whether the external provider, GitHub in this case, is enabled or not.
+  - id: 'GOTRUE_EXTERNAL_GITHUB_CLIENT_ID' # {string} A unique identifier for this param.
+    title: 'GOTRUE_EXTERNAL_GITHUB_CLIENT_ID' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: false
+    description: |
+      The OAuth2 Client ID registered with the external provider.
+  - id: 'GOTRUE_EXTERNAL_GITHUB_SECRET' # {string} A unique identifier for this param.
+    title: 'GOTRUE_EXTERNAL_GITHUB_SECRET' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: false
+    description: |
+      The OAuth2 Client Secret provided by the external provider when you registered.
+  - id: 'GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI' # {string} A unique identifier for this param.
+    title: 'GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: false
+    description: |
+      The URI a OAuth2 provider will redirect to with the `code` and `state` values.
+  - id: 'GOTRUE_URI_ALLOW_LIST' # {string} A unique identifier for this param.
+    title: 'GOTRUE_URI_ALLOW_LIST' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    description: |
+      A comma separated list of URIs (e.g. `"https://foo.example.com,https://*.foo.example.com,https://bar.example.com"`) which are permitted as valid `redirect_to` destinations.
+  - id: 'GOTRUE_JWT_EXP' # {string} A unique identifier for this param.
+    title: 'GOTRUE_JWT_EXP' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    description: |
+      How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).
+  - id: 'GOTRUE_DISABLE_SIGNUP' # {string} A unique identifier for this param.
+    title: 'GOTRUE_DISABLE_SIGNUP' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    description: |
+      Allow/disallow new user signups to your project.
+  - id: 'GOTRUE_EXTERNAL_EMAIL_ENABLED' # {string} A unique identifier for this param.
+    title: 'GOTRUE_EXTERNAL_EMAIL_ENABLED' # {string} Any name.
+    tags: ['general', 'email'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    description: |
+      Allow/disallow new user signups via email to your project.
+  - id: 'GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED' # {string} A unique identifier for this param.
+    title: 'GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED' # {string} Any name.
+    tags: ['general', 'email'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    description: |
+      If enabled, a user will be required to confirm any email change on both the old, and new email addresses. If disabled, only the new email is required to confirm.
+  - id: 'GOTRUE_MAILER_AUTOCONFIRM' # {string} A unique identifier for this param.
+    title: 'GOTRUE_MAILER_AUTOCONFIRM' # {string} Any name.
+    tags: ['general', 'email'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    description: |
+      If enabled, users need to confirm their email address before signing in.

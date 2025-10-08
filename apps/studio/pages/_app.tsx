@@ -1,5 +1,4 @@
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
+import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -7,62 +6,64 @@ import 'styles/editor.scss'
 import 'styles/graphiql-base.scss'
 import 'styles/grid.scss'
 import 'styles/main.scss'
+import 'styles/markdown-preview.scss'
 import 'styles/monaco.scss'
 import 'styles/react-data-grid-logs.scss'
+import 'styles/reactflow.scss'
 import 'styles/storage.scss'
 import 'styles/stripe.scss'
 import 'styles/toast.scss'
+import 'styles/typography.scss'
 import 'styles/ui.scss'
-import 'styles/reactflow.scss'
+import 'ui/build/css/themes/dark.css'
+import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { createClient } from '@supabase/supabase-js'
+import * as Sentry from '@sentry/nextjs'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-// @ts-ignore
-import Prism from 'prism-react-renderer/prism'
-import ConsentToast from 'ui/src/components/ConsentToast'
-import PortalToast from 'ui/src/layout/PortalToast'
+import { NuqsAdapter } from 'nuqs/adapters/next/pages'
+import { ErrorInfo, useCallback } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 
-import Favicons from 'components/head/Favicons'
 import {
-  AppBannerWrapper,
-  CommandMenuWrapper,
-  RouteValidationWrapper,
-} from 'components/interfaces/App'
-import {
-  FeaturePreviewContextProvider,
-  FeaturePreviewModal,
-} from 'components/interfaces/App/FeaturePreview'
-import FlagProvider from 'components/ui/Flag/FlagProvider'
-import PageTelemetry from 'components/ui/PageTelemetry'
+  FeatureFlagProvider,
+  getFlags,
+  TelemetryTagManager,
+  ThemeProvider,
+  useThemeSandbox,
+} from 'common'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
+import { RouteValidationWrapper } from 'components/interfaces/App'
+import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
+import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
+import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
+import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
-import { StoreProvider } from 'hooks'
+import { customFont, sourceCodePro } from 'fonts'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { dart } from 'lib/constants/prism'
+import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
-import { RootStore } from 'stores'
-import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
+import { Telemetry } from 'lib/telemetry'
 import { AppPropsWithLayout } from 'types'
+import { SonnerToaster, TooltipProvider } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
-dart(Prism)
+dayjs.extend(duration)
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -72,7 +73,7 @@ loader.config({
   // The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
   paths: {
     vs: IS_PLATFORM
-      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs'
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs'
       : `${BASE_PATH}/monaco-editor`,
   },
 })
@@ -83,107 +84,96 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-
-  const consentToastId = useRef<string>()
-  const [rootStore] = useState(() => new RootStore())
-
-  // [Joshen] Some issues with using createBrowserSupabaseClient
-  const [supabase] = useState(() =>
-    IS_PLATFORM
-      ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-        )
-      : undefined
-  )
+  const { appTitle } = useCustomContent(['app:title'])
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  const AuthContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
-
-  useEffect(() => {
-    // Check for telemetry consent
-    if (typeof window !== 'undefined') {
-      const onAcceptConsent = () => {
-        snap.setIsOptedInTelemetry(true)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
+  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+    Sentry.withScope(function (scope) {
+      scope.setTag('globalErrorBoundary', true)
+      const eventId = Sentry.captureException(error)
+      // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
+      if (eventId && error && typeof error === 'object') {
+        ;(error as any).sentryId = eventId
       }
+    })
 
-      const onOptOut = () => {
-        snap.setIsOptedInTelemetry(false)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        consentToastId.current = toast(
-          <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-          {
-            id: 'consent-toast',
-            position: 'bottom-right',
-            duration: Infinity,
-          }
-        )
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    console.error(error.stack)
+  }
 
   useThemeSandbox()
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Hydrate state={pageProps.dehydratedState}>
-        <StoreProvider rootStore={rootStore}>
-          <AuthContainer>
-            <ProfileProvider>
-              <FlagProvider>
-                <Head>
-                  <title>Supabase</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                </Head>
-                <Favicons />
+  const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
-                <PageTelemetry>
-                  <TooltipProvider>
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider]
+  )
+
+  return (
+    <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
+      <QueryClientProvider client={queryClient}>
+        <NuqsAdapter>
+          <Hydrate state={pageProps.dehydratedState}>
+            <AuthProvider>
+              <FeatureFlagProvider
+                API_URL={API_URL}
+                enabled={IS_PLATFORM}
+                getConfigCatFlags={getConfigCatFlags}
+              >
+                <ProfileProvider>
+                  <Head>
+                    <title>{appTitle ?? 'Supabase'}</title>
+                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                    <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
+                    {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                    <style
+                      dangerouslySetInnerHTML={{
+                        __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                      }}
+                    />
+                  </Head>
+                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                  <TooltipProvider delayDuration={0}>
                     <RouteValidationWrapper>
-                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                        <CommandMenuWrapper>
-                          <AppBannerWrapper>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
+                        <AppBannerContextProvider>
+                          <CommandProvider>
                             <FeaturePreviewContextProvider>
                               {getLayout(<Component {...pageProps} />)}
+                              <StudioCommandMenu />
                               <FeaturePreviewModal />
                             </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
-                        </CommandMenuWrapper>
+                            <SonnerToaster position="top-right" />
+                            <MonacoThemeProvider />
+                          </CommandProvider>
+                        </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
-                </PageTelemetry>
-
-                <HCaptchaLoadedStore />
-                <PortalToast />
-                <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-              </FlagProvider>
-            </ProfileProvider>
-          </AuthContainer>
-        </StoreProvider>
-      </Hydrate>
-    </QueryClientProvider>
+                  <Telemetry />
+                  {!isTestEnv && (
+                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                  )}
+                </ProfileProvider>
+              </FeatureFlagProvider>
+            </AuthProvider>
+          </Hydrate>
+        </NuqsAdapter>
+      </QueryClientProvider>
+      <TelemetryTagManager />
+    </ErrorBoundary>
   )
 }
 

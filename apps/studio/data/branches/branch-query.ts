@@ -1,19 +1,24 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+
+import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
+import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
-import { ResponseError } from 'types'
 
 export type BranchVariables = {
-  id: string
+  branchRef?: string
+  projectRef?: string
 }
 
-export async function getBranch({ id }: BranchVariables, signal?: AbortSignal) {
-  const { data, error } = await get(`/v1/branches/{branch_id}`, {
-    params: { path: { branch_id: id } },
+export async function getBranch({ branchRef }: BranchVariables, signal?: AbortSignal) {
+  if (!branchRef) throw new Error('branchRef is required')
+
+  const { data, error } = await get(`/v1/branches/{branch_id_or_ref}`, {
+    params: { path: { branch_id_or_ref: branchRef } },
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -21,11 +26,14 @@ export type BranchData = Awaited<ReturnType<typeof getBranch>>
 export type BranchError = ResponseError
 
 export const useBranchQuery = <TData = BranchData>(
-  { id }: BranchVariables,
+  { projectRef, branchRef }: BranchVariables,
   { enabled = true, ...options }: UseQueryOptions<BranchData, BranchError, TData> = {}
 ) =>
   useQuery<BranchData, BranchError, TData>(
-    branchKeys.detail(id),
-    ({ signal }) => getBranch({ id }, signal),
-    { enabled: enabled && typeof id !== 'undefined', ...options }
+    branchKeys.detail(projectRef, branchRef),
+    ({ signal }) => getBranch({ branchRef }, signal),
+    {
+      enabled: IS_PLATFORM && enabled && Boolean(branchRef),
+      ...options,
+    }
   )

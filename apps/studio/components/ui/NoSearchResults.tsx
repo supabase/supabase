@@ -6,7 +6,11 @@ export interface NoSearchResultsProps {
   className?: string
 }
 
-const NoSearchResults = ({ searchString, onResetFilter, className }: NoSearchResultsProps) => {
+export const NoSearchResults = ({
+  searchString,
+  onResetFilter,
+  className,
+}: NoSearchResultsProps) => {
   return (
     <div
       className={cn(
@@ -15,7 +19,7 @@ const NoSearchResults = ({ searchString, onResetFilter, className }: NoSearchRes
       )}
     >
       <div className="space-y-1">
-        <p className="text-sm text-foreground-light">No results found</p>
+        <p className="text-sm text-foreground">No results found</p>
         <p className="text-sm text-foreground-light">
           Your search for "{searchString}" did not return any results
         </p>

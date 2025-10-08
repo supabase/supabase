@@ -1,43 +1,46 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
 export type DatabasePolicyUpdateVariables = {
   projectRef: string
-  connectionString?: string
-  id: number
-  payload: {
+  connectionString?: string | null
+  originalPolicy: {
+    id: number
     name: string
-    definition: string
-    check: string
-    roles: string[]
+    schema: string
+    table: string
+  }
+  payload: {
+    name?: string
+    definition?: string
+    check?: string
+    roles?: string[]
   }
 }
 
 export async function updateDatabasePolicy({
   projectRef,
   connectionString,
-  id,
+  originalPolicy,
   payload,
 }: DatabasePolicyUpdateVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { data, error } = await patch('/platform/pg-meta/{ref}/policies', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body: payload,
-    headers,
+  const { sql } = pgMeta.policies.update(originalPolicy, payload)
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['policy', 'update', originalPolicy.id],
   })
 
-  if (error) throw error
-  return data
+  return result
 }
 
 type DatabasePolicyUpdateData = Awaited<ReturnType<typeof updateDatabasePolicy>>

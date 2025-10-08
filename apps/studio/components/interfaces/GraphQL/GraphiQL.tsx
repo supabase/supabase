@@ -32,18 +32,13 @@ import {
 } from '@graphiql/react'
 import { Fetcher } from '@graphiql/toolkit'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
+import { AlertTriangle, XIcon } from 'lucide-react'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions, useLocalStorage } from 'hooks'
-import { XIcon } from 'lucide-react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-} from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
 
@@ -71,7 +66,7 @@ interface GraphiQLInterfaceProps {
   theme: 'dark' | 'light'
 }
 
-export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
+const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
@@ -81,10 +76,13 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
 
-  const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
+  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'field.jwt_secret'
+  )
 
   const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
-    'graphiql-rls-bypass-warning-dismissed',
+    LOCAL_STORAGE_KEYS.GRAPHIQL_RLS_BYPASS_WARNING,
     false
   )
 
@@ -100,7 +98,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     direction: 'horizontal',
     initiallyHidden: pluginContext?.visiblePlugin ? undefined : 'second',
     onHiddenElementChange: (resizableElement) => {
-      if (resizableElement === 'first') {
+      if (resizableElement === 'second') {
         pluginContext?.setVisiblePlugin(null)
       }
     },
@@ -203,15 +201,15 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
   return (
     <Tooltip.Provider>
-      <div className={clsx('graphiql-container', styles.graphiqlContainer)}>
+      <div className={cn('graphiql-container', styles.graphiqlContainer)}>
         <div className="graphiql-main">
           <div
             ref={pluginResize.firstRef}
-            style={{ minWidth: 0 }}
-            className={clsx('graphiql-sessions', styles.graphiqlSessions)}
+            style={{ minWidth: '750px' }}
+            className={cn('graphiql-sessions', styles.graphiqlSessions)}
           >
             <div
-              className={clsx(
+              className={cn(
                 'graphiql-session-header',
                 !hasSingleTab && styles.graphiqlSessionHeader
               )}
@@ -260,12 +258,12 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
             <div
               role="tabpanel"
               id="graphiql-session"
-              className={clsx('graphiql-session', styles.graphiqlSession)}
+              className={cn('graphiql-session', styles.graphiqlSession)}
               aria-labelledby={`graphiql-session-tab-${editorContext.activeTabIndex}`}
             >
               <div ref={editorResize.firstRef}>
                 <div
-                  className={clsx(
+                  className={cn(
                     'graphiql-editors',
                     styles.graphiqlEditors,
                     hasSingleTab && 'full-height'
@@ -273,7 +271,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 >
                   <div ref={editorToolsResize.firstRef}>
                     <section
-                      className={clsx('graphiql-query-editor text-sm', styles.graphiqlQueryEditor)}
+                      className={cn('graphiql-query-editor text-sm', styles.graphiqlQueryEditor)}
                       aria-label="Query Editor"
                     >
                       <QueryEditor onClickReference={onClickReference} />
@@ -371,7 +369,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
                       {canReadJWTSecret && (
                         <div
-                          className={clsx(
+                          className={cn(
                             'graphiql-editor px-1',
                             activeSecondaryEditor !== 'role-impersonation' && 'hidden'
                           )}
@@ -385,13 +383,13 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
               </div>
 
               <div
-                className={clsx('graphiql-horizontal-drag-bar', styles.graphiqlHorizontalDragBar)}
+                className={cn('graphiql-horizontal-drag-bar', styles.graphiqlHorizontalDragBar)}
                 ref={editorResize.dragBarRef}
               />
 
               <div ref={editorResize.secondRef}>
                 <div
-                  className={clsx(
+                  className={cn(
                     'graphiql-response text-sm relative',
                     hasSingleTab
                       ? styles.graphiqlResponseSingleTab
@@ -403,7 +401,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
                   {!rlsBypassedWarningDismissed && (
                     <Alert_Shadcn_ variant="warning" className="absolute bottom-[5px] right-[5px]">
-                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTriangle strokeWidth={2} />
                       <AlertTitle_Shadcn_ className="leading-5 text-foreground">
                         Please note that queries and mutations run in GraphiQL now use the service
                         role key by default.
@@ -444,7 +442,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
             <div className="graphiql-plugin">{PluginContent ? <PluginContent /> : null}</div>
           </div>
         </div>
-        <div className={clsx('graphiql-sidebar', styles.graphiqlSidebar)}>
+        <div className={cn('graphiql-sidebar', styles.graphiqlSidebar)}>
           <div className="graphiql-sidebar-section">
             {pluginContext?.plugins.map((plugin, index) => {
               const isVisible = plugin === pluginContext.visiblePlugin

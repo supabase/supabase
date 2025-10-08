@@ -1,8 +1,3 @@
-.dark .sbui-default-button--dark-white {
-  @apply shadow-md text-typography-body-light border-gray-50 bg-white #{!important};
-  text-shadow: none !important;
-}
-
 /* Brought over from platform to be cleaned if needed */
 
 /* Form panels */
@@ -124,7 +119,7 @@
 }
 
 .table-container thead th:first-child {
-  @apply pl-6 rounded rounded-r-none rounded-b-none;
+  @apply rounded rounded-r-none rounded-b-none;
   @apply border-l;
 }
 
@@ -150,11 +145,11 @@
 }
 
 .table-container tbody td:first-child {
-  @apply pl-6 border-b border-l border-default;
+  @apply pl-4 border-b border-l border-default;
 }
 
 .table-container tbody td:last-child {
-  @apply pr-6 border-b border-r border-default;
+  @apply pr-4 border-b border-r border-default;
 }
 
 .table-container tbody tr:last-child td:first-child {
@@ -347,14 +342,6 @@
 
   // for Firefox
   scrollbar-width: none; // auto | thin | none | <length>;
-}
-
-.SQLTabContainer {
-  height: calc(100vh - 3rem);
-  min-height: calc(100vh - 3rem);
-  .gutter {
-    cursor: row-resize;
-  }
 }
 
 .radix-tooltip-arrow {

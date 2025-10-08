@@ -58,7 +58,7 @@
 Η Supabase είναι μια [φιλοξενούμενη πλατφόρμα](https://supabase.com/dashboard). Μπορείτε να εγγραφείτε και να αρχίσετε να χρησιμοποιείτε το Supabase χωρίς να εγκαταστήσετε τίποτα.
 Μπορείτε επίσης να κάνετε [αυτο-ξενάγηση](https://supabase.com/docs/guides/hosting/overview) και [ανάπτυξη τοπικά](https://supabase.com/docs/guides/local-development).
 
-![Αρχιτεκτονική](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Αρχιτεκτονική](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - η [PostgreSQL](https://www.postgresql.org/) είναι ένα αντικειμενο-σχεσιακό σύστημα βάσεων δεδομένων με πάνω από 30 χρόνια ενεργής ανάπτυξης που του έχει αποφέρει μια ισχυρή φήμη για την αξιοπιστία, την ευρωστία των χαρακτηριστικών και την απόδοση.
 - [Realtime](https://github.com/supabase/realtime) είναι ένας διακομιστής Elixir που σας επιτρέπει να ακούτε τις εισαγωγές, ενημερώσεις και διαγραφές της PostgreSQL χρησιμοποιώντας websockets. Το Realtime ρωτάει την ενσωματωμένη λειτουργία αντιγραφής της Postgres για αλλαγές στη βάση δεδομένων, μετατρέπει τις αλλαγές σε JSON και στη συνέχεια μεταδίδει το JSON μέσω websockets σε εξουσιοδοτημένους πελάτες.

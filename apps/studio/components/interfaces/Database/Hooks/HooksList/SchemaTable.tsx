@@ -1,24 +1,24 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 
 import Table from 'components/to-be-cleaned/Table'
-import HookList from './HookList'
+import { HookList } from './HookList'
 
 interface SchemaTableProps {
   schema: string
   filterString: string
-  editHook: (hook: any) => void
-  deleteHook: (hook: any) => void
+  editHook: (hook: PostgresTrigger) => void
+  deleteHook: (hook: PostgresTrigger) => void
 }
 
-const SchemaTable = ({
+export const SchemaTable = ({
   schema,
   filterString,
   editHook = noop,
   deleteHook = noop,
 }: SchemaTableProps) => {
   return (
-    <div key={schema} className="">
+    <div key={schema}>
       <div className="sticky top-0 backdrop-blur backdrop-filter">
         <div className="flex items-baseline space-x-1 py-2">
           <h5 className="text-foreground-light">schema</h5>
@@ -56,5 +56,3 @@ const SchemaTable = ({
     </div>
   )
 }
-
-export default observer(SchemaTable)

@@ -1,26 +1,30 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
-import { ExternalLinkIcon } from 'lucide-react'
+import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useStore } from 'hooks'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertTriangle,
-  IconDatabase,
-  IconPlus,
   Input,
   Listbox,
   Modal,
+  WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+
+const orioleExtCallOuts = ['vector', 'postgis']
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -29,18 +33,22 @@ interface EnableExtensionModalProps {
 }
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
-  const { project } = useProjectContext()
-  const { meta } = useStore()
+  const { data: project } = useSelectedProjectQuery()
+  const isOrioleDb = useIsOrioleDb()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: visible }
+  )
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
-      toast.success(`${extension.name} is on.`)
+      toast.success(`Extension "${extension.name}" is now enabled`)
       onCancel()
     },
     onError: (error) => {
@@ -62,10 +70,15 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
           setFetchingSchemaInfo(true)
           setDefaultSchema(undefined)
         }
-        const res = await meta.query(
-          `select * from pg_available_extension_versions where name = '${extension.name}'`
-        )
-        if (!res.error && !cancel) setDefaultSchema(res[0].schema)
+        try {
+          const res = await executeSql({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            sql: `select * from pg_available_extension_versions where name = '${extension.name}'`,
+          })
+          if (!cancel) setDefaultSchema(res.result[0].schema)
+        } catch (error) {}
+
         setFetchingSchemaInfo(false)
       }
       checkExtensionSchema()
@@ -89,8 +102,8 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       defaultSchema !== undefined && defaultSchema !== null
         ? defaultSchema
         : values.schema === 'custom'
-        ? values.name
-        : values.schema
+          ? values.name
+          : values.schema
 
     enableExtension({
       projectRef: project.ref,
@@ -111,7 +124,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       size="small"
       header={
         <div className="flex items-baseline gap-2">
-          <h5 className="text-sm text-foreground">Confirm to enable</h5>
+          <h5 className="text-foreground">Confirm to enable</h5>
           <code className="text-xs">{extension.name}</code>
         </div>
       }
@@ -126,8 +139,18 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       >
         {({ values }: any) => {
           return (
-            <div className="space-y-4 py-4">
-              <Modal.Content>
+            <>
+              <Modal.Content className="flex flex-col gap-y-2">
+                {isOrioleDb && orioleExtCallOuts.includes(extension.name) && (
+                  <Admonition type="default" title="Extension is limited by OrioleDB">
+                    <span className="block">
+                      {extension.name} cannot be accelerated by indexes on tables that are using the
+                      OrioleDB access method
+                    </span>
+                    <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
+                  </Admonition>
+                )}
+
                 {fetchingSchemaInfo || isSchemasLoading ? (
                   <div className="space-y-2">
                     <ShimmeringLoader />
@@ -155,24 +178,31 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       id="custom"
                       label={`Create a new schema "${extension.name}"`}
                       value="custom"
-                      addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                      addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
                     >
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
                     <Modal.Separator />
-                    {schemas?.map((schema) => {
-                      return (
-                        <Listbox.Option
-                          key={schema.id}
-                          id={schema.name}
-                          label={schema.name}
-                          value={schema.name}
-                          addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
-                        >
-                          {schema.name}
-                        </Listbox.Option>
+                    {schemas
+                      ?.filter(
+                        (schema) =>
+                          !protectedSchemas.some(
+                            (protectedSchema) => protectedSchema.name === schema.name
+                          )
                       )
-                    })}
+                      .map((schema) => {
+                        return (
+                          <Listbox.Option
+                            key={schema.id}
+                            id={schema.name}
+                            label={schema.name}
+                            value={schema.name}
+                            addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
+                          >
+                            {schema.name}
+                          </Listbox.Option>
+                        )
+                      })}
                   </Listbox>
                 )}
               </Modal.Content>
@@ -186,14 +216,14 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
               {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
                 <Modal.Content>
                   <Alert_Shadcn_ variant="warning">
-                    <IconAlertTriangle strokeWidth={2} />
+                    <WarningIcon />
                     <AlertTitle_Shadcn_>
                       The pg_cron extension is not fully supported for Fly projects
                     </AlertTitle_Shadcn_>
 
                     <AlertDescription_Shadcn_>
                       You can still enable the extension, but pg_cron jobs may not run due to the
-                      behaviour of Fly projects.
+                      behavior of Fly projects.
                     </AlertDescription_Shadcn_>
 
                     <AlertDescription_Shadcn_ className="mt-3">
@@ -214,19 +244,16 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                   </Alert_Shadcn_>
                 </Modal.Content>
               )}
-
               <Modal.Separator />
-              <Modal.Content>
-                <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
-                    Enable extension
-                  </Button>
-                </div>
+              <Modal.Content className="flex items-center justify-end space-x-2">
+                <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
+                  Enable extension
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

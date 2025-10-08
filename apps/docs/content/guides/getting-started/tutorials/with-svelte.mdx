@@ -1,0 +1,130 @@
+---
+title: 'Build a User Management App with Svelte'
+description: 'Learn how to use Supabase in your Svelte App.'
+---
+
+<$Partial path="quickstart_intro.mdx" />
+
+![Supabase User Management example](/docs/img/user-management-demo.png)
+
+<Admonition type="note">
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/svelte-user-management).
+
+</Admonition>
+
+<$Partial path="project_setup.mdx" />
+
+## Building the app
+
+Start building the Svelte app from scratch.
+
+### Initialize a Svelte app
+
+You can use the Vite Svelte TypeScript Template to initialize an app called `supabase-svelte`:
+
+```bash
+npm create vite@latest supabase-svelte -- --template svelte-ts
+cd supabase-svelte
+npm install
+```
+
+Install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+
+```bash
+npm install @supabase/supabase-js
+```
+
+Finally, save the environment variables in a `.env`.
+All you need are the API URL and the key that you copied [earlier](#get-api-details).
+
+<$CodeTabs>
+
+```bash name=.env
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
+```
+
+</$CodeTabs>
+
+Now you have the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed on the browser, and that's fine since you have [Row Level Security](/docs/guides/auth#row-level-security) enabled on the Database.
+
+<$CodeSample
+path="user-management/svelte-user-management/src/supabaseClient.ts"
+meta="name=src/supabaseClient.ts"
+/>
+
+### App styling (optional)
+
+Optionally, update the CSS file `src/app.css` to make the app look nice.
+You can find the full contents of this file [on GitHub](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
+
+### Set up a login component
+
+Set up a Svelte component to manage logins and sign ups. It uses Magic Links, so users can sign in with their email without using passwords.
+
+<$CodeSample
+path="user-management/svelte-user-management/src/lib/Auth.svelte"
+meta="name=src/lib/Auth.svelte"
+/>
+
+### Account page
+
+After a user is signed in, allow them to edit their profile details and manage their account.
+Create a new component for that called `Account.svelte`.
+
+<$CodeSample  
+path="/user-management/svelte-user-management/src/lib/Account.svelte"
+lines={[[1, 4], [7, 11], [14, 33], [34,53], [55,73], [75,-1]]}
+meta="src/lib/Account.svelte"
+/>
+
+### Launch!
+
+Now that you have all the components in place, update `App.svelte`:
+
+<$CodeSample
+path="user-management/svelte-user-management/src/App.svelte"
+meta="name=src/App.svelte"
+/>
+
+Once that's done, run this in a terminal window:
+
+```bash
+npm run dev
+```
+
+And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
+
+<Admonition type="tip">
+
+Svelte uses Vite and the default port is `5173`, Supabase uses `port 3000`. To change the redirection port for Supabase go to: **Authentication > URL Configuration** and change the **Site URL** to `http://localhost:5173/`
+
+</Admonition>
+
+![Supabase Svelte](/docs/img/supabase-svelte-demo.png)
+
+## Bonus: Profile photos
+
+Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+
+### Create an upload widget
+
+Create an avatar for the user so that they can upload a profile photo. Start by creating a new component:
+
+<$CodeSample
+path="user-management/svelte-user-management/src/lib/Avatar.svelte"
+meta="name=src/lib/Avatar.svelte"
+/>
+
+### Add the new widget
+
+And then you can add the widget to the Account page:
+
+<$CodeSample  
+path="/user-management/svelte-user-management/src/lib/Account.svelte"
+lines={[[1,1], [5,5], [71,73], [74,74], [92,-1]]}
+meta="src/lib/Account.svelte"
+/>
+
+At this stage you have a fully functional application!

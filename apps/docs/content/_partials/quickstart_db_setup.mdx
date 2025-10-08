@@ -1,0 +1,68 @@
+<StepHikeCompact.Details title="Create a Supabase project">
+
+Go to [database.new](https://database.new) and create a new Supabase project.
+
+Alternatively, you can create a project using the Management API:
+
+```bash
+# First, get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+
+# List your organizations to get the organization ID
+curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  https://api.supabase.com/v1/organizations
+
+# Create a new project (replace <org-id> with your organization ID)
+curl -X POST https://api.supabase.com/v1/projects \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "organization_id": "<org-id>",
+    "name": "My Project",
+    "region": "us-east-1",
+    "db_pass": "<your-secure-password>"
+  }'
+```
+
+When your project is up and running, go to the [Table Editor](/dashboard/project/_/editor), create a new table and insert some data.
+
+Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create a `instruments` table with some sample data.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+    ```sql SQL_EDITOR
+    -- Create the table
+    create table instruments (
+      id bigint primary key generated always as identity,
+      name text not null
+    );
+    -- Insert some sample data into the table
+    insert into instruments (name)
+    values
+      ('violin'),
+      ('viola'),
+      ('cello');
+
+    alter table instruments enable row level security;
+    ```
+
+</StepHikeCompact.Code>
+
+<StepHikeCompact.Details>
+
+Make the data in your table publicly readable by adding an RLS policy:
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+    ```sql SQL_EDITOR
+    create policy "public can read instruments"
+    on public.instruments
+    for select to anon
+    using (true);
+    ```
+
+</StepHikeCompact.Code>

@@ -1,0 +1,12 @@
+[package]
+name = "add-wasm"
+version = "0.1.0"
+description = "A simple wasm module that adds two numbers"
+license = "MIT/Apache-2.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"

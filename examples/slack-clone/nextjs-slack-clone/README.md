@@ -3,19 +3,24 @@
 This is a full-stack Slack clone example using:
 
 - Frontend:
-  - Next.js.
+  - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
   - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
   - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Demo
 
-- Live demo: http://supabase-slack-clone-supabase.vercel.app/
 - CodeSandbox: https://codesandbox.io/s/github/supabase/supabase/tree/master/examples/nextjs-slack-clone
 
 ![Demo animation gif](./public/slack-clone-demo.gif)
 
-## Deploy your own
+## Deploy with Vercel
+
+The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone&project-name=supabase-nextjs-slack-clone&repository-name=supabase-nextjs-slack-clone&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone)
+
+## Build from scratch
 
 ### 1. Create new project
 
@@ -37,62 +42,49 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 **_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
-### 4. Deploy the Next.js client
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20supabase.com/dashboard&project-name=supabase-slack-clone&repo-name=supabase-slack-clone)
-
-Here, we recommend forking this repo so you can deploy through Vercel by clicking the button above. When you click the button, replace the repo URL with your fork's URL.
-
-You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Use the API URL and `anon` key from [step 3](#3-get-the-url-and-key).
-
-### 5. Change authentication settings if necessary
-
-![Change auth settings](https://user-images.githubusercontent.com/1811651/101840012-39be3800-3af8-11eb-8c32-73f2fae6299e.png)
-
-On [supabase.com/dashboard](https://supabase.com/dashboard), you can go to Authentication -> Settings to change your auth settings for your project if necessary. Here, you can change the site URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
-
-Here, you can also enable external oauth providers, such as Google and GitHub.
-
-## How to use
-
-### Using this repo
-
-Simply clone this repo locally and proceed to the next section.
-
-### Required configuration
-
-Copy the `.env.local.example` file into a file named `.env.local` in the root directory of the example:
-
-```bash
-cp .env.local.example .env.local
-```
-
-Set your Supabase details from [step 3](#3-get-the-url-and-key) above:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=<replace-with-your-API-url>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<replace-with-your-anon-key>
-```
-
-### Change authentication settings if necessary
-
-Follow [Step #5](#5-change-authentication-settings-if-necessary) above if you want to change the auth settings.
-
-### Run the development server
-
-Now install the dependencies and start the development server.
-
-```bash
-npm install
-npm run dev
-# or
-yarn
-yarn dev
-```
-
-Visit http://localhost:3000 and start chatting! Open a channel across two browser tabs to see everything getting updated in realtime 🥳
-
 ## Supabase details
+
+### Using a Remote Supabase Project
+
+1. Create or select a project on [Supabase Dashboard](https://supabase.com/dashboard).
+2. Copy and fill the dotenv template `cp .env.production.example .env.production`
+3. Link the local project and merge the local configuration with the remote one:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest link --project-ref <your-project-ref>
+```
+
+3. Sync the configuration:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest config push
+```
+
+4. Sync the database schema:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest db push
+```
+
+## Vercel Preview with Branching
+
+Supabase integrates seamlessly with Vercel's preview branches, giving each branch a dedicated Supabase project. This setup allows testing database migrations or service configurations safely before applying them to production.
+
+### Steps
+
+1. Ensure the Vercel project is linked to a Git repository.
+2. Configure the "Preview" environment variables in Vercel:
+
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+3. Create a new branch, make changes (e.g., update `max_frequency`), and push the branch to Git.
+   - Open a pull request to trigger Vercel + Supabase integration.
+   - Upon successful deployment, the preview environment reflects the changes.
+
+![Preview Checks](https://github.com/user-attachments/assets/db688cc2-60fd-4463-bbed-e8ecc11b1a39)
+
+---
 
 ### Role-based access control (RBAC)
 
@@ -110,178 +102,13 @@ Users with the `moderator` role can delete all messages. Users with the `admin` 
 
 ### Postgres Row level security
 
-This project uses very high-level Authorization using Postgres' Role Level Security.
+This project uses very high-level Authorization using Postgres' Row Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
-Full schema here with role-based access control:
-
-```sql
---
--- For use with https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
---
-
--- Custom types
-create type public.app_permission as enum ('channels.delete', 'messages.delete');
-create type public.app_role as enum ('admin', 'moderator');
-create type public.user_status as enum ('ONLINE', 'OFFLINE');
-
--- USERS
-create table public.users (
-  id          uuid not null primary key, -- UUID from auth.users
-  username    text,
-  status      user_status default 'OFFLINE'::public.user_status
-);
-comment on table public.users is 'Profile data for each user.';
-comment on column public.users.id is 'References the internal Supabase Auth user.';
-
--- CHANNELS
-create table public.channels (
-  id            bigint generated by default as identity primary key,
-  inserted_at   timestamp with time zone default timezone('utc'::text, now()) not null,
-  slug          text not null unique,
-  created_by    uuid references public.users not null
-);
-comment on table public.channels is 'Topics and groups.';
-
--- MESSAGES
-create table public.messages (
-  id            bigint generated by default as identity primary key,
-  inserted_at   timestamp with time zone default timezone('utc'::text, now()) not null,
-  message       text,
-  user_id       uuid references public.users not null,
-  channel_id    bigint references public.channels on delete cascade not null
-);
-comment on table public.messages is 'Individual messages sent by each user.';
-
--- USER ROLES
-create table public.user_roles (
-  id        bigint generated by default as identity primary key,
-  user_id   uuid references public.users on delete cascade not null,
-  role      app_role not null,
-  unique (user_id, role)
-);
-comment on table public.user_roles is 'Application roles for each user.';
-
--- ROLE PERMISSIONS
-create table public.role_permissions (
-  id           bigint generated by default as identity primary key,
-  role         app_role not null,
-  permission   app_permission not null,
-  unique (role, permission)
-);
-comment on table public.role_permissions is 'Application permissions for each role.';
-
--- authorize with role-based access control (RBAC)
-create function public.authorize(
-  requested_permission app_permission,
-  user_id uuid
-)
-returns boolean as $$
-declare
-  bind_permissions int;
-begin
-  select count(*)
-  from public.role_permissions
-  inner join public.user_roles on role_permissions.role = user_roles.role
-  where role_permissions.permission = authorize.requested_permission
-    and user_roles.user_id = authorize.user_id
-  into bind_permissions;
-
-  return bind_permissions > 0;
-end;
-$$ language plpgsql security definer;
-
--- Secure the tables
-alter table public.users enable row level security;
-alter table public.channels enable row level security;
-alter table public.messages enable row level security;
-alter table public.user_roles enable row level security;
-alter table public.role_permissions enable row level security;
-create policy "Allow logged-in read access" on public.users for select using ( auth.role() = 'authenticated' );
-create policy "Allow individual insert access" on public.users for insert with check ( auth.uid() = id );
-create policy "Allow individual update access" on public.users for update using ( auth.uid() = id );
-create policy "Allow logged-in read access" on public.channels for select using ( auth.role() = 'authenticated' );
-create policy "Allow individual insert access" on public.channels for insert with check ( auth.uid() = created_by );
-create policy "Allow individual delete access" on public.channels for delete using ( auth.uid() = created_by );
-create policy "Allow authorized delete access" on public.channels for delete using ( authorize('channels.delete', auth.uid()) );
-create policy "Allow logged-in read access" on public.messages for select using ( auth.role() = 'authenticated' );
-create policy "Allow individual insert access" on public.messages for insert with check ( auth.uid() = user_id );
-create policy "Allow individual update access" on public.messages for update using ( auth.uid() = user_id );
-create policy "Allow individual delete access" on public.messages for delete using ( auth.uid() = user_id );
-create policy "Allow authorized delete access" on public.messages for delete using ( authorize('messages.delete', auth.uid()) );
-create policy "Allow individual read access" on public.user_roles for select using ( auth.uid() = user_id );
-
--- Send "previous data" on change
-alter table public.users replica identity full;
-alter table public.channels replica identity full;
-alter table public.messages replica identity full;
-
--- inserts a row into public.users and assigns roles
-create function public.handle_new_user()
-returns trigger as $$
-declare is_admin boolean;
-begin
-  insert into public.users (id, username)
-  values (new.id, new.email);
-
-  select count(*) = 1 from auth.users into is_admin;
-
-  if position('+supaadmin@' in new.email) > 0 then
-    insert into public.user_roles (user_id, role) values (new.id, 'admin');
-  elsif position('+supamod@' in new.email) > 0 then
-    insert into public.user_roles (user_id, role) values (new.id, 'moderator');
-  end if;
-
-  return new;
-end;
-$$ language plpgsql security definer;
-
--- trigger the function every time a user is created
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
-
-/**
- * REALTIME SUBSCRIPTIONS
- * Only allow realtime listening on public tables.
- */
-
-begin;
-  -- remove the realtime publication
-  drop publication if exists supabase_realtime;
-
-  -- re-create the publication but don't enable it for any tables
-  create publication supabase_realtime;
-commit;
-
--- add tables to the publication
-alter publication supabase_realtime add table public.channels;
-alter publication supabase_realtime add table public.messages;
-alter publication supabase_realtime add table public.users;
-
--- DUMMY DATA
-insert into public.users (id, username)
-values
-    ('8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e', 'supabot');
-
-insert into public.channels (slug, created_by)
-values
-    ('public', '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e'),
-    ('random', '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e');
-
-insert into public.messages (message, channel_id, user_id)
-values
-    ('Hello World 👋', 1, '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e'),
-    ('Perfection is attained, not when there is nothing more to add, but when there is nothing left to take away.', 2, '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e');
-
-insert into public.role_permissions (role, permission)
-values
-    ('admin', 'channels.delete'),
-    ('admin', 'messages.delete'),
-    ('moderator', 'messages.delete');
-```
+- For the full schema refer to [full-schema.sql](./full-schema.sql).
+- For documentation on Role-based Access Control, refer to the [docs](https://supabase.com/docs/guides/auth/custom-claims-and-role-based-access-control-rbac).
 
 ## Authors
 

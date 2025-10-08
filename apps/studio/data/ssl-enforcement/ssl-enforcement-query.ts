@@ -1,17 +1,8 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
 import { sslEnforcementKeys } from './keys'
 
 export type SSLEnforcementVariables = { projectRef?: string }
-
-export type SSLEnforcementResponse = {
-  appliedSuccessfully: boolean
-  currentConfig: { database: boolean }
-  error?: any
-  isNotAllowed?: boolean
-}
 
 export async function getSSLEnforcementConfiguration(
   { projectRef }: SSLEnforcementVariables,
@@ -19,29 +10,30 @@ export async function getSSLEnforcementConfiguration(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = (await get(`${API_ADMIN_URL}/projects/${projectRef}/ssl-enforcement`, {
+  const { data, error } = await get(`/v1/projects/{ref}/ssl-enforcement`, {
+    params: { path: { ref: projectRef } },
     signal,
-  })) as SSLEnforcementResponse
+  })
 
   // Not allowed error is a valid response to denote if a project
   // has access to the SSL enforcement UI, so we'll handle it here
-  if (response.error) {
+  if (error) {
     const isNotAllowedError =
-      (response.error as any)?.code === 400 &&
-      (response.error as any)?.message?.includes('not allowed to configure SSL enforcements')
+      (error as any)?.code === 400 &&
+      (error as any)?.message?.includes('not allowed to configure SSL enforcements')
 
     if (isNotAllowedError) {
       return {
         appliedSuccessfully: false,
         currentConfig: { database: false },
         isNotAllowed: true,
-      } as SSLEnforcementResponse
+      } as const
     } else {
-      throw response.error
+      handleError(error)
     }
   }
 
-  return response as SSLEnforcementResponse
+  return data
 }
 
 export type SSLEnforcementData = Awaited<ReturnType<typeof getSSLEnforcementConfiguration>>
@@ -59,15 +51,3 @@ export const useSSLEnforcementQuery = <TData = SSLEnforcementData>(
     ({ signal }) => getSSLEnforcementConfiguration({ projectRef }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-
-export const useSSLEnforcementPrefetch = ({ projectRef }: SSLEnforcementVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(sslEnforcementKeys.list(projectRef), ({ signal }) =>
-        getSSLEnforcementConfiguration({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

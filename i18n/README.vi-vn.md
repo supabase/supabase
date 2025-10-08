@@ -58,7 +58,7 @@ Supabase là sự kết hợp của các công cụ mã nguồn mở. Các tính
 Supabase là một [nền tảng lưu trữ cơ sở dữ liệu](https://supabase.com/dashboard). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì.
 Bạn cũng có thể [tự quản lý](https://supabase.com/docs/guides/hosting/overview) và [phát triển cục bộ](https://supabase.com/docs/guides/local-development).
 
-![Kiến trúc](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Kiến trúc](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) là một hệ thống cơ sở dữ liệu quan hệ đối tượng với hơn 30 năm phát triển tích cực, do đó có danh tiếng mạnh mẽ về độ tin cậy, tính năng mạnh mẽ và hiệu suất.
 - [Realtime](https://github.com/supabase/realtime) là một máy chủ Elixir cho phép bạn lắng nghe các lệnh chèn, cập nhật và xóa của PostgreSQL bằng cách sử dụng websockets. Supabase lắng nghe chức năng sao chép có sẵn của Postgres, chuyển đổi luồng byte sao chép thành JSON, sau đó phát JSON qua các cổng websockets được uỷ quyền.

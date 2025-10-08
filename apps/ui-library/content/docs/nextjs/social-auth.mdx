@@ -1,0 +1,67 @@
+---
+title: Social Authentication
+description: Social authentication block for Next.js
+---
+
+<BlockPreview name="social-auth/auth/login" />
+
+<Callout className="mt-4">
+  The block is using Github provider by default, but can be easily switched by changing a single
+  parameter.
+</Callout>
+
+## Installation
+
+<BlockItem name="social-auth-nextjs" description="All needed components for the social auth flow" />
+
+## Folder structure
+
+This block includes the [Supabase client](/ui/docs/nextjs/client). If you already have one installed, you can skip overwriting it.
+
+<RegistryBlock itemName="social-auth-nextjs" />
+
+## Usage
+
+Once you install the block in your Next.js project, you'll get all the necessary pages and components to set up a social authentication flow.
+
+### Getting started
+
+After installing the block, you'll have the following environment variables in your `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
+
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+### Setting up third party providers
+
+We support a wide variety of social providers that you can use to integrate with your application. The full list is available [here](https://supabase.com/docs/guides/auth/social-login).
+This block uses the PKCE flow with GitHub as the provider. To switch providers, just update the `provider` field in the `supabase.auth.signInWithOAuth` call. Enable the provider you want to use under [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers) in the Supabase Dashboard and add the necessary credentials.
+
+### Setting up routes and redirect URLs
+
+1. Set the site URL in the [URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration) settings in the Supabase Dashboard.
+1. Update the redirect paths in `login-form.tsx` to point to your app’s logged-in routes. Our examples use `/protected`, but you can set this to whatever fits your app.
+1. Visit `http://your-site-url/auth/login` to see this component in action.
+
+<Callout type="info">
+
+You can use this block with the Pages router by simply moving the routes from the `app` folder into the `pages` folder and renaming them. Example instead of `app/login/page.tsx`, you'd create a `pages/login.tsx` file.
+
+</Callout>
+
+### Combining social auth with password-based auth
+
+If you want to combine this block with the password-based auth, you need to:
+
+- Copy the `handleSocialLogin` function into the password-based `login-form.tsx` component and bind it to a "Login with ..." button.
+- Copy the `@/app/auth/oauth/route.ts` in your app under the same route.
+
+## Further reading
+
+- [Social login](https://supabase.com/docs/guides/auth/social-login)
+- [Authentication error codes](https://supabase.com/docs/guides/auth/debugging/error-codes)

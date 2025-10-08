@@ -1,18 +1,12 @@
-export type Json = Record<
-  string,
-  string | number | boolean | null | Json[] | { [key: string]: Json }
->
-
-export type Section = {
-  content: string
-  heading?: string
-  slug?: string
-}
+import type { Section } from '../../helpers.mdx.js'
 
 export abstract class BaseLoader {
   type: string
 
-  constructor(public source: string, public path: string) {}
+  constructor(
+    public source: string,
+    public path: string
+  ) {}
 
   abstract load(): Promise<BaseSource[]>
 }
@@ -20,12 +14,20 @@ export abstract class BaseLoader {
 export abstract class BaseSource {
   type: string
   checksum?: string
-  meta?: Json
+  meta?: Record<string, unknown>
   sections?: Section[]
 
-  constructor(public source: string, public path: string) {}
+  constructor(
+    public source: string,
+    public path: string
+  ) {}
 
-  abstract process(): { checksum: string; meta?: Json; sections: Section[] }
+  abstract process(): Promise<{
+    checksum: string
+    meta?: Record<string, unknown>
+    ragIgnore?: boolean
+    sections: Section[]
+  }>
 
   abstract extractIndexedContent(): string
 }

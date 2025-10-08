@@ -1,0 +1,62 @@
+.bg-visual {
+  animation: fadeIn 3s ease-out both;
+  background-image:
+    /* Bg glow */
+    radial-gradient(80% 100% at 50% 75%, #3ecf8e10 0%, #0d0e1200 100%),
+    radial-gradient(40% 70% at 50% 80%, #3ecf8e20 0%, #3ecf8e00 100%),
+    /* radial-gradient(100% 100% at 50% 80%, #1c1c1c50 0%, #3ecf8e00 100%), */
+      /* Stars from left to right =================================== */
+      radial-gradient(1px 1px at 5% 25%, #3ecf8e70 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 14% 15%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 19% 35%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 29% 10%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 34% 25%, #3ecf8e80 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 38% 38%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 42% 19%, #3ecf8e80 0%, #3ecf8e00 100%),
+    radial-gradient(2px 2px at 49% 27%, #3ecf8e90 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 52% 7%, #3ecf8e75 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 55% 21%, #3ecf8e90 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 59% 27%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 61% 14%, #3ecf8e90 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 64% 44%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 74% 15%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 80% 36%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 84% 35%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(2px 2px at 94% 35%, #3ecf8e50 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 90% 20%, #3ecf8e 0%, #3ecf8e00 100%);
+}
+
+.bg-visual::after {
+  content: ' ';
+  position: absolute;
+  margin: 0 auto;
+  left: -20vw;
+  right: -20vw;
+  bottom: -65%;
+  width: 140vw;
+  height: 130%;
+  border-radius: 100%;
+}
+
+.bg-visual::before {
+  content: ' ';
+  position: absolute;
+  margin: 0 auto;
+  left: -18vw;
+  right: -18vw;
+  bottom: calc(-65% + 2px);
+  width: 136vw;
+  height: 130%;
+  border-radius: 100%;
+  background: #7fe5b794;
+  box-shadow: 0 -52px 0 -30vw #ffffff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,50 +1,59 @@
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { useParams } from 'common/hooks'
-import { useStore } from 'hooks'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconGlobe,
-  Modal,
-  Badge,
-} from 'ui'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Globe } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
-import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
-import { BASE_PATH } from 'lib/constants'
+import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
+import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { Badge, Skeleton } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const BannedIPs = () => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
-  const { data: ipList } = useBannedIPsQuery({
+
+  const {
+    isLoading: isLoadingIPList,
+    isFetching: isFetchingIPList,
+    data: ipList,
+    error: ipListError,
+  } = useBannedIPsQuery({
     projectRef: ref,
   })
 
-  const { ui } = useStore()
+  const { data: userIPAddress } = useUserIPAddressQuery()
+
+  const ipListLoading = isLoadingIPList || isFetchingIPList
+
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
 
+  const { can: canUnbanNetworks } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
+
   const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: 'IP address successfully unbanned',
-      })
+      toast.success('IP address successfully unbanned')
       setSelectedIPToUnban(null) // Reset the selected IP for unban
       setShowUnban(false)
     },
     onError: (error) => {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to unban IP: ${error?.message}`,
-      })
+      toast.error(`Failed to unban IP: ${error?.message}`)
     },
   })
 
@@ -62,46 +71,52 @@ const BannedIPs = () => {
     setShowUnban(true)
   }
 
-  const [userIPAddress, setUserIPAddress] = useState<string | null>(null)
-
-  useEffect(() => {
-    // Fetch user's IP address
-    fetch(`${BASE_PATH}/api/get-ip-address`)
-      .then((response) => response.json())
-      .then((data) => setUserIPAddress(data.ipAddress))
-  }, [])
-
   return (
     <div id="banned-ips">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <FormHeader
+          className="mb-0"
           title="Network Bans"
           description="List of IP addresses that are temporarily blocked if their traffic pattern looks abusive"
         />
-        <div className="flex items-center space-x-2 mb-6">
-          <Button asChild type="default" icon={<IconExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/reference/cli/supabase-network-bans"
-              target="_blank"
-            >
-              Documentation
-            </Link>
-          </Button>
-        </div>
+        <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
       </div>
       <FormPanel>
-        {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
+        {ipListLoading ? (
+          <div className="px-8 py-4 space-y-4">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+        ) : ipListError ? (
+          <AlertError
+            className="border-0 rounded-none"
+            error={ipListError}
+            subject="Failed to retrieve banned IP addresses"
+          />
+        ) : ipList && ipList.banned_ipv4_addresses.length > 0 ? (
           ipList.banned_ipv4_addresses.map((ip) => (
             <div key={ip} className="px-8 py-4 flex items-center justify-between">
               <div className="flex items-center space-x-5">
-                <IconGlobe size={16} className="text-foreground-lighter" />
+                <Globe size={16} className="text-foreground-lighter" />
                 <p className="text-sm font-mono">{ip}</p>
-                {ip === userIPAddress && <Badge color="scale">Your IP address</Badge>}
+                {ip === userIPAddress && <Badge>Your IP address</Badge>}
               </div>
               <div>
-                <Button type="default" onClick={() => openConfirmationModal(ip)}>
+                <ButtonTooltip
+                  type="default"
+                  disabled={!canUnbanNetworks}
+                  onClick={() => openConfirmationModal(ip)}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUnbanNetworks
+                        ? 'You need additional permissions to unban networks'
+                        : undefined,
+                    },
+                  }}
+                >
                   Unban IP
-                </Button>
+                </ButtonTooltip>
               </div>
             </div>
           ))
@@ -113,28 +128,20 @@ const BannedIPs = () => {
       </FormPanel>
 
       <ConfirmationModal
-        danger
+        variant="destructive"
         size="medium"
         loading={isUnbanning}
         visible={showUnban}
-        header="Confirm Unban IP"
-        buttonLabel="Confirm Unban"
-        buttonLoadingLabel="Unbanning..."
-        onSelectConfirm={onConfirmUnbanIP}
-        onSelectCancel={() => setShowUnban(false)}
-      >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Are you sure you want to unban this IP address {selectedIPToUnban}?
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
-        </Modal.Content>
-      </ConfirmationModal>
+        title="Confirm Unban IP"
+        confirmLabel="Confirm Unban"
+        confirmLabelLoading="Unbanning..."
+        onCancel={() => setShowUnban(false)}
+        onConfirm={onConfirmUnbanIP}
+        alert={{
+          title: 'This action cannot be undone',
+          description: `Are you sure you want to unban this IP address ${selectedIPToUnban}?`,
+        }}
+      />
     </div>
   )
 }

@@ -1,38 +1,41 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { useCallback } from 'react'
-import { ResponseError } from 'types'
-import { databaseFunctionsKeys } from './keys'
-import { components } from 'data/api'
+import pgMeta from '@supabase/pg-meta'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { databaseKeys } from 'data/database/keys'
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError } from 'types'
+import { z } from 'zod'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
-export type DatabaseFunction = components['schemas']['PostgresFunction']
+export type DatabaseFunction = z.infer<typeof pgMeta.functions.pgFunctionZod>
+
+const pgMetaFunctionsList = pgMeta.functions.list()
 
 export async function getDatabaseFunctions(
   { projectRef, connectionString }: DatabaseFunctionsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
-  if (!projectRef) throw new Error('projectRef is required')
+  let headers = new Headers(headersInit)
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/functions', {
-    params: { path: { ref: projectRef } },
-    headers,
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql: pgMetaFunctionsList.sql,
+      queryKey: ['database-functions'],
+    },
     signal,
-  })
+    headers
+  )
 
-  if (error) throw error
-  // [Joshen] API codegen is wrong, its matching Edge functions type to database functions
-  return data as unknown as DatabaseFunction[]
+  return result as DatabaseFunction[]
 }
 
-export type DatabaseFunctionsData = Awaited<ReturnType<typeof getDatabaseFunctions>>
+export type DatabaseFunctionsData = z.infer<typeof pgMetaFunctionsList.zod>
 export type DatabaseFunctionsError = ResponseError
 
 export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
@@ -43,22 +46,10 @@ export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
   }: UseQueryOptions<DatabaseFunctionsData, DatabaseFunctionsError, TData> = {}
 ) =>
   useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>(
-    databaseFunctionsKeys.list(projectRef),
+    databaseKeys.databaseFunctions(projectRef),
     ({ signal }) => getDatabaseFunctions({ projectRef, connectionString }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
-
-export const useDatabaseFunctionsPrefetch = ({ projectRef }: DatabaseFunctionsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseFunctionsKeys.list(projectRef), ({ signal }) =>
-        getDatabaseFunctions({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

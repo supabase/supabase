@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { components } from 'data/api'
+import type { components } from 'data/api'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 
 export type BackupRestoreVariables = {
   ref: string
@@ -11,7 +11,7 @@ export type BackupRestoreVariables = {
 }
 
 // [Joshen] Shift to backups RQ query once created
-export type Backup = components['schemas']['Backup']
+export type Backup = components['schemas']['BackupsResponse']['backups'][number]
 
 export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables) {
   if (backup.isPhysicalBackup) {
@@ -27,7 +27,7 @@ export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables)
     params: { path: { ref } },
     body: { id: backup.id },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

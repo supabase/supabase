@@ -12,13 +12,13 @@
 - [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database)
 - [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth)
 - [x] API yang dibuat secara otomatis.
-  - [x] REST. [Documents](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Documents](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Langganan realtime. [Documents](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Dokumen](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumen](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Langganan realtime. [Dokumen](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fungsi-fungsi.
-  - [x] Fungsi-fungsi Basis Data. [Documents](https://supabase.com/docs/guides/database/functions)
-  - [x] Fungsi Tepi [Documents](https://supabase.com/docs/guides/functions)
-- [x] Penyimpanan File. [Documents](https://supabase.com/docs/guides/storage)
+  - [x] Fungsi-fungsi Basis Data. [Dokumen](https://supabase.com/docs/guides/database/functions)
+  - [x] Fungsi Tepi [Dokumen](https://supabase.com/docs/guides/functions)
+- [x] Penyimpanan File. [Dokumen](https://supabase.com/docs/guides/storage)
 - [x] Dasbor
 
 ![Dasbor Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -58,7 +58,7 @@ Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur F
 Supabase adalah [platform yang di-host](https://supabase.com/dashboard). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
 Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
 
-![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) adalah sistem basis data relasional objek dengan lebih dari 30 tahun pengembangan aktif yang telah membuatnya memiliki reputasi yang kuat dalam hal keandalan, ketangguhan fitur, dan kinerja.
 - [Realtime](https://github.com/supabase/realtime) adalah server Elixir yang memungkinkan Anda untuk mendengarkan penyisipan, pembaruan, dan penghapusan PostgreSQL menggunakan websocket. Realtime melakukan polling terhadap fungsionalitas replikasi bawaan Postgres untuk perubahan database, mengkonversi perubahan ke JSON, kemudian menyiarkan JSON melalui websockets ke klien yang berwenang.

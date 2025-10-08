@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useLayoutEffect, useMemo } from 'react'
 import { createContext } from 'react'
 import defaultTheme from './defaultTheme'

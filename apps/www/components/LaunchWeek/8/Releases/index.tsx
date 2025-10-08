@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Accordion } from 'ui'
+import { Accordion, cn } from 'ui'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 import {
@@ -77,7 +77,10 @@ export default function LW8Releases() {
                       preRelease.steps[0]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                            <div
+                              key={layer.img}
+                              className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                            >
                               <Image
                                 src={
                                   !!layer.mobileImg && isTablet
@@ -86,11 +89,10 @@ export default function LW8Releases() {
                                 }
                                 className={`
                                   absolute opacity-90
-                                  w-full h-full -z-10 transition-all duration-300
+                                  w-full h-full -z-10 transition-all duration-300 object-[100%] object-cover
                                 `}
-                                layout="fill"
-                                objectPosition="100%"
-                                objectFit="cover"
+                                fill
+                                sizes="100%"
                                 alt=""
                               />
                             </div>
@@ -121,7 +123,10 @@ export default function LW8Releases() {
                       preRelease.steps[1]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                            <div
+                              key={layer.img}
+                              className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                            >
                               <Image
                                 src={
                                   !!layer.mobileImg && isTablet
@@ -130,11 +135,10 @@ export default function LW8Releases() {
                                 }
                                 className={`
                                   absolute opacity-90
-                                  w-full h-full -z-10 transition-all duration-300
+                                  w-full h-full -z-10 transition-all duration-300 object-[20%_50%] object-cover
                                 `}
-                                layout="fill"
-                                objectPosition="20% 50%"
-                                objectFit="cover"
+                                fill
+                                sizes="100%"
                                 alt=""
                               />
                             </div>
@@ -163,18 +167,25 @@ export default function LW8Releases() {
                       preRelease.steps[2]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                            <div
+                              key={layer.img}
+                              className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                            >
                               <Image
                                 src={layer.img}
-                                className={`
+                                className={cn(
+                                  `
                                   absolute opacity-90
-                                  w-full h-full -z-10 transition-all duration-300
-                                `}
-                                layout="fill"
-                                objectPosition={
-                                  isTablet ? '50%' : isDesktop ? '100% 50%' : '30% 50%'
-                                }
-                                objectFit="contain"
+                                  w-full h-full -z-10 transition-all duration-300 object-contain
+                                `,
+                                  isTablet
+                                    ? 'object-[50%]'
+                                    : isDesktop
+                                      ? 'object-[100%_50%]'
+                                      : 'object-[30%_50%]'
+                                )}
+                                fill
+                                sizes="100%"
                                 alt=""
                               />
                             </div>
@@ -222,18 +233,23 @@ export default function LW8Releases() {
                     day1.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                          <div
+                            key={layer.img}
+                            className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                          >
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
-                              className={`
+                              className={cn(
+                                `
                                   absolute opacity-90
-                                  w-full h-full -z-10 transition-all duration-300
-                                `}
-                              layout="fill"
-                              objectPosition={isTablet ? '50%' : '90% 50%'}
-                              objectFit="contain"
+                                  w-full h-full -z-10 transition-all duration-300 object-contain
+                                `,
+                                isTablet ? 'object-[50%]' : 'object-[90%_50%]'
+                              )}
+                              fill
+                              sizes="100%"
                               alt=""
                             />
                           </div>
@@ -280,17 +296,20 @@ export default function LW8Releases() {
                     day2.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                          <div
+                            key={layer.img}
+                            className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                          >
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className={`
                                   absolute opacity-90
-                                  w-full h-full -z-10 transition-all duration-300
+                                  w-full h-full -z-10 transition-all duration-300 object-cover
                                 `}
-                              layout="fill"
-                              objectFit="cover"
+                              fill
+                              sizes="100%"
                               alt=""
                             />
                           </div>
@@ -351,15 +370,21 @@ export default function LW8Releases() {
                     day3.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                          <div
+                            key={layer.img}
+                            className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                          >
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
-                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
-                              objectPosition={isTablet ? '50%' : '100% 50%'}
-                              objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
+                              className={cn(
+                                'absolute opacity-90 w-full h-full -z-10 transition-all duration-300',
+                                isTablet ? 'object-[50%]' : 'object-[100%_50%]',
+                                i == 1 && isTablet ? 'object-contain' : 'object-cover'
+                              )}
+                              fill
+                              sizes="100%"
                               alt=""
                             />
                           </div>
@@ -406,15 +431,21 @@ export default function LW8Releases() {
                     day4.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                          <div
+                            key={layer.img}
+                            className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                          >
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
-                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
-                              objectPosition={isTablet ? '50%' : '100% 50%'}
-                              objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
+                              className={cn(
+                                'absolute opacity-90 w-full h-full -z-10 transition-all duration-300',
+                                isTablet ? 'object-[50%]' : 'object-[100%_50%]',
+                                i == 1 && isTablet ? 'object-contain' : 'object-cover'
+                              )}
+                              fill
+                              sizes="100%"
                               alt=""
                             />
                           </div>
@@ -444,14 +475,17 @@ export default function LW8Releases() {
                     day4.steps[1]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                          <div
+                            key={layer.img}
+                            className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                          >
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
-                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
-                              objectFit="cover"
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300 object-cover"
+                              fill
+                              sizes="100%"
                               alt=""
                             />
                           </div>
@@ -498,14 +532,17 @@ export default function LW8Releases() {
                     day5.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                          <div
+                            key={layer.img}
+                            className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                          >
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
-                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
-                              objectFit="cover"
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300 object-cover"
+                              fill
+                              sizes="100%"
                               alt=""
                             />
                           </div>
@@ -536,14 +573,17 @@ export default function LW8Releases() {
                     day5.steps[1]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                          <div
+                            key={layer.img}
+                            className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                          >
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
-                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
-                              objectFit="cover"
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300 object-cover"
+                              fill
+                              sizes="100%"
                               alt=""
                             />
                           </div>
@@ -574,15 +614,20 @@ export default function LW8Releases() {
                     day5.steps[2]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                          <div
+                            key={layer.img}
+                            className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                          >
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
-                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
-                              objectFit="cover"
-                              objectPosition={isTablet ? '50%' : '100% 50%'}
+                              className={cn(
+                                'absolute opacity-90 w-full h-full -z-10 transition-all duration-300 object-cover',
+                                isTablet ? 'object-[50%]' : 'object-[100%_50%]'
+                              )}
+                              fill
+                              sizes="100%"
                               alt=""
                             />
                           </div>

@@ -1,0 +1,153 @@
+---
+title: 'Use Supabase with Vue'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <$Partial path="quickstart_db_setup.mdx" />
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a Vue app">
+
+    Create a Vue app using the `npm init` command.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sh name=Terminal
+      npm init vue@latest my-app
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Install the Supabase client library">
+
+    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Vue app.
+
+    Navigate to the Vue app and install `supabase-js`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      cd my-app && npm install @supabase/supabase-js
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+
+    Create a `.env.local` file and populate with your Supabase connection variables:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="publishableKey" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      <$CodeTabs>
+
+        ```text name=.env.local
+        VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        ```
+
+      </$CodeTabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Create the Supabase client">
+
+    Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js name=src/lib/supabaseClient.js
+      import { createClient } from '@supabase/supabase-js'
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+
+      export const supabase = createClient(supabaseUrl, supabasePublishableKey)
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+    Replace the existing content in your `App.vue` file with the following code.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+
+      ```vue name=src/App.vue
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      import { supabase } from './lib/supabaseClient'
+
+      const instruments = ref([])
+
+      async function getInstruments() {
+        const { data } = await supabase.from('instruments').select()
+        instruments.value = data
+      }
+
+      onMounted(() => {
+         getInstruments()
+      })
+      </script>
+
+      <template>
+        <ul>
+          <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
+        </ul>
+      </template>
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={7}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Start the app and go to http://localhost:5173 in a browser and you should see the list of instruments.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      npm run dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>

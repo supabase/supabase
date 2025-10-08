@@ -26,16 +26,14 @@ acls:
 ### Dashboard credentials
 ###
 basicauth_credentials:
-- consumer: DASHBOARD
-  username: $DASHBOARD_USERNAME
-  password: $DASHBOARD_PASSWORD
-
+  - consumer: DASHBOARD
+    username: $DASHBOARD_USERNAME
+    password: $DASHBOARD_PASSWORD
 
 ###
 ### API Routes
 ###
 services:
-
   ## Open Auth routes
   - name: auth-v1-open
     url: http://auth:9999/verify
@@ -134,11 +132,12 @@ services:
             - anon
 
   ## Secure Realtime routes
-  - name: realtime-v1
+  - name: realtime-v1-ws
     _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
-    url: http://realtime-dev.supabase-realtime:4000/socket/
+    url: http://realtime-dev.supabase-realtime:4000/socket
+    protocol: ws
     routes:
-      - name: realtime-v1-all
+      - name: realtime-v1-ws
         strip_path: true
         paths:
           - /realtime/v1/
@@ -153,7 +152,26 @@ services:
           allow:
             - admin
             - anon
-
+  - name: realtime-v1-rest
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    url: http://realtime-dev.supabase-realtime:4000/api
+    protocol: http
+    routes:
+      - name: realtime-v1-rest
+        strip_path: true
+        paths:
+          - /realtime/v1/api
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
   ## Storage routes: the storage server manages its own auth
   - name: storage-v1
     _comment: 'Storage: /storage/v1/* -> http://storage:5000/*'

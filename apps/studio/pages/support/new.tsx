@@ -1,55 +1,63 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { observer } from 'mobx-react-lite'
+import { Loader2, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
-import { Button, IconLoader, IconTool } from 'ui'
+import { toast } from 'sonner'
 
-import Success from 'components/interfaces/Support/Success'
-import SupportForm from 'components/interfaces/Support/SupportForm'
+import { AIAssistantOption } from 'components/interfaces/Support/AIAssistantOption'
+import { Success } from 'components/interfaces/Support/Success'
+import { SupportFormV2 } from 'components/interfaces/Support/SupportFormV2'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import CopyButton from 'components/ui/CopyButton'
+import InformationBox from 'components/ui/InformationBox'
+import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
-import { useFlag, withAuth } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
+import { withAuth } from 'hooks/misc/withAuth'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { useQueryState } from 'nuqs'
+import { NextPageWithLayout } from 'types'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-const SupportPage = () => {
+const SupportPage: NextPageWithLayout = () => {
   const [sentCategory, setSentCategory] = useState<string>()
-
-  const ongoingIncident = useFlag('ongoingIncident')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
-
+  // For AIAssistantOption projectRef prop
+  const [selectedProject, setSelectedProject] = useState<string>('no-project')
+  // For AIAssistantOption organizationSlug prop
+  const [selectedOrganization, setSelectedOrganization] = useState<string>('no-org')
   const { data, isLoading } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
 
+  const [_, setHighlightRef] = useQueryState('highlight', { defaultValue: '' })
+
   return (
-    <div
-      className="relative flex overflow-y-auto overflow-x-hidden"
-      style={{ height: maxHeight, maxHeight }}
-    >
-      <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
-        <div className="space-y-12 py-8">
-          <div className="flex justify-between items-center">
+    <div className="relative flex overflow-y-auto overflow-x-hidden">
+      <div className="mx-auto my-8 max-w-2xl w-full px-4 lg:px-6">
+        <div className="flex flex-col gap-y-8 py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
             <div className="flex items-center space-x-3">
               <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
-              <h1 className="m-0 text-lg">Supabase support</h1>
+              <h3 className="m-0 text-lg">Supabase support</h3>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button asChild type="default" icon={<IconTool />}>
+
+            <div className="flex items-center gap-x-3">
+              <Button asChild type="default" icon={<Wrench />}>
                 <Link
-                  href="https://supabase.com/docs/guides/platform/troubleshooting"
+                  href={`${DOCS_URL}/guides/platform/troubleshooting`}
                   target="_blank"
                   rel="noreferrer"
                 >
                   Troubleshooting
                 </Link>
               </Button>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button
                     asChild
                     type="default"
                     icon={
                       isLoading ? (
-                        <IconLoader className="animate-spin" />
+                        <Loader2 className="animate-spin" />
                       ) : isHealthy ? (
                         <div className="h-2 w-2 bg-brand rounded-full" />
                       ) : (
@@ -61,44 +69,81 @@ const SupportPage = () => {
                       {isLoading
                         ? 'Checking status'
                         : isHealthy
-                        ? 'All systems operational'
-                        : 'Active incident ongoing'}
+                          ? 'All systems operational'
+                          : 'Active incident ongoing'}
                     </Link>
                   </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">Check Supabase status page</span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
+                  Check Supabase status page
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
+          <AIAssistantOption projectRef={selectedProject} organizationSlug={selectedOrganization} />
           <div
             className={[
-              'min-w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+              'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
               `${sentCategory === undefined ? 'py-8' : 'pt-8'}`,
               'border-default',
             ].join(' ')}
           >
             {sentCategory !== undefined ? (
-              <Success sentCategory={sentCategory} />
+              <Success sentCategory={sentCategory} selectedProject={selectedProject} />
             ) : (
-              <SupportForm setSentCategory={setSentCategory} />
+              <SupportFormV2
+                onProjectSelected={setSelectedProject}
+                onOrganizationSelected={setSelectedOrganization}
+                setSentCategory={setSentCategory}
+              />
             )}
           </div>
+
+          <InformationBox
+            title="Having trouble submitting the form?"
+            description={
+              <div className="flex flex-col gap-y-4">
+                <p className="flex items-center gap-x-1 ">
+                  Email us directly at{' '}
+                  <InlineLink href="mailto:support@supabase.com" className="font-mono">
+                    support@supabase.com
+                  </InlineLink>
+                  <CopyButton
+                    type="text"
+                    text="support@supabase.com"
+                    iconOnly
+                    onClick={() => toast.success('Copied to clipboard')}
+                  />
+                </p>
+                <p>
+                  Please, make sure to{' '}
+                  <span
+                    className={cn(InlineLinkClassName, 'cursor-pointer')}
+                    onClick={() => {
+                      const el = document.getElementById('projectRef-field')
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
+                      setHighlightRef('true')
+                    }}
+                  >
+                    include your project ID
+                  </span>{' '}
+                  and as much information as possible.
+                </p>
+              </div>
+            }
+            defaultVisibility={true}
+            hideCollapse={true}
+          />
         </div>
       </div>
     </div>
   )
 }
 
-export default withAuth(observer(SupportPage), { useHighestAAL: false })
+SupportPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>{page}</DefaultLayout>
+  </AppLayout>
+)
+
+export default withAuth(SupportPage, { useHighestAAL: false })

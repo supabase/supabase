@@ -1,3 +1,5 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import { useParams } from 'common'
 import {
   ScaffoldSection,
@@ -5,17 +7,30 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { Badge } from 'ui'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { CreditTopUp } from './CreditTopUp'
 
 const CreditBalance = () => {
   const { slug } = useParams()
-  const { data, error, isLoading, isError, isSuccess } = useOrganizationCustomerProfileQuery({
-    slug,
-  })
 
-  const customerBalance = (data?.balance ?? 0) / 100
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+
+  const {
+    data: subscription,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
+
+  const customerBalance = (subscription?.customer_balance ?? 0) / 100
   const isCredit = customerBalance < 0
   const isDebt = customerBalance > 0
   const balance =
@@ -26,37 +41,46 @@ const CreditBalance = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12">
+        <div className="sticky space-y-2 top-12 pr-3">
           <div className="flex items-center space-x-2">
-            <p className="text-base m-0">Credit balance</p>
-            {isCredit && <Badge>You have credits available</Badge>}
-            {isDebt && <Badge color="red">Outstanding payments</Badge>}
+            <p className="text-foreground text-base m-0">Credit Balance</p>
           </div>
           <p className="text-sm text-foreground-light m-0">
-            Charges will be deducted from your balance first
+            Credits will be applied to future invoices, before charging your payment method. If your
+            credit balance runs out, your default payment method will be charged.
           </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {isLoading && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        )}
+        {isPermissionsLoaded && !canReadSubscriptions ? (
+          <NoPermission resourceText="view this organization's credits" />
+        ) : (
+          <FormPanel
+            footer={subscription?.billing_via_partner ? undefined : <CreditTopUp slug={slug} />}
+          >
+            <FormSection>
+              <FormSectionContent fullWidth loading={isLoading}>
+                {isError && (
+                  <AlertError
+                    subject="Failed to retrieve organization customer profile"
+                    error={error}
+                  />
+                )}
 
-        {isError && (
-          <AlertError subject="Failed to retrieve organization customer profile" error={error} />
-        )}
-
-        {isSuccess && (
-          <div className="flex items-end space-x-1">
-            {isDebt && <h4 className="opacity-50">-</h4>}
-            <h4 className="opacity-50">$</h4>
-            <h2 className="text-4xl relative top-[2px]">{balance}</h2>
-            {isCredit && <h4 className="opacity-50">/credits</h4>}
-          </div>
+                {isSuccess && (
+                  <div className="flex w-full justify-between items-center">
+                    <span>Balance</span>
+                    <div className="flex items-center space-x-1">
+                      {isDebt && <h4 className="opacity-50">-</h4>}
+                      <h4 className="opacity-50">$</h4>
+                      <h1 className="relative">{balance}</h1>
+                      {isCredit && <h4 className="opacity-50">/credits</h4>}
+                    </div>
+                  </div>
+                )}
+              </FormSectionContent>
+            </FormSection>
+          </FormPanel>
         )}
       </ScaffoldSectionContent>
     </ScaffoldSection>

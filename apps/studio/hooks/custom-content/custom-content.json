@@ -1,0 +1,58 @@
+{
+  "$schema": "./custom-content.schema.json",
+
+  "app:title": null,
+
+  "dashboard_auth:custom_provider": null,
+
+  "organization:legal_documents": null,
+
+  "project_homepage:client_libraries": [
+    {
+      "language": "JavaScript",
+      "officialSupport": true,
+      "docsUrl": "https://supabase.com/docs/reference/javascript/installing",
+      "gitUrl": "https://github.com/supabase/supabase-js"
+    },
+    {
+      "language": "Flutter",
+      "officialSupport": true,
+      "docsUrl": "https://supabase.com/docs/reference/dart/installing",
+      "gitUrl": "https://github.com/supabase/supabase-flutter"
+    },
+    {
+      "language": "Python",
+      "officialSupport": true,
+      "releaseState": "Alpha",
+      "docsUrl": "https://supabase.com/docs/reference/python/initializing",
+      "gitUrl": "https://github.com/supabase/supabase-py"
+    },
+    {
+      "language": "C#",
+      "officialSupport": false,
+      "docsUrl": "https://supabase.com/docs/reference/csharp/installing",
+      "gitUrl": "https://github.com/supabase-community/supabase-csharp",
+      "altIconName": "c-sharp"
+    },
+    {
+      "language": "Swift",
+      "officialSupport": true,
+      "docsUrl": "https://supabase.com/docs/reference/swift/initializing",
+      "gitUrl": "https://github.com/supabase/supabase-swift"
+    },
+    {
+      "language": "Kotlin",
+      "officialSupport": false,
+      "docsUrl": "https://supabase.com/docs/reference/kotlin/installing",
+      "gitUrl": "https://github.com/supabase-community/supabase-kt"
+    }
+  ],
+  "project_homepage:example_projects": null,
+
+  "logs:default_query": null,
+
+  "infra:cloud_providers": ["AWS", "AWS_K8S", "FLY"],
+  "infra:aws_nimbus_label": "AWS Nimbus",
+
+  "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt"
+}

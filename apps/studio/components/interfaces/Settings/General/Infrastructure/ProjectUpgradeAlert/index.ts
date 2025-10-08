@@ -1,2 +1,1 @@
-import ProjectUpgradeAlert from './ProjectUpgradeAlert'
-export default ProjectUpgradeAlert
+export { default as ProjectUpgradeAlert } from './ProjectUpgradeAlert'

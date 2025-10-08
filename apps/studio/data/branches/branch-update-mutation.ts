@@ -1,29 +1,39 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchUpdateVariables = {
-  id: string
+  branchRef: string
   projectRef: string
   branchName?: string
   gitBranch?: string
+  persistent?: boolean
+  requestReview?: boolean
 }
 
-export async function updateBranch({ id, branchName, gitBranch }: BranchUpdateVariables) {
-  const { data, error } = await patch('/v1/branches/{branch_id}', {
+export async function updateBranch({
+  branchRef,
+  branchName,
+  gitBranch,
+  persistent,
+  requestReview,
+}: BranchUpdateVariables) {
+  const { data, error } = await patch('/v1/branches/{branch_id_or_ref}', {
     params: {
-      path: { branch_id: id },
+      path: { branch_id_or_ref: branchRef },
     },
     body: {
       branch_name: branchName,
       git_branch: gitBranch,
+      persistent,
+      request_review: requestReview,
     },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

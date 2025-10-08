@@ -1,137 +1,144 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMonaco } from '@monaco-editor/react'
-import { observer } from 'mobx-react-lite'
-import { useEffect, useRef } from 'react'
-import { useParams } from 'common'
+import { useEffect } from 'react'
 
-import { useFunctionsQuery } from 'data/database/functions-query'
-import { useKeywordsQuery } from 'data/database/keywords-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useTableColumnsQuery } from 'data/database/table-columns-query'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { NextPageWithLayout } from 'types'
-
-import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
-import { SQLEditorLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
-import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useParams } from 'common/hooks/useParams'
+import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
+import { useEditorType } from 'components/layouts/editors/EditorsLayout.hooks'
+import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
+import { useContentIdQuery } from 'data/content/content-id-query'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
+import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
+import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
-  const monaco = useMonaco()
-  const { id, ref } = useParams()
+  const { id, ref, content, skip } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { project } = useProjectContext()
-  const snap = useSqlEditorStateSnapshot()
-  const appSnap = useAppStateSnapshot()
+  const editor = useEditorType()
+  const tabs = useTabsStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const { history, setLastVisitedSnippet } = useDashboardHistory()
 
-  const snippets = useSnippets(ref)
-  const { mutateAsync: formatQuery } = useFormatQueryMutation()
+  const allSnippets = useSnippets(ref!)
+  const snippet = allSnippets.find((x) => x.id === id)
 
-  async function formatPgsql(value: string) {
-    try {
-      if (!project) throw new Error('No project')
-      const formatted = await formatQuery({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: value,
-      })
-      return formatted.result
-    } catch (error) {
-      console.error('formatPgsql error:', error)
-      return value
+  const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
+
+  // [Refactor] There's an unnecessary request getting triggered when we start typing while on /new
+  // the URL ID gets updated and we attempt to fetch content for a snippet that's not been created yet
+  const { data, error, isError } = useContentIdQuery(
+    { projectRef: ref, id },
+    {
+      // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
+      // the snapV2 valtio store for some reason hence why the added typeof check here
+      retry: false,
+      enabled: Boolean(
+        id !== 'new' && typeof snapV2.addSnippet === 'function' && !snippet?.isNotSavedInDatabaseYet
+      ),
     }
-  }
-
-  const { data: keywords, isSuccess: isKeywordsSuccess } = useKeywordsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: functions, isSuccess: isFunctionsSuccess } = useFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: tableColumns, isSuccess: isTableColumnsSuccess } = useTableColumnsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const pgInfoRef = useRef<any>(null)
-  const formatPgsqlRef = useRef(formatPgsql)
-  formatPgsqlRef.current = formatPgsql
-
-  const isPgInfoReady =
-    isTableColumnsSuccess && isSchemasSuccess && isKeywordsSuccess && isFunctionsSuccess
-  if (isPgInfoReady) {
-    if (pgInfoRef.current === null) {
-      pgInfoRef.current = {}
-    }
-    pgInfoRef.current.tableColumns = tableColumns?.result
-    pgInfoRef.current.schemas = schemas
-    pgInfoRef.current.keywords = keywords?.result
-    pgInfoRef.current.functions = functions?.result
-  }
-
-  useEffect(() => {
-    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined) {
-      const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
-      if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
-    }
-  }, [id, snippets])
-
-  // Enable pgsql format
-  useEffect(() => {
-    if (monaco) {
-      const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-        async provideDocumentFormattingEdits(model: any) {
-          const value = model.getValue()
-          const formatted = await formatPgsqlRef.current(value)
-          if (id) snap.setSql(id, formatted)
-          return [{ range: model.getFullModelRange(), text: formatted }]
-        },
-      })
-      return () => formatProvider.dispose()
-    }
-  }, [monaco])
-
-  // Register auto completion item provider for pgsql
-  useEffect(() => {
-    if (isPgInfoReady) {
-      let completeProvider: any
-      let signatureHelpProvider: any
-
-      if (monaco && isPgInfoReady) {
-        completeProvider = monaco.languages.registerCompletionItemProvider(
-          'pgsql',
-          getPgsqlCompletionProvider(monaco, pgInfoRef)
-        )
-        signatureHelpProvider = monaco.languages.registerSignatureHelpProvider(
-          'pgsql',
-          getPgsqlSignatureHelpProvider(monaco, pgInfoRef)
-        )
-      }
-
-      return () => {
-        completeProvider?.dispose()
-        signatureHelpProvider?.dispose()
-      }
-    }
-  }, [isPgInfoReady])
-
-  return (
-    <div className="SQLTabContainer flex-1">
-      <SQLEditor />
-    </div>
   )
+  const snippetMissing =
+    isError && error.code === 404 && error.message.includes('Content not found')
+  const invalidId = isError && error.code === 400 && error.message.includes('Invalid uuid')
+
+  useEffect(() => {
+    if (ref && data && project) {
+      // [Joshen] Check if snippet belongs to the current project
+      if (!IS_PLATFORM || data.project_id === project.id) {
+        snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+      } else {
+        setLastVisitedSnippet(undefined)
+        router.push(`/project/${ref}/sql/new`)
+      }
+    }
+  }, [ref, data, project])
+
+  // Load the last visited snippet when landing on /new
+  useEffect(() => {
+    if (
+      id === 'new' &&
+      skip !== 'true' && // [Joshen] Skip flag implies to skip loading the last visited snippet
+      history.sql !== undefined &&
+      content === undefined
+    ) {
+      const snippet = allSnippets.find((snippet) => snippet.id === history.sql)
+      if (snippet !== undefined) router.push(`/project/${ref}/sql/${history.sql}`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, allSnippets, content])
+
+  // Watch for route changes
+  useEffect(() => {
+    if (!router.isReady || !id || id === 'new') return
+
+    const tabId = createTabId('sql', { id })
+    const snippet = allSnippets.find((x) => x.id === id)
+
+    tabs.addTab({
+      id: tabId,
+      type: 'sql',
+      label: snippet?.name || 'Untitled Query',
+      metadata: {
+        sqlId: id,
+        name: snippet?.name,
+      },
+    })
+  }, [router.isReady, id])
+
+  if (snippetMissing || invalidId) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-[400px]">
+          <Admonition
+            type="default"
+            title={`Unable to find snippet with ID ${id}`}
+            description="This snippet doesn't exist in your project"
+          >
+            {!!tabId ? (
+              <Button
+                type="default"
+                className="mt-2"
+                onClick={() => {
+                  tabs.handleTabClose({
+                    id: tabId,
+                    router,
+                    editor,
+                    onClearDashboardHistory: () => setLastVisitedSnippet(undefined),
+                  })
+                }}
+              >
+                Close tab
+              </Button>
+            ) : (
+              <Button asChild type="default" className="mt-2">
+                <Link href={`/project/${ref}/sql`}>Head back</Link>
+              </Button>
+            )}
+          </Admonition>
+        </div>
+      </div>
+    )
+  }
+
+  return <SQLEditor />
 }
 
-SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+SqlEditor.getLayout = (page) => (
+  <DefaultLayout>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <SQLEditorLayout>{page}</SQLEditorLayout>
+    </EditorBaseLayout>
+  </DefaultLayout>
+)
 
-export default observer(SqlEditor)
+export default SqlEditor

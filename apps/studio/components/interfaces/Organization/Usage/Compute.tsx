@@ -1,15 +1,18 @@
-import { DataPoint } from 'data/analytics/constants'
-import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
-import SectionContent from './SectionContent'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { BarChart2 } from 'lucide-react'
+import { useMemo } from 'react'
+
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
-import { IconBarChart2 } from 'ui'
-import UsageBarChart from './UsageBarChart'
-import { Attribute, AttributeColor } from './Usage.constants'
-import { useMemo } from 'react'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { DataPoint } from 'data/analytics/constants'
 import { useOrgDailyComputeStatsQuery } from 'data/analytics/org-daily-compute-stats-query'
+import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
+import { SectionContent } from './SectionContent'
+import { Attribute, AttributeColor } from './Usage.constants'
+import UsageBarChart from './UsageBarChart'
 
 export interface ComputeProps {
   orgSlug: string
@@ -33,6 +36,8 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
     endDate,
   })
 
+  const { billingAll } = useIsFeatureEnabled(['billing:all'])
+
   const chartData: DataPoint[] = egressData?.data ?? []
 
   const COMPUTE_TO_COLOR: Record<ComputeUsageMetric, AttributeColor> = {
@@ -47,6 +52,14 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
     [ComputeUsageMetric.COMPUTE_HOURS_8XL]: 'red',
     [ComputeUsageMetric.COMPUTE_HOURS_12XL]: 'dark-red',
     [ComputeUsageMetric.COMPUTE_HOURS_16XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_OPTIMIZED_CPU]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_HIGH_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_OPTIMIZED_CPU]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_HIGH_MEMORY]: 'purple',
   }
 
   const attributes: Attribute[] = Object.keys(ComputeUsageMetric).map((it) => ({
@@ -69,17 +82,19 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
         section={{
           name: 'Compute Hours',
           description:
-            'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Starter Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
-          links: [
-            {
-              name: 'Compute Add-ons',
-              url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
-            },
-            {
-              name: 'Usage-billing for Compute',
-              url: 'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
-            },
-          ],
+            'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Micro Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
+          links: billingAll
+            ? [
+                {
+                  name: 'Compute Add-ons',
+                  url: `${DOCS_URL}/guides/platform/compute-add-ons`,
+                },
+                {
+                  name: 'Usage-billing for Compute',
+                  url: `${DOCS_URL}/guides/platform/manage-your-usage/compute`,
+                },
+              ]
+            : [],
         }}
       >
         {isLoading && <GenericSkeletonLoader />}
@@ -134,7 +149,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
               <Panel>
                 <Panel.Content>
                   <div className="flex flex-col items-center justify-center">
-                    <IconBarChart2 className="text-foreground-light mb-2" />
+                    <BarChart2 className="text-foreground-light mb-2" />
                     <p className="text-sm">No data in period</p>
                     <p className="text-sm text-foreground-light">May take up to one hour to show</p>
                   </div>

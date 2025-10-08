@@ -1,0 +1,50 @@
+---
+title: 'Migrating to the SSR package from Auth Helpers'
+description: 'Step-by-step guide to migrating your app to the new SSR package'
+sidebar_label: 'Migrating to SSR from Auth Helpers'
+---
+
+The new `ssr` package takes the core concepts of the Auth Helpers and makes them available to any server language or framework. This page will guide you through migrating from the Auth Helpers package to `ssr`.
+
+### Replacing Supabase packages
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
+
+<TabPanel id="nextjs" label="Next.js">
+
+```bash
+npm uninstall @supabase/auth-helpers-nextjs
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```bash
+npm uninstall @supabase/auth-helpers-sveltekit
+```
+
+</TabPanel>
+<TabPanel id="remix" label="Remix">
+
+```bash
+npm uninstall @supabase/auth-helpers-remix
+```
+
+</TabPanel>
+</Tabs>
+
+```bash
+npm install @supabase/ssr
+```
+
+### Creating a client
+
+The new `ssr` package exports two functions for creating a Supabase client. The `createBrowserClient` function is used in the client, and the `createServerClient` function is used in the server.
+
+Check out the [Creating a client](/docs/guides/auth/server-side/creating-a-client) page for examples of creating a client in your framework.
+
+## Next steps
+
+- Implement [Authentication using Email and Password](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr)
+- Implement [Authentication using OAuth](/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr)
+- [Learn more about SSR](/docs/guides/auth/server-side-rendering)

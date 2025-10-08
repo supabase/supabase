@@ -29,7 +29,6 @@
 ## Template for building components
 
 ```ts
-import { observer } from 'mobx-react-lite'
 
 // Declare the prop types of your component
 interface ComponentAProps {
@@ -41,6 +40,5 @@ const ComponentA = ({ sampleProp }: ComponentAProps) => {
   return <div>ComponentA: {sampleProp}</div>
 }
 
-// Observer is so that components listen to mobx store changes
-export default observer(ComponentA)
+export default ComponentA
 ```

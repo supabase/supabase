@@ -1,22 +1,13 @@
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconExternalLink,
-  Tabs,
-} from 'ui'
-
 import { useParams } from 'common'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
+import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { TEMPLATES_SCHEMAS } from 'stores/authConfig/schema'
-import TemplateEditor from './TemplateEditor'
+import { Card, Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
+import TemplateEditor from './TemplateEditor'
 
-const EmailTemplates = () => {
+export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -32,63 +23,52 @@ const EmailTemplates = () => {
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
 
   return (
-    <div>
-      <div className="flex justify-between items-center">
-        <FormHeader
-          title="Email Templates"
-          description="Customize the emails that will be sent out to your users."
-        />
-        <div className="mb-6">
-          <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/guides/auth/auth-email-templates"
-            >
-              Documentation
-            </a>
-          </Button>
-        </div>
-      </div>
+    <div className="w-full">
       {isError && (
-        <Alert_Shadcn_ variant="destructive">
-          <IconAlertCircle strokeWidth={2} />
-          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+        <AlertError
+          className="mt-12"
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration"
+        />
       )}
-      {isLoading && <GenericSkeletonLoader />}
+      {isLoading && (
+        <div className="w-[854px] mt-12">
+          <GenericSkeletonLoader />
+        </div>
+      )}
       {isSuccess && (
-        <FormPanel>
-          <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            listClassNames="px-8 pt-4"
-            defaultActiveId={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}
-          >
-            {TEMPLATES_SCHEMAS.map((template) => {
-              const panelId = template.title.trim().replace(/\s+/g, '-')
-              return (
-                <Tabs.Panel id={panelId} label={template.title} key={panelId}>
-                  {builtInSMTP ? (
-                    <div className="mx-8">
-                      <EmailRateLimitsAlert />
-                    </div>
-                  ) : null}
-                  <TemplateEditor
-                    key={template.title}
-                    template={template}
-                    authConfig={authConfig as any}
-                  />
-                </Tabs.Panel>
-              )
-            })}
-          </Tabs>
-        </FormPanel>
+        <div className="my-12">
+          {builtInSMTP ? (
+            <div className="mb-4">
+              <EmailRateLimitsAlert />
+            </div>
+          ) : null}
+          <Card>
+            <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
+              <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
+                {TEMPLATES_SCHEMAS.map((template) => {
+                  return (
+                    <TabsTrigger_Shadcn_
+                      key={`${template.id}`}
+                      value={template.title.trim().replace(/\s+/g, '-')}
+                    >
+                      {template.title}
+                    </TabsTrigger_Shadcn_>
+                  )
+                })}
+              </TabsList_Shadcn_>
+              {TEMPLATES_SCHEMAS.map((template) => {
+                const panelId = template.title.trim().replace(/\s+/g, '-')
+                return (
+                  <TabsContent_Shadcn_ key={panelId} value={panelId} className="mt-0">
+                    <TemplateEditor key={template.title} template={template} />
+                  </TabsContent_Shadcn_>
+                )
+              })}
+            </Tabs_Shadcn_>
+          </Card>
+        </div>
       )}
     </div>
   )
 }
-
-export default EmailTemplates

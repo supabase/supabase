@@ -1,26 +1,30 @@
+import { BookOpenText } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button, IconCode } from 'ui'
+import { ButtonTooltip } from './ButtonTooltip'
 
 interface APIDocsButtonProps {
   section?: string[]
 }
 
-const APIDocsButton = ({ section }: APIDocsButtonProps) => {
+export const APIDocsButton = ({ section }: APIDocsButtonProps) => {
   const snap = useAppStateSnapshot()
 
   return (
-    <Button
+    <ButtonTooltip
       size="tiny"
       type="default"
       onClick={() => {
         if (section) snap.setActiveDocsSection(section)
         snap.setShowProjectApiDocs(true)
       }}
-      icon={<IconCode size={14} strokeWidth={2} />}
-    >
-      API Docs
-    </Button>
+      icon={<BookOpenText />}
+      className="h-7 w-7"
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'API Docs',
+        },
+      }}
+    />
   )
 }
-
-export default APIDocsButton

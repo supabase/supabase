@@ -1,9 +1,14 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 
-export const CATEGORY_OPTIONS = [
+export const CATEGORY_OPTIONS: {
+  value: SupportCategories | 'Plan_upgrade'
+  label: string
+  description: string
+  query?: string
+}[] = [
   {
     value: SupportCategories.PROBLEM,
-    label: 'Issues with APIs / client libraries',
+    label: 'APIs and client libraries',
     description: "Issues with your project's API and client libraries",
     query: undefined,
   },
@@ -22,7 +27,7 @@ export const CATEGORY_OPTIONS = [
   {
     value: SupportCategories.PERFORMANCE_ISSUES,
     label: 'Performance issues',
-    description: 'Reporting of performance issues is only available on the Pro plan',
+    description: 'Reporting of performance issues is only available on the Pro Plan',
     query: 'Performance',
   },
   {
@@ -53,6 +58,13 @@ export const CATEGORY_OPTIONS = [
     value: SupportCategories.LOGIN_ISSUES,
     label: 'Issues with logging in',
     description: 'Issues with logging in and MFA',
+    query: undefined,
+  },
+  // [Joshen] Ideally shift this to shared-types, although not critical as API isn't validating the category
+  {
+    value: 'Plan_upgrade',
+    label: 'Plan upgrade',
+    description: 'Enquire a plan upgrade for your organization',
     query: undefined,
   },
 ]
@@ -125,20 +137,17 @@ export const SERVICE_OPTIONS = [
   },
 ]
 
-export const GITHUB_LINKS = [
-  {
-    name: 'supabase-js',
-    description: 'For issues with our Javascript client',
-    url: 'https://github.com/supabase/supabase-js/issues',
-  },
-  {
-    name: 'supabase-flutter',
-    description: 'For issues with our Flutter integration',
-    url: 'https://github.com/supabase-community/supabase-flutter/issues',
-  },
-  {
-    name: 'supabase',
-    description: 'For other issues about our API',
-    url: 'https://github.com/supabase/supabase/issues',
-  },
+export const IPV4_MIGRATION_STRINGS = [
+  'ipv4',
+  'ipv6',
+  'supavisor',
+  'pgbouncer',
+  '5432',
+  'ENETUNREACH',
+  'ECONNREFUSED',
+  'P1001',
+  'connect: no route to',
+  'network is unreac',
+  'could not translate host name',
+  'address family not supported by protocol',
 ]

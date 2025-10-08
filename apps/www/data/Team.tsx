@@ -103,7 +103,7 @@ const data: TeamMember[] = [
     active: true,
   },
   {
-    name: 'Wen Bo Xi',
+    name: 'Wen Bo Xie',
     github: 'https://github.com/w3b6x9',
     department: 'Engineering',
     img: 'https://github.com/w3b6x9.png',

@@ -1,21 +1,16 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { Users } from 'components/interfaces/Auth'
-import { AuthLayout } from 'components/layouts'
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { UsersV2 } from 'components/interfaces/Auth/Users/UsersV2'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import type { NextPageWithLayout } from 'types'
 
 const UsersPage: NextPageWithLayout = () => {
-  const canReadUsers = useCheckPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
-
-  return !canReadUsers ? (
-    <NoPermission isFullPage resourceText="access your project's users" />
-  ) : (
-    <Users />
-  )
+  return <UsersV2 />
 }
 
-UsersPage.getLayout = (page) => <AuthLayout title="Auth">{page}</AuthLayout>
+UsersPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>{page}</AuthLayout>
+  </DefaultLayout>
+)
 
 export default UsersPage

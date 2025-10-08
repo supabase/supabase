@@ -1,0 +1,131 @@
+---
+title: 'Use Supabase Auth with React'
+subtitle: 'Learn how to use Supabase Auth with React.js.'
+breadcrumb: 'Auth Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a new Supabase project">
+
+    [Launch a new project](/dashboard) in the Supabase Dashboard.
+
+    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](/dashboard/project/_/sql).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```sql name=SQL_EDITOR
+      select * from auth.users;
+      ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Details title="Create a React app">
+
+    Create a React app using [Vite](https://vitejs.dev/).
+
+  </StepHikeCompact.Details>
+
+  <StepHikeCompact.Code>
+
+    ```bash name=Terminal
+    npm create vite@latest my-app -- --template react
+    ```
+
+  </StepHikeCompact.Code>
+</StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Install the Supabase client library">
+
+    The fastest way to get started is to use Supabase's `auth-ui-react` library which provides a convenient interface for working with Supabase Auth from a React app.
+
+    Navigate to the React app and install the Supabase libraries.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      cd my-app && npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Set up your login component">
+
+    In `App.jsx`, create a Supabase client using your Project URL and key.
+
+    <$Partial path="api_settings_steps.mdx" />
+
+    You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+      ```jsx name=src/App.jsx
+        import './index.css'
+        import { useState, useEffect } from 'react'
+        import { createClient } from '@supabase/supabase-js'
+        import { Auth } from '@supabase/auth-ui-react'
+        import { ThemeSupa } from '@supabase/auth-ui-shared'
+
+        const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
+
+        export default function App() {
+          const [session, setSession] = useState(null)
+
+          useEffect(() => {
+            supabase.auth.getSession().then(({ data: { session } }) => {
+              setSession(session)
+            })
+
+            const {
+              data: { subscription },
+            } = supabase.auth.onAuthStateChange((_event, session) => {
+              setSession(session)
+            })
+
+            return () => subscription.unsubscribe()
+          }, [])
+
+          if (!session) {
+            return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
+          }
+          else {
+            return (<div>Logged in!</div>)
+          }
+        }
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Start the app, go to http://localhost:3000 in a browser, and open the browser console and you should be able to log in.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      npm run dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>

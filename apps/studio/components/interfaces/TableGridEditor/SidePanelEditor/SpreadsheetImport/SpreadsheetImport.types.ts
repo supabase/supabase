@@ -1,4 +1,4 @@
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 export interface SpreadsheetData {
   headers: string[]

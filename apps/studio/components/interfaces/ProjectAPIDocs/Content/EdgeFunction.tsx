@@ -4,7 +4,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
 
 const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
   const { ref } = useParams()
@@ -21,7 +21,7 @@ const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
     <div className="divide-y">
       <div className="space-y-1 px-4 py-4">
         <div className="flex items-center space-x-2">
-          <h2 className="text-xl">{edgeFunction.name}</h2>
+          <h2>{edgeFunction.name}</h2>
         </div>
       </div>
 

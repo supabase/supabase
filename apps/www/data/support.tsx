@@ -1,4 +1,5 @@
-import { IconGitHubSolid, IconDiscussions, IconDiscord, IconArrowUpRight } from 'ui'
+import { ArrowUpRight } from 'lucide-react'
+import { IconDiscord, IconDiscussions, IconGitHubSolid } from 'ui'
 
 const data = {
   meta_title: 'Help & Support | Supabase',
@@ -80,7 +81,7 @@ const data = {
         label: 'Open Ticket',
         link: 'https://supabase.com/dashboard/support/new',
         target: '_blank',
-        icon: <IconArrowUpRight />,
+        icon: <ArrowUpRight />,
         className: '!text-foreground-light hover:!text-foreground',
         type: 'text',
       },

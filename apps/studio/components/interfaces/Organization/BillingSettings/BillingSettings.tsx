@@ -1,24 +1,51 @@
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
-import BillingAddress from './BillingAddress/BillingAddress'
+import {
+  ScaffoldContainer,
+  ScaffoldContainerLegacy,
+  ScaffoldDivider,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { cn } from 'ui'
+import InvoicesSection from '../InvoicesSettings/InvoicesSection'
+import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
+import { BillingCustomerData } from './BillingCustomerData/BillingCustomerData'
 import BillingEmail from './BillingEmail'
 import CostControl from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
-import PaymentMethods from './PaymentMethods/PaymentMethods'
+import PaymentMethods from '../../Billing/Payment/PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
-import TaxID from './TaxID/TaxID'
-import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
-import { useIsFeatureEnabled } from 'hooks'
 
-const BillingSettings = () => {
+export const BillingSettings = () => {
   const {
-    billingAccountData: billingAccountDataEnabled,
-    billingPaymentMethods: billingPaymentMethodsEnabled,
-    billingCredits: billingCreditsEnabled,
-  } = useIsFeatureEnabled(['billing:account_data', 'billing:payment_methods', 'billing:credits'])
+    billingAccountData: isBillingAccountDataEnabledOnProfileLevel,
+    billingPaymentMethods: isBillingPaymentMethodsEnabledOnProfileLevel,
+    billingCredits: isBillingCreditsEnabledOnProfileLevel,
+    billingInvoices: isBillingInvoicesEnabledOnProfileLevel,
+  } = useIsFeatureEnabled([
+    'billing:account_data',
+    'billing:payment_methods',
+    'billing:credits',
+    'billing:invoices',
+  ])
+
+  const { data: org } = useSelectedOrganizationQuery()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
+
+  const billingAccountDataEnabled =
+    isBillingAccountDataEnabledOnProfileLevel && isNotOrgWithPartnerBilling
+  const billingPaymentMethodsEnabled =
+    isBillingPaymentMethodsEnabledOnProfileLevel && isNotOrgWithPartnerBilling
 
   return (
     <>
-      <ScaffoldContainer id="subscription">
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Billing</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
+
+      <ScaffoldContainer id="subscription" className={cn('[&>div]:!pt-0')}>
         <Subscription />
       </ScaffoldContainer>
 
@@ -30,16 +57,17 @@ const BillingSettings = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="breakdown">
-        <BillingBreakdown />
-      </ScaffoldContainer>
+      {org && org.plan.id !== 'free' && (
+        <ScaffoldContainer id="breakdown">
+          <BillingBreakdown />
+        </ScaffoldContainer>
+      )}
 
-      {billingCreditsEnabled && (
+      {isBillingInvoicesEnabledOnProfileLevel && (
         <>
           <ScaffoldDivider />
-
-          <ScaffoldContainer id="credits-balance">
-            <CreditBalance />
+          <ScaffoldContainer id="invoices">
+            <InvoicesSection />
           </ScaffoldContainer>
         </>
       )}
@@ -50,6 +78,16 @@ const BillingSettings = () => {
 
           <ScaffoldContainer id="payment-methods">
             <PaymentMethods />
+          </ScaffoldContainer>
+        </>
+      )}
+
+      {isBillingCreditsEnabledOnProfileLevel && (
+        <>
+          <ScaffoldDivider />
+
+          <ScaffoldContainer id="credits-balance">
+            <CreditBalance />
           </ScaffoldContainer>
         </>
       )}
@@ -65,18 +103,10 @@ const BillingSettings = () => {
           <ScaffoldDivider />
 
           <ScaffoldContainer id="address">
-            <BillingAddress />
-          </ScaffoldContainer>
-
-          <ScaffoldDivider />
-
-          <ScaffoldContainer id="taxId">
-            <TaxID />
+            <BillingCustomerData />
           </ScaffoldContainer>
         </>
       )}
     </>
   )
 }
-
-export default BillingSettings

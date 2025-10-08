@@ -1,138 +1,150 @@
-import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
+import { Command, Menu, Search } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
-import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import type { FC } from 'react'
+import { memo, useState } from 'react'
+// End of third-party imports
 
-import { getPageType } from '~/lib/helpers'
-import { REFERENCES } from './NavigationMenu.constants'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { Button, buttonVariants, cn } from 'ui'
+import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
+import { useCustomContent } from '../../../hooks/custom-content/useCustomContent'
+import GlobalNavigationMenu from './GlobalNavigationMenu'
+import useDropdownMenu from './useDropdownMenu'
+
+const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
+const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-  const { resolvedTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  const { asPath, push } = useRouter()
-  const pathSegments = asPath.split('/')
-
-  const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
-  const libraryMeta = REFERENCES?.[library] ?? undefined
-  const versions = libraryMeta?.versions ?? []
-
-  const version = versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
-    ? pathSegments[pathSegments.indexOf(library) + 1]
-    : versions[0]
-
-  const pageType = getPageType(asPath)
-
-  const pageLinks = [
-    { text: 'Guides', key: 'docs', link: '/' },
-    { text: 'Reference', key: 'reference', link: '/reference' },
-  ]
-
-  const onSelectVersion = (version: string) => {
-    // [Joshen] Ideally we use <Link> but this works for now
-    if (!library) return
-    if (version === versions[0]) {
-      push(`/reference/${library}`)
-    } else {
-      push(`/reference/${library}/${version}`)
-    }
-  }
-
-  // [Joshen] Kaizen: Use UI library's SidePanel for this
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
-    const sidebar = document.querySelector('.sidebar-menu-container')
-    const contentPane = document.querySelector('.main-content-pane')
-
-    sidebar.classList.toggle('hidden')
-    contentPane.classList.toggle('hidden')
-  }
+  const user = useUser()
+  const menu = useDropdownMenu(user)
 
   return (
-    <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75">
-      <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
-        <div className="lg:hidden">
-          <Link href="/" className=" flex items-center gap-2">
-            <Image
-              className="cursor-pointer"
-              src={
-                resolvedTheme?.includes('dark')
-                  ? '/docs/supabase-dark.svg'
-                  : '/docs/supabase-light.svg'
-              }
-              width={96}
-              height={24}
-              alt="Supabase Logo"
-            />
-            <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <SearchButton className="md:w-full lg:w-96 order-2 lg:order-1">
-            <div
-              className="
-              flex
-              group
-              items-center
-              justify-between
-              bg-surface-100
-              bg-opacity-75
-              hover:bg-surface-200
-              hover:bg-opacity-100
-              border
-              transition
-              pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
-              text-foreground-lighter
-              "
-            >
-              <div className="flex items-center space-x-2">
-                <IconSearch className="" size={18} strokeWidth={2} />
-                <p className="hidden md:flex text-sm">Search docs...</p>
-              </div>
-              <div className="hidden md:flex items-center space-x-1">
-                <div className="md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 gap-1">
-                  <IconCommand size={12} strokeWidth={1.5} />
-                  <span className="text-[12px]">K</span>
-                </div>
-              </div>
+    <>
+      <nav
+        aria-label="top bar"
+        className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
+      >
+        <div className="w-full px-5 lg:pl-10 flex justify-between h-[var(--header-height)] gap-3">
+          <div className="hidden lg:flex h-full items-center justify-center gap-2">
+            <HeaderLogo />
+            <GlobalNavigationMenu />
+          </div>
+          <div className="w-full grow lg:w-auto flex gap-3 justify-between lg:justify-end items-center h-full">
+            <div className="lg:hidden">
+              <HeaderLogo />
             </div>
-          </SearchButton>
+
+            <div className="flex gap-2 items-center">
+              <CommandMenuTrigger>
+                <button
+                  className={cn(
+                    'group',
+                    'flex-grow md:w-44 xl:w-56 h-[30px] rounded-md',
+                    'pl-1.5 md:pl-2 pr-1',
+                    'flex items-center justify-between',
+                    'bg-surface-100/75 text-foreground-lighter border',
+                    'hover:bg-opacity-100 hover:border-strong',
+                    'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+                    'transition'
+                  )}
+                >
+                  <div className="flex items-center space-x-2 text-foreground-muted">
+                    <Search size={18} strokeWidth={2} />
+                    <p className="flex text-sm pr-2">
+                      Search
+                      <span className="hidden xl:inline ml-1"> docs...</span>
+                    </p>
+                  </div>
+                  <div className="hidden md:flex items-center space-x-1">
+                    <div
+                      aria-hidden="true"
+                      className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
+                    >
+                      <Command size={12} strokeWidth={1.5} />
+                      <span className="text-[12px]">K</span>
+                    </div>
+                  </div>
+                </button>
+              </CommandMenuTrigger>
+              <button
+                title="Menu dropdown button"
+                className={cn(
+                  buttonVariants({ type: 'default' }),
+                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
+                )}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <Menu size={18} strokeWidth={1} />
+              </button>
+            </div>
+          </div>
+          <div className="hidden lg:flex items-center justify-end gap-3">
+            {!isUserLoading && (
+              <Button asChild>
+                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
+                  {isLoggedIn ? 'Dashboard' : 'Sign up'}
+                </a>
+              </Button>
+            )}
+            {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
+              <Button asChild>
+                <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
+              </Button>
+            )}
+            {isLoggedIn ? (
+              <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
+            ) : (
+              <TopNavDropdown />
+            )}
+          </div>
         </div>
-        <div className="hidden lg:flex grow items-center justify-end gap-3">
-          <Button type="text" asChild>
-            <a href="https://supabase.com" target="_blank" rel="noreferrer noopener">
-              Supabase.com
-            </a>
-          </Button>
-          {!isUserLoading && (
-            <Button asChild>
-              <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
-                {isLoggedIn ? 'Dashboard' : 'Sign up'}
-              </a>
-            </Button>
-          )}
-          <Link
-            href="https://github.com/supabase/supabase"
-            target="_blank"
-            rel="noreferrer noopener"
-            className="px-2.5 py-1"
-          >
-            <IconGitHub
-              size={16}
-              className="text-foreground-light hover:text-foreground transition"
-            />
-          </Link>
-          <ThemeToggle />
-        </div>
-      </div>
-    </nav>
+      </nav>
+      <GlobalMobileMenu open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
+    </>
   )
 }
+
+const HeaderLogo = memo(() => {
+  const { navigationLogo } = useCustomContent(['navigation:logo'])
+
+  return (
+    <Link
+      href="/"
+      className={cn(
+        buttonVariants({ type: 'default' }),
+        'flex shrink-0 items-center w-fit !bg-transparent !border-none !shadow-none'
+      )}
+    >
+      <Image
+        className="hidden dark:block !m-0"
+        src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
+        priority={true}
+        loading="eager"
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
+        alt="Supabase wordmark"
+      />
+      <Image
+        className="block dark:hidden !m-0"
+        src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
+        priority={true}
+        loading="eager"
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
+        alt="Supabase wordmark"
+      />
+      <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+    </Link>
+  )
+})
+
+HeaderLogo.displayName = 'HeaderLogo'
+
+TopNavBar.displayName = 'TopNavBar'
+
 export default TopNavBar

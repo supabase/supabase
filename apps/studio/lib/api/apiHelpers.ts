@@ -1,5 +1,7 @@
-import { camelCase, snakeCase } from 'lodash'
 import { IS_PLATFORM } from 'lib/constants'
+import { snakeCase } from 'lodash'
+import type { IncomingHttpHeaders } from 'node:http'
+import z from 'zod'
 
 /**
  * Construct headers for api request.
@@ -13,6 +15,7 @@ export function constructHeaders(headers: { [prop: string]: any }) {
     const cleansedHeaders = {
       Accept: headers.Accept,
       Authorization: headers.Authorization,
+      cookie: headers.cookie,
       'Content-Type': headers['Content-Type'],
       'x-connection-encrypted': headers['x-connection-encrypted'],
     } as any
@@ -67,58 +70,52 @@ export const toSnakeCase = (object) => {
   }
 }
 
-// Typically for HTTP response bodies
-// @ts-ignore
-export const toCamelCase = (object, whitelist = []) => {
-  const camelCaseObject: any = {}
-  const camelCaseArray: any[] = []
-
-  if (!object) return null
-
-  if (Array.isArray(object)) {
-    for (const item of object) {
-      if (typeof item === 'object') {
-        camelCaseArray.push(toCamelCase(item))
-      } else {
-        camelCaseArray.push(item)
-      }
+/**
+ * Converts Node.js `IncomingHttpHeaders` to Fetch API `Headers`.
+ */
+export function fromNodeHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
+  const headers = new Headers()
+  for (const [key, value] of Object.entries(nodeHeaders)) {
+    if (Array.isArray(value)) {
+      value.forEach((v) => headers.append(key, v))
+    } else if (value !== undefined) {
+      headers.append(key, value)
     }
-    return camelCaseArray
-  } else if (typeof object === 'object') {
-    for (const key of Object.keys(object)) {
-      // @ts-ignore
-      if (whitelist.length > 0 && whitelist.indexOf(key) >= 0) {
-        // @ts-ignore
-        snakeCaseObject[key] = value
-      } else if (typeof object[key] === 'object') {
-        camelCaseObject[camelCase(key)] = toCamelCase(object[key])
-      } else {
-        camelCaseObject[camelCase(key)] = object[key]
-      }
-    }
-    return camelCaseObject
-  } else {
-    return object
   }
+  return headers
 }
 
 /**
- * Moves all Namespaced variables to the root
+ * Zod transformer to parse boolean values from strings.
  *
- * @example
- * flattenNamespaceOnUser('https://supabase.io', { email: "copple@supabase.io", "https://supabase.io": { username: 'copple' } })
- * //=>
- * { email: "copple@supabase.io", username: 'copple' })
+ * Use when accepting a boolean value in a query parameter.
  */
-export const flattenNamespaceOnUser = (
-  NAMESPACE: string,
-  user: {
-    [prop: string]: any
-  }
-) => {
-  let res = { ...user }
-  Object.entries(user[NAMESPACE]).forEach(([k, v]) => {
-    res[k] = v
+export function zBooleanString(errorMsg?: string) {
+  return z.string().transform((value, ctx) => {
+    if (value === 'true') {
+      return true
+    }
+
+    if (value === 'false') {
+      return false
+    }
+
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: errorMsg || 'must be a boolean string',
+    })
+    return z.NEVER
   })
-  return res
+}
+
+/**
+ * Transform a comma-separated string into an array of strings.
+ *
+ * Use when accepting a list of values in a query parameter.
+ */
+export function commaSeparatedStringIntoArray(value: string): string[] {
+  return value
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)
 }

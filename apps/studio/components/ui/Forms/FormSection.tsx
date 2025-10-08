@@ -15,7 +15,7 @@ const FormSection = ({
   className?: string
 }) => {
   const classes = [
-    'grid grid-cols-12 gap-6 px-8 py-8',
+    'grid grid-cols-12 gap-6 px-4 md:px-8 py-4 md:py-8',
     `${disabled ? ' opacity-30' : ' opacity-100'}`,
     `${className}`,
   ]
@@ -65,11 +65,13 @@ const Shimmer = () => (
 const FormSectionContent = ({
   children,
   loading = true,
+  loaders,
   fullWidth,
   className,
 }: {
   children: React.ReactNode | string
   loading?: boolean
+  loaders?: number
   fullWidth?: boolean
   className?: string
 }) => {
@@ -81,7 +83,11 @@ const FormSectionContent = ({
         ${className}
       `}
     >
-      {loading ? Children.map(children, (child) => <Shimmer />) : children}
+      {loading
+        ? !!loaders
+          ? new Array(loaders).fill(0).map((_, idx) => <Shimmer key={idx} />)
+          : Children.map(children, (_, idx) => <Shimmer key={idx} />)
+        : children}
     </div>
   )
 }

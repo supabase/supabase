@@ -1,3 +1,5 @@
+'use client'
+
 import { Tabs } from 'ui'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -85,8 +87,8 @@ const Chart = () => {
                   selection === 'latency'
                     ? 'Latency (ms)'
                     : selection === 'avg_latency'
-                    ? 'Avg latency per result (ms)'
-                    : 'Number of results',
+                      ? 'Avg latency per result (ms)'
+                      : 'Number of results',
                 position: 'insideBottom',
                 offset: -32,
                 fill: 'hsl(var(--foreground-default))',

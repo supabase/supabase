@@ -1,20 +1,24 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Input, Modal } from 'ui'
+import { toast } from 'sonner'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import InformationBox from 'components/ui/InformationBox'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { organizationKeys } from 'data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from 'data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
-import { useStore } from 'hooks'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { Input } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface AddNewFactorModalProps {
   visible: boolean
   onClose: () => void
 }
 
-const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
+export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   // Generate a name with a number between 0 and 1000
   const [name, setName] = useState(`App ${Math.floor(Math.random() * 1000)}`)
   const { data, mutate: enroll, isLoading: isEnrolling, reset } = useMfaEnrollMutation()
@@ -41,9 +45,8 @@ const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
       <SecondStep
         visible={visible && Boolean(data)}
         factorName={name}
-        factor={data!}
+        factor={data as Extract<typeof data, { type: 'totp' }>}
         isLoading={isEnrolling}
-        onSuccess={() => onClose()}
         onClose={onClose}
       />
     </>
@@ -64,29 +67,25 @@ const FirstStep = ({ visible, name, enroll, setName, isEnrolling, onClose }: Fir
     <ConfirmationModal
       size="medium"
       visible={visible}
-      header="Add a new authenticator app as a factor"
-      buttonLabel="Generate QR"
-      buttonLoadingLabel="Generating QR"
-      buttonDisabled={name.length === 0}
+      title="Add a new authenticator app as a factor"
+      confirmLabel="Generate QR"
+      confirmLabelLoading="Generating QR"
+      disabled={name.length === 0}
       loading={isEnrolling}
-      onSelectCancel={onClose}
-      onSelectConfirm={() => {
+      onCancel={onClose}
+      onConfirm={() => {
         enroll({
           factorType: 'totp',
           friendlyName: name,
         })
       }}
     >
-      <Modal.Content>
-        <div className="pt-6 pb-5">
-          <Input
-            label="Provide a name to identify this app"
-            descriptionText="A string will be randomly generated if a name is not provided"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-      </Modal.Content>
+      <Input
+        label="Provide a name to identify this app"
+        descriptionText="A string will be randomly generated if a name is not provided"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
     </ConfirmationModal>
   )
 }
@@ -104,7 +103,6 @@ interface SecondStepProps {
     }
   }
   isLoading: boolean
-  onSuccess: () => void
   onClose: () => void
 }
 
@@ -113,27 +111,27 @@ const SecondStep = ({
   factorName,
   factor: outerFactor,
   isLoading,
-  onSuccess,
   onClose,
 }: SecondStepProps) => {
-  const { ui } = useStore()
   const [code, setCode] = useState('')
+  const queryClient = useQueryClient()
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
-
   const { mutate: challengeAndVerify, isLoading: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to add a second factor authentication:  ${error?.message}`,
-      })
+      toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
-    onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully added a second factor authentication`,
-      })
-      onSuccess()
+    onSuccess: async () => {
+      if (lastVisitedOrganization) {
+        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+      }
+      toast.success(`Successfully added a second factor authentication`)
+      onClose()
     },
   })
 
@@ -160,67 +158,61 @@ const SecondStep = ({
     <ConfirmationModal
       size="medium"
       visible={visible}
-      header={`Verify new factor ${factorName}`}
-      buttonLabel="Confirm"
-      buttonLoadingLabel="Confirming"
+      title={`Verify new factor ${factorName}`}
+      confirmLabel="Confirm"
+      confirmLabelLoading="Confirming"
       loading={isVerifying}
-      onSelectCancel={() => {
+      onCancel={() => {
         // If a factor has been created (but not verified), unenroll it. This will be run as a
         // side effect so that it's not confusing to the user why the modal stays open while
         // unenrolling.
         if (factor) unenroll({ factorId: factor.id })
       }}
-      onSelectConfirm={() => factor && challengeAndVerify({ factorId: factor.id, code })}
+      onConfirm={() => factor && challengeAndVerify({ factorId: factor.id, code })}
     >
-      <Modal.Content>
+      <div className="py-4 pb-0 text-sm">
+        <span>
+          Use an authenticator app to scan the following QR code, and provide the code from the app
+          to complete the enrolment.
+        </span>
+      </div>
+      {isLoading && (
+        <div className="pb-4 px-4">
+          <GenericSkeletonLoader />
+        </div>
+      )}
+      {factor && (
         <>
-          <div className="py-4 pb-0 text-sm">
-            <span>
-              Use an authenticator app to scan the following QR code, and provide the code from the
-              app to complete the enrolment.
-            </span>
-          </div>
-          {isLoading && (
-            <div className="pb-4 px-4">
-              <GenericSkeletonLoader />
+          <div className="flex justify-center py-6">
+            <div className="h-48 w-48 bg-white rounded">
+              <img width={190} height={190} src={factor.totp.qr_code} alt={factor.totp.uri} />
             </div>
-          )}
-          {factor && (
-            <>
-              <div className="flex justify-center py-6">
-                <div className="h-48 w-48 bg-white rounded">
-                  <img width={190} height={190} src={factor.totp.qr_code} alt={factor.totp.uri} />
-                </div>
-              </div>
-              <div>
-                <InformationBox
-                  title="Unable to scan?"
-                  description={
-                    <Input
-                      copy
-                      disabled
-                      id="ref"
-                      size="small"
-                      label="You can also enter this secret key into your authenticator app"
-                      value={factor.totp.secret}
-                    />
-                  }
-                />
-              </div>
-              <div className="pt-2 pb-4">
+          </div>
+          <div>
+            <InformationBox
+              title="Unable to scan?"
+              description={
                 <Input
-                  label="Authentication code"
-                  value={code}
-                  placeholder="XXXXXX"
-                  onChange={(e) => setCode(e.target.value)}
+                  copy
+                  disabled
+                  id="ref"
+                  size="small"
+                  label="You can also enter this secret key into your authenticator app"
+                  value={factor.totp.secret}
                 />
-              </div>
-            </>
-          )}
+              }
+            />
+          </div>
+          <div className="pt-2 pb-4">
+            <Input
+              label="Authentication code"
+              value={code}
+              placeholder="XXXXXX"
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </div>
         </>
-      </Modal.Content>
+      )}
     </ConfirmationModal>
   )
 }
-
-export default AddNewFactorModal

@@ -1,37 +1,35 @@
-import { observer } from 'mobx-react-lite'
-import { Alert } from 'ui'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { Admonition } from 'ui-patterns'
+import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 
-import Panel from 'components/ui/Panel'
-import DeleteOrganizationButton from './DeleteOrganizationButton'
+export const OrganizationDeletePanel = () => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-const OrganizationDeletePanel = observer(() => {
   return (
-    <Panel
-      title={
-        <p key="panel-title" className="uppercase">
-          Danger Zone
-        </p>
-      }
-    >
-      <Panel.Content>
-        <Alert
-          withIcon
-          variant="danger"
-          // @ts-ignore
-          title={
-            <span className="text-red-900">
-              Deleting this organization will also remove its projects
-            </span>
-          }
+    <ScaffoldSection isFullWidth>
+      <ScaffoldSectionTitle className="mb-4">Danger Zone</ScaffoldSectionTitle>
+      {selectedOrganization?.managed_by !== 'vercel-marketplace' ? (
+        <Admonition
+          type="destructive"
+          title="Deleting this organization will also remove its projects"
+          description="Make sure you have made a backup of your projects if you want to keep your data"
         >
-          <p className="text-red-900">
-            Make sure you have made a backup if you want to keep your data
-          </p>
           <DeleteOrganizationButton />
-        </Alert>
-      </Panel.Content>
-    </Panel>
+        </Admonition>
+      ) : (
+        <PartnerManagedResource
+          managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
+          resource="Organizations"
+          cta={{
+            installationId: selectedOrganization?.partner_id,
+            path: '/settings',
+            message: 'Delete organization in Vercel Marketplace',
+          }}
+        />
+      )}
+    </ScaffoldSection>
   )
-})
-
-export default OrganizationDeletePanel
+}

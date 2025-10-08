@@ -75,7 +75,7 @@ Supabase یک <a href="https://supabase.com/dashboard">پلتفرم میزبان
 شما همچنین می‌توانید به‌صورت <a href="https://supabase.com/docs/guides/hosting/overview">خود میزبانی</a> و <a href="https://supabase.com/docs/guides/local-development">محلی توسعه دهید</a>.
 </p>
 
-![معماری](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![معماری](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 <ul dir="rtl">
   <li>

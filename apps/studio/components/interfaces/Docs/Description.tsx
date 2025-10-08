@@ -1,11 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
-import { Button, IconLoader } from 'ui'
+import { toast } from 'sonner'
 
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
-import { useCheckPermissions, useStore } from 'hooks'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
+import { Loader } from 'lucide-react'
+import { Button } from 'ui'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
@@ -28,18 +32,20 @@ interface DescrptionProps {
 }
 
 const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
-  const { meta, ui } = useStore()
-
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)
   const [isUpdating, setIsUpdating] = useState(false)
+  const { data: project } = useSelectedProjectQuery()
 
   const { table, column, rpc } = metadata
 
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
 
-  const canUpdateDescription = useCheckPermissions(PermissionAction.TENANT_SQL_QUERY, '*')
+  const { can: canUpdateDescription } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_QUERY,
+    '*'
+  )
 
   const updateDescription = async () => {
     if (isUpdating || !canUpdateDescription) return false
@@ -53,22 +59,17 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
     if (rpc) query = `comment on function "${rpc}" is '${description}';`
 
     if (query) {
-      const res = await meta.query(query)
-
-      // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
-      await timeout(500)
-
-      if (res.error) {
-        ui.setNotification({
-          error: res.error,
-          category: 'error',
-          message: `Failed to update description: ${res.error.message}`,
+      try {
+        await executeSql({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          sql: query,
         })
-      } else {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated description`,
-        })
+        // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
+        await timeout(500)
+        toast.success(`Successfully updated description`)
+      } catch (error: any) {
+        toast.error(`Failed to update description: ${error.message}`)
       }
     }
 
@@ -78,7 +79,9 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
 
   if (!canUpdateDescription) {
     return (
-      <span className={`block ${value ? 'text-foreground' : ''}`}>{value || 'No description'}</span>
+      <span className={`block text-sm ${value ? 'text-foreground' : ''}`}>
+        {value || 'No description'}
+      </span>
     )
   }
 
@@ -107,7 +110,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         </Button>
         <Button disabled={!hasChanged} onClick={updateDescription}>
           {isUpdating ? (
-            <IconLoader className="mx-auto animate-spin" size={14} strokeWidth={2} />
+            <Loader className="mx-auto animate-spin" size={14} strokeWidth={2} />
           ) : (
             <span>Save</span>
           )}

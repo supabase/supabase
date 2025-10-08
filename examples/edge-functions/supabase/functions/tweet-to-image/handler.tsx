@@ -1,6 +1,6 @@
 import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
 import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 import { getTweets } from './getTweet.ts'
 import Tweet from './Tweet.tsx'

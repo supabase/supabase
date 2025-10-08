@@ -1,5 +1,7 @@
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+
 export interface UserContent<
-  T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content
+  T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content,
 > {
   id?: string
   name: string
@@ -39,6 +41,15 @@ export namespace SqlSnippets {
     // show sql snippet as a favorite.
     // this could be problematic if sql snippets have visibility that is != 'user'
     favorite: boolean
+
+    chart?: {
+      type: 'bar' | 'line'
+      cumulative: boolean
+      xKey: string
+      yKey: string
+      showLabels?: boolean
+      showGrid?: boolean
+    }
   }
 }
 
@@ -58,7 +69,6 @@ export namespace Dashboards {
    */
   export interface Content {
     schema_version: 1 // we can add some versioning to this schema in case we need to change the format.
-
     period_start: {
       time_period?: string // "0m", "1m", "5m", "1h", "1d", "1w", "1M", "1y"
       date?: string // "2017-01-01T00:00:00.000Z"
@@ -69,6 +79,7 @@ export namespace Dashboards {
     }
     interval: '1m' | '5m' | '1h' | '1d' | '1w' | '1M' | '1y' // this is the data interval
     layout: Chart[]
+    favorite?: boolean // not used yet
   }
 
   /**
@@ -94,10 +105,11 @@ export namespace Dashboards {
     y: number
     w: number
     h: number
+    label: string
     attribute: ChartType
-    provider: 'daily-stats' | 'prometheus'
-    chart_type: 'bar' | 'line' | 'area'
-    // title: string // Eventually we might need this "per chart" right?
+    provider: 'daily-stats' | 'infra-monitoring'
+    chart_type: 'bar' | 'line'
+    chartConfig?: Partial<ChartConfig>
   }
 }
 

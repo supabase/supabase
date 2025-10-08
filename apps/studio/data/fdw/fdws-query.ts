@@ -1,6 +1,6 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { fdwKeys } from './keys'
 
 export const getFDWsSql = () => {
   const sql = /* SQL */ `
@@ -63,43 +63,37 @@ export type FDW = {
   tables: FDWTable[]
 }
 
-export type FDWsResponse = {
-  result: FDW[]
-}
-
 export type FDWsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
-export type FDWsData = FDWsResponse
-export type FDWsError = unknown
-
-export const useFDWsQuery = <TData extends FDWsData = FDWsData>(
+export async function getFDWs(
   { projectRef, connectionString }: FDWsVariables,
-  options: UseQueryOptions<ExecuteSqlData, FDWsError, TData> = {}
-) =>
-  useExecuteSqlQuery(
-    {
-      projectRef,
-      connectionString,
-      sql: getFDWsSql(),
-      queryKey: ['fdws'],
-    },
-    options
+  signal?: AbortSignal
+) {
+  const sql = getFDWsSql()
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['fdws'] },
+    signal
   )
 
-export const useFDWsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: FDWsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getFDWsSql(),
-        queryKey: ['fdws'],
-      }),
-    [prefetch]
-  )
+  return result as FDW[]
 }
+
+export type FDWsData = Awaited<ReturnType<typeof getFDWs>>
+export type FDWsError = ExecuteSqlError
+
+export const useFDWsQuery = <TData = FDWsData>(
+  { projectRef, connectionString }: FDWsVariables,
+  { enabled = true, ...options }: UseQueryOptions<FDWsData, FDWsError, TData> = {}
+) =>
+  useQuery<FDWsData, FDWsError, TData>(
+    fdwKeys.list(projectRef),
+    ({ signal }) => getFDWs({ projectRef, connectionString }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      ...options,
+    }
+  )

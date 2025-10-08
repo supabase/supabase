@@ -75,7 +75,7 @@ const LWXSummary = () => {
                 Supabase Launch Week X Hackathon
               </Link>
             </ol>
-            <ol className="">
+            <ol>
               <Link
                 href="/blog/community-meetups-lwx"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"

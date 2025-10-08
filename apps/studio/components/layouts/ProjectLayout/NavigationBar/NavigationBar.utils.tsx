@@ -1,105 +1,101 @@
-import SVG from 'react-inlinesvg'
-import { products } from 'shared-data'
-import { IconBarChart, IconFileText, IconList, IconSettings } from 'ui'
+import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
 
-import { Route } from 'components/ui/ui.types'
-import { Project } from 'data/projects/project-detail-query'
-import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
+import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
+import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
+import { generateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/SettingsMenu.utils'
+import type { Route } from 'components/ui/ui.types'
+import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
+import type { Project } from 'data/projects/project-detail-query'
+import {
+  Auth,
+  Database,
+  EdgeFunctions,
+  Realtime,
+  Reports,
+  SqlEditor,
+  Storage,
+  TableEditor,
+} from 'icons'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
+export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   return [
     {
       key: 'editor',
       label: 'Table Editor',
-      icon: (
-        <SVG
-          src={`${BASE_PATH}/img/table-editor.svg`}
-          style={{ width: `${18}px`, height: `${18}px` }}
-          preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
-        />
-      ),
+      icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
+      linkElement: <EditorIndexPageLink projectRef={ref} />,
     },
     {
       key: 'sql',
       label: 'SQL Editor',
-      icon: (
-        <SVG
-          src={`${BASE_PATH}/img/sql-editor.svg`}
-          style={{ width: `${18}px`, height: `${18}px`, strokeWidth: `4` }}
-          preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
-        />
-      ),
+      icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
-        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql/new`),
+        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
   ]
 }
+
 export const generateProductRoutes = (
   ref?: string,
   project?: Project,
-  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
+  features?: {
+    auth?: boolean
+    edgeFunctions?: boolean
+    storage?: boolean
+    realtime?: boolean
+    authOverviewPage?: boolean
+    isStorageV2?: boolean
+  }
 ): Route[] => {
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
+  const authOverviewPageEnabled = features?.authOverviewPage ?? false
+  const isStorageV2 = features?.isStorageV2 ?? false
+
+  const databaseMenu = generateDatabaseMenu(project)
+  const authMenu = generateAuthMenu(ref as string)
 
   return [
     {
       key: 'database',
       label: 'Database',
-      icon: (
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 18 18"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d={products.database.icon[18]}
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeMiterlimit="10"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ),
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`),
+      icon: <Database size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : isProjectActive
+            ? `/project/${ref}/database/schemas`
+            : `/project/${ref}/database/backups/scheduled`),
+      items: databaseMenu,
     },
     ...(authEnabled
       ? [
           {
             key: 'auth',
             label: 'Authentication',
-            icon: (
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d={products.authentication.icon[24]}
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeMiterlimit="10"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
+            icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : authOverviewPageEnabled
+                  ? `/project/${ref}/auth/overview`
+                  : `/project/${ref}/auth/users`),
+            items: authMenu,
           },
         ]
       : []),
@@ -108,78 +104,31 @@ export const generateProductRoutes = (
           {
             key: 'storage',
             label: 'Storage',
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d={products.storage.icon[18]}
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeMiterlimit="10"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`),
+            icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/storage/${isStorageV2 ? 'files' : 'buckets'}`),
           },
         ]
       : []),
-    ...(IS_PLATFORM && edgeFunctionsEnabled
+    ...(edgeFunctionsEnabled
       ? [
           {
             key: 'functions',
             label: 'Edge Functions',
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d={products.functions.icon[18]}
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeMiterlimit="10"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/functions`),
           },
         ]
       : []),
-    ...(IS_PLATFORM && realtimeEnabled
+    ...(realtimeEnabled
       ? [
           {
             key: 'realtime',
             label: 'Realtime',
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d={products.realtime.icon[18]}
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeMiterlimit="10"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
           },
         ]
@@ -187,17 +136,31 @@ export const generateProductRoutes = (
   ]
 }
 
-export const generateOtherRoutes = (ref?: string, project?: Project): Route[] => {
+export const generateOtherRoutes = (
+  ref?: string,
+  project?: Project,
+  features?: { unifiedLogs?: boolean; showReports?: boolean }
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
+
+  const { unifiedLogs, showReports } = features ?? {}
+  const unifiedLogsEnabled = unifiedLogs ?? false
+  const reportsEnabled = showReports ?? true
 
   return [
-    ...(IS_PLATFORM
+    {
+      key: 'advisors',
+      label: 'Advisors',
+      icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+    },
+    ...(IS_PLATFORM && reportsEnabled
       ? [
           {
             key: 'reports',
             label: 'Reports',
-            icon: <IconBarChart size={18} strokeWidth={2.5} />,
+            icon: <Reports size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
           },
         ]
@@ -205,22 +168,41 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
     {
       key: 'logs',
       label: 'Logs',
-      icon: <IconList size={18} strokeWidth={2.5} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
+      icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : unifiedLogsEnabled
+            ? `/project/${ref}/logs`
+            : `/project/${ref}/logs/explorer`),
     },
     {
       key: 'api',
       label: 'API Docs',
-      icon: <IconFileText size={18} strokeWidth={2} />,
+      icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },
+    {
+      key: 'integrations',
+      label: 'Integrations',
+      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
+    },
+  ]
+}
+
+export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
+  const settingsMenu = generateSettingsMenu(ref as string)
+  return [
     ...(IS_PLATFORM
       ? [
           {
             key: 'settings',
             label: 'Project Settings',
-            icon: <IconSettings size={18} strokeWidth={2.5} />,
+            icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && `/project/${ref}/settings/general`,
+            items: settingsMenu,
           },
         ]
       : []),

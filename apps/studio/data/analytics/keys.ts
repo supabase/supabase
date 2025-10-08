@@ -1,4 +1,24 @@
 export const analyticsKeys = {
+  // logs/reports endpoints
+  functionsCombinedStats: (
+    projectRef: string | undefined,
+    {
+      interval,
+      functionId,
+    }: {
+      functionId: string | undefined
+      interval: string | undefined
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'functions-combined-stats',
+      {
+        interval,
+        functionId,
+      },
+    ] as const,
   functionsInvStats: (
     projectRef: string | undefined,
     {
@@ -115,18 +135,20 @@ export const analyticsKeys = {
       startDate,
       endDate,
       interval,
+      databaseIdentifier,
     }: {
       attribute?: string
       startDate?: string
       endDate?: string
       interval?: string
+      databaseIdentifier?: string
     }
   ) =>
     [
       'projects',
       projectRef,
       'infra-monitoring',
-      { attribute, startDate, endDate, interval },
+      { attribute, startDate, endDate, interval, databaseIdentifier },
     ] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,

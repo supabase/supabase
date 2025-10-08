@@ -1,9 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type AuthorizedAppRevokeVariables = {
@@ -15,9 +14,12 @@ export async function revokeAuthorizedApp({ id, slug }: AuthorizedAppRevokeVaria
   if (!id) throw new Error('App ID is required')
   if (!slug) throw new Error('Organization slug is required')
 
-  const response = await post(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps/${id}/revoke`, {})
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await post('/platform/organizations/{slug}/oauth/apps/{id}/revoke', {
+    params: { path: { slug, id } },
+  })
+
+  if (error) handleError(error)
+  return data
 }
 
 type AuthorizedAppRevokeData = Awaited<ReturnType<typeof revokeAuthorizedApp>>

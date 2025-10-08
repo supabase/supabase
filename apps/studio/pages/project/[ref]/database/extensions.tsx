@@ -1,36 +1,43 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 
-import { Extensions } from 'components/interfaces/Database'
-import { DatabaseLayout } from 'components/layouts'
+import { Extensions } from 'components/interfaces/Database/Extensions/Extensions'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseExtensions: NextPageWithLayout = () => {
-  const canReadExtensions = useCheckPermissions(
+  const { can: canReadExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'extensions'
   )
-  const isPermissionsLoaded = usePermissionsLoaded()
 
   if (isPermissionsLoaded && !canReadExtensions) {
     return <NoPermission isFullPage resourceText="view database extensions" />
   }
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <h3 className="mb-4 text-xl text-foreground">Database Extensions</h3>
+    <PageLayout
+      size="large"
+      title="Database Extensions"
+      subtitle="Manage what extensions are installed in your database"
+    >
+      <ScaffoldContainer size="large">
+        <ScaffoldSection isFullWidth>
           <Extensions />
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+        </ScaffoldSection>
+      </ScaffoldContainer>
+    </PageLayout>
   )
 }
 
-DatabaseExtensions.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+DatabaseExtensions.getLayout = (page) => (
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
+)
 
-export default observer(DatabaseExtensions)
+export default DatabaseExtensions

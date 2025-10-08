@@ -1,41 +1,90 @@
-import { useParams } from 'common'
-import { isEqual, partition } from 'lodash'
-import { Globe2, Loader2, Network } from 'lucide-react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { Button } from 'ui'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useReadReplicasStatusesQuery } from 'data/read-replicas/replicas-status-query'
-import { AWS_REGIONS_KEYS } from 'lib/constants'
+import {
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from 'data/read-replicas/replicas-status-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
+import { timeout } from 'lib/helpers'
+import { type AWS_REGIONS_KEYS } from 'shared-data'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  cn,
+} from 'ui'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
+import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
+import { SmoothstepEdge } from './Edge'
+import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
-import { PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
+import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
+import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { useShowNewReplicaPanel } from './use-show-new-replica'
 
-// [Joshen] Just FYI, UI assumes single provider for primary + replicas
-// [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
-// [Joshen] Show flags for regions
+interface InstanceConfigurationUIProps {
+  diagramOnly?: boolean
+}
 
-const InstanceConfigurationUI = () => {
+const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationUIProps) => {
   const reactFlow = useReactFlow()
+  const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const numComingUp = useRef<number>()
+  const numTransition = useRef<number>()
+  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+
+  const isAws = useIsAwsCloudProvider()
+  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
-  const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
+  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
   const [refetchInterval, setRefetchInterval] = useState<number | boolean>(10000)
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
-  const [selectedReplicaToResize, setSelectedReplicaToResize] = useState<Database>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
-  const { data, error, refetch, isLoading, isError, isSuccess } = useReadReplicasQuery({
+  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+
+  const {
+    data: loadBalancers,
+    refetch: refetchLoadBalancers,
+    isSuccess: isSuccessLoadBalancers,
+  } = useLoadBalancersQuery({
+    projectRef,
+  })
+  const {
+    data,
+    error,
+    refetch: refetchReplicas,
+    isLoading,
+    isError,
+    isSuccess: isSuccessReplicas,
+  } = useReadReplicasQuery({
     projectRef,
   })
   const [[primary], replicas] = useMemo(
@@ -48,14 +97,28 @@ const InstanceConfigurationUI = () => {
     {
       refetchInterval: refetchInterval as any,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        const comingUpReplicas = data.filter((db) => db.status === 'COMING_UP')
-        const hasTransientStatus = comingUpReplicas.length > 0
+      onSuccess: async (res) => {
+        const fixedStatues = [
+          REPLICA_STATUS.ACTIVE_HEALTHY,
+          REPLICA_STATUS.ACTIVE_UNHEALTHY,
+          REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
+        ]
+        const replicasInTransition = res.filter((db) => {
+          const { status } = db.replicaInitializationStatus || {}
+          return (
+            !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
+          )
+        })
+        const hasTransientStatus = replicasInTransition.length > 0
 
         // If any replica's status has changed, refetch databases
-        if (numComingUp.current !== comingUpReplicas.length) {
-          numComingUp.current = comingUpReplicas.length
-          refetch()
+        if (
+          numTransition.current !== replicasInTransition.length ||
+          res.length !== (data ?? []).length
+        ) {
+          numTransition.current = replicasInTransition.length
+          await refetchReplicas()
+          setTimeout(() => refetchLoadBalancers(), 2000)
         }
 
         // If all replicas are active healthy, stop fetching statuses
@@ -71,90 +134,178 @@ const InstanceConfigurationUI = () => {
 
   const nodes = useMemo(
     () =>
-      isSuccess
-        ? generateNodes(primary, replicas, {
+      isSuccessReplicas && isSuccessLoadBalancers && primary !== undefined
+        ? generateNodes({
+            primary,
+            replicas,
+            loadBalancers: loadBalancers ?? [],
             onSelectRestartReplica: setSelectedReplicaToRestart,
-            onSelectResizeReplica: setSelectedReplicaToResize,
             onSelectDropReplica: setSelectedReplicaToDrop,
           })
         : [],
-    [isSuccess, primary, replicas]
+    [isSuccessReplicas, isSuccessLoadBalancers, primary, replicas, loadBalancers]
   )
 
-  const edges: Edge[] = replicas.map((database) => {
-    return {
-      id: `${primary.identifier}-${database.identifier}`,
-      source: primary.identifier,
-      target: database.identifier,
-      type: 'smoothstep',
-      animated: true,
-    }
-  })
+  const edges: Edge[] = useMemo(
+    () =>
+      isSuccessReplicas && isSuccessLoadBalancers
+        ? [
+            ...((loadBalancers ?? []).length > 0
+              ? [
+                  {
+                    id: `load-balancer-${primary.identifier}`,
+                    source: 'load-balancer',
+                    target: primary.identifier,
+                    type: 'smoothstep',
+                    animated: true,
+                    className: '!cursor-default',
+                  },
+                ]
+              : []),
+            ...replicas.map((database) => {
+              return {
+                id: `${primary.identifier}-${database.identifier}`,
+                source: primary.identifier,
+                target: database.identifier,
+                type: 'smoothstep',
+                animated: true,
+                className: '!cursor-default',
+                data: {
+                  status: database.status,
+                  identifier: database.identifier,
+                  connectionString: database.connectionString,
+                },
+              }
+            }),
+          ]
+        : [],
+    [isSuccessLoadBalancers, isSuccessReplicas, loadBalancers, primary?.identifier, replicas]
+  )
 
   const nodeTypes = useMemo(
-    () => ({ PRIMARY: PrimaryNode, READ_REPLICA: ReplicaNode, REGION: RegionNode }),
+    () => ({
+      PRIMARY: PrimaryNode,
+      READ_REPLICA: ReplicaNode,
+      REGION: RegionNode,
+      LOAD_BALANCER: LoadBalancerNode,
+    }),
     []
   )
 
-  const onConfirmDropReplica = () => {
-    console.log('Drop replica', selectedReplicaToDrop)
-  }
+  const edgeTypes = useMemo(
+    () => ({
+      smoothstep: SmoothstepEdge,
+    }),
+    []
+  )
 
-  const onConfirmRestartReplica = () => {
-    console.log('Restart replica', selectedReplicaToRestart)
+  const setReactFlow = async () => {
+    const graph = getDagreGraphLayout(nodes, edges)
+    const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
+    reactFlow.setNodes(updatedNodes)
+    reactFlow.setEdges(graph.edges)
+
+    // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
+    await timeout(1)
+    reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
   }
 
   // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
   // even if I change the dependency array to just data. Not blocker, just an area to optimize
   useEffect(() => {
-    if (replicas.length > 0) {
-      const graph = getDagreGraphLayout(nodes, edges)
-      const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
-      reactFlow.setNodes(updatedNodes)
-      reactFlow.setEdges(graph.edges)
+    if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow') {
+      setReactFlow()
     }
-  }, [replicas])
+  }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
-    <>
+    <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>
       <div
-        className={`h-[500px] w-full relative ${
-          isSuccess ? '' : 'flex items-center justify-center px-28'
+        className={`${diagramOnly ? 'h-full' : 'h-[500px]'} w-full relative ${
+          isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
-        {isLoading && <Loader2 className="animate-spin text-foreground-light" />}
+        {/* Sometimes the read replicas are loaded before the project info and causes  read replicas to be shown on Fly deploys.
+            You can replicate this to going to this page and refresh. This isLoadingProject flag fixes that. */}
+        {(isLoading || isLoadingProject) && (
+          <Loader2 className="animate-spin text-foreground-light" />
+        )}
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
-        {isSuccess && (
+        {isSuccessReplicas && !isLoadingProject && (
           <>
-            <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
-              <Button type="default" onClick={() => setShowNewReplicaPanel(true)}>
-                Deploy a new replica
-              </Button>
-              <div className="flex items-center justify-center">
-                <Button
-                  type="default"
-                  icon={<Network size={15} />}
-                  className={`rounded-r-none transition ${
-                    view === 'flow' ? 'opacity-100' : 'opacity-50'
-                  }`}
-                  onClick={() => setView('flow')}
-                />
-                <Button
-                  type="default"
-                  icon={<Globe2 size={15} />}
-                  className={`rounded-l-none transition ${
-                    view === 'map' ? 'opacity-100' : 'opacity-50'
-                  }`}
-                  onClick={() => setView('map')}
-                />
+            {!diagramOnly && infrastructureReadReplicas && (
+              <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
+                <div className="flex items-center justify-center">
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canManageReplicas || isOrioleDb}
+                    className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
+                    onClick={() => setShowNewReplicaPanel(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canManageReplicas
+                          ? 'You need additional permissions to deploy replicas'
+                          : isOrioleDb
+                            ? 'Read replicas are not supported with OrioleDB'
+                            : undefined,
+                      },
+                    }}
+                  >
+                    Deploy a new replica
+                  </ButtonTooltip>
+                  {replicas.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          type="default"
+                          icon={<ChevronDown size={16} />}
+                          className="px-1 rounded-l-none border-l-0"
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-52 *:space-x-2">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                            Resize databases
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
+                          <div>Remove all replicas</div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+                {isAws && (
+                  <div className="flex items-center justify-center">
+                    <Button
+                      type="default"
+                      icon={<Network size={15} />}
+                      className={`rounded-r-none transition ${
+                        view === 'flow' ? 'opacity-100' : 'opacity-50'
+                      }`}
+                      onClick={() => setView('flow')}
+                    />
+                    <Button
+                      type="default"
+                      icon={<Globe2 size={15} />}
+                      className={`rounded-l-none transition ${
+                        view === 'map' ? 'opacity-100' : 'opacity-50'
+                      }`}
+                      onClick={() => setView('map')}
+                    />
+                  </div>
+                )}
               </div>
-            </div>
+            )}
             {view === 'flow' ? (
               <ReactFlow
                 fitView
-                fitViewOptions={{ minZoom: 0.9, maxZoom: 1 }}
+                fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
                 className="instance-configuration"
                 zoomOnPinch={false}
+                zoomOnScroll={false}
                 nodesDraggable={false}
                 nodesConnectable={false}
                 zoomOnDoubleClick={false}
@@ -163,12 +314,7 @@ const InstanceConfigurationUI = () => {
                 defaultNodes={[]}
                 defaultEdges={[]}
                 nodeTypes={nodeTypes}
-                onInit={() => {
-                  const graph = getDagreGraphLayout(nodes, edges)
-                  const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
-                  reactFlow.setNodes(updatedNodes)
-                  reactFlow.setEdges(graph.edges)
-                }}
+                edgeTypes={edgeTypes}
                 proOptions={{ hideAttribution: true }}
               >
                 <Background color={backgroundPatternColor} />
@@ -180,7 +326,6 @@ const InstanceConfigurationUI = () => {
                   setShowNewReplicaPanel(true)
                 }}
                 onSelectRestartReplica={setSelectedReplicaToRestart}
-                onSelectResizeReplica={setSelectedReplicaToResize}
                 onSelectDropReplica={setSelectedReplicaToDrop}
               />
             )}
@@ -188,60 +333,49 @@ const InstanceConfigurationUI = () => {
         )}
       </div>
 
-      <DeployNewReplicaPanel
-        visible={showNewReplicaPanel}
-        selectedDefaultRegion={newReplicaRegion}
-        onSuccess={() => setRefetchInterval(10000)}
-        onClose={() => {
-          setNewReplicaRegion(undefined)
-          setShowNewReplicaPanel(false)
-        }}
-      />
+      {!diagramOnly && (
+        <>
+          <DeployNewReplicaPanel
+            visible={showNewReplicaPanel}
+            selectedDefaultRegion={newReplicaRegion}
+            onSuccess={() => setRefetchInterval(5000)}
+            onClose={() => {
+              setNewReplicaRegion(undefined)
+              setShowNewReplicaPanel(false)
+            }}
+          />
 
-      <DropReplicaConfirmationModal
-        selectedReplica={selectedReplicaToDrop}
-        onSuccess={() => setRefetchInterval(10000)}
-        onCancel={() => setSelectedReplicaToDrop(undefined)}
-      />
+          <DropReplicaConfirmationModal
+            selectedReplica={selectedReplicaToDrop}
+            onSuccess={() => setRefetchInterval(5000)}
+            onCancel={() => setSelectedReplicaToDrop(undefined)}
+          />
 
-      {/* <ResizeReplicaPanel
-        visible={selectedReplicaToResize !== undefined}
-        selectedReplica={selectedReplicaToResize}
-        onClose={() => setSelectedReplicaToResize(undefined)}
-      /> */}
+          <DropAllReplicasConfirmationModal
+            visible={showDeleteAllModal}
+            onSuccess={() => setRefetchInterval(5000)}
+            onCancel={() => setShowDeleteAllModal(false)}
+          />
 
-      {/* <ConfirmationModal
-        size="medium"
-        visible={selectedReplicaToRestart !== undefined}
-        header="Confirm to restart selected replica?"
-        buttonLabel="Restart replica"
-        buttonLoadingLabel="Restarting replica"
-        onSelectCancel={() => setSelectedReplicaToRestart(undefined)}
-        onSelectConfirm={() => onConfirmRestartReplica()}
-      >
-        <Modal.Content className="py-3">
-          <p className="text-sm">Before restarting the replica, consider:</p>
-          <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
-            <li>
-              Network traffic from this region may slow down while the replica is restarting,
-              especially if you have no other replicas in this region
-            </li>
-          </ul>
-          <p className="text-sm mt-2">
-            Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
-          </p>
-        </Modal.Content>
-      </ConfirmationModal> */}
-    </>
+          <RestartReplicaConfirmationModal
+            selectedReplica={selectedReplicaToRestart}
+            onSuccess={() => setRefetchInterval(5000)}
+            onCancel={() => setSelectedReplicaToRestart(undefined)}
+          />
+        </>
+      )}
+    </div>
   )
 }
 
-const InstanceConfiguration = () => {
+interface InstanceConfigurationProps {
+  diagramOnly?: boolean
+}
+
+export const InstanceConfiguration = ({ diagramOnly = false }: InstanceConfigurationProps) => {
   return (
     <ReactFlowProvider>
-      <InstanceConfigurationUI />
+      <InstanceConfigurationUI diagramOnly={diagramOnly} />
     </ReactFlowProvider>
   )
 }
-
-export default InstanceConfiguration

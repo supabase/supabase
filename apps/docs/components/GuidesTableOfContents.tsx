@@ -1,58 +1,55 @@
-import { FC } from 'react'
-import { removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
+'use client'
 
-const formatSlug = (slug: string) => {
-  // [Joshen] We will still provide support for headers declared like this:
-  //    ## REST API {#rest-api-overview}
-  // At least for now, this was a docusaurus thing.
-  if (slug.includes('#')) return slug.split('#')[1]
-  return slug
-}
-
-const formatTOCHeader = (content: string) => {
-  let begin = false
-  const res = []
-  for (const x of content) {
-    if (x === '`') {
-      if (!begin) {
-        begin = true
-        res.push(`<code class="text-xs border rounded bg-muted">`)
-      } else {
-        begin = false
-        res.push(`</code>`)
-      }
-    } else {
-      res.push(x)
-    }
-  }
-  return res.join('')
-}
+import { usePathname } from 'next/navigation'
+import { isFeatureEnabled } from 'common'
+import { cn } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
+import { Feedback } from '~/components/Feedback'
+import { useTocAnchors } from '../features/docs/GuidesMdx.state'
 
 interface TOCHeader {
-  id: number
-  level: number
+  id?: string
   text: string
   link: string
+  level: number
 }
 
-interface Props {
-  list: TOCHeader[]
-}
+const GuidesTableOfContents = ({ className, video }: { className?: string; video?: string }) => {
+  const pathname = usePathname()
+  const { toc } = useTocAnchors()
 
-const GuidesTableOfContents: FC<Props> = ({ list }) => {
+  const showFeedback = isFeatureEnabled('feedback:docs')
+
+  const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
+
   return (
-    <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
-      {list.map((item, i) => (
-        <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
-          <a
-            href={`#${formatSlug(item.link)}`}
-            className="text-foreground-lighter hover:text-brand-link transition-colors"
-            dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.text)) }}
-          />
-        </li>
-      ))}
-    </ul>
+    <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
+      <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit">
+        {video && (
+          <div className="relative pl-5">
+            <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
+          </div>
+        )}
+        {showFeedback && (
+          <div className="pl-5">
+            <Feedback key={pathname} />
+          </div>
+        )}
+        {toc.length !== 0 && (
+          <Toc className="-ml-[calc(0.25rem+6px)]">
+            <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
+              On this page
+            </h3>
+            <TOCScrollArea>
+              <TOCItems items={toc} />
+            </TOCScrollArea>
+          </Toc>
+        )}
+      </div>
+    </div>
   )
 }
 
 export default GuidesTableOfContents
+export type { TOCHeader }

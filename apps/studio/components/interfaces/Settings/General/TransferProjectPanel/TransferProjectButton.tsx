@@ -1,37 +1,31 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
+import { Loader, Shield, Users, Wrench } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import {
-  Alert,
-  Button,
-  IconAlertCircle,
-  IconLoader,
-  IconShield,
-  IconTool,
-  IconUsers,
-  Listbox,
-  Loading,
-  Modal,
-} from 'ui'
+import { toast } from 'sonner'
 
+import { useFlag } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const TransferProjectButton = () => {
-  const { ui } = useStore()
-
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
-  const { data: allOrganizations } = useOrganizationsQuery()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const { data: allOrganizations } = useOrganizationsQuery({ enabled: isOpen })
   const disableProjectTransfer = useFlag('disableProjectTransfer')
 
   const organizations = (allOrganizations || []).filter((it) => it.id !== projectOrgId)
 
-  const [isOpen, setIsOpen] = useState(false)
   const [selectedOrg, setSelectedOrg] = useState()
 
   const {
@@ -40,11 +34,7 @@ const TransferProjectButton = () => {
     isLoading: isTransferring,
   } = useProjectTransferMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        duration: 5000,
-        message: `Successfully transferred project ${project?.name}.`,
-      })
+      toast.success(`Successfully transferred project ${project?.name}.`)
       setIsOpen(false)
     },
   })
@@ -69,7 +59,10 @@ const TransferProjectButton = () => {
     }
   }, [isOpen])
 
-  const canTransferProject = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canTransferProject } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   const toggle = () => {
     setIsOpen(!isOpen)
@@ -83,39 +76,25 @@ const TransferProjectButton = () => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
-          <Button
-            onClick={toggle}
-            type="default"
-            disabled={!canTransferProject || disableProjectTransfer}
-          >
-            Transfer project
-          </Button>
-        </Tooltip.Trigger>
-        {(!canTransferProject || disableProjectTransfer) && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {!canTransferProject
-                    ? 'You need additional permissions to transfer this project'
-                    : 'Project transfers are temporarily disabled, please try again later.'}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        )}
-      </Tooltip.Root>
+      <ButtonTooltip
+        type="default"
+        onClick={toggle}
+        disabled={!canTransferProject || disableProjectTransfer}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: !canTransferProject
+              ? 'You need additional permissions to transfer this project'
+              : disableProjectTransfer
+                ? 'Project transfers are temporarily disabled, please try again later.'
+                : undefined,
+          },
+        }}
+      >
+        Transfer project
+      </ButtonTooltip>
 
       <Modal
-        closable
         onCancel={() => toggle()}
         visible={isOpen}
         loading={isTransferring}
@@ -137,190 +116,102 @@ const TransferProjectButton = () => {
           </div>
         }
       >
-        <div className="space-y-4 py-4 text-foreground-light">
-          <Modal.Content>
-            <p className="text-sm">
-              To transfer projects, the owner must be a member of both the source and target
-              organizations. For further information see our{' '}
-              <Link
-                href="https://supabase.com/docs/guides/platform/project-transfer"
-                className="text-brand hover:underline"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-              .
-            </p>
+        <Modal.Content className="text-foreground-light">
+          <p className="text-sm">
+            To transfer projects, the owner must be a member of both the source and target
+            organizations. Consider the following before transferring your project:
+          </p>
 
-            <p className="font-bold mt-6 text-sm">Transferring considerations:</p>
-
-            <ul className="mt-4 space-y-5 text-sm px-4">
-              <li className="flex gap-4">
-                <span className="shrink-0 mt-1">
-                  <IconLoader />
-                </span>
-                <div>
-                  <p className="font-bold">No downtime</p>
-                  <p>There is no downtime or restrictions involved when transferring a project.</p>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <span className="shrink-0 mt-1">
-                  <IconShield />
-                </span>
-                <div>
-                  <p className="font-bold">Permissions</p>
-                  <p>
-                    Depending on your role in the target organization, your level of permissions may
-                    change after transfer.
-                  </p>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <span className="shrink-0 mt-1">
-                  <IconTool w={14} className="flex-shrink-0" />
-                </span>
-                <div>
-                  <p className="font-bold">Features</p>
-                  <p>
-                    Moving your project to an organization with a smaller subscription plan may
-                    result in the loss of certain features (i.e. image transformations).
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </Modal.Content>
-          <Modal.Content>
-            {organizations && (
-              <div className="mt-8 mx-4 border-t pt-4 space-y-2">
-                {organizations.length === 0 ? (
-                  <div className="flex items-center gap-2 bg-surface-200 p-3 text-sm">
-                    <IconAlertCircle /> You do not have any organizations with an organization-based
-                    subscription.
-                  </div>
-                ) : (
-                  <Listbox
-                    label="Select Target Organization"
-                    layout="vertical"
-                    value={selectedOrg}
-                    onChange={(slug) => setSelectedOrg(slug)}
-                    placeholder="Select Organization"
-                  >
-                    <Listbox.Option disabled key="no-results" label="Select Organization" value="">
-                      Select Organization
-                    </Listbox.Option>
-                    {organizations.map((x: any) => (
-                      <Listbox.Option
-                        key={x.id}
-                        label={x.name}
-                        value={x.slug}
-                        addOnBefore={() => <IconUsers />}
-                      >
-                        {x.name}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox>
-                )}
-
-                <p className="text-foreground-light text-sm">
-                  The target organization needs to use{' '}
-                  <Link
-                    href="https://supabase.com/docs/guides/platform/org-based-billing"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline"
-                  >
-                    organization-based billing
-                  </Link>
-                  . To migrate an organization to the new billing, head to your{' '}
-                  <Link
-                    href="/org/_/billing"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline"
-                  >
-                    organizations billing settings
-                  </Link>
-                  .
+          <ul className="mt-4 space-y-5 text-sm">
+            <li className="flex gap-4">
+              <span className="shrink-0 mt-1">
+                <Loader />
+              </span>
+              <div>
+                <p className="font-bold">Possible downtime</p>
+                <p>
+                  There might be a short downtime when transferring projects from a paid to a free
+                  organization.
                 </p>
               </div>
-            )}
-          </Modal.Content>
+            </li>
 
+            <li className="flex gap-4">
+              <span className="shrink-0 mt-1">
+                <Shield />
+              </span>
+              <div>
+                <p className="font-bold">Permissions</p>
+                <p>
+                  Depending on your role in the target organization, your level of permissions may
+                  change after transfer.
+                </p>
+              </div>
+            </li>
+
+            <li className="flex gap-4">
+              <span className="shrink-0 mt-1">
+                <Wrench size={24} className="flex-shrink-0" />
+              </span>
+              <div>
+                <p className="font-bold">Features</p>
+                <p>
+                  Moving your project to an organization with a smaller subscription plan may result
+                  in the loss of certain features (i.e. image transformations).
+                </p>
+              </div>
+            </li>
+          </ul>
+
+          <DocsButton
+            abbrev={false}
+            className="mt-6"
+            href={`${DOCS_URL}/guides/platform/project-transfer`}
+          />
+        </Modal.Content>
+
+        <Modal.Separator />
+
+        <Modal.Content>
+          {organizations && (
+            <div className="space-y-2">
+              {organizations.length === 0 ? (
+                <div className="flex items-center gap-3 bg-surface-200 p-3 text-sm rounded-md border">
+                  <InfoIcon /> You do not have any organizations you can transfer your project to.
+                </div>
+              ) : (
+                <Listbox
+                  label="Select Target Organization"
+                  layout="vertical"
+                  value={selectedOrg}
+                  onChange={(slug) => setSelectedOrg(slug)}
+                  placeholder="Select Organization"
+                >
+                  <Listbox.Option disabled key="no-results" label="Select Organization" value="">
+                    Select Organization
+                  </Listbox.Option>
+                  {organizations.map((x: any) => (
+                    <Listbox.Option
+                      key={x.id}
+                      label={x.name}
+                      value={x.slug}
+                      addOnBefore={() => <Users />}
+                    >
+                      {x.name}
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
+              )}
+            </div>
+          )}
+        </Modal.Content>
+
+        {selectedOrg !== undefined && (
           <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
             <Modal.Content>
-              <div className="px-4">
-                {transferPreviewData && transferPreviewData.valid && (
-                  <div className="text-sm text-foreground-light p-4 bg-surface-200">
-                    {transferPreviewData.source_subscription_plan !==
-                    transferPreviewData.target_subscription_plan ? (
-                      <div>
-                        <p>
-                          Your project is currently on the{' '}
-                          {transferPreviewData.source_subscription_plan} plan, whereas the target
-                          organization uses the {transferPreviewData.target_subscription_plan} plan.
-                        </p>
-                      </div>
-                    ) : (
-                      <div>
-                        Your project and the target organization are both on the{' '}
-                        {transferPreviewData.source_subscription_plan} subscription plan.
-                      </div>
-                    )}
-
-                    <div className="my-4">
-                      {transferPreviewData.credits_on_source_organization === 0 ? (
-                        <span>
-                          {' '}
-                          Your current organization won't be granted any prorated credits.
-                        </span>
-                      ) : (
-                        <span>
-                          {' '}
-                          Your current organization will be granted{' '}
-                          <span className="text-brand">
-                            ${transferPreviewData.credits_on_source_organization}
-                          </span>{' '}
-                          in credits as proration.
-                        </span>
-                      )}
-                      {transferPreviewData.costs_on_target_organization === 0 ? (
-                        <span>
-                          {' '}
-                          The target organization won't be charged any immediate upfront payment.
-                        </span>
-                      ) : (
-                        <span>
-                          {' '}
-                          The target organization will be billed{' '}
-                          <span className="text-brand">
-                            ${transferPreviewData.costs_on_target_organization}
-                          </span>{' '}
-                          immediately to prorate for the remainder of the billing period.
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {transferPreviewData && transferPreviewData.warnings.length > 0 && (
-                  <Alert
-                    withIcon
-                    variant="warning"
-                    title="Warnings for project transfer"
-                    className="mt-3"
-                  >
-                    <div className="space-y-1">
-                      {transferPreviewData.warnings.map((warning) => (
-                        <p key={warning.key}>{warning.message}</p>
-                      ))}
-                    </div>
-                  </Alert>
-                )}
+              <div className="space-y-2">
                 {transferPreviewData && transferPreviewData.errors.length > 0 && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <Admonition type="danger" title="Project cannot be transferred">
                     <div className="space-y-1">
                       {transferPreviewData.errors.map((error) => (
                         <p key={error.key}>{error.message}</p>
@@ -344,26 +235,58 @@ const TransferProjectButton = () => {
                         </ul>
                         <p className="text-sm text-foreground-light">
                           These members will need to either delete, pause, or upgrade one or more of
-                          their projects before you can downgrade this project.
+                          their projects before you can transfer this project.
                         </p>
                       </div>
                     )}
-                  </Alert>
+                  </Admonition>
                 )}
+                {transferPreviewData &&
+                  (transferPreviewData.warnings.length > 0 ||
+                    transferPreviewData.info.length > 0) && (
+                    <Admonition type="caution" showIcon={false} className="mt-3">
+                      <div className="flex flex-col gap-y-2">
+                        {transferPreviewData.warnings.map((warning) => (
+                          <div key={warning.key} className="flex items-center gap-2">
+                            <WarningIcon className="flex-shrink-0" />
+                            <p className="mb-0.5">{warning.message}</p>
+                          </div>
+                        ))}
+                        {transferPreviewData.info.map((info) => (
+                          <div key={info.key} className="flex items-start gap-2">
+                            <InfoIcon className="flex-shrink-0 mt-0.5" />
+                            <p className="mb-0.5">{info.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </Admonition>
+                  )}
                 {transferPreviewError && !transferError && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
-                    <p>{transferPreviewError.message}</p>
-                  </Alert>
+                  <Admonition
+                    type="danger"
+                    title="Project cannot be transferred"
+                    description={
+                      <>
+                        <p>{transferPreviewError.message}</p>
+                      </>
+                    }
+                  />
                 )}
                 {transferError && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
-                    <p>{transferError.message}</p>
-                  </Alert>
+                  <Admonition
+                    type="danger"
+                    title="Project cannot be transferred"
+                    description={
+                      <>
+                        <p>{transferError.message}</p>
+                      </>
+                    }
+                  />
                 )}
               </div>
             </Modal.Content>
           </Loading>
-        </div>
+        )}
       </Modal>
     </>
   )

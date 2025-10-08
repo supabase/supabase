@@ -5,9 +5,9 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+      "@ui/*": ["./../../packages/ui/src/*"]
     },
-    "target": "es2015",
+    "target": "ES2021",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -15,18 +15,25 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "module": "esnext"
+    "module": "esnext",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "pages/guides/append-test.js",
-    "jest.config.mjs"
+    ".next/types/**/*.ts",
+    "./../../packages/ui/src/**/*.d.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "examples"]
 }

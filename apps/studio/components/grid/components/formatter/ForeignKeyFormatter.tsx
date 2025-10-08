@@ -1,30 +1,34 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-import { RenderCellProps } from 'react-data-grid'
+import { ArrowRight } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import type { RenderCellProps } from 'react-data-grid'
 
-import { useParams } from 'common/hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableQuery } from 'data/tables/table-query'
+import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { Button, IconArrowRight } from 'ui'
-import { SupaRow } from '../../types'
-import { NullValue } from '../common'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import type { SupaRow } from '../../types'
+import { NullValue } from '../common/NullValue'
+import { ReferenceRecordPeek } from './ReferenceRecordPeek'
 
-export const ForeignKeyFormatter = (
-  props: PropsWithChildren<RenderCellProps<SupaRow, unknown>>
-) => {
-  const { project } = useProjectContext()
-  const { ref: projectRef, id: _id } = useParams()
-  const id = _id ? Number(_id) : undefined
+interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
+  tableId?: number
+}
 
-  const { row, column } = props
+export const ForeignKeyFormatter = (props: Props) => {
+  const { tableId, row, column } = props
+  const { data: project } = useSelectedProjectQuery()
 
-  const { data: selectedTable } = useTableQuery({
+  const { data } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    id,
+    id: tableId,
   })
+  const foreignKeyColumn = data?.columns.find((x) => x.name === column.key)
+  const selectedTable = isTableLike(data) ? data : undefined
+
   const relationship = (selectedTable?.relationships ?? []).find(
     (r) =>
       r.source_schema === selectedTable?.schema &&
@@ -33,6 +37,7 @@ export const ForeignKeyFormatter = (
   )
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
+    includeColumns: true,
     connectionString: project?.connectionString,
     schema: relationship?.target_table_schema,
   })
@@ -43,46 +48,33 @@ export const ForeignKeyFormatter = (
   )
 
   const value = row[column.key]
+  const formattedValue =
+    foreignKeyColumn?.format === 'bytea' && !!value ? convertByteaToHex(value) : value
 
   return (
     <div className="sb-grid-foreign-key-formatter flex justify-between">
       <span className="sb-grid-foreign-key-formatter__text">
-        {value === null ? <NullValue /> : value}
+        {formattedValue === null ? <NullValue /> : formattedValue}
       </span>
-      {relationship !== undefined && targetTable !== undefined && value !== null && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button
+      {relationship !== undefined && targetTable !== undefined && formattedValue !== null && (
+        <Popover_Shadcn_>
+          <PopoverTrigger_Shadcn_ asChild>
+            <ButtonTooltip
               type="default"
-              size="tiny"
-              className="translate-y-[2px]"
-              onClick={() => {}}
-              style={{ padding: '3px' }}
-              asChild
-            >
-              <Link
-                href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
-              >
-                <IconArrowRight size="tiny" />
-              </Link>
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">View referencing record</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+              className="w-6 h-6"
+              icon={<ArrowRight />}
+              onClick={(e) => e.stopPropagation()}
+              tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
+            />
+          </PopoverTrigger_Shadcn_>
+          <PopoverContent_Shadcn_ portal align="end" className="p-0 w-96">
+            <ReferenceRecordPeek
+              table={targetTable}
+              column={relationship.target_column_name}
+              value={formattedValue}
+            />
+          </PopoverContent_Shadcn_>
+        </Popover_Shadcn_>
       )}
     </div>
   )

@@ -17,16 +17,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     env:
-      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
-
-    strategy:
-      matrix:
-        node-version: [18.x]
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     defaults:
       run:
@@ -37,14 +36,18 @@ jobs:
         with:
           sparse-checkout: |
             packages
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          run_install: false
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
       - name: Install deps
-        run: npm ci
+        run: pnpm i
       - name: Type check
-        run: npm run typecheck
+        run: pnpm run typecheck
       - name: Run tests
-        run: npm run test
+        run: pnpm run test

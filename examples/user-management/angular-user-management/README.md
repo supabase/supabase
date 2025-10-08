@@ -54,7 +54,7 @@ Run the application: `npm run start`. Open your browser to `https://localhost:42
 
 ### Postgres Row level security
 
-This project uses very high-level Authorization using Postgres' Role Level Security.
+This project uses very high-level Authorization using Postgres' Row Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
@@ -79,10 +79,10 @@ create policy "Public profiles are viewable by everyone."
   using ( true );
 create policy "Users can insert their own profile."
   on profiles for insert
-  with check ( auth.uid() = id );
+  with check ( (select auth.uid()) = id );
 create policy "Users can update own profile."
   on profiles for update
-  using ( auth.uid() = id );
+  using ( (select auth.uid()) = id );
 -- Set up Realtime!
 begin;
   drop publication if exists supabase_realtime;

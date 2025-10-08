@@ -1,7 +1,7 @@
 import { isNull, noop } from 'lodash'
-import { IconChevronRight } from 'ui'
+import { ChevronRight } from 'lucide-react'
 
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 interface DrilldownPaneProps {
   pane: number
@@ -57,7 +57,7 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
               key === activeKey ? 'opacity-100' : 'opacity-50'
             } group-hover:opacity-100 transition`}
           >
-            <IconChevronRight strokeWidth={2} size={16} />
+            <ChevronRight strokeWidth={2} size={16} />
           </div>
         </div>
       ))}
@@ -72,8 +72,8 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
             {isNull(jsonData[key])
               ? 'null'
               : typeof jsonData[key] === 'string'
-              ? `"${jsonData[key]}"`
-              : jsonData[key].toString()}
+                ? `"${jsonData[key]}"`
+                : jsonData[key].toString()}
           </p>
         </div>
       ))}

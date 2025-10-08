@@ -1,9 +1,7 @@
 import React from 'react'
-import Typography from '../Typography'
-// @ts-ignore
-import CardStyles from './Card.module.css'
 
 import styleHandler from '../../lib/theme/styleHandler'
+import Typography from '../Typography'
 
 interface CardProps {
   children?: React.ReactNode
@@ -16,15 +14,7 @@ interface CardProps {
   titleExtra?: React.ReactNode
 }
 
-function Card({
-  children,
-  className,
-  cover,
-  hoverable,
-  style,
-  title,
-  titleExtra,
-}: CardProps) {
+function Card({ children, className, cover, hoverable, style, title, titleExtra }: CardProps) {
   let __styles = styleHandler('card')
 
   let classes = [__styles.base]

@@ -114,7 +114,7 @@ const Hero = (props: Props) => {
     >
       <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-foreground-light lg:px-28">
         <div className="col-span-12 text-foreground md:col-span-9 lg:col-span-8 xl:col-span-6">
-          <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
+          <p className="mb-10 text-4xl">Supabase is the Postgres development platform.</p>
           <p className="text-2xl">
             Today, we're moving to <span className="text-brand">Beta</span>
           </p>
@@ -239,7 +239,7 @@ const TableOfContents = (props: any) => {
                     onClick={() => scrollTo(chapter.key)}
                   >
                     <p className="font-mono text-xs text-foreground">{`0${chapter.no}`}</p>
-                    <p className="ml-4 text-base text-black transition border-b border-default hover:text-foreground">
+                    <p className="ml-4 text-base text-foreground-light transition border-b border-default hover:text-foreground">
                       {chapter.name}
                     </p>
                   </div>
@@ -535,7 +535,7 @@ const NewFeaturesAndIntegrations = () => {
               If you're new to Supabase, here's a few of the things you get when you choose us as
               your backend.
             </p>
-            <ul className="">
+            <ul>
               <li className="mb-10">
                 <p className="w-20 pb-2 mb-2 border-b-2 border-default">Auth</p>
                 <p className="mb-5">
@@ -550,7 +550,7 @@ const NewFeaturesAndIntegrations = () => {
                   </a>{' '}
                   (and{' '}
                   <a
-                    href="/docs/gotrue/server/about#endpoints"
+                    href="/docs/guides/auth/architecture#client-layer"
                     target="_blank"
                     className="text-brand hover:text-brand"
                   >
@@ -692,7 +692,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p>
-            The Supabase Base plan is now called the Supabase Pro plan as per the{' '}
+            The Supabase Base plan is now called the Supabase Pro Plan as per the{' '}
             <a href="https://supabase.com/pricing" className="text-brand hover:text-brand">
               pricing page
             </a>
@@ -965,7 +965,7 @@ const Beta = (props: Props) => {
           },
           images: [
             {
-              url: 'https://supabase.com/og/og-image-v2.jpg',
+              url: 'https://supabase.com/og/supabase-og.png',
             },
           ],
         }}

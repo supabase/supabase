@@ -1,33 +1,58 @@
-import clsx from 'clsx'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import InformationBox from 'components/ui/InformationBox'
+import DateRangePicker from 'components/ui/DateRangePicker'
+import NoPermission from 'components/ui/NoPermission'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { OrgProject } from 'data/projects/org-projects-infinite-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useSelectedOrganization } from 'hooks'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import Link from 'next/link'
-import { Alert, Button, IconExternalLink, IconInfo, Listbox } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
+import { Check, ChevronDown } from 'lucide-react'
+import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
-import Bandwidth from './Bandwidth'
-import SizeAndCounts from './SizeAndCounts'
 import Compute from './Compute'
-import TotalUsage from './TotalUsage'
+import Egress from './Egress'
+import SizeAndCounts from './SizeAndCounts'
+import { TotalUsage } from './TotalUsage'
 
-const Usage = () => {
+// [Joshen] JFYI this component could use nuqs to handle `projectRef` state which will help
+// simplify some of the implementation here.
+
+export const Usage = () => {
   const { slug, projectRef } = useParams()
-  const [dateRange, setDateRange] = useState<any>()
-  const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
 
-  const organization = useSelectedOrganization()
-  const { data: projects, isSuccess } = useProjectsQuery()
+  const [dateRange, setDateRange] = useState<any>()
+  const [selectedProject, setSelectedProject] = useState<OrgProject>()
+
+  const [selectedProjectRefInputValue, setSelectedProjectRefInputValue] = useState<
+    string | undefined
+  >('all-projects')
+  const [openProjectSelector, setOpenProjectSelector] = useState(false)
+
+  // [Alaister] 'all-projects' is not a valid project ref, it's just used as an extra
+  // state for the select input. As such we need to remove it for the selected project ref
+  const selectedProjectRef =
+    selectedProjectRefInputValue === 'all-projects' ? undefined : selectedProjectRefInputValue
+
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+
+  const { isSuccess: isSuccessProjectDetail } = useProjectDetailQuery({
+    ref: selectedProjectRef,
+  })
+
   const {
     data: subscription,
     error: subscriptionError,
@@ -36,34 +61,23 @@ const Usage = () => {
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
 
-  const { data: usage } = useOrgUsageQuery({ orgSlug: slug })
+  const billingCycleStart = useMemo(() => {
+    return dayjs.unix(subscription?.current_period_start ?? 0).utc()
+  }, [subscription])
 
-  const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
-
-  useEffect(() => {
-    if (projectRef && isSuccess && orgProjects !== undefined) {
-      if (orgProjects.find((project) => project.ref === projectRef)) {
-        setSelectedProjectRef(projectRef)
-      }
-    }
-    // [Joshen] Since we're already looking at isSuccess
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectRef, isSuccess])
-
-  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  const billingCycleEnd = useMemo(() => {
+    return dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  }, [subscription])
 
   const currentBillingCycleSelected = useMemo(() => {
     // Selected by default
-    if (!dateRange?.period_start || !dateRange?.period_end || !subscription) return true
-
-    const { current_period_start, current_period_end } = subscription
+    if (!dateRange?.period_start || !dateRange?.period_end) return true
 
     return (
-      dayjs(dateRange.period_start.date).isSame(new Date(current_period_start * 1000)) &&
-      dayjs(dateRange.period_end.date).isSame(new Date(current_period_end * 1000))
+      dayjs(dateRange.period_start.date).isSame(billingCycleStart) &&
+      dayjs(dateRange.period_end.date).isSame(billingCycleEnd)
     )
-  }, [dateRange, subscription])
+  }, [dateRange, billingCycleStart, billingCycleEnd])
 
   const startDate = useMemo(() => {
     // If end date is in future, set end date to now
@@ -90,143 +104,171 @@ const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, subscription])
 
-  const selectedProject = selectedProjectRef
-    ? orgProjects?.find((it) => it.ref === selectedProjectRef)
-    : undefined
-
-  const hasExceededAnyLimits = Boolean(
-    usage?.usages.find(
-      (metric) =>
-        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
-    )
-  )
+  useEffect(() => {
+    if (projectRef && isSuccessProjectDetail) {
+      setSelectedProjectRefInputValue(projectRef)
+    }
+    // [Joshen] Since we're already looking at isSuccess
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectRef, isSuccessProjectDetail])
 
   return (
     <>
-      <ScaffoldContainer className="sticky top-0 border-b bg-background z-10 overflow-hidden">
-        <div className="py-4 flex items-center space-x-4">
-          {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
-
-          {isErrorSubscription && (
-            <AlertError
-              className="w-full"
-              subject="Failed to retrieve usage data"
-              error={subscriptionError}
-            />
-          )}
-
-          {isSuccessSubscription && (
-            <>
-              <DateRangePicker
-                onChange={setDateRange}
-                value={TIME_PERIODS_BILLING[0].key}
-                options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
-                loading={isLoadingSubscription}
-                currentBillingPeriodStart={subscription?.current_period_start}
-                currentBillingPeriodEnd={subscription?.current_period_end}
-              />
-
-              <Listbox
-                size="tiny"
-                name="schema"
-                className="w-[180px]"
-                value={selectedProjectRef}
-                onChange={(value: any) => {
-                  if (value === 'all-projects') setSelectedProjectRef(undefined)
-                  else setSelectedProjectRef(value)
-                }}
-              >
-                <Listbox.Option
-                  key="all-projects"
-                  id="all-projects"
-                  label="All projects"
-                  value="all-projects"
-                >
-                  All projects
-                </Listbox.Option>
-                {orgProjects?.map((project) => (
-                  <Listbox.Option
-                    key={project.ref}
-                    id={project.ref}
-                    value={project.ref}
-                    label={project.name}
-                  >
-                    {project.name}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
-
-              <div className="flex flex-col xl:flex-row xl:gap-3">
-                <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
-                  Organization is on the {subscription.plan.name} plan
-                </p>
-                <p className="text-sm text-foreground-light">
-                  {billingCycleStart.format('DD MMM YYYY')} -{' '}
-                  {billingCycleEnd.format('DD MMM YYYY')}
-                </p>
-              </div>
-            </>
-          )}
-        </div>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Usage</ScaffoldTitle>
+        </ScaffoldHeader>
       </ScaffoldContainer>
+      <div className="sticky top-0 border-b bg-sidebar z-[1]">
+        <ScaffoldContainer>
+          <div className="py-4 flex items-center space-x-4">
+            {isLoadingSubscription || isLoadingPermissions ? (
+              <div className="flex lg:items-center items-start gap-3 flex-col lg:flex-row lg:justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <ShimmeringLoader className="w-48" />
+                  <ShimmeringLoader className="w-48" />
+                </div>
+                <ShimmeringLoader className="w-[280px]" />
+              </div>
+            ) : !canReadSubscriptions ? (
+              <NoPermission resourceText="view organization usage" />
+            ) : null}
 
-      {!selectedProject && subscription && hasExceededAnyLimits && (
-        <ScaffoldContainer className="mt-5">
-          <Alert
-            withIcon
-            variant="danger"
-            title="Your organization's usage has exceeded its included quota"
-            actions={[
-              <Button key="upgrade-button" asChild type="default" className="ml-8">
-                <Link
-                  href={`/org/${slug}/billing?panel=${
-                    subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                  }`}
-                >
-                  {subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
-                </Link>
-              </Button>,
-            ]}
-          >
-            Your projects can become unresponsive or enter read-only mode.{' '}
-            {subscription.plan.id === 'free'
-              ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
-              : 'Please disable spend cap to ensure that your projects remain available.'}
-          </Alert>
-        </ScaffoldContainer>
-      )}
+            {isErrorSubscription && (
+              <AlertError
+                className="w-full"
+                subject="Failed to retrieve usage data"
+                error={subscriptionError}
+              />
+            )}
 
-      {selectedProjectRef && (
-        <ScaffoldContainer className="mt-5">
-          <InformationBox
-            title="Usage filtered by project"
-            description={
-              <div className="space-y-3">
-                <p>
-                  You are currently viewing usage for the "
-                  {selectedProject?.name || selectedProjectRef}" project. Since your organization is
-                  using the new organization-based billing, the included quota is for your whole
-                  organization and not just this project. For billing purposes, we sum up usage from
-                  all your projects. To view your usage quota, set the project filter above back to
-                  "All Projects".
-                </p>
-                <div>
-                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                    <Link
-                      href="https://supabase.com/docs/guides/platform/org-based-billing"
-                      target="_blank"
-                      rel="noreferrer"
+            {isSuccessSubscription && (
+              <div className="flex lg:items-center items-start gap-3 flex-col lg:flex-row lg:justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <DateRangePicker
+                    onChange={setDateRange}
+                    value={TIME_PERIODS_BILLING[0].key}
+                    options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
+                    loading={isLoadingSubscription}
+                    currentBillingPeriodStart={subscription?.current_period_start}
+                    currentBillingPeriodEnd={subscription?.current_period_end}
+                    className="!w-48"
+                  />
+
+                  <OrganizationProjectSelector
+                    open={openProjectSelector}
+                    setOpen={setOpenProjectSelector}
+                    selectedRef={selectedProjectRefInputValue}
+                    onSelect={(project) => {
+                      setSelectedProject(project)
+                      setSelectedProjectRefInputValue(project.ref)
+                    }}
+                    renderTrigger={() => {
+                      return (
+                        <Button
+                          block
+                          type="default"
+                          role="combobox"
+                          size="tiny"
+                          className="justify-between w-[180px]"
+                          iconRight={<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                        >
+                          {!selectedProject || selectedProjectRefInputValue === 'all-projects'
+                            ? 'All projects'
+                            : selectedProject?.name}
+                        </Button>
+                      )
+                    }}
+                    renderRow={(project) => {
+                      const isSelected = selectedProjectRefInputValue === project.ref
+                      return (
+                        <div className="w-full flex items-center justify-between">
+                          <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
+                            {project.name}
+                          </span>
+                          {isSelected && <Check size={16} />}
+                        </div>
+                      )
+                    }}
+                    renderActions={() => (
+                      <CommandGroup_Shadcn_>
+                        <CommandItem_Shadcn_
+                          className="cursor-pointer flex items-center justify-between w-full"
+                          onSelect={() => {
+                            setOpenProjectSelector(false)
+                            setSelectedProjectRefInputValue('all-projects')
+                          }}
+                          onClick={() => {
+                            setOpenProjectSelector(false)
+                            setSelectedProjectRefInputValue('all-projects')
+                          }}
+                        >
+                          All projects
+                          {selectedProjectRefInputValue === 'all-projects' && <Check size={16} />}
+                        </CommandItem_Shadcn_>
+                      </CommandGroup_Shadcn_>
+                    )}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+                    Organization is on the{' '}
+                    <span className="font-medium text-brand">{subscription.plan.name} Plan</span>
+                  </p>
+                  <span className="text-border-stronger">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      shapeRendering="geometricPrecision"
                     >
-                      Documentation
-                    </Link>
-                  </Button>
+                      <path d="M16 3.549L7.12 20.600" />
+                    </svg>
+                  </span>
+                  <p className="text-sm text-foreground-light">
+                    {billingCycleStart.format('DD MMM YYYY')} -{' '}
+                    {billingCycleEnd.format('DD MMM YYYY')}
+                  </p>
                 </div>
               </div>
+            )}
+          </div>
+        </ScaffoldContainer>
+      </div>
+
+      {selectedProjectRef ? (
+        <ScaffoldContainer className="mt-5">
+          <Admonition
+            type="default"
+            title="Usage filtered by project"
+            description={
+              <div>
+                You are currently viewing usage for the{' '}
+                <span className="font-medium text-foreground">
+                  {selectedProject?.name || selectedProjectRef}
+                </span>{' '}
+                project. Supabase uses{' '}
+                <Link
+                  href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
+                  target="_blank"
+                >
+                  organization-level billing
+                </Link>{' '}
+                and quotas. For billing purposes, we sum up usage from all your projects. To view
+                your usage quota, set the project filter above back to "All Projects".
+              </div>
             }
-            defaultVisibility
-            hideCollapse
-            icon={<IconInfo />}
           />
+        </ScaffoldContainer>
+      ) : (
+        <ScaffoldContainer id="restriction" className="mt-5">
+          <Restriction />
         </ScaffoldContainer>
       )}
 
@@ -239,15 +281,17 @@ const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
-      <Compute
-        orgSlug={slug as string}
-        projectRef={selectedProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-      />
+      {subscription?.plan.id !== 'free' && (
+        <Compute
+          orgSlug={slug as string}
+          projectRef={selectedProjectRef}
+          subscription={subscription}
+          startDate={startDate}
+          endDate={endDate}
+        />
+      )}
 
-      <Bandwidth
+      <Egress
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
@@ -276,5 +320,3 @@ const Usage = () => {
     </>
   )
 }
-
-export default Usage

@@ -1,12 +1,9 @@
 import { Column } from 'react-data-grid'
-import { LogData } from '..'
-import {
-  RowLayout,
-  SeverityFormatter,
-  TextFormatter,
-  TimestampLocalFormatter,
-} from '../LogsFormatters'
+
+import type { LogData } from '../Logs.types'
+import { RowLayout, SeverityFormatter, TextFormatter } from '../LogsFormatters'
 import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 const columns: Column<LogData>[] = [
   {
@@ -19,7 +16,7 @@ const columns: Column<LogData>[] = [
 
       return (
         <RowLayout>
-          <TimestampLocalFormatter value={props.row.timestamp!} />
+          <TimestampInfo utcTimestamp={props.row.timestamp!} />
           {props.row.level && <SeverityFormatter value={props.row.level as string} />}
           <TextFormatter
             className="w-full"

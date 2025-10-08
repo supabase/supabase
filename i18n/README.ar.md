@@ -11,19 +11,30 @@
 
 [Supabase](https://supabase.com)هو بديل مفتوح المصدر لـ(Firebase). نحن نبني ميزات (Firebase) باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات.
 
-- [x] قاعدة بيانات (Postgres) مستضافة.
-- [x] اشتراكات الوقت الفعلي.
-- [x] المصادقة والترخيص.
+- [x] قاعدة بيانات (Postgres) مستضافة. [الشرح](https://supabase.com/docs/guides/database)
+- [x] [الشرح](https://supabase.com/docs/guides/auth) المصادقة والترخيص
 - [x] واجهات برمجة التطبيقات التي يتم إنشاؤها تلقائيا.
-- [x] لوحة الإدارة.
-- [x] التخزين.
+  - [x] REST. [الشرح](https://supabase.com/docs/guides/api)
+  - [x] GraphQL. [الشرح](https://supabase.com/docs/guides/graphql)
+  - [x] اشتراكات الوقت الفعلي (Realtime subscriptions). [الشرح](https://supabase.com/docs/guides/realtime)
 - [x] الدوال.
+  - [x] دوال قاعدة البيانات (Database Functions). [الشرح](https://supabase.com/docs/guides/database/functions)
+  - [x] Edge Functions [الشرح](https://supabase.com/docs/guides/functions)
+- [x] [الشرح](https://supabase.com/docs/guides/storage) التخزين.
+- [x] ذكاء اصطناعي + مجموعة أدوات المتجهات/التضمينات (AI + Vector/Embeddings Toolkit). [الشرح](https://supabase.com/docs/guides/ai)
+- [x] لوحة الإدارة.
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+
+شاهد "الإصدارات" من هذا المشروع للحصول على إشعار بالتحديثات الرئيسية.
+
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ## الشرح
 
 للحصول على الشرح الكامل، قم بزيارة [supabase.com/docs](https://supabase.com/docs).
+
+لمعرفه كيفية دعم المشروع قم بزيارة [Getting Started](./DEVELOPERS.md).
 
 ## المجتمع والدعم
 
@@ -31,17 +42,6 @@
 - [مشاكل GitHub](https://github.com/supabase/supabase/issues). الأفضل لـ: المشاكل والأخطاء التي تواجهها عند استخدامك لـ(Supabase).
 - [دعم البريد الإلكتروني](https://supabase.com/docs/support#business-support). الأفضل لـ: مشاكل مع قاعدة بياناتك أو البنية التحتية.
 - [ديسكورد](https://discord.supabase.com/). الأفضل لـ: مشاركة التطبيقات الخاصه بك وقضاء بعض الوقت مع المجتمع.
-
-## الحالة
-
-- [x] طور الألفا: نحن نختبر Supabase مع مجموعة مغلقة من العملاء
-- [x] طور الألفا العام: يمكن لأي شخص الاشتراك في [supabase.com/dashboard](https://supabase.com/dashboard). لكن تحلى بالصبر ، فهناك بعض العقد الصغيرة.
-- [x] طور البيتا العام: مستقر بدرجة كافية لمعظم حالات الاستخدام غير المتعلقة بالمؤسسات
-- [ ] الطور العام: جاهز للإنتاج
-
-نحن حاليًا في طور البيتا العام. شاهد "إصدارات" هذا المستودع لتلقي إخطارات بالتحديثات الرئيسية.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ## كيف يعمل (Supabase)؟
 
@@ -51,7 +51,7 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
 
 (supabase) هي [منصة مستضافة](https://supabase.com/dashboard), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
 
-![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) هي قاعدة بيانات قائمة على العلاقات الشيئية مع ٣٠ سنة من التطوير النشط التي اكسبتها سمعة وموثقية قوية وتمتاز بالمتانة والأداء.
 - [Realtime](https://github.com/supabase/realtime) هو خادم بلغة (Elixir) يمكنك من الاستماع لقاعدة البيانات لأي تغيرات سواء أنشاء أو تعديل أو مسح باستخدام ال(websocket).

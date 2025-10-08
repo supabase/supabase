@@ -1,290 +1,110 @@
-import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { find, isUndefined } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
-import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
-import { Dictionary } from 'types'
-import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Connecting from 'components/ui/Loading/Loading'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { useParams } from 'common'
+import { SupabaseGrid } from 'components/grid/SupabaseGrid'
+import { useSyncTableEditorStateFromLocalStorageWithUrl } from 'components/grid/SupabaseGrid.utils'
 import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from 'data/database/foreign-key-constraints-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { sqlKeys } from 'data/sql/keys'
-import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
-import useEntityType from 'hooks/misc/useEntityType'
-import { TableLike } from 'hooks/misc/useTable'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { EMPTY_ARR } from 'lib/void'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { SchemaView } from 'types'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
-import GridHeaderActions from './GridHeaderActions'
-import NotFoundState from './NotFoundState'
-import SidePanelEditor from './SidePanelEditor'
-import TableDefinition from './TableDefinition'
+  Entity,
+  isForeignTable,
+  isMaterializedView,
+  isTableLike,
+  isView,
+  TableLike,
+} from 'data/table-editor/table-editor-types'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
+import { Button } from 'ui'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
+import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
+import { TableDefinition } from './TableDefinition'
 
 export interface TableGridEditorProps {
-  /** Theme for the editor */
-  theme?: 'dark' | 'light'
-
   isLoadingSelectedTable?: boolean
-  selectedTable?: TableLike
+  selectedTable?: Entity
 }
 
-const TableGridEditor = ({
-  theme = 'dark',
+export const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const { meta, ui, vault } = useStore()
   const { ref: projectRef, id } = useParams()
+  const { setLastVisitedTable } = useDashboardHistory()
 
-  const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const tabs = useTabsStateSnapshot()
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  useSyncTableEditorStateFromLocalStorageWithUrl({
+    projectRef,
+    table: selectedTable,
+  })
 
-  const [encryptedColumns, setEncryptedColumns] = useState([])
-
-  const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
-  const setSelectedView = (view: string) => {
-    if (view === 'data') {
-      setUrlState({ view: undefined })
-    } else {
-      setUrlState({ view })
-    }
-  }
-
-  const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const [{ view: selectedView = 'data' }] = useUrlState()
+  const { can: canEditTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+  const { can: canEditColumns } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'columns'
+  )
   const isReadOnly = !canEditTables && !canEditColumns
+  const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
+  const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
 
-  const getEncryptedColumns = async (table: any) => {
-    const columns = await vault.listEncryptedColumns(table.schema, table.name)
-    setEncryptedColumns(columns)
-  }
-
-  const queryClient = useQueryClient()
-  const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
-    async onMutate({ projectRef, table, configuration, payload }) {
-      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
-
-      const queryKey = sqlKeys.query(projectRef, [
-        table.schema,
-        table.name,
-        { table: { name: table.name, schema: table.schema } },
-      ])
-
-      await queryClient.cancelQueries(queryKey)
-
-      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
-
-      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
-        return {
-          result:
-            old?.result.map((row) => {
-              // match primary keys
-              if (
-                Object.entries(row)
-                  .filter(([key]) => primaryKeyColumns.has(key))
-                  .every(([key, value]) => value === configuration.identifiers[key])
-              ) {
-                return { ...row, ...payload }
-              }
-
-              return row
-            }) ?? [],
-        }
-      })
-
-      return { previousRowsQueries }
+  const onTableCreated = useCallback(
+    (table: { id: number }) => {
+      router.push(`/project/${projectRef}/editor/${table.id}`)
     },
-    onError(error, _variables, context) {
-      const { previousRowsQueries } = context as {
-        previousRowsQueries: [
-          QueryKey,
-          (
-            | {
-                result: any[]
-              }
-            | undefined
-          )
-        ][]
-      }
+    [projectRef, router]
+  )
 
-      previousRowsQueries.forEach(([queryKey, previousRows]) => {
-        if (previousRows) {
-          queryClient.setQueriesData(queryKey, previousRows)
-        }
-        queryClient.invalidateQueries(queryKey)
+  const onTableDeleted = useCallback(async () => {
+    // For simplicity for now, we just open the first table within the same schema
+    if (selectedTable) {
+      // Close tab
+      const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
+      tabs.handleTabClose({
+        id: tabId,
+        router,
+        editor: 'table',
+        onClearDashboardHistory: () => setLastVisitedTable(undefined),
       })
-
-      onError(error)
-    },
-  })
-
-  const { data } = useForeignKeyConstraintsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: selectedTable?.schema,
-  })
-  const foreignKeyMeta = data || []
-
-  useEffect(() => {
-    if (selectedTable !== undefined && selectedTable.id !== undefined) {
-      getEncryptedColumns(selectedTable)
     }
-  }, [selectedTable?.id])
+  }, [router, selectedTable, tabs])
 
-  const entityType = useEntityType(selectedTable?.id)
-  const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
-  if (isLoadingSelectedTable) {
-    return <Connecting />
-  }
-
-  if (isUndefined(selectedTable)) {
-    return <NotFoundState id={Number(id)} />
-  }
-
-  const isViewSelected =
-    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-  const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
-  const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
-  const isLocked = EXCLUDED_SCHEMAS.includes(entityType?.schema ?? '')
-  const canEditViaTableEditor = isTableSelected && !isLocked
-
-  // [Joshen] We can tweak below to eventually support composite keys as the data
-  // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
-  const formattedRelationships = (
-    ('relationships' in selectedTable && selectedTable.relationships) ||
-    []
-  ).map((relationship: PostgresRelationship) => {
-    const relationshipMeta = foreignKeyMeta.find(
-      (fk: ForeignKeyConstraint) => fk.id === relationship.id
+  if (isLoadingSelectedTable || !projectRef) {
+    return (
+      <div className="flex flex-col">
+        <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
+        <div className="h-9 border-y" />
+        <div className="p-2 col-span-full">
+          <GenericSkeletonLoader />
+        </div>
+      </div>
     )
-    return {
-      ...relationship,
-      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-    }
-  })
-
-  const gridTable =
-    !isViewSelected && !isForeignTableSelected
-      ? parseSupaTable(
-          {
-            table: selectedTable as PostgresTable,
-            columns: (selectedTable as PostgresTable).columns ?? [],
-            primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
-            relationships: formattedRelationships,
-          },
-          encryptedColumns
-        )
-      : parseSupaTable({
-          table: selectedTable as SchemaView,
-          columns: (selectedTable as SchemaView).columns ?? [],
-          primaryKeys: [],
-          relationships: [],
-        })
-
-  const gridKey = `${selectedTable.schema}_${selectedTable.name}`
-
-  const onTableCreated = (table: PostgresTable) => {
-    router.push(`/project/${projectRef}/editor/${table.id}`)
   }
 
-  const onSqlQuery = async (query: string) => {
-    const res = await meta.query(query)
-    if (res.error) {
-      return { error: res.error }
-    } else {
-      return { data: res }
-    }
-  }
+  const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
+  const isTableSelected = isTableLike(selectedTable)
+  const isForeignTableSelected = isForeignTable(selectedTable)
 
-  // columns must be accessed via columnsRef.current as these two functions immediately become
-  // stale as they are accessed via some react-tracked madness
-  // [TODO]: refactor out all of react-tracked
-  const onSelectEditColumn = (name: string) => {
-    const column = find(columnsRef.current, { name }) as PostgresColumn
-    if (column) {
-      snap.onEditColumn(column)
-    } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Unable to find column ${name} in ${selectedTable?.name}`,
-      })
-    }
-  }
+  const canEditViaTableEditor = isTableSelected && !isSchemaLocked
+  const editable = !isReadOnly && canEditViaTableEditor
 
-  const onSelectDeleteColumn = (name: string) => {
-    const column = find(columnsRef.current ?? [], { name }) as PostgresColumn
-    if (column) {
-      snap.onDeleteColumn(column)
-    } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Unable to find column ${name} in ${selectedTable?.name}`,
-      })
-    }
-  }
-
-  const onError = (error: any) => {
-    ui.setNotification({
-      category: 'error',
-      message: error?.details ?? error?.message ?? error,
-    })
-  }
-
-  const updateTableRow = (previousRow: any, updatedData: any) => {
-    if (!project) return
-
-    const enumArrayColumns =
-      ('columns' in selectedTable &&
-        selectedTable.columns
-          ?.filter((column) => {
-            return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
-          })
-          .map((column) => column.name)) ||
-      []
-
-    const identifiers = {} as Dictionary<any>
-    ;(selectedTable as PostgresTable).primary_keys.forEach(
-      (column) => (identifiers[column.name] = previousRow[column.name])
-    )
-
-    const configuration = { identifiers }
-    if (Object.keys(identifiers).length === 0) {
-      return ui.setNotification({
-        category: 'error',
-        message: ERROR_PRIMARY_KEY_NOTFOUND,
-      })
-    }
-
-    mutateUpdateTableRow({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      table: gridTable as SupaTable,
-      configuration,
-      payload: updatedData,
-      enumArrayColumns,
-      impersonatedRole: getImpersonatedRole(),
-    })
-  }
+  const gridKey = !!selectedTable
+    ? `${selectedTable.schema}_${selectedTable.name}`
+    : 'unknown-table'
 
   /** [Joshen] We're going to need to refactor SupabaseGrid eventually to make the code here more readable
    * For context we previously built the SupabaseGrid as a reusable npm component, but eventually decided
@@ -292,80 +112,95 @@ const TableGridEditor = ({
    */
 
   return (
-    <>
-      <SupabaseGrid
-        key={gridKey}
-        theme={theme}
-        gridProps={{ height: '100%' }}
-        storageRef={projectRef}
-        editable={!isReadOnly && canEditViaTableEditor}
-        schema={selectedTable.schema}
-        table={gridTable}
-        headerActions={
-          isTableSelected || isViewSelected || canEditViaTableEditor ? (
-            <>
-              {canEditViaTableEditor && (
-                <GridHeaderActions table={selectedTable as PostgresTable} />
+    // When any click happens in a table tab, the tab becomes permanent
+    <div className="h-full" onClick={() => tabs.makeActiveTabPermanent()}>
+      {!selectedTable ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="w-[400px]">
+            <Admonition
+              type="default"
+              title={`Unable to find your table with ID ${id}`}
+              description="This table doesn't exist in your database"
+            >
+              {!!tabId ? (
+                <Button
+                  type="default"
+                  className="mt-2"
+                  onClick={() => {
+                    tabs.handleTabClose({
+                      id: tabId,
+                      router,
+                      editor: 'table',
+                      onClearDashboardHistory: () => setLastVisitedTable(undefined),
+                    })
+                  }}
+                >
+                  Close tab
+                </Button>
+              ) : openTabs.length > 0 ? (
+                <Button
+                  asChild
+                  type="default"
+                  className="mt-2"
+                  onClick={() => setLastVisitedTable(undefined)}
+                >
+                  <Link href={`/project/${projectRef}/editor/${openTabs[0].split('-')[1]}`}>
+                    Close tab
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  type="default"
+                  className="mt-2"
+                  onClick={() => setLastVisitedTable(undefined)}
+                >
+                  <Link href={`/project/${projectRef}/editor`}>Head back</Link>
+                </Button>
               )}
-              {(isTableSelected || isViewSelected) && (
-                <>
-                  {isViewSelected && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
+            </Admonition>
+          </div>
+        </div>
+      ) : (
+        <TableEditorTableStateContextProvider
+          key={`table-editor-table-${selectedTable.id}`}
+          projectRef={projectRef}
+          table={selectedTable}
+          editable={editable}
+        >
+          <SupabaseGrid
+            key={gridKey}
+            gridProps={{ height: '100%' }}
+            customHeader={
+              (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
+                <div className="flex items-center space-x-2">
+                  <p>
+                    SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
+                  </p>
+                  <p className="text-foreground-light text-sm">(Read only)</p>
+                </div>
+              ) : null
+            }
+          >
+            {(isViewSelected || isTableSelected) && selectedView === 'definition' && (
+              <TableDefinition entity={selectedTable} />
+            )}
+          </SupabaseGrid>
 
-                  {canEditViaTableEditor && (
-                    <div className="h-[20px] w-px border-r border-control"></div>
-                  )}
-
-                  <div>
-                    <TwoOptionToggle
-                      width={75}
-                      options={['definition', 'data']}
-                      activeOption={selectedView}
-                      borderOverride="border-gray-500"
-                      onClickOption={setSelectedView}
-                    />
-                  </div>
-                </>
-              )}
-            </>
-          ) : null
-        }
-        onAddColumn={snap.onAddColumn}
-        onEditColumn={onSelectEditColumn}
-        onDeleteColumn={onSelectDeleteColumn}
-        onAddRow={snap.onAddRow}
-        updateTableRow={updateTableRow}
-        onEditRow={snap.onEditRow}
-        onImportData={snap.onImportData}
-        onError={onError}
-        onSqlQuery={onSqlQuery}
-        onExpandJSONEditor={(column, row) =>
-          snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
-        }
-        onEditForeignKeyColumnValue={snap.onEditForeignKeyColumnValue}
-        showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
-        customHeader={
-          (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-            <div className="flex items-center space-x-2">
-              <p>
-                SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
-              </p>
-              <p className="text-foreground-light text-sm">(Read only)</p>
-            </div>
-          ) : null
-        }
-      >
-        {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
-      </SupabaseGrid>
-
-      {snap.selectedSchemaName !== undefined && (
-        <SidePanelEditor
-          editable={!isReadOnly && canEditViaTableEditor}
-          selectedTable={selectedTable as PostgresTable}
-          onTableCreated={onTableCreated}
-        />
+          <DeleteConfirmationDialogs
+            selectedTable={isTableSelected ? selectedTable : undefined}
+            onTableDeleted={onTableDeleted}
+          />
+        </TableEditorTableStateContextProvider>
       )}
-    </>
+
+      <SidePanelEditor
+        editable={editable}
+        selectedTable={
+          isTableSelected || isForeignTableSelected ? (selectedTable as TableLike) : undefined
+        }
+        onTableCreated={onTableCreated}
+      />
+    </div>
   )
 }
-
-export default observer(TableGridEditor)

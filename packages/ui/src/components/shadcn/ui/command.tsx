@@ -1,10 +1,12 @@
-import * as React from 'react'
+'use client'
+
 import { DialogProps } from '@radix-ui/react-dialog'
 import { Command as CommandPrimitive } from 'cmdk'
-import { Search } from 'lucide-react'
+import { Search, X as RemoveIcon } from 'lucide-react'
+import * as React from 'react'
 
-import { cn } from '@ui/lib/utils'
-import { Dialog, DialogContent } from '@ui/components/shadcn/ui/dialog'
+import { cn } from '../../../lib/utils/cn'
+import { Dialog, DialogContent } from './dialog'
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -37,20 +39,48 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search className="h-4 w-4 shrink-0 opacity-50" />
-    <CommandPrimitive.Input
-      ref={ref}
-      className={cn(
-        'flex h-9 w-full rounded-md bg-transparent py-3 text-xs text outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
-        className
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
+    wrapperClassName?: string
+    showResetIcon?: boolean
+    showSearchIcon?: boolean
+    handleReset?: () => void
+  }
+>(
+  (
+    {
+      className,
+      wrapperClassName,
+      showResetIcon = false,
+      showSearchIcon = true,
+      handleReset,
+      ...props
+    },
+    ref
+  ) => (
+    <div className={cn('flex items-center border-b px-3', wrapperClassName)} cmdk-input-wrapper="">
+      {showSearchIcon && <Search className="h-4 w-4 shrink-0 opacity-50" />}
+      <CommandPrimitive.Input
+        ref={ref}
+        className={cn(
+          'flex h-9 w-full rounded-md bg-transparent py-3 md:text-xs text outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
+          className
+        )}
+        {...props}
+      />
+      {showResetIcon && (
+        <button
+          onClick={handleReset}
+          className={cn(
+            'text-foreground-lighter hover:text-foreground-light hover:cursor-pointer transition-all opacity-0 duration-100',
+            !!props.value?.length && 'opacity-100'
+          )}
+        >
+          <RemoveIcon size={14} />
+        </button>
       )}
-      {...props}
-    />
-  </div>
-))
+    </div>
+  )
+)
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
@@ -87,7 +117,10 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'overflow-hidden p-1 text-foreground-light [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-foreground-muted',
+      'overflow-hidden p-1 text-foreground-light [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted',
+      '[&_[cmdk-group-heading]]:font-mono',
+      '[&_[cmdk-group-heading]]:uppercase',
+      '[&_[cmdk-group-heading]]:tracking-wider',
       className
     )}
     {...props}
@@ -102,7 +135,7 @@ const CommandSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
-    className={cn('-mx-1 h-px bg-border', className)}
+    className={cn('-mx-1 h-px bg-border-overlay', className)}
     {...props}
   />
 ))
@@ -115,7 +148,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none aria-selected:bg-overlay-hover aria-selected:text-strong data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none data-[selected=true]:bg-overlay-hover data-[selected=true]:text-strong data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
       className
     )}
     {...props}
@@ -137,11 +170,11 @@ CommandShortcut.displayName = 'CommandShortcut'
 export {
   Command,
   CommandDialog,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
-  CommandShortcut,
+  CommandList,
   CommandSeparator,
+  CommandShortcut,
 }

@@ -1,14 +1,12 @@
 import template from './templates/ApiTemplate'
 import { slugify, toArrayWithKey, toTitle, writeToDisk } from './helpers'
-import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
+import type { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
 import * as fs from 'fs'
 import * as ejs from 'ejs'
 
 export default async function gen(inputFileName: string, outputDir: string, apiUrl: string) {
   const specRaw = fs.readFileSync(inputFileName, 'utf8')
   const spec = JSON.parse(specRaw) as any
-  // console.log('spec', spec)
-
   switch (spec.openapi || spec.swagger) {
     case '3.0.0':
     case '3.0.3':
@@ -51,7 +49,6 @@ async function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiU
         path: key,
         fullPath,
         operationId: slugify(operation.summary!),
-
         responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
       }
       operations.push(enriched)
@@ -72,7 +69,6 @@ async function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiU
     sections,
     operations,
   })
-  // console.log(content)
   // Write to disk
   await writeToDisk(dest, content)
   console.log('Saved: ', dest)
@@ -92,7 +88,6 @@ async function gen_v2(spec: OpenAPIV2.Document, dest: string, { apiUrl }: { apiU
         path: key,
         fullPath,
         operationId: slugify(operation.summary!),
-
         responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
       }
       operations.push(enriched)
@@ -113,7 +108,6 @@ async function gen_v2(spec: OpenAPIV2.Document, dest: string, { apiUrl }: { apiU
     sections,
     operations,
   })
-  // console.log(content)
   // Write to disk
   await writeToDisk(dest, content)
   console.log('Saved: ', dest)

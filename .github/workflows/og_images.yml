@@ -8,6 +8,9 @@ on:
       - 'supabase/functions/og-images/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,7 +21,7 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup the Supabase CLI
         uses: supabase/setup-cli@v1

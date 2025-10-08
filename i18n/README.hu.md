@@ -58,7 +58,7 @@ A Supabase nyílt forráskódú eszközök kombinációja. A Firebase funkcióit
 A Supabase egy [hosztolt platform](https://supabase.com/dashboard). Regisztrálhat és elkezdheti használni a Supabase-t anélkül, hogy bármit telepítene.
 Önállóan is [hosztolhat](https://supabase.com/docs/guides/hosting/overview) és [fejleszthet helyben](https://supabase.com/docs/guides/local-development).
 
-![Architektúra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Architektúra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - a [PostgreSQL](https://www.postgresql.org/) egy objektum-relációs adatbázis-rendszer, amelynek több mint 30 éves aktív fejlesztése során a megbízhatóság, a funkciók robusztussága és a teljesítménye szerzett jó hírnevet.
 - a [Realtime](https://github.com/supabase/realtime) egy Elixir szerver, amely lehetővé teszi, hogy websocketek segítségével figyelje a PostgreSQL beviteleit, frissítéseit és törléseit. A Realtime lekérdezi a Postgres beépített replikációs funkcióit az adatbázis-változásokért, a változásokat JSON-ba konvertálja, majd a JSON-t websocketeken keresztül továbbítja az engedélyezett ügyfeleknek.

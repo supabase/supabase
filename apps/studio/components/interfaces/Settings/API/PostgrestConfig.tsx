@@ -1,64 +1,144 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { indexOf } from 'lodash'
-import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
+import { Lock } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
-import { useParams } from 'common/hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import MultiSelect from 'components/ui/MultiSelect'
+import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions, useStore } from 'hooks'
-import { Form, IconAlertCircle, Input, InputNumber } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CollapsibleContent_Shadcn_,
+  Collapsible_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  Separator,
+  Skeleton,
+  Switch,
+  WarningIcon,
+  cn,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
+import { HardenAPIModal } from './HardenAPIModal'
 
-const PostgrestConfig = () => {
+const formSchema = z
+  .object({
+    dbSchema: z.array(z.string()),
+    dbExtraSearchPath: z.array(z.string()),
+    maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
+    dbPool: z
+      .number()
+      .min(0, 'Must be more than 0')
+      .max(1000, "Can't be more than 1000")
+      .optional()
+      .nullable(),
+    enableDataApi: z.boolean(),
+  })
+  .refine(
+    (data) => {
+      if (data.enableDataApi && data.dbSchema.length === 0) {
+        return false
+      }
+      return true
+    },
+    {
+      message: 'Must have at least one schema if Data API is enabled',
+      path: ['dbSchema'],
+    }
+  )
+
+export const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
-  const { ui } = useStore()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { project } = useProjectContext()
-  const { data: schemas } = useSchemasQuery({
+  const [showModal, setShowModal] = useState(false)
+
+  const {
+    data: config,
+    isError,
+    isLoading: isLoadingConfig,
+  } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const {
+    data: allSchemas = [],
+    isLoading: isLoadingSchemas,
+    isSuccess: isSuccessSchemas,
+  } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+  const isLoading = isLoadingConfig || isLoadingSchemas
+
   const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+        toast.success('Successfully saved settings')
       },
     })
-  const canUpdatePostgrestConfig = useCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_postgrest'
-  )
 
   const formId = 'project-postgres-config'
-  const initialValues = { db_schema: '', max_rows: '', db_extra_search_path: '' }
+  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
+  const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 
-  const updateConfig = async (updatedConfig: typeof initialValues) => {
-    if (!projectRef) return console.error('Project ref is required')
-    updatePostgrestConfig({
-      projectRef,
-      dbSchema: updatedConfig.db_schema,
-      maxRows: updatedConfig.max_rows,
-      dbExtraSearchPath: updatedConfig.db_extra_search_path,
-    })
+  const isGraphqlExtensionEnabled =
+    (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
+
+  const dbSchema = config?.db_schema ? config?.db_schema.replace(/ /g, '').split(',') : []
+  const defaultValues = {
+    dbSchema,
+    maxRows: config?.max_rows,
+    dbExtraSearchPath: (config?.db_extra_search_path ?? '')
+      .split(',')
+      .map((x) => x.trim())
+      .filter((x) => x.length > 0 && allSchemas.find((y) => y.name === x)),
+    dbPool: config?.db_pool,
   }
 
-  const permanentSchema = ['public', 'storage']
-  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
-  const schema =
-    schemas
-      ?.filter((x) => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    mode: 'onChange',
+    defaultValues,
+  })
+
+  const schemas =
+    allSchemas
+      .filter((x) => {
         const find = indexOf(hiddenSchema, x.name)
         if (find < 0) return x
       })
@@ -67,126 +147,331 @@ const PostgrestConfig = () => {
           id: x.id,
           value: x.name,
           name: x.name,
-          disabled: indexOf(permanentSchema, x.name) >= 0 ? true : false,
+          disabled: false,
         }
       }) ?? []
 
+  function resetForm() {
+    const enableDataApi = config?.db_schema ? true : false
+    form.reset({ ...defaultValues, enableDataApi })
+  }
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!projectRef) return console.error('Project ref is required') // is this needed ?
+
+    updatePostgrestConfig({
+      projectRef,
+      dbSchema: values.dbSchema.join(', '),
+      maxRows: values.maxRows,
+      dbExtraSearchPath: values.dbExtraSearchPath.join(','),
+      dbPool: values.dbPool ? values.dbPool : null,
+    })
+  }
+
+  useEffect(() => {
+    if (config && isSuccessSchemas) {
+      /**
+       * Checks if enableDataApi should be enabled or disabled
+       * based on the db_schema value being empty string
+       */
+      resetForm()
+    }
+  }, [config, isSuccessSchemas])
+
+  const isDataApiEnabledInForm = form.getValues('enableDataApi')
+
   return (
-    <Form id={formId} initialValues={initialValues} validate={() => {}} onSubmit={updateConfig}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
-        const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+    <Card id="postgrest-config">
+      <CardHeader className="flex-row items-center justify-between">
+        Data API Settings
+        <div className="flex items-center gap-x-2">
+          <DocsButton href={`${DOCS_URL}/guides/database/connecting-to-postgres#data-apis`} />
+          <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+            Harden Data API
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className={cn(!isLoading ? 'p-0' : '')}>
+        <Form_Shadcn_ {...form}>
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+            {isLoading ? (
+              <GenericSkeletonLoader />
+            ) : isError ? (
+              <Admonition type="destructive" title="Failed to retrieve API settings" />
+            ) : (
+              <>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="enableDataApi"
+                  render={({ field }) => (
+                    <FormItem_Shadcn_ className="w-full">
+                      <FormItemLayout
+                        className="w-full px-8 py-8"
+                        layout="flex"
+                        label="Enable Data API"
+                        description="When enabled you will be able to use any Supabase client library and PostgREST endpoints with any schema configured below."
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            size="large"
+                            disabled={!canUpdatePostgrestConfig}
+                            checked={field.value}
+                            onCheckedChange={(value) => {
+                              field.onChange(value)
+                              if (!value) {
+                                form.setValue('enableDataApi', false)
+                                form.setValue('dbSchema', [])
+                              } else {
+                                form.setValue('enableDataApi', true)
+                                form.setValue('dbSchema', dbSchema)
+                              }
+                            }}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
 
-        // [Alaister] although this "technically" is breaking the rules of React hooks
-        // it won't error because the hooks are always rendered in the same order
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useEffect(() => {
-          if (config) {
-            const values = {
-              db_schema: config.db_schema,
-              max_rows: config.max_rows,
-              db_extra_search_path: config.db_extra_search_path ?? '',
-            }
-            resetForm({ values, initialValues: values })
-          }
-        }, [config])
-
-        return (
-          <>
-            <FormPanel
-              disabled={true}
-              header={<p>API settings</p>}
-              footer={
-                <div className="flex px-8 py-4">
-                  <FormActions
-                    form={formId}
-                    isSubmitting={isUpdating}
-                    hasChanges={hasChanges}
-                    handleReset={handleReset}
-                    disabled={!canUpdatePostgrestConfig}
-                    helper={
-                      !canUpdatePostgrestConfig
-                        ? "You need additional permissions to update your project's API settings"
-                        : undefined
-                    }
-                  />
-                </div>
-              }
-            >
-              {isError ? (
-                <div className="flex items-center justify-center py-8 space-x-2">
-                  <IconAlertCircle size={16} strokeWidth={1.5} />
-                  <p className="text-sm text-foreground-light">Failed to retrieve API settings</p>
-                </div>
-              ) : (
-                <>
-                  <FormSection header={<FormSectionLabel>Exposed schemas</FormSectionLabel>}>
-                    <FormSectionContent loading={false}>
-                      {schema.length >= 1 && (
-                        <MultiSelect
-                          disabled={!canUpdatePostgrestConfig}
-                          options={schema}
-                          descriptionText={
-                            <>
-                              The schemas to expose in your API. Tables, views and stored procedures
-                              in these schemas will get API endpoints.
-                              <code className="text-xs">public</code> and{' '}
-                              <code className="text-xs">storage</code> are protected by default.
-                            </>
-                          }
-                          emptyMessage={
-                            <>
-                              <IconAlertCircle strokeWidth={2} />
-                              <div className="flex flex-col mt-2 text-center">
-                                <p className="text-sm align-center">
-                                  No schema available to choose
-                                </p>
-                                <p className="text-xs opacity-50">
-                                  New schemas you create will appear here
-                                </p>
-                              </div>
-                            </>
-                          }
-                          // value must be passed as array of strings
-                          value={(values?.db_schema ?? '').replace(/ /g, '').split(',')}
-                          // onChange returns array of strings
-                          onChange={(event) => {
-                            let updatedValues: any = values
-                            updatedValues.db_schema = event.join(', ')
-                            resetForm({ values: updatedValues, initialValues: updatedValues })
-                            updateConfig({ ...updatedValues })
-                          }}
-                        />
+                      {!field.value && (
+                        <>
+                          <Separator />
+                          <Alert_Shadcn_
+                            variant="warning"
+                            className="mb-0 border-none rounded-none"
+                          >
+                            <WarningIcon className="!left-[2rem]" />
+                            <AlertTitle_Shadcn_ className="!pl-[3.5rem] !left-[6rem]">
+                              No schemas can be queried
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_ className="!pl-[3.5rem]">
+                              <p>
+                                With this setting disabled, you will not be able to query any
+                                schemas via the Data API.
+                              </p>
+                              <p>
+                                You will see errors from the Postgrest endpoint
+                                <code className="text-xs">/rest/v1/</code>.
+                              </p>
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        </>
                       )}
-                    </FormSectionContent>
-                  </FormSection>
-                  <FormSection header={<FormSectionLabel>Extra search path</FormSectionLabel>}>
-                    <FormSectionContent loading={false}>
-                      <Input
-                        id="db_extra_search_path"
-                        size="small"
-                        disabled={!canUpdatePostgrestConfig}
-                        descriptionText="Extra schemas to add to the search path of every request. Multiple schemas must be comma-separated."
-                      />
-                    </FormSectionContent>
-                  </FormSection>
-                  <FormSection header={<FormSectionLabel>Max rows</FormSectionLabel>}>
-                    <FormSectionContent loading={false}>
-                      <InputNumber
-                        id="max_rows"
-                        size="small"
-                        disabled={!canUpdatePostgrestConfig}
-                        descriptionText="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
-                      />
-                    </FormSectionContent>
-                  </FormSection>
-                </>
-              )}
-            </FormPanel>
-          </>
-        )
-      }}
-    </Form>
+                    </FormItem_Shadcn_>
+                  )}
+                />
+                <Collapsible_Shadcn_ open={form.getValues('enableDataApi')}>
+                  <CollapsibleContent_Shadcn_ className="border-t divide-y transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="dbSchema"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="w-full">
+                          <FormItemLayout
+                            label="Exposed schemas"
+                            description="The schemas to expose in your API. Tables, views and stored procedures in
+                          these schemas will get API endpoints."
+                            layout="horizontal"
+                            className="px-8 py-8"
+                          >
+                            {isLoadingSchemas ? (
+                              <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
+                                <Skeleton className="w-full h-[38px]" />
+                              </div>
+                            ) : (
+                              <MultiSelector
+                                onValuesChange={field.onChange}
+                                values={field.value}
+                                size="small"
+                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                              >
+                                <MultiSelectorTrigger
+                                  mode="inline-combobox"
+                                  label="Select schemas for Data API..."
+                                  badgeLimit="wrap"
+                                  showIcon={false}
+                                  deletableBadge
+                                />
+                                <MultiSelectorContent>
+                                  <MultiSelectorList>
+                                    {schemas.length <= 0 ? (
+                                      <MultiSelectorItem key="empty" value="no">
+                                        no
+                                      </MultiSelectorItem>
+                                    ) : (
+                                      schemas.map((x) => (
+                                        <MultiSelectorItem key={x.id + '-' + x.name} value={x.name}>
+                                          {x.name}
+                                        </MultiSelectorItem>
+                                      ))
+                                    )}
+                                  </MultiSelectorList>
+                                </MultiSelectorContent>
+                              </MultiSelector>
+                            )}
+
+                            {!field.value.includes('public') && field.value.length > 0 && (
+                              <Admonition
+                                type="default"
+                                title="The public schema for this project is not exposed"
+                                className="mt-2"
+                                description={
+                                  <>
+                                    <p className="prose text-sm">
+                                      You will not be able to query tables and views in the{' '}
+                                      <code className="text-xs">public</code> schema via supabase-js
+                                      or HTTP clients.
+                                    </p>
+                                    {isGraphqlExtensionEnabled && (
+                                      <>
+                                        <p className="prose text-sm mt-2">
+                                          Tables in the <code className="text-xs">public</code>{' '}
+                                          schema are still exposed over our GraphQL endpoints.
+                                        </p>
+                                        <Button asChild type="default" className="mt-2">
+                                          <Link href={`/project/${projectRef}/database/extensions`}>
+                                            Disable the pg_graphql extension
+                                          </Link>
+                                        </Button>
+                                      </>
+                                    )}
+                                  </>
+                                }
+                              />
+                            )}
+                          </FormItemLayout>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="dbExtraSearchPath"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="w-full">
+                          <FormItemLayout
+                            className="w-full px-8 py-8"
+                            layout="horizontal"
+                            label="Extra search path"
+                            description="Extra schemas to add to the search path of every request."
+                          >
+                            {isLoadingSchemas ? (
+                              <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
+                                <Skeleton className="w-full h-[38px]" />
+                              </div>
+                            ) : (
+                              <MultiSelector
+                                onValuesChange={field.onChange}
+                                values={field.value}
+                                size="small"
+                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                              >
+                                <MultiSelectorTrigger
+                                  mode="inline-combobox"
+                                  label="Select schemas to add to search path..."
+                                  badgeLimit="wrap"
+                                  showIcon={false}
+                                  deletableBadge
+                                />
+                                <MultiSelectorContent>
+                                  <MultiSelectorList>
+                                    {allSchemas.length <= 0 ? (
+                                      <MultiSelectorItem key="empty" value="no">
+                                        no
+                                      </MultiSelectorItem>
+                                    ) : (
+                                      allSchemas.map((x) => (
+                                        <MultiSelectorItem key={x.id + '-' + x.name} value={x.name}>
+                                          {x.name}
+                                        </MultiSelectorItem>
+                                      ))
+                                    )}
+                                  </MultiSelectorList>
+                                </MultiSelectorContent>
+                              </MultiSelector>
+                            )}
+                          </FormItemLayout>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="maxRows"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="w-full">
+                          <FormItemLayout
+                            className="w-full px-8 py-8"
+                            layout="horizontal"
+                            label="Max rows"
+                            description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                size="small"
+                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                {...field}
+                                type="number"
+                                {...form.register('maxRows', {
+                                  valueAsNumber: true, // Ensure the value is handled as a number
+                                })}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="dbPool"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="w-full">
+                          <FormItemLayout
+                            className="w-full px-8 py-8"
+                            layout="horizontal"
+                            label="Pool size"
+                            description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                size="small"
+                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                {...field}
+                                type="number"
+                                placeholder="Configured automatically based on compute size"
+                                onChange={(e) =>
+                                  field.onChange(
+                                    e.target.value === '' ? null : Number(e.target.value)
+                                  )
+                                }
+                                value={field.value === null ? '' : field.value}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                  </CollapsibleContent_Shadcn_>
+                </Collapsible_Shadcn_>
+              </>
+            )}
+          </form>
+        </Form_Shadcn_>
+      </CardContent>
+      <CardFooter>
+        <FormActions
+          form={formId}
+          isSubmitting={isUpdating}
+          hasChanges={form.formState.isDirty}
+          handleReset={resetForm}
+          disabled={!canUpdatePostgrestConfig}
+          helper={
+            isPermissionsLoaded && !canUpdatePostgrestConfig
+              ? "You need additional permissions to update your project's API settings"
+              : undefined
+          }
+        />
+      </CardFooter>
+
+      <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />
+    </Card>
   )
 }
-
-export default observer(PostgrestConfig)

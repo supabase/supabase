@@ -233,7 +233,7 @@ export default {
       yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
       amber: `bg-amber-200 text-amber-1100 border border-amber-700`,
       gold: `bg-gold-200 text-gold-1100 border border-gold-700`,
-      gray: `bg-gray-200 text-gray-1100 border border-gray-700`,
+      gray: `bg-200 text-gray-1100 border border-gray-700`,
       slate: `bg-slate-200 text-slate-1100 border border-slate-700`,
     },
   },
@@ -252,7 +252,7 @@ export default {
     description: `text-xs`,
     variant: {
       danger: {
-        base: `bg-red-200 btext-red-1200 border-red-700`,
+        base: `bg-red-200 text-red-1200 border-red-700`,
         icon: `text-red-900`,
         header: `text-red-1200`,
         description: `text-red-1100`,
@@ -264,7 +264,7 @@ export default {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-alternative border-alternative`,
+        base: `bg-alternative border`,
         icon: `text-foreground-lighter`,
         header: `text-foreground`,
         description: `text-foreground-light`,
@@ -431,6 +431,7 @@ export default {
       focus-visible:border-foreground-muted
       focus-visible:ring-background-control
       ${defaults.placeholder}
+      group
     `,
     variants: {
       standard: `
@@ -848,18 +849,18 @@ export default {
 
   sidepanel: {
     base: `
-      z-40
-      bg-overlay
+      z-50
+      bg-dash-sidebar
       flex flex-col
       fixed
       inset-y-0
       h-full lg:h-screen
-      border-l border-overlay
+      border-l
       shadow-xl
     `,
     header: `
-      space-y-1 py-4 px-4 bg-overlay sm:px-6
-      border-b border-overlay
+      space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6
+      border-b
     `,
     contents: `
       relative
@@ -872,7 +873,7 @@ export default {
     footer: `
       flex justify-end gap-2
       p-4 bg-overlay
-      border-t border-overlay
+      border-t
     `,
     size: {
       medium: `w-screen max-w-md h-full`,
@@ -901,7 +902,7 @@ export default {
       bg-border
     `,
     overlay: `
-      z-40
+      z-50
       fixed
       bg-alternative
       h-full w-full
@@ -1221,8 +1222,8 @@ export default {
   modal: {
     base: `
       relative
-      bg-overlay
-      my-4
+      bg-dash-sidebar
+      my-4 max-w-screen
       border border-overlay
       rounded-md
       shadow-xl
@@ -1245,10 +1246,10 @@ export default {
       tiny: `sm:align-middle sm:w-full sm:max-w-xs`,
       small: `sm:align-middle sm:w-full sm:max-w-sm`,
       medium: `sm:align-middle sm:w-full sm:max-w-lg`,
-      large: `sm:align-middle sm:w-full max-w-xl`,
-      xlarge: `sm:align-middle sm:w-full max-w-3xl`,
-      xxlarge: `sm:align-middle sm:w-full max-w-6xl`,
-      xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
+      large: `sm:align-middle sm:w-full md:max-w-xl`,
+      xlarge: `sm:align-middle sm:w-full md:max-w-3xl`,
+      xxlarge: `sm:align-middle sm:w-full max-w-screen md:max-w-6xl`,
+      xxxlarge: `sm:align-middle sm:w-full md:max-w-7xl`,
     },
     overlay: `
       z-40
@@ -1350,7 +1351,7 @@ export default {
     option: `
       w-listbox
       transition cursor-pointer select-none relative py-2 pl-3 pr-9
-      text-foreground-muted
+      text-foreground-light
       text-sm
       hover:bg-border-overlay
       focus:bg-border-overlay
@@ -1359,7 +1360,7 @@ export default {
       focus:outline-none
     `,
     option_active: `text-foreground bg-selection`,
-    option_disabled: `cursor-not-allowed opacity-50`,
+    option_disabled: `cursor-not-allowed opacity-60`,
     option_inner: `flex items-center space-x-3`,
     option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand`,
     option_check_active: `text-brand`,
@@ -1389,7 +1390,17 @@ export default {
     left-0 pl-3 flex
     items-center pointer-events-none
     text-foreground-light
+    [&_svg]:stroke-[1.5]
     `,
+    size: {
+      tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
+      small: '[&_svg]:h-[18px] [&_svg]:w-[18px]',
+      medium: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      large: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px]',
+      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
+      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
+    },
   },
 
   // Icon
@@ -1406,8 +1417,9 @@ export default {
     },
     spinner: `
       absolute
-      text-brand animate-spin
+      text-foreground-lighter animate-spin
       inset-0
+      size-5
       m-auto
     `,
   },

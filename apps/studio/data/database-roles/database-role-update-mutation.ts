@@ -1,16 +1,16 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { databaseRolesKeys } from './keys'
-import { components } from 'data/api'
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError } from 'types'
+import { invalidateRolesQuery } from './database-roles-query'
 
-type UpdateRoleBody = components['schemas']['UpdateRoleBody']
+type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]
 
 export type DatabaseRoleUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   payload: UpdateRoleBody
 }
@@ -21,21 +21,14 @@ export async function updateDatabaseRole({
   id,
   payload,
 }: DatabaseRoleUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await patch('/platform/pg-meta/{ref}/roles', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body: payload,
-    headers,
+  const sql = pgMeta.roles.update({ id }, payload).sql
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['roles', 'update'],
   })
-
-  if (error) throw error
-  return data
+  return result
 }
 
 type DatabaseRoleUpdateData = Awaited<ReturnType<typeof updateDatabaseRole>>
@@ -55,7 +48,7 @@ export const useDatabaseRoleUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseRolesKeys.list(projectRef))
+        await invalidateRolesQuery(queryClient, projectRef)
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

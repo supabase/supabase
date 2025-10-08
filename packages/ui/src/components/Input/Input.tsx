@@ -1,16 +1,16 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
-import { Button } from '../Button'
-import { IconCopy } from '../Icon/icons/IconCopy'
 
-import { FormLayout } from '../../lib/Layout/FormLayout'
-
+import { Copy } from 'lucide-react'
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
-
-import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
-
-import { cn } from '@ui/lib/utils/cn'
+import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
+import { copyToClipboard } from '../../lib/utils'
+import { cn } from '../../lib/utils/cn'
+import { Button } from '../Button'
 import { useFormContext } from '../Form/FormContext'
 
 export interface Props
@@ -37,6 +37,9 @@ export interface Props
   validation?: (x: any) => void
 }
 
+/**
+ * @deprecated Use `import { Input_Shadcn_ } from 'ui'` instead or `import { Input } from 'ui-patterns/DataInputs/Input'`
+ */
 function Input({
   autoComplete,
   autoFocus,
@@ -113,20 +116,13 @@ function Input({
   // }, [errors, touched])
 
   function _onCopy(value: any) {
-    navigator.clipboard.writeText(value)?.then(
-      function () {
-        /* clipboard successfully set */
-        setCopyLabel('Copied')
-        setTimeout(function () {
-          setCopyLabel('Copy')
-        }, 3000)
-        onCopy?.()
-      },
-      function () {
-        /* clipboard write failed */
-        setCopyLabel('Failed to copy')
-      }
-    )
+    copyToClipboard(value, () => {
+      setCopyLabel('Copied')
+      setTimeout(() => {
+        setCopyLabel('Copy')
+      }, 3000)
+      onCopy?.()
+    })
   }
 
   function onReveal() {
@@ -158,6 +154,7 @@ function Input({
     >
       <div className={__styles.container}>
         <input
+          data-size={size}
           autoComplete={autoComplete}
           autoFocus={autoFocus}
           defaultValue={defaultValue}
@@ -174,12 +171,12 @@ function Input({
           className={cn(inputClasses)}
           {...props}
         />
-        {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
+        {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}
         {copy || error || actions ? (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
             {copy && !(reveal && hidden) ? (
-              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => _onCopy(value)}>
+              <Button size="tiny" type="default" icon={<Copy />} onClick={() => _onCopy(value)}>
                 {copyLabel}
               </Button>
             ) : null}
@@ -196,6 +193,9 @@ function Input({
   )
 }
 
+/**
+ * @deprecated Use ./TextArea_Shadcn_ instead
+ */
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   textAreaClassName?: string
@@ -250,20 +250,14 @@ function TextArea({
   const [copyLabel, setCopyLabel] = useState('Copy')
 
   function _onCopy(value: any) {
-    navigator.clipboard.writeText(value).then(
-      function () {
-        /* clipboard successfully set */
-        setCopyLabel('Copied')
-        setTimeout(function () {
-          setCopyLabel('Copy')
-        }, 3000)
-        onCopy?.()
-      },
-      function () {
-        /* clipboard write failed */
-        setCopyLabel('Failed to copy')
-      }
-    )
+    copyToClipboard(value, () => {
+      /* clipboard successfully set */
+      setCopyLabel('Copied')
+      setTimeout(() => {
+        setCopyLabel('Copy')
+      }, 3000)
+      onCopy?.()
+    })
   }
 
   const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
@@ -344,12 +338,7 @@ function TextArea({
             <div className={__styles['textarea_actions_container_items']}>
               {error && <InputErrorIcon size={size} />}
               {copy && (
-                <Button
-                  size="tiny"
-                  type="default"
-                  onClick={() => _onCopy(value)}
-                  icon={<IconCopy />}
-                >
+                <Button size="tiny" type="default" onClick={() => _onCopy(value)} icon={<Copy />}>
                   {copyLabel}
                 </Button>
               )}

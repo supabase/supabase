@@ -1,31 +1,41 @@
-import { AuthError } from '@supabase/gotrue-js'
-import { Factor } from '@supabase/supabase-js'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconLock, Input } from 'ui'
-import { object, string } from 'yup'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import z from 'zod'
 
-import { useTelemetryProps } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useStore } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
-import Telemetry from 'lib/telemetry'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-const signInSchema = object({
-  code: string().required('MFA Code is required'),
+const schema = z.object({
+  code: z.string().min(1, 'MFA Code is required'),
 })
 
-const SignInMfaForm = () => {
-  const { ui } = useStore()
-  const queryClient = useQueryClient()
+const formId = 'sign-in-mfa-form'
+
+interface SignInMfaFormProps {
+  context?: 'forgot-password' | 'sign-in'
+}
+
+export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+  const signOut = useSignOut()
+  const queryClient = useQueryClient()
+  const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { code: '' },
+  })
 
   const {
     data: factors,
@@ -35,16 +45,33 @@ const SignInMfaForm = () => {
     isLoading: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
-    mutateAsync: mfaChallengeAndVerify,
-    isLoading,
+    mutate: mfaChallengeAndVerify,
+    isLoading: isVerifying,
     isSuccess,
-  } = useMfaChallengeAndVerifyMutation()
-  const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
-  const signOut = useSignOut()
+  } = useMfaChallengeAndVerifyMutation({
+    onSuccess: async () => {
+      await queryClient.resetQueries()
+
+      if (context === 'forgot-password') {
+        router.push({
+          pathname: '/reset-password',
+          query: router.query,
+        })
+      } else {
+        router.push(getReturnToPath())
+      }
+    },
+  })
 
   const onClickLogout = async () => {
     await signOut()
     await router.replace('/sign-in')
+  }
+
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ code }) => {
+    if (selectedFactor) {
+      mfaChallengeAndVerify({ factorId: selectedFactor.id, code, refreshFactors: false })
+    }
   }
 
   useEffect(() => {
@@ -59,43 +86,6 @@ const SignInMfaForm = () => {
     }
   }, [factors?.totp, isSuccessFactors, router, queryClient])
 
-  const onSignIn = async ({ code }: { code: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Signing in...`,
-    })
-    if (selectedFactor) {
-      await mfaChallengeAndVerify(
-        { factorId: selectedFactor.id, code, refreshFactors: false },
-        {
-          onSuccess: async () => {
-            ui.setNotification({
-              id: toastId,
-              category: 'success',
-              message: `Signed in successfully!`,
-            })
-
-            Telemetry.sendEvent(
-              { category: 'account', action: 'sign_in', label: '' },
-              telemetryProps,
-              router
-            )
-            await queryClient.resetQueries()
-
-            router.push(getReturnToPath())
-          },
-          onError: (error) => {
-            ui.setNotification({
-              id: toastId,
-              category: 'error',
-              message: (error as AuthError).message,
-            })
-          },
-        }
-      )
-    }
-  }
-
   return (
     <>
       {isLoadingFactors && <GenericSkeletonLoader />}
@@ -103,61 +93,68 @@ const SignInMfaForm = () => {
       {isErrorFactors && <AlertError error={factorsError} subject="Failed to retrieve factors" />}
 
       {isSuccessFactors && (
-        <Form
-          validateOnBlur
-          id="sign-in-mfa-form"
-          initialValues={{ code: '' }}
-          validationSchema={signInSchema}
-          onSubmit={onSignIn}
-        >
-          {() => (
-            <>
-              <div className="flex flex-col gap-4">
-                <Input
-                  id="code"
+        <Form_Shadcn_ {...form}>
+          <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField_Shadcn_
+              key="code"
+              name="code"
+              control={form.control}
+              render={({ field }) => (
+                <FormItemLayout
                   name="code"
-                  type="text"
-                  autoFocus
-                  icon={<IconLock />}
-                  placeholder="XXXXXX"
-                  disabled={isLoading}
-                  autoComplete="off"
-                  spellCheck="false"
-                  autoCapitalize="none"
-                  autoCorrect="off"
                   label={
                     selectedFactor && factors?.totp.length === 2
                       ? `Code generated by ${selectedFactor.friendly_name}`
                       : null
                   }
-                />
+                >
+                  <FormControl_Shadcn_>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
+                        <Lock />
+                      </div>
+                      <Input_Shadcn_
+                        id="code"
+                        className="pl-10"
+                        {...field}
+                        autoFocus
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="none"
+                        spellCheck="false"
+                        placeholder="XXXXXX"
+                        disabled={isVerifying}
+                      />
+                    </div>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
 
-                <div className="flex items-center justify-between space-x-2">
-                  <Button
-                    block
-                    type="outline"
-                    size="large"
-                    disabled={isLoading || isSuccess}
-                    onClick={onClickLogout}
-                    className="opacity-80 hover:opacity-100 transition"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    block
-                    form="sign-in-mfa-form"
-                    htmlType="submit"
-                    size="large"
-                    disabled={isLoading || isSuccess}
-                    loading={isLoading || isSuccess}
-                  >
-                    {isLoading ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </Form>
+            <div className="flex items-center justify-between space-x-2">
+              <Button
+                block
+                type="outline"
+                size="large"
+                disabled={isVerifying || isSuccess}
+                onClick={onClickLogout}
+                className="opacity-80 hover:opacity-100 transition"
+              >
+                Cancel
+              </Button>
+              <Button
+                block
+                form={formId}
+                htmlType="submit"
+                size="large"
+                disabled={isVerifying || isSuccess}
+                loading={isVerifying || isSuccess}
+              >
+                {isVerifying ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
+              </Button>
+            </div>
+          </form>
+        </Form_Shadcn_>
       )}
 
       <div className="my-8">
@@ -179,9 +176,17 @@ const SignInMfaForm = () => {
           )}
           <li>
             <Link
-              href="/support/new?subject=Unable+to+sign+in+via+MFA&category=Login_issues"
+              href="/logout"
+              className="text-sm transition text-foreground-light hover:text-foreground"
+            >
+              Force sign out and clear cookies
+            </Link>
+          </li>
+          <li>
+            <Link
               target="_blank"
               rel="noreferrer"
+              href="/support/new?subject=Unable+to+sign+in+via+MFA&category=Login_issues"
               className="text-sm transition text-foreground-light hover:text-foreground"
             >
               Reach out to us via support
@@ -192,5 +197,3 @@ const SignInMfaForm = () => {
     </>
   )
 }
-
-export default SignInMfaForm

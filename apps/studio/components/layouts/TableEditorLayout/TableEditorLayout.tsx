@@ -1,37 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
-import { PropsWithChildren, useEffect, useMemo } from 'react'
+import { PropsWithChildren } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions, usePermissionsLoaded, useSelectedProject, useStore } from 'hooks'
-import { ProjectLayoutWithAuth } from '../'
-import TableEditorMenu from './TableEditorMenu'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
-  const { vault, ui } = useStore()
-  const project = useSelectedProject()
-
-  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
-  const isPermissionsLoaded = usePermissionsLoaded()
-
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
-  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-
-  useEffect(() => {
-    if (isVaultEnabled) {
-      vault.load()
-    }
-  }, [ui.selectedProjectRef, isVaultEnabled])
-
-  const tableEditorMenu = useMemo(() => <TableEditorMenu />, [])
+  const { can: canReadTables, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'tables'
+  )
 
   if (isPermissionsLoaded && !canReadTables) {
-    debugger
     return (
       <ProjectLayoutWithAuth isBlocking={false}>
         <NoPermission isFullPage resourceText="view tables from this project" />
@@ -39,11 +19,7 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     )
   }
 
-  return (
-    <ProjectLayoutWithAuth product="Table Editor" productMenu={tableEditorMenu} isBlocking={false}>
-      {children}
-    </ProjectLayoutWithAuth>
-  )
+  return children
 }
 
-export default observer(TableEditorLayout)
+export default TableEditorLayout

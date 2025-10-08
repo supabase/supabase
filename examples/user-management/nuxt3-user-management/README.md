@@ -1,17 +1,19 @@
 # Supabase Nuxt User Management
 
-This repo is a quick sample of how you can get started building apps using Nuxt 3 and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Nuxt  guide](https://supabase.io/docs/guides/with-nuxt-3). 
+This repo is a quick sample of how you can get started building apps using Nuxt 3 and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Nuxt guide](https://supabase.io/docs/guides/with-nuxt-3).
 
 This repo will demonstrate how to:
+
 - sign users in with Supabase Auth using [magic link](https://supabase.io/docs/reference/dart/auth-signin#sign-in-with-magic-link)
 - store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
 - store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
 
 ## Getting Started
 
-Before running this app, you need to create a Supabase project and copy [your credentials](https://supabase.io/docs/guides/with-nuxt-3#get-the-api-keys) to `.env`. 
+Before running this app, you need to create a Supabase project and copy [your credentials](https://supabase.io/docs/guides/with-nuxt-3#get-the-api-keys) to `.env`.
 
 Run the following command to launch it on `localhost:3000`
+
 ```bash
 npm run dev
 ```
@@ -40,11 +42,11 @@ create policy "Public profiles are viewable by everyone."
 
 create policy "Users can insert their own profile."
   on profiles for insert
-  with check ( auth.uid() = id );
+  with check ( (select auth.uid()) = id );
 
 create policy "Users can update own profile."
   on profiles for update
-  using ( auth.uid() = id );
+  using ( (select auth.uid()) = id );
 
 -- Set up Realtime!
 begin;

@@ -2,32 +2,39 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { SmtpClient } from 'https://deno.land/x/denomailer@0.12.0/mod.ts'
+import nodemailer from 'npm:nodemailer@6.9.10'
 
-const smtp = new SmtpClient()
+const transport = nodemailer.createTransport({
+  host: Deno.env.get('SMTP_HOSTNAME')!,
+  port: Number(Deno.env.get('SMTP_PORT')!),
+  secure: Boolean(Deno.env.get('SMTP_SECURE')!),
+  auth: {
+    user: Deno.env.get('SMTP_USERNAME')!,
+    pass: Deno.env.get('SMTP_PASSWORD')!
+  }
+})
 
 console.log(`Function "send-email-smtp" up and running!`)
 
 Deno.serve(async (_req) => {
-  await smtp.connect({
-    hostname: Deno.env.get('SMTP_HOSTNAME')!,
-    port: Number(Deno.env.get('SMTP_PORT')!),
-    username: Deno.env.get('SMTP_USERNAME')!,
-    password: Deno.env.get('SMTP_PASSWORD')!,
-  })
-
   try {
-    await smtp.send({
-      from: Deno.env.get('SMTP_FROM')!,
-      to: 'testr@test.de',
-      subject: `Hello from Supabase Edge Functions`,
-      content: `Hello Functions \o/`,
+    await new Promise<void>((resolve, reject) => {
+      transport.sendMail({
+        from: Deno.env.get('SMTP_FROM')!,
+        to: 'testr@test.de',
+        subject: `Hello from Supabase Edge Functions`,
+        text: `Hello Functions \\o/`,
+      }, error => {
+        if (error) {
+          return reject(error)
+        }
+  
+        resolve()
+      })
     })
   } catch (error) {
     return new Response(error.message, { status: 500 })
   }
-
-  await smtp.close()
 
   return new Response(
     JSON.stringify({
