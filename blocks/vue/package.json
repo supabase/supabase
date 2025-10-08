@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": "./index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "prettier --cache --write registry.json && rimraf -G public/r && shadcn build && tsx scripts/clean-registry.ts",
     "clean": "rimraf node_modules .next .turbo",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
@@ -16,7 +16,7 @@
     "@supabase/supabase-js": "^2.49.1"
   },
   "devDependencies": {
-    "shadcn": "^2.10.0",
+    "shadcn": "^3.0.0",
     "tsconfig": "workspace:*",
     "vite": "catalog:"
   }

@@ -17,7 +17,7 @@ catalog:
   tailwindcss: 3.4.1
   typescript: ~5.9.0
   valtio: ^1.12.0
-  vite: ^6.2.7
+  vite: ^6.3.6
   zod: ^3.25.76
 
 ignoredBuiltDependencies:
@@ -38,11 +38,7 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - ai
   - '@ai-sdk/*'
-  - '@supabase/mcp-server-supabase'
-  - '@supabase/mcp-utils'
-  - '@supabase/auth-js'
-  - '@supabase/supabase-js'
-  - '@supabase/realtime-js'
+  - '@supabase/*'
 
 onlyBuiltDependencies:
   - supabase
