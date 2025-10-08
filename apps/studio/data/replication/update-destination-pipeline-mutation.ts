@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import type { components } from 'api-types'
 import { replicationKeys } from './keys'
 
 export type BigQueryDestinationConfig = {
@@ -58,7 +59,7 @@ async function updateDestinationPipeline(
   if (!projectRef) throw new Error('projectRef is required')
 
   // Build destination_config based on the type
-  let destination_config: any
+  let destination_config: components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   if ('bigQuery' in destinationConfig) {
     const { projectId, datasetId, serviceAccountKey, maxStalenessMins } = destinationConfig.bigQuery
     destination_config = {

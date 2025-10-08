@@ -5090,32 +5090,74 @@ export interface components {
     }
     CreateReplicationDestinationBody: {
       /** @description Destination configuration */
-      config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -5124,32 +5166,74 @@ export interface components {
     }
     CreateReplicationDestinationPipelineBody: {
       /** @description Destination configuration */
-      destination_config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      destination_config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -7900,32 +7984,74 @@ export interface components {
     }
     ReplicationDestinationResponse: {
       /** @description Destination configuration */
-      config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination id
        * @example 2001
@@ -7946,32 +8072,74 @@ export interface components {
       /** @description List of destinations */
       destinations: {
         /** @description Destination configuration */
-        config: {
-          big_query: {
-            /**
-             * @description BigQuery dataset id
-             * @example analytics
-             */
-            dataset_id: string
-            /**
-             * @description Maximum number of concurrent write streams
-             * @example 8
-             */
-            max_concurrent_streams?: number
-            /**
-             * @description Maximum data staleness in minutes
-             * @example 5
-             */
-            max_staleness_mins?: number
-            /**
-             * @description BigQuery project id
-             * @example my-gcp-project
-             */
-            project_id: string
-            /** @description BigQuery service account key */
-            service_account_key: string
-          }
-        }
+        config:
+          | {
+              big_query: {
+                /**
+                 * @description BigQuery dataset id
+                 * @example analytics
+                 */
+                dataset_id: string
+                /**
+                 * @description Maximum number of concurrent write streams
+                 * @example 8
+                 */
+                max_concurrent_streams?: number
+                /**
+                 * @description Maximum data staleness in minutes
+                 * @example 5
+                 */
+                max_staleness_mins?: number
+                /**
+                 * @description BigQuery project id
+                 * @example my-gcp-project
+                 */
+                project_id: string
+                /** @description BigQuery service account key */
+                service_account_key: string
+              }
+            }
+          | {
+              iceberg: {
+                supabase: {
+                  /**
+                   * @description Catalog token
+                   * @example A jwt secret
+                   */
+                  catalog_token: string
+                  /**
+                   * @description Namespace
+                   * @example my-namespace
+                   */
+                  namespace: string
+                  /**
+                   * @description Project ref
+                   * @example abcdefghijklmnopqrst
+                   */
+                  project_ref: string
+                  /**
+                   * @description S3 access key ID
+                   * @example 53383b1d0cdb16a3afa63152656aa3cc
+                   */
+                  s3_access_key_id: string
+                  /**
+                   * @description S3 region
+                   * @example ap-southeast-1
+                   */
+                  s3_region: string
+                  /**
+                   * @description S3 secret access key
+                   * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                   */
+                  s3_secret_access_key: string
+                  /**
+                   * @description Warehouse name
+                   * @example my-warehouse
+                   */
+                  warehouse_name: string
+                }
+              }
+            }
         /**
          * @description Destination id
          * @example 2001
@@ -9477,32 +9645,74 @@ export interface components {
     }
     UpdateReplicationDestinationBody: {
       /** @description Destination configuration */
-      config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -9511,32 +9721,74 @@ export interface components {
     }
     UpdateReplicationDestinationPipelineBody: {
       /** @description Destination configuration */
-      destination_config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      destination_config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
