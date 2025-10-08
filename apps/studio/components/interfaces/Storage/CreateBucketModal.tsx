@@ -53,6 +53,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
+import { BUCKET_TYPES } from './Storage.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 const FormSchema = z
@@ -130,6 +131,8 @@ export const CreateBucketModal = ({
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
+
+  const config = BUCKET_TYPES['files']
 
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -264,7 +267,7 @@ export const CreateBucketModal = ({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create storage bucket</DialogTitle>
+          <DialogTitle>Create {isStorageV2 ? config.singularName : 'storage'} bucket</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
