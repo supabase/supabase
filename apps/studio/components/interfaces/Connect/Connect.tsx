@@ -87,6 +87,9 @@ export const Connect = () => {
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
   const [queryWith, setQueryWith] = useQueryState('with', parseAsString)
+  const [queryType, setQueryType] = useQueryState('type', parseAsString)
+  const [querySource, setQuerySource] = useQueryState('source', parseAsString)
+  const [queryMethod, setQueryMethod] = useQueryState('method', parseAsString)
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -249,6 +252,10 @@ export const Connect = () => {
       setQueryFramework(null)
       setQueryUsing(null)
       setQueryWith(null)
+      // Clear connection string URL parameters
+      setQueryType(null)
+      setQuerySource(null)
+      setQueryMethod(null)
     } else {
       setShowConnect(open)
     }

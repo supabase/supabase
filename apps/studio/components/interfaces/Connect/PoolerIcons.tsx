@@ -409,6 +409,7 @@ export const DirectConnectionIcon = () => {
     }
 
     // Initial staggered animation - dots animate in and stay
+    // Start initial animations immediately with slight delays
     setTimeout(() => animateDot(0), 100)
     setTimeout(() => animateDot(1), 1500)
     setTimeout(() => animateDot(2), 3000)

@@ -1,5 +1,6 @@
 import { ChevronDown, GlobeIcon, InfoIcon } from 'lucide-react'
-import { HTMLAttributes, ReactNode, useMemo, useState } from 'react'
+import { HTMLAttributes, ReactNode, useMemo, useState, useEffect } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -34,6 +35,8 @@ import {
 import { Admonition } from 'ui-patterns'
 import {
   CONNECTION_PARAMETERS,
+  type ConnectionMethod,
+  connectionMethodOptions,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
   IPV4_ADDON_TEXT,
@@ -56,35 +59,6 @@ const StepLabel = ({
   </div>
 )
 
-type ConnectionMethod = 'direct' | 'transaction' | 'session'
-
-const connectionMethodOptions: Record<
-  ConnectionMethod,
-  { value: string; label: string; description: string; badge: string }
-> = {
-  direct: {
-    value: 'direct',
-    label: 'Direct connection',
-    description:
-      'Ideal for applications with persistent, long-lived connections, such as those running on virtual machines or long-standing containers.',
-    badge: 'IPv4 Compatible',
-  },
-  transaction: {
-    value: 'transaction',
-    label: 'Transaction pooler',
-    description:
-      'Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated.',
-    badge: 'IPv4 Compatible',
-  },
-  session: {
-    value: 'session',
-    label: 'Session pooler',
-    description:
-      'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.',
-    badge: 'IPv4 Only',
-  },
-}
-
 /**
  * [Joshen] For paid projects - Dedicated pooler is always in transaction mode
  * So session mode connection details are always using the shared pooler (Supavisor)
@@ -94,12 +68,73 @@ export const DatabaseConnectionString = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
+  // URL state management
+  const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
+  const [querySource, setQuerySource] = useQueryState('source', parseAsString)
+  const [queryMethod, setQueryMethod] = useQueryState('method', parseAsString.withDefault('direct'))
+
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
   const [selectedMethod, setSelectedMethod] = useState<ConnectionMethod>('direct')
 
   const sharedPoolerPreferred = useMemo(() => {
     return org?.plan?.id === 'free'
   }, [org])
+
+  // Sync URL state with component state on mount and when URL changes
+  useEffect(() => {
+    const validTypes = DATABASE_CONNECTION_TYPES.map((t) => t.id)
+    if (queryType && validTypes.includes(queryType as DatabaseConnectionType)) {
+      setSelectedTab(queryType as DatabaseConnectionType)
+    } else if (queryType && !validTypes.includes(queryType as DatabaseConnectionType)) {
+      setQueryType('uri')
+      setSelectedTab('uri')
+    }
+
+    const validMethods: ConnectionMethod[] = ['direct', 'transaction', 'session']
+    if (queryMethod && validMethods.includes(queryMethod as ConnectionMethod)) {
+      setSelectedMethod(queryMethod as ConnectionMethod)
+    } else if (queryMethod && !validMethods.includes(queryMethod as ConnectionMethod)) {
+      setQueryMethod('direct')
+      setSelectedMethod('direct')
+    }
+
+    if (querySource && querySource !== state.selectedDatabaseId) {
+      state.setSelectedDatabaseId(querySource)
+    } else if (!querySource && state.selectedDatabaseId !== projectRef) {
+      state.setSelectedDatabaseId(projectRef)
+    }
+  }, [queryType, queryMethod, querySource, state])
+
+  // Sync component state changes back to URL
+  const handleTabChange = (connectionType: DatabaseConnectionType) => {
+    setSelectedTab(connectionType)
+    setQueryType(connectionType)
+  }
+
+  const handleMethodChange = (method: ConnectionMethod) => {
+    setSelectedMethod(method)
+    setQueryMethod(method)
+  }
+
+  const handleDatabaseChange = (databaseId: string) => {
+    if (databaseId === projectRef) {
+      setQuerySource(null)
+    } else {
+      setQuerySource(databaseId)
+    }
+  }
+
+  // Sync database selector state changes back to URL
+  useEffect(() => {
+    if (state.selectedDatabaseId && state.selectedDatabaseId !== querySource) {
+      // Only set source in URL if it's not the primary database
+      if (state.selectedDatabaseId === projectRef) {
+        setQuerySource(null)
+      } else {
+        setQuerySource(state.selectedDatabaseId)
+      }
+    }
+  }, [state.selectedDatabaseId, querySource, projectRef])
 
   const {
     data: pgbouncerConfig,
@@ -250,12 +285,7 @@ export const DatabaseConnectionString = () => {
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Type
           </span>
-          <Select_Shadcn_
-            value={selectedTab}
-            onValueChange={(connectionType: DatabaseConnectionType) =>
-              setSelectedTab(connectionType)
-            }
-          >
+          <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
             <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
@@ -268,15 +298,16 @@ export const DatabaseConnectionString = () => {
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </div>
-        <DatabaseSelector portal={false} buttonProps={{ size: 'small' }} />
+        <DatabaseSelector
+          portal={false}
+          buttonProps={{ size: 'small' }}
+          onSelectId={handleDatabaseChange}
+        />
         <div className="flex">
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Method
           </span>
-          <Select_Shadcn_
-            value={selectedMethod}
-            onValueChange={(method: ConnectionMethod) => setSelectedMethod(method)}
-          >
+          <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
             <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
               <SelectValue_Shadcn_ size="tiny">
                 {connectionMethodOptions[selectedMethod].label}
