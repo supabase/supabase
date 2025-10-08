@@ -8,21 +8,15 @@ import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/lay
 import AlertError from 'components/ui/AlertError'
 import DateRangePicker from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { OrgProject } from 'data/projects/org-projects-infinite-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import {
-  cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Check, ChevronDown } from 'lucide-react'
+import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
@@ -31,12 +25,19 @@ import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
 
+// [Joshen] JFYI this component could use nuqs to handle `projectRef` state which will help
+// simplify some of the implementation here.
+
 export const Usage = () => {
   const { slug, projectRef } = useParams()
+
   const [dateRange, setDateRange] = useState<any>()
+  const [selectedProject, setSelectedProject] = useState<OrgProject>()
+
   const [selectedProjectRefInputValue, setSelectedProjectRefInputValue] = useState<
     string | undefined
   >('all-projects')
+  const [openProjectSelector, setOpenProjectSelector] = useState(false)
 
   // [Alaister] 'all-projects' is not a valid project ref, it's just used as an extra
   // state for the select input. As such we need to remove it for the selected project ref
@@ -48,8 +49,10 @@ export const Usage = () => {
     'stripe.subscriptions'
   )
 
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { data, isSuccess } = useProjectsQuery()
+  const { isSuccess: isSuccessProjectDetail } = useProjectDetailQuery({
+    ref: selectedProjectRef,
+  })
+
   const {
     data: subscription,
     error: subscriptionError,
@@ -57,10 +60,6 @@ export const Usage = () => {
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
-
-  const orgProjects = (data?.projects ?? []).filter(
-    (project) => project.organization_id === organization?.id
-  )
 
   const billingCycleStart = useMemo(() => {
     return dayjs.unix(subscription?.current_period_start ?? 0).utc()
@@ -105,19 +104,13 @@ export const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, subscription])
 
-  const selectedProject = selectedProjectRef
-    ? orgProjects?.find((it) => it.ref === selectedProjectRef)
-    : undefined
-
   useEffect(() => {
-    if (projectRef && isSuccess && orgProjects !== undefined) {
-      if (orgProjects.find((project) => project.ref === projectRef)) {
-        setSelectedProjectRefInputValue(projectRef)
-      }
+    if (projectRef && isSuccessProjectDetail) {
+      setSelectedProjectRefInputValue(projectRef)
     }
     // [Joshen] Since we're already looking at isSuccess
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectRef, isSuccess])
+  }, [projectRef, isSuccessProjectDetail])
 
   return (
     <>
@@ -162,37 +155,60 @@ export const Usage = () => {
                     className="!w-48"
                   />
 
-                  <Select_Shadcn_
-                    value={selectedProjectRefInputValue}
-                    onValueChange={(value) => {
-                      if (value === 'all-projects') setSelectedProjectRefInputValue('all-projects')
-                      else setSelectedProjectRefInputValue(value)
+                  <OrganizationProjectSelector
+                    open={openProjectSelector}
+                    setOpen={setOpenProjectSelector}
+                    selectedRef={selectedProjectRefInputValue}
+                    onSelect={(project) => {
+                      setSelectedProject(project)
+                      setSelectedProjectRefInputValue(project.ref)
                     }}
-                  >
-                    <SelectTrigger_Shadcn_ size="tiny" className="w-[180px]">
-                      <SelectValue_Shadcn_ placeholder="Select a project" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_
-                          key="all-projects"
-                          value="all-projects"
-                          className="text-xs"
+                    renderTrigger={() => {
+                      return (
+                        <Button
+                          block
+                          type="default"
+                          role="combobox"
+                          size="tiny"
+                          className="justify-between w-[180px]"
+                          iconRight={<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                        >
+                          {!selectedProject || selectedProjectRefInputValue === 'all-projects'
+                            ? 'All projects'
+                            : selectedProject?.name}
+                        </Button>
+                      )
+                    }}
+                    renderRow={(project) => {
+                      const isSelected = selectedProjectRefInputValue === project.ref
+                      return (
+                        <div className="w-full flex items-center justify-between">
+                          <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
+                            {project.name}
+                          </span>
+                          {isSelected && <Check size={16} />}
+                        </div>
+                      )
+                    }}
+                    renderActions={() => (
+                      <CommandGroup_Shadcn_>
+                        <CommandItem_Shadcn_
+                          className="cursor-pointer flex items-center justify-between w-full"
+                          onSelect={() => {
+                            setOpenProjectSelector(false)
+                            setSelectedProjectRefInputValue('all-projects')
+                          }}
+                          onClick={() => {
+                            setOpenProjectSelector(false)
+                            setSelectedProjectRefInputValue('all-projects')
+                          }}
                         >
                           All projects
-                        </SelectItem_Shadcn_>
-                        {orgProjects?.map((project) => (
-                          <SelectItem_Shadcn_
-                            key={project.ref}
-                            value={project.ref}
-                            className="text-xs"
-                          >
-                            {project.name}
-                          </SelectItem_Shadcn_>
-                        ))}
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                          {selectedProjectRefInputValue === 'all-projects' && <Check size={16} />}
+                        </CommandItem_Shadcn_>
+                      </CommandGroup_Shadcn_>
+                    )}
+                  />
                 </div>
 
                 <div className="flex items-center gap-2">
