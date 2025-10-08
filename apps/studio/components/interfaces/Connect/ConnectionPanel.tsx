@@ -137,12 +137,10 @@ export const ConnectionPanel = ({
             <div className="flex h-full">
               {type === 'transaction' ? <TransactionIcon /> : <DirectConnectionIcon />}
             </div>
-            <div className="flex items-center p-4">
-              <span className="text-xs text-foreground">
-                {type === 'transaction'
-                  ? 'Suitable for a large number of connected clients that share a dedicated connection pool'
-                  : 'Each client has a dedicated, long-lived connection to Postgres'}
-              </span>
+            <div className="flex items-center p-4 text-xs text-foreground">
+              {type === 'transaction'
+                ? 'Suitable for a large number of connected clients that share a dedicated connection pool'
+                : 'Each client has a dedicated, long-lived connection to Postgres'}
             </div>
           </div>
         )}
