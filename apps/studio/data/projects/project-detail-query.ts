@@ -20,12 +20,17 @@ export interface Project extends Omit<ProjectDetail, 'status'> {
   status: components['schemas']['ProjectDetailResponse']['status']
 }
 
-export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {
+export async function getProjectDetail(
+  { ref }: ProjectDetailVariables,
+  signal?: AbortSignal,
+  headers?: Record<string, string>
+) {
   if (!ref) throw new Error('Project ref is required')
 
   const { data, error } = await get('/platform/projects/{ref}', {
     params: { path: { ref } },
     signal,
+    headers,
   })
 
   if (error) handleError(error)
