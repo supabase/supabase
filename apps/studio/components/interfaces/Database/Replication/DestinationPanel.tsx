@@ -190,37 +190,37 @@ export const DestinationPanel = ({
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
-  const defaultValues = useMemo(
-    () => ({
+  const defaultValues = useMemo(() => {
+    // Type guards to safely access union properties
+    const config = destinationData?.config
+    const isBigQueryConfig = config && 'big_query' in config
+    const isIcebergConfig = config && 'iceberg' in config
+
+    return {
       // Common fields
-      type: (destinationData?.config?.big_query
+      type: (isBigQueryConfig
         ? TypeEnum.enum.BigQuery
-        : (destinationData?.config as any)?.iceberg
+        : isIcebergConfig
           ? TypeEnum.enum['Analytics Bucket']
           : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>,
       name: destinationData?.name ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
       // BigQuery fields
-      projectId: destinationData?.config?.big_query?.project_id ?? '',
-      datasetId: destinationData?.config?.big_query?.dataset_id ?? '',
-      serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
-      maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
+      projectId: isBigQueryConfig ? config.big_query.project_id : '',
+      datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
+      serviceAccountKey: isBigQueryConfig ? config.big_query.service_account_key : '',
+      maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined,
       // Analytics Bucket fields
-      warehouseName: (destinationData?.config as any)?.iceberg?.supabase?.warehouse_name ?? '',
-      namespace: (destinationData?.config as any)?.iceberg?.supabase?.namespace ?? '',
-      catalogToken:
-        (destinationData?.config as any)?.iceberg?.supabase?.catalog_token ?? serviceApiKey,
-      s3AccessKeyId: (destinationData?.config as any)?.iceberg?.supabase?.s3_access_key_id ?? '',
-      s3SecretAccessKey:
-        (destinationData?.config as any)?.iceberg?.supabase?.s3_secret_access_key ?? '',
+      warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
+      namespace: isIcebergConfig ? config.iceberg.supabase.namespace : '',
+      catalogToken: isIcebergConfig ? config.iceberg.supabase.catalog_token : serviceApiKey,
+      s3AccessKeyId: isIcebergConfig ? config.iceberg.supabase.s3_access_key_id : '',
+      s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
       s3Region:
-        projectSettings?.region ??
-        (destinationData?.config as any)?.iceberg?.supabase?.s3_region ??
-        '',
-    }),
-    [destinationData, pipelineData, serviceApiKey, projectSettings]
-  )
+        projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
+    }
+  }, [destinationData, pipelineData, serviceApiKey, projectSettings])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
