@@ -224,6 +224,7 @@ const ProjectLinker = ({
                         </div>
                         <p>{project.name}</p>
                         {project.status === 'INACTIVE' && <Badge>Paused</Badge>}
+                        {project.status === 'GOING_DOWN' && <Badge>Pausing</Badge>}
                       </div>
                       {project.ref === supabaseProjectRef && <Check size={16} />}
                     </div>
