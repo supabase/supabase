@@ -6,28 +6,6 @@ interface DocsConfig {
 }
 
 export const docsConfig: DocsConfig = {
-  // mainNav: [
-  //   {
-  //     title: 'Documentation',
-  //     href: '/docs',
-  //   },
-  //   {
-  //     title: 'Components',
-  //     href: '/docs/components/accordion',
-  //   },
-  //   {
-  //     title: 'Themes',
-  //     href: '/themes',
-  //   },
-  //   {
-  //     title: 'Examples',
-  //     href: '/examples',
-  //   },
-  //   {
-  //     title: 'Blocks',
-  //     href: '/blocks',
-  //   },
-  // ],
   sidebarNav: [
     {
       title: 'Getting Started',
@@ -75,6 +53,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Navigation',
           href: '/docs/ui-patterns/navigation',
+          items: [],
+        },
+        {
+          title: 'Empty States',
+          href: '/docs/ui-patterns/empty-states',
           items: [],
         },
       ],
