@@ -46,7 +46,7 @@ export const SessionTimeoutModal = ({
         <p>
           <ul className="list-disc pl-1.5 list-inside space-y-1 text-sm text-foreground-light">
             <li>Try with a different browser</li>
-            <li>Disable browser extensions that block network requests</li>
+            <li>Disable any browser extensions that block network requests, such as ad blockers</li>
             <li>
               <button
                 title="Clear storage and reload"
