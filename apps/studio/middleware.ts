@@ -14,6 +14,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/title-v2',
   '/ai/onboarding/design',
   '/ai/feedback/classify',
+  '/ai/table-quickstart/generate-schemas',
   '/ai/docs',
   '/get-ip-address',
   '/get-utc-time',
