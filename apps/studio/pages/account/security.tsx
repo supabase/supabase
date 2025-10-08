@@ -5,7 +5,14 @@ import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -14,11 +21,6 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 
 const collapsibleClasses = [
   'bg-surface-100',
@@ -34,7 +36,13 @@ const collapsibleClasses = [
 ]
 
 const Security: NextPageWithLayout = () => {
-  const { data } = useMfaListFactorsQuery()
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+
+  const { data } = useMfaListFactorsQuery({ enabled: showSecuritySettings })
+
+  if (!showSecuritySettings) {
+    return <UnknownInterface urlBack={`/account/me`} />
+  }
 
   return (
     <>
