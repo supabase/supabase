@@ -305,7 +305,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
   )
 
-  const isContextExceededError = error && JSON.stringify(error).includes('context_length_exceeded')
+  const isContextExceededError =
+    error &&
+    (JSON.stringify(error).includes('context_length_exceeded') ||
+      JSON.stringify(error).includes('exceeds the context window'))
 
   const renderedMessages = useMemo(
     () =>
