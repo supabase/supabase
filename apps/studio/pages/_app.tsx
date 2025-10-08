@@ -50,6 +50,7 @@ import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvid
 import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
@@ -84,6 +85,7 @@ loader.config({
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
+  const { appTitle } = useCustomContent(['app:title'])
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
@@ -127,7 +129,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               >
                 <ProfileProvider>
                   <Head>
-                    <title>Supabase</title>
+                    <title>{appTitle ?? 'Supabase'}</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                     <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
                     {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}

@@ -2,8 +2,9 @@ import { serialize } from 'next-mdx-remote/serialize'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
-import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { preprocessMdxWithCodeTabs } from '~/components/CodeTabs'
 
 // mdx2 needs self-closing tags.
 // dragging an image onto a GitHub discussion creates an <img>
@@ -64,13 +65,18 @@ function createRemarkCollectToc(maxDepth: number) {
       walk(tree)
 
       // Attach to tree data for retrieval post-serialize
-      ;(tree.data || (tree.data = {})).__collectedToc = items
+      if (!tree.data) {
+        tree.data = {}
+      }
+      tree.data.__collectedToc = items
     }
   }
 }
 
 export async function mdxSerialize(source: string, options?: { tocDepth?: number }) {
   const formattedSource = addSelfClosingTags(source)
+  // Preprocess MDX to handle CodeTabs transformation
+  const preprocessedSource = await preprocessMdxWithCodeTabs(formattedSource)
   const codeHikeOptions: CodeHikeConfig = {
     theme: codeHikeTheme,
     lineNumbers: true,
@@ -82,7 +88,7 @@ export async function mdxSerialize(source: string, options?: { tocDepth?: number
   const tocDepth = options?.tocDepth ?? 2
   let collectedToc: TocItem[] = []
 
-  const mdxSource: any = await serialize(formattedSource, {
+  const mdxSource = await serialize(preprocessedSource, {
     scope: {
       chCodeConfig: codeHikeOptions,
     },
@@ -91,10 +97,10 @@ export async function mdxSerialize(source: string, options?: { tocDepth?: number
         [remarkCodeHike, codeHikeOptions],
         remarkGfm,
         // Collect headings into a simple TOC structure
-        function () {
+        () => {
           const plugin = createRemarkCollectToc(tocDepth)
           const transformer = (plugin as any)()
-          return function (tree: any) {
+          return (tree: any) => {
             transformer(tree)
             if (tree?.data?.__collectedToc) {
               collectedToc = tree.data.__collectedToc as TocItem[]

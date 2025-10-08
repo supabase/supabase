@@ -1,6 +1,15 @@
-import { Loader2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { memo, ReactNode, useEffect, useMemo, useRef } from 'react'
+import {
+  isValidElement,
+  memo,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  type ReactElement,
+} from 'react'
+import type { StreamdownProps } from 'streamdown'
 
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import {
@@ -8,6 +17,7 @@ import {
   cn,
   CodeBlock,
   CodeBlockLang,
+  markdownComponents,
   Dialog,
   DialogClose,
   DialogContent,
@@ -23,29 +33,34 @@ import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { defaultUrlTransform } from './Message.utils'
 
-export const OrderedList = memo(({ children }: { children: ReactNode }) => (
+const Streamdown = dynamic<StreamdownProps>(
+  () => import('streamdown').then((mod) => mod.Streamdown),
+  { ssr: false }
+)
+
+export const OrderedList = memo(({ children }: { children?: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
 ))
 OrderedList.displayName = 'OrderedList'
 
-export const ListItem = memo(({ children }: { children: ReactNode }) => (
+export const ListItem = memo(({ children }: { children?: ReactNode }) => (
   <li className="[&>pre]:mt-2">{children}</li>
 ))
 ListItem.displayName = 'ListItem'
 
-export const Heading3 = memo(({ children }: { children: ReactNode }) => (
+export const Heading3 = memo(({ children }: { children?: ReactNode }) => (
   <h3 className="underline">{children}</h3>
 ))
 Heading3.displayName = 'Heading3'
 
 export const InlineCode = memo(
-  ({ className, children }: { className?: string; children: ReactNode }) => (
+  ({ className, children }: { className?: string; children?: ReactNode }) => (
     <code className={cn('text-xs', className)}>{children}</code>
   )
 )
 InlineCode.displayName = 'InlineCode'
 
-export const Hyperlink = memo(({ href, children }: { href?: string; children: ReactNode }) => {
+export const Hyperlink = memo(({ href, children }: { href?: string; children?: ReactNode }) => {
   const isExternalURL = !href?.startsWith('https://supabase.com/dashboard')
   const safeUrl = defaultUrlTransform(href ?? '')
   const isSafeUrl = safeUrl.length > 0
@@ -103,6 +118,62 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children: Re
 })
 Hyperlink.displayName = 'Hyperlink'
 
+const baseMarkdownComponents = {
+  ol: OrderedList,
+  li: ListItem,
+  h3: Heading3,
+  code: InlineCode,
+  a: Hyperlink,
+  img: ({ src }: JSX.IntrinsicElements['img']) => (
+    <span className="text-foreground-light font-mono">[Image: {src}]</span>
+  ),
+}
+
+export function MessageMarkdown({
+  id,
+  isLoading,
+  readOnly,
+  className,
+  children,
+}: {
+  id: string
+  isLoading: boolean
+  readOnly?: boolean
+  className?: string
+  children: ReactNode
+}) {
+  const markdownSource = useMemo(() => {
+    if (typeof children === 'string') {
+      return children
+    }
+
+    if (Array.isArray(children)) {
+      return children.filter((child): child is string => typeof child === 'string').join('')
+    }
+
+    return ''
+  }, [children])
+
+  const allMarkdownComponents = useMemo(
+    () => ({
+      ...markdownComponents,
+      ...baseMarkdownComponents,
+      pre: (props: JSX.IntrinsicElements['pre']) => (
+        <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
+          {props.children}
+        </MarkdownPre>
+      ),
+    }),
+    [id, isLoading, readOnly]
+  )
+
+  return (
+    <Streamdown className={className} components={allMarkdownComponents}>
+      {markdownSource}
+    </Streamdown>
+  )
+}
+
 export const MarkdownPre = ({
   children,
   id,
@@ -123,8 +194,16 @@ export const MarkdownPre = ({
     cumulative: false,
   })
 
-  const language = children[0].props.className?.replace('language-', '') || 'sql'
-  const rawContent = children[0].props.children[0]
+  const childArray = Array.isArray(children) ? children : [children]
+  const codeElement = childArray.find((child): child is ReactElement => isValidElement(child))
+  const codeProps = codeElement?.props || {}
+  const language = codeProps.className?.replace('language-', '') || 'sql'
+  const codeChildren = codeProps.children
+  const rawContent = Array.isArray(codeChildren)
+    ? codeChildren.map((node) => (typeof node === 'string' ? node : '')).join('')
+    : typeof codeChildren === 'string'
+      ? codeChildren
+      : ''
   const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
   const snippetProps: AssistantSnippetProps = useMemo(() => {
@@ -155,6 +234,10 @@ export const MarkdownPre = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snippetProps])
 
+  if (!codeElement) {
+    return <pre className="w-auto overflow-x-auto not-prose my-4">{children}</pre>
+  }
+
   return (
     <div className="w-auto overflow-x-hidden not-prose my-4 ">
       {language === 'edge' ? (
@@ -167,11 +250,6 @@ export const MarkdownPre = ({
       ) : language === 'sql' ? (
         readOnly ? (
           <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
-        ) : isLoading ? (
-          <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Writing SQL...
-          </div>
         ) : (
           <DisplayBlockRenderer
             messageId={id}
