@@ -13,7 +13,7 @@ import { OrganizationInviteError } from './OrganizationInviteError'
 
 export const OrganizationInvite = () => {
   const router = useRouter()
-  const { profile } = useProfile()
+  const { profile, isLoading: isLoadingProfile } = useProfile()
   const { slug, token } = useParams()
 
   const {
@@ -63,7 +63,11 @@ export const OrganizationInvite = () => {
         'md:w-[400px]'
       )}
     >
-      {!profile ? (
+      {isLoadingProfile || isLoadingInvitation ? (
+        <div className="p-5">
+          <GenericSkeletonLoader />
+        </div>
+      ) : !profile ? (
         <>
           <Admonition
             showIcon={false}
@@ -80,10 +84,6 @@ export const OrganizationInvite = () => {
             </Button>
           </div>
         </>
-      ) : isLoadingInvitation ? (
-        <div className="p-5">
-          <GenericSkeletonLoader />
-        </div>
       ) : inviteIsNoLongerValid ? (
         <>
           <Admonition
