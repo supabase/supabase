@@ -194,7 +194,7 @@ export const ConnectionPanel = ({
         </div>
         <div className="flex flex-col -space-y-px w-full">
           {IS_PLATFORM && (
-            <div className="border border-muted bg-surface-100 px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
+            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
                 <IPv4StatusIcon active={ipv4Status.type === 'success'} />
               </div>
@@ -224,7 +224,7 @@ export const ConnectionPanel = ({
           )}
 
           {type === 'session' && (
-            <div className="border bg-alternative px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
+            <div className="border px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
               <div className="flex w-6 h-6 rounded items-center justify-center gap-2 flex-shrink-0 bg-surface-100">
                 <WarningIcon />
               </div>

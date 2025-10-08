@@ -478,14 +478,13 @@ export const DatabaseConnectionString = () => {
                     title={connectionMethodOptions.session.label}
                     contentType={contentType}
                     lang={lang}
-                    badge="Shared pooler"
+                    badge="Shared Pooler"
                     fileTitle={fileTitle}
                     description={connectionMethodOptions.session.description}
-                    connectionString={
-                      sharedPoolerPreferred
-                        ? supavisorConnectionStrings['pooler'][selectedTab].replace('6543', '5432')
-                        : connectionStrings['pooler'][selectedTab].replace('6543', '5432')
-                    }
+                    connectionString={supavisorConnectionStrings['pooler'][selectedTab].replace(
+                      '6543',
+                      '5432'
+                    )}
                     ipv4Status={{
                       type: 'success',
                       title: 'IPv4 compatible',
