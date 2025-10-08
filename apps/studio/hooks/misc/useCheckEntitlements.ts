@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 
 export function useCheckEntitlements(
-  featureKey: string, 
+  featureKey: string,
   organizationSlug?: string,
   options?: {
     enabled?: boolean
@@ -46,8 +46,8 @@ export function useCheckEntitlements(
   }, [allEntitlements, featureKey, finalOrgSlug])
 
   const isLoading = shouldGetSelectedOrg ? isLoadingSelectedOrg : isLoadingEntitlements
-  const isSuccess = shouldGetSelectedOrg 
-    ? isSuccessSelectedOrg && isSuccessEntitlements 
+  const isSuccess = shouldGetSelectedOrg
+    ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
 
   return { hasAccess, entitlementValue, isLoading, isSuccess }
