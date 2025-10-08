@@ -78,7 +78,6 @@ is always false in SQL.
 To avoid confusion and make your intention clear, we recommend explicitly checking for authentication:
 ```sql
 USING (auth.uid() IS NOT NULL AND auth.uid() = user_id)
-```
 </Admonition>
 ## Authenticated and unauthenticated roles
 
