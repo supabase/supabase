@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
 import { ServiceFlowType, useUnifiedLogInspectionQuery } from 'data/logs'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   CodeBlock,
   ResizableHandle,
@@ -43,6 +44,8 @@ export function ServiceFlowPanel({
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('service-flow')
 
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
+
   const logType = selectedRow?.log_type
   const serviceFlowType: ServiceFlowType | undefined =
     logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
@@ -68,6 +71,14 @@ export function ServiceFlowPanel({
   // Prepare JSON data for Raw JSON tab
   const jsonData =
     shouldShowServiceFlow && serviceFlowData?.result?.[0] ? serviceFlowData.result[0] : selectedRow
+
+  const formattedJsonData =
+    !logsMetadata && 'raw_log_data' in jsonData && 'metadata' in jsonData.raw_log_data
+      ? {
+          ...jsonData,
+          raw_log_data: { ...jsonData.raw_log_data, metadata: undefined },
+        }
+      : jsonData
 
   if (selectedRowKey) {
     return (
@@ -218,7 +229,7 @@ export function ServiceFlowPanel({
                     language="json"
                     className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:!leading-tight [&_code]:!leading-tight"
                   >
-                    {JSON.stringify(jsonData, null, 2)}
+                    {JSON.stringify(formattedJsonData, null, 2)}
                   </CodeBlock>
                 </TabsContent>
               </Tabs>

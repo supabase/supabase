@@ -1,6 +1,7 @@
-import { getAuthUser } from 'lib/gotrue'
+import type { JwtPayload } from '@supabase/supabase-js'
+import { getUserClaims } from 'lib/gotrue'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { ResponseError, SupaResponse, User } from 'types'
+import type { ResponseError } from 'types'
 
 /**
  * Use this method on api routes to check if user is authenticated and having required permissions.
@@ -15,14 +16,14 @@ import type { ResponseError, SupaResponse, User } from 'types'
 export async function apiAuthenticate(
   req: NextApiRequest,
   _res: NextApiResponse
-): Promise<SupaResponse<User>> {
+): Promise<JwtPayload | { error: ResponseError }> {
   try {
-    const user = await fetchUser(req)
-    if (!user) {
+    const claims = await fetchUserClaims(req)
+    if (!claims) {
       return { error: new Error('The user does not exist') }
     }
 
-    return user
+    return claims
   } catch (error) {
     return { error: error as ResponseError }
   }
@@ -32,19 +33,19 @@ export async function apiAuthenticate(
  * @returns
  *  user with only id prop or detail object. It depends on requireUserDetail config
  */
-async function fetchUser(req: NextApiRequest): Promise<any> {
-  const token = req.headers.authorization?.replace('Bearer ', '')
+async function fetchUserClaims(req: NextApiRequest): Promise<JwtPayload> {
+  const token = req.headers.authorization?.replace(/bearer /i, '')
   if (!token) {
     throw new Error('missing access token')
   }
-  const { user, error } = await getAuthUser(token)
+  const { claims, error } = await getUserClaims(token)
   if (error) {
     throw error
   }
 
-  if (!user) {
+  if (!claims) {
     throw new Error('The user does not exist')
   }
 
-  return user
+  return claims
 }

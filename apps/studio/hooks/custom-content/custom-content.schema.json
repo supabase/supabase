@@ -6,6 +6,11 @@
       "type": "string"
     },
 
+    "app:title": {
+      "type": ["string", "null"],
+      "description": "Render a custom HTML title for the site"
+    },
+
     "dashboard_auth:custom_provider": {
       "type": ["string", "null"],
       "description": "Show a custom provider on the sign in page (Continue with X)"
@@ -85,6 +90,7 @@
     }
   },
   "required": [
+    "app:title",
     "organization:legal_documents",
     "project_homepage:client_libraries",
     "project_homepage:example_projects",

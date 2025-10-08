@@ -10,6 +10,7 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
@@ -17,6 +18,7 @@ import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-su
 import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -300,7 +302,7 @@ export const InviteMemberButton = () => {
                     <div className="flex items-center space-x-2">
                       <Button asChild type="default">
                         <Link
-                          href="https://supabase.com/docs/guides/platform/sso"
+                          href={`${DOCS_URL}/guides/platform/sso`}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -308,13 +310,7 @@ export const InviteMemberButton = () => {
                         </Link>
                       </Button>
                       {(currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
-                        <Button asChild type="default">
-                          <Link
-                            href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
-                          >
-                            Upgrade to Team
-                          </Link>
-                        </Button>
+                        <UpgradePlanButton source="inviteMemberSSO" plan="Team" />
                       )}
                     </div>
                   </div>

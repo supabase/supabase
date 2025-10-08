@@ -14,6 +14,7 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -45,20 +46,12 @@ const UserAccessTokens: NextPageWithLayout = () => {
             />
             <div className="flex items-center gap-x-2">
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a
-                  href="https://supabase.com/docs/reference/api/introduction"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <a href={`${DOCS_URL}/reference/api/introduction`} target="_blank" rel="noreferrer">
                   API Docs
                 </a>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a
-                  href="https://supabase.com/docs/reference/cli/start"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <a href={`${DOCS_URL}/reference/cli/start`} target="_blank" rel="noreferrer">
                   CLI docs
                 </a>
               </Button>

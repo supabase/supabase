@@ -3,18 +3,15 @@ import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-ki
 import { useEffect, useRef } from 'react'
 
 import { IS_PLATFORM, useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
 import { TopSection } from 'components/interfaces/HomeNew/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsOrioleDb,
-  useProjectByRefQuery,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AdvisorSection } from './AdvisorSection'
@@ -31,7 +28,7 @@ export const HomeV2 = () => {
   const snap = useAppStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
+  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
   const { mutate: sendEvent } = useSendEventMutation()
 
   const hasShownEnableBranchingModalRef = useRef(false)

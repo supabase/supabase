@@ -12,6 +12,7 @@ import { useProjectRestartMutation } from 'data/projects/project-restart-mutatio
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -30,6 +31,10 @@ const RestartServerButton = () => {
   const isProjectActive = useIsProjectActive()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
+
+  const { projectSettingsRestartProject } = useIsFeatureEnabled([
+    'project_settings:restart_project',
+  ])
 
   const projectRef = project?.ref ?? ''
   const projectRegion = project?.region ?? ''
@@ -88,68 +93,80 @@ const RestartServerButton = () => {
 
   return (
     <>
-      <div className="flex">
-        <ButtonTooltip
-          type="default"
-          className={cn(
-            'px-3 hover:z-10',
-            canRestartProject && isProjectActive ? 'rounded-r-none' : ''
+      {projectSettingsRestartProject ? (
+        <div className="flex">
+          <ButtonTooltip
+            type="default"
+            className={cn(
+              'px-3 hover:z-10',
+              canRestartProject && isProjectActive ? 'rounded-r-none' : ''
+            )}
+            disabled={
+              project === undefined ||
+              !canRestartProject ||
+              !isProjectActive ||
+              projectRestartDisabled ||
+              isAwsK8s
+            }
+            onClick={() => setServiceToRestart('project')}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: projectRestartDisabled
+                  ? 'Project restart is currently disabled'
+                  : !canRestartProject
+                    ? 'You need additional permissions to restart this project'
+                    : !isProjectActive
+                      ? 'Unable to restart project as project is not active'
+                      : isAwsK8s
+                        ? 'Project restart is not supported for AWS (Revamped) projects'
+                        : undefined,
+              },
+            }}
+          >
+            Restart project
+          </ButtonTooltip>
+          {canRestartProject && isProjectActive && !projectRestartDisabled && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="default"
+                  className="rounded-l-none px-[4px] py-[5px] -ml-[1px]"
+                  icon={<ChevronDown />}
+                  disabled={!canRestartProject}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
+                <DropdownMenuItem
+                  key="database"
+                  disabled={isLoading}
+                  onClick={() => {
+                    setServiceToRestart('database')
+                  }}
+                >
+                  <div className="space-y-1">
+                    <p className="block text-foreground">Fast database reboot</p>
+                    <p className="block text-foreground-light">
+                      Restarts only the database - faster but may not be able to recover from all
+                      failure modes
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-          disabled={
-            project === undefined ||
-            !canRestartProject ||
-            !isProjectActive ||
-            projectRestartDisabled ||
-            isAwsK8s
-          }
-          onClick={() => setServiceToRestart('project')}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: projectRestartDisabled
-                ? 'Project restart is currently disabled'
-                : !canRestartProject
-                  ? 'You need additional permissions to restart this project'
-                  : !isProjectActive
-                    ? 'Unable to restart project as project is not active'
-                    : isAwsK8s
-                      ? 'Project restart is not supported for AWS (Revamped) projects'
-                      : undefined,
-            },
+        </div>
+      ) : (
+        <Button
+          type="default"
+          disabled={isLoading}
+          onClick={() => {
+            setServiceToRestart('database')
           }}
         >
-          Restart project
-        </ButtonTooltip>
-        {canRestartProject && isProjectActive && !projectRestartDisabled && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                className="rounded-l-none px-[4px] py-[5px] -ml-[1px]"
-                icon={<ChevronDown />}
-                disabled={!canRestartProject}
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="bottom">
-              <DropdownMenuItem
-                key="database"
-                disabled={isLoading}
-                onClick={() => {
-                  setServiceToRestart('database')
-                }}
-              >
-                <div className="space-y-1">
-                  <p className="block text-foreground">Fast database reboot</p>
-                  <p className="block text-foreground-light">
-                    Restarts only the database - faster but may not be able to recover from all
-                    failure modes
-                  </p>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
+          Restart database
+        </Button>
+      )}
 
       <ConfirmModal
         danger
