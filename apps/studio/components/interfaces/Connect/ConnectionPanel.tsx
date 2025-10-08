@@ -195,32 +195,6 @@ export const ConnectionPanel = ({
           {children}
         </div>
         <div className="flex flex-col -space-y-px w-full">
-          {/* {type !== 'session' && (
-            <>
-              <div className="relative border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
-                <div className="absolute top-2 left-2.5">
-                  {type === 'transaction' ? <TransactionIcon /> : <DirectConnectionIcon />}
-                </div>
-                <div className="flex flex-col pl-[52px]">
-                  <span className="text-xs text-foreground">
-                    {type === 'transaction'
-                      ? 'Suitable for a large number of connected clients'
-                      : 'Suitable for long-lived, persistent connections'}
-                  </span>
-                </div>
-              </div>
-              <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
-                <div className="flex flex-col pl-[52px]">
-                  <span className="text-xs text-foreground">
-                    {type === 'transaction'
-                      ? 'Clients share a connection pool'
-                      : 'Each client has a dedicated connection to Postgres'}
-                  </span>
-                </div>
-              </div>
-            </>
-          )} */}
-
           {IS_PLATFORM && (
             <div className="border border-muted bg-surface-100 px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
