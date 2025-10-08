@@ -56,10 +56,6 @@ const StepLabel = ({
   </div>
 )
 
-/**
- * [Joshen] For paid projects - Dedicated pooler is always in transaction mode
- * So session mode connection details are always using the shared pooler (Supavisor)
- */
 type ConnectionMethod = 'direct' | 'transaction' | 'session'
 
 const connectionMethodOptions: Record<
@@ -89,6 +85,10 @@ const connectionMethodOptions: Record<
   },
 }
 
+/**
+ * [Joshen] For paid projects - Dedicated pooler is always in transaction mode
+ * So session mode connection details are always using the shared pooler (Supavisor)
+ */
 export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
@@ -238,40 +238,6 @@ export const DatabaseConnectionString = () => {
     : [ipv4SettingsUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
   const poolerBadge = sharedPoolerPreferred ? 'Shared Pooler' : 'Dedicated Pooler'
 
-  const ConnectionMethodSelectItem = ({ method }: { method: ConnectionMethod }) => (
-    <SelectItem_Shadcn_ value={method}>
-      <div className="flex flex-col w-full py-1">
-        <div>{connectionMethodOptions[method].label}</div>
-        <div className="text-foreground-lighter text-xs">
-          {connectionMethodOptions[method].description}
-        </div>
-        <div className="flex items-center gap-1 mt-2">
-          {method === 'session' ? (
-            <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
-              <InfoIcon className="w-3 h-3" />
-              {connectionMethodOptions[method].badge}
-            </Badge>
-          ) : (
-            <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
-              <GlobeIcon className="w-3 h-3" />
-              {connectionMethodOptions[method].badge}
-            </Badge>
-          )}
-          {method === 'transaction' && (
-            <Badge variant="outline" size="small" className="text-foreground-lighter">
-              {poolerBadge}
-            </Badge>
-          )}
-          {method === 'session' && (
-            <Badge variant="outline" size="small" className="text-foreground-lighter">
-              Shared Pooler
-            </Badge>
-          )}
-        </div>
-      </div>
-    </SelectItem_Shadcn_>
-  )
-
   return (
     <div className="flex flex-col">
       <div
@@ -318,7 +284,11 @@ export const DatabaseConnectionString = () => {
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_ className="max-w-sm">
               {Object.keys(connectionMethodOptions).map((method) => (
-                <ConnectionMethodSelectItem key={method} method={method as ConnectionMethod} />
+                <ConnectionMethodSelectItem
+                  key={method}
+                  method={method as ConnectionMethod}
+                  poolerBadge={poolerBadge}
+                />
               ))}
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
@@ -580,3 +550,43 @@ export const DatabaseConnectionString = () => {
     </div>
   )
 }
+
+const ConnectionMethodSelectItem = ({
+  method,
+  poolerBadge,
+}: {
+  method: ConnectionMethod
+  poolerBadge: string
+}) => (
+  <SelectItem_Shadcn_ value={method}>
+    <div className="flex flex-col w-full py-1">
+      <div>{connectionMethodOptions[method].label}</div>
+      <div className="text-foreground-lighter text-xs">
+        {connectionMethodOptions[method].description}
+      </div>
+      <div className="flex items-center gap-1 mt-2">
+        {method === 'session' ? (
+          <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
+            <InfoIcon className="w-3 h-3" />
+            {connectionMethodOptions[method].badge}
+          </Badge>
+        ) : (
+          <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
+            <GlobeIcon className="w-3 h-3" />
+            {connectionMethodOptions[method].badge}
+          </Badge>
+        )}
+        {method === 'transaction' && (
+          <Badge variant="outline" size="small" className="text-foreground-lighter">
+            {poolerBadge}
+          </Badge>
+        )}
+        {method === 'session' && (
+          <Badge variant="outline" size="small" className="text-foreground-lighter">
+            Shared Pooler
+          </Badge>
+        )}
+      </div>
+    </div>
+  </SelectItem_Shadcn_>
+)
