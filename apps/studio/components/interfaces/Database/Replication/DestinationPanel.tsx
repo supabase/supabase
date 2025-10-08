@@ -105,7 +105,7 @@ const FormSchema = z
     },
     {
       message: 'All fields are required for the selected destination type',
-      path: ['projectId'], // This will be overridden based on the actual validation failure
+      path: ['projectId'],
     }
   )
 
