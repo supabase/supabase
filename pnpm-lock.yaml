@@ -1470,8 +1470,8 @@ importers:
         specifier: ^1.1.7
         version: 1.6.0
       '@supabase/ssr':
-        specifier: ^0.6.1
-        version: 0.6.1(@supabase/supabase-js@2.74.0)
+        specifier: ^0.7.0
+        version: 0.7.0(@supabase/supabase-js@2.74.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.74.0
@@ -1813,8 +1813,8 @@ importers:
   blocks/vue:
     dependencies:
       '@supabase/ssr':
-        specifier: ^0.6.1
-        version: 0.6.1(@supabase/supabase-js@2.74.0)
+        specifier: ^0.7.0
+        version: 0.7.0(@supabase/supabase-js@2.74.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.74.0
@@ -8890,8 +8890,8 @@ packages:
   '@supabase/sql-to-rest@0.1.6':
     resolution: {integrity: sha512-06KgjeINtc6405XQvfnchBE1azEsU8G2NElfadmvVHKmHa5l2bFzjbtFbpaYgpgTzccHlcDmBaCgedVf2Gyl8Q==}
 
-  '@supabase/ssr@0.6.1':
-    resolution: {integrity: sha512-QtQgEMvaDzr77Mk3vZ3jWg2/y+D8tExYF7vcJT+wQ8ysuvOeGGjYbZlvj5bHYsj/SpC0bihcisnwPrM4Gp5G4g==}
+  '@supabase/ssr@0.7.0':
+    resolution: {integrity: sha512-G65t5EhLSJ5c8hTCcXifSL9Q/ZRXvqgXeNo+d3P56f4U1IxwTqjB64UfmfixvmMcjuxnq2yGqEWVJqUcO+AzAg==}
     peerDependencies:
       '@supabase/supabase-js': ^2.43.4
 
@@ -28696,7 +28696,7 @@ snapshots:
       - encoding
       - supports-color
 
-  '@supabase/ssr@0.6.1(@supabase/supabase-js@2.74.0)':
+  '@supabase/ssr@0.7.0(@supabase/supabase-js@2.74.0)':
     dependencies:
       '@supabase/supabase-js': 2.74.0
       cookie: 1.0.2

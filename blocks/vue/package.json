@@ -12,7 +12,7 @@
   "dependencies": {
     "h3": "^1.15.4",
     "nuxt": "^4.0.3",
-    "@supabase/ssr": "^0.6.1",
+    "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "catalog:"
   },
   "devDependencies": {
