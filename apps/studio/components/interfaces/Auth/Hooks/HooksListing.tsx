@@ -10,6 +10,7 @@ import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
@@ -20,7 +21,12 @@ import { extractMethod, getRevokePermissionStatements, isValidHook } from './hoo
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
 
   const [selectedHook, setSelectedHook] = useState<HOOK_DEFINITION_TITLE | null>(null)
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
@@ -60,10 +66,20 @@ export const HooksListing = () => {
 
   if (isError) {
     return (
-      <AlertError
-        error={authConfigError}
-        subject="Failed to retrieve auth configuration for hooks"
-      />
+      <ScaffoldSection isFullWidth>
+        <AlertError
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration for hooks"
+        />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
     )
   }
 

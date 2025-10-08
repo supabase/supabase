@@ -6,7 +6,7 @@ import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -127,10 +127,7 @@ export const PreviewPane = () => {
   } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
 
-  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   if (!file) return null
 

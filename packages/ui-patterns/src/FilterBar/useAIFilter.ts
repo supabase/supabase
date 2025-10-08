@@ -96,9 +96,7 @@ function processConditions(conditions: any[], filterProperties: FilterProperty[]
         conditions: processConditions(condition.conditions, filterProperties),
       }
     } else {
-      const matchedProperty = filterProperties.find(
-        (prop) => prop.name === condition.propertyName
-      )
+      const matchedProperty = filterProperties.find((prop) => prop.name === condition.propertyName)
       if (!matchedProperty) {
         throw new Error(`Invalid property: ${condition.propertyName}`)
       }

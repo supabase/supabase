@@ -11,7 +11,6 @@ import { useNotificationsV2Query } from 'data/notifications/notifications-v2-que
 import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
 import {
   Button,
@@ -39,9 +38,6 @@ export const NotificationsPopoverV2 = () => {
   // but I ran into some infinite loops issues when I was trying to implement it there
   // so opting to simplify and implement it here for now
   const rowHeights = useRef<{ [key: number]: number }>({})
-
-  const { data: projectsData } = useProjectsQuery({ enabled: open })
-  const projects = projectsData?.projects ?? []
 
   const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
@@ -210,7 +206,6 @@ export const NotificationsPopoverV2 = () => {
                         rowHeights.current = { ...rowHeights.current, [idx]: height }
                       }
                     },
-                    getProject: (ref: string) => projects?.find((project) => project.ref === ref)!,
                     getOrganizationById: (id: number) =>
                       organizations?.find((org) => org.id === id)!,
                     getOrganizationBySlug: (slug: string) =>

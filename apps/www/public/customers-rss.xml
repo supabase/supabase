@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 21 May 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Sun, 17 Aug 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/soshi</guid>
+  <title>From Hackathon to Funded Startup: How Soshi Built an AI Social Media Manager on Supabase</title>
+  <link>https://supabase.com/customers/soshi</link>
+  <description>Soshi built the world&apos;s first AI-powered social media marketing employee on Supabase, going from hackathon project to funded startup in months.</description>
+  <pubDate>Sun, 17 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/kayhanspace</guid>
   <title>Kayhan Space saw 8x improvement in developer speed when moving to Supabase</title>
   <link>https://supabase.com/customers/kayhanspace</link>
@@ -69,6 +76,13 @@
   <link>https://supabase.com/customers/resend</link>
   <description>Scaling seamlessly to 5,000+ paying customers &amp; millions of emails sent daily with Supabase</description>
   <pubDate>Fri, 21 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/juniver</guid>
+  <title>Juniver built a self-serve B2B platform with Supabase to scale eating disorder recovery</title>
+  <link>https://supabase.com/customers/juniver</link>
+  <description>Juniver switched from Firebase to Supabase and saw immediate improvements in developer experience and performance.</description>
+  <pubDate>Wed, 15 Jan 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/e2b</guid>
@@ -162,10 +176,10 @@
   <pubDate>Wed, 17 May 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/customers/mendableai</guid>
-  <title>Mendable switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.</title>
-  <link>https://supabase.com/customers/mendableai</link>
-  <description>How Mendable boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.</description>
+  <guid>https://supabase.com/customers/firecrawl</guid>
+  <title>Firecrawl switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.</title>
+  <link>https://supabase.com/customers/firecrawl</link>
+  <description>How Firecrawl boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.</description>
   <pubDate>Fri, 05 May 2023 00:00:00 -0700</pubDate>
 </item>
 <item>

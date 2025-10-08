@@ -20,9 +20,9 @@ export type CronJobRun = {
   command: string
   // statuses https://github.com/citusdata/pg_cron/blob/f5d111117ddc0f4d83a1bad34d61b857681b6720/include/job_metadata.h#L20
   status: 'starting' | 'running' | 'sending' | 'connecting' | 'succeeded' | 'failed'
-  return_message: string
+  return_message: string | null
   start_time: string
-  end_time: string
+  end_time: string | null
 }
 
 export const CRON_JOB_RUNS_PAGE_SIZE = 30

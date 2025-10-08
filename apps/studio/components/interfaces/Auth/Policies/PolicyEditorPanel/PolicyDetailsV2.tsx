@@ -5,7 +5,7 @@ import { UseFormReturn } from 'react-hook-form'
 
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -62,7 +62,7 @@ export const PolicyDetailsV2 = ({
 }: PolicyDetailsV2Props) => {
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
-  const { can: canUpdatePolicies } = useAsyncCheckProjectPermissions(
+  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )

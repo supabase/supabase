@@ -18,7 +18,9 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -59,10 +61,18 @@ export const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const { can: canUpdateEdgeFunction } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateEdgeFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_WRITE,
     '*'
   )
+
+  const showAllEdgeFunctionInvocationExamples = useIsFeatureEnabled(
+    'edge_functions:show_all_edge_function_invocation_examples'
+  )
+  const invocationTabs = useMemo(() => {
+    if (showAllEdgeFunctionInvocationExamples) return INVOCATION_TABS
+    return INVOCATION_TABS.filter((tab) => tab.id === 'curl' || tab.id === 'supabase-js')
+  }, [showAllEdgeFunctionInvocationExamples])
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -227,13 +237,13 @@ export const EdgeFunctionDetails = () => {
             <CardContent>
               <Tabs defaultValue="curl" className="w-full">
                 <TabsList className="flex flex-wrap gap-4">
-                  {INVOCATION_TABS.map((tab) => (
+                  {invocationTabs.map((tab) => (
                     <TabsTrigger key={tab.id} value={tab.id}>
                       {tab.label}
                     </TabsTrigger>
                   ))}
                 </TabsList>
-                {INVOCATION_TABS.map((tab) => (
+                {invocationTabs.map((tab) => (
                   <TabsContent key={tab.id} value={tab.id} className="mt-4">
                     <div className="overflow-x-auto">
                       <CodeBlock
@@ -378,7 +388,7 @@ export const EdgeFunctionDetails = () => {
                         icon={<ExternalLink strokeWidth={1.5} />}
                       >
                         <Link
-                          href="https://supabase.com/docs/guides/functions/dependencies"
+                          href={`${DOCS_URL}/guides/functions/dependencies`}
                           target="_blank"
                           rel="noreferrer"
                         >

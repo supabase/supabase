@@ -8,7 +8,7 @@ import { getDatabaseFunctions } from 'data/database-functions/database-functions
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { executeQuery } from 'lib/api/self-hosted/query'
 
 export const getFallbackTools = ({
   projectRef,
@@ -46,7 +46,7 @@ export const getFallbackTools = ({
                 },
                 undefined,
                 headers,
-                IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+                IS_PLATFORM ? undefined : executeQuery
               )
             : { result: [] }
 
@@ -370,8 +370,10 @@ export const getFallbackTools = ({
               )
             : []
 
+          const dataArray = Array.isArray(data) ? data : []
+
           // Filter functions by requested schemas
-          const filteredFunctions = data.filter((func) => schemas.includes(func.schema))
+          const filteredFunctions = dataArray.filter((func) => schemas.includes(func.schema))
 
           const formattedFunctions = filteredFunctions
             .map(

@@ -36,6 +36,7 @@
         "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_MCP_URL",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "ASSET_CDN_S3_ENDPOINT",
         "AWS_ACCESS_KEY_ID",
@@ -46,6 +47,7 @@
         "DOCS_GITHUB_APP_PRIVATE_KEY",
         "DOCS_REVALIDATION_KEYS",
         "DOCS_REVALIDATION_OVERRIDE_KEYS",
+        "ENABLED_FEATURES_OVERRIDE_DISABLE_ALL",
         "GITHUB_ACTIONS",
         "FORCE_ASSET_CDN",
         "LOGFLARE_INGESTION_API_KEY",

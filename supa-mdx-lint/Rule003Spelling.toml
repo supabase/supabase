@@ -69,6 +69,7 @@ allow_list = [
     "[Ll]iveness",
     "[Mm]atryoshka",
     "[Mm]essageBird",
+    "MetaMask",
     "[Mm]icroservices?",
     "[Mm]iddlewares?",
     "[Mm]onorepos?",
@@ -245,6 +246,7 @@ allow_list = [
     "PostQUEL",
     "PostgREST",
     "Postgres",
+    "postgres-meta",
     # We prefer Postgres, but check for vocabulary preference in a separate rule
     "PostgreSQL",
     "ProGuard",
@@ -277,6 +279,7 @@ allow_list = [
     "TextLocal",
     "TimescaleDB",
     "Transformers.js",
+    "[Tt]unneled",
     "Twilio",
     "Undici",
     "UnionPay",

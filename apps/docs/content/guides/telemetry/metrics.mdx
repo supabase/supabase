@@ -27,7 +27,7 @@ Your project's metrics endpoint is accessible at `https://<project-ref>.supabase
 Access to the endpoint is secured via HTTP Basic Auth:
 
 - username: `service_role`
-- password: the service role JWT from the [Supabase dashboard](/dashboard/project/_/settings/api-keys)
+- password: the `service_role` API key or any other secret API key, get these from [Supabase dashboard](/dashboard/project/_/settings/api-keys)
 
 You can also retrieve your service role key programmatically using the Management API:
 
@@ -42,6 +42,11 @@ curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
 ```
 
 <ProjectConfigVariables variable="url" />
+
+```shell
+curl <project-url>/customer/v1/privileged/metrics \
+    --user 'service_role:sb_secret_...'
+```
 
 ```shell
 curl <project-url>/customer/v1/privileged/metrics \

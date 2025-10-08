@@ -8,14 +8,16 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 
 const ThirdPartyPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
 
   const showThirdPartyAuth = useIsFeatureEnabled('authentication:third_party_auth')
 

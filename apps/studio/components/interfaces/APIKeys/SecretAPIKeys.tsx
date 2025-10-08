@@ -7,7 +7,7 @@ import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Card, CardContent, EyeOffIcon, Skeleton, cn } from 'ui'
 import {
   Table,
@@ -58,7 +58,7 @@ export const SecretAPIKeys = () => {
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false })
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     '*'
   )

@@ -19,7 +19,7 @@ export const APIKeyRow = ({
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
   lastSeen?: { timestamp: string }
 }) => {
-  const MotionTableRow = motion(TableRow)
+  const MotionTableRow = motion.create(TableRow)
 
   return (
     <MotionTableRow

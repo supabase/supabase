@@ -166,6 +166,8 @@ In projects using Postgres 17, the following extensions are deprecated:
 - `timescaledb`
 - `pgjwt`
 
-Existing projects on lower versions of Postgres are not impacted, and the extensions will continue to be supported on projects using Postgres 15, until the end of life of Postgres 15 on the Supabase platform.
+Projects planning to upgrade from Postgres 15 to Postgres 17 need to first disable these extensions in the [Supabase Dashboard](/dashboard/project/_/database/extensions).
 
-Projects planning to upgrade from Postgres 15 to Postgres 17 need to drop the extensions by [disabling them in the Supabase Dashboard](/dashboard/project/_/database/extensions).
+`pgjwt` was enabled by default on every Supabase project up until Postgres 17. If you weren’t explicitly using `pgjwt` in your project, it’s most likely safe to disable.
+
+Existing projects on lower versions of Postgres are not impacted, and the extensions will continue to be supported on projects using Postgres 15, until the end of life of Postgres 15 on the Supabase platform.

@@ -11,7 +11,8 @@ import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
@@ -26,7 +27,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
     DatabaseFunction | undefined
   >()
 
-  const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'functions'
   )
@@ -67,7 +68,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
           <div className="col-span-12">
             <FormHeader
               title="Database Functions"
-              docsUrl="https://supabase.com/docs/guides/database/functions"
+              docsUrl={`${DOCS_URL}/guides/database/functions`}
             />
             <FunctionsList
               createFunction={createFunction}

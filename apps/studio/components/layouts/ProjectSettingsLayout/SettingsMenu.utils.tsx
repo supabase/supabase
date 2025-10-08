@@ -11,6 +11,7 @@ export const generateSettingsMenu = (
   organization?: Organization,
   features?: {
     auth?: boolean
+    authProviders?: boolean
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
@@ -23,6 +24,7 @@ export const generateSettingsMenu = (
   const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
+  const authProvidersEnabled = features?.authProviders ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
@@ -109,7 +111,7 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'Alpha',
+          label: 'ALPHA',
         },
       ],
     },
@@ -128,7 +130,9 @@ export const generateSettingsMenu = (
               {
                 name: 'Authentication',
                 key: 'auth',
-                url: `/project/${ref}/auth/providers`,
+                url: authProvidersEnabled
+                  ? `/project/${ref}/auth/providers`
+                  : `/project/${ref}/auth/policies`,
                 items: [],
                 rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },

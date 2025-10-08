@@ -9,7 +9,8 @@ import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { InlineLink } from 'components/ui/InlineLink'
+import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
@@ -17,7 +18,7 @@ import {
   REALTIME_DEFAULT_CONFIG,
   useRealtimeConfigurationQuery,
 } from 'data/realtime/realtime-config-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
@@ -40,11 +41,12 @@ const formId = 'realtime-configuration-form'
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
-    PermissionAction.REALTIME_ADMIN_READ,
-    '*'
-  )
+  const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
+  const {
+    can: canUpdateConfig,
+    isLoading: isLoadingPermissions,
+    isSuccess: isPermissionsLoaded,
+  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
 
   const { data: maxConn } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -60,6 +62,7 @@ export const RealtimeSettings = () => {
     schema: 'realtime',
   })
 
+  const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
 
   // Check if RLS policies exist for realtime.messages table
@@ -134,7 +137,11 @@ export const RealtimeSettings = () => {
                       className="!p-0 !pt-2"
                       header={<FormSectionLabel>Channel restrictions</FormSectionLabel>}
                     >
-                      <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent
+                        loaders={1}
+                        loading={isLoading || isLoadingPermissions}
+                        className="!gap-y-2"
+                      >
                         <FormItemLayout
                           layout="flex"
                           label="Allow public access"
@@ -249,22 +256,28 @@ export const RealtimeSettings = () => {
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
-                        {!isUsageBillingEnabled && (
-                          <Admonition
-                            showIcon={false}
-                            type="default"
-                            title="Spend cap needs to be disabled to configure this value"
-                            description={
-                              <>
-                                You may adjust this setting in the{' '}
-                                <InlineLink
-                                  href={`/org/${organization?.slug}/billing?panel=costControl`}
-                                >
-                                  organization billing settings
-                                </InlineLink>
-                              </>
-                            }
-                          />
+                        {isSuccessOrganization && !isUsageBillingEnabled && (
+                          <Admonition showIcon={false} type="default">
+                            <div className="flex items-center gap-x-2">
+                              <div>
+                                <h5 className="text-foreground mb-1">
+                                  Spend cap needs to be disabled to configure this value
+                                </h5>
+                                <p className="text-foreground-light">
+                                  {isFreePlan
+                                    ? 'Upgrade to the Pro plan first to disable spend cap'
+                                    : 'You may adjust this setting in the organization billing settings'}
+                                </p>
+                              </div>
+                              <div className="flex-grow flex items-center justify-end">
+                                {false ? (
+                                  <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                ) : (
+                                  <ToggleSpendCapButton />
+                                )}
+                              </div>
+                            </div>
+                          </Admonition>
                         )}
                       </FormSectionContent>
                     </FormSection>
@@ -429,7 +442,7 @@ export const RealtimeSettings = () => {
               </CardContent> */}
               <CardFooter className="justify-between">
                 <div>
-                  {!canUpdateConfig && (
+                  {isPermissionsLoaded && !canUpdateConfig && (
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update realtime settings
                     </p>

@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
+import { organizationKeys } from 'data/organizations/keys'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
-import { organizationKeys } from 'data/organizations/keys'
 
 export type ProjectDeleteVariables = {
   projectRef: string
@@ -39,6 +39,9 @@ export const useProjectDeleteMutation = ({
         await queryClient.invalidateQueries(projectKeys.list())
 
         if (variables.organizationSlug) {
+          await queryClient.invalidateQueries(
+            projectKeys.infiniteListByOrg(variables.organizationSlug)
+          )
           queryClient.invalidateQueries(
             organizationKeys.freeProjectLimitCheck(variables.organizationSlug)
           )

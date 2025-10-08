@@ -24,7 +24,6 @@ export type UpdateDestinationPipelineParams = {
   pipelineConfig: {
     publicationName: string
     batch?: {
-      maxSize: number
       maxFillMs: number
     }
   }
@@ -64,7 +63,6 @@ async function updateDestinationPipeline(
           publication_name: publicationName,
           ...(batch && {
             batch: {
-              max_size: batch.maxSize,
               max_fill_ms: batch.maxFillMs,
             },
           }),

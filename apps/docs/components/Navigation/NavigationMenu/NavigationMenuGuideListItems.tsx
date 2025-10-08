@@ -146,6 +146,10 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 const Content = (props) => {
   const { menu, id } = props
 
+  if (menu.enabled === false) {
+    return null
+  }
+
   return (
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
       <Link href={menu.url ?? ''}>

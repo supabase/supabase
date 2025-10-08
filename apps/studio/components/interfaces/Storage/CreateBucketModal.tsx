@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { snakeCase } from 'lodash'
-import { Edit } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -17,7 +17,7 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import {
@@ -51,6 +51,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
@@ -95,18 +96,28 @@ const formId = 'create-storage-bucket-form'
 
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
-export const CreateBucketModal = () => {
+interface CreateBucketModalProps {
+  buttonSize?: 'tiny' | 'small'
+  buttonType?: 'default' | 'primary'
+  buttonClassName?: string
+  label?: string
+}
+
+export const CreateBucketModal = ({
+  buttonSize = 'tiny',
+  buttonType = 'default',
+  buttonClassName,
+  label = 'New bucket',
+}: CreateBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+  const isStorageV2 = useIsNewStorageUIEnabled()
 
   const [visible, setVisible] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
 
-  const { can: canCreateBuckets } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
@@ -192,7 +203,7 @@ export const CreateBucketModal = () => {
 
       setSelectedUnit(StorageSizeUnits.MB)
       setVisible(false)
-      router.push(`/project/${ref}/storage/buckets/${values.name}`)
+      if (!isStorageV2) router.push(`/project/${ref}/storage/buckets/${values.name}`)
     } catch (error: any) {
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''
@@ -231,8 +242,10 @@ export const CreateBucketModal = () => {
       <DialogTrigger asChild>
         <ButtonTooltip
           block
-          type="default"
-          icon={<Edit />}
+          size={buttonSize}
+          type={buttonType}
+          className={buttonClassName}
+          icon={<Plus size={14} />}
           disabled={!canCreateBuckets}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
@@ -245,7 +258,7 @@ export const CreateBucketModal = () => {
             },
           }}
         >
-          New bucket
+          {label}
         </ButtonTooltip>
       </DialogTrigger>
 
@@ -270,65 +283,75 @@ export const CreateBucketModal = () => {
                     labelOptional="Buckets cannot be renamed once created."
                   >
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ id="name" {...field} placeholder="Enter bucket name" />
+                      <Input_Shadcn_
+                        id="name"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        {...field}
+                        placeholder="Enter bucket name"
+                      />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
 
-              <FormField_Shadcn_
-                key="type"
-                name="type"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout label="Bucket type">
-                    <FormControl_Shadcn_>
-                      <RadioGroupStacked
-                        id="type"
-                        value={field.value}
-                        onValueChange={(v) => field.onChange(v)}
-                      >
-                        <RadioGroupStackedItem
-                          id="STANDARD"
-                          value="STANDARD"
-                          label="Standard bucket"
-                          description="Compatible with S3 buckets."
-                          showIndicator={false}
-                        />
-                        {IS_PLATFORM && (
+              {!isStorageV2 && (
+                <FormField_Shadcn_
+                  key="type"
+                  name="type"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout label="Bucket type">
+                      <FormControl_Shadcn_>
+                        <RadioGroupStacked
+                          id="type"
+                          value={field.value}
+                          onValueChange={(v) => field.onChange(v)}
+                        >
                           <RadioGroupStackedItem
-                            id="ANALYTICS"
-                            value="ANALYTICS"
-                            label="Analytics bucket"
+                            id="STANDARD"
+                            value="STANDARD"
+                            label="Standard bucket"
+                            description="Compatible with S3 buckets."
                             showIndicator={false}
-                            disabled={!icebergCatalogEnabled}
-                          >
-                            <>
-                              <p className="text-foreground-light text-left">
-                                Stores Iceberg files and is optimized for analytical workloads.
-                              </p>
+                          />
+                          {IS_PLATFORM && (
+                            <RadioGroupStackedItem
+                              id="ANALYTICS"
+                              value="ANALYTICS"
+                              label="Analytics bucket"
+                              showIndicator={false}
+                              disabled={!icebergCatalogEnabled}
+                            >
+                              <>
+                                <p className="text-foreground-light text-left">
+                                  Stores Iceberg files and is optimized for analytical workloads.
+                                </p>
 
-                              {icebergCatalogEnabled ? null : (
-                                <div className="w-full flex gap-x-2 py-2 items-center">
-                                  <WarningIcon />
-                                  <span className="text-xs text-left">
-                                    This feature is currently in alpha and not yet enabled for your
-                                    project. Sign up{' '}
-                                    <InlineLink href="https://forms.supabase.com/analytics-buckets">
-                                      here
-                                    </InlineLink>
-                                    .
-                                  </span>
-                                </div>
-                              )}
-                            </>
-                          </RadioGroupStackedItem>
-                        )}
-                      </RadioGroupStacked>
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
+                                {icebergCatalogEnabled ? null : (
+                                  <div className="w-full flex gap-x-2 py-2 items-center">
+                                    <WarningIcon />
+                                    <span className="text-xs text-left">
+                                      This feature is currently in alpha and not yet enabled for
+                                      your project. Sign up{' '}
+                                      <InlineLink href="https://forms.supabase.com/analytics-buckets">
+                                        here
+                                      </InlineLink>
+                                      .
+                                    </span>
+                                  </div>
+                                )}
+                              </>
+                            </RadioGroupStackedItem>
+                          )}
+                        </RadioGroupStacked>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
             </DialogSection>
 
             <DialogSectionSeparator />

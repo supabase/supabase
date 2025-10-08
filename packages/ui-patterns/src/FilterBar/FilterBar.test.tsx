@@ -74,7 +74,7 @@ describe('FilterBar', () => {
     const handleFilterChange = vi.fn((filters) => {
       currentFilters = filters
     })
-    
+
     const { rerender } = render(
       <FilterBar
         filterProperties={mockFilterProperties}
@@ -100,7 +100,7 @@ describe('FilterBar', () => {
     await waitFor(() => {
       expect(handleFilterChange).toHaveBeenCalled()
     })
-    
+
     // Re-render with updated filters
     rerender(
       <FilterBar
@@ -124,7 +124,7 @@ describe('FilterBar', () => {
     const handleFilterChange = vi.fn((filters) => {
       currentFilters = filters
     })
-    
+
     const { rerender } = render(
       <FilterBar
         filterProperties={mockFilterProperties}
@@ -142,7 +142,7 @@ describe('FilterBar', () => {
     await waitFor(() => {
       expect(handleFilterChange).toHaveBeenCalled()
     })
-    
+
     rerender(
       <FilterBar
         filterProperties={mockFilterProperties}
@@ -153,10 +153,9 @@ describe('FilterBar', () => {
       />
     )
 
-    const valueInput = await waitFor(
-      () => screen.getByLabelText('Value for Status'),
-      { timeout: 3000 }
-    )
+    const valueInput = await waitFor(() => screen.getByLabelText('Value for Status'), {
+      timeout: 3000,
+    })
     valueInput.focus()
 
     // Popover should show value options
@@ -169,7 +168,7 @@ describe('FilterBar', () => {
     await waitFor(() => {
       expect(handleFilterChange).toHaveBeenCalledTimes(2) // Once for property, once for value
     })
-    
+
     rerender(
       <FilterBar
         filterProperties={mockFilterProperties}
@@ -215,7 +214,7 @@ describe('FilterBar', () => {
     const handleFilterChange = vi.fn((filters) => {
       currentFilters = filters
     })
-    
+
     const { rerender } = render(
       <FilterBar
         filterProperties={customProps}
@@ -233,7 +232,7 @@ describe('FilterBar', () => {
     await waitFor(() => {
       expect(handleFilterChange).toHaveBeenCalled()
     })
-    
+
     rerender(
       <FilterBar
         filterProperties={customProps}
@@ -245,10 +244,9 @@ describe('FilterBar', () => {
     )
 
     // Wait for FilterCondition to be created
-    const valueInput = await waitFor(
-      () => screen.getByLabelText('Value for Tag'),
-      { timeout: 3000 }
-    )
+    const valueInput = await waitFor(() => screen.getByLabelText('Value for Tag'), {
+      timeout: 3000,
+    })
 
     // Focus the value input to show the popover
     await user.click(valueInput)
@@ -261,7 +259,7 @@ describe('FilterBar', () => {
     await waitFor(() => {
       expect(handleFilterChange).toHaveBeenCalledTimes(2) // Once for property, once for value
     })
-    
+
     rerender(
       <FilterBar
         filterProperties={customProps}

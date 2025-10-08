@@ -19,7 +19,7 @@ export interface AlertErrorProps {
 
 // [Joshen] To standardize the language for all error UIs
 
-const AlertError = ({
+export const AlertError = ({
   projectRef,
   subject,
   error,

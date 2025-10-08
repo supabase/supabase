@@ -19,7 +19,7 @@ import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -139,10 +139,7 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
   const isOpened =
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
-  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const onSelectFile = async (columnIndex: number, file: StorageItem) => {
     popColumnAtIndex(columnIndex)

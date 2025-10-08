@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
 
+import { DOCS_URL } from 'lib/constants'
 import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
 
-export const LOGS_EXPLORER_DOCS_URL =
-  'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'
+export const LOGS_EXPLORER_DOCS_URL = `${DOCS_URL}/guides/platform/logs#querying-with-the-logs-explorer`
 
 export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 2 // IN DAYS
 
@@ -203,6 +203,18 @@ limit 100
     for: ['database'],
   },
   {
+    label: 'Auth Audit Logs',
+    description: 'Audit logs for auth events',
+    mode: 'custom',
+    searchString: `select
+  cast(timestamp as datetime) as timestamp,
+  event_message, metadata 
+from auth_audit_logs 
+limit 10
+`,
+    for: ['database'],
+  },
+  {
     label: 'Storage Object Requests',
     description: 'Number of requests done on Storage Objects',
     mode: 'custom',
@@ -369,6 +381,7 @@ export enum LogsTableName {
   FUNCTIONS = 'function_logs',
   FN_EDGE = 'function_edge_logs',
   AUTH = 'auth_logs',
+  AUTH_AUDIT = 'auth_audit_logs',
   REALTIME = 'realtime_logs',
   STORAGE = 'storage_logs',
   POSTGREST = 'postgrest_logs',
@@ -400,7 +413,8 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres',
   [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution',
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response',
-  [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
+  [LogsTableName.AUTH]: 'Errors, warnings, and performance details from the auth service',
+  [LogsTableName.AUTH_AUDIT]: 'Audit records of user signups, logins, and account changes',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
