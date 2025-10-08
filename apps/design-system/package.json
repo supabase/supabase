@@ -6,6 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --turbopack --port 3003",
+    "dev:full": "concurrently \"pnpm dev\" \"pnpm content:dev\"",
     "build": "pnpm run content:build && pnpm run build:registry && next build --turbopack",
     "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "start": "next start",
@@ -53,6 +54,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "config": "workspace:^",
+    "concurrently": "^8.2.2",
     "mdast-util-toc": "^6.1.1",
     "postcss": "^8.5.3",
     "rimraf": "^4.1.3",
