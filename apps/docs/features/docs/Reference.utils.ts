@@ -105,10 +105,17 @@ export async function generateReferenceStaticParams() {
       slug: [sdkId, version === REFERENCES[sdkId].versions[0] ? null : version].filter(Boolean),
     }))
 
+  // Generate pages for CLI including individual command pages
+  const cliFlattenedSections = await getFlattenedSections('cli', 'latest')
   const cliPages = [
     {
       slug: ['cli'],
     },
+    ...(cliFlattenedSections || [])
+      .filter((section) => section.type === 'cli-command' && !!section.slug)
+      .map((section) => ({
+        slug: ['cli', section.slug],
+      })),
   ]
 
   const apiPages = [
@@ -171,6 +178,35 @@ export async function generateReferenceMetadata(
       },
     }
   } else if (isCliReference) {
+    const { path } = parsedPath
+    const flattenedSections = await getFlattenedSections('cli', 'latest')
+    
+    if (path.length > 0 && flattenedSections) {
+      const sectionSlug = path[0]
+      const section = flattenedSections.find((s) => s.slug === sectionSlug)
+      
+      if (section) {
+        const url = [BASE_PATH, 'reference', 'cli', section.slug].filter(Boolean).join('/')
+        const images = generateOpenGraphImageMeta({
+          type: 'CLI Reference',
+          title: `${section.title || section.id}`,
+        })
+        
+        return {
+          title: `${section.title || section.id} | Supabase CLI | Supabase Docs`,
+          description: `CLI reference for ${section.title || section.id}`,
+          alternates: {
+            canonical: url,
+          },
+          openGraph: {
+            ...parentOg,
+            url,
+            images,
+          },
+        }
+      }
+    }
+    
     return {
       title: 'CLI Reference | Supabase Docs',
       description: 'CLI reference for the Supabase CLI',
