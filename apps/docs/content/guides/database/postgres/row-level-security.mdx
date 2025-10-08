@@ -59,7 +59,7 @@ alter table "table_name" enable row level security;
 
 Once you have enabled RLS, no data will be accessible via the [API](/docs/guides/api) when using the public `anon` key, until you create policies.
 
-<Admonition type="warning" label="`auth.uid()` Returns `null` When Unauthenticated">
+<Admonition type="caution" label="`auth.uid()` Returns `null` When Unauthenticated">
 
 When a request is made without an authenticated user (e.g., no access token is provided or the session has expired), `auth.uid()` returns `null`.
 
