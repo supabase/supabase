@@ -153,13 +153,24 @@ export const Destinations = () => {
               const pipeline = pipelinesData?.pipelines.find(
                 (p) => p.destination_id === destination.id
               )
+
+              const getDestinationType = () => {
+                if ('big_query' in destination.config) {
+                  return 'BigQuery'
+                } else if ('iceberg' in destination.config) {
+                  return 'Iceberg'
+                } else {
+                  return 'Other'
+                }
+              }
+
               return (
                 <DestinationRow
                   key={destination.id}
                   sourceId={sourceId}
                   destinationId={destination.id}
                   destinationName={destination.name}
-                  type={destination.config.big_query ? 'BigQuery' : 'Other'}
+                  type={getDestinationType()}
                   pipeline={pipeline}
                   error={pipelinesError}
                   isLoading={isPipelinesLoading}
