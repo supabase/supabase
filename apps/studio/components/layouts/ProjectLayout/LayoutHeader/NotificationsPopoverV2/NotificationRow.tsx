@@ -9,13 +9,12 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
-import { ProjectInfo } from 'data/projects/projects-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import type { Organization } from 'types'
 import { CriticalIcon, WarningIcon } from 'ui'
 
 interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void
-  getProject: (ref: string) => ProjectInfo
   getOrganizationById: (id: number) => Organization
   getOrganizationBySlug: (slug: string) => Organization
   onUpdateNotificationStatus: (id: string, status: 'archived' | 'seen') => void
@@ -27,7 +26,6 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   listRef,
   item: notification,
   setRowHeight,
-  getProject,
   getOrganizationById,
   getOrganizationBySlug,
   onUpdateNotificationStatus,
@@ -35,10 +33,12 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null)
   const { ref: viewRef, inView } = useInView()
-  const { status, priority } = notification
 
+  const { status, priority } = notification
   const data = notification.data as NotificationData
-  const project = data.project_ref !== undefined ? getProject(data.project_ref) : undefined
+
+  const { data: project } = useProjectDetailQuery({ ref: data.project_ref })
+
   const organization =
     data.org_slug !== undefined
       ? getOrganizationBySlug(data.org_slug)
