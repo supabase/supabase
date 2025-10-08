@@ -89,7 +89,7 @@ export const RestoreToNewProject = () => {
       enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
-  const IS_CLONED_PROJECT = (cloneStatus?.cloned_from?.source_project as any)?.ref ? true : false
+  const IS_CLONED_PROJECT = cloneStatus?.cloned_from?.source_project?.ref ? true : false
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
 
   const previousClones = cloneStatus?.clones
@@ -197,7 +197,7 @@ export const RestoreToNewProject = () => {
           If you need to restore from a restored project, please reach out via [support](/support/new?projectRef=${project?.ref}).`}
         />
         <Button asChild type="default">
-          <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
+          <Link href={`/project/${cloneStatus?.cloned_from?.source_project?.ref || ''}`}>
             Go to original project
           </Link>
         </Button>
