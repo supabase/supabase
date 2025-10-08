@@ -18,7 +18,7 @@ export function convertTableSuggestionToTableField(
   const columns: ColumnField[] = table.fields.map((field, index) => {
     const isPrimaryKey = isPrimaryKeyField(field)
     const isIdentity = isIdentityField(field)
-    const defaultValue = isPrimaryKey ? null : field.default ? String(field.default) : null
+    const defaultValue = field.default ? String(field.default) : null
 
     return {
       id: `column-${index}`,

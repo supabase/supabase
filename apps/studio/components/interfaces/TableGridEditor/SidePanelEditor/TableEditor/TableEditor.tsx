@@ -1,6 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import dayjs from 'dayjs'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -49,6 +50,8 @@ import { TableTemplateSelector } from './TableQuickstart/TableTemplateSelector'
 import { QuickstartVariant } from './TableQuickstart/types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+
+const NEW_PROJECT_THRESHOLD_DAYS = 7
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -106,6 +109,18 @@ export const TableEditor = ({
     LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
     false
   )
+
+  const isRecentProject = useMemo(() => {
+    if (!project?.inserted_at) return false
+    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
+  }, [project?.inserted_at])
+
+  const shouldShowTemplateQuickstart =
+    isNewRecord &&
+    !isDuplicating &&
+    tableQuickstartVariant === QuickstartVariant.TEMPLATES &&
+    !quickstartDismissed &&
+    isRecentProject
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -295,23 +310,20 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        {isNewRecord &&
-          !isDuplicating &&
-          tableQuickstartVariant === QuickstartVariant.TEMPLATES &&
-          !quickstartDismissed && (
-            <TableTemplateSelector
-              variant={tableQuickstartVariant}
-              onSelectTemplate={(template) => {
-                const updates: Partial<TableField> = {}
-                if (template.name) updates.name = template.name
-                if (template.comment) updates.comment = template.comment
-                if (template.columns) updates.columns = template.columns
-                onUpdateField(updates)
-              }}
-              onDismiss={() => setQuickstartDismissed(true)}
-              disabled={false}
-            />
-          )}
+        {shouldShowTemplateQuickstart && (
+          <TableTemplateSelector
+            variant={tableQuickstartVariant}
+            onSelectTemplate={(template) => {
+              const updates: Partial<TableField> = {}
+              if (template.name) updates.name = template.name
+              if (template.comment) updates.comment = template.comment
+              if (template.columns) updates.columns = template.columns
+              onUpdateField(updates)
+            }}
+            onDismiss={() => setQuickstartDismissed(true)}
+            disabled={false}
+          />
+        )}
         <Input
           data-testid="table-name-input"
           label="Name"
