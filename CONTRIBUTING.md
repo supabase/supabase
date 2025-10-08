@@ -4,7 +4,7 @@ Thank you for contributing to Supabase! We’re a big, exciting open source proj
 
 [1. Getting Started](#getting-started)
 [2. Issues](#issues)
-[3. Pull Requests](#pull-requests) 
+[3. Pull Requests](#pull-requests)
 
 ## Getting Started
 
