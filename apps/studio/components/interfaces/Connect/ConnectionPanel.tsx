@@ -252,15 +252,16 @@ export const ConnectionPanel = ({
           )}
 
           {type === 'session' && (
-            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
+            <div className="border bg-alternative px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
               <div className="flex w-6 h-6 rounded items-center justify-center gap-2 flex-shrink-0 bg-surface-100">
                 <WarningIcon />
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-foreground">Only use on a IPv4 network</span>
-                <span className="text-xs text-foreground-lighter">
-                  Use Direct Connection if connecting via an IPv6 network
-                </span>
+                <div className="flex flex-col text-xs text-foreground-lighter">
+                  <p>Session pooler connections are IPv4 proxied for free.</p>
+                  <p>Use Direct Connection if connecting via an IPv6 network.</p>
+                </div>
               </div>
             </div>
           )}
