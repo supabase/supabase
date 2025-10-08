@@ -125,7 +125,7 @@ export const ConnectionPanel = ({
   const links = ipv4Status.links ?? []
 
   return (
-    <div className="relative text-sm flex flex-col md:grid md:grid-cols-12 gap-5">
+    <div className="relative text-sm flex flex-col gap-5 lg:grid lg:grid-cols-12 w-full">
       <div className="col-span-4 flex flex-col">
         <div className="flex items-center gap-x-2 mb-2">
           <h1 className="text-sm">{title}</h1>
@@ -224,7 +224,7 @@ export const ConnectionPanel = ({
           )}
 
           {type === 'session' && (
-            <div className="border px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
+            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
               <div className="flex w-6 h-6 rounded items-center justify-center gap-2 flex-shrink-0 bg-surface-100">
                 <WarningIcon />
               </div>
