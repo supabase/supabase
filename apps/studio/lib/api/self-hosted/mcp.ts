@@ -8,6 +8,7 @@ import {
 } from '@supabase/mcp-server-supabase/platform'
 import { ResponseError } from 'types'
 import { generateTypescriptTypes } from './generate-types'
+import { getLints } from './lints'
 import { getLogQuery, retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
@@ -113,10 +114,22 @@ export function getDebuggingOperations({
       return data
     },
     async getSecurityAdvisors(_projectRef) {
-      throw new Error('Function not implemented.')
+      const { data, error } = await getLints({ headers })
+
+      if (error) {
+        throw error
+      }
+
+      return data.filter((lint) => lint.categories.includes('SECURITY'))
     },
     async getPerformanceAdvisors(_projectRef) {
-      throw new Error('Function not implemented.')
+      const { data, error } = await getLints({ headers })
+
+      if (error) {
+        throw error
+      }
+
+      return data.filter((lint) => lint.categories.includes('PERFORMANCE'))
     },
   }
 }
