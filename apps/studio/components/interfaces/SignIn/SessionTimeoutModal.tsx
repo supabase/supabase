@@ -3,12 +3,7 @@ import { useEffect } from 'react'
 
 import { InlineLink } from 'components/ui/InlineLink'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-} from 'ui'
+import { toast } from 'sonner'
 
 interface SessionTimeoutModalProps {
   visible: boolean
@@ -42,30 +37,27 @@ export const SessionTimeoutModal = ({
       }}
     >
       <div className="space-y-4 text-sm text-foreground-light">
-        <h3 className="text-sm font-medium">Stuck? Consider these steps</h3>
-        <p>
-          <ul className="list-disc pl-1.5 list-inside space-y-1 text-sm text-foreground-light">
-            <li>Try with a different browser</li>
-            <li>Disable any browser extensions that block network requests, such as ad blockers</li>
-            <li>
-              <button
-                title="Clear storage and reload"
-                className="underline"
-                onClick={() => {
-                  try {
-                    localStorage.clear()
-                    sessionStorage.clear()
-                  } catch (e) {
-                    toast.error('Failed to clear browser storage')
-                  }
-                  window.location.reload()
-                }}
-              >
-                Clear your browser storage
-              </button>
-            </li>
-          </ul>
-        </p>
+        <ul className="list-disc pl-1.5 list-inside space-y-1 text-sm text-foreground-light">
+          <li>Try with a different browser</li>
+          <li>Disable browser extensions that block network requests</li>
+          <li>
+            <button
+              title="Clear storage and reload"
+              className="underline"
+              onClick={() => {
+                try {
+                  localStorage.clear()
+                  sessionStorage.clear()
+                } catch (e) {
+                  toast.error('Failed to clear browser storage')
+                }
+                window.location.reload()
+              }}
+            >
+              Clear your browser storage
+            </button>
+          </li>
+        </ul>
         <p>
           If none of these steps work, please{' '}
           <InlineLink href={`/support/new?subject=Session%20timed%20out`}>
