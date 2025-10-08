@@ -305,6 +305,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
   )
 
+  const isContextExceededError = error && JSON.stringify(error).includes('context_length_exceeded')
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message, index) => {
@@ -458,29 +460,50 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <Info size={16} className="mt-0.5" />
                     </div>
                     <div>
-                      <p>
-                        Sorry, I'm having trouble responding right now. If the error persists while
-                        retrying, you may try clearing the conversation's messages and try again.
-                      </p>
+                      {isContextExceededError ? (
+                        <p>
+                          This conversation has become too long for the Assistant to process. Please
+                          start a new chat to continue.
+                        </p>
+                      ) : (
+                        <p>
+                          Sorry, I'm having trouble responding right now. If the error persists
+                          while retrying, you may try clearing the conversation's messages and try
+                          again.
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-x-2">
-                    <Button
-                      type="default"
-                      size="tiny"
-                      onClick={() => regenerate()}
-                      className="text-xs"
-                    >
-                      Retry
-                    </Button>
-                    <ButtonTooltip
-                      type="default"
-                      size="tiny"
-                      onClick={handleClearMessages}
-                      className="w-7 h-7"
-                      icon={<Eraser />}
-                      tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
-                    />
+                    {isContextExceededError ? (
+                      <Button
+                        type="default"
+                        size="tiny"
+                        onClick={() => snap.newChat()}
+                        className="text-xs"
+                      >
+                        New chat
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          type="default"
+                          size="tiny"
+                          onClick={() => regenerate()}
+                          className="text-xs"
+                        >
+                          Retry
+                        </Button>
+                        <ButtonTooltip
+                          type="default"
+                          size="tiny"
+                          onClick={handleClearMessages}
+                          className="w-7 h-7"
+                          icon={<Eraser />}
+                          tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
               )}
