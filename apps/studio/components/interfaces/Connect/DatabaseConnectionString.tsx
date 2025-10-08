@@ -1,4 +1,4 @@
-import { ChevronDown, Globe2Icon, GlobeIcon, InfoIcon } from 'lucide-react'
+import { ChevronDown, GlobeIcon, InfoIcon } from 'lucide-react'
 import { HTMLAttributes, ReactNode, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -18,7 +18,6 @@ import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
-  Button,
   CodeBlock,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,

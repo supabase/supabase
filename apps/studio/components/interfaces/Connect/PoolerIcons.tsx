@@ -394,7 +394,7 @@ export const DirectConnectionIcon = () => {
   const [lines, setLines] = useState([false, false, false])
 
   useEffect(() => {
-    // Function to animate a single dot
+    // Function to animate a single dot in and keep it visible
     const animateDot = (index: number) => {
       setDots((prev) => {
         const newState = [...prev]
@@ -406,34 +406,12 @@ export const DirectConnectionIcon = () => {
         newState[index] = true
         return newState
       })
-
-      // Clear after 2.5s
-      setTimeout(() => {
-        setDots((prev) => {
-          const newState = [...prev]
-          newState[index] = false
-          return newState
-        })
-        setLines((prev) => {
-          const newState = [...prev]
-          newState[index] = false
-          return newState
-        })
-      }, 2500)
     }
 
-    // Initial staggered animation
-    // Start initial animations immediately with slight delays
+    // Initial staggered animation - dots animate in and stay
     setTimeout(() => animateDot(0), 100)
     setTimeout(() => animateDot(1), 1500)
     setTimeout(() => animateDot(2), 3000)
-
-    // Set up intervals for continuous animation
-    const intervals = [0, 1, 2].map((index) =>
-      setInterval(() => animateDot(index), Math.random() * 3000 + 8000)
-    )
-
-    return () => intervals.forEach(clearInterval)
   }, [])
 
   return (

@@ -125,13 +125,29 @@ export const ConnectionPanel = ({
   const links = ipv4Status.links ?? []
 
   return (
-    <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
-      <div className="flex flex-col">
+    <div className="relative text-sm flex flex-col md:grid md:grid-cols-12 gap-5">
+      <div className="col-span-4 flex flex-col">
         <div className="flex items-center gap-x-2 mb-2">
           <h1 className="text-sm">{title}</h1>
           {!!badge && <Badge>{badge}</Badge>}
         </div>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
+        {type !== 'session' && (
+          <div className="relative flex items-center">
+            <div className="flex h-full">
+              {type === 'transaction' ? <TransactionIcon /> : <DirectConnectionIcon />}
+            </div>
+            <div className="flex items-center p-4">
+              <span className="text-xs text-foreground">
+                {type === 'transaction'
+                  ? 'Suitable for a large number of connected clients that share a dedicated connection pool'
+                  : 'Each client has a dedicated, long-lived connection to Postgres'}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="col-span-8 flex flex-col gap-2">
         <div className="flex flex-col -space-y-px">
           {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
           {type === 'transaction' && isSessionMode ? (
@@ -160,7 +176,7 @@ export const ConnectionPanel = ({
                 )}
                 language={lang}
                 value={connectionString}
-                className="[&_code]:text-[12px] [&_code]:text-foreground"
+                className="[&_code]:text-[12px] [&_code]:text-foreground [&_code]:!whitespace-normal"
                 hideLineNumbers
                 onCopyCallback={onCopyCallback}
               />
@@ -178,10 +194,8 @@ export const ConnectionPanel = ({
           )}
           {children}
         </div>
-      </div>
-      <div className="flex flex-col items-end">
         <div className="flex flex-col -space-y-px w-full">
-          {type !== 'session' && (
+          {/* {type !== 'session' && (
             <>
               <div className="relative border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
                 <div className="absolute top-2 left-2.5">
@@ -205,10 +219,10 @@ export const ConnectionPanel = ({
                 </div>
               </div>
             </>
-          )}
+          )} */}
 
           {IS_PLATFORM && (
-            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
+            <div className="border border-muted bg-surface-100 px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
                 <IPv4StatusIcon active={ipv4Status.type === 'success'} />
               </div>
