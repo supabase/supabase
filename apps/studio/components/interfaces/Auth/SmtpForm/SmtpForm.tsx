@@ -9,6 +9,7 @@ import * as yup from 'yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -27,7 +28,6 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Switch,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { urlRegex } from '../Auth.constants'
@@ -179,16 +179,18 @@ export const SmtpForm = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
     )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view SMTP settings" />
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view SMTP settings" />
+      </ScaffoldSection>
+    )
   }
 
   return (

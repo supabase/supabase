@@ -10,6 +10,7 @@ import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
+import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { constructHeaders } from 'data/fetchers'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -18,16 +19,16 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useHotKey } from 'hooks/ui/useHotKey'
+import { prepareMessagesForAPI } from 'lib/ai/message-utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
-import type { AssistantMessageType } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary'
-import { type SqlSnippet } from './AIAssistant.types'
+import type { SqlSnippet } from './AIAssistant.types'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
@@ -37,7 +38,7 @@ import {
   ConversationContent,
   ConversationScrollButton,
 } from './elements/Conversation'
-import { MemoizedMessage } from './Message'
+import { Message } from './Message'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
@@ -83,9 +84,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
   const [isResubmitting, setIsResubmitting] = useState(false)
+  const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+
+  const { mutateAsync: rateMessage } = useRateMessageMutation()
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
@@ -107,16 +111,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const updateMessage = useCallback(
-    ({
-      messageId,
-      resultId,
-      results,
-    }: {
-      messageId: string
-      resultId?: string
-      results: any[]
-    }) => {
-      snap.updateMessage({ id: messageId, resultId, results })
+    (updatedMessage: MessageType) => {
+      snap.updateMessage(updatedMessage)
     },
     [snap]
   )
@@ -128,10 +124,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         snap.saveMessage([lastUserMessageRef.current, message])
         lastUserMessageRef.current = null
       } else {
-        snap.saveMessage(message)
+        updateMessage(message)
       }
     },
-    [snap]
+    [snap, updateMessage]
   )
 
   // TODO(refactor): This useChat hook should be moved down into each chat session.
@@ -189,21 +185,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
       async prepareSendMessagesRequest({ messages, ...options }) {
-        // [Joshen] Specifically limiting the chat history that get's sent to reduce the
-        // size of the context that goes into the model. This should always be an odd number
-        // as much as possible so that the first message is always the user's
-        const MAX_CHAT_HISTORY = 7
-
-        const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
-
-        // Filter out results from messages before sending to the model
-        const cleanedMessages = slicedMessages.map((message: any) => {
-          const cleanedMessage = { ...message } as AssistantMessageType
-          if (message.role === 'assistant' && (message as AssistantMessageType).results) {
-            delete cleanedMessage.results
-          }
-          return cleanedMessage
-        })
+        const cleanedMessages = prepareMessagesForAPI(messages)
 
         const headerData = await constructHeaders()
         const authorizationHeader = headerData.get('Authorization')
@@ -282,6 +264,52 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setValue('')
   }, [setValue])
 
+  const handleRateMessage = useCallback(
+    async (messageId: string, rating: 'positive' | 'negative', reason?: string) => {
+      if (!project?.ref || !selectedOrganization?.slug) return
+
+      // Optimistically update UI
+      setMessageRatings((prev) => ({ ...prev, [messageId]: rating }))
+
+      try {
+        const result = await rateMessage({
+          rating,
+          messages: chatMessages,
+          messageId,
+          projectRef: project.ref,
+          orgSlug: selectedOrganization.slug,
+          reason,
+        })
+
+        sendEvent({
+          action: 'assistant_message_rating_submitted',
+          properties: {
+            rating,
+            category: result.category,
+            ...(reason && { reason }),
+          },
+          groups: {
+            project: project.ref,
+            organization: selectedOrganization.slug,
+          },
+        })
+      } catch (error) {
+        console.error('Failed to rate message:', error)
+        // Rollback on error
+        setMessageRatings((prev) => {
+          const { [messageId]: _, ...rest } = prev
+          return rest
+        })
+      }
+    },
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
+  )
+
+  const isContextExceededError =
+    error &&
+    (error.message?.includes('context_length_exceeded') ||
+      error.message?.includes('exceeds the context window'))
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message, index) => {
@@ -289,29 +317,37 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         const isAfterEditedMessage = editingMessageId
           ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
           : false
+        const isLastMessage = index === chatMessages.length - 1
 
         return (
-          <MemoizedMessage
+          <Message
+            id={message.id}
             key={message.id}
             message={message}
-            status={chatStatus}
-            onResults={updateMessage}
+            isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
+            readOnly={message.role === 'user'}
+            addToolResult={addToolResult}
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
             isBeingEdited={isBeingEdited}
             onCancelEdit={cancelEdit}
+            isLastMessage={isLastMessage}
+            onRate={handleRateMessage}
+            rating={messageRatings[message.id] ?? null}
           />
         )
       }),
     [
       chatMessages,
-      updateMessage,
       deleteMessageFromHere,
       editMessage,
       cancelEdit,
       editingMessageId,
       chatStatus,
+      addToolResult,
+      handleRateMessage,
+      messageRatings,
     ]
   )
 
@@ -427,29 +463,49 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <Info size={16} className="mt-0.5" />
                     </div>
                     <div>
-                      <p>
-                        Sorry, I'm having trouble responding right now. If the error persists while
-                        retrying, you may try clearing the conversation's messages and try again.
-                      </p>
+                      {isContextExceededError ? (
+                        <p>
+                          This conversation has become too long for the Assistant to process. Please
+                          start a new chat to continue.
+                        </p>
+                      ) : (
+                        <p>
+                          Sorry, I'm having trouble responding right now. If the error persists
+                          while retrying, you may try creating a new chat and try again.
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-x-2">
-                    <Button
-                      type="default"
-                      size="tiny"
-                      onClick={() => regenerate()}
-                      className="text-xs"
-                    >
-                      Retry
-                    </Button>
-                    <ButtonTooltip
-                      type="default"
-                      size="tiny"
-                      onClick={handleClearMessages}
-                      className="w-7 h-7"
-                      icon={<Eraser />}
-                      tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
-                    />
+                    {isContextExceededError ? (
+                      <Button
+                        type="default"
+                        size="tiny"
+                        onClick={() => snap.newChat()}
+                        className="text-xs"
+                      >
+                        New chat
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          type="default"
+                          size="tiny"
+                          onClick={() => regenerate()}
+                          className="text-xs"
+                        >
+                          Retry
+                        </Button>
+                        <ButtonTooltip
+                          type="default"
+                          size="tiny"
+                          onClick={handleClearMessages}
+                          className="w-7 h-7"
+                          icon={<Eraser />}
+                          tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
               )}

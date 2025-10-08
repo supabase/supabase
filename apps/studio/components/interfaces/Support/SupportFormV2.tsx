@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   Book,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useQueryState } from 'nuqs'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -24,15 +26,16 @@ import { useDocsSearch, useParams, type DocsSearchResult as Page } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import CopyButton from 'components/ui/CopyButton'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { PLAN_REQUEST_EMPTY_PLACEHOLDER } from 'components/ui/UpgradePlanButton'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useQueryState } from 'nuqs'
 import {
   Badge,
   Button,
@@ -76,8 +79,8 @@ const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 const CONTAINER_CLASSES = 'px-6'
 
-const FormSchema = z
-  .object({
+const createFormSchema = (showClientLibraries: boolean) => {
+  const baseSchema = z.object({
     organizationSlug: z.string().min(1, 'Please select an organization'),
     projectRef: z.string().min(1, 'Please select a project'),
     category: z.string().min(1, 'Please select an issue type'),
@@ -88,15 +91,44 @@ const FormSchema = z
     affectedServices: z.string(),
     allowSupportAccess: z.boolean(),
   })
-  .refine(
-    (data) => {
-      return !(data.category === 'Problem' && data.library === '')
-    },
-    {
-      message: "Please select the library that you're facing issues with",
-      path: ['library'],
-    }
-  )
+
+  if (showClientLibraries) {
+    return baseSchema
+      .refine(
+        (data) => {
+          return !(data.category === 'Problem' && data.library === '')
+        },
+        {
+          message: "Please select the library that you're facing issues with",
+          path: ['library'],
+        }
+      )
+      .refine(
+        (data) => {
+          return !data.message.includes(PLAN_REQUEST_EMPTY_PLACEHOLDER)
+        },
+        {
+          message: `Please let us know which plan you'd like to upgrade to for your organization`,
+          path: ['message'],
+        }
+      )
+  }
+
+  // When showClientLibraries is false, make library optional and remove the refine validation
+  return baseSchema
+    .extend({
+      library: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        return !data.message.includes(PLAN_REQUEST_EMPTY_PLACEHOLDER)
+      },
+      {
+        message: `Please let us know which plan you'd like to upgrade to for your organization`,
+        path: ['message'],
+      }
+    )
+}
 
 const defaultValues = {
   organizationSlug: '',
@@ -117,8 +149,6 @@ interface SupportFormV2Props {
   setSentCategory: (value: string) => void
 }
 
-// [Joshen] Just naming it as V2 for now for PR review purposes so its easier to view
-// This is a rewrite of the old SupportForm to use the new form components
 export const SupportFormV2 = ({
   onProjectSelected: setSelectedProject,
   onOrganizationSelected: setSelectedOrganization,
@@ -139,11 +169,32 @@ export const SupportFormV2 = ({
   const router = useRouter()
   const dashboardSentryIssueId = router.query.sid as string
 
+  const isBillingEnabled = useIsFeatureEnabled('billing:all')
+  const showClientLibraries = useIsFeatureEnabled('support:show_client_libraries')
+
+  const categoryOptions = useMemo(() => {
+    return CATEGORY_OPTIONS.filter((option) => {
+      if (
+        option.value === SupportCategories.BILLING ||
+        option.value === SupportCategories.REFUND ||
+        option.value === SupportCategories.SALES_ENQUIRY
+      ) {
+        return isBillingEnabled
+      } else if (option.value === 'Plan_upgrade') {
+        return !isBillingEnabled
+      }
+
+      return true
+    })
+  }, [isBillingEnabled])
+
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [docsResults, setDocsResults] = useState<Page[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
+
+  const FormSchema = useMemo(() => createFormSchema(showClientLibraries), [showClientLibraries])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -227,7 +278,9 @@ export const SupportFormV2 = ({
     setIsSubmitting(true)
     const attachments =
       uploadedFiles.length > 0 ? await uploadAttachments(values.projectRef, uploadedFiles) : []
-    const selectedLibrary = CLIENT_LIBRARIES.find((library) => library.language === values.library)
+    const selectedLibrary = values.library
+      ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
+      : undefined
 
     const payload = {
       ...values,
@@ -292,7 +345,7 @@ export const SupportFormV2 = ({
       if (isSuccessOrganizations) {
         if (organizations.length === 0) {
           form.setValue('organizationSlug', 'no-org')
-        } else if (urlRef) {
+        } else if (urlRef && urlRef !== 'no-project') {
           // Check validity of project via project details
           const selectedProject = await getProjectDetail({ ref: urlRef })
           if (!!selectedProject) {
@@ -317,7 +370,7 @@ export const SupportFormV2 = ({
 
   useEffect(() => {
     if (urlCategory) {
-      const validCategory = CATEGORY_OPTIONS.find((option) => {
+      const validCategory = categoryOptions.find((option) => {
         if (option.value.toLowerCase() === ((urlCategory as string) ?? '').toLowerCase())
           return option
       })
@@ -414,6 +467,7 @@ export const SupportFormV2 = ({
               <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
                 <FormControl_Shadcn_>
                   <OrganizationProjectSelector
+                    key={organizationSlug}
                     sameWidthAsTrigger
                     checkPosition="left"
                     slug={organizationSlug}
@@ -533,13 +587,13 @@ export const SupportFormV2 = ({
                     <SelectTrigger_Shadcn_ className="w-full">
                       <SelectValue_Shadcn_ placeholder="Select an issue">
                         {field.value
-                          ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
+                          ? categoryOptions.find((o) => o.value === field.value)?.label
                           : null}
                       </SelectValue_Shadcn_>
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
-                        {CATEGORY_OPTIONS.map((option) => (
+                        {categoryOptions.map((option) => (
                           <SelectItem_Shadcn_ key={option.value} value={option.value}>
                             {option.label}
                             <span className="block text-xs text-foreground-lighter">
@@ -682,7 +736,7 @@ export const SupportFormV2 = ({
           )}
         </div>
 
-        {category === 'Problem' && (
+        {category === 'Problem' && showClientLibraries && (
           <FormField_Shadcn_
             name="library"
             control={form.control}
@@ -717,9 +771,9 @@ export const SupportFormV2 = ({
           />
         )}
 
-        {library.length > 0 && <LibrarySuggestions library={library} />}
+        {library && library.length > 0 && <LibrarySuggestions library={library} />}
 
-        {category !== 'Login_issues' && (
+        {category !== 'Login_issues' && category !== 'Plan_upgrade' && (
           <FormField_Shadcn_
             name="affectedServices"
             control={form.control}

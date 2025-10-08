@@ -1,9 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 
 import { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { AnalyticsData, AnalyticsInterval } from './constants'
+import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
 export type ProjectDailyStatsAttribute =
@@ -14,21 +13,10 @@ export type ProjectDailyStatsVariables = {
   attribute: ProjectDailyStatsAttribute
   startDate?: string
   endDate?: string
-  interval?: AnalyticsInterval
-  dateFormat?: string
-  databaseIdentifier?: string
-  modifier?: (x: number) => number
 }
 
 export async function getProjectDailyStats(
-  {
-    projectRef,
-    attribute,
-    startDate,
-    endDate,
-    interval = '1d',
-    databaseIdentifier,
-  }: ProjectDailyStatsVariables,
+  { projectRef, attribute, startDate, endDate }: ProjectDailyStatsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -43,9 +31,6 @@ export async function getProjectDailyStats(
         attribute,
         startDate,
         endDate,
-        interval,
-        // [Joshen] TODO: Once API support is ready
-        // databaseIdentifier,
       },
     },
     signal,
@@ -59,16 +44,7 @@ export type ProjectDailyStatsData = Awaited<ReturnType<typeof getProjectDailySta
 export type ProjectDailyStatsError = unknown
 
 export const useProjectDailyStatsQuery = <TData = ProjectDailyStatsData>(
-  {
-    projectRef,
-    attribute,
-    startDate,
-    endDate,
-    interval = '1d',
-    dateFormat = 'DD MMM',
-    databaseIdentifier,
-    modifier,
-  }: ProjectDailyStatsVariables,
+  { projectRef, attribute, startDate, endDate }: ProjectDailyStatsVariables,
   {
     enabled = true,
     ...options
@@ -79,14 +55,8 @@ export const useProjectDailyStatsQuery = <TData = ProjectDailyStatsData>(
       attribute,
       startDate,
       endDate,
-      interval,
-      databaseIdentifier,
     }),
-    ({ signal }) =>
-      getProjectDailyStats(
-        { projectRef, attribute, startDate, endDate, interval, databaseIdentifier },
-        signal
-      ),
+    ({ signal }) => getProjectDailyStats({ projectRef, attribute, startDate, endDate }, signal),
     {
       enabled:
         enabled &&
@@ -94,20 +64,7 @@ export const useProjectDailyStatsQuery = <TData = ProjectDailyStatsData>(
         typeof attribute !== 'undefined' &&
         typeof startDate !== 'undefined' &&
         typeof endDate !== 'undefined',
-      select(data) {
-        return {
-          ...data,
-          data: data.data.map((x) => {
-            return {
-              ...x,
-              [attribute]:
-                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
-            }
-          }),
-        } as TData
-      },
-      staleTime: 1000 * 60, // default good for a minute
+      staleTime: 1000 * 60 * 30, // default good for 30m, stats only refresh once a day
       ...options,
     }
   )
