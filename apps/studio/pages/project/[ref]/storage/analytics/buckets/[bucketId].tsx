@@ -119,23 +119,26 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
             </ScaffoldHeader>
             <Card>
               {/* Table should match that in S3 connection */}
-              <Table>
+              <Table className="table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Value</TableHead>
-                    <TableHead />
+                    <TableHead className="w-1/3">Name</TableHead>
+                    <TableHead className="w-full">Value</TableHead>
+                    <TableHead className="w-48" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell className="w-1/3 min-w-64">
+                    <TableCell className="w-1/3">
                       <p className="text-sm text-foreground">Catalog URI</p>
                     </TableCell>
                     <TableCell className="w-full">
-                      https://{ref}.storage.supabase.co/storage/v1/iceberg
+                      {/* <div className="truncate"> */}
+                      <div className="py-2 px-4 text-xs font-mono text-foreground-light flex border border-control bg-foreground/[.026] font-mono rounded-full overflow-hidden">
+                        https://{ref}.storage.supabase.co/storage/v1/iceberg
+                      </div>
                     </TableCell>
-                    <TableCell className="w-auto align-middle">
+                    <TableCell className="w-48 align-middle">
                       <div className="flex flex-row gap-x-2 items-center justify-end">
                         {/* <Button type="default" size="tiny" disabled>
                           Show
@@ -150,16 +153,19 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell className="w-1/3 min-w-64">
+                    <TableCell className="w-1/3">
                       <p className="text-sm text-foreground">Catalog token</p>
-                      <p className="text-sm text-foreground-lighter">
+                      <p className="text-sm text-foreground-lighter text-balance">
                         Corresponds to the service role key
                       </p>
                     </TableCell>
                     <TableCell className="w-full">
-                      •••••••••••••••••••••••••••••••••••••••
+                      {/* Match styling in ApiKeyRow -> ApiKeyPill */}
+                      <div className="py-2 px-4 text-xs font-mono text-foreground-light flex border border-control bg-foreground/[.026] font-mono rounded-full overflow-hidden">
+                        •••••••••••••••••••••••••••••••••••••••
+                      </div>
                     </TableCell>
-                    <TableCell className="w-auto align-middle">
+                    <TableCell className="w-48 align-middle">
                       <div className="flex flex-row gap-x-2 items-center justify-end">
                         <Button type="default" size="tiny">
                           Show
