@@ -292,7 +292,7 @@ export const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
-      {subscription?.plan.id !== 'freea' && (
+      {subscription?.plan.id !== 'free' && (
         <Compute orgDailyStats={orgDailyStats} isLoadingOrgDailyStats={isLoadingOrgDailyStats} />
       )}
 
