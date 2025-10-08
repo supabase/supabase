@@ -1,3 +1,4 @@
+# You can configure from here https://vector.dev/docs/reference/configuration/
 api:
   enabled: true
   address: 0.0.0.0:9001
@@ -5,8 +6,21 @@ api:
 sources:
   docker_host:
     type: docker_logs
-    exclude_containers:
-      - supabase-vector
+    # only works on this containers
+    include_containers:
+    - supabase-imgproxy
+    - supabase-db
+    - supabase-analytics
+    - supabase-auth
+    - realtime-dev.supabase-realtime
+    - supabase-meta
+    - supabase-rest
+    - supabase-kong
+    - supabase-studio
+    - supabase-edge-functions
+    - supabase-storage
+    - supabase-functions
+    - supabase-realtime
 
 transforms:
   project_logs:
