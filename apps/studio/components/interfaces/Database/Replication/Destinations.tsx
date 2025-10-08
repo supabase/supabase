@@ -158,7 +158,7 @@ export const Destinations = () => {
                 if ('big_query' in destination.config) {
                   return 'BigQuery'
                 } else if ('iceberg' in destination.config) {
-                  return 'Iceberg'
+                  return 'Analytics Bucket'
                 } else {
                   return 'Other'
                 }
