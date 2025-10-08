@@ -1,5 +1,4 @@
-import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { useCallback, useRef } from 'react'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
@@ -49,28 +48,6 @@ export const useProjectsQuery = <TData = ProjectsData>({
       ...options,
     }
   )
-}
-
-export function prefetchProjects(client: QueryClient) {
-  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal }))
-}
-
-export function useProjectsPrefetch() {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    prefetchProjects(client)
-  }, [client])
-}
-
-export function useAutoProjectsPrefetch() {
-  const prefetch = useProjectsPrefetch()
-
-  const called = useRef<boolean>(false)
-  if (called.current === false) {
-    called.current = true
-    prefetch()
-  }
 }
 
 export function invalidateProjectsQuery(client: QueryClient) {

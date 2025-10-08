@@ -25,6 +25,7 @@ interface SimpleCodeBlockProps {
   parentClassName?: string
   className?: string
   showCopy?: boolean
+  onCopy?: () => void
 }
 
 export const SimpleCodeBlock = ({
@@ -32,6 +33,7 @@ export const SimpleCodeBlock = ({
   parentClassName,
   className: languageClassName,
   showCopy = true,
+  onCopy,
 }: PropsWithChildren<SimpleCodeBlockProps>) => {
   const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
@@ -52,6 +54,7 @@ export const SimpleCodeBlock = ({
 
   const handleCopyCode = (code: any) => {
     copyToClipboard(code, () => setShowCopied(true))
+    onCopy?.()
   }
 
   return (
