@@ -96,12 +96,10 @@ export const HomePageActions = ({
                       <Checkbox_Shadcn_
                         id={key}
                         name={key}
-                        checked={filterStatus.length === 0 || filterStatus.includes(key)}
+                        checked={filterStatus.includes(key)}
                         onCheckedChange={() => {
                           if (filterStatus.includes(key)) {
                             setFilterStatus(filterStatus.filter((y) => y !== key))
-                          } else if (filterStatus.length === 1) {
-                            setFilterStatus([])
                           } else {
                             setFilterStatus(filterStatus.concat([key]))
                           }
