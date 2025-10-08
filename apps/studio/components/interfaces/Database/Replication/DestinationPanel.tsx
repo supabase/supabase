@@ -62,12 +62,16 @@ const TypeEnum = z.enum(types)
 
 const FormSchema = z
   .object({
+    // Common fields
     type: TypeEnum,
     name: z.string().min(1, 'Name is required'),
+    publicationName: z.string().min(1, 'Publication is required'),
+    maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
     // BigQuery fields
     projectId: z.string().optional(),
     datasetId: z.string().optional(),
     serviceAccountKey: z.string().optional(),
+    maxStalenessMins: z.number().nonnegative().optional(),
     // Analytics Bucket fields
     warehouseName: z.string().optional(),
     namespace: z.string().optional(),
@@ -75,10 +79,6 @@ const FormSchema = z
     s3AccessKeyId: z.string().optional(),
     s3SecretAccessKey: z.string().optional(),
     s3Region: z.string().optional(),
-    // Common fields
-    publicationName: z.string().min(1, 'Publication is required'),
-    maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
-    maxStalenessMins: z.number().nonnegative().optional(),
   })
   .refine(
     (data) => {
@@ -192,33 +192,32 @@ export const DestinationPanel = ({
 
   const defaultValues = useMemo(
     () => ({
+      // Common fields
       type: (destinationData?.config?.big_query
         ? TypeEnum.enum.BigQuery
         : (destinationData?.config as any)?.iceberg
           ? TypeEnum.enum['Analytics Bucket']
           : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>,
       name: destinationData?.name ?? '',
+      publicationName: pipelineData?.config.publication_name ?? '',
+      maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
       // BigQuery fields
       projectId: destinationData?.config?.big_query?.project_id ?? '',
       datasetId: destinationData?.config?.big_query?.dataset_id ?? '',
-      // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
+      maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
       // Analytics Bucket fields
       warehouseName: (destinationData?.config as any)?.iceberg?.supabase?.warehouse_name ?? '',
       namespace: (destinationData?.config as any)?.iceberg?.supabase?.namespace ?? '',
       catalogToken:
-        (destinationData?.config as any)?.iceberg?.supabase?.catalog_token ?? serviceApiKey, // From existing config or auto-populated from service API key
-      s3AccessKeyId: (destinationData?.config as any)?.iceberg?.supabase?.s3_access_key_id ?? '', // Existing S3 access key from saved config
+        (destinationData?.config as any)?.iceberg?.supabase?.catalog_token ?? serviceApiKey,
+      s3AccessKeyId: (destinationData?.config as any)?.iceberg?.supabase?.s3_access_key_id ?? '',
       s3SecretAccessKey:
-        (destinationData?.config as any)?.iceberg?.supabase?.s3_secret_access_key ?? '', // Existing S3 secret key from saved config
+        (destinationData?.config as any)?.iceberg?.supabase?.s3_secret_access_key ?? '',
       s3Region:
         projectSettings?.region ??
         (destinationData?.config as any)?.iceberg?.supabase?.s3_region ??
         '',
-      // Common fields
-      publicationName: pipelineData?.config.publication_name ?? '',
-      maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
-      maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
     }),
     [destinationData, pipelineData, serviceApiKey, projectSettings]
   )
@@ -232,7 +231,6 @@ export const DestinationPanel = ({
   const publicationName = form.watch('publicationName')
   const selectedType = form.watch('type')
   const warehouseName = form.watch('warehouseName')
-  const catalogToken = form.watch('catalogToken')
   const isSaving =
     creatingDestinationPipeline ||
     updatingDestinationPipeline ||
@@ -242,8 +240,8 @@ export const DestinationPanel = ({
   // Construct catalog URI for iceberg namespaces query
   const catalogUri = useMemo(() => {
     if (!project?.ref) return ''
-    // return `https://${project.ref}.supabase.co/storage/v1/iceberg`
-    return `http://localhost:8080/storage/v1/iceberg`
+    return `https://${project.ref}.supabase.co/storage/v1/iceberg`
+    // return `http://localhost:8080/storage/v1/iceberg`
   }, [project?.ref])
 
   const { data: namespaces = [], isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
@@ -346,7 +344,7 @@ export const DestinationPanel = ({
           )
           toast.success('Settings applied. Starting the pipeline...')
         }
-        // startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
+        startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
         let destinationConfig: any = {}
@@ -390,7 +388,7 @@ export const DestinationPanel = ({
         // Set request status only right before starting, then fire and close
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
         toast.success('Destination created. Starting the pipeline...')
-        // startPipeline({ projectRef, pipelineId })
+        startPipeline({ projectRef, pipelineId })
         onClose()
       }
     } catch (error) {
