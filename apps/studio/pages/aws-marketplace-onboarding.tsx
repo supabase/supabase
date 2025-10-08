@@ -36,8 +36,7 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
         <AwsMarketplaceLinkExistingOrg
           organizations={organizations}
           onboardingInfo={onboardingInfo}
-          // isLoadingOnboardingInfo={isLoadingOnboardingInfo}
-          isLoadingOnboardingInfo={false}
+          isLoadingOnboardingInfo={isLoadingOnboardingInfo}
         />
       ) : (
         <AwsMarketplaceCreateNewOrg onboardingInfo={onboardingInfo} />
