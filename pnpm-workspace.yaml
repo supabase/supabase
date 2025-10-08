@@ -5,9 +5,9 @@ packages:
   - e2e/*
 
 catalog:
-  '@supabase/auth-js': 2.72.0-rc.11
-  '@supabase/realtime-js': ^2.11.3
-  '@supabase/supabase-js': ^2.47.14
+  '@supabase/auth-js': 2.74.0
+  '@supabase/realtime-js': 2.74.0
+  '@supabase/supabase-js': 2.74.0
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
