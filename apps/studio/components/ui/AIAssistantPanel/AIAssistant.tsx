@@ -307,8 +307,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isContextExceededError =
     error &&
-    (JSON.stringify(error).includes('context_length_exceeded') ||
-      JSON.stringify(error).includes('exceeds the context window'))
+    (error.message?.includes('context_length_exceeded') ||
+      error.message?.includes('exceeds the context window'))
 
   const renderedMessages = useMemo(
     () =>
@@ -471,8 +471,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       ) : (
                         <p>
                           Sorry, I'm having trouble responding right now. If the error persists
-                          while retrying, you may try clearing the conversation's messages and try
-                          again.
+                          while retrying, you may try creating a new chat and try again.
                         </p>
                       )}
                     </div>
