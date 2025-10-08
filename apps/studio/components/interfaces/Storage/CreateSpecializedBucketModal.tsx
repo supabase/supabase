@@ -136,11 +136,16 @@ export const CreateSpecializedBucketModal = ({
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
   const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
 
+  //   TODO: installed_version is returning null, we should check for >= 0.5.3
+  //   console.log('wrappersExtension:', wrappersExtension)
+  //   console.log('isWrappersExtensionInstalled:', isWrappersExtensionInstalled)
+
   // Check if Iceberg Wrapper integration is installed
   const icebergWrapperMeta = WRAPPERS.find((w) => w.name === 'iceberg_wrapper')
   const isIcebergWrapperInstalled = icebergWrapperMeta
     ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
     : false
+  // TODO: We should complete all other checks (e.g. icebergCatalogEnabled) that are defined in CreateBucketModal
 
   const onSubmit: SubmitHandler<CreateSpecializedBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -211,13 +216,13 @@ export const CreateSpecializedBucketModal = ({
         return null
       }
 
-      // Don't show alert if both dependencies are installed (success state)
-      if (isWrappersExtensionInstalled && isIcebergWrapperInstalled) {
+      // Don't show alert if wrappers extension is properly installed (success state)
+      if (icebergWrapperExtensionState === 'installed') {
         return null
       }
 
       // Determine what needs to be installed
-      const needsWrappersExtension = !isWrappersExtensionInstalled
+      const needsWrappersExtension = icebergWrapperExtensionState === 'not-installed'
       const needsIcebergWrapper = !isIcebergWrapperInstalled
       //   const needsWrappersExtension = false // Testing
       //   const needsIcebergWrapper = true // Testing
