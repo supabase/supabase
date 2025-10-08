@@ -811,25 +811,28 @@ export const DestinationPanel = ({
                         >
                           <Input
                             value={
-                              s3Keys?.accessKey || form.getValues('s3AccessKeyId')
+                              (s3Keys?.accessKey || form.getValues('s3AccessKeyId')) &&
+                              (s3Keys?.accessKey?.trim() || form.getValues('s3AccessKeyId')?.trim())
                                 ? showS3AccessKey
                                   ? s3Keys?.accessKey || form.getValues('s3AccessKeyId')
                                   : '••••••••••••••••'
                                 : isCreatingS3AccessKey
                                   ? 'Generating...'
-                                  : 'Select warehouse first'
+                                  : ''
                             }
                             disabled
                             type={showS3AccessKey ? 'text' : 'password'}
                             placeholder="Auto-generated"
                             copy={
                               !!(
-                                (s3Keys?.accessKey || form.getValues('s3AccessKeyId')) &&
+                                (s3Keys?.accessKey?.trim() ||
+                                  form.getValues('s3AccessKeyId')?.trim()) &&
                                 showS3AccessKey
                               )
                             }
                             actions={
-                              s3Keys?.accessKey || form.getValues('s3AccessKeyId') ? (
+                              s3Keys?.accessKey?.trim() ||
+                              form.getValues('s3AccessKeyId')?.trim() ? (
                                 <div className="flex items-center justify-center mr-1">
                                   <Button
                                     type="default"
@@ -849,25 +852,29 @@ export const DestinationPanel = ({
                         >
                           <Input
                             value={
-                              s3Keys?.secretKey || form.getValues('s3SecretAccessKey')
+                              (s3Keys?.secretKey || form.getValues('s3SecretAccessKey')) &&
+                              (s3Keys?.secretKey?.trim() ||
+                                form.getValues('s3SecretAccessKey')?.trim())
                                 ? showS3SecretKey
                                   ? s3Keys?.secretKey || form.getValues('s3SecretAccessKey')
                                   : '••••••••••••••••'
                                 : isCreatingS3AccessKey
                                   ? 'Generating...'
-                                  : 'Select warehouse first'
+                                  : ''
                             }
                             disabled
                             type={showS3SecretKey ? 'text' : 'password'}
                             placeholder="Auto-generated"
                             copy={
                               !!(
-                                (s3Keys?.secretKey || form.getValues('s3SecretAccessKey')) &&
+                                (s3Keys?.secretKey?.trim() ||
+                                  form.getValues('s3SecretAccessKey')?.trim()) &&
                                 showS3SecretKey
                               )
                             }
                             actions={
-                              s3Keys?.secretKey || form.getValues('s3SecretAccessKey') ? (
+                              s3Keys?.secretKey?.trim() ||
+                              form.getValues('s3SecretAccessKey')?.trim() ? (
                                 <div className="flex items-center justify-center mr-1">
                                   <Button
                                     type="default"
