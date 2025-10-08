@@ -67,6 +67,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       icon: 'getting-started',
       href: '/guides/getting-started',
       level: 'gettingstarted',
+      enabled: frameworkQuickstartsEnabled,
     },
   ],
   [
