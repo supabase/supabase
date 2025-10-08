@@ -310,7 +310,7 @@ export const DestinationPanel = ({
         }
 
         const batchConfig: any = {}
-        if (data.type === 'BigQuery' && !!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
+        if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
         const hasBatchFields = Object.keys(batchConfig).length > 0
 
         await updateDestinationPipeline({
@@ -371,7 +371,7 @@ export const DestinationPanel = ({
           destinationConfig = { iceberg: icebergConfig }
         }
         const batchConfig: any = {}
-        if (data.type === 'BigQuery' && !!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
+        if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
         const hasBatchFields = Object.keys(batchConfig).length > 0
 
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
@@ -882,6 +882,49 @@ export const DestinationPanel = ({
                       </>
                     )}
                   </div>
+
+                  {selectedType === 'Analytics Bucket' && (
+                    <>
+                      <DialogSectionSeparator />
+
+                      <div className="px-5">
+                        <Accordion_Shadcn_ type="single" collapsible>
+                          <AccordionItem_Shadcn_ value="item-1" className="border-none">
+                            <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-between text-sm">
+                              Advanced Settings
+                            </AccordionTrigger_Shadcn_>
+                            <AccordionContent_Shadcn_ asChild className="!pb-0">
+                              <FormField_Shadcn_
+                                control={form.control}
+                                name="maxFillMs"
+                                render={({ field }) => (
+                                  <FormItemLayout
+                                    className="mb-4"
+                                    label="Max fill milliseconds"
+                                    layout="vertical"
+                                    description="The maximum amount of time to fill the data in milliseconds. Leave empty to use default value."
+                                  >
+                                    <FormControl_Shadcn_>
+                                      <Input_Shadcn_
+                                        {...field}
+                                        type="number"
+                                        value={field.value ?? ''}
+                                        onChange={(e) => {
+                                          const val = e.target.value
+                                          field.onChange(val === '' ? undefined : Number(val))
+                                        }}
+                                        placeholder="Leave empty for default"
+                                      />
+                                    </FormControl_Shadcn_>
+                                  </FormItemLayout>
+                                )}
+                              />
+                            </AccordionContent_Shadcn_>
+                          </AccordionItem_Shadcn_>
+                        </Accordion_Shadcn_>
+                      </div>
+                    </>
+                  )}
 
                   {selectedType === 'BigQuery' && (
                     <>
