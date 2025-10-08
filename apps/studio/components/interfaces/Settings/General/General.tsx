@@ -8,11 +8,12 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -29,7 +30,7 @@ const General = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
-  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
+  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
   const isBranch = parentProject !== undefined
 
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
