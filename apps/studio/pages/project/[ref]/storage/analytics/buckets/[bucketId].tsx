@@ -30,11 +30,9 @@ import { Admonition } from 'ui-patterns/admonition'
 // TODO:
 // Add dynamic data from /components/interfaces/Storage/AnalyticBucketDetails/index.tsx
 // Mark aforementioned components as deprecated in Linear (to remove post-launch)
-// Merge this file into AnalyticsBuckets.tsx and set up dynamic segment based on bucket ID
 
 const AnalyticsBucketPage: NextPageWithLayout = () => {
-  // const { bucketId, ref } = useParams()
-  const { ref } = useParams()
+  const { bucketId, ref } = useParams()
   // If the bucket is not found or the bucket type is STANDARD or VECTOR, show an error message
   // if (!bucket || bucket.type !== 'ANALYTICS') {
   //   return (
@@ -49,7 +47,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
   return (
     <>
       <PageLayout
-        title="example-bucket"
+        title={bucketId} // TODO: Change to bucket.name
         breadcrumbs={[
           {
             label: 'Analytics',
@@ -131,15 +129,38 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell className="w-1/3 min-w-40">
+                    <TableCell className="w-1/3 min-w-64">
                       <p className="text-sm text-foreground">Catalog URI</p>
-                      <p className="text-sm text-foreground-lighter">Description here</p>
+                    </TableCell>
+                    <TableCell className="w-full">
+                      https://{ref}.storage.supabase.co/storage/v1/iceberg
+                    </TableCell>
+                    <TableCell className="w-auto align-middle">
+                      <div className="flex flex-row gap-x-2 items-center justify-end">
+                        {/* <Button type="default" size="tiny" disabled>
+                          Show
+                        </Button> */}
+                        <Button type="default" size="tiny">
+                          Copy
+                        </Button>
+                        <Button type="default" size="tiny">
+                          Vault
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="w-1/3 min-w-64">
+                      <p className="text-sm text-foreground">Catalog token</p>
+                      <p className="text-sm text-foreground-lighter">
+                        Corresponds to the service role key
+                      </p>
                     </TableCell>
                     <TableCell className="w-full">
                       •••••••••••••••••••••••••••••••••••••••
                     </TableCell>
                     <TableCell className="w-auto align-middle">
-                      <div className="flex flex-row gap-x-2 items-center">
+                      <div className="flex flex-row gap-x-2 items-center justify-end">
                         <Button type="default" size="tiny">
                           Show
                         </Button>
