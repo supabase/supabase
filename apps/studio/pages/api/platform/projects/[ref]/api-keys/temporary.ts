@@ -26,7 +26,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = {
-    api_key: process.env.SUPABASE_ANON_KEY ?? '',
+    api_key: process.env.SUPABASE_SERVICE_KEY ?? '',
   }
 
   return res.status(200).json(response)
