@@ -70,8 +70,6 @@ const SUPABASE_ASSETS_URL =
     ? 'https://frontend-assets.supabase.green'
     : 'https://frontend-assets.supabase.com'
 const POSTHOG_URL = isDevOrStaging ? 'https://ph.supabase.green' : 'https://ph.supabase.com'
-// Required for feature flags and other PostHog features
-const POSTHOG_EXTERNAL_URL = 'https://*.posthog.com'
 
 const USERCENTRICS_URLS = 'https://*.usercentrics.eu'
 const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
@@ -104,7 +102,6 @@ module.exports.getCSP = function getCSP() {
     STAPE_URL,
     GOOGLE_MAPS_API_URL,
     POSTHOG_URL,
-    POSTHOG_EXTERNAL_URL,
     ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
   ]
   const SCRIPT_SRC_URLS = [
@@ -114,7 +111,6 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     STAPE_URL,
     POSTHOG_URL,
-    POSTHOG_EXTERNAL_URL,
   ]
   const FRAME_SRC_URLS = [HCAPTCHA_ASSET_URL, STRIPE_JS_URL, STAPE_URL]
   const IMG_SRC_URLS = [

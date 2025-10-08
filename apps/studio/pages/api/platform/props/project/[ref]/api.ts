@@ -6,7 +6,7 @@ import {
   PROJECT_ENDPOINT,
   PROJECT_ENDPOINT_PROTOCOL,
   PROJECT_REST_URL,
-} from 'pages/api/constants'
+} from 'lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 

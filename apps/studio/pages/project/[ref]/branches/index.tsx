@@ -22,6 +22,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
@@ -93,13 +94,13 @@ const BranchesPage: NextPageWithLayout = () => {
 
   const onConfirmDeleteBranch = () => {
     if (selectedBranchToDelete == undefined) return console.error('No branch selected')
-    if (projectRef == undefined) return console.error('Project ref is required')
+    const { project_ref: branchRef, parent_project_ref: projectRef } = selectedBranchToDelete
     deleteBranch(
-      { id: selectedBranchToDelete?.id, projectRef },
+      { branchRef, projectRef },
       {
         onSuccess: () => {
-          if (selectedBranchToDelete.project_ref === ref) {
-            router.push(`/project/${selectedBranchToDelete.parent_project_ref}/branches`)
+          if (branchRef === ref) {
+            router.push(`/project/${projectRef}/branches`)
           }
           // Track delete button click
           sendEvent({
@@ -223,7 +224,7 @@ BranchesPage.getLayout = (page) => {
             Branching Feedback
           </a>
         </Button>
-        <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
       </div>
     )
 

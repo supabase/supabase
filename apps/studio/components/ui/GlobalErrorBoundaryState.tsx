@@ -5,17 +5,10 @@ import { useRouter } from 'next/router'
 import CopyButton from './CopyButton'
 
 import Image from 'next/image'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  WarningIcon,
-  cn,
-} from 'ui'
+import { Button, cn } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { InlineLinkClassName } from './InlineLink'
 
-// More correct version of FallbackProps from react-error-boundary
 export type FallbackProps = {
   error: unknown
   resetErrorBoundary: (...args: any[]) => void
@@ -30,6 +23,12 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
   const isRemoveChildError = checkIsError
     ? errorMessage.includes("Failed to execute 'removeChild' on 'Node'")
     : false
+  const isInsertBeforeError = checkIsError
+    ? errorMessage.includes("Failed to execute 'insertBefore' on 'Node'")
+    : false
+
+  // Get Sentry issue ID from error if available
+  const sentryIssueId = (!!error && typeof error === 'object' && (error as any).sentryId) ?? ''
 
   const handleClearStorage = () => {
     try {
@@ -67,79 +66,103 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
           </p>
           <p className="text-foreground-light text-sm">{errorMessage}</p>
         </div>
-
-        {isRemoveChildError ? (
-          <Alert_Shadcn_>
-            <WarningIcon />
-            <AlertTitle_Shadcn_>
-              This error might be caused by Google translate or third-party browser extensions
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              You may try to avoid using Google translate or disable certain browser extensions to
-              avoid running into the <code className="text-xs">'removeChild' on 'Node'</code> error.
-            </AlertDescription_Shadcn_>
-            <AlertDescription_Shadcn_ className="mt-3">
-              <Button asChild type="default" icon={<ExternalLink />}>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://github.com/facebook/react/issues/17256"
-                >
-                  More information
-                </a>
-              </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+        {isRemoveChildError || isInsertBeforeError ? (
+          <Admonition
+            type="warning"
+            title="This error might be caused by Google translate or third-party browser extensions"
+          >
+            <p className="prose max-w-full text-sm !leading-normal">
+              Try to avoid using Google translate or disable certain browser extensions to avoid
+              running into the{' '}
+              <code className="text-xs">
+                {isRemoveChildError
+                  ? `'removeChild' on 'Node'`
+                  : isInsertBeforeError
+                    ? `'insertBefore' on 'Node'`
+                    : ''}
+              </code>{' '}
+              error.{' '}
+              <span
+                className={cn(InlineLinkClassName, 'cursor-pointer')}
+                onClick={() => window.location.reload()}
+              >
+                Refresh
+              </span>{' '}
+              the browser to see if occurs again.
+            </p>
+            <Button asChild className="mt-2" type="default" icon={<ExternalLink />}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={
+                  isRemoveChildError
+                    ? 'https://github.com/facebook/react/issues/17256'
+                    : isInsertBeforeError
+                      ? 'https://github.com/facebook/react/issues/24865'
+                      : '/'
+                }
+              >
+                More information
+              </a>
+            </Button>
+          </Admonition>
         ) : (
-          <Alert_Shadcn_>
-            <AlertTitle_Shadcn_>We recommend trying the following:</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              <ul className="list-disc pl-2 list-inside text-sm space-y-1 [&_b]:font-medium [&_b]:text-foreground">
-                <li>
-                  <span
-                    className={cn(InlineLinkClassName, 'cursor-pointer')}
-                    onClick={() => window.location.reload()}
-                  >
-                    Refresh
-                  </span>{' '}
-                  the page
-                </li>
-                <li>
-                  <span
-                    className={cn(InlineLinkClassName, 'cursor-pointer')}
-                    onClick={() => router.push('/logout')}
-                  >
-                    Sign out
-                  </span>{' '}
-                  and sign back in
-                </li>
-                <li>
-                  <span
-                    className={cn(InlineLinkClassName, 'cursor-pointer')}
-                    onClick={handleClearStorage}
-                  >
-                    Clear your browser storage
-                  </span>{' '}
-                  to clean potentially outdated data
-                </li>
-                <li>
-                  Disable browser extensions that might modify page content (e.g., Google Translate)
-                </li>
-                <li>If the problem persists, please contact support for assistance</li>
-              </ul>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition type="warning" showIcon={false} title="We recommend trying the following:">
+            <ul className="list-disc pl-2 list-inside text-sm space-y-1 [&_b]:font-medium [&_b]:text-foreground">
+              <li>
+                <span
+                  className={cn(InlineLinkClassName, 'cursor-pointer')}
+                  onClick={() => window.location.reload()}
+                >
+                  Refresh
+                </span>{' '}
+                the page
+              </li>
+              <li>
+                <span
+                  className={cn(InlineLinkClassName, 'cursor-pointer')}
+                  onClick={() => router.push('/logout')}
+                >
+                  Sign out
+                </span>{' '}
+                and sign back in
+              </li>
+              <li>
+                <span
+                  className={cn(InlineLinkClassName, 'cursor-pointer')}
+                  onClick={handleClearStorage}
+                >
+                  Clear your browser storage
+                </span>{' '}
+                to clean potentially outdated data
+              </li>
+              <li>
+                Disable browser extensions that might modify page content (e.g., Google Translate)
+              </li>
+              <li>If the problem persists, please contact support for assistance</li>
+            </ul>
+          </Admonition>
         )}
+        <div
+          className={cn(
+            'w-full mx-auto grid gap-2',
+            !isRemoveChildError && !isInsertBeforeError
+              ? 'grid-cols-2 sm:w-1/2'
+              : 'grid-cols-1 sm:w-1/4'
+          )}
+        >
+          {!isRemoveChildError && !isInsertBeforeError && (
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <Link
+                target="_blank"
+                rel="noopenner noreferrer"
+                href={`/support/new?category=dashboard_bug${sentryIssueId ? `&sid=${sentryIssueId}` : ''}&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}`}
+              >
+                Contact support
+              </Link>
+            </Button>
+          )}
 
-        <div className="w-full sm:w-1/2 mx-auto grid grid-cols-2 gap-2">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link
-              href={`/support/new?category=dashboard_bug&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}`}
-              target="_blank"
-            >
-              Contact support
-            </Link>
-          </Button>
           {/* [Joshen] For local and staging, allow us to escape the error boundary */}
           {/* We could actually investigate how to make this available on prod, but without being able to reliably test this, I'm not keen to do it now */}
           {process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? (
@@ -150,6 +173,17 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
             <Button type="outline" onClick={() => router.reload()}>
               Reload dashboard
             </Button>
+          )}
+
+          {(isRemoveChildError || isInsertBeforeError) && (
+            <Link
+              target="_blank"
+              rel="noopenner noreferrer"
+              className="text-center text-xs text-foreground-lighter hover:text-foreground-light transition"
+              href={`/support/new?category=dashboard_bug${sentryIssueId ? `&sid=${sentryIssueId}` : ''}&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}`}
+            >
+              Still stuck?
+            </Link>
           )}
         </div>
       </div>

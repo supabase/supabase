@@ -9,6 +9,7 @@ import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/da
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { extensions } from 'shared-data'
 import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -37,7 +38,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
 
   const extensionMeta = extensions.find((item) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
-    ? `https://supabase.com/docs${extensionMeta?.link}`
+    ? `${DOCS_URL}${extensionMeta?.link}`
     : extensionMeta?.link ?? undefined
 
   const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({

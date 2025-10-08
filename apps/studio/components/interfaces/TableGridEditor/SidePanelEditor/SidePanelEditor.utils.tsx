@@ -32,6 +32,7 @@ import {
   updateTable as updateTableMutation,
 } from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
+import { sendEvent } from 'data/telemetry/send-event-mutation'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -41,6 +42,7 @@ import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { executeWithRetry } from 'data/table-rows/table-rows-query'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -460,6 +462,7 @@ export const createTable = async ({
   foreignKeyRelations,
   isRLSEnabled,
   importContent,
+  organizationSlug,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -473,6 +476,7 @@ export const createTable = async ({
   foreignKeyRelations: ForeignKey[]
   isRLSEnabled: boolean
   importContent?: ImportContent
+  organizationSlug?: string
 }) => {
   const queryClient = getQueryClient()
 
@@ -482,6 +486,26 @@ export const createTable = async ({
     connectionString: connectionString,
     payload: payload,
   })
+
+  // Track table creation event
+  try {
+    await sendEvent({
+      event: {
+        action: 'table_created',
+        properties: {
+          method: 'table_editor',
+          schema_name: payload.schema,
+          table_name: payload.name,
+        },
+        groups: {
+          project: projectRef,
+          ...(organizationSlug && { organization: organizationSlug }),
+        },
+      },
+    })
+  } catch (error) {
+    console.error('Failed to track table creation event:', error)
+  }
 
   const table = await queryClient.fetchQuery({
     queryKey: tableKeys.retrieve(projectRef, payload.name, payload.schema),
@@ -507,6 +531,26 @@ export const createTable = async ({
         schema: table.schema,
         payload: { rls_enabled: isRLSEnabled },
       })
+
+      // Track RLS enablement event
+      try {
+        await sendEvent({
+          event: {
+            action: 'table_rls_enabled',
+            properties: {
+              method: 'table_editor',
+              schema_name: table.schema,
+              table_name: table.name,
+            },
+            groups: {
+              project: projectRef,
+              ...(organizationSlug && { organization: organizationSlug }),
+            },
+          },
+        })
+      } catch (error) {
+        console.error('Failed to track RLS enablement event:', error)
+      }
     }
 
     // Then insert the columns - we don't do Promise.all as we want to keep the integrity
@@ -661,6 +705,7 @@ export const updateTable = async ({
   foreignKeyRelations,
   existingForeignKeyRelations,
   primaryKey,
+  organizationSlug,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -671,6 +716,7 @@ export const updateTable = async ({
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
+  organizationSlug?: string
 }) => {
   const queryClient = getQueryClient()
 
@@ -701,6 +747,28 @@ export const updateTable = async ({
     schema: table.schema,
     payload,
   })
+
+  // Track RLS enablement if it's being turned on
+  if (payload.rls_enabled === true) {
+    try {
+      await sendEvent({
+        event: {
+          action: 'table_rls_enabled',
+          properties: {
+            method: 'table_editor',
+            schema_name: table.schema,
+            table_name: payload.name ?? table.name,
+          },
+          groups: {
+            project: projectRef,
+            ...(organizationSlug && { organization: organizationSlug }),
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Failed to track RLS enablement event:', error)
+    }
+  }
 
   const updatedTable = await queryClient.fetchQuery({
     queryKey: tableKeys.retrieve(
@@ -892,7 +960,9 @@ export const insertRowsViaSpreadsheet = async (
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
         try {
-          await executeSql({ projectRef, connectionString, sql: insertQuery })
+          await executeWithRetry(() =>
+            executeSql({ projectRef, connectionString, sql: insertQuery })
+          )
         } catch (error) {
           console.warn(error)
           insertError = error

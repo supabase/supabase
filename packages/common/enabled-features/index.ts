@@ -40,6 +40,15 @@ function isFeatureEnabled<T extends Feature | Feature[]>(
   features: T,
   runtimeDisabledFeatures?: Feature[]
 ) {
+  // Override is used to produce a filtered version of the docs search index
+  // using the same sync setup as our normal search index
+  if (process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL === 'true') {
+    if (Array.isArray(features)) {
+      return Object.fromEntries(features.map((feature) => [featureToCamelCase(feature), false]))
+    }
+    return false
+  }
+
   const disabledFeatures = new Set([
     ...(runtimeDisabledFeatures ?? []),
     ...disabledFeaturesStaticArray,

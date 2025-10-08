@@ -19,7 +19,10 @@ const GITHUB_INTEGRATION_AUTHORIZATION_URL = `https://github.com/login/oauth/aut
 export const GITHUB_INTEGRATION_INSTALLATION_URL = `https://github.com/apps/${GITHUB_INTEGRATION_APP_NAME}/installations/new`
 export const GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL = `https://github.com/settings/connections/applications/${GITHUB_INTEGRATION_CLIENT_ID}`
 
-export function openInstallGitHubIntegrationWindow(type: 'install' | 'authorize') {
+export function openInstallGitHubIntegrationWindow(
+  type: 'install' | 'authorize',
+  closeCallback?: () => void
+) {
   const w = 600
   const h = 800
 
@@ -37,10 +40,10 @@ export function openInstallGitHubIntegrationWindow(type: 'install' | 'authorize'
       ? document.documentElement.clientHeight
       : screen.height
 
-  let windowUrl
+  let windowUrl: string | undefined
   if (type === 'install') {
     windowUrl = GITHUB_INTEGRATION_INSTALLATION_URL
-  } else if (type === 'authorize') {
+  } else {
     const state = makeRandomString(32)
     localStorage.setItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE, state)
     windowUrl = `${GITHUB_INTEGRATION_AUTHORIZATION_URL}&state=${state}`
@@ -60,6 +63,20 @@ export function openInstallGitHubIntegrationWindow(type: 'install' | 'authorize'
      `
   )
   if (newWindow) {
+    if (closeCallback) {
+      // Poll to check if window is closed
+      const checkClosed = setInterval(() => {
+        if (newWindow.closed) {
+          clearInterval(checkClosed)
+          closeCallback()
+        }
+      }, 500) // Check every 500ms
+
+      // Add a timeout to prevent infinite polling
+      setTimeout(() => {
+        clearInterval(checkClosed)
+      }, 300000) // 5 minutes timeout
+    }
     newWindow.focus()
   }
 }

@@ -30,6 +30,7 @@ jobs:
         with:
           sparse-checkout: |
             apps/docs
+            packages
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm

@@ -13,6 +13,7 @@ import {
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   InfoIcon,
@@ -213,7 +214,7 @@ export const ServiceStatus = () => {
           {
             name: 'Edge Functions',
             error: undefined,
-            docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
+            docsUrl: `${DOCS_URL}/guides/functions/troubleshooting`,
             isLoading,
             isHealthy: !!edgeFunctionsStatus?.healthy,
             status: edgeFunctionsStatus?.healthy

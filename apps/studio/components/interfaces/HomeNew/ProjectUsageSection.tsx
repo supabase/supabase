@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Archive, ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -27,6 +28,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -75,7 +77,6 @@ type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 type ServiceEntry = {
   key: ServiceKey
   title: string
-  icon: React.ReactNode
   href?: string
   route: string
   enabled: boolean
@@ -93,6 +94,7 @@ export const ProjectUsageSection = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
@@ -156,7 +158,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'db',
         title: 'Database requests',
-        icon: <Database strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+
         href: `/project/${projectRef}/editor`,
         route: '/logs/postgres-logs',
         enabled: true,
@@ -164,14 +166,12 @@ export const ProjectUsageSection = () => {
       {
         key: 'functions',
         title: 'Functions requests',
-        icon: <Code strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         route: '/logs/edge-functions-logs',
         enabled: true,
       },
       {
         key: 'auth',
         title: 'Auth requests',
-        icon: <Key strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/auth/users`,
         route: '/logs/auth-logs',
         enabled: authEnabled,
@@ -179,7 +179,6 @@ export const ProjectUsageSection = () => {
       {
         key: 'storage',
         title: 'Storage requests',
-        icon: <Archive strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/storage/buckets`,
         route: '/logs/storage-logs',
         enabled: storageEnabled,
@@ -187,7 +186,6 @@ export const ProjectUsageSection = () => {
       {
         key: 'realtime',
         title: 'Realtime requests',
-        icon: <Zap strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         route: '/logs/realtime-logs',
         enabled: true,
       },
@@ -210,7 +208,7 @@ export const ProjectUsageSection = () => {
 
   const isLoading = services.some((s) => s.stats.isLoading)
 
-  const handleBarClick = (logRoute: string) => (datum: any) => {
+  const handleBarClick = (logRoute: string, serviceKey: ServiceKey) => (datum: any) => {
     if (!datum?.timestamp) return
 
     const datumTimestamp = dayjs(datum.timestamp).toISOString()
@@ -223,6 +221,20 @@ export const ProjectUsageSection = () => {
     })
 
     router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
+
+    if (projectRef && organization?.slug) {
+      sendEvent({
+        action: 'home_project_usage_chart_clicked',
+        properties: {
+          service_type: serviceKey,
+          bar_timestamp: datum.timestamp,
+        },
+        groups: {
+          project: projectRef,
+          organization: organization.slug,
+        },
+      })
+    }
   }
 
   const enabledServices = services.filter((s) => s.enabled)
@@ -268,17 +280,20 @@ export const ProjectUsageSection = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-row justify-between items-center gap-x-2">
-        <div className="flex items-center gap-6">
-          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-6">
+          <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{totalRequests.toLocaleString()}</span>
             <span>Total Requests</span>
-            <span className={`${totalDeltaClass}`}>{formatDelta(totalRequestsChangePct)}</span>
+            <span className={cn('text-sm', totalDeltaClass)}>
+              {formatDelta(totalRequestsChangePct)}
+            </span>
           </div>
-          <span className="text-foreground-muted">/</span>
-          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+          <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{errorRate.toFixed(1)}%</span>
             <span>Error Rate</span>
-            <span className={`${errorDeltaClass}`}>{formatDelta(errorRateChangePct)}</span>
+            <span className={cn('text-sm', errorDeltaClass)}>
+              {formatDelta(errorRateChangePct)}
+            </span>
           </div>
         </div>
         <DropdownMenu>
@@ -340,13 +355,37 @@ export const ProjectUsageSection = () => {
       </div>
       <Row columns={[3, 2, 1]}>
         {enabledServices.map((s) => (
-          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col">
+          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col h-64">
             <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
               <div className="flex items-center gap-2">
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <CardTitle className="text-foreground-light">
-                      {s.href ? <Link href={s.href}>{s.title}</Link> : s.title}
+                      {s.href ? (
+                        <Link
+                          href={s.href}
+                          onClick={() => {
+                            if (projectRef && organization?.slug) {
+                              sendEvent({
+                                action: 'home_project_usage_service_clicked',
+                                properties: {
+                                  service_type: s.key,
+                                  total_requests: s.total || 0,
+                                  error_count: s.err || 0,
+                                },
+                                groups: {
+                                  project: projectRef,
+                                  organization: organization.slug,
+                                },
+                              })
+                            }
+                          }}
+                        >
+                          {s.title}
+                        </Link>
+                      ) : (
+                        s.title
+                      )}
                     </CardTitle>
                   </div>
                   <span className="text-foreground text-xl">{(s.total || 0).toLocaleString()}</span>
@@ -369,15 +408,19 @@ export const ProjectUsageSection = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 pt-4 flex-1">
-              <Loading active={isLoading}>
+            <CardContent className="p-6 pt-4 flex-1 h-full overflow-hidden">
+              <Loading isFullHeight active={isLoading}>
                 <LogsBarChart
+                  isFullHeight
                   data={s.data}
-                  height="120px"
                   DateTimeFormat={datetimeFormat}
-                  onBarClick={handleBarClick(s.route)}
+                  onBarClick={handleBarClick(s.route, s.key)}
                   EmptyState={
-                    <NoDataPlaceholder size="small" message="No data for selected period" />
+                    <NoDataPlaceholder
+                      size="small"
+                      message="No data for selected period"
+                      isFullHeight
+                    />
                   }
                 />
               </Loading>

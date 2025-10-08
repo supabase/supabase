@@ -5,7 +5,10 @@ import { useFlag, useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import {
+  type CustomDomainsData,
+  useCustomDomainsQuery,
+} from 'data/custom-domains/custom-domains-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import CustomDomainActivate from './CustomDomainActivate'
@@ -14,7 +17,7 @@ import CustomDomainVerify from './CustomDomainVerify'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
 
-const CustomDomainConfig = () => {
+export const CustomDomainConfig = () => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -30,6 +33,7 @@ const CustomDomainConfig = () => {
     isLoading: isCustomDomainsLoading,
     isError,
     isSuccess,
+    status: customDomainStatus,
   } = useCustomDomainsQuery(
     { projectRef: ref },
     {
@@ -44,7 +48,7 @@ const CustomDomainConfig = () => {
     }
   )
 
-  const { status, customDomain } = customDomainData || {}
+  const { status } = customDomainData || {}
 
   return (
     <section id="custom-domains">
@@ -99,7 +103,7 @@ const CustomDomainConfig = () => {
         <CustomDomainsConfigureHostname />
       ) : (
         <Panel>
-          {isSuccess && (
+          {isSuccess ? (
             <div className="flex flex-col">
               {(status === '1_not_started' ||
                 status === '2_initiated' ||
@@ -116,6 +120,11 @@ const CustomDomainConfig = () => {
                 <CustomDomainDelete projectRef={ref} customDomain={customDomainData.customDomain} />
               )}
             </div>
+          ) : (
+            <CustomDomainConfigFallthrough
+              fetchStatus={customDomainStatus}
+              data={customDomainData}
+            />
           )}
         </Panel>
       )}
@@ -123,4 +132,15 @@ const CustomDomainConfig = () => {
   )
 }
 
-export default CustomDomainConfig
+interface CustomDomainConfigFallthroughProps {
+  fetchStatus: 'error' | 'success' | 'loading'
+  data: CustomDomainsData | undefined
+}
+
+function CustomDomainConfigFallthrough({ fetchStatus, data }: CustomDomainConfigFallthroughProps) {
+  console.error(`Failing to display UI for custom domains:
+Fetch status: ${fetchStatus}
+Custom domain status: ${data?.status}`)
+
+  return null
+}

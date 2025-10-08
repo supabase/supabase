@@ -22,7 +22,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import {
   AlertDescription_Shadcn_,
@@ -207,7 +207,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                               <a
                                 target="_blank"
                                 rel="noreferrer"
-                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+                                href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#time-limits`}
                               >
                                 More information
                               </a>

@@ -104,16 +104,33 @@ async function clearStorage(): Promise<void> {
   }
 }
 
+// Helper function to sanitize objects to ensure they're cloneable
+// Issue due to addToolResult
+function sanitizeForCloning(obj: any): any {
+  if (obj === null || obj === undefined) return obj
+  if (typeof obj !== 'object') return obj
+  return JSON.parse(JSON.stringify(obj))
+}
+
 // Helper function to load state from IndexedDB
 async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantState | null> {
   try {
     const persistedState = await getAiState(projectRef)
     if (persistedState) {
-      // Revive dates
+      // Revive dates and sanitize message data
       Object.values(persistedState.chats).forEach((chat: ChatSession) => {
         if (chat && typeof chat === 'object') {
           chat.createdAt = new Date(chat.createdAt)
           chat.updatedAt = new Date(chat.updatedAt)
+
+          // Sanitize message parts to remove proxy objects
+          if (chat.messages) {
+            chat.messages.forEach((message: any) => {
+              if (message.parts) {
+                message.parts = message.parts.map((part: any) => sanitizeForCloning(part))
+              }
+            })
+          }
         }
       })
       return persistedState
@@ -321,15 +338,19 @@ export const createAiAssistantState = (): AiAssistantState => {
       const chat = state.activeChat
       if (!chat) return
 
-      const existingMessages = chat.messages
-      const messagesToAdd = Array.isArray(message)
-        ? message.filter(
-            (msg) =>
-              !existingMessages.some((existing: AssistantMessageType) => existing.id === msg.id)
-          )
-        : !existingMessages.some((existing: AssistantMessageType) => existing.id === message.id)
-          ? [message]
-          : []
+      const incomingMessages = Array.isArray(message) ? message : [message]
+
+      const messagesToAdd: AssistantMessageType[] = []
+
+      incomingMessages.forEach((msg) => {
+        const index = chat.messages.findIndex((existing) => existing.id === msg.id)
+
+        if (index !== -1) {
+          state.updateMessage(msg)
+        } else {
+          messagesToAdd.push(msg as AssistantMessageType)
+        }
+      })
 
       if (messagesToAdd.length > 0) {
         chat.messages.push(...messagesToAdd)
@@ -337,26 +358,14 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
     },
 
-    updateMessage: ({
-      id,
-      resultId,
-      results,
-    }: {
-      id: string
-      resultId?: string
-      results: any[]
-    }) => {
+    updateMessage: (updatedMessage: MessageType) => {
       const chat = state.activeChat
-      if (!chat || !resultId) return
+      if (!chat) return
 
-      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
-
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        const msg = chat.messages[messageIndex]
-        if (!msg.results) {
-          msg.results = {}
-        }
-        msg.results[resultId] = results
+        chat.messages[messageIndex] = updatedMessage as AssistantMessageType
+        chat.updatedAt = new Date()
       }
     },
 
@@ -435,7 +444,7 @@ export type AiAssistantState = AiAssistantData & {
   clearMessages: () => void
   deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
   saveMessage: (message: MessageType | MessageType[]) => void
-  updateMessage: (args: { id: string; resultId?: string; results: any[] }) => void
+  updateMessage: (message: MessageType) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
   getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined

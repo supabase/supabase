@@ -25,6 +25,18 @@ setup('Global Setup', async ({ page }) => {
     - Is Platform: ${IS_PLATFORM}
     `)
 
+  /*
+   * Check if we're in CI, if so, check VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO
+   * is set to true.
+   */
+  const VERCEL_BYPASS = process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO
+
+  if (process.env.CI === 'true') {
+    if (!VERCEL_BYPASS || VERCEL_BYPASS.length === 0) {
+      throw new Error('VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO is not set')
+    }
+  }
+
   /**
    * Studio Check
    */

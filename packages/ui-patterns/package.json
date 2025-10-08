@@ -314,6 +314,10 @@
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
     },
+    "./McpUrlBuilder": {
+      "import": "./src/McpUrlBuilder/index.ts",
+      "types": "./src/McpUrlBuilder/index.ts"
+    },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
       "types": "./src/MobileSheetNav/MobileSheetNav.tsx"
@@ -521,7 +525,7 @@
     "ui": "workspace:*",
     "unist-util-visit": "^5.0.0",
     "valtio": "catalog:",
-    "zod": "^3.25.76"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.0.0",
@@ -537,7 +541,7 @@
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "tsx": "^4.19.3",
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
     "vite": "catalog:",

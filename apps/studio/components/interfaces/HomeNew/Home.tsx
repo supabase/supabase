@@ -7,13 +7,11 @@ import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
 import { TopSection } from 'components/interfaces/HomeNew/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsOrioleDb,
-  useProjectByRefQuery,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AdvisorSection } from './AdvisorSection'
@@ -30,7 +28,8 @@ export const HomeV2 = () => {
   const snap = useAppStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
+  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -69,6 +68,22 @@ export const HomeV2 = () => {
       const oldIndex = items.indexOf(String(active.id))
       const newIndex = items.indexOf(String(over.id))
       if (oldIndex === -1 || newIndex === -1) return items
+
+      if (project?.ref && organization?.slug) {
+        sendEvent({
+          action: 'home_section_rows_moved',
+          properties: {
+            section_moved: String(active.id),
+            old_position: oldIndex,
+            new_position: newIndex,
+          },
+          groups: {
+            project: project.ref,
+            organization: organization.slug,
+          },
+        })
+      }
+
       return arrayMove(items, oldIndex, newIndex)
     })
   }

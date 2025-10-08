@@ -6,6 +6,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Markdown } from '../Markdown'
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
@@ -88,7 +89,7 @@ export const IndexAdvisorDisabledState = () => {
               Enable extensions
             </Button>
           )}
-          <DocsButton href="https://supabase.com/docs/guides/database/extensions/index_advisor" />
+          <DocsButton href={`${DOCS_URL}/guides/database/extensions/index_advisor`} />
         </div>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>

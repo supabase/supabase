@@ -4,7 +4,6 @@ import { ref as valtioRef } from 'valtio'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -17,6 +16,7 @@ import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
+import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
 
 const rowKeyGetter = (row: SupaRow) => {
@@ -149,20 +149,9 @@ export const Grid = memo(
               className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
             >
               {isLoading && <GenericSkeletonLoader />}
-              {isError && (
-                <AlertError
-                  className="pointer-events-auto"
-                  error={error}
-                  subject="Failed to retrieve rows from table"
-                >
-                  {filters.length > 0 && (
-                    <p>
-                      Verify that the filter values are correct, as the error may stem from an
-                      incorrectly applied filter
-                    </p>
-                  )}
-                </AlertError>
-              )}
+
+              {isError && <GridError error={error} />}
+
               {isSuccess && (
                 <>
                   {(filters ?? []).length === 0 ? (

@@ -6,6 +6,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
+import { useMemo } from 'react'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -156,33 +157,34 @@ export function useAsyncCheckPermissions(
     isSuccess: isPermissionsSuccess,
   } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
 
-  if (!isLoggedIn) {
-    return {
-      isLoading: true,
-      isSuccess: false,
-      can: false,
-    }
-  }
-  if (!IS_PLATFORM) {
-    return {
-      isLoading: false,
-      isSuccess: true,
-      can: true,
-    }
-  }
+  const can = useMemo(() => {
+    if (!IS_PLATFORM) return true
+    if (!isLoggedIn) return false
+    if (!isPermissionsSuccess || !allPermissions) return false
 
-  const can = doPermissionsCheck(
+    return doPermissionsCheck(
+      allPermissions,
+      action,
+      resource,
+      data,
+      _organizationSlug,
+      _projectRef
+    )
+  }, [
+    isLoggedIn,
+    isPermissionsSuccess,
     allPermissions,
     action,
     resource,
     data,
     _organizationSlug,
-    _projectRef
-  )
+    _projectRef,
+  ])
 
-  return {
-    isLoading: isPermissionsLoading,
-    isSuccess: isPermissionsSuccess,
-    can,
-  }
+  // Derive loading/success consistently from the same branches
+  const isLoading = !IS_PLATFORM ? false : !isLoggedIn ? true : isPermissionsLoading
+
+  const isSuccess = !IS_PLATFORM ? true : !isLoggedIn ? false : isPermissionsSuccess
+
+  return { isLoading, isSuccess, can }
 }

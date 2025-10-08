@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
 
@@ -62,7 +63,7 @@ export const DatabaseReadOnlyAlert = () => {
             </Button>
             <Button asChild type="default" icon={<ExternalLink />}>
               <a
-                href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                 target="_blank"
                 rel="noreferrer"
               >

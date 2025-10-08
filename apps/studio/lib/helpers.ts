@@ -331,3 +331,20 @@ export const formatCurrency = (amount: number | undefined | null): string | null
     return currencyFormatterDefault.format(amount)
   }
 }
+
+/**
+ * [Joshen] This is to address an incredibly weird bug that's happening between Data Grid + Shadcn ContextMenu + Shadcn Overlay
+ * This trifecta is causing a pointer events none style getting left behind on the body element which makes the dashboard become
+ * unresponsive, hence the attempt to clean things up here
+ *
+ * Timeout is made configurable as I've observed it requires a higher timeout sometimes (e.g when closing the cron job sheet)
+ */
+export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 300) => {
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      if (document.body.style.pointerEvents === 'none') {
+        document.body.style.pointerEvents = ''
+      }
+    }, timeoutMs)
+  }
+}

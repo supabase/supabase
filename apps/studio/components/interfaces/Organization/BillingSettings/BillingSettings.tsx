@@ -57,7 +57,7 @@ export const BillingSettings = () => {
 
       <ScaffoldDivider />
 
-      {org?.plan.id !== 'free' && (
+      {org && org.plan.id !== 'free' && (
         <ScaffoldContainer id="breakdown">
           <BillingBreakdown />
         </ScaffoldContainer>

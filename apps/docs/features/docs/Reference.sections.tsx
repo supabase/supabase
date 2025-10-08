@@ -2,8 +2,9 @@ import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
 
+import { isFeatureEnabled } from 'common'
 import ApiSchema from '~/components/ApiSchema'
-import { REFERENCES } from '~/content/navigation.references'
+import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import {
@@ -40,6 +41,13 @@ async function RefSections({ libraryId, version }: RefSectionsProps) {
   let flattenedSections = await getFlattenedSections(libraryId, version)
   if (flattenedSections) {
     flattenedSections = trimIntro(flattenedSections)
+  }
+
+  if (!isFeatureEnabled('sdk:auth') && clientSdkIds.includes(libraryId)) {
+    flattenedSections = flattenedSections?.filter(
+      (section) =>
+        'product' in section && section.product !== 'auth' && section.product !== 'auth-admin'
+    )
   }
 
   return (
