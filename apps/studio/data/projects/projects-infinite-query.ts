@@ -11,71 +11,60 @@ import { projectKeys } from './keys'
 // API max rows is 100, I'm just choosing 96 here as the highest value thats a multiple of 6
 const DEFAULT_LIMIT = 96
 
-interface GetOrgProjectsInfiniteVariables {
-  slug?: string
+interface GetProjectsInfiniteVariables {
   limit?: number
   sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
   search?: string
   page?: number
-  statuses?: string[]
 }
 
-export type OrgProject = components['schemas']['OrganizationProjectsResponse']['projects'][number]
+export type ProjectInfoInfinite =
+  components['schemas']['ListProjectsPaginatedResponse']['projects'][number]
 
-async function getOrganizationProjects(
+async function getProjects(
   {
-    slug,
     limit = DEFAULT_LIMIT,
     page = 0,
     sort = 'name_asc',
     search: _search = '',
-    statuses: _statuses = [],
-  }: GetOrgProjectsInfiniteVariables,
+  }: GetProjectsInfiniteVariables,
   signal?: AbortSignal,
   headers?: Record<string, string>
 ) {
-  if (!slug) throw new Error('Slug is required')
-
   const offset = page * limit
   const search = _search.length === 0 ? undefined : _search
-  const statuses = _statuses.length === 0 ? undefined : _statuses.join(',')
 
-  const { data, error } = await get('/platform/organizations/{slug}/projects', {
-    params: { path: { slug }, query: { limit, offset, sort, search, statuses } },
+  const { data, error } = await get('/platform/projects', {
+    // @ts-ignore [Joshen] API type issue for Version 2 endpoints
+    params: { query: { limit, offset, sort, search } },
     signal,
-    headers,
+    headers: { ...headers, Version: '2' },
   })
 
   if (error) handleError(error)
-  return data
+  return data as unknown as components['schemas']['ListProjectsPaginatedResponse']
 }
 
-export type OrgProjectsInfiniteData = Awaited<ReturnType<typeof getOrganizationProjects>>
-export type OrgProjectsInfiniteError = ResponseError
+export type ProjectsInfiniteData = Awaited<ReturnType<typeof getProjects>>
+export type ProjectsInfiniteError = ResponseError
 
-export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
-  {
-    slug,
-    limit = DEFAULT_LIMIT,
-    sort = 'name_asc',
-    search,
-    statuses = [],
-  }: GetOrgProjectsInfiniteVariables,
+export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
+  { limit = DEFAULT_LIMIT, sort = 'name_asc', search }: GetProjectsInfiniteVariables,
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData> = {}
+  }: UseInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
 ) => {
   const { profile } = useProfile()
-  return useInfiniteQuery<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData>(
-    projectKeys.infiniteListByOrg(slug, { limit, sort, search, statuses }),
-    ({ signal, pageParam }) =>
-      getOrganizationProjects({ slug, limit, page: pageParam, sort, search, statuses }, signal),
+  return useInfiniteQuery<ProjectsInfiniteData, ProjectsInfiniteError, TData>(
+    projectKeys.infiniteList({ limit, sort, search }),
+    ({ signal, pageParam }) => getProjects({ limit, page: pageParam, sort, search }, signal),
     {
-      enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
+      enabled: enabled && profile !== undefined,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
         const currentTotalCount = page * limit
+        // @ts-ignore [Joshen] API type issue for Version 2 endpoints
         const totalCount = lastPage.pagination.count
 
         if (currentTotalCount >= totalCount) return undefined
