@@ -2,14 +2,18 @@ import { useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import {
   ArrowDown,
+  ArrowDownNarrowWide,
+  ArrowDownWideNarrow,
   ArrowUp,
   HelpCircle,
   Loader2,
+  LoaderPinwheel,
   RefreshCw,
   Search,
   Trash,
   Users,
   X,
+  Zap,
 } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -24,7 +28,6 @@ import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { THRESHOLD_COUNT } from 'data/table-rows/table-rows-count-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -66,6 +69,8 @@ import {
   MAX_BULK_DELETE,
   PROVIDER_FILTER_OPTIONS,
   USERS_TABLE_COLUMNS,
+  UUIDV4_LEFT_PREFIX_REGEX,
+  PHONE_NUMBER_LEFT_PREFIX_REGEX,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
 
@@ -105,13 +110,16 @@ export const UsersV2 = () => {
     }
   }, [showEmailPhoneColumns])
 
+  const [mode, setMode] = useState<'performance' | 'freeform'>('performance' as const)
+  const [column, setColumn] = useState<'id' | 'email' | 'phone'>('id' as const)
+
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
-  const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
+  const [sortByValue, setSortByValue] = useState<string>('id:asc')
 
   const [selectedUser, setSelectedUser] = useState<string>()
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
@@ -149,10 +157,12 @@ export const UsersV2 = () => {
       projectRef,
       connectionString: project?.connectionString,
       keywords: filterKeywords,
-      filter: filter === 'all' ? undefined : filter,
+      filter: mode === 'performance' || filter === 'all' ? undefined : filter,
       providers: selectedProviders,
-      sort: sortColumn as 'created_at' | 'email' | 'phone',
+      sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
+
+      ...(mode === 'performance' ? { column } : { column: undefined }),
     },
     {
       keepPreviousData: Boolean(filterKeywords),
@@ -162,31 +172,11 @@ export const UsersV2 = () => {
     }
   )
 
-  const {
-    data: countData,
-    refetch: refetchCount,
-    isLoading: isLoadingCount,
-  } = useUsersCountQuery({
-    projectRef,
-    connectionString: project?.connectionString,
-    keywords: filterKeywords,
-    filter: filter === 'all' ? undefined : filter,
-    providers: selectedProviders,
-    forceExactCount,
-  })
-
   const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
-  const totalUsers = countData?.count ?? 0
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
-
-  const formatEstimatedCount = (count: number) => {
-    if (count >= 1e6) return `${(count / 1e6).toFixed(1)}M`
-    if (count >= 1e3) return `${(count / 1e3).toFixed(1)}K`
-    return count.toString()
-  }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
@@ -252,10 +242,7 @@ export const UsersV2 = () => {
         userIds.map((id) => deleteUser({ projectRef, userId: id, skipInvalidation: true }))
       )
       // [Joshen] Skip invalidation within RQ to prevent multiple requests, then invalidate once at the end
-      await Promise.all([
-        queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-        queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
-      ])
+      await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
       toast.success(
         `Successfully deleted the selected ${selectedUsers.size} user${selectedUsers.size > 1 ? 's' : ''}`
       )
@@ -300,6 +287,16 @@ export const UsersV2 = () => {
     selectedUsers,
   ])
 
+  const searchInvalid = !search
+    ? false
+    : mode !== 'performance'
+      ? false
+      : column === 'email'
+        ? false
+        : column === 'id'
+          ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
+          : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
+
   return (
     <>
       <div className="h-full flex flex-col">
@@ -321,18 +318,101 @@ export const UsersV2 = () => {
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-2">
+                <Select_Shadcn_
+                  value={mode}
+                  onValueChange={(v) => {
+                    setMode(v as typeof mode)
+                  }}
+                >
+                  <SelectTrigger_Shadcn_
+                    size="tiny"
+                    className={cn(
+                      'w-[140px] border-none !bg-transparent',
+                      mode === 'performance' ? 'text-brand' : 'text-warning'
+                    )}
+                  >
+                    {mode === 'performance' ? (
+                      <>
+                        <Zap className="size-4" /> Optimized
+                      </>
+                    ) : (
+                      <>
+                        <LoaderPinwheel className="size-4" /> Freeform
+                      </>
+                    )}
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      <SelectItem_Shadcn_ value="performance">
+                        <div className="py-2 flex flex-col gap-2 max-w-[200px]">
+                          <div className="flex flex-row items-center gap-2 text-xs text-brand">
+                            <Zap className="size-4" /> Optimized search
+                          </div>
+                          <p className="prose text-xs">
+                            Uses fast and light prefix search, ideal for most day-to-day operations.
+                          </p>
+                        </div>
+                      </SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="freeform">
+                        <div className="py-2 flex flex-col gap-2 max-w-[200px]">
+                          <div className="flex flex-row items-center gap-2 text-xs text-warning">
+                            <LoaderPinwheel className="size-4" /> Freeform search
+                          </div>
+                          <p className="prose text-xs">
+                            Uses full-table scans accross mutliple columns. Can be very heavy on
+                            your database if the table has a large number of rows.{' '}
+                            <span className="text-warning">Use with caution!</span>
+                          </p>
+                        </div>
+                      </SelectItem_Shadcn_>
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+
                 <Input
                   size="tiny"
-                  className="w-52 pl-7 bg-transparent"
+                  className={cn(
+                    'w-52 pl-7 bg-transparent',
+                    searchInvalid ? 'text-red-900 dark:border-red-900' : ''
+                  )}
                   iconContainerClassName="pl-2"
-                  icon={<Search size={14} className="text-foreground-lighter" />}
-                  placeholder="Search email, phone or UID"
+                  icon={
+                    <Search
+                      size={14}
+                      className={cn('text-foreground-lighter', searchInvalid ? 'text-red-900' : '')}
+                    />
+                  }
+                  placeholder={
+                    mode === 'performance'
+                      ? `${column === 'id' ? 'User ID' : column === 'email' ? 'Email' : 'Phone'} or prefix...`
+                      : 'Search email, phone, name, user ID'
+                  }
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => {
+                    const value =
+                      mode === 'performance'
+                        ? e.target.value.replace(/\s+/g, '').toLowerCase()
+                        : e.target.value.trimStart()
+                    setSearch(value)
+                  }}
                   onKeyDown={(e) => {
                     if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-                      setSearch(search.trim())
-                      setFilterKeywords(search.trim().toLocaleLowerCase())
+                      setSearch((s) => {
+                        if (
+                          s &&
+                          mode === 'performance' &&
+                          column === 'phone' &&
+                          !s.startsWith('+')
+                        ) {
+                          return `+${s}`
+                        }
+
+                        return s
+                      })
+
+                      if (!searchInvalid) {
+                        setFilterKeywords(search.trim().toLocaleLowerCase())
+                      }
                     }
                   }}
                   actions={[
@@ -340,7 +420,7 @@ export const UsersV2 = () => {
                       <Button
                         size="tiny"
                         type="text"
-                        icon={<X />}
+                        icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
                         onClick={() => clearSearch()}
                         className="p-0 h-5 w-5"
                       />
@@ -348,18 +428,44 @@ export const UsersV2 = () => {
                   ]}
                 />
 
-                {showUserTypeFilter && (
-                  <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-                    <SelectTrigger_Shadcn_
-                      size="tiny"
-                      className={cn(
-                        'w-[140px] !bg-transparent',
-                        filter === 'all' && 'border-dashed'
-                      )}
-                    >
+                {mode === 'performance' && (
+                  <Select_Shadcn_
+                    value={column}
+                    onValueChange={(v) => {
+                      setColumn(v as typeof column)
+                    }}
+                  >
+                    <SelectTrigger_Shadcn_ size="tiny" className={cn('w-[140px] !bg-transparent')}>
                       <SelectValue_Shadcn_ />
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
+                      <SelectGroup_Shadcn_>
+                        <SelectItem_Shadcn_ value="id" className="text-xs">
+                          User ID
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="email" className="text-xs">
+                          Email address
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="phone" className="text-xs">
+                          Phone number
+                        </SelectItem_Shadcn_>
+                      </SelectGroup_Shadcn_>
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                )}
+
+                {showUserTypeFilter && mode !== 'performance' && (
+                  <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
+                    <SelectContent_Shadcn_>
+                      <SelectTrigger_Shadcn_
+                        size="tiny"
+                        className={cn(
+                          'w-[140px] !bg-transparent',
+                          filter === 'all' && 'border-dashed'
+                        )}
+                      >
+                        <SelectValue_Shadcn_ />
+                      </SelectTrigger_Shadcn_>
                       <SelectGroup_Shadcn_>
                         <SelectItem_Shadcn_ value="all" className="text-xs">
                           All users
@@ -378,7 +484,7 @@ export const UsersV2 = () => {
                   </Select_Shadcn_>
                 )}
 
-                {showProviderFilter && (
+                {showProviderFilter && mode !== 'performance' && (
                   <FilterPopover
                     name="Provider"
                     options={PROVIDER_FILTER_OPTIONS}
@@ -442,14 +548,32 @@ export const UsersV2 = () => {
                 />
 
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                      Sorted by {sortColumn.replaceAll('_', ' ')}
+                  <DropdownMenuTrigger asChild disabled={mode === 'performance'}>
+                    <Button
+                      icon={
+                        mode === 'performance' ? (
+                          <ArrowDownNarrowWide />
+                        ) : sortOrder === 'desc' ? (
+                          <ArrowDownWideNarrow />
+                        ) : (
+                          <ArrowDownNarrowWide />
+                        )
+                      }
+                    >
+                      Sorted by{' '}
+                      {mode === 'performance'
+                        ? column === 'id'
+                          ? 'user ID'
+                          : column
+                        : sortColumn === 'id'
+                          ? 'user ID'
+                          : sortColumn.replaceAll('_', ' ')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-44" align="start">
                     <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
                       <DropdownMenuSub>
+                        <DropdownMenuRadioItem value="id:asc">User ID</DropdownMenuRadioItem>
                         <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
                           <DropdownMenuRadioItem value="created_at:asc">
@@ -511,7 +635,6 @@ export const UsersV2 = () => {
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={() => {
                     refetch()
-                    refetchCount()
                   }}
                 >
                   Refresh
@@ -616,51 +739,6 @@ export const UsersV2 = () => {
             />
           )}
         </ResizablePanelGroup>
-
-        <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
-          <div className="flex items-center gap-x-2">
-            {isLoadingCount ? (
-              'Loading user count...'
-            ) : (
-              <>
-                <span>
-                  Total:{' '}
-                  {countData?.is_estimate
-                    ? formatEstimatedCount(totalUsers)
-                    : totalUsers.toLocaleString()}{' '}
-                  user{totalUsers !== 1 ? 's' : ''}
-                  {countData?.is_estimate && ' (estimated)'}
-                </span>
-                {countData?.is_estimate && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="tiny"
-                        type="text"
-                        className="px-1.5"
-                        icon={<HelpCircle />}
-                        onClick={() => {
-                          setShowFetchExactCountModal(true)
-                        }}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="w-72">
-                      This is an estimated value as your project has more than{' '}
-                      {THRESHOLD_COUNT.toLocaleString()} users.
-                      <br />
-                      <span className="text-brand">Click to retrieve the exact count.</span>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </>
-            )}
-          </div>
-          {(isLoading || isRefetching || isFetchingNextPage) && (
-            <span className="flex items-center gap-2">
-              <Loader2 size={14} className="animate-spin" /> Loading...
-            </span>
-          )}
-        </div>
       </div>
 
       <ConfirmationModal

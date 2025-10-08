@@ -15,13 +15,61 @@ export type UsersVariables = {
   keywords?: string
   filter?: Filter
   providers?: string[]
-  sort?: 'created_at' | 'email' | 'phone' | 'last_sign_in_at'
+  sort?: 'id' | 'created_at' | 'email' | 'phone' | 'last_sign_in_at'
   order?: 'asc' | 'desc'
+
+  column?: 'id' | 'email' | 'phone'
+  startAt?: string
 }
 
 export const USERS_PAGE_LIMIT = 50
 export type User = components['schemas']['UserBody'] & {
   providers: readonly string[]
+}
+
+function prefixToUUID(prefix: string, max: boolean) {
+  const mapped = '00000000-0000-0000-0000-000000000000'
+    .split('')
+    .map((c, i) => (c === '-' ? c : prefix[i] ?? c))
+
+  console.log('prefix', prefix, 'max', max, mapped)
+
+  if (prefix.length >= mapped.length) {
+    return mapped.join('')
+  }
+
+  if (prefix.length && prefix.length < 15) {
+    mapped[14] = '4'
+  }
+
+  if (prefix.length && prefix.length < 20) {
+    mapped[19] = max ? 'b' : '8'
+  }
+
+  if (max) {
+    for (let i = prefix.length; i < mapped.length; i += 1) {
+      if (mapped[i] === '0') {
+        mapped[i] = 'f'
+      }
+    }
+  }
+
+  return mapped.join('')
+}
+
+function stringRange(prefix: string) {
+  if (!prefix) {
+    return [prefix, undefined]
+  }
+
+  const lastChar = prefix.charCodeAt(prefix.length - 1)
+
+  if (lastChar >= `~`.charCodeAt(0)) {
+    // not ASCII
+    return [prefix, prefix]
+  }
+
+  return [prefix, prefix.substring(0, prefix.length - 1) + String.fromCharCode(lastChar + 1)]
 }
 
 export const getUsersSQL = ({
@@ -31,14 +79,23 @@ export const getUsersSQL = ({
   providers,
   sort,
   order,
+
+  column,
+  startAt,
 }: {
-  page: number
+  page?: number
   verified?: Filter
   keywords?: string
   providers?: string[]
   sort: string
   order: 'asc' | 'desc'
+
+  /** If set, uses fast queries but these don't allow any sorting so the above parameters are completely ignored. */
+  column?: 'id' | 'email' | 'phone'
+  startAt?: string
 }) => {
+  // IMPORTANT: DO NOT CHANGE THESE QUERIES EVEN IN THE SLIGHTEST WITHOUT CONSULTING WITH AUTH TEAM.
+
   const offset = page * USERS_PAGE_LIMIT
   const hasValidKeywords = keywords && keywords !== ''
 
@@ -78,34 +135,53 @@ export const getUsersSQL = ({
   const sortOn = sort ?? 'created_at'
   const sortOrder = order ?? 'desc'
 
-  const usersQuery = `
-with
-  users_data as (
-    select
-      id,
-      email,
-      banned_until,
-      created_at,
-      confirmed_at,
-      confirmation_sent_at,
-      is_anonymous,
-      is_sso_user,
-      invited_at,
-      last_sign_in_at,
-      phone,
-      raw_app_meta_data,
-      raw_user_meta_data,
-      updated_at
-    from
-      auth.users
-    ${conditions.length > 0 ? ` where ${combinedConditions}` : ''}
+  let actualQuery = `${conditions.length > 0 ? ` where ${combinedConditions}` : ''}
     order by
       "${sortOn}" ${sortOrder} nulls last
     limit
       ${USERS_PAGE_LIMIT}
     offset
       ${offset}
-  )
+  `
+
+  // DON'T TOUCH THESE QUERIES. ONE CHARACTER OFF AND DISASTER.
+  let firstOperator = startAt ? '>' : '>='
+
+  if (column === 'email') {
+    const range = stringRange(keywords ?? '')
+
+    actualQuery = `where lower(email) ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and lower(email) < '${range[1]}'` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${USERS_PAGE_LIMIT}`
+  } else if (column === 'phone') {
+    const range = stringRange(keywords ?? '')
+
+    actualQuery = `where phone ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and phone < '${range[1]}'` : ''} order by phone asc limit ${USERS_PAGE_LIMIT}`
+  } else if (column === 'id') {
+    actualQuery = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${USERS_PAGE_LIMIT}`
+  }
+
+  let usersData = `
+    select
+      auth.users.id,
+      auth.users.email,
+      auth.users.banned_until,
+      auth.users.created_at,
+      auth.users.confirmed_at,
+      auth.users.confirmation_sent_at,
+      auth.users.is_anonymous,
+      auth.users.is_sso_user,
+      auth.users.invited_at,
+      auth.users.last_sign_in_at,
+      auth.users.phone,
+      auth.users.raw_app_meta_data,
+      auth.users.raw_user_meta_data,
+      auth.users.updated_at
+    from
+      auth.users
+    ${actualQuery}`
+
+  let usersQuery = `
+with
+  users_data as (${usersData})
 select
   *,
   coalesce(
@@ -130,7 +206,16 @@ export type UsersData = { result: User[] }
 export type UsersError = ExecuteSqlError
 
 export const useUsersInfiniteQuery = <TData = UsersData>(
-  { projectRef, connectionString, keywords, filter, providers, sort, order }: UsersVariables,
+  {
+    projectRef,
+    connectionString,
+    keywords,
+    filter,
+    providers,
+    sort,
+    order,
+    column,
+  }: UsersVariables,
   { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
@@ -144,12 +229,15 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
           projectRef,
           connectionString,
           sql: getUsersSQL({
-            page: pageParam,
+            page: column ? undefined : pageParam,
             verified: filter,
             keywords,
             providers,
-            sort: sort ?? 'created_at',
-            order: order ?? 'desc',
+            sort: sort ?? 'id',
+            order: order ?? 'asc',
+
+            column,
+            startAt: column ? pageParam : undefined,
           }),
           queryKey: authKeys.usersInfinite(projectRef),
         },
@@ -159,6 +247,14 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
     {
       enabled: enabled && typeof projectRef !== 'undefined' && isActive,
       getNextPageParam(lastPage, pages) {
+        if (column) {
+          const lastItem = lastPage.result[lastPage.result.length - 1]
+          if (lastItem) {
+            return lastItem[column]
+          }
+          return undefined
+        }
+
         const page = pages.length
         const hasNextPage = lastPage.result.length >= USERS_PAGE_LIMIT
         if (!hasNextPage) return undefined
