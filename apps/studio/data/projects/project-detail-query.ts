@@ -34,7 +34,7 @@ export async function getProjectDetail(
   })
 
   if (error) handleError(error)
-  return data
+  return data as Project
 }
 
 export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>
