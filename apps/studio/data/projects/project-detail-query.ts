@@ -29,7 +29,7 @@ export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?:
   })
 
   if (error) handleError(error)
-  return data as unknown as Project
+  return data
 }
 
 export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>
