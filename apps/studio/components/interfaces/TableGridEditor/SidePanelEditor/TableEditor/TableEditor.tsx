@@ -24,7 +24,6 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
 import { usePHFlag } from 'hooks/ui/useFlag'
-import { useTablesQuery } from 'data/tables/tables-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -102,11 +101,6 @@ export const TableEditor = ({
    * - `undefined`: posthog still loading
    */
   const tableQuickstartVariant = usePHFlag<QuickstartVariant | false | undefined>('tableQuickstart')
-
-  const { data: tables } = useTablesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const [quickstartDismissed, setQuickstartDismissed] = useLocalStorage(
     LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
