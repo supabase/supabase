@@ -8,20 +8,17 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsOrioleDb,
-  useProjectByRefQuery,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
+  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
 
   const { data: branches } = useBranchesQuery({
     projectRef: project?.parent_project_ref ?? project?.ref,
