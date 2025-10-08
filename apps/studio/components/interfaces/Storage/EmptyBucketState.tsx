@@ -12,7 +12,9 @@ export const EmptyBucketState = ({ bucketType }: EmptyBucketStateProps) => {
   return (
     <aside className="mt-12 border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-6 items-center text-center gap-1 text-balance">
       <div className="flex flex-col gap-1">
-        <h3>Create {config.label}</h3>
+        <h3>
+          Create {config.article} {config.singularName} bucket
+        </h3>
         <p className="text-foreground-light text-sm">{config.valueProp}</p>
       </div>
 

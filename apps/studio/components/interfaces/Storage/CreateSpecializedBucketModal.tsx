@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
-import { snakeCase } from 'lodash'
 import { Info, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -11,21 +10,24 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { wrapperMetaComparator } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -82,7 +84,6 @@ interface CreateSpecializedBucketModalProps {
   buttonSize?: 'tiny' | 'small'
   buttonType?: 'default' | 'primary'
   buttonClassName?: string
-  label?: string
 }
 
 export const CreateSpecializedBucketModal = ({
@@ -90,11 +91,11 @@ export const CreateSpecializedBucketModal = ({
   buttonSize = 'tiny',
   buttonType = 'default',
   buttonClassName,
-  label,
 }: CreateSpecializedBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
   const [visible, setVisible] = useState(false)
 
@@ -111,15 +112,18 @@ export const CreateSpecializedBucketModal = ({
     useDatabaseExtensionEnableMutation()
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-  const { data: extensions } = useDatabaseExtensionsQuery({
+  const { data: extensions, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
     projectRef: ref,
-    connectionString: undefined,
+    connectionString: project?.connectionString,
+  })
+  const { data: fdws, isLoading: isFDWsLoading } = useFDWsQuery({
+    projectRef: ref,
+    connectionString: project?.connectionString,
   })
   const icebergWrapperExtensionState = useIcebergWrapperExtension()
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
   const config = BUCKET_TYPES[bucketType]
-  const bucketTypeLabel = label || `New ${config.label}`
 
   const form = useForm<CreateSpecializedBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -128,11 +132,15 @@ export const CreateSpecializedBucketModal = ({
     },
   })
 
-  const bucketName = snakeCase(form.watch('name'))
-
   // Check if wrappers extension is installed
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
   const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
+
+  // Check if Iceberg Wrapper integration is installed
+  const icebergWrapperMeta = WRAPPERS.find((w) => w.name === 'iceberg_wrapper')
+  const isIcebergWrapperInstalled = icebergWrapperMeta
+    ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
+    : false
 
   const onSubmit: SubmitHandler<CreateSpecializedBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -182,12 +190,12 @@ export const CreateSpecializedBucketModal = ({
         await createIcebergWrapper({ bucketName: values.name })
       }
 
-      toast.success(`Successfully created ${config.label} ${values.name}`)
+      toast.success(`Created bucket “${values.name}”`)
       form.reset()
       setVisible(false)
       router.push(`/project/${ref}/storage/${bucketType}/${values.name}`)
     } catch (error: any) {
-      toast.error(`Failed to create ${config.label}: ${error.message}`)
+      toast.error(`Failed to create bucket: ${error.message}`)
     }
   }
 
@@ -197,41 +205,90 @@ export const CreateSpecializedBucketModal = ({
   }
 
   const getIntegrationAlert = () => {
-    if (bucketType === 'analytics' && icebergWrapperExtensionState !== 'installed') {
-      return (
-        <Alert_Shadcn_ variant="default">
-          <Info className="text-foreground-light" strokeWidth={1.5} />
-          <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-            <p>
-              The{' '}
-              <InlineLink
-                href={`/project/${ref}/database/extensions?filter=wrappers`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Wrappers
-              </InlineLink>{' '}
-              extension and{' '}
-              <InlineLink
-                href={`/project/${ref}/integrations/iceberg_wrapper`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Iceberg Wrapper
-              </InlineLink>{' '}
-              integration are required for querying analytical data. Supabase will install these on
-              your behalf.{' '}
-              <InlineLink
-                href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Learn more
-              </InlineLink>
-            </p>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )
+    if (bucketType === 'analytics') {
+      // Don't show alert while data is loading
+      if (isExtensionsLoading || isFDWsLoading) {
+        return null
+      }
+
+      // Don't show alert if both dependencies are installed (success state)
+      if (isWrappersExtensionInstalled && isIcebergWrapperInstalled) {
+        return null
+      }
+
+      // Determine what needs to be installed
+      const needsWrappersExtension = !isWrappersExtensionInstalled
+      const needsIcebergWrapper = !isIcebergWrapperInstalled
+      //   const needsWrappersExtension = false // Testing
+      //   const needsIcebergWrapper = true // Testing
+
+      if (needsWrappersExtension) {
+        // If wrappers extension is missing, show alert for both (since Iceberg Wrapper depends on it)
+        return (
+          <Alert_Shadcn_ variant="default">
+            <Info className="text-foreground-light" strokeWidth={1.5} />
+            <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+              <p>
+                The{' '}
+                <InlineLink
+                  href={`/project/${ref}/database/extensions?filter=wrappers`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Wrappers
+                </InlineLink>{' '}
+                extension and{' '}
+                <InlineLink
+                  href={`/project/${ref}/integrations/iceberg_wrapper`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Iceberg Wrapper
+                </InlineLink>{' '}
+                integration are required for querying analytical data. Supabase will install these
+                on your behalf.{' '}
+                <InlineLink
+                  href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
+                </InlineLink>
+              </p>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )
+      } else if (needsIcebergWrapper) {
+        // Wrappers extension is installed, but Iceberg Wrapper integration is missing
+        return (
+          <Alert_Shadcn_ variant="default">
+            <Info className="text-foreground-light" strokeWidth={1.5} />
+            <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+              <p>
+                The{' '}
+                <InlineLink
+                  href={`/project/${ref}/integrations/iceberg_wrapper`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Iceberg Wrapper
+                </InlineLink>{' '}
+                integration is required for querying analytical data. Supabase will install it on
+                your behalf.{' '}
+                <InlineLink
+                  href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
+                </InlineLink>
+              </p>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )
+      }
+
+      return null
     }
 
     if (bucketType === 'vectors') {
@@ -242,23 +299,7 @@ export const CreateSpecializedBucketModal = ({
     return null
   }
 
-  const getIntegrationSuccessMessage = () => {
-    if (bucketType === 'analytics' && icebergWrapperExtensionState === 'installed') {
-      return (
-        <Alert_Shadcn_ variant="default">
-          <AlertTitle_Shadcn_>Ready to create your Analytics bucket</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            <p>
-              Supabase will automatically set up the necessary infrastructure including a foreign
-              data wrapper, S3 access keys, and vault secrets for your analytics bucket.
-            </p>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )
-    }
-
-    return null
-  }
+  const integrationAlert = getIntegrationAlert()
 
   return (
     <Dialog
@@ -294,7 +335,7 @@ export const CreateSpecializedBucketModal = ({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create {config.label}</DialogTitle>
+          <DialogTitle>Create {config.singularName} bucket</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -309,7 +350,7 @@ export const CreateSpecializedBucketModal = ({
                 render={({ field }) => (
                   <FormItemLayout
                     name="name"
-                    label="Name of bucket"
+                    label="Bucket name"
                     labelOptional="Cannot be changed after creation"
                     description="Must be between 3–63 characters. Only lowercase letters, numbers, dots, and hyphens are allowed."
                   >
@@ -329,12 +370,12 @@ export const CreateSpecializedBucketModal = ({
               />
             </DialogSection>
 
-            <DialogSectionSeparator />
-
-            <DialogSection className="space-y-3">
-              {getIntegrationAlert()}
-              {getIntegrationSuccessMessage()}
-            </DialogSection>
+            {integrationAlert && (
+              <>
+                <DialogSectionSeparator />
+                <DialogSection className="space-y-3">{integrationAlert}</DialogSection>
+              </>
+            )}
           </form>
         </Form_Shadcn_>
 

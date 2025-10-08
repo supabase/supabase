@@ -213,7 +213,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   <FormItemLayout
                     hideMessage
                     name="name"
-                    label="Name of bucket"
+                    label="Bucket name"
                     labelOptional="Cannot be changed after creation"
                   >
                     <FormControl_Shadcn_>
