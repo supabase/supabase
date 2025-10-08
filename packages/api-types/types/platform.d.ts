@@ -1679,6 +1679,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/usage/daily': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets daily aggregated usage stats */
+    get: operations['OrgUsageController_getDailyOrgUsage']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/cloud-marketplace': {
     parameters: {
       query?: never
@@ -3124,6 +3141,63 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/privatelink/associations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get AWS accounts attached to PrivateLink share for the project. */
+    get: operations['ProjectPrivateLinkController_getPrivateLink']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/privatelink/associations/aws-account': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Add AWS account to PrivateLink share for the project
+     * @description Add an AWS account to the project's PrivateLink configuration. Creates middleware entry and manages AWS resources.
+     */
+    post: operations['ProjectPrivateLinkController_addAwsAccountToPrivateLink']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Remove AWS account from PrivateLink share for the project
+     * @description Removes an AWS account from the project's PrivateLink configuration. Cleans up associated AWS resources.
+     */
+    delete: operations['ProjectPrivateLinkController_removeAwsAccountFromPrivateLink']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/resize': {
     parameters: {
       query?: never
@@ -4410,6 +4484,10 @@ export interface components {
       /** @enum {string} */
       scope?: 'V0'
       token_alias: string
+    }
+    AddAwsAccountToPrivateLinkBody: {
+      account_name?: string
+      aws_account_id: string
     }
     AnalyticsResponse: {
       error?:
@@ -5849,6 +5927,35 @@ export interface components {
       max_rows: number
       role_claim_key: string
     }
+    GetPrivateLinkResponse: {
+      private_link_associations: {
+        account_name?: string
+        aws_account_id: string
+        /**
+         * Format: date-time
+         * @description The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending.
+         */
+        shared_at: string | null
+        /**
+         * @description
+         *       - `CREATING`: The PrivateLink resources and the Association are in the process of being created. The PrivateLink Share cannot be accepted yet.
+         *       - `READY`: The PrivateLink resources have been created and the PrivateLink Share can be accepted for the duration of 12h after sharing. See `shared_at`.
+         *       - `ASSOCIATION_REQUEST_EXPIRED`: The PrivateLink Share has not been accepted within the 12h time limit. This association can now be deleted.
+         *       - `ASSOCIATION_ACCEPTED`: The PrivateLink Share was successfully accepted.
+         *       - `CREATION_FAILED`: The PrivateLink resources failed to create. This likely means something went wrong on Supabase's and and support should be contacted.
+         *       - `DELETING`: The PrivateLink resources and the Association are in the process of being deleted. The PrivateLink Share cannot be accepted yet.
+         *
+         * @enum {string}
+         */
+        status:
+          | 'CREATING'
+          | 'READY'
+          | 'ASSOCIATION_REQUEST_EXPIRED'
+          | 'ASSOCIATION_ACCEPTED'
+          | 'CREATION_FAILED'
+          | 'DELETING'
+      }[]
+    }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
@@ -6385,19 +6492,40 @@ export interface components {
       JWT_EXP: number
       MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: boolean
       MAILER_AUTOCONFIRM: boolean
+      MAILER_NOTIFICATIONS_EMAIL_CHANGED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_IDENTITY_LINKED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_IDENTITY_UNLINKED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_MFA_FACTOR_ENROLLED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_MFA_FACTOR_UNENROLLED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_PASSWORD_CHANGED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_PHONE_CHANGED_ENABLED: boolean
       MAILER_OTP_EXP: number
       MAILER_OTP_LENGTH: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       MAILER_SUBJECTS_CONFIRMATION: string
       MAILER_SUBJECTS_EMAIL_CHANGE: string
+      MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: string
+      MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: string
+      MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: string
       MAILER_SUBJECTS_INVITE: string
       MAILER_SUBJECTS_MAGIC_LINK: string
+      MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: string
+      MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: string
+      MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: string
+      MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: string
       MAILER_SUBJECTS_REAUTHENTICATION: string
       MAILER_SUBJECTS_RECOVERY: string
       MAILER_TEMPLATES_CONFIRMATION_CONTENT: string
       MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string
+      MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_IDENTITY_UNLINKED_NOTIFICATION_CONTENT: string
       MAILER_TEMPLATES_INVITE_CONTENT: string
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
+      MAILER_TEMPLATES_MFA_FACTOR_ENROLLED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_MFA_FACTOR_UNENROLLED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_PHONE_CHANGED_NOTIFICATION_CONTENT: string
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
       MFA_ALLOW_LOW_AAL: boolean
@@ -7034,6 +7162,69 @@ export interface components {
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       slug: string
       usage_billing_enabled: boolean
+    }
+    OrgDailyUsageResponse: {
+      usages: {
+        breakdown: {
+          egress_function: number
+          egress_graphql: number
+          egress_logdrain: number
+          egress_realtime: number
+          egress_rest: number
+          egress_storage: number
+          egress_supavisor: number
+        } | null
+        date: string
+        /** @enum {string} */
+        metric:
+          | 'EGRESS'
+          | 'CACHED_EGRESS'
+          | 'DATABASE_SIZE'
+          | 'STORAGE_SIZE'
+          | 'MONTHLY_ACTIVE_USERS'
+          | 'MONTHLY_ACTIVE_SSO_USERS'
+          | 'FUNCTION_INVOCATIONS'
+          | 'FUNCTION_CPU_MILLISECONDS'
+          | 'STORAGE_IMAGES_TRANSFORMED'
+          | 'REALTIME_MESSAGE_COUNT'
+          | 'REALTIME_PEAK_CONNECTIONS'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'AUTH_MFA_PHONE'
+          | 'AUTH_MFA_WEB_AUTHN'
+          | 'LOG_DRAIN_EVENTS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
+          | 'COMPUTE_HOURS_BRANCH'
+          | 'COMPUTE_HOURS_XS'
+          | 'COMPUTE_HOURS_SM'
+          | 'COMPUTE_HOURS_MD'
+          | 'COMPUTE_HOURS_L'
+          | 'COMPUTE_HOURS_XL'
+          | 'COMPUTE_HOURS_2XL'
+          | 'COMPUTE_HOURS_4XL'
+          | 'COMPUTE_HOURS_8XL'
+          | 'COMPUTE_HOURS_12XL'
+          | 'COMPUTE_HOURS_16XL'
+          | 'COMPUTE_HOURS_24XL'
+          | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+          | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+          | 'COMPUTE_HOURS_48XL'
+          | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+          | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+          | 'CUSTOM_DOMAIN'
+          | 'PITR_7'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'IPV4'
+          | 'LOG_DRAIN'
+        usage: number
+        usage_original: number
+      }[]
     }
     OrgDocumentUrlResponse: {
       fileUrl: string
@@ -9187,19 +9378,40 @@ export interface components {
       JWT_EXP?: number | null
       MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS?: boolean | null
       MAILER_AUTOCONFIRM?: boolean | null
+      MAILER_NOTIFICATIONS_EMAIL_CHANGED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_IDENTITY_LINKED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_IDENTITY_UNLINKED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_MFA_FACTOR_ENROLLED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_MFA_FACTOR_UNENROLLED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_PASSWORD_CHANGED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_PHONE_CHANGED_ENABLED?: boolean | null
       MAILER_OTP_EXP?: number
       MAILER_OTP_LENGTH?: number | null
       MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean | null
       MAILER_SUBJECTS_CONFIRMATION?: string | null
       MAILER_SUBJECTS_EMAIL_CHANGE?: string | null
+      MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION?: string | null
       MAILER_SUBJECTS_INVITE?: string | null
       MAILER_SUBJECTS_MAGIC_LINK?: string | null
+      MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION?: string | null
       MAILER_SUBJECTS_REAUTHENTICATION?: string | null
       MAILER_SUBJECTS_RECOVERY?: string | null
       MAILER_TEMPLATES_CONFIRMATION_CONTENT?: string | null
       MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT?: string | null
+      MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_IDENTITY_UNLINKED_NOTIFICATION_CONTENT?: string | null
       MAILER_TEMPLATES_INVITE_CONTENT?: string | null
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string | null
+      MAILER_TEMPLATES_MFA_FACTOR_ENROLLED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_MFA_FACTOR_UNENROLLED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_PHONE_CHANGED_NOTIFICATION_CONTENT?: string | null
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string | null
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string | null
       MFA_ALLOW_LOW_AAL?: boolean | null
@@ -10320,6 +10532,13 @@ export interface operations {
           | 'magic-link'
           | 'recovery'
           | 'reauthentication'
+          | 'password-changed-notification'
+          | 'email-changed-notification'
+          | 'phone-changed-notification'
+          | 'mfa-factor-enrolled-notification'
+          | 'mfa-factor-unenrolled-notification'
+          | 'identity-linked-notification'
+          | 'identity-unlinked-notification'
       }
       cookie?: never
     }
@@ -15405,6 +15624,61 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OrgUsageResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get usage stats */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgUsageController_getDailyOrgUsage: {
+    parameters: {
+      query?: {
+        apikey?: string
+        end?: string
+        project_ref?: string
+        start?: string
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrgDailyUsageResponse']
         }
       }
       /** @description Unauthorized */
@@ -21484,7 +21758,6 @@ export interface operations {
           | 'total_func_invocations'
           | 'total_func_cpu_time_ms'
         endDate: string
-        interval?: string
         startDate: string
       }
       header?: never
@@ -22465,6 +22738,173 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectPrivateLinkController_getPrivateLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetPrivateLinkResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve AWS accounts from privateLink middleware */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectPrivateLinkController_addAwsAccountToPrivateLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddAwsAccountToPrivateLinkBody']
+      }
+    }
+    responses: {
+      /** @description Scheduled AWS PrivateLink resources to be created. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description AWS PrivateLink is not available for the current billing plan. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to add AWS account to PrivateLink share */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectPrivateLinkController_removeAwsAccountFromPrivateLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        aws_account_id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Scheduled AWS PrivateLink resources to be removed. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Invalid AWS account ID format or association does not have a valid status for deletion. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to remove AWS account from PrivateLink share */
+      500: {
         headers: {
           [name: string]: unknown
         }

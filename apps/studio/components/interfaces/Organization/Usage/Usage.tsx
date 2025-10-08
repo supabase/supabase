@@ -24,6 +24,7 @@ import Compute from './Compute'
 import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
+import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 
 // [Joshen] JFYI this component could use nuqs to handle `projectRef` state which will help
 // simplify some of the implementation here.
@@ -111,6 +112,16 @@ export const Usage = () => {
     // [Joshen] Since we're already looking at isSuccess
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectRef, isSuccessProjectDetail])
+
+  const { data: orgDailyStats, isLoading: isLoadingOrgDailyStats } = useOrgDailyStatsQuery(
+    {
+      orgSlug: slug,
+      projectRef,
+      startDate,
+      endDate,
+    },
+    { enabled: slug !== undefined }
+  )
 
   return (
     <>
@@ -281,32 +292,26 @@ export const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
-      {subscription?.plan.id !== 'free' && (
-        <Compute
-          orgSlug={slug as string}
-          projectRef={selectedProjectRef}
-          subscription={subscription}
-          startDate={startDate}
-          endDate={endDate}
-        />
+      {subscription?.plan.id !== 'freea' && (
+        <Compute orgDailyStats={orgDailyStats} isLoadingOrgDailyStats={isLoadingOrgDailyStats} />
       )}
 
       <Egress
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
 
       <SizeAndCounts
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
 
       <Activity
@@ -316,6 +321,8 @@ export const Usage = () => {
         startDate={startDate}
         endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
     </>
   )
