@@ -4,6 +4,9 @@ import dayjs from 'dayjs'
 import { ScaffoldSectionTitle, ScaffoldSection } from 'components/layouts/Scaffold'
 import { Card, Skeleton } from 'ui'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { DATABASE_CONNECTIONS_CHART } from './OverviewMonitoring.constants'
 
 const MonitoringMetric = ({
   title,
@@ -31,6 +34,13 @@ const MonitoringMetric = ({
 export const OverviewMonitoring = () => {
   const { ref: projectRef } = useParams()
 
+  const endDate = dayjs().toISOString()
+  const startDate = dayjs().subtract(24, 'hour').toISOString()
+
+  const updateDateRange = (from: string, to: string) => {
+    console.log('Date range update:', from, to)
+  }
+
   return (
     <ScaffoldSection isFullWidth>
       <div className="flex items-center justify-between mb-4">
@@ -50,7 +60,15 @@ export const OverviewMonitoring = () => {
         <Card className="h-36" />
         <Card className="aspect-video" />
         <Card className="aspect-video" />
-        <Card className="aspect-video" />
+        <LazyComposedChartHandler
+          {...DATABASE_CONNECTIONS_CHART}
+          attributes={DATABASE_CONNECTIONS_CHART.attributes as MultiAttribute[]}
+          interval="1h"
+          defaultChartStyle="line"
+          startDate={startDate}
+          endDate={endDate}
+          updateDateRange={updateDateRange}
+        />
         <Card className="aspect-video" />
       </div>
     </ScaffoldSection>
