@@ -11,7 +11,6 @@ import type {
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { Badge, Button, cn } from 'ui'
@@ -236,10 +235,7 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
 
 const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ connection, type, ...props }, ref) => {
-    const { data } = useProjectsQuery()
-    const project = (data?.projects ?? []).find(
-      (project) => project.ref === connection.supabase_project_ref
-    )
+    const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
 
     return (
       <li
