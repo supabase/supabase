@@ -38,6 +38,30 @@ interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
 }
 
+const calculateTimeConsumedWidth = (data: any[]) => {
+  if (!data || data.length === 0) return 150 // fallback
+
+  let maxWidth = 150 // minimum width
+
+  data.forEach((row) => {
+    const percentage = row.prop_total_time || 0
+    const totalTime = row.total_time || 0
+
+    if (percentage && totalTime) {
+      // Estimate width based on content
+      const percentageText = `${percentage.toFixed(1)}%`
+      const durationText = formatDuration(totalTime)
+      const fullText = `${percentageText} / ${durationText}`
+
+      // Rough estimation: ~8px per character + padding
+      const estimatedWidth = fullText.length * 8 + 40 // 40px for padding/margins
+      maxWidth = Math.max(maxWidth, estimatedWidth)
+    }
+  })
+
+  return Math.min(maxWidth, 300) // cap at reasonable maximum
+}
+
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
@@ -57,7 +81,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       name: col.name,
       cellClass: `column-${col.id}`,
       resizable: true,
-      minWidth: col.minWidth ?? 120,
+      minWidth:
+        col.id === 'prop_total_time' ? calculateTimeConsumedWidth(data ?? []) : col.minWidth ?? 120,
       sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {
