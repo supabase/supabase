@@ -6,11 +6,12 @@ import {
   ExecuteSqlOptions,
   GetLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
+import { ResponseError } from 'types'
+import { generateTypescriptTypes } from './generate-types'
+import { getLogQuery, retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
-import { generateTypescriptTypes } from './generate-types'
-import { ResponseError } from 'types'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -92,8 +93,24 @@ export function getDebuggingOperations({
   headers,
 }: GetDebuggingOperationsOptions): DebuggingOperations {
   return {
-    async getLogs(_projectRef, options) {
-      throw new Error('Function not implemented.')
+    async getLogs(projectRef: string, options: GetLogsOptions) {
+      const sql = getLogQuery(options.service)
+
+      const { data, error } = await retrieveAnalyticsData({
+        name: 'logs.all',
+        projectRef,
+        params: {
+          sql,
+          iso_timestamp_start: options.iso_timestamp_start,
+          iso_timestamp_end: options.iso_timestamp_end,
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      return data
     },
     async getSecurityAdvisors(_projectRef) {
       throw new Error('Function not implemented.')
