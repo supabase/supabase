@@ -38,7 +38,7 @@ const Enterprise: NextPage = () => (
         {...content.heroSection}
         className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
         sectionContainerClassName="lg:gap-4"
-        footer={<AIBuildersLogos className="mt-8 lg:max-w-xs xl:max-w-none" />}
+        footer={<AIBuildersLogos className=" lg:max-w-xs xl:max-w-none" />}
         footerPosition="left"
       />
       <Quotes {...content.quotes} />

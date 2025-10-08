@@ -1,23 +1,25 @@
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import {
+  type CustomDomainsData,
+  useCustomDomainsQuery,
+} from 'data/custom-domains/custom-domains-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainDelete from './CustomDomainDelete'
 import CustomDomainVerify from './CustomDomainVerify'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
 
-const CustomDomainConfig = () => {
+export const CustomDomainConfig = () => {
   const { ref } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
@@ -27,10 +29,11 @@ const CustomDomainConfig = () => {
   const hasCustomDomainAddon = !!addons?.selected_addons.find((x) => x.type === 'custom_domain')
 
   const {
+    data: customDomainData,
     isLoading: isCustomDomainsLoading,
     isError,
     isSuccess,
-    data,
+    status: customDomainStatus,
   } = useCustomDomainsQuery(
     { projectRef: ref },
     {
@@ -44,6 +47,8 @@ const CustomDomainConfig = () => {
       },
     }
   )
+
+  const { status } = customDomainData || {}
 
   return (
     <section id="custom-domains">
@@ -94,26 +99,32 @@ const CustomDomainConfig = () => {
             </div>
           </Panel.Content>
         </Panel>
-      ) : data?.status === '0_no_hostname_configured' ? (
+      ) : status === '0_no_hostname_configured' ? (
         <CustomDomainsConfigureHostname />
       ) : (
         <Panel>
-          {isSuccess && (
+          {isSuccess ? (
             <div className="flex flex-col">
-              {(data.status === '1_not_started' ||
-                data.status === '2_initiated' ||
-                data.status === '3_challenge_verified') && (
-                <CustomDomainVerify customDomain={data.customDomain} />
+              {(status === '1_not_started' ||
+                status === '2_initiated' ||
+                status === '3_challenge_verified') && <CustomDomainVerify />}
+
+              {customDomainData.status === '4_origin_setup_completed' && (
+                <CustomDomainActivate
+                  projectRef={ref}
+                  customDomain={customDomainData.customDomain}
+                />
               )}
 
-              {data.status === '4_origin_setup_completed' && (
-                <CustomDomainActivate projectRef={ref} customDomain={data.customDomain} />
-              )}
-
-              {data.status === '5_services_reconfigured' && (
-                <CustomDomainDelete projectRef={ref} customDomain={data.customDomain} />
+              {customDomainData.status === '5_services_reconfigured' && (
+                <CustomDomainDelete projectRef={ref} customDomain={customDomainData.customDomain} />
               )}
             </div>
+          ) : (
+            <CustomDomainConfigFallthrough
+              fetchStatus={customDomainStatus}
+              data={customDomainData}
+            />
           )}
         </Panel>
       )}
@@ -121,4 +132,15 @@ const CustomDomainConfig = () => {
   )
 }
 
-export default CustomDomainConfig
+interface CustomDomainConfigFallthroughProps {
+  fetchStatus: 'error' | 'success' | 'loading'
+  data: CustomDomainsData | undefined
+}
+
+function CustomDomainConfigFallthrough({ fetchStatus, data }: CustomDomainConfigFallthroughProps) {
+  console.error(`Failing to display UI for custom domains:
+Fetch status: ${fetchStatus}
+Custom domain status: ${data?.status}`)
+
+  return null
+}

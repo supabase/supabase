@@ -1,15 +1,24 @@
 import { useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { ArrowDown, ArrowUp, Loader2, RefreshCw, Search, Trash, Users, X } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  HelpCircle,
+  Loader2,
+  RefreshCw,
+  Search,
+  Trash,
+  Users,
+  X,
+} from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import APIDocsButton from 'components/ui/APIDocsButton'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -17,7 +26,11 @@ import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { THRESHOLD_COUNT } from 'data/table-rows/table-rows-count-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   Button,
   cn,
@@ -38,11 +51,14 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import AddUserDropdown from './AddUserDropdown'
+import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserPanel } from './UserPanel'
 import {
@@ -51,7 +67,7 @@ import {
   PROVIDER_FILTER_OPTIONS,
   USERS_TABLE_COLUMNS,
 } from './Users.constants'
-import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
+import { formatUserColumns, formatUsersData } from './Users.utils'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
@@ -60,10 +76,34 @@ export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+
+  const {
+    authenticationShowProviderFilter: showProviderFilter,
+    authenticationShowSortByEmail: showSortByEmail,
+    authenticationShowSortByPhone: showSortByPhone,
+    authenticationShowUserTypeFilter: showUserTypeFilter,
+    authenticationShowEmailPhoneColumns: showEmailPhoneColumns,
+  } = useIsFeatureEnabled([
+    'authentication:show_provider_filter',
+    'authentication:show_sort_by_email',
+    'authentication:show_sort_by_phone',
+    'authentication:show_user_type_filter',
+    'authentication:show_email_phone_columns',
+  ])
+
+  const userTableColumns = useMemo(() => {
+    if (showEmailPhoneColumns) return USERS_TABLE_COLUMNS
+    else {
+      return USERS_TABLE_COLUMNS.filter((col) => {
+        if (col.id === 'email' || col.id === 'phone') return false
+        return true
+      })
+    }
+  }, [showEmailPhoneColumns])
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
@@ -78,6 +118,9 @@ export const UsersV2 = () => {
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
+
+  const [forceExactCount, setForceExactCount] = useState(false)
+  const [showFetchExactCountModal, setShowFetchExactCountModal] = useState(false)
 
   const [
     columnConfiguration,
@@ -119,20 +162,31 @@ export const UsersV2 = () => {
     }
   )
 
-  const { data: countData, refetch: refetchCount } = useUsersCountQuery({
+  const {
+    data: countData,
+    refetch: refetchCount,
+    isLoading: isLoadingCount,
+  } = useUsersCountQuery({
     projectRef,
     connectionString: project?.connectionString,
     keywords: filterKeywords,
     filter: filter === 'all' ? undefined : filter,
     providers: selectedProviders,
+    forceExactCount,
   })
 
   const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
-  const totalUsers = countData ?? 0
+  const totalUsers = countData?.count ?? 0
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
+
+  const formatEstimatedCount = (count: number) => {
+    if (count >= 1e6) return `${(count / 1e6).toFixed(1)}M`
+    if (count >= 1e3) return `${(count / 1e3).toFixed(1)}K`
+    return count.toString()
+  }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
@@ -223,6 +277,7 @@ export const UsersV2 = () => {
         (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
     ) {
       const columns = formatUserColumns({
+        columns: userTableColumns,
         config: columnConfiguration ?? [],
         users: users ?? [],
         visibleColumns: selectedColumns,
@@ -230,7 +285,7 @@ export const UsersV2 = () => {
         onSelectDeleteUser: setSelectedUserToDelete,
       })
       setColumns(columns)
-      if (columns.length < USERS_TABLE_COLUMNS.length) {
+      if (columns.length < userTableColumns.length) {
         setSelectedColumns(columns.filter((col) => col.key !== 'img').map((col) => col.key))
       }
     }
@@ -275,7 +330,7 @@ export const UsersV2 = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.code === 'Enter') {
+                    if (e.code === 'Enter' || e.code === 'NumpadEnter') {
                       setSearch(search.trim())
                       setFilterKeywords(search.trim().toLocaleLowerCase())
                     }
@@ -293,42 +348,50 @@ export const UsersV2 = () => {
                   ]}
                 />
 
-                <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-                  <SelectTrigger_Shadcn_
-                    size="tiny"
-                    className={cn('w-[140px] !bg-transparent', filter === 'all' && 'border-dashed')}
-                  >
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectGroup_Shadcn_>
-                      <SelectItem_Shadcn_ value="all" className="text-xs">
-                        All users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="verified" className="text-xs">
-                        Verified users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="unverified" className="text-xs">
-                        Unverified users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="anonymous" className="text-xs">
-                        Anonymous users
-                      </SelectItem_Shadcn_>
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                {showUserTypeFilter && (
+                  <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
+                    <SelectTrigger_Shadcn_
+                      size="tiny"
+                      className={cn(
+                        'w-[140px] !bg-transparent',
+                        filter === 'all' && 'border-dashed'
+                      )}
+                    >
+                      <SelectValue_Shadcn_ />
+                    </SelectTrigger_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      <SelectGroup_Shadcn_>
+                        <SelectItem_Shadcn_ value="all" className="text-xs">
+                          All users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="verified" className="text-xs">
+                          Verified users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                          Unverified users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                          Anonymous users
+                        </SelectItem_Shadcn_>
+                      </SelectGroup_Shadcn_>
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                )}
 
-                <FilterPopover
-                  name="Provider"
-                  options={PROVIDER_FILTER_OPTIONS}
-                  labelKey="name"
-                  valueKey="value"
-                  iconKey="icon"
-                  activeOptions={selectedProviders}
-                  labelClass="text-xs"
-                  maxHeightClass="h-[190px]"
-                  onSaveFilters={setSelectedProviders}
-                />
+                {showProviderFilter && (
+                  <FilterPopover
+                    name="Provider"
+                    options={PROVIDER_FILTER_OPTIONS}
+                    labelKey="name"
+                    valueKey="value"
+                    iconKey="icon"
+                    activeOptions={selectedProviders}
+                    labelClass="text-xs"
+                    maxHeightClass="h-[190px]"
+                    className="w-52"
+                    onSaveFilters={setSelectedProviders}
+                  />
+                )}
 
                 <div className="border-r border-strong h-6" />
 
@@ -336,7 +399,7 @@ export const UsersV2 = () => {
                   name={selectedColumns.length === 0 ? 'All columns' : 'Columns'}
                   title="Select columns to show"
                   buttonType={selectedColumns.length === 0 ? 'dashed' : 'default'}
-                  options={USERS_TABLE_COLUMNS.slice(1)} // Ignore user image column
+                  options={userTableColumns.slice(1)} // Ignore user image column
                   labelKey="name"
                   valueKey="id"
                   labelClass="text-xs"
@@ -351,19 +414,20 @@ export const UsersV2 = () => {
 
                     let updatedConfig = (columnConfiguration ?? []).slice()
                     if (value.length === 0) {
-                      updatedConfig = USERS_TABLE_COLUMNS.map((c) => ({ id: c.id, width: c.width }))
+                      updatedConfig = userTableColumns.map((c) => ({ id: c.id, width: c.width }))
                     } else {
                       value.forEach((col) => {
                         const hasExisting = updatedConfig.find((c) => c.id === col)
                         if (!hasExisting)
                           updatedConfig.push({
                             id: col,
-                            width: USERS_TABLE_COLUMNS.find((c) => c.id === col)?.width,
+                            width: userTableColumns.find((c) => c.id === col)?.width,
                           })
                       })
                     }
 
                     const updatedColumns = formatUserColumns({
+                      columns: userTableColumns,
                       config: updatedConfig,
                       users: users ?? [],
                       visibleColumns: value,
@@ -407,24 +471,32 @@ export const UsersV2 = () => {
                           </DropdownMenuRadioItem>
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="email:asc">Ascending</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="email:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="phone:asc">Ascending</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="phone:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
+                      {showSortByEmail && (
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuRadioItem value="email:asc">
+                              Ascending
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="email:desc">
+                              Descending
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                      )}
+                      {showSortByPhone && (
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuRadioItem value="phone:asc">
+                              Ascending
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="phone:desc">
+                              Descending
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                      )}
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -546,7 +618,43 @@ export const UsersV2 = () => {
         </ResizablePanelGroup>
 
         <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
-          {isLoading || isRefetching ? 'Loading users...' : `Total: ${totalUsers} users`}
+          <div className="flex items-center gap-x-2">
+            {isLoadingCount ? (
+              'Loading user count...'
+            ) : (
+              <>
+                <span>
+                  Total:{' '}
+                  {countData?.is_estimate
+                    ? formatEstimatedCount(totalUsers)
+                    : totalUsers.toLocaleString()}{' '}
+                  user{totalUsers !== 1 ? 's' : ''}
+                  {countData?.is_estimate && ' (estimated)'}
+                </span>
+                {countData?.is_estimate && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="tiny"
+                        type="text"
+                        className="px-1.5"
+                        icon={<HelpCircle />}
+                        onClick={() => {
+                          setShowFetchExactCountModal(true)
+                        }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="w-72">
+                      This is an estimated value as your project has more than{' '}
+                      {THRESHOLD_COUNT.toLocaleString()} users.
+                      <br />
+                      <span className="text-brand">Click to retrieve the exact count.</span>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </>
+            )}
+          </div>
           {(isLoading || isRefetching || isFetchingNextPage) && (
             <span className="flex items-center gap-2">
               <Loader2 size={14} className="animate-spin" /> Loading...
@@ -586,12 +694,33 @@ export const UsersV2 = () => {
       <DeleteUserModal
         visible={!!selectedUserToDelete}
         selectedUser={selectedUserToDelete}
-        onClose={() => setSelectedUserToDelete(undefined)}
+        onClose={() => {
+          setSelectedUserToDelete(undefined)
+          cleanPointerEventsNoneOnBody()
+        }}
         onDeleteSuccess={() => {
           if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
           setSelectedUserToDelete(undefined)
+          cleanPointerEventsNoneOnBody(500)
         }}
       />
+
+      <ConfirmationModal
+        variant="warning"
+        visible={showFetchExactCountModal}
+        title="Fetch exact user count"
+        confirmLabel="Fetch exact count"
+        onCancel={() => setShowFetchExactCountModal(false)}
+        onConfirm={() => {
+          setForceExactCount(true)
+          setShowFetchExactCountModal(false)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Your project has more than {THRESHOLD_COUNT.toLocaleString()} users, and fetching the
+          exact count may cause performance issues on your database.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }

@@ -2,16 +2,23 @@ import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { VIOLATION_TYPE_LABELS } from 'data/usage/constants'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { VIOLATION_TYPE_LABELS } from 'data/usage/constants'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { usePathname } from 'next/navigation'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  CriticalIcon,
+  WarningIcon,
+} from 'ui'
 
 export const Restriction = () => {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess: isSuccessOrgUsage } = useOrgUsageQuery({ orgSlug: org?.slug })
 
   const pathname = usePathname()
@@ -88,9 +95,7 @@ export const Restriction = () => {
                 </Button>
               )}
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/cost-control#spend-cap">
-                  About spend cap
-                </a>
+                <a href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}>About spend cap</a>
               </Button>
             </div>
           </AlertDescription_Shadcn_>
@@ -133,7 +138,7 @@ export const Restriction = () => {
               )}
 
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>
@@ -173,7 +178,7 @@ export const Restriction = () => {
                 </Button>
               )}
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>
@@ -211,7 +216,7 @@ export const Restriction = () => {
                 </Button>
               )}
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>

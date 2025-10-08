@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+
+    "app:title": {
+      "type": ["string", "null"],
+      "description": "Render a custom HTML title for the site"
+    },
+
+    "dashboard_auth:custom_provider": {
+      "type": ["string", "null"],
+      "description": "Show a custom provider on the sign in page (Continue with X)"
+    },
+
+    "organization:legal_documents": {
+      "type": ["array", "null"],
+      "description": "Renders a provided set of documents under the organization legal documents page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "action": {
+            "type": "object",
+            "properties": {
+              "text": { "type": "string" },
+              "url": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "project_homepage:client_libraries": {
+      "type": "array",
+      "description": "Renders a provided set of client libraries under the project's home page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "language": { "type": "string" },
+          "officialSupport": { "type": "boolean" },
+          "releaseState": { "type": "string" },
+          "docsUrl": { "type": "string" },
+          "gitUrl": { "type": "string" },
+          "altIconName": { "type": "string" }
+        },
+        "required": ["language", "officialSupport", "docsUrl"]
+      }
+    },
+    "project_homepage:example_projects": {
+      "type": ["array", "null"],
+      "description": "Renders a provided set of example projects under the project's home page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "iconUrl": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+
+    "logs:default_query": {
+      "type": ["string", "null"],
+      "description": "Renders a default query when landing on the logs explorer"
+    },
+
+    "infra:cloud_providers": {
+      "type": ["array"],
+      "description": "Filters the valid cloud providers",
+      "items": {
+        "type": "string",
+        "enum": ["AWS", "AWS_K8S", "AWS_NIMBUS", "FLY"]
+      }
+    },
+    "infra:aws_nimbus_label": {
+      "type": "string",
+      "description": "The label of the AWS Nimbus provider"
+    },
+
+    "ssl:certificate_url": {
+      "type": "string",
+      "description": "The URL of the SSL certificate"
+    }
+  },
+  "required": [
+    "app:title",
+    "organization:legal_documents",
+    "project_homepage:client_libraries",
+    "project_homepage:example_projects",
+    "logs:default_query",
+    "infra:cloud_providers",
+    "infra:aws_nimbus_label",
+    "ssl:certificate_url"
+  ],
+  "additionalProperties": false
+}

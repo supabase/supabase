@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
 
 import { useParams } from 'common'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -44,6 +45,10 @@ const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef: ref },
+    { enabled: snap.showProjectApiDocs }
+  )
   const { data: settings } = useProjectSettingsV2Query(
     { projectRef: ref },
     { enabled: snap.showProjectApiDocs }
@@ -53,7 +58,7 @@ const ProjectAPIDocs = () => {
     { enabled: snap.showProjectApiDocs }
   )
 
-  const { anonKey } = getAPIKeys(settings)
+  const { anonKey } = getKeys(apiKeys)
   const apikey = showKeys
     ? anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY'
     : 'SUPABASE_CLIENT_ANON_KEY'

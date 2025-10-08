@@ -15,14 +15,13 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
-import { jwtAPIKey, apiKey, role as extractRole } from './Logs.utils'
+import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
 
 export interface LogSelectionProps {
   log?: LogData
   onClose: () => void
   queryType?: QueryType
   projectRef: string
-  collectionName?: string
   isLoading: boolean
   error?: string | object
 }
@@ -41,8 +40,6 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
     if (!log) return <LogDetailEmptyState />
 
     switch (queryType) {
-      // case 'warehouse':
-      //   return <WarehouseSelectionRenderer log={log} />
       case 'api':
         const status = log?.metadata?.[0]?.response?.[0]?.status_code
         const method = log?.metadata?.[0]?.request?.[0]?.method
@@ -100,6 +97,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
               Raw
             </TabsTrigger_Shadcn_>
+
             <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
               <ButtonTooltip
                 disabled={!log || isLoading}

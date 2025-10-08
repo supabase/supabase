@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   comment_on_pr:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure'
     steps:
       - id: download_artifact

@@ -90,7 +90,9 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 
-            {content && <MDXRemoteBase source={content} options={mdxOptions} />}
+            {content && (
+              <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />
+            )}
             {children}
 
             <footer className="mt-16 not-prose">

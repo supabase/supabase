@@ -2,17 +2,18 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { getIndexAdvisorExtensions } from './index-advisor.utils'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Markdown } from '../Markdown'
+import { getIndexAdvisorExtensions } from './index-advisor.utils'
 
 export const IndexAdvisorDisabledState = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -88,7 +89,7 @@ export const IndexAdvisorDisabledState = () => {
               Enable extensions
             </Button>
           )}
-          <DocsButton href="https://supabase.com/docs/guides/database/extensions/index_advisor" />
+          <DocsButton href={`${DOCS_URL}/guides/database/extensions/index_advisor`} />
         </div>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>

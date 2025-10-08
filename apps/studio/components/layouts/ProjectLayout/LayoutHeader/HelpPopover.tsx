@@ -6,7 +6,9 @@ import SVG from 'react-inlinesvg'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -18,12 +20,11 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { useProjectContext } from '../ProjectContext'
 
 export const HelpPopover = () => {
   const router = useRouter()
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -99,7 +100,7 @@ export const HelpPopover = () => {
             )}
             <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
               <a
-                href="https://supabase.com/docs/guides/platform/troubleshooting"
+                href={`${DOCS_URL}/guides/platform/troubleshooting`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -107,7 +108,7 @@ export const HelpPopover = () => {
               </a>
             </ButtonGroupItem>
             <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
-              <a href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
+              <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
                 Docs
               </a>
             </ButtonGroupItem>
@@ -124,7 +125,7 @@ export const HelpPopover = () => {
         <Popover.Separator />
         <div className="mb-4 space-y-2">
           <div className="mb-4 px-5">
-            <h5 className={'mb-2'}>Reach out to the community</h5>
+            <h5 className="mb-2">Reach out to the community</h5>
 
             <p className="text-sm text-foreground-lighter">
               For other support, including questions on our client libraries, advice, or best

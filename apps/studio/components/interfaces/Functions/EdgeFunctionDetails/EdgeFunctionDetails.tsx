@@ -12,12 +12,15 @@ import z from 'zod'
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -58,8 +61,20 @@ export const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const { can: canUpdateEdgeFunction } = useAsyncCheckPermissions(
+    PermissionAction.FUNCTIONS_WRITE,
+    '*'
+  )
 
+  const showAllEdgeFunctionInvocationExamples = useIsFeatureEnabled(
+    'edge_functions:show_all_edge_function_invocation_examples'
+  )
+  const invocationTabs = useMemo(() => {
+    if (showAllEdgeFunctionInvocationExamples) return INVOCATION_TABS
+    return INVOCATION_TABS.filter((tab) => tab.id === 'curl' || tab.id === 'supabase-js')
+  }, [showAllEdgeFunctionInvocationExamples])
+
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const {
@@ -86,8 +101,8 @@ export const EdgeFunctionDetails = () => {
     defaultValues: { name: '', verify_jwt: false },
   })
 
-  const { anonKey } = getAPIKeys(settings)
-  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
+  const { anonKey, publishableKey } = getKeys(apiKeys)
+  const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''
@@ -222,13 +237,13 @@ export const EdgeFunctionDetails = () => {
             <CardContent>
               <Tabs defaultValue="curl" className="w-full">
                 <TabsList className="flex flex-wrap gap-4">
-                  {INVOCATION_TABS.map((tab) => (
+                  {invocationTabs.map((tab) => (
                     <TabsTrigger key={tab.id} value={tab.id}>
                       {tab.label}
                     </TabsTrigger>
                   ))}
                 </TabsList>
-                {INVOCATION_TABS.map((tab) => (
+                {invocationTabs.map((tab) => (
                   <TabsContent key={tab.id} value={tab.id} className="mt-4">
                     <div className="overflow-x-auto">
                       <CodeBlock
@@ -373,7 +388,7 @@ export const EdgeFunctionDetails = () => {
                         icon={<ExternalLink strokeWidth={1.5} />}
                       >
                         <Link
-                          href="https://supabase.com/docs/guides/functions/dependencies"
+                          href={`${DOCS_URL}/guides/functions/dependencies`}
                           target="_blank"
                           rel="noreferrer"
                         >

@@ -12,7 +12,8 @@ import {
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   InfoIcon,
@@ -74,7 +75,7 @@ const StatusIcon = ({
 
 export const ServiceStatus = () => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
 
   const {
@@ -213,7 +214,7 @@ export const ServiceStatus = () => {
           {
             name: 'Edge Functions',
             error: undefined,
-            docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
+            docsUrl: `${DOCS_URL}/guides/functions/troubleshooting`,
             isLoading,
             isHealthy: !!edgeFunctionsStatus?.healthy,
             status: edgeFunctionsStatus?.healthy

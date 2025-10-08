@@ -11,7 +11,8 @@ const MobileSheetNav: React.FC<{
   children: React.ReactNode
   open?: boolean
   onOpenChange(open: boolean): void
-}> = ({ children, open = false, onOpenChange }) => {
+  stickyBottom?: boolean
+}> = ({ children, open = false, onOpenChange, stickyBottom = false }) => {
   const router = useRouter()
   const { width } = useWindowSize()
 
@@ -31,8 +32,8 @@ const MobileSheetNav: React.FC<{
         size="full"
         side="bottom"
         className={cn(
-          'rounded-t-lg overflow-hidden overflow-y-scroll',
-          'h-[85dvh] md:max-h-[500px] py-2'
+          'rounded-t-lg overflow-hidden overflow-y-scroll h-[85dvh] md:max-h-[500px]',
+          stickyBottom ? 'pt-2 pb-0' : 'py-2'
         )}
       >
         <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>{children}</ErrorBoundary>

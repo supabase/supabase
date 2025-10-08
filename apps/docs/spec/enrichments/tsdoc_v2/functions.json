@@ -1,352 +1,360 @@
 {
   "id": 0,
   "name": "@supabase/functions-js",
+  "variant": "project",
   "kind": 1,
-  "kindString": "Project",
   "flags": {},
-  "originalName": "",
   "children": [
     {
-      "id": 67,
+      "id": 68,
       "name": "FunctionRegion",
+      "variant": "declaration",
       "kind": 8,
-      "kindString": "Enumeration",
       "flags": {},
       "children": [
         {
-          "id": 68,
+          "id": 69,
           "name": "Any",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 45,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 46,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L46"
             }
           ],
           "type": {
             "type": "literal",
             "value": "any"
-          },
-          "defaultValue": "\"any\""
+          }
         },
         {
-          "id": 69,
+          "id": 70,
           "name": "ApNortheast1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 46,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 47,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L47"
             }
           ],
           "type": {
             "type": "literal",
             "value": "ap-northeast-1"
-          },
-          "defaultValue": "\"ap-northeast-1\""
+          }
         },
         {
-          "id": 70,
+          "id": 71,
           "name": "ApNortheast2",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 47,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 48,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L48"
             }
           ],
           "type": {
             "type": "literal",
             "value": "ap-northeast-2"
-          },
-          "defaultValue": "\"ap-northeast-2\""
+          }
         },
         {
-          "id": 71,
+          "id": 72,
           "name": "ApSouth1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 48,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 49,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L49"
             }
           ],
           "type": {
             "type": "literal",
             "value": "ap-south-1"
-          },
-          "defaultValue": "\"ap-south-1\""
+          }
         },
         {
-          "id": 72,
+          "id": 73,
           "name": "ApSoutheast1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 49,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 50,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L50"
             }
           ],
           "type": {
             "type": "literal",
             "value": "ap-southeast-1"
-          },
-          "defaultValue": "\"ap-southeast-1\""
+          }
         },
         {
-          "id": 73,
+          "id": 74,
           "name": "ApSoutheast2",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 50,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 51,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L51"
             }
           ],
           "type": {
             "type": "literal",
             "value": "ap-southeast-2"
-          },
-          "defaultValue": "\"ap-southeast-2\""
+          }
         },
         {
-          "id": 74,
+          "id": 75,
           "name": "CaCentral1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 51,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 52,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L52"
             }
           ],
           "type": {
             "type": "literal",
             "value": "ca-central-1"
-          },
-          "defaultValue": "\"ca-central-1\""
+          }
         },
         {
-          "id": 75,
+          "id": 76,
           "name": "EuCentral1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 52,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 53,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L53"
             }
           ],
           "type": {
             "type": "literal",
             "value": "eu-central-1"
-          },
-          "defaultValue": "\"eu-central-1\""
+          }
         },
         {
-          "id": 76,
+          "id": 77,
           "name": "EuWest1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 53,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 54,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L54"
             }
           ],
           "type": {
             "type": "literal",
             "value": "eu-west-1"
-          },
-          "defaultValue": "\"eu-west-1\""
+          }
         },
         {
-          "id": 77,
+          "id": 78,
           "name": "EuWest2",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 54,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 55,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L55"
             }
           ],
           "type": {
             "type": "literal",
             "value": "eu-west-2"
-          },
-          "defaultValue": "\"eu-west-2\""
+          }
         },
         {
-          "id": 78,
+          "id": 79,
           "name": "EuWest3",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 55,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 56,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L56"
             }
           ],
           "type": {
             "type": "literal",
             "value": "eu-west-3"
-          },
-          "defaultValue": "\"eu-west-3\""
+          }
         },
         {
-          "id": 79,
+          "id": 80,
           "name": "SaEast1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 56,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 57,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L57"
             }
           ],
           "type": {
             "type": "literal",
             "value": "sa-east-1"
-          },
-          "defaultValue": "\"sa-east-1\""
+          }
         },
         {
-          "id": 80,
+          "id": 81,
           "name": "UsEast1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 57,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 58,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L58"
             }
           ],
           "type": {
             "type": "literal",
             "value": "us-east-1"
-          },
-          "defaultValue": "\"us-east-1\""
+          }
         },
         {
-          "id": 81,
+          "id": 82,
           "name": "UsWest1",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 58,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 59,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L59"
             }
           ],
           "type": {
             "type": "literal",
             "value": "us-west-1"
-          },
-          "defaultValue": "\"us-west-1\""
+          }
         },
         {
-          "id": 82,
+          "id": 83,
           "name": "UsWest2",
+          "variant": "declaration",
           "kind": 16,
-          "kindString": "Enumeration Member",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 59,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 60,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L60"
             }
           ],
           "type": {
             "type": "literal",
             "value": "us-west-2"
-          },
-          "defaultValue": "\"us-west-2\""
+          }
         }
       ],
       "groups": [
         {
           "title": "Enumeration Members",
-          "kind": 16,
-          "children": [68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82]
+          "children": [69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83]
         }
       ],
       "sources": [
         {
-          "fileName": "src/types.ts",
-          "line": 44,
-          "character": 12
+          "fileName": "packages/core/functions-js/src/types.ts",
+          "line": 45,
+          "character": 12,
+          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L45"
         }
       ]
     },
     {
       "id": 1,
       "name": "FunctionsClient",
+      "variant": "declaration",
       "kind": 128,
-      "kindString": "Class",
       "flags": {},
       "children": [
         {
           "id": 2,
           "name": "constructor",
+          "variant": "declaration",
           "kind": 512,
-          "kindString": "Constructor",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/FunctionsClient.ts",
+              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 18,
-              "character": 2
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L18"
             }
           ],
           "signatures": [
             {
               "id": 3,
-              "name": "new FunctionsClient",
+              "name": "FunctionsClient",
+              "variant": "signature",
               "kind": 16384,
-              "kindString": "Constructor signature",
               "flags": {},
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
+                  "line": 18,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L18"
+                }
+              ],
               "parameters": [
                 {
                   "id": 4,
                   "name": "url",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "intrinsic",
@@ -356,31 +364,32 @@
                 {
                   "id": 5,
                   "name": "__namedParameters",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reflection",
                     "declaration": {
                       "id": 6,
                       "name": "__type",
+                      "variant": "declaration",
                       "kind": 65536,
-                      "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
                           "id": 8,
                           "name": "customFetch",
+                          "variant": "declaration",
                           "kind": 1024,
-                          "kindString": "Property",
                           "flags": {
                             "isOptional": true
                           },
                           "sources": [
                             {
-                              "fileName": "src/FunctionsClient.ts",
+                              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
                               "line": 26,
-                              "character": 6
+                              "character": 6,
+                              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L26"
                             }
                           ],
                           "type": {
@@ -388,37 +397,70 @@
                             "declaration": {
                               "id": 9,
                               "name": "__type",
+                              "variant": "declaration",
                               "kind": 65536,
-                              "kindString": "Type literal",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "node_modules/typescript/lib/lib.dom.d.ts",
+                                  "line": 29329,
+                                  "character": 17
+                                },
+                                {
+                                  "fileName": "node_modules/@types/node/web-globals/fetch.d.ts",
+                                  "line": 16,
+                                  "character": 13
+                                }
+                              ],
                               "signatures": [
                                 {
                                   "id": 10,
                                   "name": "__type",
+                                  "variant": "signature",
                                   "kind": 4096,
-                                  "kindString": "Call signature",
                                   "flags": {},
+                                  "comment": {
+                                    "summary": [
+                                      {
+                                        "kind": "text",
+                                        "text": "[MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch)"
+                                      }
+                                    ]
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "node_modules/typescript/lib/lib.dom.d.ts",
+                                      "line": 29329,
+                                      "character": 17
+                                    }
+                                  ],
                                   "parameters": [
                                     {
                                       "id": 11,
                                       "name": "input",
+                                      "variant": "param",
                                       "kind": 32768,
-                                      "kindString": "Parameter",
                                       "flags": {},
                                       "type": {
                                         "type": "union",
                                         "types": [
                                           {
                                             "type": "reference",
-                                            "qualifiedName": "RequestInfo",
-                                            "package": "typescript",
-                                            "name": "RequestInfo"
+                                            "target": {
+                                              "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                                              "qualifiedName": "RequestInfo"
+                                            },
+                                            "name": "RequestInfo",
+                                            "package": "typescript"
                                           },
                                           {
                                             "type": "reference",
-                                            "qualifiedName": "URL",
-                                            "package": "typescript",
-                                            "name": "URL"
+                                            "target": {
+                                              "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                                              "qualifiedName": "URL"
+                                            },
+                                            "name": "URL",
+                                            "package": "typescript"
                                           }
                                         ]
                                       }
@@ -426,46 +468,70 @@
                                     {
                                       "id": 12,
                                       "name": "init",
+                                      "variant": "param",
                                       "kind": 32768,
-                                      "kindString": "Parameter",
                                       "flags": {
                                         "isOptional": true
                                       },
                                       "type": {
                                         "type": "reference",
-                                        "qualifiedName": "RequestInit",
-                                        "package": "typescript",
-                                        "name": "RequestInit"
+                                        "target": {
+                                          "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                                          "qualifiedName": "RequestInit"
+                                        },
+                                        "name": "RequestInit",
+                                        "package": "typescript"
                                       }
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
+                                    "target": {
+                                      "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                                      "qualifiedName": "Promise"
+                                    },
                                     "typeArguments": [
                                       {
                                         "type": "reference",
-                                        "qualifiedName": "Response",
-                                        "package": "typescript",
-                                        "name": "Response"
+                                        "target": {
+                                          "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                                          "qualifiedName": "Response"
+                                        },
+                                        "name": "Response",
+                                        "package": "typescript"
                                       }
                                     ],
-                                    "qualifiedName": "Promise",
-                                    "package": "typescript",
-                                    "name": "Promise"
+                                    "name": "Promise",
+                                    "package": "typescript"
                                   }
                                 },
                                 {
                                   "id": 13,
                                   "name": "__type",
+                                  "variant": "signature",
                                   "kind": 4096,
-                                  "kindString": "Call signature",
                                   "flags": {},
+                                  "comment": {
+                                    "summary": [
+                                      {
+                                        "kind": "text",
+                                        "text": "[MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch)"
+                                      }
+                                    ]
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "node_modules/@types/node/web-globals/fetch.d.ts",
+                                      "line": 16,
+                                      "character": 13
+                                    }
+                                  ],
                                   "parameters": [
                                     {
                                       "id": 14,
                                       "name": "input",
+                                      "variant": "param",
                                       "kind": 32768,
-                                      "kindString": "Parameter",
                                       "flags": {},
                                       "type": {
                                         "type": "union",
@@ -476,15 +542,21 @@
                                           },
                                           {
                                             "type": "reference",
-                                            "qualifiedName": "Request",
-                                            "package": "typescript",
-                                            "name": "Request"
+                                            "target": {
+                                              "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                                              "qualifiedName": "Request"
+                                            },
+                                            "name": "Request",
+                                            "package": "typescript"
                                           },
                                           {
                                             "type": "reference",
-                                            "qualifiedName": "URL",
-                                            "package": "typescript",
-                                            "name": "URL"
+                                            "target": {
+                                              "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                                              "qualifiedName": "URL"
+                                            },
+                                            "name": "URL",
+                                            "package": "typescript"
                                           }
                                         ]
                                       }
@@ -492,32 +564,41 @@
                                     {
                                       "id": 15,
                                       "name": "init",
+                                      "variant": "param",
                                       "kind": 32768,
-                                      "kindString": "Parameter",
                                       "flags": {
                                         "isOptional": true
                                       },
                                       "type": {
                                         "type": "reference",
-                                        "qualifiedName": "RequestInit",
-                                        "package": "typescript",
-                                        "name": "RequestInit"
+                                        "target": {
+                                          "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                                          "qualifiedName": "RequestInit"
+                                        },
+                                        "name": "RequestInit",
+                                        "package": "typescript"
                                       }
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
+                                    "target": {
+                                      "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                                      "qualifiedName": "Promise"
+                                    },
                                     "typeArguments": [
                                       {
                                         "type": "reference",
-                                        "qualifiedName": "Response",
-                                        "package": "typescript",
-                                        "name": "Response"
+                                        "target": {
+                                          "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                                          "qualifiedName": "Response"
+                                        },
+                                        "name": "Response",
+                                        "package": "typescript"
                                       }
                                     ],
-                                    "qualifiedName": "Promise",
-                                    "package": "typescript",
-                                    "name": "Promise"
+                                    "name": "Promise",
+                                    "package": "typescript"
                                   }
                                 }
                               ]
@@ -527,20 +608,25 @@
                         {
                           "id": 7,
                           "name": "headers",
+                          "variant": "declaration",
                           "kind": 1024,
-                          "kindString": "Property",
                           "flags": {
                             "isOptional": true
                           },
                           "sources": [
                             {
-                              "fileName": "src/FunctionsClient.ts",
+                              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
                               "line": 25,
-                              "character": 6
+                              "character": 6,
+                              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L25"
                             }
                           ],
                           "type": {
                             "type": "reference",
+                            "target": {
+                              "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                              "qualifiedName": "Record"
+                            },
                             "typeArguments": [
                               {
                                 "type": "intrinsic",
@@ -551,38 +637,48 @@
                                 "name": "string"
                               }
                             ],
-                            "qualifiedName": "Record",
-                            "package": "typescript",
-                            "name": "Record"
-                          }
+                            "name": "Record",
+                            "package": "typescript"
+                          },
+                          "defaultValue": "{}"
                         },
                         {
                           "id": 16,
                           "name": "region",
+                          "variant": "declaration",
                           "kind": 1024,
-                          "kindString": "Property",
                           "flags": {
                             "isOptional": true
                           },
                           "sources": [
                             {
-                              "fileName": "src/FunctionsClient.ts",
+                              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
                               "line": 27,
-                              "character": 6
+                              "character": 6,
+                              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L27"
                             }
                           ],
                           "type": {
                             "type": "reference",
-                            "id": 67,
-                            "name": "FunctionRegion"
-                          }
+                            "target": 68,
+                            "name": "FunctionRegion",
+                            "package": "@supabase/functions-js"
+                          },
+                          "defaultValue": "FunctionRegion.Any"
                         }
                       ],
                       "groups": [
                         {
                           "title": "Properties",
-                          "kind": 1024,
                           "children": [8, 7, 16]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
+                          "line": 24,
+                          "character": 7,
+                          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L24"
                         }
                       ]
                     }
@@ -592,8 +688,9 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 1,
-                "name": "FunctionsClient"
+                "target": 1,
+                "name": "FunctionsClient",
+                "package": "@supabase/functions-js"
               }
             }
           ]
@@ -601,16 +698,17 @@
         {
           "id": 20,
           "name": "fetch",
+          "variant": "declaration",
           "kind": 1024,
-          "kindString": "Property",
           "flags": {
             "isProtected": true
           },
           "sources": [
             {
-              "fileName": "src/FunctionsClient.ts",
+              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 16,
-              "character": 12
+              "character": 12,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L16"
             }
           ],
           "type": {
@@ -618,37 +716,70 @@
             "declaration": {
               "id": 21,
               "name": "__type",
+              "variant": "declaration",
               "kind": 65536,
-              "kindString": "Type literal",
               "flags": {},
+              "sources": [
+                {
+                  "fileName": "node_modules/typescript/lib/lib.dom.d.ts",
+                  "line": 29329,
+                  "character": 17
+                },
+                {
+                  "fileName": "node_modules/@types/node/web-globals/fetch.d.ts",
+                  "line": 16,
+                  "character": 13
+                }
+              ],
               "signatures": [
                 {
                   "id": 22,
                   "name": "__type",
+                  "variant": "signature",
                   "kind": 4096,
-                  "kindString": "Call signature",
                   "flags": {},
+                  "comment": {
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "[MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch)"
+                      }
+                    ]
+                  },
+                  "sources": [
+                    {
+                      "fileName": "node_modules/typescript/lib/lib.dom.d.ts",
+                      "line": 29329,
+                      "character": 17
+                    }
+                  ],
                   "parameters": [
                     {
                       "id": 23,
                       "name": "input",
+                      "variant": "param",
                       "kind": 32768,
-                      "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "union",
                         "types": [
                           {
                             "type": "reference",
-                            "qualifiedName": "RequestInfo",
-                            "package": "typescript",
-                            "name": "RequestInfo"
+                            "target": {
+                              "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                              "qualifiedName": "RequestInfo"
+                            },
+                            "name": "RequestInfo",
+                            "package": "typescript"
                           },
                           {
                             "type": "reference",
-                            "qualifiedName": "URL",
-                            "package": "typescript",
-                            "name": "URL"
+                            "target": {
+                              "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                              "qualifiedName": "URL"
+                            },
+                            "name": "URL",
+                            "package": "typescript"
                           }
                         ]
                       }
@@ -656,46 +787,70 @@
                     {
                       "id": 24,
                       "name": "init",
+                      "variant": "param",
                       "kind": 32768,
-                      "kindString": "Parameter",
                       "flags": {
                         "isOptional": true
                       },
                       "type": {
                         "type": "reference",
-                        "qualifiedName": "RequestInit",
-                        "package": "typescript",
-                        "name": "RequestInit"
+                        "target": {
+                          "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                          "qualifiedName": "RequestInit"
+                        },
+                        "name": "RequestInit",
+                        "package": "typescript"
                       }
                     }
                   ],
                   "type": {
                     "type": "reference",
+                    "target": {
+                      "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                      "qualifiedName": "Promise"
+                    },
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "qualifiedName": "Response",
-                        "package": "typescript",
-                        "name": "Response"
+                        "target": {
+                          "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                          "qualifiedName": "Response"
+                        },
+                        "name": "Response",
+                        "package": "typescript"
                       }
                     ],
-                    "qualifiedName": "Promise",
-                    "package": "typescript",
-                    "name": "Promise"
+                    "name": "Promise",
+                    "package": "typescript"
                   }
                 },
                 {
                   "id": 25,
                   "name": "__type",
+                  "variant": "signature",
                   "kind": 4096,
-                  "kindString": "Call signature",
                   "flags": {},
+                  "comment": {
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "[MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch)"
+                      }
+                    ]
+                  },
+                  "sources": [
+                    {
+                      "fileName": "node_modules/@types/node/web-globals/fetch.d.ts",
+                      "line": 16,
+                      "character": 13
+                    }
+                  ],
                   "parameters": [
                     {
                       "id": 26,
                       "name": "input",
+                      "variant": "param",
                       "kind": 32768,
-                      "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "union",
@@ -706,15 +861,21 @@
                           },
                           {
                             "type": "reference",
-                            "qualifiedName": "Request",
-                            "package": "typescript",
-                            "name": "Request"
+                            "target": {
+                              "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                              "qualifiedName": "Request"
+                            },
+                            "name": "Request",
+                            "package": "typescript"
                           },
                           {
                             "type": "reference",
-                            "qualifiedName": "URL",
-                            "package": "typescript",
-                            "name": "URL"
+                            "target": {
+                              "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                              "qualifiedName": "URL"
+                            },
+                            "name": "URL",
+                            "package": "typescript"
                           }
                         ]
                       }
@@ -722,32 +883,41 @@
                     {
                       "id": 27,
                       "name": "init",
+                      "variant": "param",
                       "kind": 32768,
-                      "kindString": "Parameter",
                       "flags": {
                         "isOptional": true
                       },
                       "type": {
                         "type": "reference",
-                        "qualifiedName": "RequestInit",
-                        "package": "typescript",
-                        "name": "RequestInit"
+                        "target": {
+                          "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                          "qualifiedName": "RequestInit"
+                        },
+                        "name": "RequestInit",
+                        "package": "typescript"
                       }
                     }
                   ],
                   "type": {
                     "type": "reference",
+                    "target": {
+                      "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                      "qualifiedName": "Promise"
+                    },
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "qualifiedName": "Response",
-                        "package": "typescript",
-                        "name": "Response"
+                        "target": {
+                          "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                          "qualifiedName": "Response"
+                        },
+                        "name": "Response",
+                        "package": "typescript"
                       }
                     ],
-                    "qualifiedName": "Promise",
-                    "package": "typescript",
-                    "name": "Promise"
+                    "name": "Promise",
+                    "package": "typescript"
                   }
                 }
               ]
@@ -757,20 +927,25 @@
         {
           "id": 18,
           "name": "headers",
+          "variant": "declaration",
           "kind": 1024,
-          "kindString": "Property",
           "flags": {
             "isProtected": true
           },
           "sources": [
             {
-              "fileName": "src/FunctionsClient.ts",
+              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 14,
-              "character": 12
+              "character": 12,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L14"
             }
           ],
           "type": {
             "type": "reference",
+            "target": {
+              "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+              "qualifiedName": "Record"
+            },
             "typeArguments": [
               {
                 "type": "intrinsic",
@@ -781,45 +956,47 @@
                 "name": "string"
               }
             ],
-            "qualifiedName": "Record",
-            "package": "typescript",
-            "name": "Record"
+            "name": "Record",
+            "package": "typescript"
           }
         },
         {
           "id": 19,
           "name": "region",
+          "variant": "declaration",
           "kind": 1024,
-          "kindString": "Property",
           "flags": {
             "isProtected": true
           },
           "sources": [
             {
-              "fileName": "src/FunctionsClient.ts",
+              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 15,
-              "character": 12
+              "character": 12,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L15"
             }
           ],
           "type": {
             "type": "reference",
-            "id": 67,
-            "name": "FunctionRegion"
+            "target": 68,
+            "name": "FunctionRegion",
+            "package": "@supabase/functions-js"
           }
         },
         {
           "id": 17,
           "name": "url",
+          "variant": "declaration",
           "kind": 1024,
-          "kindString": "Property",
           "flags": {
             "isProtected": true
           },
           "sources": [
             {
-              "fileName": "src/FunctionsClient.ts",
+              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 13,
-              "character": 12
+              "character": 12,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L13"
             }
           ],
           "type": {
@@ -830,32 +1007,46 @@
         {
           "id": 31,
           "name": "invoke",
+          "variant": "declaration",
           "kind": 2048,
-          "kindString": "Method",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/FunctionsClient.ts",
+              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 49,
-              "character": 8
+              "character": 8,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L49"
             }
           ],
           "signatures": [
             {
               "id": 32,
               "name": "invoke",
+              "variant": "signature",
               "kind": 4096,
-              "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Invokes a function"
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "Invokes a function"
+                  }
+                ]
               },
-              "typeParameter": [
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
+                  "line": 49,
+                  "character": 8,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L49"
+                }
+              ],
+              "typeParameters": [
                 {
                   "id": 33,
                   "name": "T",
+                  "variant": "typeParam",
                   "kind": 131072,
-                  "kindString": "Type parameter",
                   "flags": {},
                   "default": {
                     "type": "intrinsic",
@@ -867,11 +1058,16 @@
                 {
                   "id": 34,
                   "name": "functionName",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "shortText": "The name of the Function to invoke."
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "The name of the Function to invoke."
+                      }
+                    ]
                   },
                   "type": {
                     "type": "intrinsic",
@@ -881,39 +1077,51 @@
                 {
                   "id": 35,
                   "name": "options",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "shortText": "Options for invoking the Function.\n"
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "Options for invoking the Function."
+                      }
+                    ]
                   },
                   "type": {
                     "type": "reference",
-                    "id": 36,
-                    "name": "FunctionInvokeOptions"
+                    "target": 36,
+                    "name": "FunctionInvokeOptions",
+                    "package": "@supabase/functions-js"
                   },
                   "defaultValue": "{}"
                 }
               ],
               "type": {
                 "type": "reference",
+                "target": {
+                  "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                  "qualifiedName": "Promise"
+                },
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 83,
+                    "target": 84,
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 33,
-                        "name": "T"
+                        "target": 33,
+                        "name": "T",
+                        "package": "@supabase/functions-js",
+                        "refersToTypeParameter": true
                       }
                     ],
-                    "name": "FunctionsResponse"
+                    "name": "FunctionsResponse",
+                    "package": "@supabase/functions-js"
                   }
                 ],
-                "qualifiedName": "Promise",
-                "package": "typescript",
-                "name": "Promise"
+                "name": "Promise",
+                "package": "typescript"
               }
             }
           ]
@@ -921,35 +1129,54 @@
         {
           "id": 28,
           "name": "setAuth",
+          "variant": "declaration",
           "kind": 2048,
-          "kindString": "Method",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/FunctionsClient.ts",
+              "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 40,
-              "character": 2
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L40"
             }
           ],
           "signatures": [
             {
               "id": 29,
               "name": "setAuth",
+              "variant": "signature",
               "kind": 4096,
-              "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Updates the authorization header"
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "Updates the authorization header"
+                  }
+                ]
               },
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
+                  "line": 40,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L40"
+                }
+              ],
               "parameters": [
                 {
                   "id": 30,
                   "name": "token",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "shortText": "the new jwt token sent in the authorisation header\n"
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "the new jwt token sent in the authorisation header"
+                      }
+                    ]
                   },
                   "type": {
                     "type": "intrinsic",
@@ -968,61 +1195,68 @@
       "groups": [
         {
           "title": "Constructors",
-          "kind": 512,
           "children": [2]
         },
         {
           "title": "Properties",
-          "kind": 1024,
           "children": [20, 18, 19, 17]
         },
         {
           "title": "Methods",
-          "kind": 2048,
           "children": [31, 28]
         }
       ],
       "sources": [
         {
-          "fileName": "src/FunctionsClient.ts",
+          "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
           "line": 12,
-          "character": 13
+          "character": 13,
+          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/FunctionsClient.ts#L12"
         }
       ]
     },
     {
-      "id": 45,
+      "id": 46,
       "name": "FunctionsError",
+      "variant": "declaration",
       "kind": 128,
-      "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 46,
+          "id": 47,
           "name": "constructor",
+          "variant": "declaration",
           "kind": 512,
-          "kindString": "Constructor",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 19,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 20,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L20"
             }
           ],
           "signatures": [
             {
-              "id": 47,
-              "name": "new FunctionsError",
+              "id": 48,
+              "name": "FunctionsError",
+              "variant": "signature",
               "kind": 16384,
-              "kindString": "Constructor signature",
               "flags": {},
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 20,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L20"
+                }
+              ],
               "parameters": [
                 {
-                  "id": 48,
+                  "id": 49,
                   "name": "message",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "intrinsic",
@@ -1030,10 +1264,10 @@
                   }
                 },
                 {
-                  "id": 49,
+                  "id": 50,
                   "name": "name",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "intrinsic",
@@ -1042,10 +1276,10 @@
                   "defaultValue": "'FunctionsError'"
                 },
                 {
-                  "id": 50,
+                  "id": 51,
                   "name": "context",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {
                     "isOptional": true
                   },
@@ -1057,31 +1291,35 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 45,
-                "name": "FunctionsError"
+                "target": 46,
+                "name": "FunctionsError",
+                "package": "@supabase/functions-js"
               },
               "overwrites": {
                 "type": "reference",
+                "target": -1,
                 "name": "Error.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
+            "target": -1,
             "name": "Error.constructor"
           }
         },
         {
-          "id": 51,
+          "id": 52,
           "name": "context",
+          "variant": "declaration",
           "kind": 1024,
-          "kindString": "Property",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 18,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 19,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L19"
             }
           ],
           "type": {
@@ -1093,81 +1331,92 @@
       "groups": [
         {
           "title": "Constructors",
-          "kind": 512,
-          "children": [46]
+          "children": [47]
         },
         {
           "title": "Properties",
-          "kind": 1024,
-          "children": [51]
+          "children": [52]
         }
       ],
       "sources": [
         {
-          "fileName": "src/types.ts",
-          "line": 17,
-          "character": 13
+          "fileName": "packages/core/functions-js/src/types.ts",
+          "line": 18,
+          "character": 13,
+          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L18"
         }
       ],
       "extendedTypes": [
         {
           "type": "reference",
-          "qualifiedName": "Error",
-          "package": "typescript",
-          "name": "Error"
+          "target": {
+            "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+            "qualifiedName": "Error"
+          },
+          "name": "Error",
+          "package": "typescript"
         }
       ],
       "extendedBy": [
         {
           "type": "reference",
-          "id": 52,
+          "target": 53,
           "name": "FunctionsFetchError"
         },
         {
           "type": "reference",
-          "id": 57,
+          "target": 58,
           "name": "FunctionsHttpError"
         },
         {
           "type": "reference",
-          "id": 62,
+          "target": 63,
           "name": "FunctionsRelayError"
         }
       ]
     },
     {
-      "id": 52,
+      "id": 53,
       "name": "FunctionsFetchError",
+      "variant": "declaration",
       "kind": 128,
-      "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 53,
+          "id": 54,
           "name": "constructor",
+          "variant": "declaration",
           "kind": 512,
-          "kindString": "Constructor",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 27,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 28,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L28"
             }
           ],
           "signatures": [
             {
-              "id": 54,
-              "name": "new FunctionsFetchError",
+              "id": 55,
+              "name": "FunctionsFetchError",
+              "variant": "signature",
               "kind": 16384,
-              "kindString": "Constructor signature",
               "flags": {},
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 28,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L28"
+                }
+              ],
               "parameters": [
                 {
-                  "id": 55,
+                  "id": 56,
                   "name": "context",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "intrinsic",
@@ -1177,33 +1426,37 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 52,
-                "name": "FunctionsFetchError"
+                "target": 53,
+                "name": "FunctionsFetchError",
+                "package": "@supabase/functions-js"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 47,
+                "target": 48,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 46,
+            "target": 47,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 56,
+          "id": 57,
           "name": "context",
+          "variant": "declaration",
           "kind": 1024,
-          "kindString": "Property",
-          "flags": {},
+          "flags": {
+            "isInherited": true
+          },
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 18,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 19,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L19"
             }
           ],
           "type": {
@@ -1212,7 +1465,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 51,
+            "target": 52,
             "name": "FunctionsError.context"
           }
         }
@@ -1220,63 +1473,72 @@
       "groups": [
         {
           "title": "Constructors",
-          "kind": 512,
-          "children": [53]
+          "children": [54]
         },
         {
           "title": "Properties",
-          "kind": 1024,
-          "children": [56]
+          "children": [57]
         }
       ],
       "sources": [
         {
-          "fileName": "src/types.ts",
-          "line": 26,
-          "character": 13
+          "fileName": "packages/core/functions-js/src/types.ts",
+          "line": 27,
+          "character": 13,
+          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L27"
         }
       ],
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 45,
-          "name": "FunctionsError"
+          "target": 46,
+          "name": "FunctionsError",
+          "package": "@supabase/functions-js"
         }
       ]
     },
     {
-      "id": 57,
+      "id": 58,
       "name": "FunctionsHttpError",
+      "variant": "declaration",
       "kind": 128,
-      "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 58,
+          "id": 59,
           "name": "constructor",
+          "variant": "declaration",
           "kind": 512,
-          "kindString": "Constructor",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 39,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 40,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L40"
             }
           ],
           "signatures": [
             {
-              "id": 59,
-              "name": "new FunctionsHttpError",
+              "id": 60,
+              "name": "FunctionsHttpError",
+              "variant": "signature",
               "kind": 16384,
-              "kindString": "Constructor signature",
               "flags": {},
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 40,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L40"
+                }
+              ],
               "parameters": [
                 {
-                  "id": 60,
+                  "id": 61,
                   "name": "context",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "intrinsic",
@@ -1286,33 +1548,37 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 57,
-                "name": "FunctionsHttpError"
+                "target": 58,
+                "name": "FunctionsHttpError",
+                "package": "@supabase/functions-js"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 47,
+                "target": 48,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 46,
+            "target": 47,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 61,
+          "id": 62,
           "name": "context",
+          "variant": "declaration",
           "kind": 1024,
-          "kindString": "Property",
-          "flags": {},
+          "flags": {
+            "isInherited": true
+          },
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 18,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 19,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L19"
             }
           ],
           "type": {
@@ -1321,7 +1587,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 51,
+            "target": 52,
             "name": "FunctionsError.context"
           }
         }
@@ -1329,63 +1595,72 @@
       "groups": [
         {
           "title": "Constructors",
-          "kind": 512,
-          "children": [58]
+          "children": [59]
         },
         {
           "title": "Properties",
-          "kind": 1024,
-          "children": [61]
+          "children": [62]
         }
       ],
       "sources": [
         {
-          "fileName": "src/types.ts",
-          "line": 38,
-          "character": 13
+          "fileName": "packages/core/functions-js/src/types.ts",
+          "line": 39,
+          "character": 13,
+          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L39"
         }
       ],
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 45,
-          "name": "FunctionsError"
+          "target": 46,
+          "name": "FunctionsError",
+          "package": "@supabase/functions-js"
         }
       ]
     },
     {
-      "id": 62,
+      "id": 63,
       "name": "FunctionsRelayError",
+      "variant": "declaration",
       "kind": 128,
-      "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 63,
+          "id": 64,
           "name": "constructor",
+          "variant": "declaration",
           "kind": 512,
-          "kindString": "Constructor",
           "flags": {},
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 33,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 34,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L34"
             }
           ],
           "signatures": [
             {
-              "id": 64,
-              "name": "new FunctionsRelayError",
+              "id": 65,
+              "name": "FunctionsRelayError",
+              "variant": "signature",
               "kind": 16384,
-              "kindString": "Constructor signature",
               "flags": {},
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 34,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L34"
+                }
+              ],
               "parameters": [
                 {
-                  "id": 65,
+                  "id": 66,
                   "name": "context",
+                  "variant": "param",
                   "kind": 32768,
-                  "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "intrinsic",
@@ -1395,33 +1670,37 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 62,
-                "name": "FunctionsRelayError"
+                "target": 63,
+                "name": "FunctionsRelayError",
+                "package": "@supabase/functions-js"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 47,
+                "target": 48,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 46,
+            "target": 47,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 66,
+          "id": 67,
           "name": "context",
+          "variant": "declaration",
           "kind": 1024,
-          "kindString": "Property",
-          "flags": {},
+          "flags": {
+            "isInherited": true
+          },
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 18,
-              "character": 2
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 19,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L19"
             }
           ],
           "type": {
@@ -1430,7 +1709,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 51,
+            "target": 52,
             "name": "FunctionsError.context"
           }
         }
@@ -1438,41 +1717,42 @@
       "groups": [
         {
           "title": "Constructors",
-          "kind": 512,
-          "children": [63]
+          "children": [64]
         },
         {
           "title": "Properties",
-          "kind": 1024,
-          "children": [66]
+          "children": [67]
         }
       ],
       "sources": [
         {
-          "fileName": "src/types.ts",
-          "line": 32,
-          "character": 13
+          "fileName": "packages/core/functions-js/src/types.ts",
+          "line": 33,
+          "character": 13,
+          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L33"
         }
       ],
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 45,
-          "name": "FunctionsError"
+          "target": 46,
+          "name": "FunctionsError",
+          "package": "@supabase/functions-js"
         }
       ]
     },
     {
       "id": 36,
       "name": "FunctionInvokeOptions",
-      "kind": 4194304,
-      "kindString": "Type alias",
+      "variant": "declaration",
+      "kind": 2097152,
       "flags": {},
       "sources": [
         {
-          "fileName": "src/types.ts",
-          "line": 62,
-          "character": 12
+          "fileName": "packages/core/functions-js/src/types.ts",
+          "line": 63,
+          "character": 12,
+          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L63"
         }
       ],
       "type": {
@@ -1480,26 +1760,32 @@
         "declaration": {
           "id": 37,
           "name": "__type",
+          "variant": "declaration",
           "kind": 65536,
-          "kindString": "Type literal",
           "flags": {},
           "children": [
             {
               "id": 44,
               "name": "body",
+              "variant": "declaration",
               "kind": 1024,
-              "kindString": "Property",
               "flags": {
                 "isOptional": true
               },
               "comment": {
-                "shortText": "The body of the request."
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "The body of the request."
+                  }
+                ]
               },
               "sources": [
                 {
-                  "fileName": "src/types.ts",
-                  "line": 78,
-                  "character": 2
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 79,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L79"
                 }
               ],
               "type": {
@@ -1507,44 +1793,66 @@
                 "types": [
                   {
                     "type": "reference",
-                    "qualifiedName": "File",
-                    "package": "typescript",
-                    "name": "File"
+                    "target": {
+                      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                      "qualifiedName": "File"
+                    },
+                    "name": "File",
+                    "package": "typescript"
                   },
                   {
                     "type": "reference",
-                    "qualifiedName": "Blob",
-                    "package": "typescript",
-                    "name": "Blob"
+                    "target": {
+                      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                      "qualifiedName": "Blob"
+                    },
+                    "name": "Blob",
+                    "package": "typescript"
                   },
                   {
                     "type": "reference",
-                    "qualifiedName": "ArrayBuffer",
-                    "package": "typescript",
-                    "name": "ArrayBuffer"
+                    "target": {
+                      "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                      "qualifiedName": "ArrayBuffer"
+                    },
+                    "name": "ArrayBuffer",
+                    "package": "typescript"
                   },
                   {
                     "type": "reference",
-                    "qualifiedName": "FormData",
-                    "package": "typescript",
-                    "name": "FormData"
+                    "target": {
+                      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                      "qualifiedName": "FormData"
+                    },
+                    "name": "FormData",
+                    "package": "typescript"
                   },
                   {
                     "type": "reference",
+                    "target": {
+                      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                      "qualifiedName": "ReadableStream"
+                    },
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "qualifiedName": "Uint8Array",
-                        "package": "typescript",
-                        "name": "Uint8Array"
+                        "target": {
+                          "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                          "qualifiedName": "Uint8Array"
+                        },
+                        "name": "Uint8Array",
+                        "package": "typescript"
                       }
                     ],
-                    "qualifiedName": "ReadableStream",
-                    "package": "typescript",
-                    "name": "ReadableStream"
+                    "name": "ReadableStream",
+                    "package": "typescript"
                   },
                   {
                     "type": "reference",
+                    "target": {
+                      "sourceFileName": "../../../node_modules/typescript/lib/lib.es5.d.ts",
+                      "qualifiedName": "Record"
+                    },
                     "typeArguments": [
                       {
                         "type": "intrinsic",
@@ -1555,9 +1863,8 @@
                         "name": "any"
                       }
                     ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
+                    "name": "Record",
+                    "package": "typescript"
                   },
                   {
                     "type": "intrinsic",
@@ -1569,19 +1876,25 @@
             {
               "id": 38,
               "name": "headers",
+              "variant": "declaration",
               "kind": 1024,
-              "kindString": "Property",
               "flags": {
                 "isOptional": true
               },
               "comment": {
-                "shortText": "Object representing the headers to send with the request."
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "Object representing the headers to send with the request."
+                  }
+                ]
               },
               "sources": [
                 {
-                  "fileName": "src/types.ts",
-                  "line": 66,
-                  "character": 2
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 67,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L67"
                 }
               ],
               "type": {
@@ -1589,58 +1902,76 @@
                 "declaration": {
                   "id": 39,
                   "name": "__type",
+                  "variant": "declaration",
                   "kind": 65536,
-                  "kindString": "Type literal",
                   "flags": {},
                   "sources": [
                     {
-                      "fileName": "src/types.ts",
-                      "line": 66,
-                      "character": 12
+                      "fileName": "packages/core/functions-js/src/types.ts",
+                      "line": 67,
+                      "character": 12,
+                      "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L67"
                     }
                   ],
-                  "indexSignature": {
-                    "id": 40,
-                    "name": "__index",
-                    "kind": 8192,
-                    "kindString": "Index signature",
-                    "flags": {},
-                    "parameters": [
-                      {
-                        "id": 41,
-                        "name": "key",
-                        "kind": 32768,
-                        "flags": {},
-                        "type": {
-                          "type": "intrinsic",
-                          "name": "string"
+                  "indexSignatures": [
+                    {
+                      "id": 40,
+                      "name": "__index",
+                      "variant": "signature",
+                      "kind": 8192,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 67,
+                          "character": 14,
+                          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L67"
                         }
+                      ],
+                      "parameters": [
+                        {
+                          "id": 41,
+                          "name": "key",
+                          "variant": "param",
+                          "kind": 32768,
+                          "flags": {},
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
                       }
-                    ],
-                    "type": {
-                      "type": "intrinsic",
-                      "name": "string"
                     }
-                  }
+                  ]
                 }
               }
             },
             {
               "id": 42,
               "name": "method",
+              "variant": "declaration",
               "kind": 1024,
-              "kindString": "Property",
               "flags": {
                 "isOptional": true
               },
               "comment": {
-                "shortText": "The HTTP verb of the request"
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "The HTTP verb of the request"
+                  }
+                ]
               },
               "sources": [
                 {
-                  "fileName": "src/types.ts",
-                  "line": 70,
-                  "character": 2
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 71,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L71"
                 }
               ],
               "type": {
@@ -1672,64 +2003,106 @@
             {
               "id": 43,
               "name": "region",
+              "variant": "declaration",
               "kind": 1024,
-              "kindString": "Property",
               "flags": {
                 "isOptional": true
               },
               "comment": {
-                "shortText": "The Region to invoke the function in."
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "The Region to invoke the function in."
+                  }
+                ]
               },
               "sources": [
                 {
-                  "fileName": "src/types.ts",
-                  "line": 74,
-                  "character": 2
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 75,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L75"
                 }
               ],
               "type": {
                 "type": "reference",
-                "id": 67,
-                "name": "FunctionRegion"
+                "target": 68,
+                "name": "FunctionRegion",
+                "package": "@supabase/functions-js"
+              }
+            },
+            {
+              "id": 45,
+              "name": "signal",
+              "variant": "declaration",
+              "kind": 1024,
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "The AbortSignal to use for the request."
+                  }
+                ]
+              },
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 90,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L90"
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "target": {
+                  "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+                  "qualifiedName": "AbortSignal"
+                },
+                "name": "AbortSignal",
+                "package": "typescript"
               }
             }
           ],
           "groups": [
             {
               "title": "Properties",
-              "kind": 1024,
-              "children": [44, 38, 42, 43]
+              "children": [44, 38, 42, 43, 45]
             }
           ],
           "sources": [
             {
-              "fileName": "src/types.ts",
-              "line": 62,
-              "character": 36
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 63,
+              "character": 36,
+              "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L63"
             }
           ]
         }
       }
     },
     {
-      "id": 83,
+      "id": 84,
       "name": "FunctionsResponse",
-      "kind": 4194304,
-      "kindString": "Type alias",
+      "variant": "declaration",
+      "kind": 2097152,
       "flags": {},
       "sources": [
         {
-          "fileName": "src/types.ts",
-          "line": 15,
-          "character": 12
+          "fileName": "packages/core/functions-js/src/types.ts",
+          "line": 16,
+          "character": 12,
+          "url": "https://github.com/supabase/supabase-js/blob/4c1d51fef285ecf8276f5be487e87855147debde/packages/core/functions-js/src/types.ts#L16"
         }
       ],
-      "typeParameter": [
+      "typeParameters": [
         {
-          "id": 84,
+          "id": 85,
           "name": "T",
+          "variant": "typeParam",
           "kind": 131072,
-          "kindString": "Type parameter",
           "flags": {}
         }
       ],
@@ -1738,18 +2111,30 @@
         "types": [
           {
             "type": "reference",
+            "target": {
+              "sourceFileName": "src/types.ts",
+              "qualifiedName": "FunctionsResponseSuccess"
+            },
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 84,
-                "name": "T"
+                "target": 85,
+                "name": "T",
+                "package": "@supabase/functions-js",
+                "refersToTypeParameter": true
               }
             ],
-            "name": "FunctionsResponseSuccess"
+            "name": "FunctionsResponseSuccess",
+            "package": "@supabase/functions-js"
           },
           {
             "type": "reference",
-            "name": "FunctionsResponseFailure"
+            "target": {
+              "sourceFileName": "src/types.ts",
+              "qualifiedName": "FunctionsResponseFailure"
+            },
+            "name": "FunctionsResponseFailure",
+            "package": "@supabase/functions-js"
           }
         ]
       }
@@ -1758,25 +2143,454 @@
   "groups": [
     {
       "title": "Enumerations",
-      "kind": 8,
-      "children": [67]
+      "children": [68]
     },
     {
       "title": "Classes",
-      "kind": 128,
-      "children": [1, 45, 52, 57, 62]
+      "children": [1, 46, 53, 58, 63]
     },
     {
       "title": "Type Aliases",
-      "kind": 4194304,
-      "children": [36, 83]
+      "children": [36, 84]
     }
   ],
-  "sources": [
+  "packageName": "@supabase/functions-js",
+  "readme": [
     {
-      "fileName": "src/index.ts",
-      "line": 1,
-      "character": 0
+      "kind": "text",
+      "text": "# "
+    },
+    {
+      "kind": "code",
+      "text": "`functions-js`"
+    },
+    {
+      "kind": "text",
+      "text": "\n\n<div align=\"center\">\n\n[![pkg.pr.new](https://pkg.pr.new/badge/supabase/functions-js)](https://pkg.pr.new/~/supabase/functions-js)\n\n</div>\n\nJS Client library to interact with Supabase Functions.\n\n## Docs\n\n- **API Reference**: <https://supabase.com/docs/reference/javascript/functions-invoke>\n- **Functions Guide**: <https://supabase.com/docs/guides/functions>\n- **Typedoc**: <https://supabase.github.io/supabase-js/functions-js/v2/spec.json>\n\n## Quick Start\n\n### Installation\n\n"
+    },
+    {
+      "kind": "code",
+      "text": "```bash\nnpm install @supabase/functions-js\n```"
+    },
+    {
+      "kind": "text",
+      "text": "\n\n### Usage\n\n"
+    },
+    {
+      "kind": "code",
+      "text": "```js\nimport { FunctionsClient } from '@supabase/functions-js'\n\nconst functionsUrl = 'https://<project_ref>.supabase.co/functions/v1'\nconst anonKey = '<anon_key>'\n\nconst functions = new FunctionsClient(functionsUrl, {\n  headers: {\n    Authorization: `Bearer ${anonKey}`,\n  },\n})\n\n// Invoke a function\nconst { data, error } = await functions.invoke('hello-world', {\n  body: { name: 'Functions' },\n})\n```"
+    },
+    {
+      "kind": "text",
+      "text": "\n\n## Development\n\nThis package is part of the [Supabase JavaScript monorepo](https://github.com/supabase/supabase-js). To work on this package:\n\n### Building\n\n"
+    },
+    {
+      "kind": "code",
+      "text": "```bash\n# Complete build (from monorepo root)\nnpx nx build functions-js\n\n# Build with watch mode for development\nnpx nx build functions-js --watch\n\n# Individual build targets\nnpx nx build:main functions-js    # CommonJS build (dist/main/)\nnpx nx build:module functions-js  # ES Modules build (dist/module/)\n\n# Other useful commands\nnpx nx clean functions-js         # Clean build artifacts\nnpx nx format functions-js        # Format code with Prettier\nnpx nx typecheck functions-js     # TypeScript type checking\nnpx nx docs functions-js          # Generate documentation\n```"
+    },
+    {
+      "kind": "text",
+      "text": "\n\n#### Build Outputs\n\n- **CommonJS ("
+    },
+    {
+      "kind": "code",
+      "text": "`dist/main/`"
+    },
+    {
+      "kind": "text",
+      "text": ")** - For Node.js environments\n- **ES Modules ("
+    },
+    {
+      "kind": "code",
+      "text": "`dist/module/`"
+    },
+    {
+      "kind": "text",
+      "text": ")** - For modern bundlers (Webpack, Vite, Rollup)\n- **TypeScript definitions ("
+    },
+    {
+      "kind": "code",
+      "text": "`dist/module/index.d.ts`"
+    },
+    {
+      "kind": "text",
+      "text": ")** - Type definitions for TypeScript projects\n\n### Testing\n\n**Docker Required** for relay tests. The functions-js tests use testcontainers to spin up a Deno relay server for testing Edge Function invocations.\n\n"
+    },
+    {
+      "kind": "code",
+      "text": "```bash\n# Run all tests (from monorepo root)\nnpx nx test functions-js\n\n# Run tests with coverage report\nnpx nx test functions-js --coverage\n\n# Run tests in watch mode during development\nnpx nx test functions-js --watch\n\n# CI test command (runs with coverage)\nnpx nx test:ci functions-js\n```"
+    },
+    {
+      "kind": "text",
+      "text": "\n\n#### Test Requirements\n\n- **Node.js 20+** - Required for testcontainers\n- **Docker** - Must be installed and running for relay tests\n- No Supabase instance needed - Tests use mocked services and testcontainers\n\n#### What Gets Tested\n\n- **Function invocation** - Testing the "
+    },
+    {
+      "kind": "code",
+      "text": "`invoke()`"
+    },
+    {
+      "kind": "text",
+      "text": " method with various options\n- **Relay functionality** - Using a containerized Deno relay to test real Edge Function scenarios\n- **Error handling** - Ensuring proper error responses and retries\n- **Request/response models** - Validating headers, body, and response formats\n\n### Contributing\n\nWe welcome contributions! Please see our [Contributing Guide]("
+    },
+    {
+      "kind": "relative-link",
+      "text": "../../../CONTRIBUTING.md",
+      "target": 2
+    },
+    {
+      "kind": "text",
+      "text": ") for details on how to get started.\n\nFor major changes or if you're unsure about something, please open an issue first to discuss your proposed changes."
     }
-  ]
+  ],
+  "symbolIdMap": {
+    "0": {
+      "sourceFileName": "src/index.ts",
+      "qualifiedName": ""
+    },
+    "1": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient"
+    },
+    "2": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.__constructor"
+    },
+    "3": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient"
+    },
+    "4": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "url"
+    },
+    "5": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "__1"
+    },
+    "6": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "__type"
+    },
+    "7": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "__type.headers"
+    },
+    "8": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "__type.customFetch"
+    },
+    "9": {
+      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+      "qualifiedName": "fetch"
+    },
+    "10": {
+      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+      "qualifiedName": "fetch"
+    },
+    "11": {
+      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+      "qualifiedName": "input"
+    },
+    "12": {
+      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+      "qualifiedName": "init"
+    },
+    "13": {
+      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "qualifiedName": "fetch"
+    },
+    "14": {
+      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "qualifiedName": "input"
+    },
+    "15": {
+      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "qualifiedName": "init"
+    },
+    "16": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "__type.region"
+    },
+    "17": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.url"
+    },
+    "18": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.headers"
+    },
+    "19": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.region"
+    },
+    "20": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.fetch"
+    },
+    "21": {
+      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+      "qualifiedName": "fetch"
+    },
+    "22": {
+      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+      "qualifiedName": "fetch"
+    },
+    "23": {
+      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+      "qualifiedName": "input"
+    },
+    "24": {
+      "sourceFileName": "../../../node_modules/typescript/lib/lib.dom.d.ts",
+      "qualifiedName": "init"
+    },
+    "25": {
+      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "qualifiedName": "fetch"
+    },
+    "26": {
+      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "qualifiedName": "input"
+    },
+    "27": {
+      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "qualifiedName": "init"
+    },
+    "28": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.setAuth"
+    },
+    "29": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.setAuth"
+    },
+    "30": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "token"
+    },
+    "31": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.invoke"
+    },
+    "32": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "FunctionsClient.invoke"
+    },
+    "33": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "T"
+    },
+    "34": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "functionName"
+    },
+    "35": {
+      "sourceFileName": "src/FunctionsClient.ts",
+      "qualifiedName": "options"
+    },
+    "36": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionInvokeOptions"
+    },
+    "37": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type"
+    },
+    "38": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.headers"
+    },
+    "39": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type"
+    },
+    "40": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.__index"
+    },
+    "42": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.method"
+    },
+    "43": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.region"
+    },
+    "44": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.body"
+    },
+    "45": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.signal"
+    },
+    "46": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError"
+    },
+    "47": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError.__constructor"
+    },
+    "48": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError"
+    },
+    "49": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "message"
+    },
+    "50": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "name"
+    },
+    "51": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "context"
+    },
+    "52": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError.context"
+    },
+    "53": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsFetchError"
+    },
+    "54": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsFetchError.__constructor"
+    },
+    "55": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsFetchError"
+    },
+    "56": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "context"
+    },
+    "57": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError.context"
+    },
+    "58": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsHttpError"
+    },
+    "59": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsHttpError.__constructor"
+    },
+    "60": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsHttpError"
+    },
+    "61": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "context"
+    },
+    "62": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError.context"
+    },
+    "63": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsRelayError"
+    },
+    "64": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsRelayError.__constructor"
+    },
+    "65": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsRelayError"
+    },
+    "66": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "context"
+    },
+    "67": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError.context"
+    },
+    "68": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion"
+    },
+    "69": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.Any"
+    },
+    "70": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApNortheast1"
+    },
+    "71": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApNortheast2"
+    },
+    "72": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApSouth1"
+    },
+    "73": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApSoutheast1"
+    },
+    "74": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApSoutheast2"
+    },
+    "75": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.CaCentral1"
+    },
+    "76": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.EuCentral1"
+    },
+    "77": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.EuWest1"
+    },
+    "78": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.EuWest2"
+    },
+    "79": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.EuWest3"
+    },
+    "80": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.SaEast1"
+    },
+    "81": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.UsEast1"
+    },
+    "82": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.UsWest1"
+    },
+    "83": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.UsWest2"
+    },
+    "84": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsResponse"
+    },
+    "85": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "T"
+    }
+  },
+  "files": {
+    "entries": {
+      "1": "src/index.ts",
+      "2": "../../../CONTRIBUTING.md"
+    },
+    "reflections": {
+      "1": 0
+    }
+  }
 }

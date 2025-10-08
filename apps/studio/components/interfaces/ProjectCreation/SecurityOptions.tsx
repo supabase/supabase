@@ -94,7 +94,7 @@ export const SecurityOptions = ({
           control={form.control}
           render={({ field }) => (
             <>
-              <FormItemLayout className="mt-6" layout={layout} label="Data API Configuration">
+              <FormItemLayout className="mt-6" layout={layout} label="Data API configuration">
                 <FormControl_Shadcn_>
                   <RadioGroupStacked
                     defaultValue={field.value.toString()}

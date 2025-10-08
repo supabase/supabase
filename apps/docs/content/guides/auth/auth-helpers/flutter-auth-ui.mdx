@@ -2,7 +2,7 @@
 id: 'flutter-auth-ui'
 title: 'Flutter Auth UI'
 description: 'Prebuilt, customizable Flutter widgets for authenticating users.'
-sitemapPriority: 0.5
+sitemapPriority: 0.3
 ---
 
 Flutter Auth UI is a Flutter package containing pre-built widgets for authenticating users.
@@ -27,7 +27,7 @@ import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 void main() async {
   await Supabase.initialize(
     url: dotenv.get('SUPABASE_URL'),
-    anonKey: dotenv.get('SUPABASE_ANON_KEY'),
+    anonKey: dotenv.get('SUPABASE_PUBLISHABLE_KEY'),
   );
 
   runApp(const MyApp());

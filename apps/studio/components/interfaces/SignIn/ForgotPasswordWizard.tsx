@@ -10,10 +10,11 @@ import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { auth } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Must be a valid email').min(1, 'Email is required'),
+  email: z.string().min(1, 'Please provide an email address').email('Must be a valid email'),
 })
 
 const codeSchema = z.object({
@@ -60,10 +61,13 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
       if (user?.factors?.length) {
         await router.push({
           pathname: '/forgot-password-mfa',
-          query: { returnTo: '/reset-password' },
+          query: router.query,
         })
       } else {
-        await router.push('reset-password')
+        await router.push({
+          pathname: '/reset-password',
+          query: router.query,
+        })
       }
     }
   }
@@ -75,6 +79,11 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
         className="flex flex-col pt-4 space-y-4"
         onSubmit={codeForm.handleSubmit(onCodeEntered)}
       >
+        <Admonition
+          type="default"
+          title="Check your email for a reset code"
+          description="You'll receive an email if an account associated with the email address exists"
+        />
         <FormField_Shadcn_
           control={codeForm.control}
           name="code"

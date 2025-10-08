@@ -10,8 +10,8 @@ import FormBoxEmpty from 'components/ui/FormBoxEmpty'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -80,7 +80,7 @@ interface TriggerSheetProps {
 }
 
 export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetProps) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
@@ -107,14 +107,16 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     }
   )
 
-  const { data = [], isSuccess } = useTablesQuery({
+  const { data = [], isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas, isSuccess: isSuccessProtectedSchemas } = useProtectedSchemas()
+  const isSuccess = isSuccessTables && isSuccessProtectedSchemas
 
   const tables = data
     .sort((a, b) => a.schema.localeCompare(b.schema))
-    .filter((a) => !PROTECTED_SCHEMAS.includes(a.schema))
+    .filter((a) => !protectedSchemas.find((s) => s.name === a.schema))
   const isEditing = !!selectedTrigger
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -449,7 +451,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
               Cancel
             </Button>
             <Button form={formId} htmlType="submit" loading={isCreating || isUpdating}>
-              Create trigger
+              {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>
         </SheetContent>

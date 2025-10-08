@@ -1,3 +1,4 @@
+import type { JwtPayload } from '@supabase/supabase-js'
 import { getAccessToken, type User } from 'common/auth'
 import { gotrueClient } from 'common/gotrue'
 
@@ -23,18 +24,17 @@ export const validateReturnTo = (
   return safePathPattern.test(returnTo) ? returnTo : fallback
 }
 
-export const getAuthUser = async (token: String): Promise<any> => {
+export const getUserClaims = async (
+  token: String
+): Promise<{ error: any | null; claims: JwtPayload | null }> => {
   try {
-    const {
-      data: { user },
-      error,
-    } = await auth.getUser(token.replace('Bearer ', ''))
+    const { data, error } = await auth.getClaims(token.replace(/bearer /i, ''))
     if (error) throw error
 
-    return { user, error: null }
+    return { claims: data?.claims ?? null, error: null }
   } catch (err) {
     console.error(err)
-    return { user: null, error: err }
+    return { claims: null, error: err }
   }
 }
 
@@ -73,6 +73,11 @@ export const buildPathWithParams = (pathname: string) => {
 }
 
 export const getReturnToPath = (fallback = DEFAULT_FALLBACK_PATH) => {
+  // If we're in a server environment, return the fallback
+  if (typeof location === 'undefined') {
+    return fallback
+  }
+
   const searchParams = new URLSearchParams(location.search)
 
   let returnTo = searchParams.get('returnTo') ?? fallback

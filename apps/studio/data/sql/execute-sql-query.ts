@@ -1,7 +1,8 @@
 import { QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { MB, PROJECT_STATUS } from 'lib/constants'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
@@ -43,10 +44,10 @@ export async function executeSql<T = any>(
   >,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
-  fetcherOverride?: (
-    sql: string,
+  fetcherOverride?: (options: {
+    query: string
     headers?: HeadersInit
-  ) => Promise<{ data: T } | { error: ResponseError }>
+  }) => Promise<{ data: T } | { error: ResponseError }>
 ): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -63,7 +64,7 @@ export async function executeSql<T = any>(
   let error
 
   if (fetcherOverride) {
-    const result = await fetcherOverride(sql, headers)
+    const result = await fetcherOverride({ query: sql, headers })
     if ('data' in result) {
       data = result.data
     } else {
@@ -73,7 +74,12 @@ export async function executeSql<T = any>(
     const result = await post('/platform/pg-meta/{ref}/query', {
       signal,
       params: {
-        header: { 'x-connection-encrypted': connectionString ?? '' },
+        header: {
+          'x-connection-encrypted': connectionString ?? '',
+          'x-pg-application-name': isStatementTimeoutDisabled
+            ? 'supabase/dashboard-query-editor'
+            : DEFAULT_PLATFORM_APPLICATION_NAME,
+        },
         path: { ref: projectRef },
         // @ts-expect-error: This is just a client side thing to identify queries better
         query: {
@@ -153,7 +159,7 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   }: ExecuteSqlVariables,
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
 ) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<ExecuteSqlData, ExecuteSqlError, TData>(

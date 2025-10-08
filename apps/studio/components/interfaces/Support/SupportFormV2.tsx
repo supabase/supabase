@@ -1,7 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { Book, ChevronRight, ExternalLink, Github, Loader2, Mail, Plus, X } from 'lucide-react'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  Book,
+  Check,
+  ChevronRight,
+  ChevronsUpDown,
+  ExternalLink,
+  Github,
+  Loader2,
+  Mail,
+  Plus,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useQueryState } from 'nuqs'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -9,12 +24,16 @@ import * as z from 'zod'
 
 import { useDocsSearch, useParams, type DocsSearchResult as Page } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
+import CopyButton from 'components/ui/CopyButton'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { PLAN_REQUEST_EMPTY_PLACEHOLDER } from 'components/ui/UpgradePlanButton'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import type { Project } from 'data/projects/project-detail-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
@@ -24,6 +43,8 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -41,7 +62,9 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
+import { IssueSuggestion } from './IssueSuggestions'
 import { LibrarySuggestions } from './LibrarySuggestions'
 import { PlanExpectationInfoBox } from './PlanExpectationInfoBox'
 import {
@@ -56,28 +79,114 @@ const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 const CONTAINER_CLASSES = 'px-6'
 
+const createFormSchema = (showClientLibraries: boolean) => {
+  const baseSchema = z.object({
+    organizationSlug: z.string().min(1, 'Please select an organization'),
+    projectRef: z.string().min(1, 'Please select a project'),
+    category: z.string().min(1, 'Please select an issue type'),
+    severity: z.string(),
+    library: z.string(),
+    subject: z.string().min(1, 'Please add a subject heading'),
+    message: z.string().min(1, "Please add a message about the issue that you're facing"),
+    affectedServices: z.string(),
+    allowSupportAccess: z.boolean(),
+  })
+
+  if (showClientLibraries) {
+    return baseSchema
+      .refine(
+        (data) => {
+          return !(data.category === 'Problem' && data.library === '')
+        },
+        {
+          message: "Please select the library that you're facing issues with",
+          path: ['library'],
+        }
+      )
+      .refine(
+        (data) => {
+          return !data.message.includes(PLAN_REQUEST_EMPTY_PLACEHOLDER)
+        },
+        {
+          message: `Please let us know which plan you'd like to upgrade to for your organization`,
+          path: ['message'],
+        }
+      )
+  }
+
+  // When showClientLibraries is false, make library optional and remove the refine validation
+  return baseSchema
+    .extend({
+      library: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        return !data.message.includes(PLAN_REQUEST_EMPTY_PLACEHOLDER)
+      },
+      {
+        message: `Please let us know which plan you'd like to upgrade to for your organization`,
+        path: ['message'],
+      }
+    )
+}
+
+const defaultValues = {
+  organizationSlug: '',
+  // [Joshen TODO] We should refactor this to accept a null value instead of a magic string
+  projectRef: 'no-project',
+  category: '',
+  severity: 'Low',
+  library: '',
+  subject: '',
+  message: '',
+  affectedServices: '',
+  allowSupportAccess: true,
+}
+
 interface SupportFormV2Props {
   onProjectSelected: (value: string) => void
   onOrganizationSelected: (value: string) => void
   setSentCategory: (value: string) => void
 }
 
-// [Joshen] Just naming it as V2 for now for PR review purposes so its easier to view
-// This is a rewrite of the old SupportForm to use the new form components
 export const SupportFormV2 = ({
   onProjectSelected: setSelectedProject,
   onOrganizationSelected: setSelectedOrganization,
   setSentCategory,
 }: SupportFormV2Props) => {
   const { profile } = useProfile()
+  const [highlightRef, setHighlightRef] = useQueryState('highlight', { defaultValue: '' })
+
+  // [Joshen] Ideally refactor all these to use nuqs
   const {
-    projectRef: ref,
-    slug,
+    projectRef: urlRef,
+    slug: urlSlug,
     category: urlCategory,
     subject: urlSubject,
     message: urlMessage,
     error,
   } = useParams()
+  const router = useRouter()
+  const dashboardSentryIssueId = router.query.sid as string
+
+  const isBillingEnabled = useIsFeatureEnabled('billing:all')
+  const showClientLibraries = useIsFeatureEnabled('support:show_client_libraries')
+
+  const categoryOptions = useMemo(() => {
+    return CATEGORY_OPTIONS.filter((option) => {
+      if (
+        option.value === SupportCategories.BILLING ||
+        option.value === SupportCategories.REFUND ||
+        option.value === SupportCategories.SALES_ENQUIRY
+      ) {
+        return isBillingEnabled
+      } else if (option.value === 'Plan_upgrade') {
+        return !isBillingEnabled
+      }
+
+      return true
+    })
+  }, [isBillingEnabled])
 
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -85,39 +194,7 @@ export const SupportFormV2 = ({
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
 
-  const FormSchema = z
-    .object({
-      organizationSlug: z.string().min(1, 'Please select an organization'),
-      projectRef: z.string().min(1, 'Please select a project'),
-      category: z.string(),
-      severity: z.string(),
-      library: z.string(),
-      subject: z.string().min(1, 'Please add a subject heading'),
-      message: z.string().min(1, "Please add a message about the issue that you're facing"),
-      affectedServices: z.string(),
-      allowSupportAccess: z.boolean(),
-    })
-    .refine(
-      (data) => {
-        return !(data.category === 'Problem' && data.library === '')
-      },
-      {
-        message: "Please select the library that you're facing issues with",
-        path: ['library'],
-      }
-    )
-
-  const defaultValues = {
-    organizationSlug: '',
-    projectRef: 'no-project',
-    category: CATEGORY_OPTIONS[0].value,
-    severity: 'Low',
-    library: '',
-    subject: '',
-    message: '',
-    affectedServices: '',
-    allowSupportAccess: true,
-  }
+  const FormSchema = useMemo(() => createFormSchema(showClientLibraries), [showClientLibraries])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -140,11 +217,7 @@ export const SupportFormV2 = ({
     () => organizations?.find((org) => org.slug === organizationSlug),
     [organizationSlug, organizations]
   )
-  const {
-    data: allProjects,
-    isLoading: isLoadingProjects,
-    isSuccess: isSuccessProjects,
-  } = useProjectsQuery()
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
@@ -173,10 +246,6 @@ export const SupportFormV2 = ({
   const respondToEmail = profile?.primary_email ?? 'your email'
   const subscriptionPlanId = selectedOrganization?.plan.id
 
-  const projects = [
-    ...(allProjects ?? []).filter((project) => project.organization_slug === organizationSlug),
-    { ref: 'no-project', name: 'No specific project' } as Partial<Project>,
-  ]
   const hasResults =
     state.status === 'fullResults' ||
     state.status === 'partialResults' ||
@@ -209,7 +278,9 @@ export const SupportFormV2 = ({
     setIsSubmitting(true)
     const attachments =
       uploadedFiles.length > 0 ? await uploadAttachments(values.projectRef, uploadedFiles) : []
-    const selectedLibrary = CLIENT_LIBRARIES.find((library) => library.language === values.library)
+    const selectedLibrary = values.library
+      ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
+      : undefined
 
     const payload = {
       ...values,
@@ -226,6 +297,7 @@ export const SupportFormV2 = ({
         .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
         .join(';'),
       browserInformation: detectBrowser(),
+      ...(dashboardSentryIssueId && { dashboardSentryIssueId }),
     }
 
     if (values.projectRef !== 'no-project') {
@@ -269,32 +341,36 @@ export const SupportFormV2 = ({
 
   useEffect(() => {
     // For prefilling form fields via URL, project ref will taking higher precedence than org slug
-    if (isSuccessOrganizations && isSuccessProjects) {
-      if (organizations.length === 0) {
-        form.setValue('organizationSlug', 'no-org')
-      } else if (ref) {
-        const selectedProject = allProjects.find((p) => p.ref === ref)
-        if (selectedProject !== undefined) {
-          form.setValue('organizationSlug', selectedProject.organization_slug)
-          form.setValue('projectRef', selectedProject.ref)
-        }
-      } else if (slug) {
-        if (organizations.some((it) => it.slug === slug)) {
-          form.setValue('organizationSlug', slug)
-        }
-      } else if (ref === undefined && slug === undefined) {
-        const firstOrganization = organizations?.[0]
-        if (firstOrganization !== undefined) {
-          form.setValue('organizationSlug', firstOrganization.slug)
+    const prefillForm = async () => {
+      if (isSuccessOrganizations) {
+        if (organizations.length === 0) {
+          form.setValue('organizationSlug', 'no-org')
+        } else if (urlRef && urlRef !== 'no-project') {
+          // Check validity of project via project details
+          const selectedProject = await getProjectDetail({ ref: urlRef })
+          if (!!selectedProject) {
+            const org = organizations.find((x) => x.id === selectedProject.organization_id)
+            if (!!org) form.setValue('organizationSlug', org.slug)
+            form.setValue('projectRef', selectedProject.ref)
+          }
+        } else if (urlSlug) {
+          if (organizations.some((it) => it.slug === urlSlug)) {
+            form.setValue('organizationSlug', urlSlug)
+          }
+        } else if (!urlRef && !urlSlug) {
+          const firstOrganization = organizations?.[0]
+          if (!!firstOrganization) {
+            form.setValue('organizationSlug', firstOrganization.slug)
+          }
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref, slug, isSuccessOrganizations, isSuccessProjects])
+    prefillForm()
+  }, [urlRef, urlSlug, isSuccessOrganizations])
 
   useEffect(() => {
     if (urlCategory) {
-      const validCategory = CATEGORY_OPTIONS.find((option) => {
+      const validCategory = categoryOptions.find((option) => {
         if (option.value.toLowerCase() === ((urlCategory as string) ?? '').toLowerCase())
           return option
       })
@@ -383,38 +459,103 @@ export const SupportFormV2 = ({
           )}
         />
 
-        <div className={cn(CONTAINER_CLASSES, 'flex flex-col gap-y-2')}>
+        <div id="projectRef-field" className={cn(CONTAINER_CLASSES, 'flex flex-col gap-y-2')}>
           <FormField_Shadcn_
             name="projectRef"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout layout="vertical" label="Which project is affected?">
+              <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
                 <FormControl_Shadcn_>
-                  <Select_Shadcn_
-                    {...field}
-                    disabled={isLoadingProjects}
-                    defaultValue={field.value}
-                    onValueChange={(val) => {
-                      if (val.length > 0) field.onChange(val)
+                  <OrganizationProjectSelector
+                    key={organizationSlug}
+                    sameWidthAsTrigger
+                    checkPosition="left"
+                    slug={organizationSlug}
+                    selectedRef={field.value}
+                    onInitialLoad={(projects) => {
+                      if (!urlRef) field.onChange(projects[0]?.ref ?? 'no-project')
                     }}
-                  >
-                    <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select a project" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        {projects?.map((project) => (
-                          <SelectItem_Shadcn_ key={project.ref} value={project.ref as string}>
-                            {project.name}
-                          </SelectItem_Shadcn_>
-                        ))}
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    onSelect={(project) => field.onChange(project.ref)}
+                    renderTrigger={({ isLoading, project }) => (
+                      <Button
+                        block
+                        type="default"
+                        role="combobox"
+                        size="small"
+                        className="justify-between"
+                        iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                      >
+                        {isLoading ? (
+                          <ShimmeringLoader className="w-44 py-2" />
+                        ) : field.value === 'no-project' ? (
+                          'No specific project'
+                        ) : (
+                          project?.name ?? 'Unknown project'
+                        )}
+                      </Button>
+                    )}
+                    renderActions={(setOpen) => (
+                      <CommandGroup_Shadcn_>
+                        <CommandItem_Shadcn_
+                          className="w-full gap-x-2"
+                          onSelect={() => {
+                            field.onChange('no-project')
+                            setOpen(false)
+                          }}
+                        >
+                          {field.value === 'no-project' && <Check size={16} />}
+                          <p className={field.value !== 'no-project' ? 'ml-6' : ''}>
+                            No specific project
+                          </p>
+                        </CommandItem_Shadcn_>
+                      </CommandGroup_Shadcn_>
+                    )}
+                  />
                 </FormControl_Shadcn_>
               </FormItemLayout>
             )}
           />
+
+          <AnimatePresence>
+            {projectRef !== 'no-project' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center gap-x-1"
+              >
+                <p
+                  className={cn(
+                    'text-sm prose transition',
+                    highlightRef ? 'text-foreground' : 'text-foreground-lighter'
+                  )}
+                >
+                  Project ID:{' '}
+                  <code
+                    className={cn(
+                      'transition',
+                      highlightRef
+                        ? 'text-brand font-medium border-brand-500 animate-pulse'
+                        : 'text-foreground-light'
+                    )}
+                  >
+                    {projectRef}
+                  </code>
+                </p>
+                <CopyButton
+                  iconOnly
+                  type="text"
+                  text={projectRef}
+                  onClick={() => {
+                    toast.success('Copied to clipboard')
+                    setHighlightRef(null)
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {organizationSlug &&
             subscriptionPlanId !== 'enterprise' &&
             category !== 'Login_issues' && (
@@ -436,7 +577,7 @@ export const SupportFormV2 = ({
             name="category"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout layout="vertical" label="What areas are you having problems with?">
+              <FormItemLayout layout="vertical" label="What are you having issues with?">
                 <FormControl_Shadcn_>
                   <Select_Shadcn_
                     {...field}
@@ -444,13 +585,15 @@ export const SupportFormV2 = ({
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_>
-                        {CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label}
+                      <SelectValue_Shadcn_ placeholder="Select an issue">
+                        {field.value
+                          ? categoryOptions.find((o) => o.value === field.value)?.label
+                          : null}
                       </SelectValue_Shadcn_>
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
-                        {CATEGORY_OPTIONS.map((option) => (
+                        {categoryOptions.map((option) => (
                           <SelectItem_Shadcn_ key={option.value} value={option.value}>
                             {option.label}
                             <span className="block text-xs text-foreground-lighter">
@@ -498,6 +641,9 @@ export const SupportFormV2 = ({
               </FormItemLayout>
             )}
           />
+
+          <IssueSuggestion category={category} projectRef={projectRef} />
+
           {(severity === 'Urgent' || severity === 'High') && (
             <p className="text-sm text-foreground-light mt-2 sm:col-span-2">
               We do our best to respond to everyone as quickly as possible; however, prioritization
@@ -532,7 +678,7 @@ export const SupportFormV2 = ({
           {docsResults.length > 0 && hasResults && (
             <>
               <div className="flex items-center gap-2">
-                <h5 className="text-sm text-foreground-lighter">AI Suggested resources</h5>
+                <h5 className="text-foreground-lighter">AI Suggested resources</h5>
                 {searchState.status === 'loading' && (
                   <div className="flex items-center gap-2 text-xs text-foreground-light">
                     <Loader2 className="animate-spin" size={12} />
@@ -557,9 +703,7 @@ export const SupportFormV2 = ({
                       )}
                       <a
                         href={
-                          page.type === 'github-discussions'
-                            ? page.path
-                            : `https://supabase.com/docs${page.path}`
+                          page.type === 'github-discussions' ? page.path : `${DOCS_URL}${page.path}`
                         }
                         target="_blank"
                         rel="noreferrer"
@@ -584,7 +728,7 @@ export const SupportFormV2 = ({
                 rel="noreferrer"
                 className="flex items-center gap-x-1 underline hover:text-foreground transition"
               >
-                Github discussions
+                GitHub discussions
                 <ExternalLink size={14} strokeWidth={2} />
               </Link>
               <span> for a quick answer</span>
@@ -592,7 +736,7 @@ export const SupportFormV2 = ({
           )}
         </div>
 
-        {category === 'Problem' && (
+        {category === 'Problem' && showClientLibraries && (
           <FormField_Shadcn_
             name="library"
             control={form.control}
@@ -609,7 +753,7 @@ export const SupportFormV2 = ({
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Please select a library" />
+                      <SelectValue_Shadcn_ placeholder="Select a library" />
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
@@ -627,9 +771,9 @@ export const SupportFormV2 = ({
           />
         )}
 
-        {library.length > 0 && <LibrarySuggestions library={library} />}
+        {library && library.length > 0 && <LibrarySuggestions library={library} />}
 
-        {category !== 'Login_issues' && (
+        {category !== 'Login_issues' && category !== 'Plan_upgrade' && (
           <FormField_Shadcn_
             name="affectedServices"
             control={form.control}

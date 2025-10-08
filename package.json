@@ -29,7 +29,6 @@
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
-
     "e2e": "pnpm --prefix e2e/studio run e2e",
     "e2e:dev-hosted": "pnpm --prefix e2e/studio run e2e:dev-hosted",
     "e2e:dev-selfhosted": "pnpm --prefix e2e/studio run e2e:dev-selfhosted",
@@ -39,7 +38,6 @@
     "e2e:ci": "pnpm --prefix e2e/studio run e2e:ci",
     "e2e:supabase:start": "pnpm --prefix e2e/studio run supabase:start",
     "e2e:supabase:stop": "pnpm --prefix e2e/studio run supabase:stop",
-
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
     "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
@@ -58,26 +56,16 @@
     "supabase": "^1.151.1",
     "supports-color": "^8.0.0",
     "turbo": "2.3.3",
-    "typescript": "~5.5.0"
+    "typescript": "catalog:"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
   },
-  "pnpm": {
-    "overrides": {
-      "@supabase/supabase-js>@supabase/auth-js": "catalog:",
-      "@tanstack/directive-functions-plugin>vite": "catalog:",
-      "@tanstack/react-start-plugin>vite": "catalog:",
-      "esbuild": "^0.25.2",
-      "payload>image-size": "1.2.1"
-    },
-    "neverBuiltDependencies": ["libpg-query"]
-  },
   "engines": {
-    "pnpm": ">=9",
+    "pnpm": "10.18",
     "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@9.15.5"
+  "packageManager": "pnpm@10.18.0"
 }

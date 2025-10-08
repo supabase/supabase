@@ -1,24 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
+import Link from 'next/link'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { InlineLink } from 'components/ui/InlineLink'
+import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
 import {
   REALTIME_DEFAULT_CONFIG,
   useRealtimeConfigurationQuery,
 } from 'data/realtime/realtime-config-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
@@ -38,19 +40,37 @@ const formId = 'realtime-configuration-form'
 
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
-  const canUpdateConfig = useCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
+  const {
+    can: canUpdateConfig,
+    isLoading: isLoadingPermissions,
+    isSuccess: isPermissionsLoaded,
+  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
 
   const { data: maxConn } = useMaxConnectionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data, error, isLoading, isSuccess, isError } = useRealtimeConfigurationQuery({
+  const { data, error, isLoading, isError } = useRealtimeConfigurationQuery({
     projectRef,
   })
 
+  const { data: policies, isSuccess: isSuccessPolicies } = useDatabasePoliciesQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    schema: 'realtime',
+  })
+
+  const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
+
+  // Check if RLS policies exist for realtime.messages table
+  const realtimeMessagesPolicies = policies?.filter(
+    (policy) => policy.schema === 'realtime' && policy.table === 'messages'
+  )
+  const hasRealtimeMessagesPolicies =
+    realtimeMessagesPolicies && realtimeMessagesPolicies.length > 0
 
   const { mutate: updateRealtimeConfig, isLoading: isUpdatingConfig } =
     useRealtimeConfigurationUpdateMutation({
@@ -81,7 +101,14 @@ export const RealtimeSettings = () => {
       ...REALTIME_DEFAULT_CONFIG,
       allow_public: !REALTIME_DEFAULT_CONFIG.private_only,
     },
+    values: {
+      ...(data ?? REALTIME_DEFAULT_CONFIG),
+      allow_public: !(data?.private_only ?? REALTIME_DEFAULT_CONFIG.private_only),
+    } as any,
   })
+
+  const { allow_public } = form.watch()
+  const isSettingToPrivate = !data?.private_only && !allow_public
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -92,14 +119,6 @@ export const RealtimeSettings = () => {
       max_concurrent_users: data.max_concurrent_users,
     })
   }
-
-  useEffect(() => {
-    // [Joshen] Temp typed with any - API typing marks all the properties as nullable,
-    // but checked with Filipe that they're not supposed to
-    if (isSuccess) {
-      form.reset({ ...data, allow_public: !data.private_only } as any)
-    }
-  }, [isSuccess])
 
   return (
     <ScaffoldSection isFullWidth>
@@ -118,7 +137,11 @@ export const RealtimeSettings = () => {
                       className="!p-0 !pt-2"
                       header={<FormSectionLabel>Channel restrictions</FormSectionLabel>}
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent
+                        loaders={1}
+                        loading={isLoading || isLoadingPermissions}
+                        className="!gap-y-2"
+                      >
                         <FormItemLayout
                           layout="flex"
                           label="Allow public access"
@@ -132,6 +155,30 @@ export const RealtimeSettings = () => {
                             />
                           </FormControl_Shadcn_>
                         </FormItemLayout>
+
+                        {isSuccessPolicies && !hasRealtimeMessagesPolicies && !allow_public && (
+                          <Admonition
+                            showIcon={false}
+                            type="warning"
+                            title="No Realtime RLS policies found"
+                            description={
+                              <>
+                                <p className="prose max-w-full text-sm">
+                                  Private mode is {isSettingToPrivate ? 'being ' : ''}
+                                  enabled, but no RLS policies exists on the{' '}
+                                  <code className="text-xs">realtime.messages</code> table. No
+                                  messages will be received by users.
+                                </p>
+
+                                <Button asChild type="default" className="mt-2">
+                                  <Link href={`/project/${projectRef}/realtime/policies`}>
+                                    Create policy
+                                  </Link>
+                                </Button>
+                              </>
+                            }
+                          />
+                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}
@@ -156,7 +203,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -199,7 +246,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -209,22 +256,28 @@ export const RealtimeSettings = () => {
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
-                        {!isUsageBillingEnabled && (
-                          <Admonition
-                            showIcon={false}
-                            type="default"
-                            title="Spend cap needs to be disabled to configure this value"
-                            description={
-                              <>
-                                You may adjust this setting in the{' '}
-                                <InlineLink
-                                  href={`/org/${organization?.slug}/billing?panel=costControl`}
-                                >
-                                  organization billing settings
-                                </InlineLink>
-                              </>
-                            }
-                          />
+                        {isSuccessOrganization && !isUsageBillingEnabled && (
+                          <Admonition showIcon={false} type="default">
+                            <div className="flex items-center gap-x-2">
+                              <div>
+                                <h5 className="text-foreground mb-1">
+                                  Spend cap needs to be disabled to configure this value
+                                </h5>
+                                <p className="text-foreground-light">
+                                  {isFreePlan
+                                    ? 'Upgrade to the Pro plan first to disable spend cap'
+                                    : 'You may adjust this setting in the organization billing settings'}
+                                </p>
+                              </div>
+                              <div className="flex-grow flex items-center justify-end">
+                                {false ? (
+                                  <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                ) : (
+                                  <ToggleSpendCapButton />
+                                )}
+                              </div>
+                            </div>
+                          </Admonition>
                         )}
                       </FormSectionContent>
                     </FormSection>
@@ -389,7 +442,7 @@ export const RealtimeSettings = () => {
               </CardContent> */}
               <CardFooter className="justify-between">
                 <div>
-                  {!canUpdateConfig && (
+                  {isPermissionsLoaded && !canUpdateConfig && (
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update realtime settings
                     </p>

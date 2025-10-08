@@ -3,15 +3,14 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
@@ -26,9 +25,15 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { GB, PROJECT_STATUS } from 'lib/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsCloudProvider,
+  useIsAwsK8sCloudProvider,
+  useIsAwsNimbusCloudProvider,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
+import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
   Button,
@@ -60,12 +65,10 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 
 export function DiskManagementForm() {
-  // isLoading is used to avoid a useCheckPermissions() race condition
-  const { project, isLoading: isProjectLoading } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
 
@@ -76,28 +79,20 @@ export function DiskManagementForm() {
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
 
-  /**
-   * Permissions
-   */
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+      resource: {
+        project_id: project?.id,
+      },
+    })
 
-  /**
-   * Component States
-   */
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [message, setMessageState] = useState<DiskManagementMessage | null>(null)
   const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
-  /**
-   * Fetch form data
-   */
   const { data: databases, isSuccess: isReadReplicasSuccess } = useReadReplicasQuery({ projectRef })
   const { data, isSuccess: isDiskAttributesSuccess } = useDiskAttributesQuery(
     { projectRef },
@@ -143,9 +138,6 @@ export function DiskManagementForm() {
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
     useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: project != null && isAws })
 
-  /**
-   * Handle default values
-   */
   const computeSize = project?.infra_compute_size
     ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
     : undefined
@@ -166,7 +158,10 @@ export function DiskManagementForm() {
 
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(
-      CreateDiskStorageSchema(defaultValues.totalSize, project?.cloud_provider as CloudProvider)
+      CreateDiskStorageSchema({
+        defaultTotalSize: defaultValues.totalSize,
+        cloudProvider: project?.cloud_provider as CloudProvider,
+      })
     ),
     defaultValues,
     mode: 'onBlur',
@@ -186,10 +181,6 @@ export function DiskManagementForm() {
       }
     }
   }, [modifiedComputeSize, isDialogOpen, project])
-
-  /**
-   * State handling
-   */
 
   const isSuccess =
     isAddonsSuccess &&
@@ -225,7 +216,7 @@ export function DiskManagementForm() {
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
-  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration && !isProjectLoading
+  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
@@ -255,12 +246,14 @@ export function DiskManagementForm() {
     let willUpdateDiskConfiguration = false
     setMessageState(null)
 
+    // [Joshen] Skip disk configuration related stuff for AWS Nimbus
     try {
       if (
-        payload.storageType !== form.formState.defaultValues?.storageType ||
-        payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
-        payload.throughput !== form.formState.defaultValues?.throughput ||
-        payload.totalSize !== form.formState.defaultValues?.totalSize
+        !isAwsNimbus &&
+        (payload.storageType !== form.formState.defaultValues?.storageType ||
+          payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
+          payload.throughput !== form.formState.defaultValues?.throughput ||
+          payload.totalSize !== form.formState.defaultValues?.totalSize)
       ) {
         willUpdateDiskConfiguration = true
 
@@ -274,9 +267,10 @@ export function DiskManagementForm() {
       }
 
       if (
-        payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
-        payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
-        payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb
+        !isAwsNimbus &&
+        (payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
+          payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
+          payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb)
       ) {
         await updateDiskAutoscaleConfig({
           projectRef,
@@ -324,15 +318,7 @@ export function DiskManagementForm() {
             type="default"
             visible={isPlanUpgradeRequired}
             title="Compute and Disk configuration is not available on the Free Plan"
-            actions={
-              <Button type="default" asChild>
-                <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementConfigure`}
-                >
-                  Upgrade plan
-                </Link>
-              </Button>
-            }
+            actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
           />
 
@@ -358,12 +344,16 @@ export function DiskManagementForm() {
             </div>
           ) : null}
           <Separator />
+
           <ComputeSizeField form={form} disabled={disableComputeInputs} />
-          <Separator />
+
+          {!(isAws || isAwsNimbus) && <Separator />}
+
           <SpendCapDisabledSection />
+
           <NoticeBar
             type="default"
-            visible={!isAws}
+            visible={!(isAws || isAwsNimbus)}
             title="Disk configuration is only available for projects in the AWS cloud provider"
             description={
               isAwsK8s
@@ -386,7 +376,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
                     />
                   </Admonition>
                 )}
@@ -399,7 +389,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                     />
                   </Admonition>
                 )}

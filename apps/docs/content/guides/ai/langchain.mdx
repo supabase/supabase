@@ -20,7 +20,7 @@ Prepare you database with the relevant tables:
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [SQL Editor](https://supabase.com/dashboard/project/_/sql) page in the Dashboard.
+1. Go to the [SQL Editor](/dashboard/project/_/sql) page in the Dashboard.
 2. Click **LangChain** in the Quick start section.
 3. Click **Run**.
 
@@ -76,8 +76,8 @@ $$;
 You can now search your documents using any Node.js application. This is intended to be run on a secure server route.
 
 ```js
-import { SupabaseVectorStore } from 'langchain/vectorstores/supabase'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
+import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
+import { OpenAIEmbeddings } from '@langchain/openai'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -111,8 +111,8 @@ export const run = async () => {
 Given the above `match_documents` Postgres function, you can also pass a filter parameter to only return documents with a specific metadata field value. This filter parameter is a JSON object, and the `match_documents` function will use the Postgres JSONB Containment operator `@>` to filter documents by the metadata field values you specify. See details on the [Postgres JSONB Containment operator](https://www.postgresql.org/docs/current/datatype-json.html#JSON-CONTAINMENT) for more information.
 
 ```js
-import { SupabaseVectorStore } from 'langchain/vectorstores/supabase'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
+import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
+import { OpenAIEmbeddings } from '@langchain/openai'
 import { createClient } from '@supabase/supabase-js'
 
 // First, follow set-up instructions above
@@ -147,11 +147,11 @@ export const run = async () => {
 
 ### Advanced metadata filtering
 
-You can also use query builder-style filtering ([similar to how the Supabase JavaScript library works](https://supabase.com/docs/reference/javascript/using-filters)) instead of passing an object. Note that since the filter properties will be in the metadata column, you need to use arrow operators (`->` for integer or `->>` for text) as defined in [PostgREST API documentation](https://postgrest.org/en/stable/references/api/tables_views.html?highlight=operators#json-columns) and specify the data type of the property (e.g. the column should look something like `metadata->some_int_value::int`).
+You can also use query builder-style filtering ([similar to how the Supabase JavaScript library works](/docs/reference/javascript/using-filters)) instead of passing an object. Note that since the filter properties will be in the metadata column, you need to use arrow operators (`->` for integer or `->>` for text) as defined in [PostgREST API documentation](https://postgrest.org/en/stable/references/api/tables_views.html?highlight=operators#json-columns) and specify the data type of the property (e.g. the column should look something like `metadata->some_int_value::int`).
 
 ```js
-import { SupabaseFilterRPCCall, SupabaseVectorStore } from 'langchain/vectorstores/supabase'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
+import { SupabaseFilterRPCCall, SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
+import { OpenAIEmbeddings } from '@langchain/openai'
 import { createClient } from '@supabase/supabase-js'
 
 // First, follow set-up instructions above

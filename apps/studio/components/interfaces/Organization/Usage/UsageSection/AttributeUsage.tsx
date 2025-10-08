@@ -11,7 +11,7 @@ import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-que
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import SectionContent from '../SectionContent'
+import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
   ChartTooltipValueFormatter,
@@ -224,7 +224,7 @@ const AttributeUsage = ({
                   </div>
                 ) : chartData.length > 0 && notAllValuesZero ? (
                   <UsageBarChart
-                    name={`${attribute.chartPrefix || ''}${attribute.name}`}
+                    name={`${attribute.chartPrefix || ''} ${attribute.name}`}
                     unit={attribute.unit}
                     attributes={attribute.attributes}
                     data={chartData}

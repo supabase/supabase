@@ -44,6 +44,7 @@ const PasswordStrengthBar = ({
         >
           Generate a password
         </span>
+        .
       </p>
     </>
   )

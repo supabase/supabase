@@ -8,7 +8,9 @@ import { DataPoint } from 'data/analytics/constants'
 import { useOrgDailyComputeStatsQuery } from 'data/analytics/org-daily-compute-stats-query'
 import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
-import SectionContent from './SectionContent'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
+import { SectionContent } from './SectionContent'
 import { Attribute, AttributeColor } from './Usage.constants'
 import UsageBarChart from './UsageBarChart'
 
@@ -33,6 +35,8 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
     startDate,
     endDate,
   })
+
+  const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
   const chartData: DataPoint[] = egressData?.data ?? []
 
@@ -79,16 +83,18 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
           name: 'Compute Hours',
           description:
             'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Micro Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
-          links: [
-            {
-              name: 'Compute Add-ons',
-              url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
-            },
-            {
-              name: 'Usage-billing for Compute',
-              url: 'https://supabase.com/docs/guides/platform/manage-your-usage/compute',
-            },
-          ],
+          links: billingAll
+            ? [
+                {
+                  name: 'Compute Add-ons',
+                  url: `${DOCS_URL}/guides/platform/compute-add-ons`,
+                },
+                {
+                  name: 'Usage-billing for Compute',
+                  url: `${DOCS_URL}/guides/platform/manage-your-usage/compute`,
+                },
+              ]
+            : [],
         }}
       >
         {isLoading && <GenericSkeletonLoader />}

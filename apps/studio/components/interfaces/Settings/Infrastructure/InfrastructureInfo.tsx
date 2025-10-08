@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -13,7 +12,7 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,7 +24,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
-import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import {
   ObjectsToBeDroppedWarning,
   ReadReplicasWarning,
@@ -35,9 +34,10 @@ import {
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
-  const authEnabled = useIsFeatureEnabled('project_auth:all')
+  const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
+    useIsFeatureEnabled(['project_auth:all', 'project_settings:database_upgrades'])
 
   const {
     data,
@@ -65,8 +65,9 @@ const InfrastructureInfo = () => {
   const currentPgVersion = (current_app_version ?? '')
     .split('supabase-postgres-')[1]
     ?.replace('-orioledb', '')
-  const isOnNonGenerallyAvailableReleaseChannel =
-    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+  const isVisibleReleaseChannel =
+    current_app_version_release_channel &&
+    !['ga', 'withdrawn'].includes(current_app_version_release_channel)
       ? current_app_version_release_channel
       : undefined
   const isOrioleDb = useIsOrioleDb()
@@ -92,9 +93,9 @@ const InfrastructureInfo = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>
-            <p>Service Versions</p>
-            <p className="text-foreground-light text-sm">
-              Information on your provisioned instance
+            <h4 className="text-base capitalize m-0">Service Versions</h4>
+            <p className="text-foreground-light text-sm pr-8 mt-1">
+              Service versions and upgrade eligibility for your provisioned instance.
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
@@ -109,6 +110,7 @@ const InfrastructureInfo = () => {
               </Alert_Shadcn_>
             ) : (
               <>
+                {/* [Joshen] Double check why we need this waterfall loading behaviour here */}
                 {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
                 {isErrorUpgradeEligibility && (
                   <AlertError error={error} subject="Failed to retrieve Postgres version" />
@@ -144,16 +146,16 @@ const InfrastructureInfo = () => {
                           value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
                           label="Postgres version"
                           actions={[
-                            isOnNonGenerallyAvailableReleaseChannel && (
+                            isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1 capitalize">
-                                    {isOnNonGenerallyAvailableReleaseChannel}
+                                    {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
-                                  database version release
+                                  This project uses a {isVisibleReleaseChannel} database version
+                                  release
                                 </TooltipContent>
                               </Tooltip>
                             ),
@@ -187,7 +189,7 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {data.eligible ? (
+                    {showDatabaseUpgrades && data.eligible ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (
@@ -195,7 +197,7 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {!data.eligible ? (
+                    {showDatabaseUpgrades && !data.eligible ? (
                       hasObjectsToBeDropped ? (
                         <ObjectsToBeDroppedWarning
                           objectsToBeDropped={data.objects_to_be_dropped}

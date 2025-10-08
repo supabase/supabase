@@ -14,7 +14,7 @@ export async function getProfileIdentities() {
 }
 
 type ProfileIdentitiesData = {
-  identities: UserIdentity[]
+  identities: (UserIdentity & { email?: string })[]
   new_email?: string
   email_change_sent_at?: string
 }

@@ -603,10 +603,6 @@ module.exports = {
     cssVariable: 'var(--brand-default)',
     value: 'hsl(153.10000000000002, 60.2%, 52.7%)',
   },
-  'brand-button': {
-    cssVariable: 'var(--brand-button)',
-    value: 'hsl(154.89999999999998, 100%, 19.2%)',
-  },
   'brand-link': {
     cssVariable: 'var(--brand-link)',
     value: 'hsl(155, 100%, 38.6%)',

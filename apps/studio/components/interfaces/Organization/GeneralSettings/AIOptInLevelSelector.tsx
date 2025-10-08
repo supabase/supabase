@@ -2,11 +2,10 @@ import { ReactNode } from 'react'
 import { Control } from 'react-hook-form'
 
 import { AIOptInFormValues } from 'hooks/forms/useAIOptInForm'
-import { useFlag } from 'hooks/ui/useFlag'
 import { FormField_Shadcn_, RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OptInToOpenAIToggle } from './OptInToOpenAIToggle'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 interface AIOptInLevelSelectorProps {
   control: Control<AIOptInFormValues>
@@ -15,58 +14,66 @@ interface AIOptInLevelSelectorProps {
   layout?: 'horizontal' | 'vertical' | 'flex-row-reverse'
 }
 
-const AI_OPT_IN_LEVELS_OLD = [
-  {
-    value: 'disabled',
-    title: 'Disabled',
-    description:
-      'You do not consent to sharing any database information with Supabase AI and understand that responses will be generic and not tailored to your database',
-  },
-  {
-    value: 'schema',
-    title: 'Send anonymous metadata',
-    description:
-      'You consent to sending anonymous data to Supabase AI, which can improve the answers it shows you.',
-  },
-]
-
-const AI_OPT_IN_LEVELS = [
-  {
-    value: 'disabled',
-    title: 'Disabled',
-    description:
-      'You do not consent to sharing any database information with Amazon Bedrock and understand that responses will be generic and not tailored to your database',
-  },
-  {
-    value: 'schema',
-    title: 'Schema Only',
-    description:
-      'You consent to sharing your database’s schema metadata (such as table and column names, data types, and relationships—but not actual database data) with Amazon Bedrock',
-  },
-  {
-    value: 'schema_and_log',
-    title: 'Schema & Logs',
-    description:
-      'You consent to sharing your schema and logs (which may contain PII/database data) with Amazon Bedrock for better results',
-  },
-  {
-    value: 'schema_and_log_and_data',
-    title: 'Schema, Logs & Database Data',
-    description:
-      'You consent to give Amazon Bedrock  full access to run database read only queries and analyze results for optimal results',
-  },
-]
-
 export const AIOptInLevelSelector = ({
   control,
   disabled,
   label,
   layout = 'vertical',
 }: AIOptInLevelSelectorProps) => {
-  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
+  const {
+    aiOptInLevelDisabled,
+    aiOptInLevelSchema,
+    aiOptInLevelSchemaAndLog,
+    aiOptInLevelSchemaAndLogAndData,
+  } = useIsFeatureEnabled([
+    'ai:opt_in_level_disabled',
+    'ai:opt_in_level_schema',
+    'ai:opt_in_level_schema_and_log',
+    'ai:opt_in_level_schema_and_log_and_data',
+  ])
 
-  const optInLevels = useBedrockAssistant ? AI_OPT_IN_LEVELS : AI_OPT_IN_LEVELS_OLD
+  const AI_OPT_IN_LEVELS = [
+    ...(aiOptInLevelDisabled
+      ? [
+          {
+            value: 'disabled',
+            title: 'Disabled',
+            description:
+              'You do not consent to sharing any database information with third-party AI providers and understand that responses will be generic and not tailored to your database',
+          },
+        ]
+      : []),
+    ...(aiOptInLevelSchema
+      ? [
+          {
+            value: 'schema',
+            title: 'Schema Only',
+            description:
+              'You consent to sharing your database’s schema metadata (such as table and column names, data types, and relationships—but not actual database data) with third-party AI providers',
+          },
+        ]
+      : []),
+    ...(aiOptInLevelSchemaAndLog
+      ? [
+          {
+            value: 'schema_and_log',
+            title: 'Schema & Logs',
+            description:
+              'You consent to sharing your schema and logs (which may contain PII/database data) with third-party AI providers for better results',
+          },
+        ]
+      : []),
+    ...(aiOptInLevelSchemaAndLogAndData
+      ? [
+          {
+            value: 'schema_and_log_and_data',
+            title: 'Schema, Logs & Database Data',
+            description:
+              'You consent to give third-party AI providers full access to run database read-only queries and analyze results for optimal results',
+          },
+        ]
+      : []),
+  ]
 
   return (
     <FormItemLayout
@@ -74,24 +81,16 @@ export const AIOptInLevelSelector = ({
       layout={layout}
       description={
         <div className="flex flex-col gap-y-4 my-4 max-w-xl">
-          {useBedrockAssistant && (
-            <>
-              {!newOrgAiOptIn && (
-                <Admonition
-                  type="note"
-                  title="Assistant Opt-in is temporarily disabled"
-                  description="We will re-enable opting in to the assistant shortly!"
-                />
-              )}
-              <p>
-                Supabase AI can provide more relevant answers if you choose to share different
-                levels of data. This feature is powered by Amazon Bedrock which does not store or
-                log your prompts and completions, nor does it use them to train AWS models or
-                distribute them to third parties. This is an organization-wide setting, so please
-                select the level of data you are comfortable sharing.
-              </p>
-            </>
-          )}
+          <p>
+            Supabase AI can provide more relevant answers if you choose to share different levels of
+            data. This feature is powered by third-party AI providers. This is an organization-wide
+            setting, so please select the level of data you are comfortable sharing.
+          </p>
+          <p>
+            For organizations with HIPAA compliance enabled in their Supabase configuration, any
+            consented information will only be shared with third-party AI providers with whom
+            Supabase has established a Business Associate Agreement (BAA).
+          </p>
           <OptInToOpenAIToggle />
         </div>
       }
@@ -107,7 +106,7 @@ export const AIOptInLevelSelector = ({
               disabled={disabled}
               className="space-y-2 mb-6"
             >
-              {optInLevels.map((item) => (
+              {AI_OPT_IN_LEVELS.map((item) => (
                 <div key={item.value} className="flex items-start space-x-3">
                   <RadioGroupItem_Shadcn_
                     value={item.value}

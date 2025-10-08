@@ -5,7 +5,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
@@ -14,12 +13,13 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 import { Shortcuts } from './components/common/Shortcuts'
-import Footer from './components/footer/Footer'
+import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
-import Header, { HeaderProps } from './components/header/Header'
+import { Header, HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { GridProps } from './types'
 
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 
@@ -35,8 +35,7 @@ export const SupabaseGrid = ({
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const { project } = useProjectContext()
-
+  const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
@@ -61,17 +60,10 @@ export const SupabaseGrid = ({
     },
     {
       keepPreviousData: true,
-      retryDelay: (retryAttempt, error: any) => {
+      retry: (_, error: any) => {
         const doesNotExistError = error && error.message?.includes('does not exist')
-        const tooManyRequestsError = error.message?.includes('Too Many Requests')
-        const vaultError = error.message?.includes('query vault failed')
-
         if (doesNotExistError) onApplySorts([])
-
-        if (retryAttempt > 3 || doesNotExistError || tooManyRequestsError || vaultError) {
-          return Infinity
-        }
-        return 5000
+        return false
       },
     }
   )
@@ -85,7 +77,7 @@ export const SupabaseGrid = ({
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header customHeader={customHeader} />
+        <Header customHeader={customHeader} isRefetching={isRefetching} />
 
         {children || (
           <>
@@ -100,7 +92,7 @@ export const SupabaseGrid = ({
               filters={filters}
               onApplyFilters={onApplyFilters}
             />
-            <Footer isRefetching={isRefetching} />
+            <Footer />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}

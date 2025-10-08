@@ -1,12 +1,4 @@
-export { default as ColumnList } from './Tables/ColumnList'
-export { default as TableList } from './Tables/TableList'
-
 export { default as RolesList } from './Roles/RolesList'
-
-export { default as Extensions } from './Extensions/Extensions'
-
-export { default as PublicationsList } from './Publications/PublicationsList'
-export { default as PublicationsTables } from './Publications/PublicationsTables'
 
 export { default as BackupsList } from './Backups/BackupsList'
 

@@ -8,9 +8,19 @@ hideToc: true
 
 Supabase provides a globally distributed [Realtime](https://github.com/supabase/realtime) service with the following features:
 
-- [Broadcast](/docs/guides/realtime/broadcast): Send low-latency messages using the client libraries, REST, or your Database.
-- [Presence](/docs/guides/realtime/presence): Track and synchronize shared state between users.
-- [Postgres Changes](/docs/guides/realtime/postgres-changes): Listen to Database changes and send them to authorized users.
+- [Broadcast](/docs/guides/realtime/broadcast): Send low-latency messages between clients. Perfect for real-time messaging, database changes, cursor tracking, game events, and custom notifications.
+- [Presence](/docs/guides/realtime/presence): Track and synchronize user state across clients. Ideal for showing who's online, or active participants.
+- [Postgres Changes](/docs/guides/realtime/postgres-changes): Listen to database changes in real-time.
+
+## What can you build?
+
+- **Chat applications** - Real-time messaging with typing indicators and online presence
+- **Collaborative tools** - Document editing, whiteboards, and shared workspaces
+- **Live dashboards** - Real-time data visualization and monitoring
+- **Multiplayer games** - Synchronized game state and player interactions
+- **Social features** - Live notifications, reactions, and user activity feeds
+
+Check the [Getting Started](/docs/guides/realtime/getting-started) guide to get started.
 
 ## Examples
 
@@ -18,16 +28,32 @@ Supabase provides a globally distributed [Realtime](https://github.com/supabase/
   {[
     {
       name: 'Multiplayer.dev',
-      description: 'Mouse movements and chat messages.',
+      description: 'Showcase application displaying cursor movements and chat messages using Broadcast.',
       href: 'https://multiplayer.dev',
     },
-  ].map((x) => (
-    <div className="col-span-12" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
+    {
+      name: 'Chat',
+      description: 'Supabase UI chat component using Broadcast to send message between users.',
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-chat'
+    },
+    {
+      name: 'Avatar Stack',
+      description: 'Supabase UI avatar stack component using Presence to track connected users.',
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-avatar-stack'
+    },
+    {
+      name: 'Realtime Cursor',
+      description: "Supabase UI realtime cursor component using Broadcast to share users' cursors to build collaborative applications.",
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-cursor'
+    }
+].map((x) => (
+  <div className="col-span-6" key={x.href}>
+    <Link href={x.href} target="_blank" passHref>
+      <GlassPanel title={x.name}>{x.description}</GlassPanel>
+    </Link>
+  </div>
+))}
+
 </div>
 
 ## Resources

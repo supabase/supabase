@@ -17,6 +17,7 @@ export type ApiAuthorizationResponse = {
   expires_at: string
   approved_at: string | null
   approved_organization_slug?: string
+  registration_type: string
 }
 
 export async function getApiAuthorizationDetails(

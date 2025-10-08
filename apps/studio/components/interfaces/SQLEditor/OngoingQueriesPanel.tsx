@@ -3,13 +3,15 @@ import { RefreshCw, StopCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useQueryAbortMutation } from 'data/sql/abort-query-mutation'
 import { useOngoingQueriesQuery } from 'data/sql/ongoing-queries-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { IS_PLATFORM } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { ResponseError } from 'types'
 import {
@@ -27,13 +29,11 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useParams } from 'common'
 
 export const OngoingQueriesPanel = () => {
   const [_, setParams] = useUrlState({ replace: true })
   const { viewOngoingQueries } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
   const appState = useAppStateSnapshot()
   const [selectedId, setSelectedId] = useState<number>()

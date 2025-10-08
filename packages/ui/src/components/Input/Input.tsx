@@ -38,7 +38,7 @@ export interface Props
 }
 
 /**
- * @deprecated Use ./Input_shadcn_ instead or ./ui-patterns/data-inputs/input
+ * @deprecated Use `import { Input_Shadcn_ } from 'ui'` instead or `import { Input } from 'ui-patterns/DataInputs/Input'`
  */
 function Input({
   autoComplete,

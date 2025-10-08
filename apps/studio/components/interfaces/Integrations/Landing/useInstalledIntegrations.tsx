@@ -3,13 +3,23 @@ import { useMemo } from 'react'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from 'lib/void'
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
 import { INTEGRATIONS } from './Integrations.constants'
 
 export const useInstalledIntegrations = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+
+  const allIntegrations = useMemo(() => {
+    if (integrationsWrappers) {
+      return INTEGRATIONS
+    } else {
+      return INTEGRATIONS.filter((integration) => !integration.id.endsWith('_wrapper'))
+    }
+  }, [integrationsWrappers])
 
   const {
     data,
@@ -47,28 +57,30 @@ export const useInstalledIntegrations = () => {
   const wrappers = useMemo(() => data ?? EMPTY_ARR, [data])
 
   const installedIntegrations = useMemo(() => {
-    return INTEGRATIONS.filter((i) => {
-      // special handling for supabase webhooks
-      if (i.id === 'webhooks') {
-        return isHooksEnabled
-      }
-      if (i.type === 'wrapper') {
-        return wrappers.find((w) => wrapperMetaComparator(i.meta, w))
-      }
-      if (i.type === 'postgres_extension') {
-        return i.requiredExtensions.every((extName) => {
-          const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
-          return !!foundExtension?.installed_version
-        })
-      }
-      return false
-    }).sort((a, b) => a.name.localeCompare(b.name))
+    return allIntegrations
+      .filter((i) => {
+        // special handling for supabase webhooks
+        if (i.id === 'webhooks') {
+          return isHooksEnabled
+        }
+        if (i.type === 'wrapper') {
+          return wrappers.find((w) => wrapperMetaComparator(i.meta, w))
+        }
+        if (i.type === 'postgres_extension') {
+          return i.requiredExtensions.every((extName) => {
+            const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
+            return !!foundExtension?.installed_version
+          })
+        }
+        return false
+      })
+      .sort((a, b) => a.name.localeCompare(b.name))
   }, [wrappers, extensions, isHooksEnabled])
 
   // available integrations are all integrations that can be installed. If an integration can't be installed (needed
   // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
   const availableIntegrations = useMemo(
-    () => INTEGRATIONS.sort((a, b) => a.name.localeCompare(b.name)),
+    () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
     []
   )
 

@@ -1,8 +1,6 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCompletion } from 'ai/react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronUp, Command, Loader2 } from 'lucide-react'
+import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -21,9 +19,8 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
 import { detectOS, uuidv4 } from 'lib/helpers'
@@ -81,11 +78,10 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
 
   const { profile } = useProfile()
-  const project = useSelectedProject()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const queryClient = useQueryClient()
   const tabs = useTabsStateSnapshot()
@@ -209,7 +205,7 @@ export const SQLEditor = () => {
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
-        const { title: name } = await generateSqlTitle({ sql, useBedrockAssistant })
+        const { title: name } = await generateSqlTitle({ sql })
         snapV2.renameSnippet({ id, name })
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
@@ -217,7 +213,7 @@ export const SQLEditor = () => {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
     },
-    [generateSqlTitle, useBedrockAssistant, snapV2]
+    [generateSqlTitle, snapV2]
   )
 
   const prettifyQuery = useCallback(async () => {
@@ -456,26 +452,70 @@ export const SQLEditor = () => {
     closeDiff()
   }, [closeDiff, resetPrompt, sendEvent])
 
-  const {
-    complete,
-    completion,
-    isLoading: isCompletionLoading,
-  } = useCompletion({
-    api: useBedrockAssistant
-      ? `${BASE_PATH}/api/ai/sql/complete-v2`
-      : `${BASE_PATH}/api/ai/sql/complete`,
-    body: {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      includeSchemaMetadata,
+  const [isCompletionLoading, setIsCompletionLoading] = useState<boolean>(false)
+
+  const complete = useCallback(
+    async (
+      prompt: string,
+      options?: {
+        headers?: Record<string, string>
+        body?: { completionMetadata?: any }
+      }
+    ) => {
+      try {
+        setIsCompletionLoading(true)
+
+        const response = await fetch(`${BASE_PATH}/api/ai/code/complete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(options?.headers ?? {}),
+          },
+          body: JSON.stringify({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            language: 'sql',
+            orgSlug: org?.slug,
+            ...(options?.body ?? {}),
+          }),
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(errorText || 'Failed to generate completion')
+        }
+
+        // API returns a JSON-encoded string
+        const text: string = await response.json()
+
+        const meta = options?.body?.completionMetadata ?? {}
+        const beforeSelection: string = meta.textBeforeCursor ?? ''
+        const afterSelection: string = meta.textAfterCursor ?? ''
+        const selection: string = meta.selection ?? ''
+
+        const original = beforeSelection + selection + afterSelection
+        const modified = beforeSelection + text + afterSelection
+
+        const formattedModified = formatSql(modified)
+        setSourceSqlDiff({ original, modified: formattedModified })
+        setSelectedDiffType(DiffType.Modification)
+        setPromptState((prev) => ({ ...prev, isLoading: false }))
+        setIsCompletionLoading(false)
+      } catch (error: any) {
+        toast.error(`Failed to generate SQL: ${error?.message ?? 'Unknown error'}`)
+        setIsCompletionLoading(false)
+        throw error
+      }
     },
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
-    },
-    onError: (error) => {
-      toast.error(`Failed to generate SQL: ${error.message}`)
-    },
-  })
+    [
+      org?.slug,
+      project?.connectionString,
+      project?.ref,
+      setPromptState,
+      setSelectedDiffType,
+      setSourceSqlDiff,
+    ]
+  )
 
   const handlePrompt = async (
     prompt: string,
@@ -600,35 +640,6 @@ export const SQLEditor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snapV2.diffContent])
 
-  useEffect(() => {
-    if (!completion) {
-      return
-    }
-
-    const original =
-      promptState.beforeSelection + promptState.selection + promptState.afterSelection
-    const modified = promptState.beforeSelection + completion + promptState.afterSelection
-
-    if (isCompletionLoading) {
-      // Attempt to format the modified SQL in case the LLM left out indentation, etc
-      let formattedModified = formatSql(modified)
-
-      setSourceSqlDiff({
-        original,
-        modified: formattedModified,
-      })
-      setSelectedDiffType(DiffType.Modification)
-      setPromptState((prev) => ({ ...prev, isLoading: false }))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    completion,
-    promptState.beforeSelection,
-    promptState.selection,
-    promptState.afterSelection,
-    isCompletionLoading,
-  ])
-
   // We want to check if the diff editor is mounted and if it is, we want to show the widget
   // We also want to cleanup the widget when the diff editor is closed
   useEffect(() => {
@@ -665,7 +676,7 @@ export const SQLEditor = () => {
           direction="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <ResizablePanel maxSize={70}>
+          <ResizablePanel defaultSize={50} maxSize={70}>
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
@@ -722,6 +733,13 @@ export const SQLEditor = () => {
                   <div key={id} className="w-full h-full relative">
                     <MonacoEditor
                       autoFocus
+                      placeholder={
+                        !promptState.isOpen && !editorRef.current?.getValue()
+                          ? 'Hit ' +
+                            (os === 'macos' ? 'CMD+K' : `CTRL+K`) +
+                            ' to generate query or just start typing'
+                          : ''
+                      }
                       id={id}
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
@@ -767,19 +785,6 @@ export const SQLEditor = () => {
                         endLineNumber={promptState.endLineNumber}
                       />
                     )}
-                    <AnimatePresence>
-                      {!promptState.isOpen && !editorRef.current?.getValue() && (
-                        <motion.p
-                          initial={{ y: 5, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          exit={{ y: 5, opacity: 0 }}
-                          className="text-foreground-lighter absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
-                        >
-                          Hit {os === 'macos' ? <Command size={12} /> : `CTRL+`}K to edit with the
-                          Assistant
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
                   </div>
                 </>
               )}
@@ -788,7 +793,7 @@ export const SQLEditor = () => {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel maxSize={70}>
+          <ResizablePanel defaultSize={50} maxSize={70}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />
@@ -806,7 +811,7 @@ export const SQLEditor = () => {
             )}
           </ResizablePanel>
 
-          <div className="max-h-9">
+          <div className="h-9">
             {results?.rows !== undefined && !isExecuting && (
               <GridFooter className="flex items-center justify-between gap-2">
                 <Tooltip>

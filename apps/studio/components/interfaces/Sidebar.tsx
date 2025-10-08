@@ -12,14 +12,13 @@ import {
   generateSettingsRoutes,
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -42,14 +41,19 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
-import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useIsNewStorageUIEnabled,
+  useUnifiedLogsPreview,
+} from './App/FeaturePreview/FeaturePreviewContext'
+import { useFlag } from 'common'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
 export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
 export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 
-const SidebarMotion = motion(SidebarPrimitive) as FC<
+const SidebarMotion = motion.create(SidebarPrimitive) as FC<
   ComponentProps<typeof SidebarPrimitive> & {
     transition?: MotionProps['transition']
   }
@@ -218,12 +222,14 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
 const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snap = useAppStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
+  const showReports = useIsFeatureEnabled('reports:all')
 
-  const showWarehouse = useFlag('warehouse')
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const isStorageV2 = useIsNewStorageUIEnabled()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -239,14 +245,21 @@ const ProjectLinks = () => {
     'realtime:all',
   ])
 
+  const authOverviewPageEnabled = useFlag('authOverviewPage')
+
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
+    authOverviewPage: authOverviewPageEnabled,
+    isStorageV2,
   })
-  const otherRoutes = generateOtherRoutes(ref, project)
+  const otherRoutes = generateOtherRoutes(ref, project, {
+    unifiedLogs: isUnifiedLogsEnabled,
+    showReports,
+  })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (
@@ -310,14 +323,11 @@ const ProjectLinks = () => {
               </div>
             )
           } else if (route.key === 'logs') {
-            // TODO: Undo this when warehouse flag is removed
-            const label = showWarehouse ? 'Logs & Analytics' : route.label
-            const newRoute = { ...route, label }
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={newRoute}
-                active={activeRoute === newRoute.key}
+                route={route}
+                active={activeRoute === route.key}
               />
             )
           } else {
@@ -349,9 +359,11 @@ const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
+
+  const showBilling = useIsFeatureEnabled('billing:all')
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -380,12 +392,16 @@ const OrganizationLinks = () => {
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-      key: 'billing',
-      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
+    ...(showBilling
+      ? [
+          {
+            label: 'Billing',
+            href: `/org/${slug}/billing`,
+            key: 'billing',
+            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+          },
+        ]
+      : []),
     {
       label: 'Organization settings',
       href: `/org/${slug}/general`,

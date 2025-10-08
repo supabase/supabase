@@ -12,7 +12,8 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import {
   Button,
@@ -47,7 +48,7 @@ export const FeedbackWidget = ({
 
   const router = useRouter()
   const { ref, slug } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const uploadButtonRef = useRef(null)
 
   const [isSending, setSending] = useState(false)
@@ -236,7 +237,7 @@ export const FeedbackWidget = ({
               </span>
             </Link>{' '}
             or{' '}
-            <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
+            <a href={`${DOCS_URL}`} target="_blank" rel="noreferrer">
               <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
                 see docs
               </span>

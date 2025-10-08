@@ -31,7 +31,10 @@ const findIntanceValueByColumn = (instance: any, column: string) =>
 const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
 
 const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivity?: boolean }) => {
-  const computeInstances = pricingAddOn.database.rows
+  // Filter out rows with no specific pricing
+  const computeInstances = pricingAddOn.database.rows.filter((row) =>
+    row.columns.some((it) => it.key === 'pricing' && it.value !== 'Contact Us')
+  )
   const priceSteps = computeInstances.map((instance) =>
     parsePrice(findIntanceValueByColumn(instance, 'pricing'))
   )

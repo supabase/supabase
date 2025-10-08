@@ -12,8 +12,7 @@ import {
 import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
@@ -33,8 +32,7 @@ const RenameQueryModal = ({
   onComplete,
 }: RenameQueryModalProps) => {
   const { ref } = useParams()
-  const organization = useSelectedOrganization()
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
@@ -66,13 +64,11 @@ const RenameQueryModal = ({
 
   const generateTitle = async () => {
     if ('content' in snippet && isSQLSnippet) {
-      titleSql({ sql: snippet.content.sql, useBedrockAssistant })
+      titleSql({ sql: snippet.content.sql })
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        if ('sql' in content) {
-          titleSql({ sql: content.sql, useBedrockAssistant })
-        }
+        if ('sql' in content) titleSql({ sql: content.sql })
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }

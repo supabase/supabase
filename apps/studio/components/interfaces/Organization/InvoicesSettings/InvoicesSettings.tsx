@@ -11,20 +11,36 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { getInvoice } from 'data/invoices/invoice-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { ChevronLeft, ChevronRight, Download, FileText } from 'lucide-react'
 import { Button } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import InvoicePayButton from './InvoicePayButton'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Organization } from 'types/base'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 
 const PAGE_LIMIT = 5
 
+const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
+  if (selectedOrganization.managed_by === MANAGED_BY.VERCEL_MARKETPLACE) {
+    return {
+      installationId: selectedOrganization?.partner_id,
+      path: '/invoices',
+    }
+  }
+  if (selectedOrganization.managed_by === MANAGED_BY.AWS_MARKETPLACE) {
+    return {
+      organizationSlug: selectedOrganization?.slug,
+      overrideUrl: 'https://console.aws.amazon.com/billing/home#/bills',
+    }
+  }
+}
 const InvoicesSettings = () => {
   const [page, setPage] = useState(1)
 
-  const selectedOrganization = useSelectedOrganization()
-  const { slug } = selectedOrganization ?? {}
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const slug = selectedOrganization?.slug
   const offset = (page - 1) * PAGE_LIMIT
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
@@ -33,7 +49,7 @@ const InvoicesSettings = () => {
     },
     { enabled: selectedOrganization?.managed_by === 'supabase' }
   )
-  const { data, error, isLoading, isError, isSuccess } = useInvoicesQuery(
+  const { data, error, isLoading, isError } = useInvoicesQuery(
     {
       slug,
       offset,
@@ -62,13 +78,9 @@ const InvoicesSettings = () => {
   ) {
     return (
       <PartnerManagedResource
-        partner={selectedOrganization?.managed_by}
+        managedBy={selectedOrganization?.managed_by}
         resource="Invoices"
-        cta={{
-          installationId: selectedOrganization?.partner_id,
-          path: '/invoices',
-        }}
-        // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+        cta={getPartnerManagedResourceCta(selectedOrganization)}
       />
     )
   }

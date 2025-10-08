@@ -1,16 +1,17 @@
-import { memo, useState } from 'react'
+import { Command, Menu, Search } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Command, Search, Menu } from 'lucide-react'
+import type { FC } from 'react'
+import { memo, useState } from 'react'
+// End of third-party imports
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
+import { useCustomContent } from '../../../hooks/custom-content/useCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
-
-import type { FC } from 'react'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
@@ -55,7 +56,8 @@ const TopNavBar: FC = () => {
                   <div className="flex items-center space-x-2 text-foreground-muted">
                     <Search size={18} strokeWidth={2} />
                     <p className="flex text-sm pr-2">
-                      Search<span className="hidden xl:inline ml-1"> docs...</span>
+                      Search
+                      <span className="hidden xl:inline ml-1"> docs...</span>
                     </p>
                   </div>
                   <div className="hidden md:flex items-center space-x-1">
@@ -84,12 +86,7 @@ const TopNavBar: FC = () => {
           <div className="hidden lg:flex items-center justify-end gap-3">
             {!isUserLoading && (
               <Button asChild>
-                <a
-                  href="https://supabase.com/dashboard"
-                  className="h-[30px]"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
+                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
                   {isLoggedIn ? 'Dashboard' : 'Sign up'}
                 </a>
               </Button>
@@ -113,6 +110,8 @@ const TopNavBar: FC = () => {
 }
 
 const HeaderLogo = memo(() => {
+  const { navigationLogo } = useCustomContent(['navigation:logo'])
+
   return (
     <Link
       href="/"
@@ -123,20 +122,20 @@ const HeaderLogo = memo(() => {
     >
       <Image
         className="hidden dark:block !m-0"
-        src="/docs/supabase-dark.svg"
+        src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
-        width={96}
-        height={18}
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
       <Image
         className="block dark:hidden !m-0"
-        src="/docs/supabase-light.svg"
+        src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"
-        width={96}
-        height={18}
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
       <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>

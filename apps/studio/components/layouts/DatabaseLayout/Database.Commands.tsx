@@ -1,14 +1,22 @@
 import { Blocks, Code, Database, History, Search } from 'lucide-react'
 
+import { useParams } from 'common'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
-import { useParams } from 'common'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
+import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 export function useDatabaseGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
   ref ||= '_'
+
+  const { databaseReplication, databaseRoles, integrationsWrappers } = useIsFeatureEnabled([
+    'database:replication',
+    'database:roles',
+    'integrations:wrappers',
+  ])
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.QUERY,
@@ -59,20 +67,28 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/extensions`,
         defaultHidden: true,
       },
-      {
-        id: 'nav-database-roles',
-        name: 'Roles',
-        value: 'Database: Roles',
-        route: `/project/${ref}/database/roles`,
-        defaultHidden: true,
-      },
-      {
-        id: 'nav-database-replication',
-        name: 'Replication',
-        value: 'Database: Replication',
-        route: `/project/${ref}/database/replication`,
-        defaultHidden: true,
-      },
+      ...(databaseRoles
+        ? [
+            {
+              id: 'nav-database-roles',
+              name: 'Roles',
+              value: 'Database: Roles',
+              route: `/project/${ref}/database/roles`,
+              defaultHidden: true,
+            } as IRouteCommand,
+          ]
+        : []),
+      ...(databaseReplication
+        ? [
+            {
+              id: 'nav-database-replication',
+              name: 'Replication',
+              value: 'Database: Replication',
+              route: `/project/${ref}/database/replication`,
+              defaultHidden: true,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'nav-database-hooks',
         name: 'Webhooks',
@@ -87,13 +103,17 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/backups/scheduled`,
         defaultHidden: true,
       },
-      {
-        id: 'nav-database-wrappers',
-        name: 'Wrappers',
-        value: 'Database: Wrappers',
-        route: `/project/${ref}/integrations/wrappers`,
-        defaultHidden: true,
-      },
+      ...(integrationsWrappers
+        ? [
+            {
+              id: 'nav-database-wrappers',
+              name: 'Wrappers',
+              value: 'Database: Wrappers',
+              route: `/project/${ref}/integrations?category=wrappers`,
+              defaultHidden: true,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'nav-database-migrations',
         name: 'Migrations',
@@ -144,12 +164,16 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/indexes`,
         icon: () => <Database />,
       },
-      {
-        id: 'run-view-database-roles',
-        name: 'View your roles',
-        route: `/project/${ref}/database/roles`,
-        icon: () => <Database />,
-      },
+      ...(databaseRoles
+        ? [
+            {
+              id: 'run-view-database-roles',
+              name: 'View your roles',
+              route: `/project/${ref}/database/roles`,
+              icon: () => <Database />,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'run-view-database-backups',
         name: 'View your backups',

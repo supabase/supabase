@@ -17,6 +17,7 @@ export type sendSupportTicketVariables = {
   allowSupportAccess: boolean
   siteUrl?: string
   additionalRedirectUrls?: string
+  dashboardSentryIssueId?: string
 }
 
 export async function sendSupportTicket({
@@ -32,6 +33,7 @@ export async function sendSupportTicket({
   allowSupportAccess,
   siteUrl,
   additionalRedirectUrls,
+  dashboardSentryIssueId,
 }: sendSupportTicketVariables) {
   const { data, error } = await post('/platform/feedback/send', {
     body: {
@@ -49,10 +51,20 @@ export async function sendSupportTicket({
       affectedServices,
       browserInformation,
       allowSupportAccess,
+      dashboardSentryIssueId,
     },
   })
 
-  if (error) handleError(error, { alwaysCapture: true })
+  if (error) {
+    handleError(error, {
+      alwaysCapture: true,
+      sentryContext: {
+        tags: {
+          dashboardSupportForm: true,
+        },
+      },
+    })
+  }
   return data
 }
 

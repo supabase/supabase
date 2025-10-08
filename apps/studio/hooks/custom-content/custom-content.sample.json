@@ -1,0 +1,58 @@
+{
+  "$schema": "./custom-content.schema.json",
+
+  "app:title": "Test Title",
+
+  "dashboard_auth:custom_provider": "Nimbus",
+
+  "organization:legal_documents": [
+    {
+      "id": "doc1",
+      "name": "Document 1",
+      "description": "This is a description of Document 1",
+      "action": {
+        "text": "Download document",
+        "url": "https://supabase.com"
+      }
+    },
+    {
+      "id": "doc2",
+      "name": "Document 2",
+      "description": "This is a description of Document 2",
+      "action": {
+        "text": "Download document",
+        "url": "https://supabase.com"
+      }
+    }
+  ],
+
+  "project_homepage:client_libraries": [
+    {
+      "language": "JavaScript",
+      "officialSupport": true,
+      "docsUrl": "https://supabase.com/docs/reference/javascript/installing",
+      "gitUrl": "https://github.com/supabase/supabase-js"
+    }
+  ],
+  "project_homepage:example_projects": [
+    {
+      "title": "Framework 1",
+      "description": "This is a description of Framework 1",
+      "iconUrl": "https://supabase.com/dashboard/img/supabase-logo.svg",
+      "url": "https://supabase.com"
+    },
+    {
+      "title": "Framework 2",
+      "description": "This is a description of Framework 2",
+      "iconUrl": "https://supabase.com/dashboard/img/supabase-logo.svg",
+      "url": "https://supabase.com"
+    }
+  ],
+
+  "logs:default_query": "This is a sample query",
+
+  "infra:cloud_providers": ["AWS_NIMBUS"],
+  "infra:aws_nimbus_label": "AWS Nimbus",
+
+  "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt"
+}

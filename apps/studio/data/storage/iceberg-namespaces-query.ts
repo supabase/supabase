@@ -11,10 +11,20 @@ type GetNamespacesVariables = {
 }
 
 async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVariables) {
-  const headers = await constructHeaders({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-  })
+  let headers = new Headers()
+  // handle both secret key and service role key
+  if (token.startsWith('sb_secret_')) {
+    headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      apikey: `${token}`,
+    })
+    headers.delete('Authorization')
+  } else {
+    headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    })
+  }
 
   const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
 

@@ -1,5 +1,6 @@
 import { isbot } from 'isbot'
 import { type NextRequest, NextResponse } from 'next/server'
+
 import { clientSdkIds } from '~/content/navigation.references'
 import { BASE_PATH } from '~/lib/constants'
 

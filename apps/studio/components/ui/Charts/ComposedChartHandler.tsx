@@ -1,21 +1,23 @@
-import React, { PropsWithChildren, useState, useMemo, useEffect, useRef } from 'react'
+import { List, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Loader2 } from 'lucide-react'
-import { cn, WarningIcon } from 'ui'
+import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { Card, cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
-import ComposedChart from './ComposedChart'
+import type { ChartHighlightAction } from './ChartHighlightActions'
+import { ComposedChart } from './ComposedChart'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
-import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
+import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
+import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
 
-import type { ChartData } from './Charts.types'
+import dayjs from 'dayjs'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { ChartData } from './Charts.types'
 import { MultiAttribute } from './ComposedChart.utils'
 
 export interface ComposedChartHandlerProps {
@@ -24,7 +26,7 @@ export interface ComposedChartHandlerProps {
   attributes: MultiAttribute[]
   startDate: string
   endDate: string
-  interval: string
+  interval?: string
   customDateFormat?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hideChartType?: boolean
@@ -42,6 +44,7 @@ export interface ComposedChartHandlerProps {
   isVisible?: boolean
   docsUrl?: string
   hide?: boolean
+  syncId?: string
 }
 
 /**
@@ -112,6 +115,7 @@ const ComposedChartHandler = ({
   valuePrecision,
   isVisible = true,
   id,
+  syncId,
   ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
@@ -123,7 +127,6 @@ const ComposedChartHandler = ({
 
   const databaseIdentifier = state.selectedDatabaseId
 
-  // Use the custom hook at the top level of the component
   const attributeQueries = useAttributeQueries(
     attributes,
     ref,
@@ -135,7 +138,6 @@ const ComposedChartHandler = ({
     isVisible
   )
 
-  // Combine all the data into a single dataset
   const combinedData = useMemo(() => {
     if (data) return data
 
@@ -145,7 +147,6 @@ const ComposedChartHandler = ({
     const hasError = attributeQueries.some((query: any) => !query.data)
     if (hasError) return undefined
 
-    // Get all unique timestamps from all datasets
     const timestamps = new Set<string>()
     attributeQueries.forEach((query: any) => {
       query.data?.data?.forEach((point: any) => {
@@ -159,32 +160,26 @@ const ComposedChartHandler = ({
       (_, index) => attributes[index].provider === 'reference-line'
     )
 
-    // Combine data points for each timestamp
     const combined = Array.from(timestamps)
       .sort()
       .map((timestamp) => {
         const point: any = { timestamp }
 
-        // Add regular attributes
         attributes.forEach((attr, index) => {
           if (!attr) return
 
-          // Handle custom value attributes (like disk size)
           if (attr.customValue !== undefined) {
             point[attr.attribute] = attr.customValue
             return
           }
 
-          // Skip reference line attributes here, we'll add them below
           if (attr.provider === 'reference-line') return
 
           const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
           let value = matchingPoint?.[attr.attribute] ?? 0
 
-          // Apply value manipulation if provided
           if (attr.manipulateValue && typeof attr.manipulateValue === 'function') {
-            // Ensure value is a number before manipulation
             const numericValue = typeof value === 'number' ? value : Number(value) || 0
             value = attr.manipulateValue(numericValue)
           }
@@ -192,14 +187,18 @@ const ComposedChartHandler = ({
           point[attr.attribute] = value
         })
 
-        // Add reference line values for each timestamp
         referenceLineQueries.forEach((query: any) => {
           const attr = query.data.attribute
           const value = query.data.total
           point[attr] = value
         })
 
-        return point as DataPoint
+        const formattedDataPoint: DataPoint =
+          !('period_start' in point) && 'timestamp' in point
+            ? { ...point, period_start: dayjs.utc(point.timestamp).unix() * 1000 }
+            : point
+
+        return formattedDataPoint
       })
 
     return combined as DataPoint[]
@@ -207,7 +206,6 @@ const ComposedChartHandler = ({
 
   const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 
-  // Calculate highlighted value based on the first attribute's data
   const _highlightedValue = useMemo(() => {
     if (highlightedValue !== undefined) return highlightedValue
 
@@ -234,20 +232,33 @@ const ComposedChartHandler = ({
           : (firstData.data[firstData.data.length - 1] as any)?.[firstAttr.attribute]
   }, [highlightedValue, attributes, attributeQueries])
 
+  const highlightActions: ChartHighlightAction[] = useMemo(() => {
+    return [
+      {
+        id: 'open-logs',
+        label: 'Open in Postgres Logs',
+        icon: <List size={12} />,
+        onSelect: ({ start, end }) => {
+          const projectRef = ref as string
+          if (!projectRef) return
+          const url = `/project/${projectRef}/logs/postgres-logs?its=${start}&ite=${end}`
+          router.push(url)
+        },
+      },
+    ]
+  }, [ref])
+
   if (loading) {
     return (
-      <Panel
+      <Card
         className={cn(
           'flex min-h-[280px] w-full flex-col items-center justify-center gap-y-2',
           className
         )}
-        wrapWithLoading={false}
-        noMargin
-        noHideOverflow
       >
         <Loader2 size={18} className="animate-spin text-border-strong" />
         <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
-      </Panel>
+      </Card>
     )
   }
 
@@ -260,7 +271,6 @@ const ComposedChartHandler = ({
     )
   }
 
-  // Rest of the component remains similar, but pass all attributes to charts
   return (
     <Panel
       noMargin
@@ -275,6 +285,7 @@ const ComposedChartHandler = ({
           attributes={attributes}
           data={combinedData as DataPoint[]}
           format={format}
+          // [Joshen] This is where it's messing up
           xAxisKey="period_start"
           yAxisKey={attributes[0].attribute}
           highlightedValue={_highlightedValue}
@@ -290,6 +301,8 @@ const ComposedChartHandler = ({
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
+          syncId={syncId}
+          highlightActions={highlightActions}
           {...otherProps}
         />
       </Panel.Content>
@@ -330,8 +343,6 @@ const useAttributeQueries = (
     ref,
     startDate,
     endDate,
-    interval,
-    databaseIdentifier,
     data,
     isVisible
   )
@@ -341,7 +352,7 @@ const useAttributeQueries = (
 
     return {
       data: {
-        data: [], // Will be populated in combinedData
+        data: [],
         attribute: line.attribute,
         total: value,
         maximum: value,
@@ -355,7 +366,7 @@ const useAttributeQueries = (
   return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries]
 }
 
-export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
+export function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
   if (props.hide) return null
 
   return (

@@ -3,12 +3,16 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import type { CustomerAddress, CustomerTaxId } from './types'
 
 export type OrganizationCreditTopUpVariables = {
   payment_method_id: string
   amount: number
   slug?: string
   hcaptchaToken?: string | null
+  address?: CustomerAddress | null
+  tax_id?: CustomerTaxId | null
+  billing_name?: string | null
 }
 
 export async function topUpCredits({
@@ -16,6 +20,9 @@ export async function topUpCredits({
   amount,
   slug,
   hcaptchaToken,
+  address,
+  tax_id,
+  billing_name,
 }: OrganizationCreditTopUpVariables) {
   if (!payment_method_id) {
     throw new Error('Payment method id required')
@@ -35,7 +42,14 @@ export async function topUpCredits({
         slug,
       },
     },
-    body: { payment_method_id, amount, hcaptcha_token: hcaptchaToken },
+    body: {
+      payment_method_id,
+      amount,
+      hcaptcha_token: hcaptchaToken,
+      address: address ?? undefined,
+      tax_id: tax_id ?? undefined,
+      billing_name: billing_name ?? undefined,
+    },
   })
 
   if (error) handleError(error)

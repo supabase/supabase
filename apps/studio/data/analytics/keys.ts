@@ -1,20 +1,24 @@
 export const analyticsKeys = {
-  // warehouse
-  warehouseQuery: (projectRef: string, query: string) =>
-    ['projects', projectRef, 'warehouse', 'query', query] as const,
-  warehouseTenant: (projectRef: string) => ['projects', projectRef, 'warehouse', 'tenant'] as const,
-  warehouseCollections: (projectRef: string) =>
-    ['projects', projectRef, 'warehouse', 'collections'] as const,
-  warehouseCollectionsCreate: (projectRef: string) =>
-    ['projects', projectRef, 'warehouse', 'collections', 'create'] as const,
-  warehouseEndpoints: (projectRef: string) =>
-    ['projects', projectRef, 'warehouse', 'endpoints'] as const,
-  warehouseBackends: (projectRef: string) =>
-    ['projects', projectRef, 'warehouse', 'backends'] as const,
-  warehouseAccessTokens: (projectRef: string) =>
-    ['projects', projectRef, 'warehouse', 'access-tokens'] as const,
-
   // logs/reports endpoints
+  functionsCombinedStats: (
+    projectRef: string | undefined,
+    {
+      interval,
+      functionId,
+    }: {
+      functionId: string | undefined
+      interval: string | undefined
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'functions-combined-stats',
+      {
+        interval,
+        functionId,
+      },
+    ] as const,
   functionsInvStats: (
     projectRef: string | undefined,
     {

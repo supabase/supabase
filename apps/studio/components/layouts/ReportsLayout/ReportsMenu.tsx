@@ -1,24 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
+import { Plus, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ReportMenuItem } from './ReportMenuItem'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const ReportsMenu = () => {
   const router = useRouter()
@@ -35,10 +34,14 @@ const ReportsMenu = () => {
   const storageSupported = useIsFeatureEnabled('project_storage:all')
   const storageEnabled = storageReportEnabled && storageSupported
 
-  const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateCustomReport } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'report', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   // Preserve date range query parameters when navigating
   const preservedQueryParams = useMemo(() => {
@@ -143,6 +146,12 @@ const ReportsMenu = () => {
               },
             ]
           : []),
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/advisors/query-performance`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+        },
         ...(postgrestReportEnabled
           ? [
               {
@@ -247,8 +256,14 @@ const ReportsMenu = () => {
                             : 'hover:bg-surface-200'
                         )}
                       >
-                        <Link href={subItem.url} className="flex-grow h-7 flex items-center pl-3">
-                          {subItem.name}
+                        <Link
+                          href={subItem.url}
+                          className="flex-grow h-7 flex justify-between items-center pl-3"
+                        >
+                          <span>{subItem.name}</span>
+                          {subItem.rightIcon && (
+                            <span className="shrink-0">{subItem.rightIcon}</span>
+                          )}
                         </Link>
                       </li>
                     ))}

@@ -22,6 +22,7 @@ import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { readFile, writeFile } from 'node:fs/promises'
 import { parse, stringify } from 'smol-toml'
+
 import {
   getAllTroubleshootingEntriesInternal as getAllTroubleshootingEntries,
   getArticleSlug,
@@ -256,13 +257,49 @@ async function updateChecksumIfNeeded(entry) {
 }
 
 /**
+ * Converts relative links to absolute URLs for GitHub discussions using MDAST
+ * @param {string} content - The markdown content to process
+ */
+function rewriteRelativeLinks(content) {
+  const baseUrl = 'https://supabase.com'
+  
+  // Parse the markdown to AST
+  const mdast = fromMarkdown(content, {
+    extensions: [gfm(), mdxjs()],
+    mdastExtensions: [gfmFromMarkdown(), mdxFromMarkdown()],
+  })
+  
+  // Walk the tree and modify link nodes
+	/** 
+	 * @param {import('mdast').Root|import('mdast').Content} node
+	 */
+  function visitNode(node) {
+    if (node.type === 'link' && node.url && node.url.startsWith('/')) {
+      // Convert relative URL to absolute
+      node.url = `${baseUrl}${node.url}`
+    }
+    
+    // Recursively visit children
+    if ('children' in node) {
+      node.children.forEach(visitNode)
+    }
+  }
+  
+  visitNode(mdast)
+  
+  // Convert back to markdown
+  return toMarkdown(mdast, { extensions: [gfmToMarkdown(), mdxToMarkdown()] })
+}
+
+/**
  * @param {TroubleshootingEntry} entry
  */
 function addCanonicalUrl(entry) {
   const docsUrl = 'https://supabase.com/docs/guides/troubleshooting/' + getArticleSlug(entry)
+  const contentWithAbsoluteLinks = rewriteRelativeLinks(entry.contentWithoutJsx)
   const content =
     `_This is a copy of a troubleshooting article on Supabase's docs site. It may be missing some details from the original. View the [original article](${docsUrl})._\n\n` +
-    entry.contentWithoutJsx
+    contentWithAbsoluteLinks
   return content
 }
 

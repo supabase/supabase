@@ -77,13 +77,18 @@ export const getDefaultOrderByColumns = (table: Pick<PGTable, 'primary_keys' | '
     return primaryKeyColumns
   }
   if (table.columns && table.columns.length > 0) {
-    return [table.columns[0].name]
+    const eligibleColumnsForSorting = table.columns.filter((x) => !x.data_type.includes('json'))
+    if (eligibleColumnsForSorting.length > 0) return [eligibleColumnsForSorting[0].name]
+    else return []
   }
   return []
 }
 
 /**
  * Determines if a column type should be truncated based on its format and dataType
+ * Be aware if the logic in RowEditor.utils.ts -> isValueTruncated needs to be revised
+ * if we're updating the truncation logic, as it'll affect whether the Table Editor displays
+ * the data as truncated or not
  */
 export const shouldTruncateColumn = (columnFormat: string): boolean =>
   LARGE_COLUMNS_TYPES_SET.has(columnFormat.toLowerCase())

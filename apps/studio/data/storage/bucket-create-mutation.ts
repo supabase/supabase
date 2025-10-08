@@ -6,14 +6,14 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
-export type BucketCreateVariables = Omit<CreateStorageBucketBody, 'public'> & {
+type BucketCreateVariables = Omit<CreateStorageBucketBody, 'public'> & {
   projectRef: string
   isPublic: boolean
 }
 
 type CreateStorageBucketBody = components['schemas']['CreateStorageBucketBody']
 
-export async function createBucket({
+async function createBucket({
   projectRef,
   id,
   type,

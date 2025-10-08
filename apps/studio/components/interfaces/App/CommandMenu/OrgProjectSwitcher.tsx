@@ -1,10 +1,10 @@
-import { Forward, Wrench, Building } from 'lucide-react'
+import { Building, Forward, Wrench } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 import { IS_PLATFORM } from 'common'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
@@ -13,10 +13,10 @@ const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
 export function useProjectSwitchCommand() {
   const setPage = useSetPage()
 
-  const { data: _projects } = useProjectsQuery({ enabled: IS_PLATFORM })
+  const { data } = useProjectsQuery({ enabled: IS_PLATFORM })
   const projects = useMemo(
-    () => (_projects ?? []).map(({ name, ref }) => ({ name, ref })),
-    [_projects]
+    () => (data?.projects ?? []).map(({ name, ref }) => ({ name, ref })),
+    [data]
   )
 
   useRegisterPage(

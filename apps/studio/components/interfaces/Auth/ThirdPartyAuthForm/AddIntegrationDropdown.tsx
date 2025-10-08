@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
+import { useFlag } from 'common'
 import {
   Button,
   cn,
@@ -11,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   getIntegrationTypeIcon,
   getIntegrationTypeLabel,

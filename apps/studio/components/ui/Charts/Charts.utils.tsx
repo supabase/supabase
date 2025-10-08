@@ -1,12 +1,9 @@
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { FC, PropsWithChildren, useMemo } from 'react'
 import { ResponsiveContainer } from 'recharts'
 
 import { DateTimeFormats } from './Charts.constants'
 import type { CommonChartProps, StackedChartProps } from './Charts.types'
-
-dayjs.extend(utc)
 
 /**
  * Auto formats a number to a default precision if it is a float
