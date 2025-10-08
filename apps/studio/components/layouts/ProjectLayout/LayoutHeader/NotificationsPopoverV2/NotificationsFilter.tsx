@@ -22,7 +22,7 @@ import {
 import { CommandGroup } from '@ui/components/shadcn/ui/command'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { DEFAULT_LIMIT, useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
 import { CriticalIcon, WarningIcon } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -44,6 +44,7 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
   )
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
   const projectCount = data?.pages[0].pagination.count ?? 0
+  const pageLimit = data?.pages[0].pagination.limit ?? 0
 
   return (
     <Popover_Shadcn_ modal={true} open={open} onOpenChange={setOpen}>
@@ -217,7 +218,7 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
                     </Label_Shadcn_>
                   </CommandItem_Shadcn_>
                 ))}
-                {projectCount > DEFAULT_LIMIT && (
+                {projectCount > pageLimit && (
                   <p className="text-foreground-lighter text-xs pt-2 px-2">
                     Not all projects are shown here. Try searching to find a specific project.
                   </p>
