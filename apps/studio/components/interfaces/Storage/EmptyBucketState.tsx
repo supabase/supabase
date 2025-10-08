@@ -20,28 +20,27 @@ export const EmptyBucketState = ({ bucketType }: EmptyBucketStateProps) => {
         <p className="text-foreground-light text-sm">{config.valueProp}</p>
       </div>
 
-      {/* [Joshen] We can render the individual bucket modals here instead - where each modal has its own trigger */}
-      {bucketType === 'files' && (
+      {bucketType === 'files' ? (
         <CreateBucketModal buttonSize="tiny" buttonType="primary" buttonClassName="w-fit" />
-      )}
-      {/* [Danny] Convert above and below into single ternary after vector bucket is supported */}
-      {/* i.e. bucketType === 'files' ? <CreateFileBucketModal /> : <CreateSpecializedBucketModal bucketType={bucketType} />  */}
-      {bucketType === 'analytics' && (
+      ) : (
         <CreateSpecializedBucketModal
-          bucketType="analytics"
+          bucketType={bucketType}
           buttonSize="tiny"
           buttonType="primary"
           buttonClassName="w-fit"
+          disabled={bucketType === 'vectors'}
+          tooltip={
+            bucketType === 'vectors'
+              ? {
+                  content: {
+                    side: 'bottom',
+                    text: 'Vector buckets are not supported yet',
+                  },
+                }
+              : undefined
+          }
         />
       )}
-      {/* {bucketType === 'vectors' && (
-        <CreateSpecializedBucketModal
-          bucketType="vectors"
-          buttonSize="tiny"
-          buttonType="primary"
-          buttonClassName="w-fit"
-        />
-      )} */}
     </aside>
   )
 }

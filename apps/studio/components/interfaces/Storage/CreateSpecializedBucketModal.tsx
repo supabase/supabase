@@ -84,6 +84,13 @@ interface CreateSpecializedBucketModalProps {
   buttonSize?: 'tiny' | 'small'
   buttonType?: 'default' | 'primary'
   buttonClassName?: string
+  disabled?: boolean
+  tooltip?: {
+    content: {
+      side?: 'top' | 'bottom' | 'left' | 'right'
+      text?: string
+    }
+  }
 }
 
 export const CreateSpecializedBucketModal = ({
@@ -91,6 +98,8 @@ export const CreateSpecializedBucketModal = ({
   buttonSize = 'tiny',
   buttonType = 'default',
   buttonClassName,
+  disabled = false,
+  tooltip,
 }: CreateSpecializedBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -322,15 +331,15 @@ export const CreateSpecializedBucketModal = ({
           type={buttonType}
           className={buttonClassName}
           icon={<Plus size={14} />}
-          disabled={!canCreateBuckets}
+          disabled={!canCreateBuckets || disabled}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
             content: {
-              side: 'bottom',
+              side: tooltip?.content?.side || 'bottom',
               text: !canCreateBuckets
                 ? 'You need additional permissions to create buckets'
-                : undefined,
+                : tooltip?.content?.text,
             },
           }}
         >
