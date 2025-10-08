@@ -221,6 +221,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/organizations/{slug}/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['v1-get-organization-entitlements']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/organizations/{slug}/members': {
     parameters: {
       query?: never
@@ -2882,7 +2902,7 @@ export interface components {
        * @description Resource indicator for MCP (Model Context Protocol) clients
        * @enum {string}
        */
-      resource?: 'https://api.supabase.green/mcp' | 'https://mcp.supabase.green/mcp'
+      resource?: 'http://localhost:8080/mcp' | 'http://localhost:8080/mcp'
     }
     OAuthTokenResponse: {
       access_token: string
@@ -3738,6 +3758,15 @@ export interface components {
        */
       template_url?: string
     }
+    V1EntitlementResponse: {
+      feature: {
+        key: string
+        /** @enum {string} */
+        type: 'boolean' | 'numeric' | 'string'
+      }
+      hasAccess: boolean
+      value?: number
+    }
     V1GetUsageApiCountResponse: {
       error?:
         | string
@@ -4280,7 +4309,7 @@ export interface operations {
         organization_slug?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
-        resource?: 'https://api.supabase.green/mcp' | 'https://mcp.supabase.green/mcp'
+        resource?: 'http://localhost:8080/mcp' | 'http://localhost:8080/mcp'
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
@@ -4445,6 +4474,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['V1OrganizationSlugResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-organization-entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1EntitlementResponse'][]
         }
       }
       /** @description Unauthorized */
