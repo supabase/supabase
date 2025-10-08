@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Archive, ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -77,7 +77,6 @@ type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 type ServiceEntry = {
   key: ServiceKey
   title: string
-  icon: React.ReactNode
   href?: string
   route: string
   enabled: boolean
@@ -159,7 +158,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'db',
         title: 'Database requests',
-        icon: <Database strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+
         href: `/project/${projectRef}/editor`,
         route: '/logs/postgres-logs',
         enabled: true,
@@ -167,14 +166,12 @@ export const ProjectUsageSection = () => {
       {
         key: 'functions',
         title: 'Functions requests',
-        icon: <Code strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         route: '/logs/edge-functions-logs',
         enabled: true,
       },
       {
         key: 'auth',
         title: 'Auth requests',
-        icon: <Key strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/auth/users`,
         route: '/logs/auth-logs',
         enabled: authEnabled,
@@ -182,7 +179,6 @@ export const ProjectUsageSection = () => {
       {
         key: 'storage',
         title: 'Storage requests',
-        icon: <Archive strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/storage/buckets`,
         route: '/logs/storage-logs',
         enabled: storageEnabled,
@@ -190,7 +186,6 @@ export const ProjectUsageSection = () => {
       {
         key: 'realtime',
         title: 'Realtime requests',
-        icon: <Zap strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         route: '/logs/realtime-logs',
         enabled: true,
       },

@@ -1,14 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
-import { cn, Separator } from 'ui'
+import React, { useMemo, useState } from 'react'
+import { cn, Separator, CodeBlock } from 'ui'
 
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { FEATURE_GROUPS, MCP_CLIENTS } from './constants'
-import { getMcpUrl } from './utils/getMcpUrl'
+import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
 import type { McpClient } from './types'
+import { getMcpUrl } from './utils/getMcpUrl'
+import { InfoTooltip } from '../info-tooltip'
 
 export interface McpConfigPanelProps {
   basePath: string
@@ -18,26 +19,37 @@ export interface McpConfigPanelProps {
   onClientSelect?: (client: McpClient) => void
   theme?: 'light' | 'dark'
   className?: string
+  isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
+  apiUrl?: string
 }
 
 export function McpConfigPanel({
   basePath,
-  baseUrl,
   projectRef,
   initialSelectedClient,
   onClientSelect,
   className,
   theme = 'dark',
+  isPlatform,
+  apiUrl,
 }: McpConfigPanelProps) {
   const [readonly, setReadonly] = useState(false)
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
 
-  const { clientConfig } = getMcpUrl({
-    baseUrl,
+  const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
+  const selectedFeaturesSupported = useMemo(() => {
+    return selectedFeatures.filter((feature) =>
+      supportedFeatures.some((group) => group.id === feature)
+    )
+  }, [selectedFeatures, supportedFeatures])
+
+  const { mcpUrl, clientConfig } = getMcpUrl({
     projectRef,
+    isPlatform,
+    apiUrl,
     readonly,
-    features: selectedFeatures,
+    features: selectedFeaturesSupported,
     selectedClient,
   })
 
@@ -60,12 +72,31 @@ export function McpConfigPanel({
         <Separator />
         <McpConfigurationOptions
           className={innerPanelSpacing}
+          isPlatform={isPlatform}
           readonly={readonly}
           onReadonlyChange={setReadonly}
-          selectedFeatures={selectedFeatures}
+          selectedFeatures={selectedFeaturesSupported}
           onFeaturesChange={setSelectedFeatures}
-          featureGroups={FEATURE_GROUPS}
+          featureGroups={isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM}
         />
+        <div className={innerPanelSpacing}>
+          <CodeBlock
+            focusable={false}
+            title={
+              <div className="flex items-center gap-2">
+                Server URL
+                <InfoTooltip>
+                  {`MCP clients should support the Streamable HTTP transport${isPlatform ? ' and OAuth 2.1 with dynamic client registration' : ''}`}
+                </InfoTooltip>
+              </div>
+            }
+            hideLineNumbers
+            language="http"
+            className="max-h-64 overflow-y-auto"
+          >
+            {mcpUrl}
+          </CodeBlock>
+        </div>
       </div>
       <div className="flex flex-col gap-y-3">
         <ClientSelectDropdown

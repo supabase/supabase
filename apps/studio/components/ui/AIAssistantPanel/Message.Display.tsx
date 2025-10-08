@@ -5,7 +5,8 @@ import { ProfileImage as ProfileImageDisplay } from 'components/ui/ProfileImage'
 import { useProfileNameAndPicture } from 'lib/profile'
 import { cn } from 'ui'
 import { useMessageInfoContext } from './Message.Context'
-import { MessageMarkdown, MessagePartSwitcher } from './Message.Parts'
+import { MessageMarkdown } from './MessageMarkdown'
+import { MessagePartSwitcher } from './Message.Parts'
 
 function MessageDisplayProfileImage() {
   const { username, avatarUrl } = useProfileNameAndPicture()
@@ -75,7 +76,7 @@ function MessageDisplayTextMessage({
       id={id}
       isLoading={isLoading}
       readOnly={readOnly}
-      className="prose prose-sm max-w-none break-words"
+      className="prose prose-sm max-w-none break-words prose-h2:font-medium"
     >
       {children}
     </MessageMarkdown>

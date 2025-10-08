@@ -1,6 +1,8 @@
 import type { CloudProvider } from 'shared-data'
 
 export type CustomContentTypes = {
+  appTitle: string
+
   dashboardAuthCustomProvider: string
 
   organizationLegalDocuments: {

@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -12,6 +11,7 @@ import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
@@ -128,11 +128,9 @@ export const SecuritySettings = () => {
               </div>
 
               <div className="flex items-center">
-                <Button type="primary" asChild>
-                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=mfa`}>
-                    Upgrade subscription
-                  </Link>
-                </Button>
+                <UpgradePlanButton type="primary" source="mfa" plan="Pro">
+                  Upgrade subscription
+                </UpgradePlanButton>
               </div>
             </div>
           </Alert_Shadcn_>

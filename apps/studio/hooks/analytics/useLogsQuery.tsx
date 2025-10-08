@@ -16,6 +16,7 @@ import {
   checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 
 export interface LogsQueryHook {
@@ -45,6 +46,8 @@ const useLogsQuery = (
       ? initialParams.iso_timestamp_end
       : defaultHelper.calcTo(),
   })
+
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
   useEffect(() => {
     setParams((prev) => ({
@@ -113,10 +116,19 @@ const useLogsQuery = (
     setParams((prev) => ({ ...prev, sql: newQuery }))
   }
 
+  const logData = (data?.result ?? []).map((x) => {
+    if (logsMetadata) {
+      return x
+    } else {
+      const { metadata, ...log } = x
+      return log
+    }
+  })
+
   return {
     params,
     isLoading: (_enabled && isLoading) || isRefetching,
-    logData: data?.result ?? [],
+    logData: logData,
     error,
     changeQuery,
     runQuery: () => refetch(),

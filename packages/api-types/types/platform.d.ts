@@ -11,14 +11,14 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets GoTrue config */
+    /** Gets Auth config */
     get: operations['GoTrueConfigController_getGoTrueConfig']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
-    /** Updates GoTrue config */
+    /** Updates Auth config */
     patch: operations['GoTrueConfigController_updateGoTrueConfig']
     trace?: never
   }
@@ -35,7 +35,7 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    /** Updates GoTrue config hooks */
+    /** Updates Auth config hooks */
     patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
     trace?: never
   }
@@ -114,7 +114,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets GoTrue template */
+    /** Gets Auth template */
     get: operations['TemplateController_getTemplate']
     put?: never
     post?: never
@@ -2619,7 +2619,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets project's pgbouncer config */
+    /**
+     * Gets project's pgbouncer config
+     * @description Returns pgbouncer config. To check pgbouncer status, use `GET /v0/projects/{ref}/config/pgbouncer/status`
+     */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
     put?: never
     post?: never
@@ -3026,6 +3029,23 @@ export interface paths {
     }
     /** Gets non-removed databases of a specified project */
     get: operations['LoadBalancersController_getLoadBalancers']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/members': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the list of users with access to the project */
+    get: operations['ProjectMembersController_getProjecMembers']
     put?: never
     post?: never
     delete?: never
@@ -4905,7 +4925,7 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
+          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
@@ -5887,6 +5907,7 @@ export interface components {
     GetProjectLogsBody: {
       iso_timestamp_end?: string
       iso_timestamp_start?: string
+      lql?: string
       sql?: string
     }
     GetProjectVercelConnectionsResponse: {
@@ -6035,7 +6056,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
       cached_egress_enabled: boolean
       current_period_end: number
@@ -6256,73 +6277,91 @@ export interface components {
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string
       EXTERNAL_APPLE_CLIENT_ID: string
+      EXTERNAL_APPLE_EMAIL_OPTIONAL: boolean
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_SECRET: string
       EXTERNAL_AZURE_CLIENT_ID: string
+      EXTERNAL_AZURE_EMAIL_OPTIONAL: boolean
       EXTERNAL_AZURE_ENABLED: boolean
       EXTERNAL_AZURE_SECRET: string
       EXTERNAL_AZURE_URL: string
       EXTERNAL_BITBUCKET_CLIENT_ID: string
+      EXTERNAL_BITBUCKET_EMAIL_OPTIONAL: boolean
       EXTERNAL_BITBUCKET_ENABLED: boolean
       EXTERNAL_BITBUCKET_SECRET: string
       EXTERNAL_DISCORD_CLIENT_ID: string
+      EXTERNAL_DISCORD_EMAIL_OPTIONAL: boolean
       EXTERNAL_DISCORD_ENABLED: boolean
       EXTERNAL_DISCORD_SECRET: string
       EXTERNAL_EMAIL_ENABLED: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID: string
+      EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: boolean
       EXTERNAL_FACEBOOK_ENABLED: boolean
       EXTERNAL_FACEBOOK_SECRET: string
       EXTERNAL_FIGMA_CLIENT_ID: string
+      EXTERNAL_FIGMA_EMAIL_OPTIONAL: boolean
       EXTERNAL_FIGMA_ENABLED: boolean
       EXTERNAL_FIGMA_SECRET: string
       EXTERNAL_GITHUB_CLIENT_ID: string
+      EXTERNAL_GITHUB_EMAIL_OPTIONAL: boolean
       EXTERNAL_GITHUB_ENABLED: boolean
       EXTERNAL_GITHUB_SECRET: string
       EXTERNAL_GITLAB_CLIENT_ID: string
+      EXTERNAL_GITLAB_EMAIL_OPTIONAL: boolean
       EXTERNAL_GITLAB_ENABLED: boolean
       EXTERNAL_GITLAB_SECRET: string
       EXTERNAL_GITLAB_URL: string
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string
       EXTERNAL_GOOGLE_CLIENT_ID: string
+      EXTERNAL_GOOGLE_EMAIL_OPTIONAL: boolean
       EXTERNAL_GOOGLE_ENABLED: boolean
       EXTERNAL_GOOGLE_SECRET: string
       EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean
       EXTERNAL_KAKAO_CLIENT_ID: string
+      EXTERNAL_KAKAO_EMAIL_OPTIONAL: boolean
       EXTERNAL_KAKAO_ENABLED: boolean
       EXTERNAL_KAKAO_SECRET: string
       EXTERNAL_KEYCLOAK_CLIENT_ID: string
+      EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: boolean
       EXTERNAL_KEYCLOAK_ENABLED: boolean
       EXTERNAL_KEYCLOAK_SECRET: string
       EXTERNAL_KEYCLOAK_URL: string
       EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string
+      EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: boolean
       EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean
       EXTERNAL_LINKEDIN_OIDC_SECRET: string
       EXTERNAL_NOTION_CLIENT_ID: string
+      EXTERNAL_NOTION_EMAIL_OPTIONAL: boolean
       EXTERNAL_NOTION_ENABLED: boolean
       EXTERNAL_NOTION_SECRET: string
       EXTERNAL_PHONE_ENABLED: boolean
       EXTERNAL_SLACK_CLIENT_ID: string
+      EXTERNAL_SLACK_EMAIL_OPTIONAL: boolean
       EXTERNAL_SLACK_ENABLED: boolean
       EXTERNAL_SLACK_OIDC_CLIENT_ID: string
+      EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: boolean
       EXTERNAL_SLACK_OIDC_ENABLED: boolean
       EXTERNAL_SLACK_OIDC_SECRET: string
       EXTERNAL_SLACK_SECRET: string
       EXTERNAL_SPOTIFY_CLIENT_ID: string
+      EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: boolean
       EXTERNAL_SPOTIFY_ENABLED: boolean
       EXTERNAL_SPOTIFY_SECRET: string
       EXTERNAL_TWITCH_CLIENT_ID: string
+      EXTERNAL_TWITCH_EMAIL_OPTIONAL: boolean
       EXTERNAL_TWITCH_ENABLED: boolean
       EXTERNAL_TWITCH_SECRET: string
       EXTERNAL_TWITTER_CLIENT_ID: string
+      EXTERNAL_TWITTER_EMAIL_OPTIONAL: boolean
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
       EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean
       EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
-      EXTERNAL_WORKOS_ENABLED: boolean
       EXTERNAL_WORKOS_SECRET: string
       EXTERNAL_WORKOS_URL: string
       EXTERNAL_ZOOM_CLIENT_ID: string
+      EXTERNAL_ZOOM_EMAIL_OPTIONAL: boolean
       EXTERNAL_ZOOM_ENABLED: boolean
       EXTERNAL_ZOOM_SECRET: string
       HOOK_BEFORE_USER_CREATED_ENABLED: boolean
@@ -6885,7 +6924,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
@@ -6939,7 +6978,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -7120,8 +7159,6 @@ export interface components {
       inserted_at: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
-      /** @enum {string} */
-      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
       query_wait_timeout?: number
@@ -7723,6 +7760,13 @@ export interface components {
       status: string
       subscription_id: string | null
     }
+    ProjectMembersResponse: {
+      members: {
+        primary_email: string
+        user_id: string
+        username: string
+      }[]
+    }
     ProjectRefResponse: {
       id: number
       name: string
@@ -7946,7 +7990,7 @@ export interface components {
       }[]
     }
     ReplicationPipelineReplicationStatusResponse: {
-      /** @description The apply worker lag */
+      /** @description Stats about apply worker lag */
       apply_lag?: {
         /**
          * @description Bytes between the current WAL location and the confirmed flush LSN.
@@ -8033,7 +8077,7 @@ export interface components {
          * @example public.orders
          */
         table_name: string
-        /** @description The table sync worker lag */
+        /** @description Stats about table sync worker lag */
         table_sync_lag?: {
           /**
            * @description Bytes between the current WAL location and the confirmed flush LSN.
@@ -9034,64 +9078,82 @@ export interface components {
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string | null
       EXTERNAL_APPLE_CLIENT_ID?: string | null
+      EXTERNAL_APPLE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_APPLE_ENABLED?: boolean | null
       EXTERNAL_APPLE_SECRET?: string | null
       EXTERNAL_AZURE_CLIENT_ID?: string | null
+      EXTERNAL_AZURE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_AZURE_ENABLED?: boolean | null
       EXTERNAL_AZURE_SECRET?: string | null
       EXTERNAL_AZURE_URL?: string | null
       EXTERNAL_BITBUCKET_CLIENT_ID?: string | null
+      EXTERNAL_BITBUCKET_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_BITBUCKET_ENABLED?: boolean | null
       EXTERNAL_BITBUCKET_SECRET?: string | null
       EXTERNAL_DISCORD_CLIENT_ID?: string | null
+      EXTERNAL_DISCORD_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_DISCORD_ENABLED?: boolean | null
       EXTERNAL_DISCORD_SECRET?: string | null
       EXTERNAL_EMAIL_ENABLED?: boolean | null
       EXTERNAL_FACEBOOK_CLIENT_ID?: string | null
+      EXTERNAL_FACEBOOK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_FACEBOOK_ENABLED?: boolean | null
       EXTERNAL_FACEBOOK_SECRET?: string | null
       EXTERNAL_FIGMA_CLIENT_ID?: string | null
+      EXTERNAL_FIGMA_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_FIGMA_ENABLED?: boolean | null
       EXTERNAL_FIGMA_SECRET?: string | null
       EXTERNAL_GITHUB_CLIENT_ID?: string | null
+      EXTERNAL_GITHUB_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GITHUB_ENABLED?: boolean | null
       EXTERNAL_GITHUB_SECRET?: string | null
       EXTERNAL_GITLAB_CLIENT_ID?: string | null
+      EXTERNAL_GITLAB_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GITLAB_ENABLED?: boolean | null
       EXTERNAL_GITLAB_SECRET?: string | null
       EXTERNAL_GITLAB_URL?: string | null
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string | null
       EXTERNAL_GOOGLE_CLIENT_ID?: string | null
+      EXTERNAL_GOOGLE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GOOGLE_ENABLED?: boolean | null
       EXTERNAL_GOOGLE_SECRET?: string | null
       EXTERNAL_GOOGLE_SKIP_NONCE_CHECK?: boolean | null
       EXTERNAL_KAKAO_CLIENT_ID?: string | null
+      EXTERNAL_KAKAO_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_KAKAO_ENABLED?: boolean | null
       EXTERNAL_KAKAO_SECRET?: string | null
       EXTERNAL_KEYCLOAK_CLIENT_ID?: string | null
+      EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_KEYCLOAK_ENABLED?: boolean | null
       EXTERNAL_KEYCLOAK_SECRET?: string | null
       EXTERNAL_KEYCLOAK_URL?: string | null
       EXTERNAL_LINKEDIN_OIDC_CLIENT_ID?: string | null
+      EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_LINKEDIN_OIDC_ENABLED?: boolean | null
       EXTERNAL_LINKEDIN_OIDC_SECRET?: string | null
       EXTERNAL_NOTION_CLIENT_ID?: string | null
+      EXTERNAL_NOTION_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_NOTION_ENABLED?: boolean | null
       EXTERNAL_NOTION_SECRET?: string | null
       EXTERNAL_PHONE_ENABLED?: boolean | null
       EXTERNAL_SLACK_CLIENT_ID?: string | null
+      EXTERNAL_SLACK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SLACK_ENABLED?: boolean | null
       EXTERNAL_SLACK_OIDC_CLIENT_ID?: string | null
+      EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SLACK_OIDC_ENABLED?: boolean | null
       EXTERNAL_SLACK_OIDC_SECRET?: string | null
       EXTERNAL_SLACK_SECRET?: string | null
       EXTERNAL_SPOTIFY_CLIENT_ID?: string | null
+      EXTERNAL_SPOTIFY_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SPOTIFY_ENABLED?: boolean | null
       EXTERNAL_SPOTIFY_SECRET?: string | null
       EXTERNAL_TWITCH_CLIENT_ID?: string | null
+      EXTERNAL_TWITCH_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_TWITCH_ENABLED?: boolean | null
       EXTERNAL_TWITCH_SECRET?: string | null
       EXTERNAL_TWITTER_CLIENT_ID?: string | null
+      EXTERNAL_TWITTER_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_TWITTER_ENABLED?: boolean | null
       EXTERNAL_TWITTER_SECRET?: string | null
       EXTERNAL_WEB3_ETHEREUM_ENABLED?: boolean | null
@@ -9101,6 +9163,7 @@ export interface components {
       EXTERNAL_WORKOS_SECRET?: string | null
       EXTERNAL_WORKOS_URL?: string | null
       EXTERNAL_ZOOM_CLIENT_ID?: string | null
+      EXTERNAL_ZOOM_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_ZOOM_ENABLED?: boolean | null
       EXTERNAL_ZOOM_SECRET?: string | null
       HOOK_BEFORE_USER_CREATED_ENABLED?: boolean | null
@@ -9919,7 +9982,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to retrieve GoTrue config */
+      /** @description Failed to retrieve Auth config */
       500: {
         headers: {
           [name: string]: unknown
@@ -9973,7 +10036,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update GoTrue config */
+      /** @description Failed to update Auth config */
       500: {
         headers: {
           [name: string]: unknown
@@ -10027,7 +10090,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update GoTrue config hooks */
+      /** @description Failed to update Auth config hooks */
       500: {
         headers: {
           [name: string]: unknown
@@ -10268,7 +10331,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to retrieve GoTrue template */
+      /** @description Failed to retrieve Auth template */
       500: {
         headers: {
           [name: string]: unknown
@@ -18508,6 +18571,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
+        lql?: string
         sql?: string
       }
       header?: never
@@ -21401,34 +21465,21 @@ export interface operations {
         attribute:
           | 'total_realtime_requests'
           | 'total_realtime_egress'
-          | 'total_ingress'
           | 'total_egress'
           | 'total_cached_egress'
           | 'total_requests'
-          | 'total_get_requests'
-          | 'total_patch_requests'
-          | 'total_post_requests'
           | 'total_delete_requests'
           | 'total_supavisor_egress_bytes'
-          | 'total_rest_ingress'
           | 'total_rest_egress'
           | 'total_rest_requests'
-          | 'total_rest_get_requests'
-          | 'total_rest_post_requests'
-          | 'total_rest_patch_requests'
-          | 'total_rest_delete_requests'
           | 'total_auth_billing_period_mau'
           | 'total_auth_billing_period_sso_mau'
           | 'total_auth_egress'
           | 'total_auth_requests'
-          | 'total_auth_delete_requests'
           | 'total_storage_ingress'
           | 'total_storage_egress'
           | 'total_storage_image_render_count'
           | 'total_storage_requests'
-          | 'total_storage_get_requests'
-          | 'total_storage_post_requests'
-          | 'total_storage_delete_requests'
           | 'total_logdrain_egress'
           | 'total_func_invocations'
           | 'total_func_cpu_time_ms'
@@ -22055,6 +22106,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['LoadBalancerDetailResponse'][]
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectMembersController_getProjecMembers: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectMembersResponse']
         }
       }
       /** @description Unauthorized */

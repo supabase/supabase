@@ -127,9 +127,11 @@ const BlogPostRenderer = ({
               <div>
                 <p className="text-foreground-lighter text-sm">{label}</p>
               </div>
-              <div>
+              <div className="flex flex-col gap-2">
                 {'title' in post && (
-                  <h4 className="text-foreground text-lg">{(post as { title?: string }).title}</h4>
+                  <h4 className="text-foreground text-lg text-balance">
+                    {(post as { title?: string }).title}
+                  </h4>
                 )}
                 {'formattedDate' in post && (
                   <p className="small">{(post as { formattedDate?: string }).formattedDate}</p>
@@ -306,7 +308,7 @@ const BlogPostRenderer = ({
                               formattedDate: string
                             }
                           }
-                          label="Last post"
+                          label="Previous post"
                         />
                       )}
                     </div>

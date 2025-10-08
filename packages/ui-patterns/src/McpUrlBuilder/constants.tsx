@@ -3,16 +3,15 @@ import type {
   ClaudeCodeMcpConfig,
   McpClient,
   McpFeatureGroup,
-  OtherMcpConfig,
   VSCodeMcpConfig,
   WindsurfMcpConfig,
 } from './types'
 
-export const FEATURE_GROUPS: McpFeatureGroup[] = [
+export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
   {
     id: 'docs',
     name: 'Documentation',
-    description: 'Access project documentation and guides',
+    description: 'Access Supabase documentation and guides',
   },
   {
     id: 'account',
@@ -50,6 +49,10 @@ export const FEATURE_GROUPS: McpFeatureGroup[] = [
     description: 'Manage files and storage buckets',
   },
 ]
+
+export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group) =>
+  ['docs', 'database', 'development'].includes(group.id)
+)
 
 export const MCP_CLIENTS: McpClient[] = [
   {
@@ -147,29 +150,7 @@ export const MCP_CLIENTS: McpClient[] = [
       )
     },
   },
-  {
-    key: 'other',
-    label: 'Other',
-    transformConfig: (config): OtherMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    alternateInstructions: (_config) => {
-      return (
-        <p className="text-xs text-foreground-light">
-          These generic MCP settings may work with other MCP clients, but there are no guarantees,
-          due to differences between clients. Refer to your specific client docs for where to input
-          the configuration.
-        </p>
-      )
-    },
-  },
 ]
 
-export const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL ?? 'http://localhost:8080/mcp'
+export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
+export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'

@@ -12,9 +12,10 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
   ref ||= '_'
 
-  const { databaseReplication, databaseRoles } = useIsFeatureEnabled([
+  const { databaseReplication, databaseRoles, integrationsWrappers } = useIsFeatureEnabled([
     'database:replication',
     'database:roles',
+    'integrations:wrappers',
   ])
 
   useRegisterCommands(
@@ -102,13 +103,17 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/backups/scheduled`,
         defaultHidden: true,
       },
-      {
-        id: 'nav-database-wrappers',
-        name: 'Wrappers',
-        value: 'Database: Wrappers',
-        route: `/project/${ref}/integrations/wrappers`,
-        defaultHidden: true,
-      },
+      ...(integrationsWrappers
+        ? [
+            {
+              id: 'nav-database-wrappers',
+              name: 'Wrappers',
+              value: 'Database: Wrappers',
+              route: `/project/${ref}/integrations?category=wrappers`,
+              defaultHidden: true,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'nav-database-migrations',
         name: 'Migrations',

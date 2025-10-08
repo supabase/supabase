@@ -33,10 +33,11 @@ const DatabaseProductMenu = () => {
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
   const enablePgReplicate = useFlag('enablePgReplicate')
 
-  const { databaseReplication: showPgReplicate, databaseRoles: showRoles } = useIsFeatureEnabled([
-    'database:replication',
-    'database:roles',
-  ])
+  const {
+    databaseReplication: showPgReplicate,
+    databaseRoles: showRoles,
+    integrationsWrappers: showWrappers,
+  } = useIsFeatureEnabled(['database:replication', 'database:roles', 'integrations:wrappers'])
 
   return (
     <>
@@ -49,6 +50,7 @@ const DatabaseProductMenu = () => {
           enablePgReplicate,
           showPgReplicate,
           showRoles,
+          showWrappers,
         })}
       />
     </>

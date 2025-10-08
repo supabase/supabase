@@ -50,6 +50,7 @@ export const generateProductRoutes = (
     edgeFunctions?: boolean
     storage?: boolean
     realtime?: boolean
+    authOverviewPage?: boolean
     isStorageV2?: boolean
   }
 ): Route[] => {
@@ -61,6 +62,7 @@ export const generateProductRoutes = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
+  const authOverviewPageEnabled = features?.authOverviewPage ?? false
   const isStorageV2 = features?.isStorageV2 ?? false
 
   const databaseMenu = generateDatabaseMenu(project)
@@ -86,7 +88,13 @@ export const generateProductRoutes = (
             key: 'auth',
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : authOverviewPageEnabled
+                  ? `/project/${ref}/auth/overview`
+                  : `/project/${ref}/auth/users`),
             items: authMenu,
           },
         ]
