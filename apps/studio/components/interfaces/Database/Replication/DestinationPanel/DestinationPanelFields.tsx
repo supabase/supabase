@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import * as z from 'zod'
 
 import { useParams } from 'common'
 import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
@@ -21,9 +20,7 @@ import {
   TextArea_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { DestinationPanelFormSchema } from './DestinationPanel.schema'
-
-type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>
+import { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   return (

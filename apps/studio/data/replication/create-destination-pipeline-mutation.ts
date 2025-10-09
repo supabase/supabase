@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { components } from 'api-types'
 import { replicationKeys } from './keys'
 
 export type BigQueryDestinationConfig = {
@@ -56,6 +56,7 @@ async function createDestinationPipeline(
 
   // Build destination_config based on the type
   let destination_config: components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+
   if ('bigQuery' in destinationConfig) {
     const { projectId, datasetId, serviceAccountKey, maxStalenessMins } = destinationConfig.bigQuery
     destination_config = {
@@ -63,7 +64,7 @@ async function createDestinationPipeline(
         project_id: projectId,
         dataset_id: datasetId,
         service_account_key: serviceAccountKey,
-        ...(maxStalenessMins != null && { max_staleness_mins: maxStalenessMins }),
+        ...(maxStalenessMins !== null ? { max_staleness_mins: maxStalenessMins } : {}),
       },
     }
   } else if ('iceberg' in destinationConfig) {
@@ -101,13 +102,7 @@ async function createDestinationPipeline(
       destination_config,
       pipeline_config: {
         publication_name: publicationName,
-        ...(batch
-          ? {
-              batch: {
-                max_fill_ms: batch.maxFillMs,
-              },
-            }
-          : {}),
+        ...(!!batch ? { batch: { max_fill_ms: batch.maxFillMs } } : {}),
       },
     },
     signal,

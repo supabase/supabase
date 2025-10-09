@@ -53,3 +53,5 @@ export const DestinationPanelFormSchema = z
       path: ['projectId'],
     }
   )
+
+export type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>

@@ -154,15 +154,12 @@ export const Destinations = () => {
                 (p) => p.destination_id === destination.id
               )
 
-              const getDestinationType = () => {
-                if ('big_query' in destination.config) {
-                  return 'BigQuery'
-                } else if ('iceberg' in destination.config) {
-                  return 'Analytics Bucket'
-                } else {
-                  return 'Other'
-                }
-              }
+              const type =
+                'big_query' in destination.config
+                  ? 'BigQuery'
+                  : 'iceberg' in destination.config
+                    ? 'Analytics Bucket'
+                    : 'Other'
 
               return (
                 <DestinationRow
@@ -170,7 +167,7 @@ export const Destinations = () => {
                   sourceId={sourceId}
                   destinationId={destination.id}
                   destinationName={destination.name}
-                  type={getDestinationType()}
+                  type={type}
                   pipeline={pipeline}
                   error={pipelinesError}
                   isLoading={isPipelinesLoading}

@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { components } from 'api-types'
 import { replicationKeys } from './keys'
 
 export type BigQueryDestinationConfig = {
@@ -60,6 +60,7 @@ async function updateDestinationPipeline(
 
   // Build destination_config based on the type
   let destination_config: components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+
   if ('bigQuery' in destinationConfig) {
     const { projectId, datasetId, serviceAccountKey, maxStalenessMins } = destinationConfig.bigQuery
     destination_config = {
@@ -67,7 +68,7 @@ async function updateDestinationPipeline(
         project_id: projectId,
         dataset_id: datasetId,
         service_account_key: serviceAccountKey,
-        ...(maxStalenessMins != null && { max_staleness_mins: maxStalenessMins }),
+        ...(maxStalenessMins !== null ? { max_staleness_mins: maxStalenessMins } : {}),
       },
     }
   } else if ('iceberg' in destinationConfig) {
@@ -102,25 +103,18 @@ async function updateDestinationPipeline(
     {
       params: { path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId } },
       body: {
-        destination_name: destinationName,
         destination_config,
+        source_id: sourceId,
+        destination_name: destinationName,
         pipeline_config: {
           publication_name: publicationName,
-          ...(batch && {
-            batch: {
-              max_fill_ms: batch.maxFillMs,
-            },
-          }),
+          ...(!!batch ? { batch: { max_fill_ms: batch.maxFillMs } } : {}),
         },
-        source_id: sourceId,
       },
       signal,
     }
   )
-  if (error) {
-    handleError(error)
-  }
-
+  if (error) handleError(error)
   return data
 }
 

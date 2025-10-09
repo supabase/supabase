@@ -1,5 +1,4 @@
 import { UseFormReturn } from 'react-hook-form'
-import * as z from 'zod'
 
 import {
   Accordion_Shadcn_,
@@ -11,9 +10,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { DestinationPanelFormSchema } from './DestinationPanel.schema'
-
-type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>
+import { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   const { type } = form.watch()
