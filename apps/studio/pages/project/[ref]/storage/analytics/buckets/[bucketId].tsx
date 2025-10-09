@@ -21,7 +21,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
-import { ExternalLink, Eye, EyeOff, Plus } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff, Plus, Copy } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import type { NextPageWithLayout } from 'types'
@@ -275,9 +275,15 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                   Use these parameters to connect an Iceberg client to this bucket.
                 </ScaffoldSectionDescription>
               </div>
-              <DocsButton
-                href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
-              />
+              <div className="flex flex-row gap-x-2">
+                {/* TODO replace with CopyEnvButton */}
+                <Button type="default" icon={<Copy size={14} />}>
+                  Copy all
+                </Button>
+                <DocsButton
+                  href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+                />
+              </div>
             </ScaffoldHeader>
             <Card>
               {/* Table should match that in S3 connection */}
