@@ -36,9 +36,10 @@ ignoredBuiltDependencies:
 minimumReleaseAge: 10080
 
 minimumReleaseAgeExclude:
-  - ai
   - '@ai-sdk/*'
   - '@supabase/*'
+  - ai
+  - supabase
 
 onlyBuiltDependencies:
   - supabase

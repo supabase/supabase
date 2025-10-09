@@ -86,8 +86,8 @@ export const RealtimeSettings = () => {
       .min(1)
       .max(maxConn?.maxConnections ?? 100),
     max_concurrent_users: z.coerce.number().min(1).max(50000),
+    max_events_per_second: z.coerce.number().min(1).max(10000),
     // [Joshen] These fields are temporarily hidden from the UI
-    // max_events_per_second: z.coerce.number().min(1).max(50000),
     // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
     // max_channels_per_client: z.coerce.number().min(1).max(10000),
     // max_joins_per_second: z.coerce.number().min(1).max(5000),
@@ -117,6 +117,7 @@ export const RealtimeSettings = () => {
       private_only: !data.allow_public,
       connection_pool: data.connection_pool,
       max_concurrent_users: data.max_concurrent_users,
+      max_events_per_second: data.max_events_per_second,
     })
   }
 
@@ -248,6 +249,36 @@ export const RealtimeSettings = () => {
                     >
                       <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
+                          <Input_Shadcn_ {...field} type="number" value={field.value || ''} />
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </FormSectionContent>
+                    </FormSection>
+                  )}
+                />
+              </CardContent>
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="max_events_per_second"
+                  render={({ field }) => (
+                    <FormSection
+                      className="!p-0 !py-2"
+                      header={
+                        <FormSectionLabel
+                          description={
+                            <p className="text-foreground-lighter text-sm !mt-1">
+                              Sets maximum number of events per second that can be sent to your
+                              Realtime service
+                            </p>
+                          }
+                        >
+                          Max events per second
+                        </FormSectionLabel>
+                      }
+                    >
+                      <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
+                        <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
                             type="number"
@@ -270,7 +301,7 @@ export const RealtimeSettings = () => {
                                 </p>
                               </div>
                               <div className="flex-grow flex items-center justify-end">
-                                {false ? (
+                                {isFreePlan ? (
                                   <UpgradePlanButton source="realtimeSettings" plan="Pro" />
                                 ) : (
                                   <ToggleSpendCapButton />
@@ -287,46 +318,11 @@ export const RealtimeSettings = () => {
 
               {/*
                 [Joshen] The following fields are hidden from the UI temporarily while we figure out what settings to expose to the users
-                - Max events per second
                 - Max bytes per second
                 - Max channels per client
                 - Max joins per second
               */}
 
-              {/* <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="max_events_per_second"
-                  render={({ field }) => (
-                    <FormSection
-                      className="!p-0 !py-2"
-                      header={
-                        <FormSectionLabel
-                          description={
-                            <p className="text-foreground-lighter text-sm !mt-1">
-                              Sets maximum number of events per second rate per channel limit
-                            </p>
-                          }
-                        >
-                          Max events per second
-                        </FormSectionLabel>
-                      }
-                    >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            disabled={!canUpdateConfig}
-                            value={field.value || ''}
-                          />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormSectionContent>
-                    </FormSection>
-                  )}
-                />
-              </CardContent> */}
               {/* <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
@@ -440,6 +436,7 @@ export const RealtimeSettings = () => {
                   )}
                 />
               </CardContent> */}
+
               <CardFooter className="justify-between">
                 <div>
                   {isPermissionsLoaded && !canUpdateConfig && (
