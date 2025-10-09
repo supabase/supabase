@@ -17,7 +17,7 @@ import { Alert, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
-import PlanUpdateSidePanel from './PlanUpdateSidePanel'
+import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 
 const Subscription = () => {
   const { slug } = useParams()
