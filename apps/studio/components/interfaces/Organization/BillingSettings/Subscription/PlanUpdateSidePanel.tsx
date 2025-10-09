@@ -54,8 +54,6 @@ export const PlanUpdateSidePanel = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  console.log({ selectedOrganization })
-
   const originalPlanRef = useRef<string>()
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
