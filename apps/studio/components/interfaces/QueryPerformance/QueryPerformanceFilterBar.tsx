@@ -1,59 +1,31 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { RefreshCw, Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { Search, X } from 'lucide-react'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { ChangeEvent, useEffect, useState } from 'react'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import { AggregatedQueryData } from './QueryPerformanceData.utils'
 
 export const QueryPerformanceFilterBar = ({
-  queryPerformanceQuery,
-  onResetReportClick,
+  aggregatedData = [],
 }: {
-  queryPerformanceQuery: DbQueryHook<any>
-  onResetReportClick?: () => void
+  aggregatedData?: AggregatedQueryData[]
 }) => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const { sort, clearSort } = useQueryPerformanceSort()
-  const [showBottomSection] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
-    true
-  )
 
-  const [{ search: searchQuery, roles: defaultFilterRoles }, setSearchParams] = useQueryStates({
+  const [{ search: searchQuery }, setSearchParams] = useQueryStates({
     search: parseAsString.withDefault(''),
-    roles: parseAsArrayOf(parseAsString).withDefault([]),
   })
 
   const [inputValue, setInputValue] = useState(searchQuery)
   const debouncedInputValue = useDebounce(inputValue, 500)
   const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
-
-  const [filters, setFilters] = useState<{ roles: string[]; query: string }>({
-    roles: defaultFilterRoles,
-    query: '',
-  })
-
-  const { isLoading, isRefetching } = queryPerformanceQuery
-  const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
-
-  const onFilterRolesChange = (roles: string[]) => {
-    setFilters({ ...filters, roles })
-    setSearchParams({ roles })
-  }
 
   const onSearchQueryChange = (value: string) => {
     setSearchParams({ search: value || '' })
@@ -91,16 +63,6 @@ export const QueryPerformanceFilterBar = ({
             ]}
           />
 
-          <FilterPopover
-            name="Roles"
-            options={roles}
-            labelKey="name"
-            valueKey="name"
-            activeOptions={isLoadingRoles ? [] : filters.roles}
-            onSaveFilters={onFilterRolesChange}
-            className="w-56"
-          />
-
           {sort && (
             <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
               <p className="md:inline-flex gap-x-1 hidden truncate">
@@ -118,26 +80,8 @@ export const QueryPerformanceFilterBar = ({
       </div>
 
       <div className="flex gap-2 items-center pl-2">
-        {!showBottomSection && onResetReportClick && (
-          <Button type="default" onClick={() => onResetReportClick()}>
-            Reset report
-          </Button>
-        )}
-        <Button
-          size="tiny"
-          type="default"
-          onClick={() => queryPerformanceQuery.runQuery()}
-          disabled={isLoading || isRefetching}
-          icon={
-            <RefreshCw
-              className={`text-foreground-light ${isLoading || isRefetching ? 'animate-spin' : ''}`}
-            />
-          }
-        >
-          Refresh
-        </Button>
         <DownloadResultsButton
-          results={queryPerformanceQuery.data ?? []}
+          results={aggregatedData}
           fileName={`Supabase Query Performance (${ref})`}
           align="end"
         />

@@ -133,10 +133,7 @@ export const QueryPerformance = ({
         isLoading={isLogsLoading}
         error={logsError}
       />
-      <QueryPerformanceFilterBar
-        queryPerformanceQuery={queryPerformanceQuery}
-        onResetReportClick={() => setShowResetgPgStatStatements(true)}
-      />
+      <QueryPerformanceFilterBar aggregatedData={aggregatedGridData} />
       <LoadingLine loading={isLoading || isRefetching || isLogsLoading} />
 
       <QueryPerformanceGrid aggregatedData={aggregatedGridData} isLoading={isLogsLoading} />
