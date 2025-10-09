@@ -100,6 +100,7 @@ export const AnalyticsBucketFields = ({
     isLoading: isLoadingBuckets,
     isError: isErrorBuckets,
   } = useBucketsQuery({ projectRef })
+  const analyticsBuckets = buckets.filter((bucket) => bucket.type === 'ANALYTICS')
 
   // Construct catalog URI for iceberg namespaces query
   const catalogUri = useMemo(() => {
@@ -151,12 +152,12 @@ export const AnalyticsBucketFields = ({
                       <SelectItem_Shadcn_ value="__no_buckets__" disabled>
                         Failed to fetch buckets
                       </SelectItem_Shadcn_>
-                    ) : buckets.length === 0 ? (
+                    ) : analyticsBuckets.length === 0 ? (
                       <SelectItem_Shadcn_ value="__no_buckets__" disabled>
                         No buckets available
                       </SelectItem_Shadcn_>
                     ) : (
-                      buckets.map((bucket) => (
+                      analyticsBuckets.map((bucket) => (
                         <SelectItem_Shadcn_ key={bucket.id} value={bucket.name}>
                           {bucket.name}
                         </SelectItem_Shadcn_>
