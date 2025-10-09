@@ -42,6 +42,7 @@ import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -51,9 +52,9 @@ const configUrlSchema = z.object({
 })
 
 const schema = z.object({
-  GOTRUE_OAUTH_SERVER_ENABLED: z.boolean().default(false),
-  GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: z.boolean().default(false),
-  authorizationPath: z.string().optional().or(z.literal('')),
+  OAUTH_SERVER_ENABLED: z.boolean().nullish().default(false),
+  OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: z.boolean().nullish().default(false),
+  OAUTH_SERVER_AUTHORIZATION_PATH: z.string().nullish().optional().or(z.literal('')),
   availableScopes: z.array(z.string()).default(['openid', 'email', 'profile']),
   config_urls: z.array(configUrlSchema).optional(),
 })
@@ -66,9 +67,9 @@ interface ConfigUrl {
 }
 
 interface OAuthServerSettings {
-  GOTRUE_OAUTH_SERVER_ENABLED: boolean
-  GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
-  authorizationPath?: string
+  OAUTH_SERVER_ENABLED: boolean
+  OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
+  OAUTH_SERVER_AUTHORIZATION_PATH?: string
   availableScopes: string[]
   config_urls?: ConfigUrl[]
 }
@@ -76,7 +77,7 @@ interface OAuthServerSettings {
 const OAuthServerSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const [isLoading, setIsLoading] = useState(true)
+  const { mutate: updateAuthConfig, isLoading } = useAuthConfigUpdateMutation()
   const [isSaving, setIsSaving] = useState(false)
   const [oAuthAppsCount, setOAuthAppsCount] = useState(0)
   const [showDynamicAppsConfirmation, setShowDynamicAppsConfirmation] = useState(false)
@@ -95,30 +96,25 @@ const OAuthServerSettingsForm = () => {
   const form = useForm<OAuthServerSettings>({
     resolver: zodResolver(schema),
     defaultValues: {
-      GOTRUE_OAUTH_SERVER_ENABLED: false,
-      GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: false,
-      authorizationPath: undefined,
+      OAUTH_SERVER_ENABLED: false,
+      OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: false,
+      OAUTH_SERVER_AUTHORIZATION_PATH: undefined,
       availableScopes: ['openid', 'email', 'profile'],
     },
   })
 
-  // Load settings from localStorage
+  // Load settings from auth config
   useEffect(() => {
-    const loadSettings = () => {
-      try {
-        const stored = localStorage.getItem('oauth_server_settings')
-        if (stored) {
-          const parsedSettings = JSON.parse(stored)
-          form.reset(parsedSettings)
-        }
-      } catch (error) {
-        console.error('Error loading OAuth server settings from localStorage:', error)
-      }
-      setIsLoading(false)
+    if (authConfig) {
+      form.reset({
+        OAUTH_SERVER_ENABLED: authConfig.OAUTH_SERVER_ENABLED ?? false,
+        OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION:
+          authConfig.OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION ?? false,
+        OAUTH_SERVER_AUTHORIZATION_PATH: authConfig.OAUTH_SERVER_AUTHORIZATION_PATH ?? '',
+        availableScopes: ['openid', 'email', 'profile'], // Keep default scopes
+      })
     }
-
-    loadSettings()
-  }, [])
+  }, [authConfig])
 
   // Load OAuth apps count from localStorage
   useEffect(() => {
@@ -158,34 +154,32 @@ const OAuthServerSettingsForm = () => {
   }, [])
 
   const onSubmit = async (values: OAuthServerSettings) => {
+    if (!projectRef) return console.error('Project ref is required')
+
     setIsSaving(true)
-    try {
-      // Generate config URLs if OAuth server is being enabled and config_urls don't exist
-      const updatedValues = { ...values }
-      if (values.GOTRUE_OAUTH_SERVER_ENABLED && !values.config_urls) {
-        updatedValues.config_urls = generateConfigUrls()
-      }
 
-      // Save to localStorage
-      localStorage.setItem('oauth_server_settings', JSON.stringify(updatedValues))
-      // Reset form to clear isDirty state
-      form.reset(updatedValues)
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new CustomEvent('oauth-server-settings-changed'))
-      toast.success('OAuth server settings updated successfully')
-    } catch (error) {
-      toast.error('Failed to update OAuth server settings')
-      console.error('Error saving OAuth server settings:', error)
-    } finally {
-      setIsSaving(false)
+    const config = {
+      OAUTH_SERVER_ENABLED: values.OAUTH_SERVER_ENABLED,
+      OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: values.OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION,
+      OAUTH_SERVER_AUTHORIZATION_PATH: values.OAUTH_SERVER_AUTHORIZATION_PATH || null,
     }
-  }
 
-  // const addCustomScope = () => {
-  //   const currentScopes = form.getValues('availableScopes')
-  //   const newScope = `custom_scope_${Date.now()}`
-  //   form.setValue('availableScopes', [...currentScopes, newScope])
-  // }
+    updateAuthConfig(
+      { projectRef, config },
+      {
+        onError: (error) => {
+          toast.error(`Failed to update OAuth server settings: ${error?.message}`)
+          setIsSaving(false)
+        },
+        onSuccess: () => {
+          toast.success('OAuth server settings updated successfully')
+          setIsSaving(false)
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new CustomEvent('oauth-server-settings-changed'))
+        },
+      }
+    )
+  }
 
   const removeScope = (scopeToRemove: string) => {
     const currentScopes = form.getValues('availableScopes')
@@ -197,12 +191,12 @@ const OAuthServerSettingsForm = () => {
     if (checked) {
       setShowDynamicAppsConfirmation(true)
     } else {
-      form.setValue('GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION', false, { shouldDirty: true })
+      form.setValue('OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION', false, { shouldDirty: true })
     }
   }
 
   const confirmDynamicApps = () => {
-    form.setValue('GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION', true, { shouldDirty: true })
+    form.setValue('OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION', true, { shouldDirty: true })
     setShowDynamicAppsConfirmation(false)
   }
 
@@ -214,12 +208,12 @@ const OAuthServerSettingsForm = () => {
     if (!checked && oAuthAppsCount > 0) {
       setShowDisableOAuthServerConfirmation(true)
     } else {
-      form.setValue('GOTRUE_OAUTH_SERVER_ENABLED', checked, { shouldDirty: true })
+      form.setValue('OAUTH_SERVER_ENABLED', checked, { shouldDirty: true })
     }
   }
 
   const confirmDisableOAuthServer = () => {
-    form.setValue('GOTRUE_OAUTH_SERVER_ENABLED', false, { shouldDirty: true })
+    form.setValue('OAUTH_SERVER_ENABLED', false, { shouldDirty: true })
     setShowDisableOAuthServerConfirmation(false)
   }
 
@@ -282,7 +276,7 @@ const OAuthServerSettingsForm = () => {
                 <CardContent className="flex flex-col py-6 gap-y-4">
                   <FormField_Shadcn_
                     control={form.control}
-                    name="GOTRUE_OAUTH_SERVER_ENABLED"
+                    name="OAUTH_SERVER_ENABLED"
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
@@ -314,7 +308,7 @@ const OAuthServerSettingsForm = () => {
                   />
                 </CardContent>
                 {/* Site URL and Authorization Path - Only show when OAuth Server is enabled */}
-                {form.watch('GOTRUE_OAUTH_SERVER_ENABLED') && (
+                {form.watch('OAUTH_SERVER_ENABLED') && (
                   <>
                     <CardContent className="flex flex-col py-6 gap-y-4">
                       <FormItemLayout
@@ -343,7 +337,7 @@ const OAuthServerSettingsForm = () => {
 
                       <FormField_Shadcn_
                         control={form.control}
-                        name="authorizationPath"
+                        name="OAUTH_SERVER_AUTHORIZATION_PATH"
                         render={({ field }) => (
                           <FormItemLayout
                             label="Authorization Path"
@@ -358,14 +352,14 @@ const OAuthServerSettingsForm = () => {
                       <Admonition
                         type="tip"
                         title="Make sure this path is implemented in your application."
-                        description={`Preview Authorization URL: ${authConfig?.SITE_URL || 'https://myapp.com'}${form.watch('authorizationPath') || '/oauth/consent'}`}
+                        description={`Preview Authorization URL: ${authConfig?.SITE_URL || 'https://myapp.com'}${form.watch('OAUTH_SERVER_AUTHORIZATION_PATH') || '/oauth/consent'}`}
                       />
                     </CardContent>
                     <CardContent className="py-6">
                       <div className="space-y-6">
                         <FormField_Shadcn_
                           control={form.control}
-                          name="GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION"
+                          name="OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION"
                           render={({ field }) => (
                             <FormItemLayout
                               layout="flex-row-reverse"
@@ -418,7 +412,7 @@ const OAuthServerSettingsForm = () => {
               </Card>
 
               {/* Additional Settings Section - Only show when OAuth Server is enabled */}
-              {form.watch('GOTRUE_OAUTH_SERVER_ENABLED') && (
+              {form.watch('OAUTH_SERVER_ENABLED') && (
                 <ScaffoldSection isFullWidth>
                   <ScaffoldSectionContent>
                     <Separator />
