@@ -71,12 +71,6 @@ export const ReportChartV2 = ({
       enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
       staleTime: 0,
-      select: (data) => {
-        if (report.selectTransform) {
-          return report.selectTransform(data)
-        }
-        return data
-      },
     }
   )
 
