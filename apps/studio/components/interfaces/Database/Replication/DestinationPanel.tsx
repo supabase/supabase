@@ -8,6 +8,7 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
@@ -239,9 +240,12 @@ export const DestinationPanel = ({
 
   // Construct catalog URI for iceberg namespaces query
   const catalogUri = useMemo(() => {
-    if (!project?.ref) return ''
-    return `https://${project.ref}.supabase.co/storage/v1/iceberg`
-  }, [project?.ref])
+    if (!project?.ref || !projectSettings) return ''
+    const protocol = projectSettings.app_config?.protocol ?? 'https'
+    const endpoint =
+      projectSettings.app_config?.storage_endpoint || projectSettings.app_config?.endpoint
+    return getCatalogURI(project.ref, protocol, endpoint)
+  }, [project?.ref, projectSettings])
 
   const { data: namespaces = [], isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
     {
