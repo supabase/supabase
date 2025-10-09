@@ -324,7 +324,7 @@ const ProjectLinker = ({
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
-                  className="p-0 !w-72"
+                  className="p-0"
                   side="bottom"
                   align="center"
                   sameWidthAsTrigger
