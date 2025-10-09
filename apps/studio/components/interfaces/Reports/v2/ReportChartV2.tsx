@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
@@ -70,7 +70,6 @@ export const ReportChartV2 = ({
     {
       enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
-      staleTime: 0,
     }
   )
 
