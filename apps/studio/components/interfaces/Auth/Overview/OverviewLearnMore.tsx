@@ -15,7 +15,7 @@ export const OverviewLearnMore = () => {
     {
       label: 'Docs',
       title: 'Auth docs',
-      description: 'Read more on auth and managing users.',
+      description: 'Read more on Supabase auth, managing users and more.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
         {
@@ -27,7 +27,7 @@ export const OverviewLearnMore = () => {
     },
     {
       label: 'Assistant',
-      title: 'Explain authentication errors',
+      title: 'Explain auth errors',
       description: 'Our Assistant can help you debug and fix authentication errors.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-assistant.jpg`,
       actions: [
@@ -35,7 +35,7 @@ export const OverviewLearnMore = () => {
           label: 'Ask Assistant',
           onClick: () => {
             aiSnap.newChat({
-              name: 'Authentication Help',
+              name: 'Auth Help',
               open: true,
               initialInput:
                 'Look at my logs related to Supabase Auth and help me debug the recent errors.',
@@ -69,7 +69,7 @@ export const OverviewLearnMore = () => {
     {
       label: 'Logs',
       title: 'Dive into the logs',
-      description: 'Authentication logs provide a deeper view into your auth requests.',
+      description: 'Auth logs provide a deeper view into your auth requests.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-logs.jpg`,
       actions: [
         {
