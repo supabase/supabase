@@ -259,8 +259,8 @@ export const CreateSpecializedBucketModal = ({
                 >
                   Iceberg Wrapper
                 </InlineLink>{' '}
-                integration are required for querying analytical data. Supabase will install these
-                on your behalf.{' '}
+                integration are required to query analytical data. Supabase will install these on
+                your behalf.{' '}
                 <InlineLink
                   href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
                   target="_blank"
@@ -287,8 +287,8 @@ export const CreateSpecializedBucketModal = ({
                 >
                   Iceberg Wrapper
                 </InlineLink>{' '}
-                integration is required for querying analytical data. Supabase will install it on
-                your behalf.{' '}
+                integration is required to query analytical data. Supabase will install it on your
+                behalf.{' '}
                 <InlineLink
                   href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
                   target="_blank"
