@@ -141,11 +141,76 @@ export const QueryPerformanceChart = ({
           rows_read: parseInt(log.rows) || 0,
           calls: parseInt(log.calls) || 0,
           cache_hits: parseFloat(log.shared_blks_hit) || 0,
+          cache_misses: parseFloat(log.shared_blks_read) || 0,
         }
       })
       .filter((item): item is NonNullable<typeof item> => item !== null)
       .sort((a, b) => a.period_start - b.period_start)
   }, [parsedLogs])
+
+  const currentMetrics = useMemo(() => {
+    if (!chartData || chartData.length === 0) return []
+
+    switch (selectedMetric) {
+      case 'query_latency': {
+        // Calculate Average p95
+        const sortedTimes = chartData.map((d) => d.mean_time).sort((a, b) => a - b)
+        const p95Index = Math.floor(sortedTimes.length * 0.95)
+        const averageP95 = sortedTimes[p95Index] || 0
+
+        return [
+          {
+            label: 'Average p95',
+            value: `${averageP95.toFixed(2)} ms`,
+          },
+        ]
+      }
+      case 'rows_read': {
+        // Calculate Total Rows Read
+        const totalRowsRead = chartData.reduce((sum, d) => sum + d.rows_read, 0)
+
+        return [
+          {
+            label: 'Total Rows Read',
+            value: totalRowsRead.toLocaleString(),
+          },
+        ]
+      }
+      case 'calls': {
+        // Calculate Total Calls
+        const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
+
+        return [
+          {
+            label: 'Total Calls',
+            value: totalCalls.toLocaleString(),
+          },
+        ]
+      }
+      case 'cache_hits': {
+        // Calculate Cache Hit Rate and Cache Miss Rate
+        const totalHits = chartData.reduce((sum, d) => sum + d.cache_hits, 0)
+        const totalMisses = chartData.reduce((sum, d) => sum + d.cache_misses, 0)
+        const total = totalHits + totalMisses
+
+        const hitRate = total > 0 ? (totalHits / total) * 100 : 0
+        const missRate = total > 0 ? (totalMisses / total) * 100 : 0
+
+        return [
+          {
+            label: 'Cache Hit Rate',
+            value: `${hitRate.toFixed(2)}%`,
+          },
+          {
+            label: 'Cache Miss Rate',
+            value: `${missRate.toFixed(2)}%`,
+          },
+        ]
+      }
+      default:
+        return []
+    }
+  }, [chartData, selectedMetric])
 
   const getChartAttributes = useMemo((): MultiAttribute[] => {
     const attributeMap: Record<string, MultiAttribute[]> = {
@@ -246,8 +311,12 @@ export const QueryPerformanceChart = ({
                 Error loading chart data
               </p>
             ) : (
-              <div className="w-full flex flex-col h-full p-6">
-                <QueryMetricBlock label="Value" value={0} />
+              <div className="w-full flex flex-col h-full px-6 py-4">
+                <div className="flex gap-6 mb-4">
+                  {currentMetrics.map((metric, index) => (
+                    <QueryMetricBlock key={index} label={metric.label} value={metric.value} />
+                  ))}
+                </div>
                 <ComposedChart
                   data={chartData}
                   attributes={getChartAttributes}
