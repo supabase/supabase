@@ -15,9 +15,7 @@ Supabase branches create separate environments that spin off from your main proj
 - **Managing Branches**: You can create, review, and merge branches either automatically via our [GitHub integration](/docs/guides/deployment/branching/github-integration) or directly [through the dashboard](/docs/guides/deployment/branching/dashboard) (currently in beta). All branches show up in the branches page in the dashboard, regardless of how they were created.
 - **Data-less**: New branches do not start with any data from your main project. This is meant to better protect your sensitive production data. To start your branches with data, you can use a [seed file](/docs/guides/deployment/branching/github-integration#seeding) if using the GitHub integration.
 
-## Deployment workflow overview
-
-When you push changes to a connected branch, Supabase automatically runs a deployment workflow consisting some or all of the following deployment steps.
+When you merge changes from a branch into your main project, Supabase automatically runs a deployment workflow consisting some or all of the following steps.
 
 1. **Clone** - Checks out your repository at the specified git branch (optional for [Branching via Dashboard](/docs/guides/deployment/branching/dashboard))
 2. **Pull** - Retrieves database migrations from your base project (also initialises the migration history table when [Branching via Dashboard](/docs/guides/deployment/branching/dashboard))
@@ -28,16 +26,3 @@ When you push changes to a connected branch, Supabase automatically runs a deplo
 7. **Deploy** - Deploys any changed Edge Functions and updates function secrets
 
 The deployment workflow is expressed as a Directed Acyclic Graph where each node represents a single deployment step. This means we can execute independent steps in parallel and skip children nodes when the parent fails. For e.g.. if your database migrations failed at step 5, we will skip step 6 and not seed your branch.
-
-### Monitoring deployments
-
-To check deployment status and troubleshoot failures:
-
-1. Go to your project dashboard
-2. Navigate to "Manage Branches"
-3. Click on your branch to view deployment logs
-4. Check the "View logs" section for detailed error messages
-
-For programmatic monitoring, you can use the [Management API](https://api.supabase.com/api/v1#tag/environments/post/v1/projects/{ref}/branches) to poll branch status.
-
-For detailed troubleshooting guidance, see our [Troubleshooting guide](/docs/guides/deployment/branching/troubleshooting).
