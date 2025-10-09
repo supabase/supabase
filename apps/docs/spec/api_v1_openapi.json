@@ -559,8 +559,7 @@
         "responses": { "204": { "description": "" } },
         "security": [{ "bearer": [] }],
         "summary": "Authorize user through oauth and claim a project",
-        "tags": ["OAuth"],
-        "x-internal": true
+        "tags": ["OAuth"]
       }
     },
     "/v1/snippets": {
@@ -6656,6 +6655,9 @@
           "hook_before_user_created_enabled": { "type": "boolean", "nullable": true },
           "hook_before_user_created_uri": { "type": "string", "nullable": true },
           "hook_before_user_created_secrets": { "type": "string", "nullable": true },
+          "hook_after_user_created_enabled": { "type": "boolean", "nullable": true },
+          "hook_after_user_created_uri": { "type": "string", "nullable": true },
+          "hook_after_user_created_secrets": { "type": "string", "nullable": true },
           "jwt_exp": { "type": "integer", "nullable": true },
           "mailer_allow_unverified_email_sign_ins": { "type": "boolean", "nullable": true },
           "mailer_autoconfirm": { "type": "boolean", "nullable": true },
@@ -6668,12 +6670,66 @@
           "mailer_subjects_magic_link": { "type": "string", "nullable": true },
           "mailer_subjects_reauthentication": { "type": "string", "nullable": true },
           "mailer_subjects_recovery": { "type": "string", "nullable": true },
+          "mailer_subjects_password_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_email_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_phone_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_mfa_factor_enrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_unenrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_linked_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_identity_unlinked_notification": { "type": "string", "nullable": true },
           "mailer_templates_confirmation_content": { "type": "string", "nullable": true },
           "mailer_templates_email_change_content": { "type": "string", "nullable": true },
           "mailer_templates_invite_content": { "type": "string", "nullable": true },
           "mailer_templates_magic_link_content": { "type": "string", "nullable": true },
           "mailer_templates_reauthentication_content": { "type": "string", "nullable": true },
           "mailer_templates_recovery_content": { "type": "string", "nullable": true },
+          "mailer_templates_password_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_email_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_phone_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_enrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_unenrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_linked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_unlinked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_notifications_password_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_email_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_phone_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_mfa_factor_enrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_unenrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_linked_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_identity_unlinked_enabled": { "type": "boolean", "nullable": true },
           "mfa_max_enrolled_factors": { "type": "integer", "nullable": true },
           "mfa_totp_enroll_enabled": { "type": "boolean", "nullable": true },
           "mfa_totp_verify_enabled": { "type": "boolean", "nullable": true },
@@ -6876,6 +6932,9 @@
           "hook_before_user_created_enabled",
           "hook_before_user_created_uri",
           "hook_before_user_created_secrets",
+          "hook_after_user_created_enabled",
+          "hook_after_user_created_uri",
+          "hook_after_user_created_secrets",
           "jwt_exp",
           "mailer_allow_unverified_email_sign_ins",
           "mailer_autoconfirm",
@@ -6888,12 +6947,33 @@
           "mailer_subjects_magic_link",
           "mailer_subjects_reauthentication",
           "mailer_subjects_recovery",
+          "mailer_subjects_password_changed_notification",
+          "mailer_subjects_email_changed_notification",
+          "mailer_subjects_phone_changed_notification",
+          "mailer_subjects_mfa_factor_enrolled_notification",
+          "mailer_subjects_mfa_factor_unenrolled_notification",
+          "mailer_subjects_identity_linked_notification",
+          "mailer_subjects_identity_unlinked_notification",
           "mailer_templates_confirmation_content",
           "mailer_templates_email_change_content",
           "mailer_templates_invite_content",
           "mailer_templates_magic_link_content",
           "mailer_templates_reauthentication_content",
           "mailer_templates_recovery_content",
+          "mailer_templates_password_changed_notification_content",
+          "mailer_templates_email_changed_notification_content",
+          "mailer_templates_phone_changed_notification_content",
+          "mailer_templates_mfa_factor_enrolled_notification_content",
+          "mailer_templates_mfa_factor_unenrolled_notification_content",
+          "mailer_templates_identity_linked_notification_content",
+          "mailer_templates_identity_unlinked_notification_content",
+          "mailer_notifications_password_changed_enabled",
+          "mailer_notifications_email_changed_enabled",
+          "mailer_notifications_phone_changed_enabled",
+          "mailer_notifications_mfa_factor_enrolled_enabled",
+          "mailer_notifications_mfa_factor_unenrolled_enabled",
+          "mailer_notifications_identity_linked_enabled",
+          "mailer_notifications_identity_unlinked_enabled",
           "mfa_max_enrolled_factors",
           "mfa_totp_enroll_enabled",
           "mfa_totp_verify_enabled",
@@ -6990,12 +7070,66 @@
           "mailer_subjects_email_change": { "type": "string", "nullable": true },
           "mailer_subjects_magic_link": { "type": "string", "nullable": true },
           "mailer_subjects_reauthentication": { "type": "string", "nullable": true },
+          "mailer_subjects_password_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_email_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_phone_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_mfa_factor_enrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_unenrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_linked_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_identity_unlinked_notification": { "type": "string", "nullable": true },
           "mailer_templates_invite_content": { "type": "string", "nullable": true },
           "mailer_templates_confirmation_content": { "type": "string", "nullable": true },
           "mailer_templates_recovery_content": { "type": "string", "nullable": true },
           "mailer_templates_email_change_content": { "type": "string", "nullable": true },
           "mailer_templates_magic_link_content": { "type": "string", "nullable": true },
           "mailer_templates_reauthentication_content": { "type": "string", "nullable": true },
+          "mailer_templates_password_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_email_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_phone_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_enrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_unenrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_linked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_unlinked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_notifications_password_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_email_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_phone_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_mfa_factor_enrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_unenrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_linked_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_identity_unlinked_enabled": { "type": "boolean", "nullable": true },
           "mfa_max_enrolled_factors": {
             "type": "integer",
             "minimum": 0,
@@ -7155,6 +7289,9 @@
           "hook_before_user_created_enabled": { "type": "boolean", "nullable": true },
           "hook_before_user_created_uri": { "type": "string", "nullable": true },
           "hook_before_user_created_secrets": { "type": "string", "nullable": true },
+          "hook_after_user_created_enabled": { "type": "boolean", "nullable": true },
+          "hook_after_user_created_uri": { "type": "string", "nullable": true },
+          "hook_after_user_created_secrets": { "type": "string", "nullable": true },
           "external_apple_enabled": { "type": "boolean", "nullable": true },
           "external_apple_client_id": { "type": "string", "nullable": true },
           "external_apple_email_optional": { "type": "boolean", "nullable": true },
