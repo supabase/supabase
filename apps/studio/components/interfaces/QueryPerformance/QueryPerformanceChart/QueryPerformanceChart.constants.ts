@@ -17,7 +17,23 @@ export const QUERY_PERFORMANCE_CHART_TABS = [
   },
 ]
 
-export const PG_STAT_MONITOR_LOGS_QUERY = `
+export const QUERY_PERFORMANCE_TIME_RANGES = [
+  {
+    id: 'last_60_minutes',
+    label: 'Last 60 minutes',
+  },
+  {
+    id: 'last_3_hours',
+    label: 'Last 3 hours',
+  },
+  {
+    id: 'last_24_hours',
+    label: 'Last 24 hours',
+  },
+]
+
+export const getPgStatMonitorLogsQuery = (startTime: string, endTime: string) =>
+  `
 select 
   id,
   pgl.timestamp as timestamp,
@@ -35,6 +51,13 @@ from postgres_logs as pgl
 cross join unnest(pgl.metadata) as pgl_metadata
 cross join unnest(pgl_metadata.parsed) as pgl_parsed
 WHERE pgl.event_message LIKE '%[pg_stat_monitor]%'
+  AND pgl.timestamp >= CAST('${startTime}' AS TIMESTAMP)
+  AND pgl.timestamp <= CAST('${endTime}' AS TIMESTAMP)
 ORDER BY timestamp DESC
-LIMIT 100
+LIMIT 200
 `.trim()
+
+export const PG_STAT_MONITOR_LOGS_QUERY = getPgStatMonitorLogsQuery(
+  new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+  new Date().toISOString()
+)
