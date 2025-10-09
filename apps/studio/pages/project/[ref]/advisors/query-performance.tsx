@@ -16,11 +16,24 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
+
+  const {
+    selectedDateRange,
+    datePickerValue,
+    datePickerHelpers,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS)
 
   const [{ search: searchQuery, roles }] = useQueryStates({
     sort: parseAsString,
@@ -45,15 +58,25 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   return (
     <div className="h-full flex flex-col">
       <FormHeader
-        className="py-4 px-6 !mb-0"
+        className="py-4 px-6 !mb-0 md:flex-row flex-col"
         title="Query Performance"
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <EnableIndexAdvisorButton />
             <DocsButton
               href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
             />
             <DatabaseSelector />
+            <LogsDatePicker
+              value={datePickerValue}
+              helpers={datePickerHelpers.filter(
+                (h) =>
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
+              )}
+              onSubmit={handleDatePickerChange}
+            />
           </div>
         }
       />

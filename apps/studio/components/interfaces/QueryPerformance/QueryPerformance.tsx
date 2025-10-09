@@ -17,7 +17,7 @@ import { Markdown } from '../Markdown'
 import { PresetHookResult } from '../Reports/Reports.utils'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
-import { QueryPerformanceMetrics } from './QueryPerformanceMetrics'
+// import { QueryPerformanceMetrics } from './QueryPerformanceMetrics'
 import { QueryPerformanceChart } from './QueryPerformanceChart/QueryPerformanceChart'
 
 interface QueryPerformanceProps {
