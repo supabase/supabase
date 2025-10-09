@@ -70,7 +70,7 @@ export const PauseFailedState = () => {
             <div className="border-t border-overlay flex items-center justify-end gap-x-2 py-4 px-8">
               <Button asChild type="default">
                 <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Pausing%20failed%20for%20project`}
                 >
                   Contact support
                 </Link>
