@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { analyticsKeys } from './keys'
 import type { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
+import { ResponseError } from 'types'
+import { analyticsKeys } from './keys'
 
 export enum EgressType {
   REST = 'egress_rest',
@@ -144,7 +145,7 @@ export async function getOrgDailyStats(
 }
 
 export type OrgDailyStatsData = Awaited<ReturnType<typeof getOrgDailyStats>>
-export type OrgDailyStatsError = unknown
+export type OrgDailyStatsError = ResponseError
 
 export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
   { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,

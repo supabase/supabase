@@ -4,12 +4,18 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSection,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import DateRangePicker from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -24,7 +30,6 @@ import Compute from './Compute'
 import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
-import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 
 // [Joshen] JFYI this component could use nuqs to handle `projectRef` state which will help
 // simplify some of the implementation here.
@@ -105,6 +110,18 @@ export const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, subscription])
 
+  const {
+    data: orgDailyStats,
+    error: orgDailyStatsError,
+    isLoading: isLoadingOrgDailyStats,
+    isError: isErrorOrgDailyStats,
+  } = useOrgDailyStatsQuery({
+    orgSlug: slug,
+    projectRef,
+    startDate,
+    endDate,
+  })
+
   useEffect(() => {
     if (projectRef && isSuccessProjectDetail) {
       setSelectedProjectRefInputValue(projectRef)
@@ -112,16 +129,6 @@ export const Usage = () => {
     // [Joshen] Since we're already looking at isSuccess
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectRef, isSuccessProjectDetail])
-
-  const { data: orgDailyStats, isLoading: isLoadingOrgDailyStats } = useOrgDailyStatsQuery(
-    {
-      orgSlug: slug,
-      projectRef,
-      startDate,
-      endDate,
-    },
-    { enabled: slug !== undefined }
-  )
 
   return (
     <>
@@ -252,6 +259,17 @@ export const Usage = () => {
           </div>
         </ScaffoldContainer>
       </div>
+
+      {isErrorOrgDailyStats && (
+        <ScaffoldContainer>
+          <ScaffoldSection isFullWidth className="pb-0">
+            <AlertError
+              error={orgDailyStatsError}
+              subject="Failed to retrieve usage statistics for organization"
+            />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      )}
 
       {selectedProjectRef ? (
         <ScaffoldContainer className="mt-5">
