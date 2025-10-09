@@ -59,6 +59,32 @@ alter table "table_name" enable row level security;
 
 Once you have enabled RLS, no data will be accessible via the [API](/docs/guides/api) when using the public `anon` key, until you create policies.
 
+<Admonition type="caution" label="`auth.uid()` Returns `null` When Unauthenticated">
+
+When a request is made without an authenticated user (e.g., no access token is provided or the session has expired), `auth.uid()` returns `null`.
+
+This means that a policy like:
+
+```sql
+USING (auth.uid() = user_id)
+```
+
+will silently fail for unauthenticated users, because:
+
+```sql
+null = user_id
+```
+
+is always false in SQL.
+
+To avoid confusion and make your intention clear, we recommend explicitly checking for authentication:
+
+```sql
+USING (auth.uid() IS NOT NULL AND auth.uid() = user_id)
+```
+
+</Admonition>
+
 ## Authenticated and unauthenticated roles
 
 Supabase maps every request to one of the roles:
