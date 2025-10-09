@@ -123,6 +123,7 @@ export const AnalyticsBucketFields = ({
 
   const {
     data: keysData,
+    isSuccess: isSuccessKeys,
     isLoading: isLoadingKeys,
     isError: isErrorKeys,
   } = useStorageCredentialsQuery({ projectRef })
@@ -398,7 +399,7 @@ export const AnalyticsBucketFields = ({
         )}
       />
 
-      {keyNoLongerExists && (
+      {isSuccessKeys && keyNoLongerExists && (
         <div className="px-5">
           <Admonition type="warning" title="Unable to find access key ID in project">
             <p className="!leading-normal">
