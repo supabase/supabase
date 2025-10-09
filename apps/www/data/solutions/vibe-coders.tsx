@@ -1,6 +1,12 @@
 import { Timer, Zap, CheckCircle, Check, Sparkles } from 'lucide-react'
 import { Button, Image } from 'ui'
-import type { FeaturesSection, HeroSection, Metadata, PostGridProps, Quotes } from './solutions.utils'
+import type {
+  FeaturesSection,
+  HeroSection,
+  Metadata,
+  PostGridProps,
+  Quotes,
+} from './solutions.utils'
 import dynamic from 'next/dynamic'
 
 import MainProducts from '../MainProducts'
