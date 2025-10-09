@@ -1191,7 +1191,7 @@ export default {
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
-            bg-surface-200
+            bg-surface-400 dark:bg-surface-200
             text-foreground-lighter
             z-10
 
