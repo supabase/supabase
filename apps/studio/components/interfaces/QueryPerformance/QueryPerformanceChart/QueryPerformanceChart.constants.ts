@@ -54,7 +54,6 @@ WHERE pgl.event_message LIKE '%[pg_stat_monitor]%'
   AND pgl.timestamp >= CAST('${startTime}' AS TIMESTAMP)
   AND pgl.timestamp <= CAST('${endTime}' AS TIMESTAMP)
 ORDER BY timestamp DESC
-LIMIT 200
 `.trim()
 
 export const PG_STAT_MONITOR_LOGS_QUERY = getPgStatMonitorLogsQuery(

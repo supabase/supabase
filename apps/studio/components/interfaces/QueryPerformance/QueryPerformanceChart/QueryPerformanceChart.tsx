@@ -17,29 +17,65 @@ import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 
 dayjs.extend(utc)
 
-export const QueryPerformanceChart = () => {
+interface QueryPerformanceChartProps {
+  dateRange?: {
+    period_start: { date: string; time_period: string }
+    period_end: { date: string; time_period: string }
+    interval: string
+  }
+  onDateRangeChange?: (from: string, to: string) => void
+}
+
+const QueryMetricBlock = ({
+  label,
+  value,
+}: {
+  label: string
+  value: string | number | undefined
+}) => {
+  return (
+    <div className="flex flex-col gap-0.5 text-xs">
+      <span className="font-mono text-xs text-foreground-light uppercase">{label}</span>
+      <span className="text-lg">{value}</span>
+    </div>
+  )
+}
+
+export const QueryPerformanceChart = ({
+  dateRange,
+  onDateRangeChange,
+}: QueryPerformanceChartProps) => {
   const [selectedMetric, setSelectedMetric] = useState('query_latency')
 
   const { ref: projectRef } = useParams() as { ref: string }
 
-  const dateRange = useMemo(() => {
+  const effectiveDateRange = useMemo(() => {
+    if (dateRange) {
+      return {
+        iso_timestamp_start: dateRange.period_start.date,
+        iso_timestamp_end: dateRange.period_end.date,
+      }
+    }
+    // Fallback to default 24 hours
     const end = dayjs.utc()
     const start = end.subtract(24, 'hours')
-
     return {
       iso_timestamp_start: start.toISOString(),
       iso_timestamp_end: end.toISOString(),
     }
-  }, [])
+  }, [dateRange])
 
   const queryWithTimeRange = useMemo(() => {
-    return getPgStatMonitorLogsQuery(dateRange.iso_timestamp_start, dateRange.iso_timestamp_end)
-  }, [dateRange])
+    return getPgStatMonitorLogsQuery(
+      effectiveDateRange.iso_timestamp_start,
+      effectiveDateRange.iso_timestamp_end
+    )
+  }, [effectiveDateRange])
 
   const pgStatMonitorLogs = useLogsQuery(projectRef, {
     sql: queryWithTimeRange,
-    iso_timestamp_start: dateRange.iso_timestamp_start,
-    iso_timestamp_end: dateRange.iso_timestamp_end,
+    iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
+    iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
   })
 
   const { logData, isLoading, error } = pgStatMonitorLogs
@@ -171,6 +207,7 @@ export const QueryPerformanceChart = () => {
 
   const updateDateRange = (from: string, to: string) => {
     console.log('Date range update:', from, to)
+    onDateRangeChange?.(from, to)
   }
 
   useEffect(() => {
@@ -201,7 +238,7 @@ export const QueryPerformanceChart = () => {
         </TabsList_Shadcn_>
 
         <TabsContent_Shadcn_ value={selectedMetric} className="bg-surface-100 mt-0 h-inherit">
-          <div className="w-full flex items-center justify-center min-h-[300px]">
+          <div className="w-full flex items-center justify-center min-h-[320px]">
             {isLoading ? (
               <Loader2 size={20} className="animate-spin text-foreground-lighter" />
             ) : error ? (
@@ -209,7 +246,8 @@ export const QueryPerformanceChart = () => {
                 Error loading chart data
               </p>
             ) : (
-              <div className="w-full p-6">
+              <div className="w-full flex flex-col h-full p-6">
+                <QueryMetricBlock label="Value" value={0} />
                 <ComposedChart
                   data={chartData}
                   attributes={getChartAttributes}
@@ -218,6 +256,7 @@ export const QueryPerformanceChart = () => {
                   title=""
                   customDateFormat="MMM D, YYYY hh:mm A"
                   hideChartType={true}
+                  hideHighlightArea={true}
                   showTooltip={true}
                   showGrid={true}
                   showLegend={
@@ -235,6 +274,7 @@ export const QueryPerformanceChart = () => {
                     tickFormatter: (value) => value.toLocaleString(),
                   }}
                   xAxisIsDate={true}
+                  className="mt-6"
                 />
               </div>
             )}

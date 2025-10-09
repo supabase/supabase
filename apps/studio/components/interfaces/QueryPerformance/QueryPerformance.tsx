@@ -24,12 +24,20 @@ interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
   queryPerformanceQuery: DbQueryHook<any>
   queryMetrics: PresetHookResult
+  dateRange?: {
+    period_start: { date: string; time_period: string }
+    period_end: { date: string; time_period: string }
+    interval: string
+  }
+  onDateRangeChange?: (from: string, to: string) => void
 }
 
 export const QueryPerformance = ({
   queryHitRate,
   queryPerformanceQuery,
   queryMetrics,
+  dateRange,
+  onDateRangeChange,
 }: QueryPerformanceProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -62,7 +70,7 @@ export const QueryPerformance = ({
   return (
     <>
       {/* <QueryPerformanceMetrics /> */}
-      <QueryPerformanceChart />
+      <QueryPerformanceChart dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
       <QueryPerformanceFilterBar
         queryPerformanceQuery={queryPerformanceQuery}
         onResetReportClick={() => setShowResetgPgStatStatements(true)}

@@ -30,8 +30,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     selectedDateRange,
     datePickerValue,
     datePickerHelpers,
-    showUpgradePrompt,
-    setShowUpgradePrompt,
+    updateDateRange,
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS)
 
@@ -84,6 +83,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}
         queryMetrics={queryMetrics}
+        dateRange={selectedDateRange}
+        onDateRangeChange={updateDateRange}
       />
     </div>
   )
