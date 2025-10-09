@@ -14,8 +14,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
-import { DestinationPanel } from '../Database/Replication/DestinationPanel/DestinationPanel'
 import { AdvisorSection } from './AdvisorSection'
 import { CustomReportSection } from './CustomReportSection'
 import {
@@ -99,16 +97,6 @@ export const HomeV2 = () => {
 
   return (
     <div className="w-full">
-      <PipelineRequestStatusProvider>
-        <DestinationPanel
-          visible={true}
-          sourceId={undefined}
-          onClose={function (): void {
-            throw new Error('Function not implemented.')
-          }}
-        />
-      </PipelineRequestStatusProvider>
-
       <ScaffoldContainer size="large">
         <ScaffoldSection isFullWidth className="pt-16 pb-0">
           <TopSection
@@ -123,7 +111,6 @@ export const HomeV2 = () => {
           />
         </ScaffoldSection>
       </ScaffoldContainer>
-
       {!isPaused && (
         <ScaffoldContainer size="large">
           <ScaffoldSection isFullWidth className="gap-16 pb-32">
