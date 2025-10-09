@@ -10,6 +10,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -146,7 +147,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       {extension.name} cannot be accelerated by indexes on tables that are using the
                       OrioleDB access method
                     </span>
-                    <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+                    <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
                   </Admonition>
                 )}
 

@@ -4,8 +4,6 @@ import { ref as valtioRef } from 'valtio'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -15,10 +13,10 @@ import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
+import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
 
 const rowKeyGetter = (row: SupaRow) => {
@@ -60,7 +58,6 @@ export const Grid = memo(
 
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
-      const isBranch = project?.parent_project_ref !== undefined
 
       const onRowsChange = useOnRowsChange(rows)
 
@@ -79,9 +76,6 @@ export const Grid = memo(
       const tableEntityType = snap.originalTable?.entity_type
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
       const isTableEmpty = (rows ?? []).length === 0
-
-      const isForeignTableMissingVaultKeyError =
-        isForeignTable && isError && error.message.includes('query vault failed')
 
       const { mutate: sendEvent } = useSendEventMutation()
 
@@ -155,51 +149,9 @@ export const Grid = memo(
               className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
             >
               {isLoading && <GenericSkeletonLoader />}
-              {isError ? (
-                isForeignTableMissingVaultKeyError ? (
-                  <Admonition
-                    type="warning"
-                    className="pointer-events-auto"
-                    title="Failed to retrieve rows from foreign table"
-                  >
-                    <p>
-                      The key that's used to retrieve data from your foreign table is either
-                      incorrect or missing. Verify the key in your{' '}
-                      <InlineLink href={`/project/${project?.ref}/integrations?category=wrapper`}>
-                        wrapper's settings
-                      </InlineLink>{' '}
-                      or in{' '}
-                      <InlineLink href={`/project/${project?.ref}/integrations/vault/overview`}>
-                        Vault
-                      </InlineLink>
-                      .
-                    </p>
-                    {isBranch && (
-                      <p>
-                        Note: Vault keys from the main project do not sync to branches. You may add
-                        them manually into{' '}
-                        <InlineLink href={`/project/${project?.ref}/integrations/vault/overview`}>
-                          Vault
-                        </InlineLink>{' '}
-                        if you want to query foreign tables while on a branch.
-                      </p>
-                    )}
-                  </Admonition>
-                ) : (
-                  <AlertError
-                    className="pointer-events-auto"
-                    error={error}
-                    subject="Failed to retrieve rows from table"
-                  >
-                    {filters.length > 0 && (
-                      <p>
-                        Verify that the filter values are correct, as the error may stem from an
-                        incorrectly applied filter
-                      </p>
-                    )}
-                  </AlertError>
-                )
-              ) : null}
+
+              {isError && <GridError error={error} />}
+
               {isSuccess && (
                 <>
                   {(filters ?? []).length === 0 ? (

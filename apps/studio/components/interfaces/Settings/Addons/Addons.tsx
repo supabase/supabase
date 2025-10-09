@@ -25,18 +25,15 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsOrioleDbInAws,
-  useProjectByRefQuery,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { BASE_PATH, DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
@@ -59,7 +56,9 @@ export const Addons = () => {
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: selectedProject, isLoading: isLoadingProject } = useSelectedProjectQuery()
-  const { data: parentProject } = useProjectByRefQuery(selectedProject?.parent_project_ref)
+  const { data: parentProject } = useProjectDetailQuery({
+    ref: selectedProject?.parent_project_ref,
+  })
   const isBranch = parentProject !== undefined
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -180,7 +179,7 @@ export const Addons = () => {
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                        href={`${DOCS_URL}/guides/platform/compute-add-ons`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -192,7 +191,7 @@ export const Addons = () => {
                     </div>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
+                        href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -347,7 +346,7 @@ export const Addons = () => {
                         <p className="text-sm text-foreground-light m-0">More information</p>
                         <div>
                           <Link
-                            href="https://supabase.com/docs/guides/platform/ipv4-address"
+                            href={`${DOCS_URL}/guides/platform/ipv4-address`}
                             target="_blank"
                             rel="noreferrer"
                           >
@@ -424,7 +423,7 @@ export const Addons = () => {
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+                        href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -548,7 +547,7 @@ export const Addons = () => {
                         <p className="text-sm text-foreground-light m-0">More information</p>
                         <div>
                           <Link
-                            href="https://supabase.com/docs/guides/platform/custom-domains"
+                            href={`${DOCS_URL}/guides/platform/custom-domains`}
                             target="_blank"
                             rel="noreferrer"
                           >

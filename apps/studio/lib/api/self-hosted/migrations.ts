@@ -1,6 +1,13 @@
 import { source } from 'common-tags'
 import { makeRandomString } from 'lib/helpers'
 import { executeQuery } from './query'
+import { PgMetaDatabaseError, WrappedResult } from './types'
+import { assertSelfHosted } from './util'
+
+export type ListMigrationsResult = {
+  version: string
+  name?: string
+}
 
 const listMigrationVersionsQuery = () =>
   'select version, name from supabase_migrations.schema_migrations order by version'
@@ -40,8 +47,31 @@ export type ListMigrationVersionsOptions = {
   headers?: HeadersInit
 }
 
-export async function listMigrationVersions({ headers }: ListMigrationVersionsOptions) {
-  return await executeQuery({ query: listMigrationVersionsQuery(), headers })
+/**
+ * Lists all migrations in the migrations history table.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export async function listMigrationVersions({
+  headers,
+}: ListMigrationVersionsOptions): Promise<WrappedResult<ListMigrationsResult[]>> {
+  assertSelfHosted()
+
+  const { data, error } = await executeQuery<ListMigrationsResult>({
+    query: listMigrationVersionsQuery(),
+    headers,
+  })
+
+  if (error) {
+    // Return empty list if the migrations table doesn't exist
+    if (error instanceof PgMetaDatabaseError && error.code === '42P01') {
+      return { data: [], error: undefined }
+    }
+
+    return { data: undefined, error }
+  }
+
+  return { data, error: undefined }
 }
 
 export type ApplyAndTrackMigrationsOptions = {
@@ -50,11 +80,18 @@ export type ApplyAndTrackMigrationsOptions = {
   headers?: HeadersInit
 }
 
-export async function applyAndTrackMigrations({
+/**
+ * Applies a SQL migration and tracks it in the migrations history table.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export async function applyAndTrackMigrations<T = unknown>({
   query,
   name,
   headers,
-}: ApplyAndTrackMigrationsOptions) {
+}: ApplyAndTrackMigrationsOptions): Promise<WrappedResult<T[]>> {
+  assertSelfHosted()
+
   const initializeResponse = await executeQuery<void>({
     query: initializeHistoryTableQuery(),
     headers,
@@ -64,7 +101,7 @@ export async function applyAndTrackMigrations({
     return initializeResponse
   }
 
-  const applyAndTrackResponse = await executeQuery({
+  const applyAndTrackResponse = await executeQuery<T>({
     query: applyAndTrackMigrationsQuery(query, name),
     headers,
   })

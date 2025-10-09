@@ -24,6 +24,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -240,7 +241,7 @@ AuthPoliciesPage.getLayout = (page) => (
         title="Policies"
         subtitle="Manage Row Level Security policies for your tables"
         secondaryActions={
-          <DocsButton href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security" />
+          <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
         }
         size="large"
       >

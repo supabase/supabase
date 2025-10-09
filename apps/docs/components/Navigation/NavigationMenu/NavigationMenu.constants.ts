@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+// End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'
 import type { IconPanel } from 'ui-patterns/IconPanel'
@@ -14,13 +15,14 @@ const {
   docsAuthTroubleshooting: authTroubleshootingEnabled,
   docsCompliance: complianceEnabled,
   docsContribution: contributionEnabled,
-  'docsSelf-hosting': selfHostingEnabled,
+  docsFdw: fdwEnabled,
   docsFrameworkQuickstarts: frameworkQuickstartsEnabled,
   docsFullPlatform: fullPlatformEnabled,
   docsLocalDevelopment: localDevelopmentEnabled,
   docsMobileTutorials: mobileTutorialsEnabled,
   docsPgtap: pgTapEnabled,
   docsProductionChecklist: productionChecklistEnabled,
+  'docsSelf-hosting': selfHostingEnabled,
   docsWebApps: webAppsEnabled,
   integrationsPartners: integrationsEnabled,
   sdkCsharp: sdkCsharpEnabled,
@@ -38,13 +40,14 @@ const {
   'docs:auth_troubleshooting',
   'docs:compliance',
   'docs:contribution',
-  'docs:self-hosting',
+  'docs:fdw',
   'docs:framework_quickstarts',
   'docs:full_platform',
   'docs:local_development',
   'docs:mobile_tutorials',
   'docs:pgtap',
   'docs:production_checklist',
+  'docs:self-hosting',
   'docs:web_apps',
   'integrations:partners',
   'sdk:csharp',
@@ -64,6 +67,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       icon: 'getting-started',
       href: '/guides/getting-started',
       level: 'gettingstarted',
+      enabled: frameworkQuickstartsEnabled,
     },
   ],
   [
@@ -260,6 +264,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-api',
             href: '/reference/api/introduction' as `/${string}`,
             level: 'reference_javascript',
+          },
+          {
+            label: 'UI Library',
+            icon: 'ui',
+            href: 'https://supabase.com/ui' as `/${string}`,
+            level: 'ui',
           },
         ],
         [
@@ -1254,6 +1264,7 @@ export const database: NavMenuConstant = {
     {
       name: 'Foreign Data Wrappers',
       url: undefined,
+      enabled: fdwEnabled,
       items: [
         {
           name: 'Overview',
@@ -1380,7 +1391,13 @@ export const queues: NavMenuConstant = {
     {
       name: 'Getting Started',
       url: undefined,
-      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+      items: [
+        { name: 'Quickstart', url: '/guides/queues/quickstart' },
+        {
+          name: 'Consuming Messages with Edge Functions',
+          url: '/guides/queues/consuming-messages-with-edge-functions',
+        },
+      ],
     },
     {
       name: 'References',
@@ -2440,8 +2457,6 @@ export const platform: NavMenuConstant = {
           name: 'Manage your usage',
           url: '/guides/platform/manage-your-usage' as `/${string}`,
           items: [
-            { name: 'Usage limits', url: '/guides/platform/usage-limits' as `/${string}` },
-            { name: 'Overages', url: '/guides/platform/overages' as `/${string}` },
             {
               name: 'Compute',
               url: '/guides/platform/manage-your-usage/compute' as `/${string}`,

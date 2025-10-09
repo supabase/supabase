@@ -11,7 +11,7 @@ import {
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
@@ -34,10 +34,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     const { data: org } = useSelectedOrganizationQuery()
 
     const { type, connection } = props
-    const { data } = useProjectsQuery()
-    const project = (data?.projects ?? []).find(
-      (project) => project.ref === connection.supabase_project_ref
-    )
+    const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
     const isBranchingEnabled = project?.is_branch_enabled === true
 
     const [isOpen, setIsOpen] = useState(false)

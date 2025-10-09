@@ -5,22 +5,23 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { DOCS_URL } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { partition } from 'lodash'
 import { useMemo } from 'react'
 import {
   Button,
+  Card,
   Loading,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableRow,
-  Card,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { MemberRow } from './MemberRow'
@@ -108,7 +109,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             <a
                               target="_blank"
                               rel="noreferrer"
-                              href="https://supabase.com/docs/guides/platform/access-control"
+                              href={`${DOCS_URL}/guides/platform/access-control`}
                             >
                               <HelpCircle size={14} className="text-foreground-light" />
                             </a>

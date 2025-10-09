@@ -1,14 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useParams, useFlag } from 'common'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -27,6 +28,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
@@ -67,6 +69,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
+  const triggersInsteadOfRealtime = useFlag<boolean>('triggersInsteadOfRealtime')
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
@@ -115,6 +118,21 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       },
     })
 
+  const { data: triggersData } = useDatabaseTriggersQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: isTable,
+    }
+  )
+  const tableTriggers = (triggersData ?? []).filter(
+    (trigger) => trigger.schema === table.schema && trigger.table === table.name
+  )
+
+  const tableTriggersCount = tableTriggers.length
+
   const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
@@ -145,6 +163,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     )
 
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
   const toggleRealtime = async () => {
     if (!project) return console.error('Project is required')
@@ -195,6 +215,19 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       name: table.name,
       schema: table.schema,
       payload: payload,
+    })
+
+    sendEvent({
+      action: 'table_rls_enabled',
+      properties: {
+        method: 'table_editor',
+        schema_name: table.schema,
+        table_name: table.name,
+      },
+      groups: {
+        project: projectRef,
+        ...(org?.slug && { organization: org.slug }),
+      },
     })
   }
 
@@ -310,6 +343,55 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               </Popover_Shadcn_>
             )
           ) : null}
+
+          {isTable && triggersInsteadOfRealtime ? (
+            <Button
+              asChild
+              type={'default'}
+              size="tiny"
+              icon={
+                <div
+                  className={cn(
+                    'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                    tableTriggersCount > 9 ? 'px-1' : 'w-[16px]'
+                  )}
+                >
+                  <span className="text-[11px] text-foreground font-mono text-center">
+                    {tableTriggersCount}
+                  </span>
+                </div>
+              }
+            >
+              <Link href={manageTriggersHref}>
+                {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
+              </Link>
+            </Button>
+          ) : (
+            realtimeEnabled && (
+              <ButtonTooltip
+                type="default"
+                size="tiny"
+                icon={
+                  <MousePointer2
+                    strokeWidth={1.5}
+                    className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
+                  />
+                }
+                onClick={() => setShowEnableRealtime(true)}
+                className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: isRealtimeEnabled
+                      ? 'Click to disable realtime for this table'
+                      : 'Click to enable realtime for this table',
+                  },
+                }}
+              >
+                {!isRealtimeEnabled && 'Enable Realtime'}
+              </ButtonTooltip>
+            )
+          )}
 
           {isView && viewHasLints && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
@@ -432,7 +514,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
+                        href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
                       >
                         Learn more
                       </Link>
@@ -445,32 +527,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
           <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
-          {isTable && realtimeEnabled && (
-            <ButtonTooltip
-              type="default"
-              size="tiny"
-              icon={
-                <MousePointer2
-                  strokeWidth={1.5}
-                  className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
-                />
-              }
-              onClick={() => setShowEnableRealtime(true)}
-              className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: isRealtimeEnabled
-                    ? 'Click to disable realtime for this table'
-                    : 'Click to enable realtime for this table',
-                },
-              }}
-            >
-              {!isRealtimeEnabled && 'Enable Realtime'}
-            </ButtonTooltip>
+          {doesHaveAutoGeneratedAPIDocs && (
+            <APIDocsButton section={['entities', table.name]} source="table_editor" />
           )}
-
-          {doesHaveAutoGeneratedAPIDocs && <APIDocsButton section={['entities', table.name]} />}
 
           <RefreshButton tableId={table.id} isRefetching={isRefetching} />
         </div>

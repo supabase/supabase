@@ -11,6 +11,7 @@ import type {
 } from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
@@ -110,7 +111,7 @@ const VercelIntegrationConnectionForm = ({
                   <Link
                     target="_blank"
                     rel="noreferrer"
-                    href="https://supabase.com/docs/guides/platform/branching"
+                    href={`${DOCS_URL}/guides/platform/branching`}
                     className="underline"
                   >
                     Branching

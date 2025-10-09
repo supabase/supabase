@@ -22,6 +22,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
@@ -223,7 +224,7 @@ BranchesPage.getLayout = (page) => {
             Branching Feedback
           </a>
         </Button>
-        <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
       </div>
     )
 

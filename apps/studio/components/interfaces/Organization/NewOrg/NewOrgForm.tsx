@@ -14,11 +14,12 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
+import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -93,13 +94,15 @@ type FormState = z.infer<typeof formSchema>
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
-const newMandatoryAddressInput = true
-
 /**
  * No org selected yet, create a new one
  * [Joshen] Need to refactor to use Form_Shadcn here
  */
-const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOrgFormProps) => {
+export const NewOrgForm = ({
+  onPaymentMethodReset,
+  setupIntent,
+  onPlanSelected,
+}: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
   const { resolvedTheme } = useTheme()
@@ -107,7 +110,8 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
   const isBillingEnabled = useIsFeatureEnabled('billing:all')
 
   const { data: organizations, isSuccess } = useOrganizationsQuery()
-  const { data } = useProjectsQuery()
+  const { data } = useProjectsInfiniteQuery({})
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) ?? [], [data?.pages])
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -116,9 +120,13 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
 
   const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
 
+  // [Joshen] JFYI because we're now using a paginated endpoint, there's a chance that not all projects will be
+  // factored in here (page limit is 100 results). This data is mainly used for the `hasFreeOrgWithProjects` check
+  // in onSubmit below, which isn't a critical functionality imo so am okay for now. But ideally perhaps this data can
+  // be computed on the API and returned in /profile or something (since this data is on the account level)
   const projectsByOrg = useMemo(() => {
-    return _.groupBy(data?.projects ?? [], 'organization_slug')
-  }, [data])
+    return _.groupBy(projects, 'organization_slug')
+  }, [projects])
 
   const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
     useState(false)
@@ -571,9 +579,9 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
 
       <ConfirmationModal
         size="large"
-        loading={false}
+        loading={newOrgLoading}
         visible={isOrgCreationConfirmationModalVisible}
-        title={<>Confirm organization creation</>}
+        title="Confirm organization creation"
         confirmLabel="Create new organization"
         onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
         onConfirm={async () => {
@@ -584,13 +592,9 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       >
         <p className="text-sm text-foreground-light">
           Supabase{' '}
-          <Link
-            className="underline"
-            href="/docs/guides/platform/billing-on-supabase"
-            target="_blank"
-          >
+          <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
             bills per organization
-          </Link>
+          </InlineLink>
           . If you want to upgrade your existing projects, upgrade your existing organization
           instead.
         </p>
@@ -613,7 +617,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
                   </div>
                   <div className="text-foreground-light text-xs">
                     {orgProjects.length <= 2 ? (
-                      <span>{orgProjects.join('and ')}</span>
+                      <span>{orgProjects.join(' and ')}</span>
                     ) : (
                       <div>
                         {orgProjects.slice(0, 2).join(', ')} and{' '}
@@ -660,5 +664,3 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     </form>
   )
 }
-
-export default NewOrgForm

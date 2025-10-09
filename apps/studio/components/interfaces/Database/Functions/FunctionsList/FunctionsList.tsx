@@ -115,10 +115,11 @@ const FunctionsList = ({
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
-                  const url = new URL(document.URL)
-                  url.searchParams.delete('search')
-                  router.push(url)
-                  setSelectedSchema(schema)
+                  setFilterString('')
+                  // Wait for the filter to be cleared from the URL
+                  setTimeout(() => {
+                    setSelectedSchema(schema)
+                  }, 50)
                 }}
               />
               <Input

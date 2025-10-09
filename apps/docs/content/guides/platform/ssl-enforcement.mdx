@@ -27,7 +27,7 @@ export SUPABASE_ACCESS_TOKEN="your-access-token"
 export PROJECT_REF="your-project-ref"
 
 # Get current SSL enforcement status
-curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/ssl-enforceemnt" \
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/ssl-enforcement" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
 # Enable SSL enforcement

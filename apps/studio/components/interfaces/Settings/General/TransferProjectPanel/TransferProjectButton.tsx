@@ -11,6 +11,7 @@ import { useProjectTransferMutation } from 'data/projects/project-transfer-mutat
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -165,7 +166,7 @@ const TransferProjectButton = () => {
           <DocsButton
             abbrev={false}
             className="mt-6"
-            href="https://supabase.com/docs/guides/platform/project-transfer"
+            href={`${DOCS_URL}/guides/platform/project-transfer`}
           />
         </Modal.Content>
 

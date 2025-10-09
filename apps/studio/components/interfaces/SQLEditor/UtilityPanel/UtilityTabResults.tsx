@@ -9,6 +9,7 @@ import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -72,11 +73,13 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 </p>
                 <p className="text-sm text-foreground-light">
                   You can either{' '}
-                  <InlineLink href="https://supabase.com/docs/guides/platform/performance#examining-query-performance">
+                  <InlineLink
+                    href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
+                  >
                     optimize your query
                   </InlineLink>
                   , or{' '}
-                  <InlineLink href="https://supabase.com/docs/guides/database/timeouts">
+                  <InlineLink href={`${DOCS_URL}/guides/database/timeouts`}>
                     increase the statement timeout
                   </InlineLink>
                   {' or '}
