@@ -5,6 +5,7 @@ import {
   QUERY_PERFORMANCE_CHART_TABS,
   PG_STAT_MONITOR_LOGS_QUERY,
 } from './QueryPerformanceChart.constants'
+import { transformLogsToJSON } from './QueryPerformanceChart.utils'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
@@ -21,17 +22,6 @@ export const QueryPerformanceChart = () => {
   })
 
   const { logData, isLoading, error } = pgStatMonitorLogs
-
-  const transformLogsToJSON = (log: string) => {
-    try {
-      let jsonString = log.replace('[pg_stat_monitor] ', '')
-      jsonString = jsonString.replace(/""/g, '","')
-      const jsonObject = JSON.parse(jsonString)
-      return jsonObject
-    } catch (error) {
-      return null
-    }
-  }
 
   const parsedLogs = useMemo(() => {
     if (!logData || logData.length === 0) return []
