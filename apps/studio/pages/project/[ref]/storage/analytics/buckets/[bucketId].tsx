@@ -4,6 +4,7 @@ import {
   LABELS,
   OPTION_ORDER,
 } from 'components/interfaces/Storage/AnalyticBucketDetails/constants'
+import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
 import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -45,6 +46,20 @@ import { Admonition } from 'ui-patterns/admonition'
 const AnalyticsBucketPage: NextPageWithLayout = () => {
   const { bucketId, ref } = useParams()
   const [showToken, setShowToken] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  // Temporary mock data
+  const mockBucket = {
+    id: bucketId || '',
+    name: bucketId || '',
+    type: 'ANALYTICS' as const,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    owner: 'mock-owner',
+    public: false,
+    allowed_mime_types: [],
+    file_size_limit: undefined,
+  }
 
   // If the bucket is not found or the bucket type is STANDARD or VECTOR, show an error message
   // if (!bucket || bucket.type !== 'ANALYTICS') {
@@ -171,7 +186,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
   return (
     <>
       <PageLayout
-        title={bucketId} // TODO: Change to bucket.name
+        title={mockBucket.name}
         breadcrumbs={[
           {
             label: 'Analytics',
@@ -271,12 +286,20 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                     you want to keep your data.
                   </p>
                 </div>
-                <Button type="danger">Delete bucket</Button>
+                <Button type="danger" onClick={() => setShowDeleteModal(true)}>
+                  Delete bucket
+                </Button>
               </CardContent>
             </Card>
           </ScaffoldSection>
         </ScaffoldContainer>
       </PageLayout>
+
+      <DeleteBucketModal
+        visible={showDeleteModal}
+        bucket={mockBucket}
+        onClose={() => setShowDeleteModal(false)}
+      />
     </>
   )
 }
