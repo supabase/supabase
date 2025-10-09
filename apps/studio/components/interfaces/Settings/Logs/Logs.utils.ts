@@ -224,11 +224,11 @@ limit ${limit}
   `
 
     case 'pg_cron_logs':
-      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message::text LIKE '%cron job%')`
 
       const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
 
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.query
+      return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
 from postgres_logs
   cross join unnest(metadata) as m
   cross join unnest(m.parsed) as parsed
