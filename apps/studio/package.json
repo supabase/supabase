@@ -191,7 +191,7 @@
     "eslint-config-supabase": "workspace:*",
     "eslint-plugin-barrel-files": "^2.0.7",
     "graphql-ws": "5.14.1",
-    "import-in-the-middle": "^1.13.1",
+    "import-in-the-middle": "^1.14.2",
     "jsdom-testing-mocks": "^1.13.1",
     "msw": "^2.3.0",
     "next-router-mock": "^0.9.13",

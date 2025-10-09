@@ -19,6 +19,7 @@ export type ChartHighlightActionContext = {
   start: string
   end: string
   clear: () => void
+  chartId?: string
 }
 
 export type ChartHighlightAction = {
@@ -34,10 +35,12 @@ export const ChartHighlightActions = ({
   chartHighlight,
   updateDateRange,
   actions,
+  chartId,
 }: {
   chartHighlight?: ChartHighlight
   updateDateRange?: UpdateDateRange
   actions?: ChartHighlightAction[]
+  chartId?: string
 }) => {
   const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
@@ -48,7 +51,7 @@ export const ChartHighlightActions = ({
 
   const ctx: ChartHighlightActionContext | undefined =
     selectedRangeStart && selectedRangeEnd && clearHighlight
-      ? { start: selectedRangeStart, end: selectedRangeEnd, clear: clearHighlight }
+      ? { start: selectedRangeStart, end: selectedRangeEnd, clear: clearHighlight, chartId }
       : undefined
 
   const defaultActions: ChartHighlightAction[] = useMemo(() => {
@@ -110,7 +113,7 @@ export const ChartHighlightActions = ({
             <DropdownMenuItem asChild key={action.id} disabled={disabled} className={cn('group')}>
               <button
                 disabled={disabled}
-                onClick={() => ctx && action.onSelect(ctx)}
+                onClick={() => ctx && action.onSelect({ ...ctx })}
                 className="w-full flex items-center gap-1.5"
               >
                 {action.icon}

@@ -163,6 +163,12 @@ const AIEditor = ({
       }
     }
 
+    // [Joshen] Opting to ignore "Cannot find module" errors here as users are getting
+    // confused with the error highlighting when importing external modules
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      diagnosticCodesToIgnore: [2792],
+    })
+
     fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
       .then((response) => response.text())
       .then((code) => {
