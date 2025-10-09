@@ -1,4 +1,8 @@
+import dayjs from 'dayjs'
+import { groupBy } from 'lodash'
+
 import { DataPoint } from 'data/analytics/constants'
+import type { OrgDailyUsageResponse, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
@@ -91,4 +95,39 @@ const formatBytesPrecision = (bytes: any) => {
   const unit = sizes[i]
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(3)) + ' ' + unit
+}
+
+export function dailyUsageToDataPoints(
+  dailyUsage: OrgDailyUsageResponse | undefined,
+  includeMetric: (metric: PricingMetric) => boolean
+): DataPoint[] {
+  if (!dailyUsage || !dailyUsage.usages.length) return []
+
+  const groupedByDate = groupBy(
+    dailyUsage.usages.filter((it) => includeMetric(it.metric as PricingMetric)),
+    'date'
+  )
+
+  const dataPoints: DataPoint[] = []
+
+  Object.entries(groupedByDate).forEach(([date, usages]) => {
+    const dataPoint: DataPoint = {
+      period_start: date,
+      periodStartFormatted: dayjs(date).format('DD MMM'),
+    }
+
+    for (const usage of usages) {
+      dataPoint[usage.metric.toLowerCase()] = usage.usage_original
+
+      if (usage.breakdown) {
+        for (const [key, value] of Object.entries(usage.breakdown)) {
+          dataPoint[key.toLowerCase()] = value
+        }
+      }
+    }
+
+    dataPoints.push(dataPoint)
+  })
+
+  return dataPoints
 }
