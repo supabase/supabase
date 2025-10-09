@@ -28,6 +28,7 @@ export interface ParsedLogEntry {
   query?: string
   userid?: string
   rolname?: string
+  resp_calls?: number[] // Add this - histogram array
   [key: string]: any
 }
 
@@ -39,6 +40,13 @@ export interface ChartDataPoint {
   min_time: number
   max_time: number
   stddev_time: number
+  // Add these percentile fields
+  p50_time: number
+  p75_time: number
+  p90_time: number
+  p95_time: number
+  p99_time: number
+  p99_9_time: number
   rows_read: number
   calls: number
   cache_hits: number
@@ -107,6 +115,30 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
         return null
       }
 
+      // DEBUG: Log the raw log object to see what fields are available
+      console.log('Raw log object keys:', Object.keys(log))
+
+      // Check specifically for histogram-related fields
+      const histogramFields = Object.keys(log).filter(
+        (key) =>
+          key.toLowerCase().includes('resp') ||
+          key.toLowerCase().includes('histogram') ||
+          key.toLowerCase().includes('time')
+      )
+      console.log('Potential histogram fields:', histogramFields)
+
+      // Log the actual values
+      console.log('resp_calls value:', log.resp_calls)
+      console.log('Full log object:', log)
+
+      // Calculate percentiles from histogram
+      const percentiles =
+        log.resp_calls && Array.isArray(log.resp_calls)
+          ? calculatePercentilesFromHistogram(log.resp_calls)
+          : { p50: 0, p75: 0, p90: 0, p95: 0, p99: 0, p99_9: 0 }
+
+      console.log('Calculated percentiles:', percentiles)
+
       return {
         period_start: periodStart,
         timestamp: possibleTimestamps.find((t) => t) || '',
@@ -121,6 +153,13 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
         stddev_time: parseFloat(
           String(log.stddev_time ?? log.stddev_exec_time ?? log.stddev_query_time ?? 0)
         ),
+        // Add calculated percentiles
+        p50_time: percentiles.p50,
+        p75_time: percentiles.p75,
+        p90_time: percentiles.p90,
+        p95_time: percentiles.p95,
+        p99_time: percentiles.p99,
+        p99_9_time: percentiles.p99_9,
         rows_read: parseInt(String(log.rows ?? 0), 10),
         calls: parseInt(String(log.calls ?? 0), 10),
         cache_hits: parseFloat(String(log.shared_blks_hit ?? 0)),
@@ -155,51 +194,59 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQu
 
   const queryStats = Array.from(queryGroups.entries()).map(([query, logs]) => {
     const count = logs.length
-    let totalMeanTime = 0
-    let totalMinTime = 0
-    let totalMaxTime = 0
     let totalCalls = 0
     let totalRowsRead = 0
     let totalCacheHits = 0
     let totalCacheMisses = 0
     let rolname = logs[0].username
+    let minTime = Infinity
+    let maxTime = -Infinity
+    let totalExecutionTimeForQuery = 0
 
     logs.forEach((log) => {
-      totalMeanTime += parseFloat(
+      const logMeanTime = parseFloat(
         String(log.mean_time ?? log.mean_exec_time ?? log.mean_query_time ?? 0)
       )
-      totalMinTime += parseFloat(
+      const logMinTime = parseFloat(
         String(log.min_time ?? log.min_exec_time ?? log.min_query_time ?? 0)
       )
-      totalMaxTime += parseFloat(
+      const logMaxTime = parseFloat(
         String(log.max_time ?? log.max_exec_time ?? log.max_query_time ?? 0)
       )
-      totalCalls += parseInt(String(log.calls ?? 0), 10)
-      totalRowsRead += parseInt(String(log.rows ?? 0), 10)
-      totalCacheHits += parseFloat(String(log.shared_blks_hit ?? 0))
-      totalCacheMisses += parseFloat(String(log.shared_blks_read ?? 0))
+      const logCalls = parseInt(String(log.calls ?? 0), 10)
+      const logRows = parseInt(String(log.rows ?? 0), 10)
+      const logCacheHits = parseFloat(String(log.shared_blks_hit ?? 0))
+      const logCacheMisses = parseFloat(String(log.shared_blks_read ?? 0))
+
+      minTime = Math.min(minTime, logMinTime)
+      maxTime = Math.max(maxTime, logMaxTime)
+
+      totalCalls += logCalls
+      totalRowsRead += logRows
+      totalCacheHits += logCacheHits
+      totalCacheMisses += logCacheMisses
+
+      // Total execution time = sum of (mean_time * calls) for each bucket
+      totalExecutionTimeForQuery += logMeanTime * logCalls
     })
 
-    const avgMeanTime = totalMeanTime / count
-    const avgMinTime = totalMinTime / count
-    const avgMaxTime = totalMaxTime / count
-    const avgCalls = totalCalls / count
-    const avgRowsRead = totalRowsRead / count
+    // Overall mean time is the weighted average
+    const avgMeanTime = totalCalls > 0 ? totalExecutionTimeForQuery / totalCalls : 0
+    const finalMinTime = minTime === Infinity ? 0 : minTime
+    const finalMaxTime = maxTime === -Infinity ? 0 : maxTime
 
-    const totalTime = avgMeanTime * avgCalls
-
-    totalExecutionTime += totalTime
+    totalExecutionTime += totalExecutionTimeForQuery
 
     return {
       query,
       rolname,
       count,
       avgMeanTime,
-      avgMinTime,
-      avgMaxTime,
-      avgCalls,
-      avgRowsRead,
-      totalTime,
+      minTime: finalMinTime,
+      maxTime: finalMaxTime,
+      totalCalls,
+      totalRowsRead,
+      totalTime: totalExecutionTimeForQuery,
       totalCacheHits,
       totalCacheMisses,
     }
@@ -214,12 +261,12 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQu
     aggregatedData.push({
       query: stats.query,
       rolname: stats.rolname,
-      calls: Math.round(stats.avgCalls),
+      calls: stats.totalCalls,
       mean_time: stats.avgMeanTime,
-      min_time: stats.avgMinTime,
-      max_time: stats.avgMaxTime,
+      min_time: stats.minTime,
+      max_time: stats.maxTime,
       total_time: stats.totalTime,
-      rows_read: Math.round(stats.avgRowsRead),
+      rows_read: stats.totalRowsRead,
       cache_hit_rate: cacheHitRate,
       prop_total_time: propTotalTime,
       _total_cache_hits: stats.totalCacheHits,
@@ -231,4 +278,90 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQu
   console.log('Aggregated data:', aggregatedData)
 
   return aggregatedData.sort((a, b) => b.total_time - a.total_time)
+}
+
+// Add this function to calculate percentiles from histogram
+export const calculatePercentilesFromHistogram = (
+  respCalls: number[]
+): {
+  p50: number
+  p75: number
+  p90: number
+  p95: number
+  p99: number
+  p99_9: number
+} => {
+  console.log('Input respCalls:', respCalls)
+
+  // pg_stat_monitor histogram buckets (in milliseconds)
+  // Bucket boundaries: [1, 10, 100, 1000, 10000, Infinity]
+  const bucketBoundaries = [
+    { min: 0, max: 1 }, // Index 0
+    { min: 1, max: 10 }, // Index 1
+    { min: 10, max: 100 }, // Index 2
+    { min: 100, max: 1000 }, // Index 3
+    { min: 1000, max: 10000 }, // Index 4
+    { min: 10000, max: 100000 }, // Index 5+
+  ]
+
+  // Build cumulative distribution
+  const totalCalls = respCalls.reduce((sum, count) => sum + count, 0)
+  console.log('Total calls:', totalCalls)
+
+  if (totalCalls === 0) {
+    console.log('No calls found, returning zeros')
+    return { p50: 0, p75: 0, p90: 0, p95: 0, p99: 0, p99_9: 0 }
+  }
+
+  // Create cumulative counts with bucket midpoints
+  const distribution: { value: number; cumulativeCount: number }[] = []
+  let cumulativeCount = 0
+
+  respCalls.forEach((count, index) => {
+    if (count > 0 && index < bucketBoundaries.length) {
+      const bucket = bucketBoundaries[index]
+      // Use geometric mean of bucket boundaries as representative value
+      const value = Math.sqrt(bucket.min * bucket.max)
+      cumulativeCount += count
+      distribution.push({ value, cumulativeCount })
+    }
+  })
+
+  // Calculate percentiles using linear interpolation
+  const getPercentile = (percentile: number): number => {
+    const targetCount = totalCalls * percentile
+
+    // Find the bucket containing this percentile
+    for (let i = 0; i < distribution.length; i++) {
+      if (distribution[i].cumulativeCount >= targetCount) {
+        if (i === 0) {
+          return distribution[i].value
+        }
+
+        // Linear interpolation between previous and current bucket
+        const prevCount = i > 0 ? distribution[i - 1].cumulativeCount : 0
+        const prevValue = i > 0 ? distribution[i - 1].value : 0
+        const currCount = distribution[i].cumulativeCount
+        const currValue = distribution[i].value
+
+        const ratio = (targetCount - prevCount) / (currCount - prevCount)
+        return prevValue + ratio * (currValue - prevValue)
+      }
+    }
+
+    // If we get here, return the last value
+    return distribution[distribution.length - 1]?.value || 0
+  }
+
+  const result = {
+    p50: getPercentile(0.5),
+    p75: getPercentile(0.75),
+    p90: getPercentile(0.9),
+    p95: getPercentile(0.95),
+    p99: getPercentile(0.99),
+    p99_9: getPercentile(0.999),
+  }
+
+  console.log('Final percentile result:', result)
+  return result
 }

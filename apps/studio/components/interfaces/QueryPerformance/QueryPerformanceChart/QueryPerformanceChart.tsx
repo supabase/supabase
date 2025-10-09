@@ -33,6 +33,13 @@ const QueryMetricBlock = ({
   )
 }
 
+const formatTimeValue = (value: number): string => {
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(1)}s`
+  }
+  return `${value.toFixed(1)}ms`
+}
+
 export const QueryPerformanceChart = ({
   // dateRange,
   onDateRangeChange,
@@ -47,14 +54,13 @@ export const QueryPerformanceChart = ({
 
     switch (selectedMetric) {
       case 'query_latency': {
-        const sortedTimes = chartData.map((d) => d.mean_time).sort((a, b) => a - b)
-        const p95Index = Math.floor(sortedTimes.length * 0.95)
-        const averageP95 = sortedTimes[p95Index] || 0
+        // Calculate average p95 across all time periods
+        const avgP95 = chartData.reduce((sum, d) => sum + d.p95_time, 0) / chartData.length
 
         return [
           {
             label: 'Average p95',
-            value: `${averageP95.toFixed(2)}ms`,
+            value: `${avgP95.toFixed(2)}ms`,
           },
         ]
       }
@@ -102,36 +108,84 @@ export const QueryPerformanceChart = ({
     }
   }, [chartData, selectedMetric])
 
+  // Add this transformation for the chart data
+  const transformedChartData = useMemo(() => {
+    if (selectedMetric !== 'query_latency') return chartData
+
+    return chartData.map((dataPoint) => ({
+      ...dataPoint,
+      p50_time:
+        dataPoint.p50_time >= 1000
+          ? parseFloat((dataPoint.p50_time / 1000).toFixed(1))
+          : parseFloat(dataPoint.p50_time.toFixed(1)),
+      p75_time:
+        dataPoint.p75_time >= 1000
+          ? parseFloat((dataPoint.p75_time / 1000).toFixed(1))
+          : parseFloat(dataPoint.p75_time.toFixed(1)),
+      p90_time:
+        dataPoint.p90_time >= 1000
+          ? parseFloat((dataPoint.p90_time / 1000).toFixed(1))
+          : parseFloat(dataPoint.p90_time.toFixed(1)),
+      p95_time:
+        dataPoint.p95_time >= 1000
+          ? parseFloat((dataPoint.p95_time / 1000).toFixed(1))
+          : parseFloat(dataPoint.p95_time.toFixed(1)),
+      p99_time:
+        dataPoint.p99_time >= 1000
+          ? parseFloat((dataPoint.p99_time / 1000).toFixed(1))
+          : parseFloat(dataPoint.p99_time.toFixed(1)),
+      p99_9_time:
+        dataPoint.p99_9_time >= 1000
+          ? parseFloat((dataPoint.p99_9_time / 1000).toFixed(1))
+          : parseFloat(dataPoint.p99_9_time.toFixed(1)),
+    }))
+  }, [chartData, selectedMetric])
+
+  // Update the chart attributes to show the correct units
   const getChartAttributes = useMemo((): MultiAttribute[] => {
     const attributeMap: Record<string, MultiAttribute[]> = {
       query_latency: [
         {
-          attribute: 'mean_time',
-          label: 'Mean',
+          attribute: 'p50_time',
+          label: 'p50',
+          provider: 'logs',
+          type: 'line',
+          color: { light: '#10B981', dark: '#10B981' },
+        },
+        {
+          attribute: 'p75_time',
+          label: 'p75',
           provider: 'logs',
           type: 'line',
           color: { light: '#3ECF8E', dark: '#3ECF8E' },
         },
         {
-          attribute: 'min_time',
-          label: 'Min',
+          attribute: 'p90_time',
+          label: 'p90',
           provider: 'logs',
           type: 'line',
           color: { light: '#65BCD9', dark: '#65BCD9' },
         },
         {
-          attribute: 'max_time',
-          label: 'Max',
+          attribute: 'p95_time',
+          label: 'p95',
+          provider: 'logs',
+          type: 'line',
+          color: { light: '#F59E0B', dark: '#F59E0B' },
+        },
+        {
+          attribute: 'p99_time',
+          label: 'p99',
           provider: 'logs',
           type: 'line',
           color: { light: '#DA760B', dark: '#DA760B' },
         },
         {
-          attribute: 'stddev_time',
-          label: 'Std Dev',
+          attribute: 'p99_9_time',
+          label: 'p99.9',
           provider: 'logs',
           type: 'line',
-          color: { light: '#DB8DF9', dark: '#DB8DF9' },
+          color: { light: '#DC2626', dark: '#DC2626' },
         },
       ],
       rows_read: [
@@ -200,7 +254,7 @@ export const QueryPerformanceChart = ({
                   ))}
                 </div>
                 <ComposedChart
-                  data={chartData as any} /* [kemal]: FIX any here */
+                  data={transformedChartData as any}
                   attributes={getChartAttributes}
                   yAxisKey={getChartAttributes[0]?.attribute || ''}
                   xAxisKey="period_start"
@@ -222,7 +276,7 @@ export const QueryPerformanceChart = ({
                   YAxisProps={{
                     tick: true,
                     width: 60,
-                    tickFormatter: (value) => value.toLocaleString(),
+                    tickFormatter: formatTimeValue, // Use custom formatter for Y-axis
                   }}
                   xAxisIsDate={true}
                   className="mt-6"
