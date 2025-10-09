@@ -55,13 +55,9 @@ const SqlEditor: NextPageWithLayout = () => {
 
   // [Joshen] Atm we suspect that replication lag is causing this to happen whereby a newly created snippet
   // shows the "Unable to find snippet" error which blocks the whole UI
-  // - For a newly created a snippet (on /new), snippets are marked with 'isNotSavedInDatabaseYet' (ref createSqlSnippetSkeletonV2)
-  // - New snippet is saved after debouncing, in which thereafter 'isNotSavedInDatabaseYet' is marked as false (ref upsertSnippet)
-  //   - Note that it only gets marked as false if the upsert happened successfully
-  // - This then satisfies the condition for 'canFetchContentBasedOnId' and FE tries to fetch the content of the snippet
-  // - But because of replication lag, that request returns a 404 despite the save working correctly
-  // Am opting to silently swallow this error, since the saves are still going through and we're scoping this behaviour down to a
-  // very specific use case too with all these conditionals
+  // Am opting to silently swallow this error, since the saves are still going through and we're scoping this behaviour
+  // behaviour down to a very specific use case too with all these conditionals
+  // More details: https://github.com/supabase/supabase/pull/39389
   const snippetMissingImmediatelyAfterCreating =
     !!snippet && snippetMissing && previousRoute === 'new' && 'isNotSavedInDatabaseYet' in snippet
 
