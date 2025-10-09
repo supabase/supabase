@@ -99,14 +99,14 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
 
     return (
       <TableRow key={key}>
-        <TableCell className="w-1/3">
+        <TableCell>
           <p className="text-sm text-foreground">{label}</p>
           {/* {description && (
             <p className="text-sm text-foreground-lighter text-balance">{description}</p>
           )} */}
         </TableCell>
-        <TableCell className="w-full">
-          <div className="py-1 px-2 text-xs font-mono text-foreground-light flex border border-control bg-foreground/[.026] font-mono rounded-full overflow-hidden">
+        <TableCell>
+          <div className="-mx-3 mr-3 py-1.5 px-3 truncate text-xs font-mono text-foreground-light flex border bg-foreground/[.026] font-mono rounded-full overflow-hidden">
             {isSecretValue ? (
               <>
                 <span>{value.slice(0, 15)}</span>
@@ -119,7 +119,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
             )}
           </div>
         </TableCell>
-        <TableCell className="w-48 align-middle">
+        <TableCell>
           <div className="flex flex-row gap-x-2 items-center justify-end">
             {/* Reveal/Hide button for secret values */}
             {isSecretValue && (
@@ -249,9 +249,9 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
               <Table className="table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-1/3">Name</TableHead>
-                    <TableHead className="w-full">Value</TableHead>
-                    <TableHead className="w-48" />
+                    <TableHead className="w-48">Name</TableHead>
+                    <TableHead>Value</TableHead>
+                    <TableHead className="w-32" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>{OPTION_ORDER.map((key) => renderConnectionRow(key))}</TableBody>
