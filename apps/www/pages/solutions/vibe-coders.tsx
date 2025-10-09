@@ -5,15 +5,17 @@ import { NextSeo } from 'next-seo'
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
 import SolutionsStickyNav from 'components/SolutionsStickyNav'
-import getContent from 'data/solutions/vibe-coders'
+import useVibeCodersContent from 'data/solutions/vibe-coders'
 import { Solutions } from 'data/Solutions'
+import Quotes from '~/components/Solutions/Quotes'
 
 const WhySupabase = dynamic(() => import('components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))
 const PlatformStarterSection = dynamic(() => import('components/Solutions/TwoColumnsSection'))
+const MPCSection = dynamic(() => import('components/Solutions/MPCSection'))
 
 const VibeCodersPage: NextPage = () => {
-  const content = getContent
+  const content = useVibeCodersContent()
 
   return (
     <>
@@ -33,9 +35,11 @@ const VibeCodersPage: NextPage = () => {
           className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-16 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
           sectionContainerClassName="lg:gap-4"
         />
+        <Quotes {...content.quotes} />
         <WhySupabase {...content.why} />
         <PlatformSection {...content.platform} />
         <PlatformStarterSection {...content.platformStarterSection} />
+        <MPCSection {...content.mcp} />
       </Layout>
     </>
   )
