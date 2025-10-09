@@ -14,8 +14,8 @@ export const OverviewLearnMore = () => {
   const LearnMoreCards = [
     {
       label: 'Docs',
-      title: 'Authentication docs',
-      description: 'Read more on authentication and the benefits of using Supabase policies.',
+      title: 'Auth docs',
+      description: 'Read more on auth and managing users.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
         {
@@ -37,7 +37,8 @@ export const OverviewLearnMore = () => {
             aiSnap.newChat({
               name: 'Authentication Help',
               open: true,
-              initialInput: 'Help me debug and fix authentication errors in my Supabase project',
+              initialInput:
+                'Look at my logs related to Supabase Auth and help me debug the recent errors.',
               suggestions: {
                 title: 'I can help you with authentication issues. Here are some common problems:',
                 prompts: [
