@@ -336,6 +336,24 @@ export const AnalyticsBucketFields = ({
         )}
       />
 
+      {!keyExists && (
+        <Admonition type="warning" title="Unable to find access key ID in project">
+          <p className="!leading-normal">
+            Please select another key or create a new set, as this destination will not work
+            otherwise. S3 access keys can be managed in your{' '}
+            <InlineLink
+              href={
+                isStorageV2
+                  ? `/project/${projectRef}/storage/files/settings`
+                  : `/project/${projectRef}/storage/settings`
+              }
+            >
+              storage settings
+            </InlineLink>
+          </p>
+        </Admonition>
+      )}
+
       {s3AccessKeyId === CREATE_NEW_KEY ? (
         <Admonition type="default" title="A new set of S3 access keys will be created">
           <p className="!leading-normal">
