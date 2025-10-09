@@ -224,8 +224,7 @@ limit ${limit}
   `
 
     case 'pg_cron_logs':
-      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message::text LIKE '%cron job%')`
-
+      const baseWhere = `where (coalesce(parsed.application_name, '') = "pg_cron" or regexp_contains(event_message, 'cron job'))`
       const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
 
       return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
