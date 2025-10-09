@@ -114,7 +114,7 @@ export const AnalyticsBucketFields = ({
   const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
   const { serviceKey, secretKey } = getKeys(apiKeys)
   const hasSecretKey = !!secretKey
   const serviceApiKey = secretKey?.api_key ?? serviceKey?.api_key ?? ''
@@ -340,7 +340,7 @@ export const AnalyticsBucketFields = ({
             />
           </FormItemLayout>
         )}
-      ></FormField_Shadcn_>
+      />
 
       <FormField_Shadcn_
         control={form.control}
