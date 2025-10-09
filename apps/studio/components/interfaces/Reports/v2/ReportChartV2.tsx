@@ -24,6 +24,7 @@ export interface ReportChartV2Props {
   syncId?: string
   filters?: any
   highlightActions?: ChartHighlightAction[]
+  queryKeys?: string[]
 }
 
 export const ReportChartV2 = ({
@@ -37,6 +38,7 @@ export const ReportChartV2 = ({
   syncId,
   filters,
   highlightActions,
+  queryKeys,
 }: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
@@ -53,12 +55,15 @@ export const ReportChartV2 = ({
     error,
     isFetching,
   } = useQuery(
-    [
-      'projects',
-      projectRef,
-      'report-v2',
-      { reportId: report.id, startDate, endDate, interval, filters },
-    ],
+    queryKeys && queryKeys.length > 0
+      ? [
+          'projects',
+          projectRef,
+          'report-v2',
+          ...queryKeys,
+          { startDate, endDate, interval, filters },
+        ]
+      : ['projects', projectRef, 'report-v2', report.id, { startDate, endDate, interval, filters }],
     async () => {
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
@@ -66,6 +71,12 @@ export const ReportChartV2 = ({
       enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
       staleTime: 0,
+      select: (data) => {
+        if (report.selectTransform) {
+          return report.selectTransform(data)
+        }
+        return data
+      },
     }
   )
 

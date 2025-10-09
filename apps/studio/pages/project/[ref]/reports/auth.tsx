@@ -25,6 +25,7 @@ import {
   createUsageReportConfig,
   createErrorsReportConfig,
   createLatencyReportConfig,
+  AUTH_REPORT_QUERY_KEYS,
 } from 'data/reports/v2/auth.config'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
@@ -160,6 +161,8 @@ const AuthUsage = () => {
 
     setIsRefreshing(true)
 
+    queryClient.invalidateQueries(AUTH_REPORT_QUERY_KEYS.usage)
+
     refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
@@ -269,6 +272,7 @@ const AuthUsage = () => {
                   syncId={chartSyncId}
                   filters={{ provider: usageProviderFilter }}
                   highlightActions={highlightActions}
+                  queryKeys={metric.queryKeys}
                 />
               ))}
             </div>

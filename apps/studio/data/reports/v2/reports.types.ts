@@ -39,4 +39,5 @@ export interface ReportConfig<FiltersType = any> {
   YAxisProps?: YAxisProps
   xAxisKey?: string
   yAxisKey?: string
+  queryKeys?: string[]
 }
