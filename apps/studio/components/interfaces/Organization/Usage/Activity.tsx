@@ -1,7 +1,8 @@
 import { DataPoint } from 'data/analytics/constants'
-import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
+import { PricingMetric, type OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import UsageSection from './UsageSection/UsageSection'
+import { dailyUsageToDataPoints } from './Usage.utils'
 
 export interface ActivityProps {
   orgSlug: string
@@ -10,6 +11,8 @@ export interface ActivityProps {
   endDate: string | undefined
   subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
+  orgDailyStats: OrgDailyUsageResponse | undefined
+  isLoadingOrgDailyStats: boolean
 }
 
 const Activity = ({
@@ -19,97 +22,59 @@ const Activity = ({
   startDate,
   endDate,
   currentBillingCycleSelected,
+  orgDailyStats,
+  isLoadingOrgDailyStats,
 }: ActivityProps) => {
-  const { data: mauData, isLoading: isLoadingMauData } = useOrgDailyStatsQuery({
-    orgSlug,
-    projectRef,
-    metric: PricingMetric.MONTHLY_ACTIVE_USERS,
-    interval: '1d',
-    startDate,
-    endDate,
-  })
-
-  const { data: mauSSOData, isLoading: isLoadingMauSSOData } = useOrgDailyStatsQuery({
-    orgSlug,
-    projectRef,
-    metric: PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
-    interval: '1d',
-    startDate,
-    endDate,
-  })
-
-  const { data: assetTransformationsData, isLoading: isLoadingAssetTransformationsData } =
-    useOrgDailyStatsQuery({
-      orgSlug,
-      projectRef,
-      metric: PricingMetric.STORAGE_IMAGES_TRANSFORMED,
-      interval: '1d',
-      startDate,
-      endDate,
-    })
-
-  const { data: funcInvocationsData, isLoading: isLoadingFuncInvocationsData } =
-    useOrgDailyStatsQuery({
-      orgSlug,
-      projectRef,
-      metric: PricingMetric.FUNCTION_INVOCATIONS,
-      interval: '1d',
-      startDate,
-      endDate,
-    })
-
-  const { data: realtimeMessagesData, isLoading: isLoadingRealtimeMessagesData } =
-    useOrgDailyStatsQuery({
-      orgSlug,
-      projectRef,
-      metric: PricingMetric.REALTIME_MESSAGE_COUNT,
-      interval: '1d',
-      startDate,
-      endDate,
-    })
-
-  const { data: realtimeConnectionsData, isLoading: isLoadingRealtimeConnectionsData } =
-    useOrgDailyStatsQuery({
-      orgSlug,
-      projectRef,
-      metric: PricingMetric.REALTIME_PEAK_CONNECTIONS,
-      interval: '1d',
-      startDate,
-      endDate,
-    })
-
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
     [PricingMetric.MONTHLY_ACTIVE_USERS]: {
-      data: mauData?.data ?? [],
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.MONTHLY_ACTIVE_USERS
+      ),
       margin: 18,
-      isLoading: isLoadingMauData,
+      isLoading: isLoadingOrgDailyStats,
     },
     [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: {
-      data: mauSSOData?.data ?? [],
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.MONTHLY_ACTIVE_SSO_USERS
+      ),
       margin: 20,
-      isLoading: isLoadingMauSSOData,
+      isLoading: isLoadingOrgDailyStats,
     },
     [PricingMetric.STORAGE_IMAGES_TRANSFORMED]: {
-      data: assetTransformationsData?.data ?? [],
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.STORAGE_IMAGES_TRANSFORMED
+      ),
       margin: 0,
-      isLoading: isLoadingAssetTransformationsData,
+      isLoading: isLoadingOrgDailyStats,
     },
     [PricingMetric.FUNCTION_INVOCATIONS]: {
-      data: funcInvocationsData?.data ?? [],
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.FUNCTION_INVOCATIONS
+      ),
       margin: 26,
-      isLoading: isLoadingFuncInvocationsData,
+      isLoading: isLoadingOrgDailyStats,
     },
     [PricingMetric.REALTIME_MESSAGE_COUNT]: {
-      data: realtimeMessagesData?.data ?? [],
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.REALTIME_MESSAGE_COUNT
+      ),
       margin: 38,
-      isLoading: isLoadingRealtimeMessagesData,
+      isLoading: isLoadingOrgDailyStats,
     },
     [PricingMetric.REALTIME_PEAK_CONNECTIONS]: {
-      data: realtimeConnectionsData?.data ?? [],
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.REALTIME_PEAK_CONNECTIONS
+      ),
       margin: 0,
-      isLoading: isLoadingRealtimeConnectionsData,
+      isLoading: isLoadingOrgDailyStats,
     },
   }
 

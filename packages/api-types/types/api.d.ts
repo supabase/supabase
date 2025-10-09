@@ -1972,19 +1972,40 @@ export interface components {
       jwt_exp: number | null
       mailer_allow_unverified_email_sign_ins: boolean | null
       mailer_autoconfirm: boolean | null
+      mailer_notifications_email_changed_enabled: boolean | null
+      mailer_notifications_identity_linked_enabled: boolean | null
+      mailer_notifications_identity_unlinked_enabled: boolean | null
+      mailer_notifications_mfa_factor_enrolled_enabled: boolean | null
+      mailer_notifications_mfa_factor_unenrolled_enabled: boolean | null
+      mailer_notifications_password_changed_enabled: boolean | null
+      mailer_notifications_phone_changed_enabled: boolean | null
       mailer_otp_exp: number
       mailer_otp_length: number | null
       mailer_secure_email_change_enabled: boolean | null
       mailer_subjects_confirmation: string | null
       mailer_subjects_email_change: string | null
+      mailer_subjects_email_changed_notification: string | null
+      mailer_subjects_identity_linked_notification: string | null
+      mailer_subjects_identity_unlinked_notification: string | null
       mailer_subjects_invite: string | null
       mailer_subjects_magic_link: string | null
+      mailer_subjects_mfa_factor_enrolled_notification: string | null
+      mailer_subjects_mfa_factor_unenrolled_notification: string | null
+      mailer_subjects_password_changed_notification: string | null
+      mailer_subjects_phone_changed_notification: string | null
       mailer_subjects_reauthentication: string | null
       mailer_subjects_recovery: string | null
       mailer_templates_confirmation_content: string | null
       mailer_templates_email_change_content: string | null
+      mailer_templates_email_changed_notification_content: string | null
+      mailer_templates_identity_linked_notification_content: string | null
+      mailer_templates_identity_unlinked_notification_content: string | null
       mailer_templates_invite_content: string | null
       mailer_templates_magic_link_content: string | null
+      mailer_templates_mfa_factor_enrolled_notification_content: string | null
+      mailer_templates_mfa_factor_unenrolled_notification_content: string | null
+      mailer_templates_password_changed_notification_content: string | null
+      mailer_templates_phone_changed_notification_content: string | null
       mailer_templates_reauthentication_content: string | null
       mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
@@ -3332,19 +3353,40 @@ export interface components {
       jwt_exp?: number | null
       mailer_allow_unverified_email_sign_ins?: boolean | null
       mailer_autoconfirm?: boolean | null
+      mailer_notifications_email_changed_enabled?: boolean | null
+      mailer_notifications_identity_linked_enabled?: boolean | null
+      mailer_notifications_identity_unlinked_enabled?: boolean | null
+      mailer_notifications_mfa_factor_enrolled_enabled?: boolean | null
+      mailer_notifications_mfa_factor_unenrolled_enabled?: boolean | null
+      mailer_notifications_password_changed_enabled?: boolean | null
+      mailer_notifications_phone_changed_enabled?: boolean | null
       mailer_otp_exp?: number
       mailer_otp_length?: number | null
       mailer_secure_email_change_enabled?: boolean | null
       mailer_subjects_confirmation?: string | null
       mailer_subjects_email_change?: string | null
+      mailer_subjects_email_changed_notification?: string | null
+      mailer_subjects_identity_linked_notification?: string | null
+      mailer_subjects_identity_unlinked_notification?: string | null
       mailer_subjects_invite?: string | null
       mailer_subjects_magic_link?: string | null
+      mailer_subjects_mfa_factor_enrolled_notification?: string | null
+      mailer_subjects_mfa_factor_unenrolled_notification?: string | null
+      mailer_subjects_password_changed_notification?: string | null
+      mailer_subjects_phone_changed_notification?: string | null
       mailer_subjects_reauthentication?: string | null
       mailer_subjects_recovery?: string | null
       mailer_templates_confirmation_content?: string | null
       mailer_templates_email_change_content?: string | null
+      mailer_templates_email_changed_notification_content?: string | null
+      mailer_templates_identity_linked_notification_content?: string | null
+      mailer_templates_identity_unlinked_notification_content?: string | null
       mailer_templates_invite_content?: string | null
       mailer_templates_magic_link_content?: string | null
+      mailer_templates_mfa_factor_enrolled_notification_content?: string | null
+      mailer_templates_mfa_factor_unenrolled_notification_content?: string | null
+      mailer_templates_password_changed_notification_content?: string | null
+      mailer_templates_phone_changed_notification_content?: string | null
       mailer_templates_reauthentication_content?: string | null
       mailer_templates_recovery_content?: string | null
       mfa_max_enrolled_factors?: number | null
