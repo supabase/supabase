@@ -8,7 +8,9 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Loader2 } from 'lucide-react'
 import {
+  Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
@@ -129,44 +131,58 @@ export const AnalyticsBucketFields = ({
         name="warehouseName"
         render={({ field }) => (
           <FormItemLayout
-            label="Warehouse Name"
+            label="Bucket"
             layout="vertical"
-            description="Select a storage bucket to use as your Analytics Bucket warehouse"
+            description="Select a storage Analytics Bucket to use as your warehouse"
           >
-            <FormControl_Shadcn_>
-              <Select_Shadcn_
-                value={field.value}
-                onValueChange={(value) => {
-                  setIsFormInteracting(true)
-                  field.onChange(value)
-                }}
+            {isLoadingBuckets ? (
+              <Button
+                disabled
+                type="default"
+                className="w-full justify-between"
+                size="small"
+                iconRight={<Loader2 className="animate-spin" />}
               >
-                <SelectTrigger_Shadcn_>{field.value || 'Select a warehouse'}</SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
-                    {isLoadingBuckets ? (
-                      <SelectItem_Shadcn_ value="__loading__" disabled>
-                        Loading buckets...
-                      </SelectItem_Shadcn_>
-                    ) : isErrorBuckets ? (
-                      <SelectItem_Shadcn_ value="__no_buckets__" disabled>
-                        Failed to fetch buckets
-                      </SelectItem_Shadcn_>
-                    ) : analyticsBuckets.length === 0 ? (
-                      <SelectItem_Shadcn_ value="__no_buckets__" disabled>
-                        No buckets available
-                      </SelectItem_Shadcn_>
-                    ) : (
-                      analyticsBuckets.map((bucket) => (
-                        <SelectItem_Shadcn_ key={bucket.id} value={bucket.name}>
-                          {bucket.name}
+                Retrieving buckets
+              </Button>
+            ) : (
+              <FormControl_Shadcn_>
+                <Select_Shadcn_
+                  value={field.value}
+                  onValueChange={(value) => {
+                    setIsFormInteracting(true)
+                    field.onChange(value)
+                  }}
+                >
+                  <SelectTrigger_Shadcn_>
+                    {field.value || 'Select a warehouse'}
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      {isLoadingBuckets ? (
+                        <SelectItem_Shadcn_ value="__loading__" disabled>
+                          Loading buckets...
                         </SelectItem_Shadcn_>
-                      ))
-                    )}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-            </FormControl_Shadcn_>
+                      ) : isErrorBuckets ? (
+                        <SelectItem_Shadcn_ value="__no_buckets__" disabled>
+                          Failed to fetch buckets
+                        </SelectItem_Shadcn_>
+                      ) : analyticsBuckets.length === 0 ? (
+                        <SelectItem_Shadcn_ value="__no_buckets__" disabled>
+                          No buckets available
+                        </SelectItem_Shadcn_>
+                      ) : (
+                        analyticsBuckets.map((bucket) => (
+                          <SelectItem_Shadcn_ key={bucket.id} value={bucket.name}>
+                            {bucket.name}
+                          </SelectItem_Shadcn_>
+                        ))
+                      )}
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormControl_Shadcn_>
+            )}
           </FormItemLayout>
         )}
       />
@@ -178,7 +194,7 @@ export const AnalyticsBucketFields = ({
           <FormItemLayout
             label="Namespace"
             layout="vertical"
-            description="Select a namespace from your Analytics Bucket warehouse"
+            description="Select a namespace from your Analytics Bucket"
           >
             <FormControl_Shadcn_>
               <Select_Shadcn_
@@ -188,7 +204,7 @@ export const AnalyticsBucketFields = ({
               >
                 <SelectTrigger_Shadcn_>
                   {!warehouseName || !serviceApiKey
-                    ? 'Select warehouse first'
+                    ? 'Select a warehouse first'
                     : field.value || 'Select a namespace'}
                 </SelectTrigger_Shadcn_>
                 <SelectContent_Shadcn_>
