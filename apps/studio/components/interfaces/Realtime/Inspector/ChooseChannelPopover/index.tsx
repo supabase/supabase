@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -67,7 +67,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
     let token = config.token
 
     // [Joshen] Refresh if starting to listen + using temp API key, since it has a low refresh rate
-    if (token.startsWith('sb_temp')) {
+    if (token.startsWith('sb_temp') || !IS_PLATFORM) {
       const data = await getTemporaryAPIKey({ projectRef: config.projectRef, expiry: 3600 })
       token = data.api_key
     }
