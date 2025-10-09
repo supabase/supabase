@@ -36,17 +36,19 @@ const SqlEditor: NextPageWithLayout = () => {
 
   // [Refactor] There's an unnecessary request getting triggered when we start typing while on /new
   // the URL ID gets updated and we attempt to fetch content for a snippet that's not been created yet
+  // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
+  // the snapV2 valtio store for some reason hence why the added typeof check here
+  const canFetchContentBasedOnId = Boolean(
+    id !== 'new' && typeof snapV2.addSnippet === 'function' && !snippet?.isNotSavedInDatabaseYet
+  )
   const { data, error, isError } = useContentIdQuery(
     { projectRef: ref, id },
     {
-      // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
-      // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
-      enabled: Boolean(
-        id !== 'new' && typeof snapV2.addSnippet === 'function' && !snippet?.isNotSavedInDatabaseYet
-      ),
+      enabled: canFetchContentBasedOnId,
     }
   )
+
   const snippetMissing =
     isError && error.code === 404 && error.message.includes('Content not found')
   const invalidId = isError && error.code === 400 && error.message.includes('Invalid uuid')
