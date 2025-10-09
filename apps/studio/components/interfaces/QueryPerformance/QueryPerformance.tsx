@@ -18,6 +18,7 @@ import { PresetHookResult } from '../Reports/Reports.utils'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
 import { QueryPerformanceMetrics } from './QueryPerformanceMetrics'
+import { QueryPerformanceChart } from './QueryPerformanceChart/QueryPerformanceChart'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
@@ -60,7 +61,8 @@ export const QueryPerformance = ({
 
   return (
     <>
-      <QueryPerformanceMetrics />
+      {/* <QueryPerformanceMetrics /> */}
+      <QueryPerformanceChart />
       <QueryPerformanceFilterBar
         queryPerformanceQuery={queryPerformanceQuery}
         onResetReportClick={() => setShowResetgPgStatStatements(true)}
