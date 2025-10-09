@@ -196,6 +196,14 @@ limit ${limit}
     `
 
     case 'function_edge_logs':
+      if (IS_PLATFORM === false) {
+        return `
+select id, function_edge_logs.timestamp, event_message
+from function_edge_logs
+${orderBy}
+limit ${limit}
+`
+      }
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
