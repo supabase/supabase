@@ -5,7 +5,7 @@ import { analyticsKeys } from './keys'
 import type { components } from 'api-types'
 
 export enum EgressType {
-  DATABASE = 'egress_rest',
+  REST = 'egress_rest',
   AUTH = 'egress_auth',
   STORAGE = 'egress_storage',
   REALTIME = 'egress_realtime',

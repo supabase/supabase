@@ -128,7 +128,5 @@ export function dailyUsageToDataPoints(
     dataPoints.push(dataPoint)
   })
 
-  console.log(dataPoints)
-
   return dataPoints
 }
