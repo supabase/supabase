@@ -85,3 +85,8 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
     }
   )
 }
+
+export const getComputeSize = (project: OrgProject) => {
+  const primaryDatabase = project.databases.find((db) => db.identifier === project.ref)
+  return primaryDatabase?.infra_compute_size
+}
