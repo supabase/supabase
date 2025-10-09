@@ -90,8 +90,8 @@
   "devDependencies": {
     "@react-router/dev": "^7.1.5",
     "@shikijs/compat": "^1.1.7",
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.1",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "catalog:",
     "@tanstack/react-router": "^1.114.27",
     "@tanstack/react-start": "^1.114.25",
     "@types/common-tags": "^1.8.4",

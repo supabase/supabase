@@ -40,7 +40,7 @@ export const AIAssistantOption = ({
   }
 
   // If no specific project selected, use the wildcard route
-  const aiLink = `/project/${projectRef !== 'no-project' ? projectRef : '_'}?aiAssistantPanelOpen=true`
+  const aiLink = `/project/${projectRef !== 'no-project' ? projectRef : '_'}?aiAssistantPanelOpen=true&slug=${organizationSlug}`
 
   return (
     <AnimatePresence initial={false}>
