@@ -10,6 +10,8 @@ import { Solutions } from 'data/Solutions'
 import Quotes from '~/components/Solutions/Quotes'
 import PostGrid from '~/components/Solutions/PostGrid'
 import { getSortedPosts, type Post } from '~/lib/posts'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import AIBuildersLogos from 'components/Solutions/AIBuildersLogos'
 
 const WhySupabase = dynamic(() => import('components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))
@@ -43,6 +45,13 @@ const VibeCodersPage: NextPage<{ posts: Post[] }> = ({ posts }) => {
         <PlatformStarterSection {...content.platformStarterSection} />
         <MPCSection {...content.mcp} />
         <PostGrid posts={posts} {...content.postGrid} />
+        <SectionContainer className="flex flex-col items-center gap-8 mb-32">
+          <h2 className="h3">
+            Supabase is the backend platform for apps created by your favorite AI Builders.
+          </h2>
+
+          <AIBuildersLogos className="" />
+        </SectionContainer>
       </Layout>
     </>
   )

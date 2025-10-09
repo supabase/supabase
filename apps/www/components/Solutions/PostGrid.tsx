@@ -18,7 +18,7 @@ function PostGrid({ id, className, header, subheader, posts }: PostGridProps) {
 
   return (
     <SectionContainer id={id} className={cn('flex flex-col gap-12 py-16 md:py-24', className)}>
-      <div className="flex flex-col max-w-[50%]">
+      <div className="flex flex-col lg:max-w-[50%]">
         <h2 className="h2">{header}</h2>
         <p className="p">{subheader}</p>
       </div>
