@@ -35,8 +35,8 @@ const QueryMetricBlock = ({
 }) => {
   return (
     <div className="flex flex-col gap-0.5 text-xs">
-      <span className="font-mono text-xs text-foreground-light uppercase">{label}</span>
-      <span className="text-lg">{value}</span>
+      <span className="font-mono text-xs text-foreground-lighter uppercase">{label}</span>
+      <span className="text-lg tabular-nums">{value}</span>
     </div>
   )
 }
@@ -153,7 +153,6 @@ export const QueryPerformanceChart = ({
 
     switch (selectedMetric) {
       case 'query_latency': {
-        // Calculate Average p95
         const sortedTimes = chartData.map((d) => d.mean_time).sort((a, b) => a - b)
         const p95Index = Math.floor(sortedTimes.length * 0.95)
         const averageP95 = sortedTimes[p95Index] || 0
@@ -161,12 +160,11 @@ export const QueryPerformanceChart = ({
         return [
           {
             label: 'Average p95',
-            value: `${averageP95.toFixed(2)} ms`,
+            value: `${averageP95.toFixed(2)}ms`,
           },
         ]
       }
       case 'rows_read': {
-        // Calculate Total Rows Read
         const totalRowsRead = chartData.reduce((sum, d) => sum + d.rows_read, 0)
 
         return [
@@ -177,7 +175,6 @@ export const QueryPerformanceChart = ({
         ]
       }
       case 'calls': {
-        // Calculate Total Calls
         const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
 
         return [
@@ -188,7 +185,6 @@ export const QueryPerformanceChart = ({
         ]
       }
       case 'cache_hits': {
-        // Calculate Cache Hit Rate and Cache Miss Rate
         const totalHits = chartData.reduce((sum, d) => sum + d.cache_hits, 0)
         const totalMisses = chartData.reduce((sum, d) => sum + d.cache_misses, 0)
         const total = totalHits + totalMisses

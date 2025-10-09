@@ -19,7 +19,6 @@ import type { NextPageWithLayout } from 'types'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -32,7 +31,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     datePickerHelpers,
     updateDateRange,
     handleDatePickerChange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS)
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const [{ search: searchQuery, roles }] = useQueryStates({
     sort: parseAsString,
