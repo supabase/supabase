@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import { ReportSectionHeader } from 'components/interfaces/Reports/v2/ReportSectionHeader'
