@@ -14,6 +14,7 @@ import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
+  DialogSectionSeparator,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
@@ -27,6 +28,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CREATE_NEW_KEY } from './DestinationPanel.constants'
 import { DestinationPanelSchemaType } from './DestinationPanel.schema'
@@ -39,8 +41,9 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
         name="projectId"
         render={({ field }) => (
           <FormItemLayout
-            label="Project ID"
             layout="vertical"
+            className="px-5"
+            label="Project ID"
             description="Which BigQuery project to send data to"
           >
             <FormControl_Shadcn_>
@@ -54,7 +57,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
         control={form.control}
         name="datasetId"
         render={({ field }) => (
-          <FormItemLayout label="Project's Dataset ID" layout="vertical">
+          <FormItemLayout label="Project's Dataset ID" layout="vertical" className="px-5">
             <FormControl_Shadcn_>
               <Input_Shadcn_ {...field} placeholder="Dataset ID" />
             </FormControl_Shadcn_>
@@ -67,8 +70,9 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
         name="serviceAccountKey"
         render={({ field }) => (
           <FormItemLayout
-            label="Service Account Key"
             layout="vertical"
+            className="px-5"
+            label="Service Account Key"
             description="The service account key for BigQuery"
           >
             <FormControl_Shadcn_>
@@ -88,18 +92,22 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
 
 /**
  * [Joshen] JFYI I'd foresee a possible UX friction point here regarding S3 access key IDs and secret access keys
- *
+ * - We'd allow users to select access key IDs via a dropdown here, but require a text input for secret access keys
+ * - Chances are most users wouldn't have the corresponding secret access key for the selected key ID at the top of their heads
+ * - So highly likely may have to default to "Create a new key" -> which from here they won't know the secret access key thereafter
+ * - And it'll end up just creating more keys for each destination
+ * Ideal scenario: Just select an access key ID, we then apply the secret access key in the PATCH request, so FE has no
+ * context of the secret access key at any point
  */
 export const AnalyticsBucketFields = ({
   form,
-  editMode,
   setIsFormInteracting,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
-  editMode?: boolean
   setIsFormInteracting: (value: boolean) => void
 }) => {
   const { warehouseName, type, s3AccessKeyId } = form.watch()
+  const [showCatalogToken, setShowCatalogToken] = useState(false)
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 
   const { ref: projectRef } = useParams()
@@ -107,19 +115,22 @@ export const AnalyticsBucketFields = ({
   const { data: project } = useSelectedProjectQuery()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef })
-  const { serviceKey } = getKeys(apiKeys)
-  const serviceApiKey = serviceKey?.api_key ?? ''
+  const { serviceKey, secretKey } = getKeys(apiKeys)
+  const hasSecretKey = !!secretKey
+  const serviceApiKey = secretKey?.api_key ?? serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
   const {
     data: keysData,
-    isSuccess: isSuccessKeys,
     isLoading: isLoadingKeys,
     isError: isErrorKeys,
   } = useStorageCredentialsQuery({ projectRef })
   const s3Keys = keysData?.data ?? []
-  const keyExists = !!s3Keys.find((k) => k.id === s3AccessKeyId)
+  const keyNoLongerExists =
+    (s3AccessKeyId ?? '').length > 0 &&
+    s3AccessKeyId !== CREATE_NEW_KEY &&
+    !s3Keys.find((k) => k.id === s3AccessKeyId)
 
   const {
     data: buckets = [],
@@ -163,6 +174,7 @@ export const AnalyticsBucketFields = ({
           <FormItemLayout
             label="Bucket"
             layout="vertical"
+            className="px-5"
             description="Select a storage Analytics Bucket to use as your warehouse"
           >
             {isLoadingBuckets ? (
@@ -224,6 +236,7 @@ export const AnalyticsBucketFields = ({
           <FormItemLayout
             label="Namespace"
             layout="vertical"
+            className="px-5"
             description="Select a namespace from your Analytics Bucket"
           >
             {isLoadingNamespaces && canSelectNamespace ? (
@@ -280,11 +293,60 @@ export const AnalyticsBucketFields = ({
         )}
       />
 
+      <DialogSectionSeparator />
+
+      <p className="px-5 text-sm text-foreground-light px-5">Credentials</p>
+
+      <FormField_Shadcn_
+        control={form.control}
+        name="catalogToken"
+        render={({ field }) => (
+          <FormItemLayout
+            layout="vertical"
+            label="Catalog Token"
+            className="px-5"
+            description={
+              <>
+                Automatically retrieved from your project's{' '}
+                <InlineLink
+                  href={
+                    hasSecretKey
+                      ? `/project/${projectRef}/settings/api-keys/new`
+                      : `/project/${projectRef}/settings/api-keys`
+                  }
+                >
+                  {hasSecretKey ? 'API Secret' : 'service role'} key
+                </InlineLink>
+              </>
+            }
+          >
+            <Input
+              disabled
+              value={field.value}
+              type={showCatalogToken ? 'text' : 'password'}
+              placeholder="Auto-populated"
+              actions={
+                serviceApiKey ? (
+                  <div className="flex items-center justify-center">
+                    <Button
+                      type="default"
+                      className="w-7"
+                      icon={showCatalogToken ? <Eye /> : <EyeOff />}
+                      onClick={() => setShowCatalogToken(!showCatalogToken)}
+                    />
+                  </div>
+                ) : null
+              }
+            />
+          </FormItemLayout>
+        )}
+      ></FormField_Shadcn_>
+
       <FormField_Shadcn_
         control={form.control}
         name="s3AccessKeyId"
         render={({ field }) => (
-          <FormItemLayout layout="vertical" label="S3 Access Key ID">
+          <FormItemLayout layout="vertical" label="S3 Access Key ID" className="px-5">
             {isLoadingKeys ? (
               <Button
                 disabled
@@ -336,40 +398,44 @@ export const AnalyticsBucketFields = ({
         )}
       />
 
-      {!keyExists && (
-        <Admonition type="warning" title="Unable to find access key ID in project">
-          <p className="!leading-normal">
-            Please select another key or create a new set, as this destination will not work
-            otherwise. S3 access keys can be managed in your{' '}
-            <InlineLink
-              href={
-                isStorageV2
-                  ? `/project/${projectRef}/storage/files/settings`
-                  : `/project/${projectRef}/storage/settings`
-              }
-            >
-              storage settings
-            </InlineLink>
-          </p>
-        </Admonition>
+      {keyNoLongerExists && (
+        <div className="px-5">
+          <Admonition type="warning" title="Unable to find access key ID in project">
+            <p className="!leading-normal">
+              Please select another key or create a new set, as this destination will not work
+              otherwise. S3 access keys can be managed in your{' '}
+              <InlineLink
+                href={
+                  isStorageV2
+                    ? `/project/${projectRef}/storage/files/settings`
+                    : `/project/${projectRef}/storage/settings`
+                }
+              >
+                storage settings
+              </InlineLink>
+            </p>
+          </Admonition>
+        </div>
       )}
 
       {s3AccessKeyId === CREATE_NEW_KEY ? (
-        <Admonition type="default" title="A new set of S3 access keys will be created">
-          <p className="!leading-normal">
-            S3 access keys can be managed in your{' '}
-            <InlineLink
-              href={
-                isStorageV2
-                  ? `/project/${projectRef}/storage/files/settings`
-                  : `/project/${projectRef}/storage/settings`
-              }
-            >
-              storage settings
-            </InlineLink>
-            .
-          </p>
-        </Admonition>
+        <div className="px-5">
+          <Admonition type="default" title="A new set of S3 access keys will be created">
+            <p className="!leading-normal">
+              S3 access keys can be managed in your{' '}
+              <InlineLink
+                href={
+                  isStorageV2
+                    ? `/project/${projectRef}/storage/files/settings`
+                    : `/project/${projectRef}/storage/settings`
+                }
+              >
+                storage settings
+              </InlineLink>
+              .
+            </p>
+          </Admonition>
+        </div>
       ) : (
         <FormField_Shadcn_
           control={form.control}
@@ -378,7 +444,7 @@ export const AnalyticsBucketFields = ({
             <FormItemLayout
               layout="vertical"
               label="S3 Secret Access Key"
-              className="relative"
+              className="relative px-5"
               description="The corresponding secret access key for the selected key ID"
             >
               <FormControl_Shadcn_>
@@ -390,8 +456,8 @@ export const AnalyticsBucketFields = ({
               </FormControl_Shadcn_>
               <Button
                 type="default"
-                icon={showSecretAccessKey ? <EyeOff /> : <Eye />}
-                className="w-7 absolute right-[4px] top-[33px]"
+                icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                className="w-7 absolute right-6 top-[33px]"
                 onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
               />
             </FormItemLayout>

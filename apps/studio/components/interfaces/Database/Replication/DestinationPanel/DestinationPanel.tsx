@@ -117,9 +117,9 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
-  const { serviceKey } = getKeys(apiKeys)
-  const serviceApiKey = serviceKey?.api_key ?? ''
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { serviceKey, secretKey } = getKeys(apiKeys)
+  const catalogToken = secretKey?.api_key ?? serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
@@ -147,13 +147,13 @@ export const DestinationPanel = ({
       // Analytics Bucket fields
       warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
       namespace: isIcebergConfig ? config.iceberg.supabase.namespace : '',
-      catalogToken: isIcebergConfig ? config.iceberg.supabase.catalog_token : serviceApiKey,
+      catalogToken: isIcebergConfig ? config.iceberg.supabase.catalog_token : catalogToken,
       s3AccessKeyId: isIcebergConfig ? config.iceberg.supabase.s3_access_key_id : '',
       s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
       s3Region:
         projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
     }
-  }, [destinationData, pipelineData, serviceApiKey, projectSettings])
+  }, [destinationData, pipelineData, catalogToken, projectSettings])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -472,8 +472,8 @@ export const DestinationPanel = ({
 
                   <DialogSectionSeparator />
 
-                  <div className="p-5 flex flex-col gap-y-4">
-                    <p className="text-sm text-foreground-light">Where to send that data</p>
+                  <div className="py-5 flex flex-col gap-y-4">
+                    <p className="px-5 text-sm text-foreground-light">Where to send that data</p>
                     <FormField_Shadcn_
                       name="type"
                       control={form.control}
@@ -481,6 +481,7 @@ export const DestinationPanel = ({
                         <FormItemLayout
                           label="Type"
                           layout="vertical"
+                          className="px-5"
                           description="The type of destination to send the data to"
                         >
                           <FormControl_Shadcn_>
@@ -511,7 +512,6 @@ export const DestinationPanel = ({
                     ) : selectedType === 'Analytics Bucket' ? (
                       <AnalyticsBucketFields
                         form={form}
-                        editMode={editMode}
                         setIsFormInteracting={setIsFormInteracting}
                       />
                     ) : null}
