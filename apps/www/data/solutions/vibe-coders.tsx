@@ -138,7 +138,7 @@ const useVibeCodersContent: () => {
           icon: Timer,
           heading: 'Built for how you build',
           subheading:
-            'Supabase is a production-ready backend that works with your AI tools from day one. No DevOps degree required. No months of setup. No &quot;learning the hard way.&quot; Just ship.',
+            'Supabase is a production-ready backend that works with your AI tools from day one. No DevOps degree required. No months of setup. No "learning the hard way." Just ship.',
         },
         {
           id: 'production-ready',
