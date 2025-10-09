@@ -33,16 +33,17 @@ import {
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { formatDuration } from './QueryPerformance.utils'
+import { AggregatedQueryData } from './QueryPerformanceData.utils'
 
 interface QueryPerformanceGridProps {
-  queryPerformanceQuery: DbQueryHook<any>
+  aggregatedData: AggregatedQueryData[]
+  isLoading: boolean
 }
 
-export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
+export const QueryPerformanceGrid = ({ aggregatedData, isLoading }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { sort: urlSort, order, roles, search } = useParams()
-  const { isLoading, data } = queryPerformanceQuery
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
@@ -237,13 +238,9 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         if (col.id === 'cache_hit_rate') {
           return (
             <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
-              {typeof value === 'string' ? (
-                <p
-                  className={cn(
-                    cacheHitRateToNumber(value).toFixed(2) === '0.00' && 'text-foreground-lighter'
-                  )}
-                >
-                  {cacheHitRateToNumber(value).toLocaleString(undefined, {
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p className={cn(value.toFixed(2) === '0.00' && 'text-foreground-lighter')}>
+                  {value.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -287,27 +284,39 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   })
 
   const reportData = useMemo(() => {
-    const rawData = data ?? []
+    let data = [...aggregatedData]
 
-    if (sort?.column === 'prop_total_time') {
-      const sortedData = [...rawData].sort((a, b) => {
-        const getNumericValue = (value: number | string) => {
-          if (!value || value === 'n/a') return 0
-          if (typeof value === 'number') return value
-          return parseFloat(value.toString().replace('%', '')) || 0
-        }
-
-        const aValue = getNumericValue(a.prop_total_time)
-        const bValue = getNumericValue(b.prop_total_time)
-
-        return sort.order === 'asc' ? aValue - bValue : bValue - aValue
-      })
-
-      return sortedData
+    // Apply search filter if present
+    if (search && typeof search === 'string' && search.length > 0) {
+      data = data.filter((row) => row.query.toLowerCase().includes(search.toLowerCase()))
     }
 
-    return rawData
-  }, [data, sort])
+    // Apply role filter if present
+    if (roles && Array.isArray(roles) && roles.length > 0) {
+      data = data.filter((row) => row.rolname && roles.includes(row.rolname))
+    }
+
+    // Apply sorting
+    if (sort?.column === 'prop_total_time') {
+      data.sort((a, b) => {
+        const aValue = a.prop_total_time || 0
+        const bValue = b.prop_total_time || 0
+        return sort.order === 'asc' ? aValue - bValue : bValue - aValue
+      })
+    } else if (sort?.column && sort.column !== 'query') {
+      data.sort((a, b) => {
+        const aValue = a[sort.column as keyof AggregatedQueryData] || 0
+        const bValue = b[sort.column as keyof AggregatedQueryData] || 0
+
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return sort.order === 'asc' ? aValue - bValue : bValue - aValue
+        }
+        return 0
+      })
+    }
+
+    return data
+  }, [aggregatedData, sort, search, roles])
 
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
@@ -328,7 +337,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
       if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
 
-      // stop default RDG behavior (which moves focus to header when selectedRow is 0)
       event.stopPropagation()
 
       let nextIndex = selectedRow

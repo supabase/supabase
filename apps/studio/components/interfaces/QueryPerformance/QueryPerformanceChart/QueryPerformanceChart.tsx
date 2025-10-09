@@ -1,21 +1,10 @@
-import { useState, useMemo, useEffect } from 'react'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-
+import { useState, useMemo } from 'react'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import {
-  QUERY_PERFORMANCE_CHART_TABS,
-  QUERY_PERFORMANCE_TIME_RANGES,
-  getPgStatMonitorLogsQuery,
-} from './QueryPerformanceChart.constants'
-import { transformLogsToJSON } from './QueryPerformanceChart.utils'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useParams } from 'common'
+import { QUERY_PERFORMANCE_CHART_TABS } from './QueryPerformanceChart.constants'
 import { Loader2 } from 'lucide-react'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-
-dayjs.extend(utc)
+import type { ChartDataPoint } from '../QueryPerformanceData.utils'
 
 interface QueryPerformanceChartProps {
   dateRange?: {
@@ -24,6 +13,9 @@ interface QueryPerformanceChartProps {
     interval: string
   }
   onDateRangeChange?: (from: string, to: string) => void
+  chartData: ChartDataPoint[]
+  isLoading: boolean
+  error: any
 }
 
 const QueryMetricBlock = ({
@@ -42,111 +34,13 @@ const QueryMetricBlock = ({
 }
 
 export const QueryPerformanceChart = ({
-  dateRange,
+  // dateRange,
   onDateRangeChange,
+  chartData,
+  isLoading,
+  error,
 }: QueryPerformanceChartProps) => {
   const [selectedMetric, setSelectedMetric] = useState('query_latency')
-
-  const { ref: projectRef } = useParams() as { ref: string }
-
-  const effectiveDateRange = useMemo(() => {
-    if (dateRange) {
-      return {
-        iso_timestamp_start: dateRange.period_start.date,
-        iso_timestamp_end: dateRange.period_end.date,
-      }
-    }
-    // Fallback to default 24 hours
-    const end = dayjs.utc()
-    const start = end.subtract(24, 'hours')
-    return {
-      iso_timestamp_start: start.toISOString(),
-      iso_timestamp_end: end.toISOString(),
-    }
-  }, [dateRange])
-
-  const queryWithTimeRange = useMemo(() => {
-    return getPgStatMonitorLogsQuery(
-      effectiveDateRange.iso_timestamp_start,
-      effectiveDateRange.iso_timestamp_end
-    )
-  }, [effectiveDateRange])
-
-  const pgStatMonitorLogs = useLogsQuery(projectRef, {
-    sql: queryWithTimeRange,
-    iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
-    iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
-  })
-
-  const { logData, isLoading, error } = pgStatMonitorLogs
-
-  const parsedLogs = useMemo(() => {
-    if (!logData || logData.length === 0) return []
-
-    const validParsedLogs = logData
-      .map((log) => ({
-        ...log,
-        parsedEventMessage: transformLogsToJSON(log.event_message),
-      }))
-      .filter((log) => log.parsedEventMessage !== null)
-
-    console.log(`Successfully parsed: ${validParsedLogs.length}/${logData.length}`)
-
-    return validParsedLogs.map((log) => log.parsedEventMessage)
-  }, [logData])
-
-  const chartData = useMemo(() => {
-    if (!parsedLogs || parsedLogs.length === 0) return []
-
-    if (parsedLogs.length > 0) {
-      console.log('Sample parsed log for debugging:', parsedLogs[0])
-      console.log('Available timestamp fields:', {
-        bucket: parsedLogs[0].bucket,
-        timestamp: parsedLogs[0].timestamp,
-        bucket_start_time: parsedLogs[0].bucket_start_time,
-      })
-    }
-
-    return parsedLogs
-      .map((log: any) => {
-        const possibleTimestamps = [log.bucket_start_time, log.bucket, log.timestamp, log.ts]
-
-        let periodStart: number | null = null
-
-        for (const ts of possibleTimestamps) {
-          if (ts) {
-            const date = new Date(ts)
-            const time = date.getTime()
-            if (!isNaN(time) && time > 0 && time > 946684800000) {
-              periodStart = time
-              break
-            }
-          }
-        }
-
-        if (!periodStart) {
-          return null
-        }
-
-        return {
-          period_start: periodStart,
-          timestamp: possibleTimestamps.find((t) => t) || '',
-          query_latency:
-            parseFloat(log.mean_time || log.mean_exec_time || log.mean_query_time) || 0,
-          mean_time: parseFloat(log.mean_time || log.mean_exec_time || log.mean_query_time) || 0,
-          min_time: parseFloat(log.min_time || log.min_exec_time || log.min_query_time) || 0,
-          max_time: parseFloat(log.max_time || log.max_exec_time || log.max_query_time) || 0,
-          stddev_time:
-            parseFloat(log.stddev_time || log.stddev_exec_time || log.stddev_query_time) || 0,
-          rows_read: parseInt(log.rows) || 0,
-          calls: parseInt(log.calls) || 0,
-          cache_hits: parseFloat(log.shared_blks_hit) || 0,
-          cache_misses: parseFloat(log.shared_blks_read) || 0,
-        }
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null)
-      .sort((a, b) => a.period_start - b.period_start)
-  }, [parsedLogs])
 
   const currentMetrics = useMemo(() => {
     if (!chartData || chartData.length === 0) return []
@@ -271,14 +165,6 @@ export const QueryPerformanceChart = ({
     onDateRangeChange?.(from, to)
   }
 
-  useEffect(() => {
-    if (parsedLogs.length > 0) {
-      console.log('Parsed logs updated:', parsedLogs)
-      console.log('Chart data:', chartData)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsedLogs.length])
-
   return (
     <div className="bg-surface-200 border-t">
       <Tabs_Shadcn_
@@ -314,7 +200,7 @@ export const QueryPerformanceChart = ({
                   ))}
                 </div>
                 <ComposedChart
-                  data={chartData}
+                  data={chartData as any} /* [kemal]: FIX any here */
                   attributes={getChartAttributes}
                   yAxisKey={getChartAttributes[0]?.attribute || ''}
                   xAxisKey="period_start"
