@@ -27,4 +27,4 @@ When you merge any branch into your main project, Supabase automatically runs a 
 6. **Seed** - Runs seed files to populate your branch with initial data (must be [enabled in config.toml](/docs/guides/deployment/branching/configuration#branch-configuration-with-remotes) for persistent branches)
 7. **Deploy** - Deploys any changed Edge Functions and updates function secrets
 
-If a parent node fails, all dependent children nodes will be skipped. For e.g., if your database migrations failed at step 5, we will not seed your branch because step 6 is skipped. If you are using GitHub integration, the same deployment workflow will be run on every push to your git branch.
+If a parent deployment step fails, all dependent children steps will be skipped. For e.g., if your database migrations failed at step 5, our runner will not seed your branch because step 6 is skipped. If you are using GitHub integration, the same deployment workflow will be run on every commit pushed to your git branch.
