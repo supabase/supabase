@@ -87,7 +87,7 @@ const ProjectLinker = ({
   const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
   const foreignProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
   const [openProjectsDropdown, setOpenProjectsDropdown] = useState(false)
-  const [foreignProjectsComboBoxOpen, setForeignProjectsComboboxOpen] = useState(false)
+  const [openForeignProjectsComboBox, setOpenForeignProjectsComboBox] = useState(false)
   const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
     defaultForeignProjectId
   )
@@ -300,12 +300,11 @@ const ProjectLinker = ({
               </div>
 
               <Popover_Shadcn_
-                open={foreignProjectsComboBoxOpen}
-                onOpenChange={setForeignProjectsComboboxOpen}
+                open={openForeignProjectsComboBox}
+                onOpenChange={setOpenForeignProjectsComboBox}
               >
                 <PopoverTrigger_Shadcn_ asChild>
                   <Button
-                    ref={foreignProjectsComboBoxRef}
                     type="default"
                     block
                     disabled={loadingForeignProjects}
@@ -346,7 +345,7 @@ const ProjectLinker = ({
                               className="flex gap-2 items-center"
                               onSelect={() => {
                                 if (project.id) setForeignProjectId(project.id)
-                                setForeignProjectsComboboxOpen(false)
+                                setOpenForeignProjectsComboBox(false)
                               }}
                             >
                               <div>{getForeignProjectIcon?.(project) ?? integrationIcon}</div>
