@@ -145,14 +145,6 @@ function buildAuthLatencyAllSQL(
   endDate: string
 ) {
   const granularity = analyticsIntervalToGranularity(interval)
-  const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-
-  const providerClause =
-    filters?.provider && filters.provider.length > 0
-      ? `AND COALESCE(JSON_VALUE(event_message, '$.provider'), 'unknown') IN (${filters.provider
-          .map((p) => `'${p.replace(/'/g, "\\'")}'`)
-          .join(', ')})`
-      : ''
 
   return `
     -- Auth latency (sign-in + sign-up), single scan, FE does zero-fill
@@ -164,7 +156,6 @@ function buildAuthLatencyAllSQL(
     base AS (
       SELECT
         TIMESTAMP_TRUNC(timestamp, ${granularity}) AS ts,
-        COALESCE(JSON_VALUE(event_message, '$.provider'), 'unknown') AS provider,
         -- normalize action; accept both signup spellings
         CASE COALESCE(JSON_VALUE(event_message, '$.auth_event.action'), JSON_VALUE(event_message, '$.action'))
           WHEN 'login' THEN 'SignInLatency'
@@ -195,12 +186,10 @@ function buildAuthLatencyAllSQL(
         ) AS latency_ms
       FROM auth_logs, params
       WHERE timestamp >= start_ts AND timestamp < end_ts
-        ${providerClause}
     ),
     filtered AS (
       SELECT
         ts,
-        provider,
         metric,
         latency_ms
       FROM base
@@ -208,28 +197,25 @@ function buildAuthLatencyAllSQL(
     ),
     basic AS (
       SELECT
-        ts
-        ${groupByProvider ? ', provider' : ''},
+        ts,
         metric,
         MIN(latency_ms) AS min,
         AVG(latency_ms) AS avg,
         MAX(latency_ms) AS max
       FROM filtered
-      GROUP BY ts${groupByProvider ? ', provider' : ''}, metric
+      GROUP BY ts, metric
     ),
     pct AS (
       SELECT
-        ts
-        ${groupByProvider ? ', provider' : ''},
+        ts,
         metric,
         APPROX_QUANTILES(latency_ms, 100) AS q
       FROM filtered
-      GROUP BY ts${groupByProvider ? ', provider' : ''}, metric
+      GROUP BY ts, metric
     )
     SELECT
       b.ts AS timestamp,
       b.metric,
-      ${groupByProvider ? 'b.provider,' : 'CAST(NULL AS STRING) AS provider,'}
       b.min  AS min_processing_time_ms,
       b.avg  AS avg_processing_time_ms,
       b.max  AS max_processing_time_ms,
@@ -237,8 +223,8 @@ function buildAuthLatencyAllSQL(
       q[OFFSET(95)] AS p95_processing_time_ms,
       q[OFFSET(99)] AS p99_processing_time_ms
     FROM basic b
-    JOIN pct USING (ts${groupByProvider ? ', provider' : ''}, metric)
-    ORDER BY timestamp DESC${groupByProvider ? ', provider' : ''}, metric
+    JOIN pct USING (ts, metric)
+    ORDER BY timestamp DESC, metric
   `
 }
 
@@ -724,8 +710,6 @@ export const createLatencyReportConfig = ({
   interval: AnalyticsInterval
   filters: AuthReportFilters
 }): ReportConfig<AuthReportFilters>[] => {
-  const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-
   return [
     {
       id: 'sign-in-processing-time-basic',
@@ -762,7 +746,7 @@ export const createLatencyReportConfig = ({
 
         const sql = buildAuthLatencyAllSQL(interval, filters, startDate, endDate)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-        const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
+        const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
         return {
           data: transformedData.data,
@@ -806,7 +790,7 @@ export const createLatencyReportConfig = ({
 
         const sql = buildAuthLatencyAllSQL(interval, filters, startDate, endDate)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-        const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
+        const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
         return {
           data: transformedData.data,
@@ -850,7 +834,7 @@ export const createLatencyReportConfig = ({
 
         const sql = buildAuthLatencyAllSQL(interval, filters, startDate, endDate)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-        const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
+        const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
         return {
           data: transformedData.data,
@@ -894,7 +878,7 @@ export const createLatencyReportConfig = ({
 
         const sql = buildAuthLatencyAllSQL(interval, filters, startDate, endDate)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-        const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
+        const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
         return {
           data: transformedData.data,
