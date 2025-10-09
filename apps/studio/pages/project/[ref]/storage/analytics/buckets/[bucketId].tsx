@@ -19,6 +19,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
 import { ExternalLink, Eye, EyeOff, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -84,11 +85,6 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
     return connectionData[key as keyof typeof connectionData] || ''
   }
 
-  const handleOpenInVault = () => {
-    // TODO: Implement vault functionality
-    console.log('Open in vault')
-  }
-
   // Component to render a connection detail row
   const renderConnectionRow = (key: string) => {
     const label = LABELS[key]
@@ -127,7 +123,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                 <TooltipTrigger asChild>
                   <Button
                     type="outline"
-                    className="rounded-full px-2 pointer-events-auto"
+                    className="rounded-full px-2 pointer-events-auto bg-alternative"
                     icon={showToken ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
                     onClick={handleToggleToken}
                   />
@@ -143,7 +139,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                   type="default"
                   asyncText={() => handleCopyValue(key)}
                   iconOnly
-                  className="rounded-full px-2 pointer-events-auto"
+                  className="rounded-full px-2 pointer-events-auto bg-alternative"
                 />
               </TooltipTrigger>
               <TooltipContent side="bottom">Copy</TooltipContent>
@@ -154,11 +150,14 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
+                    asChild
                     type="outline"
-                    className="rounded-full px-2 pointer-events-auto"
+                    className="rounded-full px-2 pointer-events-auto bg-alternative"
                     icon={<ExternalLink strokeWidth={2} />}
-                    onClick={handleOpenInVault}
-                  />
+                    aria-label="Open in Vault"
+                  >
+                    <Link href={`/project/${ref}/integrations/vault/secrets?search=${value}`} />
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Open in Vault</TooltipContent>
               </Tooltip>
@@ -267,7 +266,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
               <CardContent className="flex flex-col md:flex-row md:justify-between gap-y-4 gap-x-8 md:items-center">
                 <div className="flex flex-col">
                   <h3>Delete bucket</h3>
-                  <p className="text-sm text-foreground-light">
+                  <p className="text-sm text-foreground-lighter">
                     This will also delete any data in your bucket. Make sure you have a backup if
                     you want to keep your data.
                   </p>
