@@ -33,33 +33,46 @@ import {
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { formatDuration } from './QueryPerformance.utils'
+import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
 }
 
-const calculateTimeConsumedWidth = (data: any[]) => {
-  if (!data || data.length === 0) return 150 // fallback
+interface QueryPerformanceRow {
+  query: string
+  prop_total_time: number
+  total_time: number
+  calls: number
+  max_time: number
+  mean_time: number
+  min_time: number
+  rows_read: number
+  cache_hit_rate: string
+  rolname: string
+  index_advisor_result: GetIndexAdvisorResultResponse | null
+}
 
-  let maxWidth = 150 // minimum width
+const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
+  if (!data || data.length === 0) return 150
+
+  let maxWidth = 150
 
   data.forEach((row) => {
     const percentage = row.prop_total_time || 0
     const totalTime = row.total_time || 0
 
     if (percentage && totalTime) {
-      // Estimate width based on content
       const percentageText = `${percentage.toFixed(1)}%`
       const durationText = formatDuration(totalTime)
       const fullText = `${percentageText} / ${durationText}`
+      const estimatedWidth = fullText.length * 8 + 40
 
-      // Rough estimation: ~8px per character + padding
-      const estimatedWidth = fullText.length * 8 + 40 // 40px for padding/margins
       maxWidth = Math.max(maxWidth, estimatedWidth)
     }
   })
 
-  return Math.min(maxWidth, 300) // cap at reasonable maximum
+  return Math.min(maxWidth, 300)
 }
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
