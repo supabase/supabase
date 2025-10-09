@@ -13,6 +13,7 @@ interface NoDataPlaceholderProps {
   className?: string
   size: Parameters<typeof useChartSize>[0]
   isFullHeight?: boolean
+  titleTooltip?: string
 }
 const NoDataPlaceholder = ({
   attribute,
@@ -22,13 +23,19 @@ const NoDataPlaceholder = ({
   className = '',
   size,
   isFullHeight = false,
+  titleTooltip,
 }: NoDataPlaceholderProps) => {
   const { minHeight } = useChartSize(size)
 
   return (
     <div className={cn(isFullHeight && 'h-full')}>
       {attribute !== undefined && (
-        <ChartHeader title={attribute} format={format} highlightedValue={0} />
+        <ChartHeader
+          title={attribute}
+          format={format}
+          highlightedValue={0}
+          titleTooltip={titleTooltip}
+        />
       )}
       <div
         className={cn(

@@ -10,7 +10,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
-import { components } from 'api-types'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   FreeProjectLimitWarning,
@@ -42,11 +41,11 @@ import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-l
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -58,6 +57,7 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
+  DOCS_URL,
   FLY_REGIONS_DEFAULT,
   MANAGED_BY,
   PROJECT_STATUS,
@@ -214,16 +214,16 @@ const Wizard: NextPageWithLayout = () => {
     },
   })
 
-  const { data: allProjectsFromApi } = useProjectsQuery()
-  const [allProjects, setAllProjects] = useState<
-    components['schemas']['ProjectInfo'][] | undefined
-  >(undefined)
+  const { data: orgProjectsFromApi } = useOrgProjectsInfiniteQuery({ slug: currentOrg?.slug })
+  const allOrgProjects = useMemo(
+    () => orgProjectsFromApi?.pages.flatMap((page) => page.projects),
+    [orgProjectsFromApi?.pages]
+  )
+
+  const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
 
   const organizationProjects =
-    allProjects?.filter(
-      (project) =>
-        project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
-    ) ?? []
+    allProjects?.filter((project) => project.status !== PROJECT_STATUS.INACTIVE) ?? []
 
   const defaultProvider = useDefaultProvider()
 
@@ -339,14 +339,21 @@ const Wizard: NextPageWithLayout = () => {
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
     // current project costs
-    organizationProjects.reduce(
-      (prev, acc) => prev + monthlyInstancePrice(acc.infra_compute_size),
-      0
-    ) +
+    organizationProjects.reduce((prev, acc) => {
+      const primaryDatabase = acc.databases.find((db) => db.identifier === acc.ref)
+      const cost = !!primaryDatabase ? monthlyInstancePrice(primaryDatabase.infra_compute_size) : 0
+      return prev + cost
+    }, 0) +
     // selected compute size
     monthlyInstancePrice(instanceSize) -
     // compute credits
     10
+
+  const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
+
+  const additionalMonthlySpend = isFreePlan
+    ? 0
+    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
 
   // [Refactor] DB Password could be a common component used in multiple pages with repeated logic
   function generatePassword() {
@@ -359,6 +366,7 @@ const Wizard: NextPageWithLayout = () => {
     const launchingLargerInstance =
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
+
     if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
       sendEvent({
         action: 'project_creation_simple_version_confirm_modal_opened',
@@ -436,10 +444,10 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
-    if (allProjectsFromApi && !allProjects) {
-      setAllProjects(allProjectsFromApi.projects)
+    if (allOrgProjects && allOrgProjects.length > 0 && !allProjects) {
+      setAllProjects(allOrgProjects)
     }
-  }, [allProjectsFromApi, allProjects, setAllProjects])
+  }, [allOrgProjects, allProjects, setAllProjects])
 
   useEffect(() => {
     // Handle no org: redirect to new org route
@@ -466,12 +474,6 @@ const Wizard: NextPageWithLayout = () => {
       form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
     }
   }, [regionError])
-
-  const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
-
-  const additionalMonthlySpend = isFreePlan
-    ? 0
-    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
 
   return (
     <Form_Shadcn_ {...form}>
@@ -505,7 +507,7 @@ const Wizard: NextPageWithLayout = () => {
                             <p>
                               Each project includes a dedicated Postgres instance running on its own
                               server. You are charged for the{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
+                              <InlineLink href={`${DOCS_URL}/guides/platform/billing-on-supabase`}>
                                 Compute resource
                               </InlineLink>{' '}
                               of that server, independent of your database usage.
@@ -526,19 +528,24 @@ const Wizard: NextPageWithLayout = () => {
                               </TableRow>
                             </TableHeader>
                             <TableBody className="[&_td]:py-2">
-                              {organizationProjects.map((project) => (
-                                <TableRow key={project.ref} className="text-foreground-light">
-                                  <TableCell className="w-[170px] truncate">
-                                    {project.name}
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    {instanceLabel(project.infra_compute_size)}
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    ${monthlyInstancePrice(project.infra_compute_size)}
-                                  </TableCell>
-                                </TableRow>
-                              ))}
+                              {organizationProjects.map((project) => {
+                                const primaryDb = project.databases.find(
+                                  (db) => db.identifier === project.ref
+                                )
+                                return (
+                                  <TableRow key={project.ref} className="text-foreground-light">
+                                    <TableCell className="w-[170px] truncate">
+                                      {project.name}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                      {instanceLabel(primaryDb?.infra_compute_size)}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                      ${monthlyInstancePrice(primaryDb?.infra_compute_size)}
+                                    </TableCell>
+                                  </TableRow>
+                                )
+                              })}
 
                               <TableRow>
                                 <TableCell className="w-[170px] flex gap-2">
@@ -754,7 +761,7 @@ const Wizard: NextPageWithLayout = () => {
                                     <Link
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                                      href={`${DOCS_URL}/guides/platform/compute-add-ons`}
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute add-ons</p>
@@ -764,7 +771,7 @@ const Wizard: NextPageWithLayout = () => {
                                     <Link
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
+                                      href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute billing</p>
@@ -1029,7 +1036,7 @@ const Wizard: NextPageWithLayout = () => {
               monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
               clicking "I understand", you agree to the additional costs.{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                 target="_blank"
                 className="underline"
               >

@@ -4,7 +4,7 @@ import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn
 
 import { isFeatureEnabled } from 'common'
 import ApiSchema from '~/components/ApiSchema'
-import { REFERENCES } from '~/content/navigation.references'
+import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import {
@@ -43,7 +43,7 @@ async function RefSections({ libraryId, version }: RefSectionsProps) {
     flattenedSections = trimIntro(flattenedSections)
   }
 
-  if (!isFeatureEnabled('sdk:auth')) {
+  if (!isFeatureEnabled('sdk:auth') && clientSdkIds.includes(libraryId)) {
     flattenedSections = flattenedSections?.filter(
       (section) =>
         'product' in section && section.product !== 'auth' && section.product !== 'auth-admin'

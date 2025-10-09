@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import CodeSnippet from '../CodeSnippet'
 import Snippets from '../Snippets'
@@ -179,11 +180,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
               </p>
               <p>
                 View all the available{' '}
-                <a
-                  href="https://supabase.com/docs/guides/auth#providers"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <a href={`${DOCS_URL}/guides/auth#providers`} target="_blank" rel="noreferrer">
                   Third Party OAuth providers
                 </a>
               </p>

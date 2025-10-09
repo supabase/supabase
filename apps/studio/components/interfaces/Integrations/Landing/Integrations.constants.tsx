@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
@@ -177,7 +177,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     navigation: [
       {
@@ -221,7 +221,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     requiredExtensions: [],
     navigation: [
@@ -275,7 +275,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       />
     ),
     description: 'Run GraphQL queries through our interactive in-browser IDE',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     navigation: [
       {

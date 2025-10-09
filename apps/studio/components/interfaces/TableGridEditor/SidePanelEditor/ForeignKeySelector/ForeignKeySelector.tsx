@@ -18,6 +18,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import ActionBar from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -494,7 +495,7 @@ export const ForeignKeySelector = ({
                 label="Action if referenced row is removed"
                 // @ts-ignore
                 labelOptional={
-                  <DocsButton href="https://supabase.com/docs/guides/database/postgres/cascade-deletes" />
+                  <DocsButton href={`${DOCS_URL}/guides/database/postgres/cascade-deletes`} />
                 }
                 descriptionText={
                   <>

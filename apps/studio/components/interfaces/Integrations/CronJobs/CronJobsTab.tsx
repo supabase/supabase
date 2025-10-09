@@ -5,7 +5,7 @@ import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
-import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
+import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
@@ -144,7 +144,7 @@ export const CronjobsTab = () => {
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
-                if (e.code === 'Enter') setSearchQuery(search.trim())
+                if (e.code === 'Enter' || e.code === 'NumpadEnter') setSearchQuery(search.trim())
               }}
               actions={[
                 search && (

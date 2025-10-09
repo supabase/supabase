@@ -24,6 +24,7 @@ import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
@@ -117,13 +118,22 @@ export const S3Connection = () => {
       <ScaffoldSection isFullWidth>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <ScaffoldSectionTitle>S3 Connection</ScaffoldSectionTitle>
+            <ScaffoldSectionTitle>Connection</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
-              Connect to your bucket using any S3-compatible service via the S3 protocol
+              Connect to your bucket using any S3-compatible service via the S3 protocol.
             </ScaffoldSectionDescription>
           </div>
-          <DocsButton href="https://supabase.com/docs/guides/storage/s3/authentication" />
+          <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />
         </div>
+
+        {isErrorStorageConfig && (
+          <AlertError
+            className="mb-4"
+            subject="Failed to retrieve storage configuration"
+            error={configError}
+          />
+        )}
+
         <Form_Shadcn_ {...form}>
           <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
             {projectIsLoading ? (
@@ -152,15 +162,6 @@ export const S3Connection = () => {
                       </FormItemLayout>
                     )}
                   />
-
-                  {isErrorStorageConfig && (
-                    <div className="px-8 pb-8">
-                      <AlertError
-                        subject="Failed to retrieve storage configuration"
-                        error={configError}
-                      />
-                    </div>
-                  )}
                 </CardContent>
 
                 <CardContent className="py-6">
@@ -226,7 +227,7 @@ export const S3Connection = () => {
       <ScaffoldSection isFullWidth>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <ScaffoldSectionTitle>S3 Access Keys</ScaffoldSectionTitle>
+            <ScaffoldSectionTitle>Access keys</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
               Manage your access keys for this project.
             </ScaffoldSectionDescription>
