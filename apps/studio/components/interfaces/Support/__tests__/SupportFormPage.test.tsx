@@ -10,6 +10,7 @@ import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock, mswServer } from 'tests/lib/msw'
 import { createMockProfileContext } from 'tests/lib/profile-helpers'
 import { SupportFormPage } from '../SupportFormPage'
+import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
 
 type Screen = typeof screen
 
@@ -1184,5 +1185,72 @@ describe('SupportFormPage', () => {
       url.revokeObjectURL = originalRevokeObjectURL
       vi.mocked(createSupportStorageClient).mockReset()
     }
+  })
+
+  test('can submit form with no organizations and no projects', async () => {
+    const submitSpy = vi.fn()
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations',
+      response: [],
+    })
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects',
+      response: [],
+    })
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json({ ok: true })
+      },
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getOrganizationSelector(screen)).toHaveTextContent('No specific organization')
+    })
+    await waitFor(() => {
+      expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
+    })
+
+    await selectCategoryOption(screen, 'Dashboard bug')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+
+    await userEvent.type(getSummaryField(screen), 'Cannot access my account')
+    await userEvent.type(getMessageField(screen), 'I need help accessing my Supabase account')
+
+    await userEvent.click(getSubmitButton(screen))
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledTimes(1)
+    })
+
+    const payload = submitSpy.mock.calls[0]?.[0]
+    expect(payload).toMatchObject({
+      subject: 'Cannot access my account',
+      message: 'I need help accessing my Supabase account',
+      category: 'Dashboard_bug',
+      projectRef: NO_PROJECT_MARKER,
+      organizationSlug: NO_ORG_MARKER,
+      library: '',
+      affectedServices: '',
+      allowSupportAccess: false,
+      verified: true,
+      tags: ['dashboard-support-form'],
+      browserInformation: 'Chrome',
+    })
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
+    })
   })
 })

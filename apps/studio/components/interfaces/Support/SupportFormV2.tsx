@@ -76,9 +76,8 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
     const payload = {
       ...values,
-      organizationSlug:
-        values.organizationSlug === NO_ORG_MARKER ? undefined : values.organizationSlug,
-      projectRef: values.projectRef === NO_PROJECT_MARKER ? undefined : values.projectRef,
+      organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
+      projectRef: values.projectRef ?? NO_PROJECT_MARKER,
       allowSupportAccess: SUPPORT_ACCESS_CATEGORIES.includes(values.category)
         ? values.allowSupportAccess
         : false,

@@ -81,25 +81,27 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
               }}
               onSelect={(project) => field.onChange(project.ref)}
-              renderTrigger={({ isLoading, project }) => (
-                <Button
-                  block
-                  type="default"
-                  role="combobox"
-                  aria-label="Select a project"
-                  size="small"
-                  className="justify-between"
-                  iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
-                >
-                  {isLoading ? (
-                    <ShimmeringLoader className="w-44 py-2" />
-                  ) : field.value === NO_PROJECT_MARKER ? (
-                    'No specific project'
-                  ) : (
-                    project?.name ?? 'Unknown project'
-                  )}
-                </Button>
-              )}
+              renderTrigger={({ isLoading, project }) => {
+                return (
+                  <Button
+                    block
+                    type="default"
+                    role="combobox"
+                    aria-label="Select a project"
+                    size="small"
+                    className="justify-between"
+                    iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                  >
+                    {!!orgSlug && isLoading ? (
+                      <ShimmeringLoader className="w-44 py-2" />
+                    ) : !field.value || field.value === NO_PROJECT_MARKER ? (
+                      'No specific project'
+                    ) : (
+                      project?.name ?? 'Unknown project'
+                    )}
+                  </Button>
+                )
+              }}
               renderActions={(setOpen) => (
                 <CommandGroup_Shadcn_>
                   <CommandItem_Shadcn_
