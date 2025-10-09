@@ -15,7 +15,7 @@ const statuses = [
   'Discord support: 95% replied within 8h',
 ]
 
-export function SupportFormDiscordCallout({ interval = 2500 }: DynamicStatusProps) {
+export function SupportFormDiscordCallout({ interval = 4000 }: DynamicStatusProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
