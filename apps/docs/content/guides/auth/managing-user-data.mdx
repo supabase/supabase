@@ -216,7 +216,7 @@ You can then export the results as CSV.
 
 ## Frequently Asked Questions
 
-### How do I disable/remove the user data management triggers on the auth.users table?
+### How to disable/remove the user data management triggers on the auth.users table?
 
 Supabase Auth uses your project's database to store user data. It relies on the `auth` schema, and Supabase restricts access to the `auth` schema to prevent unintended custom changes that could break the functionality of the Auth service.
 
@@ -228,7 +228,7 @@ drop function public.handle_new_user cascade;
 
 This command still works because the `postgres` role has the ownership of `public.handle_new_user()` function, and the `cascade` clause will drop the trigger indirectly.
 
-### I run into **database errors** when creating/updating/deleting users.
+### Running into **database errors** when creating/updating/deleting users.
 
 Errors in your custom user management logic can cause unexpected issues when creating, updating or deleting users. Here are some common examples.
 
@@ -236,7 +236,7 @@ Errors in your custom user management logic can cause unexpected issues when cre
 - Failed to update user: Error updating user
 - Failed to delete user: Database error deleting user
 
-If you encounter a similar error, check your project's auth logs. Expanding the error log will display more details about what caused the issue.
+If you encounter a similar error, check your project's [auth logs](/dashboard/project/_/logs/auth-logs). Expanding the error log will display more details about what caused the issue.
 
 **Example error messages:**
 
