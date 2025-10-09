@@ -972,9 +972,6 @@ importers:
       react-contexify:
         specifier: ^5.0.0
         version: 5.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-copy-to-clipboard:
-        specifier: ^5.1.0
-        version: 5.1.0(react@18.3.1)
       react-data-grid:
         specifier: 7.0.0-beta.41
         version: 7.0.0-beta.41(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1153,9 +1150,6 @@ importers:
       '@types/react-beautiful-dnd':
         specifier: ^13.1.2
         version: 13.1.5
-      '@types/react-copy-to-clipboard':
-        specifier: ^5.0.4
-        version: 5.0.5
       '@types/react-datepicker':
         specifier: ^4.3.4
         version: 4.15.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
