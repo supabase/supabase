@@ -8,13 +8,15 @@ import SolutionsStickyNav from 'components/SolutionsStickyNav'
 import useVibeCodersContent from 'data/solutions/vibe-coders'
 import { Solutions } from 'data/Solutions'
 import Quotes from '~/components/Solutions/Quotes'
+import PostGrid from '~/components/Solutions/PostGrid'
+import { getSortedPosts, type Post } from '~/lib/posts'
 
 const WhySupabase = dynamic(() => import('components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))
 const PlatformStarterSection = dynamic(() => import('components/Solutions/TwoColumnsSection'))
 const MPCSection = dynamic(() => import('components/Solutions/MPCSection'))
 
-const VibeCodersPage: NextPage = () => {
+const VibeCodersPage: NextPage<{ posts: Post[] }> = ({ posts }) => {
   const content = useVibeCodersContent()
 
   return (
@@ -40,9 +42,16 @@ const VibeCodersPage: NextPage = () => {
         <PlatformSection {...content.platform} />
         <PlatformStarterSection {...content.platformStarterSection} />
         <MPCSection {...content.mcp} />
+        <PostGrid posts={posts} {...content.postGrid} />
       </Layout>
     </>
   )
+}
+
+export const getStaticProps = async () => {
+  // TODO: add `vibe-coders` tag to the posts when merging PR
+  const posts = getSortedPosts({ directory: '_blog', limit: 3 })
+  return { props: { posts } }
 }
 
 export default VibeCodersPage
