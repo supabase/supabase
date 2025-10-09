@@ -18,6 +18,7 @@ import {
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import CopyButton from 'components/ui/CopyButton'
 import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
 import { ExternalLink, Eye, EyeOff, Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -56,6 +57,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     owner: 'mock-owner',
+    // TODO: below properties are irrelevant for analytics buckets, consider removing from DeleteBucketModal props
     public: false,
     allowed_mime_types: [],
     file_size_limit: undefined,
@@ -199,12 +201,23 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
           <ScaffoldSection isFullWidth>
             <Admonition
               title="Missing integration"
-              description="The Iceberg Wrapper integration is required to query analytical data."
+              description={
+                <p>
+                  The Iceberg Wrapper integration is required for querying analytical data.{' '}
+                  <InlineLink
+                    href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-foreground-lighter hover:text-foreground transition-colors"
+                  >
+                    Learn more
+                  </InlineLink>
+                </p>
+              }
               type="warning"
             >
-              {/* TODO: Should rightAction be built into Admonition? Like PageLayout */}
               {/* TODO: Update Admonition documentation */}
-              <Button type="default" className="mt-3">
+              <Button type="warning" className="mt-3">
                 Install
               </Button>
             </Admonition>

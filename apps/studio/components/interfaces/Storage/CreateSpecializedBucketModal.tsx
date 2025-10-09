@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
-import { Info, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -26,8 +26,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -42,6 +40,7 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { BUCKET_TYPES } from './Storage.constants'
@@ -231,74 +230,46 @@ export const CreateSpecializedBucketModal = ({
       }
 
       // Determine what needs to be installed
-      const needsWrappersExtension = icebergWrapperExtensionState === 'not-installed'
+      // const needsWrappersExtension = icebergWrapperExtensionState === 'not-installed'
       const needsIcebergWrapper = !isIcebergWrapperInstalled
-      //   const needsWrappersExtension = false // Testing
+      const needsWrappersExtension = false // Testing
       //   const needsIcebergWrapper = true // Testing
 
       if (needsWrappersExtension) {
         // If wrappers extension is missing, show alert for both (since Iceberg Wrapper depends on it)
         return (
-          <Alert_Shadcn_ variant="default">
-            <Info className="text-foreground-light" strokeWidth={1.5} />
-            <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-              <p>
-                The{' '}
-                <InlineLink
-                  href={`/project/${ref}/database/extensions?filter=wrappers`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Wrappers
-                </InlineLink>{' '}
-                extension and{' '}
-                <InlineLink
-                  href={`/project/${ref}/integrations/iceberg_wrapper`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Iceberg Wrapper
-                </InlineLink>{' '}
-                integration are required to query analytical data. Supabase will install these on
-                your behalf.{' '}
-                <InlineLink
-                  href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </InlineLink>
-              </p>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition type="default">
+            <p>
+              The Wrappers extension and Iceberg Wrapper integration are required for querying
+              analytical data. Supabase will install these on your behalf.{' '}
+              <InlineLink
+                href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground-lighter hover:text-foreground transition-colors"
+              >
+                Learn more
+              </InlineLink>
+            </p>
+          </Admonition>
         )
       } else if (needsIcebergWrapper) {
         // Wrappers extension is installed, but Iceberg Wrapper integration is missing
         return (
-          <Alert_Shadcn_ variant="default">
-            <Info className="text-foreground-light" strokeWidth={1.5} />
-            <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-              <p>
-                The{' '}
-                <InlineLink
-                  href={`/project/${ref}/integrations/iceberg_wrapper`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Iceberg Wrapper
-                </InlineLink>{' '}
-                integration is required to query analytical data. Supabase will install it on your
-                behalf.{' '}
-                <InlineLink
-                  href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </InlineLink>
-              </p>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition type="default">
+            <p>
+              The Iceberg Wrapper integration is required for querying analytical data. Supabase
+              will install it on your behalf.{' '}
+              <InlineLink
+                href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground-lighter hover:text-foreground transition-colors"
+              >
+                Learn more
+              </InlineLink>
+            </p>
+          </Admonition>
         )
       }
 
