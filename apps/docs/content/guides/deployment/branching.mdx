@@ -15,7 +15,7 @@ Supabase branches create separate environments that spin off from your main proj
 - **Managing Branches**: You can create, review, and merge branches either automatically via our [GitHub integration](/docs/guides/deployment/branching/github-integration) or directly [through the dashboard](/docs/guides/deployment/branching/dashboard) (currently in beta). All branches show up in the branches page in the dashboard, regardless of how they were created.
 - **Data-less**: New branches do not start with any data from your main project. This is meant to better protect your sensitive production data. To start your branches with data, you can use a [seed file](/docs/guides/deployment/branching/github-integration#seeding) if using the GitHub integration.
 
-## Deploying changes to production
+## Promoting to production
 
 When you merge any branch into your main project, Supabase automatically runs a deployment workflow to deploy your changes to production. The deployment workflow is expressed as a Directed Acyclic Graph where each node represents one of the following deployment steps.
 
@@ -27,4 +27,4 @@ When you merge any branch into your main project, Supabase automatically runs a 
 6. **Seed** - Runs seed files to populate your branch with initial data (must be [enabled in config.toml](/docs/guides/deployment/branching/configuration#branch-configuration-with-remotes) for persistent branches)
 7. **Deploy** - Deploys any changed Edge Functions and updates function secrets
 
-We execute independent steps in parallel and skip children nodes when the parent fails. For e.g., if your database migrations failed at step 5, we will skip step 6 and not seed your branch.
+If a parent node fails, all dependent children nodes will be skipped. For e.g., if your database migrations failed at step 5, we will not seed your branch because step 6 is skipped.
