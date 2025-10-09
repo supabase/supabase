@@ -1,24 +1,22 @@
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 
-import { LogChartHandler } from 'components/ui/Charts/LogChartHandler'
-import { ReportConfig } from 'data/reports/v2/reports.types'
+import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { Button, Card, cn } from 'ui'
 
-export function ReportChartUpsell({
-  report,
-  orgSlug,
-}: {
+interface ReportsChartUpsellProps {
   report: {
     label: string
     availableIn: string[]
   }
   orgSlug: string
-}) {
-  const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
+}
 
+export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) => {
   const startDate = '2025-01-01'
   const endDate = '2025-01-02'
+
+  const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
 
   const getExpDemoChartData = () =>
     new Array(20).fill(0).map((_, index) => ({
@@ -66,7 +64,7 @@ export function ReportChartUpsell({
         </Button>
       </div>
       <div className="absolute top-0 left-0 w-full h-full z-0">
-        <LogChartHandler
+        <LazyComposedChartHandler
           attributes={[
             {
               attribute: 'demo',
@@ -75,10 +73,9 @@ export function ReportChartUpsell({
               provider: 'logs',
             },
           ]}
-          label={''}
+          label="Sample Report"
           startDate={startDate}
           endDate={endDate}
-          interval={'1d'}
           data={demoData as any}
           isLoading={false}
           highlightedValue={0}

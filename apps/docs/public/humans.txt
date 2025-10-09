@@ -19,6 +19,7 @@ Barco Fourie
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
+Brendan Stephens
 Brent Newson
 Carel de Waal
 Cameron Blackwood
@@ -45,6 +46,7 @@ Deji I
 Div Arora
 Divit D
 Douglas Hunley
+Dustin Keib
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
@@ -59,6 +61,7 @@ Greg Kress
 Greg P
 Greg Richardson
 Guilherme Souza
+Hannah Bowers
 Hardik Maheshwari
 Haydn Maley
 Hieu Pham
@@ -101,6 +104,7 @@ Matt Johnston
 Matt Rossman
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Nick Littman
 Nyannyacha
 Oli R
 Pamela Chia
@@ -118,7 +122,9 @@ Riccardo Busetti
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
+Ryan Goulet
 Sam Meech-Ward
+Sam Rome
 Sam Rose
 Sean Oliver
 Sergio Cioban Filho
@@ -126,6 +132,7 @@ Sreyas Udayavarman
 Stanislav M
 Stephen Morgan
 Steve Chavez
+Steven Eubank
 Stojan Dimitrovski
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
@@ -145,6 +152,7 @@ Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova
 Yuri Santana
+Zsolt Pazmandy
 ____________
 
 JOBS

@@ -32,6 +32,7 @@ const AnnouncementBadge = ({
       className={cn(
         `
           announcement-link
+          text-nowrap
           group/announcement
           relative
           flex flex-row

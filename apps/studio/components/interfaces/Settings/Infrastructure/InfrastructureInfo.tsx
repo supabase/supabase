@@ -95,7 +95,7 @@ const InfrastructureInfo = () => {
           <ScaffoldSectionDetail>
             <h4 className="text-base capitalize m-0">Service Versions</h4>
             <p className="text-foreground-light text-sm pr-8 mt-1">
-              Information on your provisioned instance.
+              Service versions and upgrade eligibility for your provisioned instance.
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>

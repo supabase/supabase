@@ -1,9 +1,10 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { Archive } from 'lucide-react'
 
-import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
 import { Bucket } from 'data/storage/buckets-query'
+import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+
+import { Bucket as BucketIcon } from 'icons'
 import {
   Badge,
   Button,
@@ -41,7 +42,7 @@ export const StoragePoliciesBucketRow = ({
     <Card>
       <CardHeader className="flex flex-row w-full items-center justify-between gap-0 space-y-0">
         <div className="flex items-center gap-3">
-          <Archive className="text-foreground-light" size={16} strokeWidth={1.5} />
+          <BucketIcon className="text-foreground-muted" size={16} strokeWidth={1.5} />
           <CardTitle>{label}</CardTitle>
           {bucket?.public && <Badge variant="warning">Public</Badge>}
         </div>

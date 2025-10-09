@@ -1385,6 +1385,1126 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "shortText": "Lists all factors associated to a user."
         }
       },
+      "@supabase/auth-js.GoTrueAdminApi.oauth.createClient": {
+        "name": "@supabase/auth-js.GoTrueAdminApi.oauth.createClient",
+        "params": [
+          {
+            "name": "params",
+            "type": {
+              "name": "CreateOAuthClientParams",
+              "type": "object",
+              "properties": [
+                {
+                  "name": "client_name",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "comment": {
+                    "shortText": "Human-readable name of the OAuth client"
+                  }
+                },
+                {
+                  "name": "client_uri",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "URI of the OAuth client"
+                  }
+                },
+                {
+                  "name": "grant_types",
+                  "type": {
+                    "type": "array",
+                    "elemType": {
+                      "type": "union",
+                      "name": "OAuthClientGrantType",
+                      "subTypes": [
+                        {
+                          "type": "literal",
+                          "value": "authorization_code"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "refresh_token"
+                        }
+                      ]
+                    }
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Array of allowed grant types (optional, defaults to authorization_code and refresh_token)"
+                  }
+                },
+                {
+                  "name": "redirect_uris",
+                  "type": {
+                    "type": "array",
+                    "elemType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  "comment": {
+                    "shortText": "Array of allowed redirect URIs"
+                  }
+                },
+                {
+                  "name": "response_types",
+                  "type": {
+                    "type": "array",
+                    "elemType": {
+                      "type": "literal",
+                      "value": "code",
+                      "name": "OAuthClientResponseType"
+                    }
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Array of allowed response types (optional, defaults to code)"
+                  }
+                },
+                {
+                  "name": "scope",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Scope of the OAuth client"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "name": "OAuthClientResponse",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "name": "T",
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "client_id",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Unique identifier for the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_name",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Human-readable name of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_secret",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Client secret (only returned on registration and regeneration)"
+                            }
+                          },
+                          {
+                            "name": "client_type",
+                            "type": {
+                              "type": "union",
+                              "name": "OAuthClientType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "public"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "confidential"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Type of OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_uri",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "URI of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "created_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Timestamp when the client was created"
+                            }
+                          },
+                          {
+                            "name": "grant_types",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "union",
+                                "name": "OAuthClientGrantType",
+                                "subTypes": [
+                                  {
+                                    "type": "literal",
+                                    "value": "authorization_code"
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "refresh_token"
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed grant types"
+                            }
+                          },
+                          {
+                            "name": "redirect_uris",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed redirect URIs"
+                            }
+                          },
+                          {
+                            "name": "registration_type",
+                            "type": {
+                              "type": "union",
+                              "name": "OAuthClientRegistrationType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "dynamic"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "manual"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Registration type of the client"
+                            }
+                          },
+                          {
+                            "name": "response_types",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "literal",
+                                "value": "code",
+                                "name": "OAuthClientResponseType"
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed response types"
+                            }
+                          },
+                          {
+                            "name": "scope",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Scope of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "token_endpoint_auth_method",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Token endpoint authentication method"
+                            }
+                          },
+                          {
+                            "name": "updated_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Timestamp when the client was last updated"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Creates a new OAuth client.\\nOnly relevant when the OAuth 2.1 server is enabled in Supabase Auth.\\n\\nThis function should only be called on a server. Never expose your \`service_role\` key in the browser."
+        }
+      },
+      "@supabase/auth-js.GoTrueAdminApi.oauth.deleteClient": {
+        "name": "@supabase/auth-js.GoTrueAdminApi.oauth.deleteClient",
+        "params": [
+          {
+            "name": "clientId",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "name": "OAuthClientResponse",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "name": "T",
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "client_id",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Unique identifier for the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_name",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Human-readable name of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_secret",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Client secret (only returned on registration and regeneration)"
+                            }
+                          },
+                          {
+                            "name": "client_type",
+                            "type": {
+                              "type": "union",
+                              "name": "OAuthClientType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "public"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "confidential"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Type of OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_uri",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "URI of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "created_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Timestamp when the client was created"
+                            }
+                          },
+                          {
+                            "name": "grant_types",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "union",
+                                "name": "OAuthClientGrantType",
+                                "subTypes": [
+                                  {
+                                    "type": "literal",
+                                    "value": "authorization_code"
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "refresh_token"
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed grant types"
+                            }
+                          },
+                          {
+                            "name": "redirect_uris",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed redirect URIs"
+                            }
+                          },
+                          {
+                            "name": "registration_type",
+                            "type": {
+                              "type": "union",
+                              "name": "OAuthClientRegistrationType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "dynamic"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "manual"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Registration type of the client"
+                            }
+                          },
+                          {
+                            "name": "response_types",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "literal",
+                                "value": "code",
+                                "name": "OAuthClientResponseType"
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed response types"
+                            }
+                          },
+                          {
+                            "name": "scope",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Scope of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "token_endpoint_auth_method",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Token endpoint authentication method"
+                            }
+                          },
+                          {
+                            "name": "updated_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Timestamp when the client was last updated"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Deletes an OAuth client.\\nOnly relevant when the OAuth 2.1 server is enabled in Supabase Auth.\\n\\nThis function should only be called on a server. Never expose your \`service_role\` key in the browser."
+        }
+      },
+      "@supabase/auth-js.GoTrueAdminApi.oauth.getClient": {
+        "name": "@supabase/auth-js.GoTrueAdminApi.oauth.getClient",
+        "params": [
+          {
+            "name": "clientId",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "name": "OAuthClientResponse",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "name": "T",
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "client_id",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Unique identifier for the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_name",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Human-readable name of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_secret",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Client secret (only returned on registration and regeneration)"
+                            }
+                          },
+                          {
+                            "name": "client_type",
+                            "type": {
+                              "type": "union",
+                              "name": "OAuthClientType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "public"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "confidential"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Type of OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_uri",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "URI of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "created_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Timestamp when the client was created"
+                            }
+                          },
+                          {
+                            "name": "grant_types",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "union",
+                                "name": "OAuthClientGrantType",
+                                "subTypes": [
+                                  {
+                                    "type": "literal",
+                                    "value": "authorization_code"
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "refresh_token"
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed grant types"
+                            }
+                          },
+                          {
+                            "name": "redirect_uris",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed redirect URIs"
+                            }
+                          },
+                          {
+                            "name": "registration_type",
+                            "type": {
+                              "type": "union",
+                              "name": "OAuthClientRegistrationType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "dynamic"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "manual"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Registration type of the client"
+                            }
+                          },
+                          {
+                            "name": "response_types",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "literal",
+                                "value": "code",
+                                "name": "OAuthClientResponseType"
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed response types"
+                            }
+                          },
+                          {
+                            "name": "scope",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Scope of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "token_endpoint_auth_method",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Token endpoint authentication method"
+                            }
+                          },
+                          {
+                            "name": "updated_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Timestamp when the client was last updated"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Gets details of a specific OAuth client.\\nOnly relevant when the OAuth 2.1 server is enabled in Supabase Auth.\\n\\nThis function should only be called on a server. Never expose your \`service_role\` key in the browser."
+        }
+      },
+      "@supabase/auth-js.GoTrueAdminApi.oauth.listClients": {
+        "name": "@supabase/auth-js.GoTrueAdminApi.oauth.listClients",
+        "params": [
+          {
+            "name": "params",
+            "type": {
+              "name": "PageParams",
+              "type": "object",
+              "properties": [
+                {
+                  "name": "page",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "number"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The page number"
+                  }
+                },
+                {
+                  "name": "perPage",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "number"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Number of items returned per page"
+                  }
+                }
+              ]
+            },
+            "isOptional": true
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "name": "OAuthClientListResponse",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data"
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "clients"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "AuthError"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Lists all OAuth clients with optional pagination.\\nOnly relevant when the OAuth 2.1 server is enabled in Supabase Auth.\\n\\nThis function should only be called on a server. Never expose your \`service_role\` key in the browser."
+        }
+      },
+      "@supabase/auth-js.GoTrueAdminApi.oauth.regenerateClientSecret": {
+        "name": "@supabase/auth-js.GoTrueAdminApi.oauth.regenerateClientSecret",
+        "params": [
+          {
+            "name": "clientId",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "name": "OAuthClientResponse",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "name": "T",
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "client_id",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Unique identifier for the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_name",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Human-readable name of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_secret",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Client secret (only returned on registration and regeneration)"
+                            }
+                          },
+                          {
+                            "name": "client_type",
+                            "type": {
+                              "type": "union",
+                              "name": "OAuthClientType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "public"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "confidential"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Type of OAuth client"
+                            }
+                          },
+                          {
+                            "name": "client_uri",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "URI of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "created_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Timestamp when the client was created"
+                            }
+                          },
+                          {
+                            "name": "grant_types",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "union",
+                                "name": "OAuthClientGrantType",
+                                "subTypes": [
+                                  {
+                                    "type": "literal",
+                                    "value": "authorization_code"
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "refresh_token"
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed grant types"
+                            }
+                          },
+                          {
+                            "name": "redirect_uris",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed redirect URIs"
+                            }
+                          },
+                          {
+                            "name": "registration_type",
+                            "type": {
+                              "type": "union",
+                              "name": "OAuthClientRegistrationType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "dynamic"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "manual"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Registration type of the client"
+                            }
+                          },
+                          {
+                            "name": "response_types",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "literal",
+                                "value": "code",
+                                "name": "OAuthClientResponseType"
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of allowed response types"
+                            }
+                          },
+                          {
+                            "name": "scope",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Scope of the OAuth client"
+                            }
+                          },
+                          {
+                            "name": "token_endpoint_auth_method",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Token endpoint authentication method"
+                            }
+                          },
+                          {
+                            "name": "updated_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "comment": {
+                              "shortText": "Timestamp when the client was last updated"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Regenerates the secret for an OAuth client.\\nOnly relevant when the OAuth 2.1 server is enabled in Supabase Auth.\\n\\nThis function should only be called on a server. Never expose your \`service_role\` key in the browser."
+        }
+      },
       "@supabase/auth-js.GoTrueAdminApi.createUser": {
         "name": "@supabase/auth-js.GoTrueAdminApi.createUser",
         "params": [
@@ -33605,6 +34725,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 }
               ]
             },
+            "isOptional": true,
             "comment": {
               "shortText": "Named parameters"
             }
@@ -34837,6 +35958,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                               "isOptional": true
                             },
                             {
+                              "name": "replay",
+                              "type": {
+                                "type": "nameOnly",
+                                "name": "ReplayOption"
+                              },
+                              "isOptional": true
+                            },
+                            {
                               "name": "self",
                               "type": {
                                 "type": "intrinsic",
@@ -34848,7 +35977,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         },
                         "isOptional": true,
                         "comment": {
-                          "shortText": "self option enables client to receive message it broadcast\\nack option instructs server to acknowledge that broadcast message was received"
+                          "shortText": "self option enables client to receive message it broadcast\\nack option instructs server to acknowledge that broadcast message was received\\nreplay option instructs server to replay broadcast messages"
                         }
                       },
                       {
@@ -35570,6 +36699,30 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             }
                           },
                           {
+                            "name": "meta",
+                            "type": {
+                              "type": "object",
+                              "properties": [
+                                {
+                                  "name": "id",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "replayed",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                }
+                              ]
+                            },
+                            "isOptional": true
+                          },
+                          {
                             "name": "type",
                             "type": {
                               "type": "literal",
@@ -35642,6 +36795,30 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                               "type": "intrinsic",
                               "name": "string"
                             }
+                          },
+                          {
+                            "name": "meta",
+                            "type": {
+                              "type": "object",
+                              "properties": [
+                                {
+                                  "name": "id",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "replayed",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                }
+                              ]
+                            },
+                            "isOptional": true
                           },
                           {
                             "name": "payload",
@@ -36323,6 +37500,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                               "isOptional": true
                             },
                             {
+                              "name": "replay",
+                              "type": {
+                                "type": "nameOnly",
+                                "name": "ReplayOption"
+                              },
+                              "isOptional": true
+                            },
+                            {
                               "name": "self",
                               "type": {
                                 "type": "intrinsic",
@@ -36334,7 +37519,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         },
                         "isOptional": true,
                         "comment": {
-                          "shortText": "self option enables client to receive message it broadcast\\nack option instructs server to acknowledge that broadcast message was received"
+                          "shortText": "self option enables client to receive message it broadcast\\nack option instructs server to acknowledge that broadcast message was received\\nreplay option instructs server to replay broadcast messages"
                         }
                       },
                       {
@@ -40495,7 +41680,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "type": "intrinsic",
                     "name": "string"
                   },
-                  "isOptional": true
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The cursor used for pagination. Pass the value received from nextCursor of the previous request."
+                  }
                 },
                 {
                   "name": "limit",
@@ -40503,7 +41691,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "type": "intrinsic",
                     "name": "number"
                   },
-                  "isOptional": true
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The number of files you want to be returned."
+                  }
                 },
                 {
                   "name": "prefix",
@@ -40511,7 +41702,60 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "type": "intrinsic",
                     "name": "string"
                   },
-                  "isOptional": true
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The prefix search string to filter files by."
+                  }
+                },
+                {
+                  "name": "sortBy",
+                  "type": {
+                    "type": "object",
+                    "name": "SortByV2",
+                    "properties": [
+                      {
+                        "name": "column",
+                        "type": {
+                          "type": "union",
+                          "subTypes": [
+                            {
+                              "type": "literal",
+                              "value": "name"
+                            },
+                            {
+                              "type": "literal",
+                              "value": "updated_at"
+                            },
+                            {
+                              "type": "literal",
+                              "value": "created_at"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "order",
+                        "type": {
+                          "type": "union",
+                          "subTypes": [
+                            {
+                              "type": "literal",
+                              "value": "desc"
+                            },
+                            {
+                              "type": "literal",
+                              "value": "asc"
+                            }
+                          ]
+                        },
+                        "isOptional": true
+                      }
+                    ]
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The column and order to sort by"
+                  }
                 },
                 {
                   "name": "with_delimiter",
@@ -40519,7 +41763,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "type": "intrinsic",
                     "name": "boolean"
                   },
-                  "isOptional": true
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Whether to emulate a hierarchical listing of objects using delimiters.\\n\\n- When \`false\` (default), all objects are listed as flat key/value pairs.\\n- When \`true\`, the response groups objects by delimiter, making it appear\\n  like a file/folder hierarchy."
+                  }
                 }
               ]
             },
@@ -40590,6 +41837,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                               "type": "intrinsic",
                               "name": "boolean"
                             }
+                          },
+                          {
+                            "name": "nextCursor",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true
                           },
                           {
                             "name": "objects",

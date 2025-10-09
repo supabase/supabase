@@ -1,0 +1,1806 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "Supabase UI Library",
+  "homepage": "https://supabase.com/ui",
+  "items": [
+    {
+      "name": "password-based-auth-nextjs",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for Nextjs and Supabase",
+      "description": "Password Based Auth flow for Nextjs and Supabase",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/login/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/error/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/error/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/protected/page.tsx",
+          "type": "registry:page",
+          "target": "app/protected/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/confirm/route.ts",
+          "type": "registry:page",
+          "target": "app/auth/confirm/route.ts"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/components/login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/middleware.ts",
+          "type": "registry:file",
+          "target": "middleware.ts"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/sign-up/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up-success/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/sign-up-success/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/components/sign-up-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/forgot-password/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/forgot-password/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/update-password/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/update-password/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/components/forgot-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/components/update-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/components/logout-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "password-based-auth-react",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for React and Supabase",
+      "description": "Password Based Auth flow for React and Supabase",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/password-based-auth-react/components/login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react/components/sign-up-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react/components/forgot-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react/components/update-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "password-based-auth-react-router",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for React Router and Supabase",
+      "description": "Password Based Auth flow for React Router and Supabase",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@react-router/dev@latest",
+        "@react-router/fs-routes@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/auth.confirm.tsx",
+          "type": "registry:file",
+          "target": "app/routes/auth.confirm.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/auth.error.tsx",
+          "type": "registry:file",
+          "target": "app/routes/auth.error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx",
+          "type": "registry:file",
+          "target": "app/routes/forgot-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/login.tsx",
+          "type": "registry:file",
+          "target": "app/routes/login.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/logout.tsx",
+          "type": "registry:file",
+          "target": "app/routes/logout.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/protected.tsx",
+          "type": "registry:file",
+          "target": "app/routes/protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx",
+          "type": "registry:file",
+          "target": "app/routes/sign-up.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx",
+          "type": "registry:file",
+          "target": "app/routes/update-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes.ts",
+          "type": "registry:file",
+          "target": "app/routes.ts"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "password-based-auth-tanstack",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for tanstack and Supabase",
+      "description": "Password Based Auth flow for tanstack and Supabase",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/login.tsx",
+          "type": "registry:file",
+          "target": "routes/login.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/error.tsx",
+          "type": "registry:file",
+          "target": "routes/auth/error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected/protected.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected/protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts",
+          "type": "registry:file",
+          "target": "routes/auth/confirm.ts"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/sign-up.tsx",
+          "type": "registry:file",
+          "target": "routes/sign-up.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/sign-up-success.tsx",
+          "type": "registry:file",
+          "target": "routes/sign-up-success.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/sign-up-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/forgot-password.tsx",
+          "type": "registry:file",
+          "target": "routes/forgot-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/update-password.tsx",
+          "type": "registry:file",
+          "target": "routes/update-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/update-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "social-auth-nextjs",
+      "type": "registry:block",
+      "title": "Social Auth flow for Nextjs and Supabase",
+      "description": "Social Auth flow for Nextjs and Supabase",
+      "registryDependencies": [
+        "button",
+        "card"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/social-auth-nextjs/app/auth/login/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/login/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-nextjs/app/auth/error/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/error/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-nextjs/app/protected/page.tsx",
+          "type": "registry:page",
+          "target": "app/protected/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-nextjs/app/auth/oauth/route.ts",
+          "type": "registry:page",
+          "target": "app/auth/oauth/route.ts"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-nextjs/components/login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-nextjs/middleware.ts",
+          "type": "registry:file",
+          "target": "middleware.ts"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-nextjs/components/logout-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "social-auth-react",
+      "type": "registry:block",
+      "title": "Social Auth flow for React and Supabase",
+      "description": "Social Auth flow for React and Supabase",
+      "registryDependencies": [
+        "button",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/social-auth-react/components/login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "social-auth-react-router",
+      "type": "registry:block",
+      "title": "Social Auth flow for React Router and Supabase",
+      "description": "Social Auth flow for React Router and Supabase",
+      "registryDependencies": [
+        "button",
+        "card"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@react-router/dev@latest",
+        "@react-router/fs-routes@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/social-auth-react-router/app/routes/auth.error.tsx",
+          "type": "registry:file",
+          "target": "app/routes/auth.error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-react-router/app/routes/auth.oauth.tsx",
+          "type": "registry:file",
+          "target": "app/routes/auth.oauth.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-react-router/app/routes/login.tsx",
+          "type": "registry:file",
+          "target": "app/routes/login.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-react-router/app/routes/logout.tsx",
+          "type": "registry:file",
+          "target": "app/routes/logout.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-react-router/app/routes/protected.tsx",
+          "type": "registry:file",
+          "target": "app/routes/protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-react-router/app/routes.ts",
+          "type": "registry:file",
+          "target": "app/routes.ts"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "name": "social-auth-tanstack",
+      "type": "registry:block",
+      "title": "Social Auth flow for TanStack and Supabase",
+      "description": "Social Auth flow for TanStack and Supabase",
+      "registryDependencies": [
+        "button",
+        "card"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/social-auth-tanstack/components/login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-tanstack/routes/_protected.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-tanstack/routes/_protected/protected.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected/protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-tanstack/routes/auth/error.tsx",
+          "type": "registry:file",
+          "target": "routes/auth/error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-tanstack/routes/auth/oauth.ts",
+          "type": "registry:file",
+          "target": "routes/auth/oauth.ts"
+        },
+        {
+          "path": "registry/default/blocks/social-auth-tanstack/routes/login.tsx",
+          "type": "registry:file",
+          "target": "routes/login.tsx"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "dropzone-nextjs",
+      "type": "registry:component",
+      "title": "Dropzone (File Upload)",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/dropzone/hooks/use-supabase-upload.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "dropzone-react",
+      "type": "registry:component",
+      "title": "Dropzone (File Upload)",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/dropzone/hooks/use-supabase-upload.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "dropzone-react-router",
+      "type": "registry:component",
+      "title": "Dropzone (File Upload)",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/dropzone/hooks/use-supabase-upload.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "dropzone-tanstack",
+      "type": "registry:component",
+      "title": "Dropzone (File Upload)",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/dropzone/hooks/use-supabase-upload.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-cursor-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Cursor",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": [
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-cursor-react",
+      "type": "registry:component",
+      "title": "Realtime Cursor",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": [
+        "lucide-react",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-cursor-react-router",
+      "type": "registry:component",
+      "title": "Realtime Cursor",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": [
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-cursor-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Cursor",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": [
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-nextjs",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-react",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-react-router",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-tanstack",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-nextjs",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-react",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-react-router",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-tanstack",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [
+        "input",
+        "button"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-react",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [
+        "input",
+        "button"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-react-router",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [
+        "input",
+        "button"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [
+        "input",
+        "button"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "infinite-query-hook",
+      "type": "registry:block",
+      "title": "Infinite Query Hook",
+      "description": "React hook for infinite lists, fetching data from Supabase.",
+      "dependencies": [
+        "@supabase/supabase-js",
+        "@supabase/postgrest-js@*"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/default/blocks/infinite-query-hook/hooks/use-infinite-query.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "supabase-client-nextjs",
+      "type": "registry:lib",
+      "title": "Supabase Client for Next.js",
+      "description": "",
+      "registryDependencies": [],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "supabase-client-react",
+      "type": "registry:lib",
+      "title": "Supabase Client for React",
+      "description": "",
+      "registryDependencies": [],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "supabase-client-react-router",
+      "type": "registry:lib",
+      "title": "Supabase Client for React Router",
+      "description": "",
+      "registryDependencies": [],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "supabase-client-tanstack",
+      "type": "registry:lib",
+      "title": "Supabase Client for TanStack Start",
+      "description": "",
+      "registryDependencies": [],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "platform-kit-nextjs",
+      "type": "registry:block",
+      "title": "Platform Kit for Nextjs and Supabase",
+      "description": "Platform Kit for Nextjs and Supabase",
+      "registryDependencies": [
+        "alert",
+        "badge",
+        "button",
+        "card",
+        "chart",
+        "command",
+        "dialog",
+        "drawer",
+        "form",
+        "hover-card",
+        "input",
+        "label",
+        "popover",
+        "select",
+        "skeleton",
+        "switch",
+        "table",
+        "toggle",
+        "toggle-group",
+        "tooltip"
+      ],
+      "dependencies": [
+        "@hookform/resolvers",
+        "@monaco-editor/react",
+        "@tanstack/react-query",
+        "@tanstack/react-table",
+        "axios",
+        "cmdk",
+        "common-tags",
+        "openai",
+        "openapi-fetch",
+        "react-hook-form",
+        "react-markdown",
+        "recharts",
+        "sonner"
+      ],
+      "files": [
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/app/api/ai/sql/route.ts",
+          "type": "registry:page",
+          "target": "app/api/ai/sql/route.ts"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/app/api/supabase-proxy/[...path]/route.ts",
+          "type": "registry:page",
+          "target": "app/api/supabase-proxy/[...path]/route.ts"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/dynamic-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/logo-supabase.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/results-table.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/sql-editor.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/auth.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/database.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/index.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/logs.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/secrets.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/storage.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/suggestions.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/users.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/components/users-growth-chart.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/hooks/use-auth.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/hooks/use-logs.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/hooks/use-run-query.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/hooks/use-secrets.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/hooks/use-storage.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/hooks/use-suggestions.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/hooks/use-tables.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/hooks/use-user-counts.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/lib/logs.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/lib/management-api-schema.d.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/lib/management-api.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/sql.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/index.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/types.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/lib/schemas/auth.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/lib/schemas/secrets.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext.tsx",
+          "type": "registry:component",
+          "target": "contexts/SheetNavigationContext.tsx"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "supabase-client-nuxtjs",
+      "type": "registry:lib",
+      "title": "Supabase Client for Nuxt.js",
+      "description": "",
+      "registryDependencies": [],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NUXT_PUBLIC_SUPABASE_URL": "",
+        "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/default/clients/nuxtjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nuxtjs/server/middleware/is-authenticated.ts",
+          "type": "registry:file",
+          "target": "server/middleware/is-authenticated.ts"
+        },
+        {
+          "path": "registry/default/clients/nuxtjs/server/api/profile.get.ts",
+          "type": "registry:file",
+          "target": "server/api/profile.get.ts"
+        },
+        {
+          "path": "registry/default/clients/nuxtjs/server/supabase/client.ts",
+          "type": "registry:file",
+          "target": "server/supabase/client.ts"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "supabase-client-vue",
+      "type": "registry:lib",
+      "title": "Supabase Client for Vue",
+      "description": "",
+      "registryDependencies": [],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/default/clients/vue/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ai-editor-rules",
+      "type": "registry:file",
+      "title": "Prompt rules for AI Editors",
+      "description": "Prompts for working with Supabase using AI-powered IDE tools",
+      "registryDependencies": [],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "registry/default/ai-editor-rules/create-db-functions.mdc",
+          "type": "registry:file",
+          "target": "~/.cursor/rules/create-db-functions.mdc"
+        },
+        {
+          "path": "registry/default/ai-editor-rules/create-migration.mdc",
+          "type": "registry:file",
+          "target": "~/.cursor/rules/create-migration.mdc"
+        },
+        {
+          "path": "registry/default/ai-editor-rules/create-rls-policies.mdc",
+          "type": "registry:file",
+          "target": "~/.cursor/rules/create-rls-policies.mdc"
+        },
+        {
+          "path": "registry/default/ai-editor-rules/postgres-sql-style-guide.mdc",
+          "type": "registry:file",
+          "target": "~/.cursor/rules/postgres-sql-style-guide.mdc"
+        },
+        {
+          "path": "registry/default/ai-editor-rules/writing-supabase-edge-functions.mdc",
+          "type": "registry:file",
+          "target": "~/.cursor/rules/writing-supabase-edge-functions.mdc"
+        },
+        {
+          "path": "registry/default/ai-editor-rules/use-realtime.mdc",
+          "type": "registry:file",
+          "target": "~/.cursor/rules/use-realtime.mdc"
+        }
+      ]
+    }
+  ]
+}

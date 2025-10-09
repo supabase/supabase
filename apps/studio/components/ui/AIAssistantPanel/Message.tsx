@@ -10,8 +10,12 @@ import { MessageDisplay } from './Message.Display'
 import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 
 function AssistantMessage({ message }: { message: VercelMessage }) {
-  const { variant, state } = useMessageInfoContext()
-  const { onCancelEdit } = useMessageActionsContext()
+  const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
+  const { onCancelEdit, onRate } = useMessageActionsContext()
+
+  const handleRate = (newRating: 'positive' | 'negative', reason?: string) => {
+    onRate?.(id, newRating, reason)
+  }
 
   return (
     <MessageDisplay.Container
@@ -24,6 +28,20 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
       <MessageDisplay.MainArea>
         <MessageDisplay.Content message={message} />
       </MessageDisplay.MainArea>
+      {!readOnly && isLastMessage && onRate && !isLoading && (
+        <MessageActions alwaysShow>
+          <MessageActions.ThumbsUp
+            onClick={() => handleRate('positive')}
+            isActive={rating === 'positive'}
+            disabled={!!rating}
+          />
+          <MessageActions.ThumbsDown
+            onClick={(reason) => handleRate('negative', reason)}
+            isActive={rating === 'negative'}
+            disabled={!!rating}
+          />
+        </MessageActions>
+      )}
     </MessageDisplay.Container>
   )
 }
@@ -81,6 +99,8 @@ interface MessageProps {
   isBeingEdited: boolean
   onCancelEdit: () => void
   isLastMessage?: boolean
+  onRate?: (id: string, rating: 'positive' | 'negative', reason?: string) => void
+  rating?: 'positive' | 'negative' | null
 }
 
 export function Message(props: MessageProps) {
@@ -99,6 +119,7 @@ export function Message(props: MessageProps) {
         ? 'predecessor-editing'
         : 'idle',
     isLastMessage: props.isLastMessage,
+    rating: props.rating,
   } satisfies MessageInfo
 
   const messageActions = {
@@ -106,6 +127,7 @@ export function Message(props: MessageProps) {
     onDelete: props.onDelete,
     onEdit: props.onEdit,
     onCancelEdit: props.onCancelEdit,
+    onRate: props.onRate,
   }
 
   return (

@@ -67,6 +67,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       icon: 'getting-started',
       href: '/guides/getting-started',
       level: 'gettingstarted',
+      enabled: frameworkQuickstartsEnabled,
     },
   ],
   [
@@ -1390,7 +1391,13 @@ export const queues: NavMenuConstant = {
     {
       name: 'Getting Started',
       url: undefined,
-      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+      items: [
+        { name: 'Quickstart', url: '/guides/queues/quickstart' },
+        {
+          name: 'Consuming Messages with Edge Functions',
+          url: '/guides/queues/consuming-messages-with-edge-functions',
+        },
+      ],
     },
     {
       name: 'References',
