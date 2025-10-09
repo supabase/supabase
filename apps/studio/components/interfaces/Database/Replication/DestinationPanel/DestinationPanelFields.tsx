@@ -130,7 +130,7 @@ export const AnalyticsBucketFields = ({
   const keyNoLongerExists =
     (s3AccessKeyId ?? '').length > 0 &&
     s3AccessKeyId !== CREATE_NEW_KEY &&
-    !s3Keys.find((k) => k.id === s3AccessKeyId)
+    !s3Keys.find((k) => k.access_key === s3AccessKeyId)
 
   const {
     data: buckets = [],
@@ -380,8 +380,8 @@ export const AnalyticsBucketFields = ({
                   <SelectContent_Shadcn_>
                     <SelectGroup_Shadcn_>
                       {s3Keys.map((key) => (
-                        <SelectItem_Shadcn_ key={key.id} value={key.id}>
-                          {key.id}
+                        <SelectItem_Shadcn_ key={key.id} value={key.access_key}>
+                          {key.access_key}
                           <p className="text-foreground-lighter">{key.description}</p>
                         </SelectItem_Shadcn_>
                       ))}
