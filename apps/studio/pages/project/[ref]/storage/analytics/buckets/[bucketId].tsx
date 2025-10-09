@@ -5,6 +5,7 @@ import {
   OPTION_ORDER,
 } from 'components/interfaces/Storage/AnalyticBucketDetails/constants'
 import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
+import { NewTableModal } from 'components/interfaces/Storage/NewTableModal'
 import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -48,6 +49,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
   const { bucketId, ref } = useParams()
   const [showToken, setShowToken] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showNewTableModal, setShowNewTableModal] = useState(false)
 
   // Temporary mock data
   const mockBucket = {
@@ -229,7 +231,12 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                   Analytics tables connected to this bucket.
                 </ScaffoldSectionDescription>
               </div>
-              <Button type="primary" size="tiny" icon={<Plus size={14} />}>
+              <Button
+                type="primary"
+                size="tiny"
+                icon={<Plus size={14} />}
+                onClick={() => setShowNewTableModal(true)}
+              >
                 New table
               </Button>
             </ScaffoldHeader>
@@ -241,7 +248,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                     <TableHead className="text-foreground-muted">Name</TableHead>
                     <TableHead className="text-foreground-muted">Schema</TableHead>
                     <TableHead className="text-foreground-muted">Created at</TableHead>
-                    <TableHead />
+                    {/* <TableHead /> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -252,7 +259,8 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                         Create an analytics table to get started
                       </p>
                     </TableCell>
-                    <TableCell />
+                    {/* <TableCell /> */}
+                    {/* <TableCell /> */}
                   </TableRow>
                 </TableBody>
               </Table>
@@ -313,6 +321,8 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
         bucket={mockBucket}
         onClose={() => setShowDeleteModal(false)}
       />
+
+      <NewTableModal visible={showNewTableModal} onClose={() => setShowNewTableModal(false)} />
     </>
   )
 }
