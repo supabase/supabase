@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 
+import { copyToClipboard } from '../../lib/utils'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button/Button'
 import { monokaiCustomTheme } from './CodeBlock.utils'
@@ -27,7 +28,6 @@ import {
 } from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
-import { copyToClipboard } from '../../lib/utils'
 
 export type CodeBlockLang =
   | 'js'
