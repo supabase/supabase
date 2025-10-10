@@ -35,6 +35,8 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           setIsConnected(true)
+        } else {
+          setIsConnected(false)
         }
       })
 
