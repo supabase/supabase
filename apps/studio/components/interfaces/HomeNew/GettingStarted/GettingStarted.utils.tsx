@@ -236,7 +236,6 @@ export const getNoCodeWorkflowSteps = ({
     hasTables,
     hasSampleData,
     hasRlsPolicies,
-    hasConfiguredAuth,
     hasAppConnected,
     hasFirstUser,
     hasStorageObjects,
