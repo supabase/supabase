@@ -1,4 +1,4 @@
-import { Check, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
 
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -14,6 +14,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  TooltipContent,
+  TooltipTrigger,
+  Tooltip,
 } from 'ui'
 
 interface ModelSelectorProps {
@@ -80,7 +83,18 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                     <Check className="h-3.5 w-3.5" />
                   ) : null
                 ) : (
-                  <Badge variant="warning">Upgrade</Badge>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <Badge role="button" variant="warning">
+                          Upgrade
+                        </Badge>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      gpt-5 is available on Pro plans and above
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
