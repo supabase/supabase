@@ -10,22 +10,27 @@ import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@d
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { SnippetDropdown } from 'components/interfaces/HomeNew/SnippetDropdown'
 import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
+import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import type { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import { Content } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { Dashboards } from 'types'
@@ -39,6 +44,7 @@ export function CustomReportSection() {
   const { profile } = useProfile()
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
@@ -147,7 +153,7 @@ export function CustomReportSection() {
     []
   )
 
-  const addSnippetToReport = (snippet: { id: string; name: string }) => {
+  const addSnippetToReport = useCallback((snippet: { id: string; name: string }) => {
     if (
       editableReport?.layout?.some(
         (x) =>
@@ -221,7 +227,18 @@ export function CustomReportSection() {
         },
       })
     }
-  }
+  }, [
+    editableReport,
+    homeReport,
+    ref,
+    profile,
+    upsertContent,
+    organization,
+    sendEvent,
+    findNextPlacement,
+    createSnippetChartBlock,
+    persistReport,
+  ])
 
   const handleRemoveChart = ({ metric }: { metric: { key: string } }) => {
     if (!editableReport) return
@@ -269,6 +286,52 @@ export function CustomReportSection() {
     persistReport(updated)
   }
 
+  const handleDrop = useCallback(
+    async (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      if (!ref || !profile || !project) return
+
+      const data = e.dataTransfer.getData('application/json')
+      if (!data) return
+
+      const { label, sql, config } = JSON.parse(data)
+      if (!label || !sql) return
+
+      const toastId = toast.loading(`Creating new query: ${label}`)
+      const id = uuidv4()
+
+      const payload = createSqlSnippetSkeletonV2({
+        id,
+        name: label,
+        sql,
+        owner_id: profile.id,
+        project_id: project.id,
+      }) as UpsertContentPayload
+
+      upsertContent(
+        { projectRef: ref, payload },
+        {
+          onSuccess: () => {
+            toast.success(`Successfully created new query: ${label}`, { id: toastId })
+            addSnippetToReport({ id, name: label })
+            sendEvent({
+              action: 'custom_report_assistant_sql_block_added',
+              groups: { project: ref, organization: organization?.slug ?? 'Unknown' },
+            })
+          },
+          onError: () => {
+            toast.error(`Failed to create query: ${label}`, { id: toastId })
+          },
+        }
+      )
+    },
+    [ref, profile, project, upsertContent, addSnippetToReport, sendEvent, organization]
+  )
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+  }
+
   const layout = useMemo(() => editableReport?.layout ?? [], [editableReport])
 
   useEffect(() => {
@@ -296,7 +359,11 @@ export function CustomReportSection() {
       </div>
       <div className="relative">
         {layout.length === 0 ? (
-          <div className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 border-default">
+          <div
+            className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 border-default"
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
             <h4>Build a custom report</h4>
             <p className="text-sm text-foreground-light mb-4">
               Keep track of your most important metrics
@@ -329,7 +396,7 @@ export function CustomReportSection() {
               items={(editableReport?.layout ?? []).map((x) => String(x.id))}
               strategy={rectSortingStrategy}
             >
-              <Row columns={[3, 2, 1]}>
+              <Row columns={[3, 2, 1]} onDrop={handleDrop} onDragOver={handleDragOver}>
                 {layout.map((item) => (
                   <SortableReportBlock key={item.id} id={String(item.id)}>
                     <div className="h-64">
