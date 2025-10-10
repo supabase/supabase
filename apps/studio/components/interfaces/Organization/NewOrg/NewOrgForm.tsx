@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import _ from 'lodash'
@@ -6,10 +7,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { loadStripe } from '@stripe/stripe-js'
-import { Form_Shadcn_ } from 'ui'
+import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
@@ -79,7 +82,7 @@ const formSchema = z.object({
     .string()
     .transform((val) => val.toUpperCase())
     .pipe(z.enum(plans)),
-  name: z.string().min(1),
+  name: z.string().min(1, 'Organization name is required'),
   kind: z
     .string()
     .transform((val) => val.toUpperCase())
@@ -141,45 +144,45 @@ export const NewOrgForm = ({
     [setupIntent, resolvedTheme]
   )
 
-  const [formState, setFormState] = useState<FormState>({
-    plan: 'FREE',
-    name: '',
-    kind: ORG_KIND_DEFAULT,
-    size: ORG_SIZE_DEFAULT,
-    spend_cap: true,
-  })
-
   const [searchParams] = useQueryStates({
     returnTo: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
   })
 
-  const updateForm = (key: keyof FormState, value: unknown) => {
-    setFormState((prev) => ({ ...prev, [key]: value }))
-  }
+  const form = useForm<FormState>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      plan: 'FREE',
+      name: '',
+      kind: ORG_KIND_DEFAULT,
+      size: ORG_SIZE_DEFAULT,
+      spend_cap: true,
+    },
+  })
 
   useEffect(() => {
     if (!router.isReady) return
 
     const { name, kind, plan, size, spend_cap } = router.query
 
-    if (typeof name === 'string') updateForm('name', name)
-    if (typeof kind === 'string') updateForm('kind', kind)
+    if (typeof name === 'string') form.setValue('name', name)
+    if (typeof kind === 'string') form.setValue('kind', kind)
     if (typeof plan === 'string' && plans.includes(plan.toUpperCase() as (typeof plans)[number])) {
       const uppercasedPlan = plan.toUpperCase() as (typeof plans)[number]
-      updateForm('plan', uppercasedPlan)
+      form.setValue('plan', uppercasedPlan)
       onPlanSelected(uppercasedPlan)
     }
-    if (typeof size === 'string') updateForm('size', size)
-    if (typeof spend_cap === 'string') updateForm('spend_cap', spend_cap === 'true')
-  }, [router.isReady])
+    if (typeof size === 'string') form.setValue('size', size as any)
+    if (typeof spend_cap === 'string') form.setValue('spend_cap', spend_cap === 'true')
+  }, [router.isReady, router.query, form, onPlanSelected])
 
   useEffect(() => {
-    if (!formState.name && organizations?.length === 0 && !user.isLoading) {
+    const currentName = form.getValues('name')
+    if (!currentName && organizations?.length === 0 && !user.isLoading) {
       const prefilledOrgName = user.profile?.username ? user.profile.username + `'s Org` : 'My Org'
-      updateForm('name', prefilledOrgName)
+      form.setValue('name', prefilledOrgName)
     }
-  }, [isSuccess])
+  }, [isSuccess, form, organizations?.length, user.isLoading, user.profile?.username])
 
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
@@ -246,11 +249,6 @@ export const NewOrgForm = ({
     }
   }
 
-  function validateOrgName(name: any) {
-    const value = name ? name.trim() : ''
-    return value.length >= 1
-  }
-
   const stripeOptionsConfirm = useMemo(() => {
     return {
       clientSecret: paymentIntentSecret,
@@ -266,17 +264,18 @@ export const NewOrgForm = ({
       tax_id: CustomerTaxId | null
     }
   ) {
-    const dbTier = formState.plan === 'PRO' && !formState.spend_cap ? 'PAYG' : formState.plan
+    const formValues = form.getValues()
+    const dbTier = formValues.plan === 'PRO' && !formValues.spend_cap ? 'PAYG' : formValues.plan
 
     createOrganization({
-      name: formState.name,
-      kind: formState.kind,
+      name: formValues.name,
+      kind: formValues.kind,
       tier: ('tier_' + dbTier.toLowerCase()) as
         | 'tier_payg'
         | 'tier_pro'
         | 'tier_free'
         | 'tier_team',
-      ...(formState.kind == 'COMPANY' ? { size: formState.size } : {}),
+      ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
       address: dbTier === 'FREE' ? null : customerData?.address,
@@ -288,8 +287,9 @@ export const NewOrgForm = ({
 
   const handleSubmit = async () => {
     setNewOrgLoading(true)
+    const formValues = form.getValues()
 
-    if (formState.plan === 'FREE') {
+    if (formValues.plan === 'FREE') {
       await createOrg()
     } else if (!paymentMethod) {
       const result = await paymentRef.current?.createPaymentMethod()
@@ -315,17 +315,16 @@ export const NewOrgForm = ({
     return onPaymentMethodReset()
   }
 
-  const onSubmitWithOrgCreation = async (event: any) => {
-    event.preventDefault()
-
-    const isOrgNameValid = validateOrgName(formState.name)
+  const onSubmitWithOrgCreation = async () => {
+    const formValues = form.getValues()
+    const isOrgNameValid = formValues.name.trim().length > 0
     if (!isOrgNameValid) {
       return toast.error('Organization name is empty')
     }
 
     const hasFreeOrgWithProjects = freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0)
 
-    if (hasFreeOrgWithProjects && formState.plan !== 'FREE') {
+    if (hasFreeOrgWithProjects && formValues.plan !== 'FREE') {
       setIsOrgCreationConfirmationModalVisible(true)
     } else {
       await handleSubmit()
@@ -333,15 +332,15 @@ export const NewOrgForm = ({
   }
 
   return (
-    <Form_Shadcn_ {...formState}>
-      <form onSubmit={onSubmitWithOrgCreation}>
+    <Form_Shadcn_ {...form}>
+      <form onSubmit={form.handleSubmit(onSubmitWithOrgCreation)}>
         <Panel
           title={
             <div key="panel-title">
               <h3>Create a new organization</h3>
               <p className="text-sm text-foreground-lighter text-balance">
-                This is your organization within Supabase. You could use the name of your company or
-                department, for example.
+                Organizations are a way to group your projects. Each organization can be configured
+                with different team members and billing settings.
               </p>
             </div>
           }
@@ -357,199 +356,186 @@ export const NewOrgForm = ({
               >
                 Cancel
               </Button>
-              <div className="flex items-center space-x-3">
-                <p className="text-xs text-foreground-lighter">
-                  You can rename your organization later
-                </p>
-                <Button
-                  htmlType="submit"
-                  type="primary"
-                  loading={newOrgLoading}
-                  disabled={newOrgLoading}
-                >
-                  Create organization
-                </Button>
-              </div>
+
+              <Button
+                htmlType="submit"
+                type="primary"
+                loading={newOrgLoading}
+                disabled={newOrgLoading}
+              >
+                Create organization
+              </Button>
             </div>
           }
         >
           <div className="divide-y divide-border-muted">
             <Panel.Content className="Form section-block--body has-inputs-centered">
-              <div className="grid grid-cols-3 w-full">
-                <div>
-                  <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
-                </div>
-                <div className="col-span-2">
-                  <Input_Shadcn_
-                    id="name"
-                    autoFocus
-                    type="text"
-                    placeholder="Organization name"
-                    value={formState.name}
-                    onChange={(e) => updateForm('name', e.target.value)}
-                  />
-                  <div className="mt-1">
-                    <Label_Shadcn_
-                      htmlFor="name"
-                      className="text-foreground-lighter leading-normal text-sm"
-                    >
-                      What's the name of your company or team?
-                    </Label_Shadcn_>
-                  </div>
-                </div>
-              </div>
+              <FormField_Shadcn_
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Name"
+                    layout="horizontal"
+                    description="What's the name of your company or team? You can change this name later."
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        autoFocus
+                        type="text"
+                        placeholder="Organization name"
+                        {...field}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
             </Panel.Content>
             <Panel.Content className="Form section-block--body has-inputs-centered">
-              <div className="grid grid-cols-3">
-                <div>
-                  <Label_Shadcn_ htmlFor="kind">Type</Label_Shadcn_>
-                </div>
-                <div className="col-span-2">
-                  <Select_Shadcn_
-                    value={formState.kind}
-                    onValueChange={(value) => updateForm('kind', value)}
+              <FormField_Shadcn_
+                control={form.control}
+                name="kind"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Type"
+                    layout="horizontal"
+                    description="What best describes your organization?"
                   >
-                    <SelectTrigger_Shadcn_ id="kind" className="w-full">
-                      <SelectValue_Shadcn_ />
-                    </SelectTrigger_Shadcn_>
+                    <FormControl_Shadcn_>
+                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger_Shadcn_ className="w-full">
+                          <SelectValue_Shadcn_ />
+                        </SelectTrigger_Shadcn_>
 
-                    <SelectContent_Shadcn_>
-                      {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-                        <SelectItem_Shadcn_ key={k} value={k}>
-                          {v}
-                        </SelectItem_Shadcn_>
-                      ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
-
-                  <div className="mt-1">
-                    <Label_Shadcn_
-                      htmlFor="kind"
-                      className="text-foreground-lighter leading-normal text-sm"
-                    >
-                      What would best describe your organization?
-                    </Label_Shadcn_>
-                  </div>
-                </div>
-              </div>
+                        <SelectContent_Shadcn_>
+                          {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
+                            <SelectItem_Shadcn_ key={k} value={k}>
+                              {v}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
             </Panel.Content>
 
-            {formState.kind == 'COMPANY' && (
+            {form.watch('kind') == 'COMPANY' && (
               <Panel.Content className="Form section-block--body has-inputs-centered">
-                <div className="grid grid-cols-3">
-                  <div>
-                    <Label_Shadcn_ htmlFor="size">Company size</Label_Shadcn_>
-                  </div>
-                  <div className="col-span-2">
-                    <Select_Shadcn_
-                      value={formState.size}
-                      onValueChange={(value) => updateForm('size', value)}
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="size"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Company size"
+                      layout="horizontal"
+                      description="How many people are in your company?"
                     >
-                      <SelectTrigger_Shadcn_ id="size" className="w-full">
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
+                      <FormControl_Shadcn_>
+                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger_Shadcn_ className="w-full">
+                            <SelectValue_Shadcn_ />
+                          </SelectTrigger_Shadcn_>
 
-                      <SelectContent_Shadcn_>
-                        {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                          <SelectItem_Shadcn_ key={k} value={k}>
-                            {v}
-                          </SelectItem_Shadcn_>
-                        ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-
-                    <div className="mt-2">
-                      <Label_Shadcn_
-                        htmlFor="size"
-                        className="text-foreground-lighter leading-normal text-sm"
-                      >
-                        How many people are in your company?
-                      </Label_Shadcn_>
-                    </div>
-                  </div>
-                </div>
+                          <SelectContent_Shadcn_>
+                            {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
+                              <SelectItem_Shadcn_ key={k} value={k}>
+                                {v}
+                              </SelectItem_Shadcn_>
+                            ))}
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
               </Panel.Content>
             )}
 
             {isBillingEnabled && (
               <Panel.Content>
-                <div className="grid grid-cols-3">
-                  <Label_Shadcn_ htmlFor="plan" className=" text-sm">
-                    Plan
-                  </Label_Shadcn_>
-
-                  <div className="col-span-2">
-                    <Select_Shadcn_
-                      value={formState.plan}
-                      onValueChange={(value) => {
-                        updateForm('plan', value)
-                        onPlanSelected(value)
-                      }}
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="plan"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Plan"
+                      layout="horizontal"
+                      description={
+                        <>
+                          Which plan fits your organization's needs best?{' '}
+                          <InlineLink
+                            href="https://supabase.com/pricing"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-inherit hover:text-foreground transition-colors"
+                          >
+                            Learn more
+                          </InlineLink>
+                          .
+                        </>
+                      }
                     >
-                      <SelectTrigger_Shadcn_ id="plan" className="w-full">
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
-
-                      <SelectContent_Shadcn_>
-                        {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-                          <SelectItem_Shadcn_ key={k} value={k} translate="no">
-                            {v}
-                          </SelectItem_Shadcn_>
-                        ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-
-                    <div className="mt-1">
-                      <Label_Shadcn_
-                        htmlFor="plan"
-                        className="text-foreground-lighter leading-normal text-sm"
-                      >
-                        Which plan fits your organization’s needs best?{' '}
-                        <InlineLink
-                          href="https://supabase.com/pricing"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-inherit hover:text-foreground transition-colors"
+                      <FormControl_Shadcn_>
+                        <Select_Shadcn_
+                          value={field.value}
+                          onValueChange={(value) => {
+                            field.onChange(value)
+                            onPlanSelected(value)
+                          }}
                         >
-                          More information
-                        </InlineLink>
-                        .
-                      </Label_Shadcn_>
-                    </div>
-                  </div>
-                </div>
+                          <SelectTrigger_Shadcn_ className="w-full">
+                            <SelectValue_Shadcn_ />
+                          </SelectTrigger_Shadcn_>
+
+                          <SelectContent_Shadcn_>
+                            {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
+                              <SelectItem_Shadcn_ key={k} value={k} translate="no">
+                                {v}
+                              </SelectItem_Shadcn_>
+                            ))}
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
               </Panel.Content>
             )}
 
-            {formState.plan === 'PRO' && (
+            {form.watch('plan') === 'PRO' && (
               <>
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                  <div className="grid grid-cols-3">
-                    <div className="col-span-1 flex space-x-2 text-sm">
-                      <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
-                        Spend Cap
-                      </Label_Shadcn_>
-
-                      <HelpCircle
-                        size={16}
-                        strokeWidth={1.5}
-                        className="transition opacity-50 cursor-pointer hover:opacity-100"
-                        onClick={() => setShowSpendCapHelperModal(true)}
-                      />
-                    </div>
-                    <div className="col-span-2 flex items-center space-x-2">
-                      <Switch
-                        id="spend-cap"
-                        checked={formState.spend_cap}
-                        onCheckedChange={() => updateForm('spend_cap', !formState.spend_cap)}
-                      />
-                      <Label_Shadcn_ htmlFor="spend-cap">
-                        {formState.spend_cap
-                          ? `Usage is limited to the plan's quota.`
-                          : `You pay for overages beyond the plan's quota.`}
-                      </Label_Shadcn_>
-                    </div>
-                  </div>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="spend_cap"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label={
+                          <div className="flex space-x-2 text-sm items-center">
+                            <span>Spend Cap</span>
+                            <HelpCircle
+                              size={16}
+                              strokeWidth={1.5}
+                              className="transition opacity-50 cursor-pointer hover:opacity-100"
+                              onClick={() => setShowSpendCapHelperModal(true)}
+                            />
+                          </div>
+                        }
+                        layout="horizontal"
+                        description={
+                          field.value
+                            ? `Usage is limited to the plan's quota.`
+                            : `You pay for overages beyond the plan's quota.`
+                        }
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
                 </Panel.Content>
 
                 <SpendCapModal
@@ -559,16 +545,14 @@ export const NewOrgForm = ({
               </>
             )}
 
-            {setupIntent && formState.plan !== 'FREE' && (
-              <Panel.Content>
+            {setupIntent && form.watch('plan') !== 'FREE' && (
+              <Panel.Content className="pt-5">
                 <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
-                  <Panel.Content>
-                    <NewPaymentMethodElement
-                      ref={paymentRef}
-                      email={user.profile?.primary_email}
-                      readOnly={newOrgLoading || paymentConfirmationLoading}
-                    />
-                  </Panel.Content>
+                  <NewPaymentMethodElement
+                    ref={paymentRef}
+                    email={user.profile?.primary_email}
+                    readOnly={newOrgLoading || paymentConfirmationLoading}
+                  />
                 </Elements>
               </Panel.Content>
             )}
