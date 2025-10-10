@@ -30,9 +30,12 @@ export const TableTemplateSelector = ({
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
       setSelectedTemplate(template)
-      toast.success(`${template.tableName} template applied. You can add or modify the fields below.`, {
-        duration: SUCCESS_MESSAGE_DURATION_MS,
-      })
+      toast.success(
+        `${template.tableName} template applied. You can add or modify the fields below.`,
+        {
+          duration: SUCCESS_MESSAGE_DURATION_MS,
+        }
+      )
     },
     [onSelectTemplate]
   )
