@@ -1,4 +1,4 @@
-import { TableSuggestion, TableSource } from './types'
+import { TableSource, TableSuggestion } from './types'
 
 export const tableTemplates: Record<string, TableSuggestion[]> = {
   'Social Network': [
@@ -29,7 +29,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'User profiles for social networking',
+      rationale: 'Stores user profile details such as name, avatar, and bio',
       source: TableSource.TEMPLATE,
     },
     {
@@ -56,7 +56,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Social media posts and updates',
+      rationale: 'Stores user posts, images, and engagement counts',
       source: TableSource.TEMPLATE,
     },
     {
@@ -85,7 +85,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'User follow relationships',
+      rationale: 'Tracks relationships between followers and followed users',
       source: TableSource.TEMPLATE,
     },
   ],
@@ -114,7 +114,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Product catalog with inventory management',
+      rationale: 'Stores product details, pricing, and stock levels',
       source: TableSource.TEMPLATE,
     },
     {
@@ -144,7 +144,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Order management and tracking',
+      rationale: 'Manages customer orders, payment totals, and statuses',
       source: TableSource.TEMPLATE,
     },
     {
@@ -174,7 +174,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'quantity', type: 'int4', nullable: false, default: '1' },
         { name: 'added_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Shopping cart functionality',
+      rationale: 'Tracks products added to customer shopping carts',
       source: TableSource.TEMPLATE,
     },
   ],
@@ -206,7 +206,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Blog articles with publishing workflow',
+      rationale: 'Stores blog posts with author, status, and publish dates',
       source: TableSource.TEMPLATE,
     },
     {
@@ -225,7 +225,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'color', type: 'text', nullable: true },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Article categories and tags',
+      rationale: 'Organizes articles into categories or tags for filtering',
       source: TableSource.TEMPLATE,
     },
     {
@@ -251,7 +251,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'approved', type: 'bool', nullable: false, default: 'false' },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Blog comments with moderation',
+      rationale: 'Stores reader comments and approval status for moderation',
       source: TableSource.TEMPLATE,
     },
   ],
@@ -282,7 +282,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Individual tasks with priority and due dates',
+      rationale: 'Stores user tasks with priorities, due dates, and status',
       source: TableSource.TEMPLATE,
     },
     {
@@ -309,7 +309,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
         { name: 'updated_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Task lists for organization',
+      rationale: 'Groups tasks into named lists for better organization',
       source: TableSource.TEMPLATE,
     },
     {
@@ -334,7 +334,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'position', type: 'int4', nullable: false, default: '0' },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Subtasks for breaking down larger tasks',
+      rationale: 'Tracks smaller subtasks linked to a main task',
       source: TableSource.TEMPLATE,
     },
   ],
@@ -363,7 +363,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'ip_address', type: 'text', nullable: true },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Event tracking for analytics',
+      rationale: 'Captures user events and properties for analytics tracking',
       source: TableSource.TEMPLATE,
     },
     {
@@ -389,7 +389,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'duration', type: 'int4', nullable: true },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Page view tracking',
+      rationale: 'Tracks user page views, referrers, and session info',
       source: TableSource.TEMPLATE,
     },
     {
@@ -409,7 +409,7 @@ export const tableTemplates: Record<string, TableSuggestion[]> = {
         { name: 'aggregation_period', type: 'text', nullable: true },
         { name: 'created_at', type: 'timestamptz', nullable: false, default: 'now()' },
       ],
-      rationale: 'Custom metrics and KPI tracking',
+      rationale: 'Stores aggregated metrics and KPIs with timestamps',
       source: TableSource.TEMPLATE,
     },
   ],

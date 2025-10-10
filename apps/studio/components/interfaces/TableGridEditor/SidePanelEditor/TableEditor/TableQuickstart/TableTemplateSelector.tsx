@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react'
+import { toast } from 'sonner'
 import { Button, cn } from 'ui'
 import { tableTemplates } from './templates'
 import { QuickstartVariant } from './types'
@@ -12,6 +13,8 @@ interface TableTemplateSelectorProps {
   onDismiss?: () => void
   disabled?: boolean
 }
+
+const SUCCESS_MESSAGE_DURATION_MS = 3000
 
 export const TableTemplateSelector = ({
   variant: _variant,
@@ -27,6 +30,9 @@ export const TableTemplateSelector = ({
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
       setSelectedTemplate(template)
+      toast.success(`${template.tableName} template applied. You can add or modify the fields below.`, {
+        duration: SUCCESS_MESSAGE_DURATION_MS,
+      })
     },
     [onSelectTemplate]
   )
@@ -48,9 +54,9 @@ export const TableTemplateSelector = ({
     <div className="rounded-lg border border-default bg-surface-75 p-4">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="text-sm font-medium">Quickstart: choose a template</h3>
+          <h3 className="text-sm font-medium">Start faster with a table template</h3>
           <p className="text-xs text-foreground-lighter mt-1">
-            Pick a table template and pre-fill the editor
+            Save time by starting from a ready-made table schema.
           </p>
         </div>
         {onDismiss && (
@@ -95,17 +101,12 @@ export const TableTemplateSelector = ({
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="text-sm font-medium">{t.tableName}</div>
-                {activeCategory && (
-                  <div className="text-[11px] text-foreground-muted mt-0.5 capitalize">
-                    {activeCategory}
-                  </div>
-                )}
+                <div className="text-sm font-medium font-mono">{t.tableName}</div>
                 {t.rationale && (
-                  <div className="text-xs text-foreground-light mt-1">{t.rationale}</div>
+                  <div className="text-sm text-foreground-light mt-1">{t.rationale}</div>
                 )}
               </div>
-              <div className="flex items-center gap-1 text-xs text-foreground-muted ml-3">
+              <div className="flex items-center gap-1 text-sm text-foreground-muted ml-3">
                 <span>{t.fields.length} columns</span>
               </div>
             </div>
