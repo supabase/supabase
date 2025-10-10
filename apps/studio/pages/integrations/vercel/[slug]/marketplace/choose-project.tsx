@@ -16,8 +16,7 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout, Organization } from 'types'
@@ -34,13 +33,9 @@ const VercelIntegration: NextPageWithLayout = () => {
    *
    * Array of integrations installed on all
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useOrgIntegrationsQuery({
-    orgSlug: slug,
-  })
+  const { data: integrationData } = useOrgIntegrationsQuery({ orgSlug: slug })
 
-  const { data, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery({
-    enabled: slug !== undefined,
-  })
+  const { data } = useOrganizationsQuery({ enabled: slug !== undefined })
 
   const organization = data?.find((organization: Organization) => organization.slug === slug)
 
@@ -49,28 +44,6 @@ const VercelIntegration: NextPageWithLayout = () => {
       x.metadata !== undefined &&
       'configuration_id' in x.metadata &&
       x.metadata?.configuration_id === configurationId
-  )
-
-  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjectsData } = useProjectsQuery(
-    {
-      enabled: integration?.id !== undefined,
-    }
-  )
-
-  const supabaseProjects = useMemo(
-    () =>
-      (supabaseProjectsData?.projects ?? [])
-        .filter(
-          (project) =>
-            project.organization_id === organization?.id &&
-            (project.status === PROJECT_STATUS['ACTIVE_HEALTHY'] ||
-              project.status === PROJECT_STATUS['COMING_UP'] ||
-              project.status === PROJECT_STATUS['RESTORING'] ||
-              project.status === PROJECT_STATUS['RESTARTING'] ||
-              project.status === PROJECT_STATUS['RESIZING'])
-        )
-        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
-    [organization?.id, supabaseProjectsData]
   )
 
   const { data: vercelProjectsData, isLoading: isLoadingVercelProjectsData } =
@@ -155,9 +128,9 @@ This Supabase integration manages your environment variables automatically to pr
             />
           </header>
           <ProjectLinker
+            slug={organization?.slug}
             organizationIntegrationId={integration?.id}
             foreignProjects={vercelProjects}
-            supabaseProjects={supabaseProjects}
             onCreateConnections={onCreateConnections}
             installedConnections={integration?.connections}
             isLoading={isCreatingConnection}
@@ -170,7 +143,6 @@ This Supabase integration manages your environment variables automatically to pr
               }
             }}
             loadingForeignProjects={isLoadingVercelProjectsData}
-            loadingSupabaseProjects={isLoadingSupabaseProjectsData}
             mode="Vercel"
           />
           <Markdown

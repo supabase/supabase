@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version that was released (e.g., patch, minor, major, or v2.1.0)"
+        description: 'Version that was released (e.g., patch, minor, major, or v2.1.0)'
         required: true
         type: string
       source:
-        description: "Source of the documentation update"
+        description: 'Source of the documentation update'
         required: false
         type: string
-        default: "manual"
+        default: 'manual'
 
 permissions:
   pull-requests: write
@@ -25,8 +25,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: master
-          sparse-checkout: |
-            apps/docs
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -36,8 +34,8 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install deps
         run: pnpm i
@@ -50,12 +48,18 @@ jobs:
           echo "Version: ${{ github.event.inputs.version }}"
           make
 
+      - name: Generate new typespec snapshot
+        working-directory: apps/docs
+        run: |
+          echo "Generating new typespec snapshot for review..."
+          npx vitest run --update ./features/docs/Reference.typeSpec.test.ts
+
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "docs: update js client libraries (${{ github.event.inputs.version }})"
-          title: "docs: update js client libraries (${{ github.event.inputs.version }})"
+          commit-message: 'docs: update js client libraries (${{ github.event.inputs.version }})'
+          title: 'docs: update js client libraries (${{ github.event.inputs.version }})'
           body: |
             Updates JS client libraries documentation following stable release. 
             Ran `make` in apps/docs/spec to regenerate tsdoc files.
@@ -66,5 +70,5 @@ jobs:
             - **Changes:** Regenerated tsdoc files from latest spec files
 
             🤖 Auto-generated from supabase-js-libs stable release.
-          branch: "gha/update-js-libs-docs-${{ github.run_number }}"
-          base: "master"
+          branch: 'gha/update-js-libs-docs-${{ github.run_number }}'
+          base: 'master'
