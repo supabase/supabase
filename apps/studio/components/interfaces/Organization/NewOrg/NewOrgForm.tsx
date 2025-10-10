@@ -373,7 +373,7 @@ export const NewOrgForm = ({
           footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
-            <Panel.Content className="Form section-block--body has-inputs-centered">
+            <Panel.Content>
               <FormField_Shadcn_
                 control={form.control}
                 name="name"
@@ -395,7 +395,7 @@ export const NewOrgForm = ({
                 )}
               />
             </Panel.Content>
-            <Panel.Content className="Form section-block--body has-inputs-centered">
+            <Panel.Content>
               <FormField_Shadcn_
                 control={form.control}
                 name="kind"
@@ -426,7 +426,7 @@ export const NewOrgForm = ({
             </Panel.Content>
 
             {form.watch('kind') == 'COMPANY' && (
-              <Panel.Content className="Form section-block--body has-inputs-centered">
+              <Panel.Content>
                 <FormField_Shadcn_
                   control={form.control}
                   name="size"
