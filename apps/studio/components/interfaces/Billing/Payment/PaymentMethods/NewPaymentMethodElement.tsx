@@ -242,9 +242,9 @@ const NewPaymentMethodElement = forwardRef(
     }, [availableTaxIds, stripeAddress])
 
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-foreground-light mb-2">
-          Please ensure CVC and postal codes match what is on file for your card.
+      <div className="space-y-2">
+        <p className="text-sm text-foreground-lighter">
+          Please ensure CVC and postal codes match what’s on file for your card.
         </p>
 
         <PaymentElement
@@ -256,14 +256,14 @@ const NewPaymentMethodElement = forwardRef(
         />
 
         {fullyLoaded && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 py-4">
             <Checkbox_Shadcn_
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
             />
-            <label htmlFor="business" className="text-foreground-light text-sm leading-none">
-              I'm purchasing as a business
+            <label htmlFor="business" className="text-foreground text-sm leading-none">
+              I’m purchasing as a business
             </label>
           </div>
         )}

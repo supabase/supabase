@@ -29,7 +29,7 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
         </Admonition>
       )}
 
-      <h3 className="text-sm">Select an organization to create your new project from</h3>
+      <h3 className="text-sm">Select an organization to create your new project in</h3>
 
       <div className="grid gap-2 grid-cols-2">
         {isOrganizationsLoading && (
