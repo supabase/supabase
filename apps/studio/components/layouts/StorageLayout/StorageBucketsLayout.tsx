@@ -47,7 +47,7 @@ export const StorageBucketsLayout = ({
     <PageLayout
       title={title || (config?.displayName ?? 'Storage')}
       subtitle={
-        hideSubtitle ? config?.description || 'Manage your storage buckets and files.' : null
+        !hideSubtitle ? config?.description || 'Manage your storage buckets and files.' : null
       }
       navigationItems={navigationItems}
       secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
