@@ -168,8 +168,6 @@ const AuthUsage = () => {
 
     updateDateRange(newStart, newEnd)
 
-    queryClient.invalidateQueries(['projects', ref, 'report-v2'])
-
     refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
