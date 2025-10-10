@@ -1,0 +1,62 @@
+---
+title = "Why are my Supabase branches empty?"
+topics = [ "branching" ]
+keywords = [ "branching", "migrations" ]
+---
+
+Branching in Supabase (Branching 2.0) relies on the current migration files in your project—**not** a schema dump—when creating environments from `main`. This means if your `main` branch lacks migration history, branching will not fully capture your schema. This is a known limitation highlighted in the [Branching 2.0 documentation](/blog/branching-2-0#current-limitations). Follow the steps below to generate, synchronize, and repair your migration history for smooth branching.
+
+#### 1. Prerequisites: Prepare local Supabase environment
+
+- If you do not have a local environment set up already, follow the Supabase local development getting started guide:
+  - [Running Supabase Locally](/docs/guides/local-development/cli/getting-started).
+
+Execute the following commands to initialize and start a local project:
+
+```bash
+supabase init
+supabase start
+```
+
+---
+
+#### 2. Pull remote schema into migrations
+
+With your project linked, run:
+
+```bash
+supabase db pull --linked
+```
+
+This command generates a migration file in your `supabase/migrations` folder which reflects your remote schema. This will not run the migration locally or overwrite anything.
+
+---
+
+#### 3. Sync remote migration history
+
+Upon running the above command, the Supabase CLI will typically prompt with:
+
+```
+Update remote migration history table? [Y/n]
+```
+
+Type `Y` to update your remote project’s migration history and ensure it matches your new local migrations.
+
+- If the CLI suggests repairing migration history due to mismatches, you might see:
+  ```
+  Make sure your local git repo is up-to-date. If the error persists, try repairing the migration history table:
+  supabase migration repair --status applied <timestamp>
+  ```
+  Run the exact repair command provided, replacing the timestamp as instructed (example timestamp: 20251006141726). This synchronizes the migration state between local and remote.
+
+---
+
+#### 4. Proceed with Branching
+
+Once your migration history is up to date, continue to use branching features as normal. Each new branch will now inherit the correct migrations from your `main` branch.
+
+---
+
+#### Additional tips
+
+- If further issues arise (such as schema drift or migration mismatches), review the [troubleshooting documentation](/docs/guides/deployment/branching/troubleshooting#migration-issues), and consider manual repair with `supabase migration repair`(https://supabase.com/docs/reference/cli/supabase-migration-repair).
