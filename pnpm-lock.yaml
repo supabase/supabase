@@ -814,8 +814,8 @@ importers:
         specifier: 'catalog:'
         version: 2.74.0
       '@supabase/mcp-server-supabase':
-        specifier: ^0.5.4
-        version: 0.5.5(supports-color@8.1.1)
+        specifier: ^0.5.6
+        version: 0.5.6(supports-color@8.1.1)
       '@supabase/mcp-utils':
         specifier: ^0.2.0
         version: 0.2.1(supports-color@8.1.1)
@@ -8793,8 +8793,8 @@ packages:
   '@supabase/functions-js@2.74.0':
     resolution: {integrity: sha512-VqWYa981t7xtIFVf7LRb9meklHckbH/tqwaML5P3LgvlaZHpoSPjMCNLcquuLYiJLxnh2rio7IxLh+VlvRvSWw==}
 
-  '@supabase/mcp-server-supabase@0.5.5':
-    resolution: {integrity: sha512-te1XM2i+h3NBUgJ/8z9PkNCKaJ268VzFI3Qx5RA97s8eGtH94NyPy3lOIZAh3BFAOFHDpcB7Mn1b0oCTGFxg5g==}
+  '@supabase/mcp-server-supabase@0.5.6':
+    resolution: {integrity: sha512-pLVukhxx0oxwAcvAEaJEwNngcPIEieFyd4bWK4phpXpbxqs4xp3i3f7nwrnflkSmG5PnRhLCKcurw3fwQHnCKQ==}
     hasBin: true
 
   '@supabase/mcp-utils@0.2.1':
@@ -28553,7 +28553,7 @@ snapshots:
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
-  '@supabase/mcp-server-supabase@0.5.5(supports-color@8.1.1)':
+  '@supabase/mcp-server-supabase@0.5.6(supports-color@8.1.1)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
       '@modelcontextprotocol/sdk': 1.18.0(supports-color@8.1.1)
