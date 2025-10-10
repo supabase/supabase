@@ -5,7 +5,6 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
-import { OverviewMonitoring } from 'components/interfaces/Auth/Overview/OverviewMonitoring'
 import { OverviewUsage } from 'components/interfaces/Auth/Overview/OverviewUsage'
 import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
 import { useRouter } from 'next/router'
@@ -32,7 +31,6 @@ const AuthOverview: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer size="large">
       <div className="mb-4 flex flex-col gap-2">
-        <OverviewMonitoring />
         <OverviewUsage />
         <OverviewLearnMore />
       </div>
@@ -48,7 +46,7 @@ AuthOverview.getLayout = (page) => (
         secondaryActions={
           <div className="flex items-center gap-2">
             <span className="text-sm text-foreground-light">
-              All reports <span className="text-foreground">Last 24 hours</span>
+              <span className="text-foreground">Last 24 hours</span>
             </span>
             <DocsButton href={`${DOCS_URL}/guides/auth`} />
           </div>

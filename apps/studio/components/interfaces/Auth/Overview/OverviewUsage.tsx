@@ -9,17 +9,14 @@ import { useParams } from 'common'
 import { ChevronRight, Loader2 } from 'lucide-react'
 import { Reports } from 'icons'
 import {
-  getChangeSign,
   getChangeColor,
   fetchAllAuthMetrics,
   processAllAuthMetrics,
   calculatePercentageChange,
 } from './OverviewUsage.constants'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
-import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
-import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import dayjs from 'dayjs'
+import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react'
 
 const StatCard = ({
   title,
@@ -27,19 +24,32 @@ const StatCard = ({
   previous,
   loading,
   suffix = '',
+  invert = false,
+  href,
 }: {
   title: string
   current: number
   previous: number
   loading: boolean
   suffix?: string
+  invert?: boolean
+  href?: string
 }) => {
-  const changeColor = getChangeColor(previous)
-  const changeSign = getChangeSign(previous)
-  const formattedCurrent = suffix === 'ms' ? current.toFixed(2) : current
+  const isZeroChange = previous === 0
+  const changeColor = isZeroChange
+    ? 'text-foreground-lighter'
+    : invert
+      ? previous >= 0
+        ? 'text-destructive'
+        : 'text-brand'
+      : getChangeColor(previous)
+  const formattedCurrent =
+    suffix === 'ms' ? current.toFixed(2) : suffix === '%' ? current.toFixed(1) : Math.round(current)
+  const ArrowIcon = previous >= 0 ? ArrowUpIcon : ArrowDownIcon
+  const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
-  return (
-    <Card>
+  const Inner = (
+    <Card className={cn(href && 'cursor-pointer hover:bg-muted')}>
       <CardContent
         className={cn(
           'flex flex-col my-1 gap-1',
@@ -51,15 +61,18 @@ const StatCard = ({
         ) : (
           <>
             <h4 className="text-sm text-foreground-lighter font-normal mb-0 truncate">{title}</h4>
-            <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
-            <p className={cn('text-sm text-foreground-lighter', changeColor)}>
-              {`${changeSign}${previous.toFixed(1)}%`}
-            </p>
+            <p className="text-xl font-mono">{`${formattedCurrent}${suffix}`}</p>
+            <div className={cn('flex items-center gap-1 font-mono text-sm', changeColor)}>
+              {!isZeroChange && <ArrowIcon className="size-3" />}
+              <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
+            </div>
           </>
         )}
       </CardContent>
     </Card>
   )
+
+  return href ? <Link href={href}>{Inner}</Link> : Inner
 }
 
 export const OverviewUsage = () => {
@@ -84,55 +97,13 @@ export const OverviewUsage = () => {
     metrics.current.activeUsers,
     metrics.previous.activeUsers
   )
-  const passwordResetChange = calculatePercentageChange(
-    metrics.current.passwordResets,
-    metrics.previous.passwordResets
-  )
-  const signInLatencyChange = calculatePercentageChange(
-    metrics.current.signInLatency,
-    metrics.previous.signInLatency
-  )
-  const signUpLatencyChange = calculatePercentageChange(
-    metrics.current.signUpLatency,
-    metrics.previous.signUpLatency
-  )
+
+  const signUpsChange = calculatePercentageChange(metrics.current.signUps, metrics.previous.signUps)
 
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
 
-  const signUpChartConfig = useMemo(() => {
-    const config = createAuthReportConfig({
-      projectRef: ref as string,
-      startDate,
-      endDate,
-      interval: '1h',
-      filters: { status_code: null },
-    })
-    const chart = config.find((c) => c.id === 'signups')
-    if (chart) {
-      return { ...chart, defaultChartStyle: 'bar' }
-    }
-    return chart
-  }, [ref, startDate, endDate])
-
-  const signInChartConfig = useMemo(() => {
-    const config = createAuthReportConfig({
-      projectRef: ref as string,
-      startDate,
-      endDate,
-      interval: '1h',
-      filters: { status_code: null },
-    })
-    const chart = config.find((c) => c.id === 'sign-in-attempts')
-    if (chart) {
-      return { ...chart, defaultChartStyle: 'bar' }
-    }
-    return chart
-  }, [ref, startDate, endDate])
-
-  const updateDateRange = (from: string, to: string) => {
-    console.log('Date range update:', from, to)
-  }
+  // No charts on overview; keep date range for link only
 
   return (
     <ScaffoldSection isFullWidth>
@@ -150,53 +121,41 @@ export const OverviewUsage = () => {
       <ScaffoldSectionContent className="gap-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard
-            title="Active Users"
+            title="Active users"
             current={metrics.current.activeUsers}
             previous={activeUsersChange}
             loading={isLoading}
+            href={`/project/${ref}/reports/auth#usage`}
           />
           <StatCard
-            title="Password Reset Requests"
-            current={metrics.current.passwordResets}
-            previous={passwordResetChange}
+            title="Sign ups"
+            current={metrics.current.signUps}
+            previous={signUpsChange}
             loading={isLoading}
+            href={`/project/${ref}/reports/auth#usage`}
           />
           <StatCard
-            title="Sign up Latency"
-            current={Number(metrics.current.signUpLatency.toFixed(2))}
-            previous={signUpLatencyChange}
+            title="Auth API success rate"
+            current={Math.max(0, 100 - metrics.current.apiErrorRate)}
+            previous={calculatePercentageChange(
+              Math.max(0, 100 - metrics.current.apiErrorRate),
+              Math.max(0, 100 - metrics.previous.apiErrorRate)
+            )}
             loading={isLoading}
-            suffix="ms"
+            suffix="%"
+            href={`/project/${ref}/reports/auth#monitoring`}
           />
           <StatCard
-            title="Sign in Latency"
-            current={Number(metrics.current.signInLatency.toFixed(2))}
-            previous={signInLatencyChange}
+            title="Auth success rate"
+            current={Math.max(0, 100 - metrics.current.authErrorRate)}
+            previous={calculatePercentageChange(
+              Math.max(0, 100 - metrics.current.authErrorRate),
+              Math.max(0, 100 - metrics.previous.authErrorRate)
+            )}
             loading={isLoading}
-            suffix="ms"
+            suffix="%"
+            href={`/project/${ref}/reports/auth#monitoring`}
           />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {signUpChartConfig && (
-            <ReportChartV2
-              report={signUpChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
-            />
-          )}
-          {signInChartConfig && (
-            <ReportChartV2
-              report={signInChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
-            />
-          )}
         </div>
       </ScaffoldSectionContent>
     </ScaffoldSection>
