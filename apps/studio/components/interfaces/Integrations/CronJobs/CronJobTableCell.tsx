@@ -1,6 +1,6 @@
 import parser from 'cron-parser'
 import dayjs from 'dayjs'
-import { Clipboard, Edit, MoreVertical, Play, Trash } from 'lucide-react'
+import { Copy, Edit, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -295,7 +295,7 @@ export const CronJobTableCell = ({
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => copyToClipboard(formattedValue)}
         >
-          <Clipboard size={12} />
+          <Copy size={12} />
           <span>Copy {col.name.toLowerCase()}</span>
         </ContextMenuItem_Shadcn_>
 

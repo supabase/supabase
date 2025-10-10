@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Clipboard, Trash, UserIcon } from 'lucide-react'
+import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 
 import { User } from 'data/auth/users-infinite-query'
@@ -386,7 +386,7 @@ export const formatUserColumns = ({
                   copyToClipboard(value)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
               </ContextMenuItem_Shadcn_>
               <ContextMenuSeparator_Shadcn_ />

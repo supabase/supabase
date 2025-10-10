@@ -4,12 +4,18 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSection,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import DateRangePicker from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -103,6 +109,18 @@ export const Usage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, subscription])
+
+  const {
+    data: orgDailyStats,
+    error: orgDailyStatsError,
+    isLoading: isLoadingOrgDailyStats,
+    isError: isErrorOrgDailyStats,
+  } = useOrgDailyStatsQuery({
+    orgSlug: slug,
+    projectRef,
+    startDate,
+    endDate,
+  })
 
   useEffect(() => {
     if (projectRef && isSuccessProjectDetail) {
@@ -242,6 +260,17 @@ export const Usage = () => {
         </ScaffoldContainer>
       </div>
 
+      {isErrorOrgDailyStats && (
+        <ScaffoldContainer>
+          <ScaffoldSection isFullWidth className="pb-0">
+            <AlertError
+              error={orgDailyStatsError}
+              subject="Failed to retrieve usage statistics for organization"
+            />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      )}
+
       {selectedProjectRef ? (
         <ScaffoldContainer className="mt-5">
           <Admonition
@@ -282,31 +311,25 @@ export const Usage = () => {
       />
 
       {subscription?.plan.id !== 'free' && (
-        <Compute
-          orgSlug={slug as string}
-          projectRef={selectedProjectRef}
-          subscription={subscription}
-          startDate={startDate}
-          endDate={endDate}
-        />
+        <Compute orgDailyStats={orgDailyStats} isLoadingOrgDailyStats={isLoadingOrgDailyStats} />
       )}
 
       <Egress
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
 
       <SizeAndCounts
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
 
       <Activity
@@ -316,6 +339,8 @@ export const Usage = () => {
         startDate={startDate}
         endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
     </>
   )
