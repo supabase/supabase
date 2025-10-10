@@ -45,8 +45,7 @@ function PostGrid({ id, className, header, subheader, posts }: PostGridProps) {
               <div className="p-3 mt-auto flex flex-col gap-1">
                 <h3 className="p !mb-0 !text-foreground line-clamp-1">{post.title}</h3>
                 <p className="text-sm !mb-0 !text-foreground-light inline-flex items-center gap-2">
-                  <span>{post.readingTime}</span> <span>—</span>{' '}
-                  <span>{post.date ? `${formatDate(post.date)}` : ''}</span>
+                  <span>{post.readingTime}</span>
                 </p>
               </div>
             </Link>
