@@ -28,7 +28,7 @@ export interface ParsedLogEntry {
   query?: string
   userid?: string
   rolname?: string
-  resp_calls?: number[] // Add this - histogram array
+  resp_calls?: number[]
   [key: string]: any
 }
 
@@ -40,7 +40,6 @@ export interface ChartDataPoint {
   min_time: number
   max_time: number
   stddev_time: number
-  // Add these percentile fields
   p50_time: number
   p75_time: number
   p90_time: number
@@ -64,8 +63,7 @@ export interface AggregatedQueryData {
   rows_read: number
   cache_hit_rate: number
   prop_total_time: number
-  index_advisor_result?: any // Optional since pg_stat_monitor doesn't provide this
-  // For internal calculations
+  index_advisor_result?: any // [kemal]: This needs proper typing.
   _total_cache_hits: number
   _total_cache_misses: number
   _count: number
@@ -133,7 +131,6 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
         stddev_time: parseFloat(
           String(log.stddev_time ?? log.stddev_exec_time ?? log.stddev_query_time ?? 0)
         ),
-        // Add calculated percentiles
         p50_time: percentiles.p50,
         p75_time: percentiles.p75,
         p90_time: percentiles.p90,
@@ -200,13 +197,10 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQu
 
       minTime = Math.min(minTime, logMinTime)
       maxTime = Math.max(maxTime, logMaxTime)
-
       totalCalls += logCalls
       totalRowsRead += logRows
       totalCacheHits += logCacheHits
       totalCacheMisses += logCacheMisses
-
-      // Total execution time = sum of (mean_time * calls) for each bucket
       totalExecutionTimeForQuery += logMeanTime * logCalls
     })
 
@@ -260,7 +254,6 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQu
   return aggregatedData.sort((a, b) => b.total_time - a.total_time)
 }
 
-// Add this function to calculate percentiles from histogram
 export const calculatePercentilesFromHistogram = (
   respCalls: number[]
 ): {
@@ -286,7 +279,6 @@ export const calculatePercentilesFromHistogram = (
     return { p50: 0, p75: 0, p90: 0, p95: 0, p99: 0, p99_9: 0 }
   }
 
-  // Create distribution with better interpolation within buckets
   const distribution: {
     minValue: number
     maxValue: number
@@ -308,7 +300,6 @@ export const calculatePercentilesFromHistogram = (
     }
   })
 
-  // Calculate percentiles with linear interpolation within buckets
   const getPercentile = (percentile: number): number => {
     const targetCount = totalCalls * percentile
 
@@ -316,14 +307,9 @@ export const calculatePercentilesFromHistogram = (
       const prevCumulativeCount = i > 0 ? distribution[i - 1].cumulativeCount : 0
 
       if (distribution[i].cumulativeCount >= targetCount) {
-        // How far into this bucket is our target percentile?
         const positionInBucket = (targetCount - prevCumulativeCount) / distribution[i].count
-
-        // Linear interpolation within the bucket range (log scale would be better for large ranges)
         const bucketMin = distribution[i].minValue
         const bucketMax = distribution[i].maxValue
-
-        // Use log interpolation for better distribution across wide buckets
         const logMin = Math.log10(Math.max(bucketMin, 0.1))
         const logMax = Math.log10(bucketMax)
         const logValue = logMin + positionInBucket * (logMax - logMin)
@@ -332,7 +318,6 @@ export const calculatePercentilesFromHistogram = (
       }
     }
 
-    // Return max of last bucket if we somehow get here
     return distribution[distribution.length - 1]?.maxValue || 0
   }
 
@@ -344,8 +329,6 @@ export const calculatePercentilesFromHistogram = (
     p99: getPercentile(0.99),
     p99_9: getPercentile(0.999),
   }
-
-  console.log('📊 Percentile calculation:', { respCalls, result })
 
   return result
 }

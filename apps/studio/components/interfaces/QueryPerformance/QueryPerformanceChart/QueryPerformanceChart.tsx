@@ -47,7 +47,6 @@ const formatNumberValue = (value: number): string => {
 }
 
 export const QueryPerformanceChart = ({
-  // dateRange,
   onDateRangeChange,
   chartData,
   isLoading,
@@ -109,11 +108,8 @@ export const QueryPerformanceChart = ({
     }
   }, [chartData, selectedMetric])
 
-  // Add this transformation for the chart data
   const transformedChartData = useMemo(() => {
     if (selectedMetric !== 'query_latency') return chartData
-
-    console.log('🟢 Original chartData:', chartData)
 
     const transformed = chartData.map((dataPoint) => ({
       ...dataPoint,
@@ -151,14 +147,11 @@ export const QueryPerformanceChart = ({
     if (!currentSelectedQuery || !parsedLogs.length) return null
 
     const normalizedSelected = currentSelectedQuery.replace(/\s+/g, ' ').trim()
-
-    // Filter logs for the selected query
     const queryLogs = parsedLogs.filter((log) => {
       const normalized = (log.query || '').replace(/\s+/g, ' ').trim()
       return normalized === normalizedSelected
     })
 
-    // Build a map of timestamp -> meanTime for the selected query
     const queryTimeMap = new Map<number, number>()
 
     queryLogs.forEach((log) => {
@@ -176,13 +169,11 @@ export const QueryPerformanceChart = ({
     return queryTimeMap
   }, [currentSelectedQuery, parsedLogs])
 
-  // Merge selected query data with the aggregate chart data
   const mergedChartData = useMemo(() => {
     if (!querySpecificData || !currentSelectedQuery) {
       return transformedChartData
     }
 
-    // Add the selected query values to each data point
     return transformedChartData.map((dataPoint) => {
       const queryValue = querySpecificData.get(dataPoint.period_start)
 
@@ -193,7 +184,6 @@ export const QueryPerformanceChart = ({
     })
   }, [transformedChartData, querySpecificData, currentSelectedQuery])
 
-  // Update the chart attributes to show the correct units
   const getChartAttributes = useMemo((): MultiAttribute[] => {
     const attributeMap: Record<string, MultiAttribute[]> = {
       query_latency: [
@@ -274,7 +264,6 @@ export const QueryPerformanceChart = ({
 
     const baseAttributes = attributeMap[selectedMetric] || []
 
-    // If a query is selected, add it as an additional line
     if (currentSelectedQuery && querySpecificData && selectedMetric === 'query_latency') {
       return [
         ...baseAttributes,
@@ -284,7 +273,7 @@ export const QueryPerformanceChart = ({
           provider: 'logs',
           type: 'line',
           color: { light: '#DC2626', dark: '#DC2626' },
-          strokeWidth: 3, // Make it thicker to stand out
+          strokeWidth: 3,
         },
       ]
     }
@@ -297,11 +286,9 @@ export const QueryPerformanceChart = ({
   }
 
   const getYAxisFormatter = useMemo(() => {
-    // Only use time formatting for query latency metrics
     if (selectedMetric === 'query_latency') {
       return formatTimeValue
     }
-    // For other metrics (rows_read, calls, cache_hits), use number formatting
     return formatNumberValue
   }, [selectedMetric])
 

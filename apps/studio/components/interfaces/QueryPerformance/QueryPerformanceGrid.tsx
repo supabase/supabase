@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
   DropdownMenu,
@@ -349,17 +348,14 @@ export const QueryPerformanceGrid = ({
   const reportData = useMemo(() => {
     let data = [...aggregatedData]
 
-    // Apply search filter if present
     if (search && typeof search === 'string' && search.length > 0) {
       data = data.filter((row) => row.query.toLowerCase().includes(search.toLowerCase()))
     }
 
-    // Apply role filter if present
     if (roles && Array.isArray(roles) && roles.length > 0) {
       data = data.filter((row) => row.rolname && roles.includes(row.rolname))
     }
 
-    // Apply sorting
     if (sort?.column === 'prop_total_time') {
       data.sort((a, b) => {
         const aValue = a.prop_total_time || 0
@@ -463,13 +459,6 @@ export const QueryPerformanceGrid = ({
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      // setSelectedRow(idx)
-                      // gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-
-                      // const rowQuery = reportData[idx]?.query ?? ''
-                      // if (!rowQuery.trim().toLowerCase().startsWith('select')) {
-                      //   setView('details')
-                      // }
                       const query = reportData[idx]?.query
                       if (query) {
                         onCurrentSelectQuery(query)

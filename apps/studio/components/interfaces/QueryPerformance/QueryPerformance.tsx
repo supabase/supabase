@@ -50,14 +50,11 @@ export const QueryPerformance = ({
   onDateRangeChange,
 }: QueryPerformanceProps) => {
   const { ref } = useParams()
-  const { ref: projectRef } = useParams() as { ref: string }
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
-
   const { isLoading, isRefetching } = queryPerformanceQuery
   const isPrimaryDatabase = state.selectedDatabaseId === ref
   const formattedDatabaseId = formatDatabaseID(state.selectedDatabaseId ?? '')
-
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
   const [selectedQuery, setSelectedQuery] = useState<string | null>(null)
 
@@ -90,7 +87,7 @@ export const QueryPerformance = ({
     )
   }, [effectiveDateRange])
 
-  const pgStatMonitorLogs = useLogsQuery(projectRef, {
+  const pgStatMonitorLogs = useLogsQuery(ref as string, {
     sql: queryWithTimeRange,
     iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
     iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
@@ -98,7 +95,6 @@ export const QueryPerformance = ({
 
   const { logData, isLoading: isLogsLoading, error: logsError } = pgStatMonitorLogs
 
-  // Parse and process logs
   const parsedLogs = useMemo(() => {
     return parsePgStatMonitorLogs(logData || [])
   }, [logData])
@@ -106,16 +102,6 @@ export const QueryPerformance = ({
   const chartData = useMemo(() => {
     return transformLogsToChartData(parsedLogs)
   }, [parsedLogs])
-
-  console.log(
-    '⚡️ Cache Stats:',
-    chartData.map((d) => ({
-      timestamp: d.timestamp,
-      cache_hits: d.cache_hits,
-      cache_misses: d.cache_misses,
-      hit_rate: ((d.cache_hits / (d.cache_hits + d.cache_misses)) * 100).toFixed(2) + '%',
-    }))
-  )
 
   const aggregatedGridData = useMemo(() => {
     return aggregateLogsByQuery(parsedLogs)

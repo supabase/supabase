@@ -5,7 +5,6 @@ import { ChangeEvent, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
