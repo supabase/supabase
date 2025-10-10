@@ -25,7 +25,6 @@ import {
   createUsageReportConfig,
   createErrorsReportConfig,
   createLatencyReportConfig,
-  AUTH_REPORT_QUERY_KEYS,
 } from 'data/reports/v2/auth.config'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
@@ -161,7 +160,15 @@ const AuthUsage = () => {
 
     setIsRefreshing(true)
 
-    queryClient.invalidateQueries(AUTH_REPORT_QUERY_KEYS.usage)
+    const duration = dayjs(selectedDateRange.period_end.date).diff(
+      selectedDateRange.period_start.date
+    )
+    const newEnd = dayjs().toISOString()
+    const newStart = dayjs().subtract(duration, 'milliseconds').toISOString()
+
+    updateDateRange(newStart, newEnd)
+
+    queryClient.invalidateQueries(['projects', ref, 'report-v2'])
 
     refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
