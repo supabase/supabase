@@ -22,21 +22,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const url = new URL(PROJECT_ANALYTICS_URL)
       url.pathname = `/api/backends/${uuid}`
       const result = await fetch(url, {
-        method: "GET",
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then(r=>r.json())
-
+      }).then((r) => r.json())
 
       return res.status(200).json(result)
     case 'PUT':
       // create the log drain
       const putUrl = new URL(PROJECT_ANALYTICS_URL)
       putUrl.pathname = `/api/backends/${uuid}`
-      delete req.body["metadata"]
+      delete req.body['metadata']
       const putResult = await fetch(putUrl, {
         body: JSON.stringify(req.body),
         method: 'PUT',
@@ -45,10 +44,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then(async r =>  await r.json()).catch((err) => {
-        console.error('error updating log drain', err)
-        return res.status(500).json({ error: { message: 'Error updating log drain' } })
       })
+        .then(async (r) => await r.json())
+        .catch((err) => {
+          console.error('error updating log drain', err)
+          return res.status(500).json({ error: { message: 'Error updating log drain' } })
+        })
       return res.status(200).json(putResult)
 
     case 'DELETE':
@@ -67,7 +68,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         console.error('error deleting log drain', err)
         return res.status(500).json({ error: { message: 'Error deleting log drain' } })
       })
-      return res.status(204).json({error: null})
+      return res.status(204).json({ error: null })
     default:
       res.setHeader('Allow', ['GET', 'POST'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
