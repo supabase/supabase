@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { MoveUpRight } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { IconDiscord } from 'ui'
+import { Button, IconDiscord } from 'ui'
 
 interface DynamicStatusProps {
   interval?: number
@@ -30,9 +30,10 @@ export function SupportFormDiscordCallout({ interval = 4000 }: DynamicStatusProp
 
   return (
     <div
-      className="flex items-center gap-4 border-t border-b border-default px-6 py-2 overflow-hidden"
+      className="flex items-center gap-4 border-t border-b border-default px-6 py-3 overflow-hidden"
       style={{
-        backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px)',
+        backgroundImage:
+          'radial-gradient(circle, hsl(var(--background-surface-300) / 0.75) 1px, transparent 1px)',
         backgroundSize: '8px 8px',
       }}
     >
@@ -44,36 +45,25 @@ export function SupportFormDiscordCallout({ interval = 4000 }: DynamicStatusProp
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
             transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="absolute inset-0 block text-sm font-medium"
+            className="absolute inset-0 block text-sm font-medium text-foreground truncate"
           >
             {statuses[currentIndex]}
           </motion.span>
         </AnimatePresence>
       </div>
-      <div className="ml-auto">
-        <Link
-          href="https://discord.supabase.com"
-          target="_blank"
-          rel="noreferrer"
-          className="group flex items-center gap-1 transition-colors hover:text-[#5865F2]"
-        >
-          <motion.div
-            animate={{
-              scale: [1, 1.05, 1],
-              opacity: [0.7, 1, 0.7],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          >
-            <IconDiscord className="text-[#5865F2]" />
-          </motion.div>
 
-          <MoveUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+      <Button
+        asChild
+        type="text"
+        size="tiny"
+        icon={<IconDiscord size={14} className="text-[#5865F2]" />}
+        iconRight={<ExternalLink size={12} />}
+        className="-mr-2"
+      >
+        <Link href="https://discord.supabase.com" target="_blank" rel="noreferrer">
+          Discord
         </Link>
-      </div>
+      </Button>
     </div>
   )
 }
