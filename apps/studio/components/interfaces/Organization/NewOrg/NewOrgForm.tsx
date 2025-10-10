@@ -185,11 +185,11 @@ export const NewOrgForm = ({
 
   useEffect(() => {
     const currentName = form.getValues('name')
-    if (!currentName && organizations?.length === 0 && !user.isLoading) {
+    if (!currentName && isSuccess && organizations?.length === 0 && user.isSuccess) {
       const prefilledOrgName = user.profile?.username ? user.profile.username + `'s Org` : 'My Org'
       form.setValue('name', prefilledOrgName)
     }
-  }, [isSuccess, form, organizations?.length, user.isLoading, user.profile?.username])
+  }, [isSuccess, form, organizations?.length, user.profile?.username, user.isSuccess])
 
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
