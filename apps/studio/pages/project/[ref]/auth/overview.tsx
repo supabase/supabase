@@ -32,7 +32,7 @@ const AuthOverview: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer size="large">
       <div className="mb-4 flex flex-col gap-2">
-        <OverviewMonitoring />
+        {/* <OverviewMonitoring /> */}
         <OverviewUsage />
         <OverviewLearnMore />
       </div>
@@ -48,7 +48,7 @@ AuthOverview.getLayout = (page) => (
         secondaryActions={
           <div className="flex items-center gap-2">
             <span className="text-sm text-foreground-light">
-              All reports <span className="text-foreground">Last 24 hours</span>
+              <span className="text-foreground">Last 24 hours</span>
             </span>
             <DocsButton href={`${DOCS_URL}/guides/auth`} />
           </div>
