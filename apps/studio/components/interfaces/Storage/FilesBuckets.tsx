@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
+import { ScaffoldHeader, ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
@@ -62,7 +62,9 @@ export const FilesBuckets = () => {
       buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD').length === 0 ? (
         <EmptyBucketState bucketType="files" />
       ) : (
+        // Add !pt-8 to override the default first:pt-12
         <ScaffoldSection isFullWidth className="gap-y-4">
+          {/* <ScaffoldHeader className="py-0">Buckets</ScaffoldHeader> */}
           <div className="flex flex-grow justify-between gap-x-2 items-center">
             <Input
               size="tiny"
