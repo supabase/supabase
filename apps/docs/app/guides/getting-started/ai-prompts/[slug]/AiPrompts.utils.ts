@@ -6,8 +6,11 @@ import { readdir, readFile, stat } from 'node:fs/promises'
 import { basename, extname, join } from 'node:path'
 import { cache } from 'react'
 import { visit, EXIT } from 'unist-util-visit'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
+
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 const PROMPTS_DIRECTORY = join(EXAMPLES_DIRECTORY, 'prompts')
 
@@ -85,7 +88,7 @@ export async function generateAiPromptMetadata(props: { params: Promise<{ slug: 
 
   if (!prompt) {
     return {
-      title: 'AI Prompt | Supabase Docs',
+      title: `AI Prompt | ${metadataTitle || 'Supabase'}`,
     }
   }
 
