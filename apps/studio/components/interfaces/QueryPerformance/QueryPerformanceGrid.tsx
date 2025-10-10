@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, ArrowRight, TextSearch } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -35,6 +35,7 @@ import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { formatDuration } from './QueryPerformance.utils'
 import { AggregatedQueryData } from './QueryPerformanceData.utils'
 import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface QueryPerformanceGridProps {
   aggregatedData: AggregatedQueryData[]
@@ -166,25 +167,40 @@ export const QueryPerformanceGrid = ({
         const value = props.row?.[col.id]
         if (col.id === 'query') {
           return (
-            <div className="w-full flex items-center gap-x-3 ml-4">
-              {hasIndexRecommendations(props.row.index_advisor_result, true) && (
-                <IndexSuggestionIcon
-                  indexAdvisorResult={props.row.index_advisor_result}
-                  onClickIcon={() => {
-                    setSelectedRow(props.rowIdx)
-                    setView('suggestion')
-                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
-                  }}
-                />
-              )}
+            <div className="w-full flex items-center gap-x-3 group">
+              <div className="flex-shrink-0 w-4">
+                {hasIndexRecommendations(props.row.index_advisor_result, true) && (
+                  <IndexSuggestionIcon
+                    indexAdvisorResult={props.row.index_advisor_result}
+                    onClickIcon={() => {
+                      setSelectedRow(props.rowIdx)
+                      setView('suggestion')
+                      gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
+                    }}
+                  />
+                )}
+              </div>
               <CodeBlock
                 language="pgsql"
-                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-8 flex-grow pointer-events-none"
-                wrapperClassName="!max-w-full"
+                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-20 pointer-events-none"
+                wrapperClassName="!max-w-full flex-1"
                 hideLineNumbers
                 hideCopy
                 value={value.replace(/\s+/g, ' ').trim() as string}
                 wrapLines={false}
+              />
+              <ButtonTooltip
+                tooltip={{ content: { text: 'Query details' } }}
+                icon={<ArrowRight size={14} />}
+                size="tiny"
+                type="default"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedRow(props.rowIdx)
+                  setView('details')
+                  gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
+                }}
+                className="p-1 flex-shrink-0 -translate-x-4 group-hover:flex hidden"
               />
             </div>
           )

@@ -152,7 +152,6 @@ export const QueryPerformance = ({
       />
       <QueryPerformanceFilterBar aggregatedData={aggregatedGridData} />
       <LoadingLine loading={isLoading || isRefetching || isLogsLoading} />
-
       <QueryPerformanceGrid
         aggregatedData={aggregatedGridData}
         isLoading={isLogsLoading}
