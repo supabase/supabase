@@ -370,6 +370,7 @@ export const NewOrgForm = ({
           // Allow address dropdown in Stripe Elements to overflow the panel
           noHideOverflow
           // Prevent resulting rounded corners in footer being clipped by squared corners of bg
+          titleClasses="rounded-t-md"
           footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
