@@ -34,7 +34,7 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
   if (category !== 'Problem') return null
 
   return (
-    <>
+    <div className="flex flex-col gap-y-1">
       <FormField_Shadcn_
         name="library"
         control={form.control}
@@ -60,7 +60,7 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
         )}
       />
       {library && library.length > 0 && <LibrarySuggestions library={library} />}
-    </>
+    </div>
   )
 }
 
@@ -74,7 +74,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
     library.name.includes('supabase-')
   )
   return (
-    <div className="px-6 flex flex-col gap-y-4">
+    <div className="flex flex-col gap-y-4">
       <div className="space-y-2">
         <p className="text-sm text-foreground-light">
           Found an issue or a bug? Try searching our GitHub issues or submit a new one.

@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import CopyButton from 'components/ui/CopyButton'
 import InformationBox from 'components/ui/InformationBox'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
   cn,
@@ -187,6 +188,8 @@ interface PlanExpectationInfoBoxProps {
 }
 
 const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps) => {
+  const { billingAll } = useIsFeatureEnabled(['billing:all'])
+
   return (
     <InformationBox
       icon={<AlertCircle size={18} strokeWidth={2} />}
@@ -222,20 +225,26 @@ const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps
             </p>
           )}
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
-            <Button asChild>
-              <Link
-                href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
-              >
-                Upgrade project
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
-                Enquire about Enterprise
-              </Link>
-            </Button>
-          </div>
+          {billingAll && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
+              <Button asChild>
+                <Link
+                  href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
+                >
+                  Upgrade project
+                </Link>
+              </Button>
+              <Button asChild type="default" icon={<ExternalLink />}>
+                <Link
+                  href="https://supabase.com/contact/enterprise"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Enquire about Enterprise
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       }
     />

@@ -68,6 +68,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   })
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (values) => {
+    dispatch({ type: 'SUBMIT' })
     const attachments = await attachmentUpload.createAttachments(projectRef)
 
     const selectedLibrary = values.library
@@ -112,10 +113,10 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     }
 
     submitSupportTicket(payload)
-    dispatch({ type: 'SUBMIT' })
   }
 
   const handleFormSubmit = form.handleSubmit(onSubmit)
+
   const handleSubmitButtonClick: MouseEventHandler<HTMLButtonElement> = (event) => {
     handleFormSubmit(event)
   }
