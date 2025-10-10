@@ -124,15 +124,15 @@ function OrgProjectSelector() {
       stateSummary !== 'loggedIn.dataSuccess.hasData'
         ? []
         : (projects!
-          .map((project) => {
-            const organization = organizations!.find((org) => org.id === project.organization_id)!
-            return {
-              id: project.ref,
-              value: toOrgProjectValue(organization, project),
-              displayName: toDisplayNameOrgProject(organization, project),
-            }
-          })
-          .filter(Boolean) as ComboBoxOption[]),
+            .map((project) => {
+              const organization = organizations!.find((org) => org.id === project.organization_id)!
+              return {
+                id: project.ref,
+                value: toOrgProjectValue(organization, project),
+                displayName: toDisplayNameOrgProject(organization, project),
+              }
+            })
+            .filter(Boolean) as ComboBoxOption[]),
     [organizations, projects, stateSummary]
   )
 
@@ -218,10 +218,10 @@ function BranchSelector() {
     stateSummary !== 'loggedIn.branches.dataSuccess.hasData'
       ? []
       : data!.map((branch) => ({
-        id: branch.id,
-        displayName: branch.name,
-        value: toBranchValue(branch),
-      }))
+          id: branch.id,
+          displayName: branch.name,
+          value: toBranchValue(branch),
+        }))
 
   useEffect(() => {
     if (stateSummary === 'loggedIn.branches.dataSuccess.hasData' && !selectedBranch) {
@@ -323,13 +323,13 @@ function VariableView({ variable, className }: { variable: Variable; className?:
         ? 'loggedIn.noSelectedProject'
         : projectPaused
           ? 'loggedIn.selectedProject.projectPaused'
-          : (needsApiQuery ? (isApiSettingsPending || isApiKeysPending) : isSupavisorPending)
+          : (needsApiQuery ? isApiSettingsPending || isApiKeysPending : isSupavisorPending)
             ? 'loggedIn.selectedProject.dataPending'
             : (
-              needsApiQuery
-                ? (isApiSettingsError || isApiKeysError)
-                : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
-            )
+                  needsApiQuery
+                    ? isApiSettingsError || isApiKeysError
+                    : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
+                )
               ? 'loggedIn.selectedProject.dataError'
               : 'loggedIn.selectedProject.dataSuccess'
 
@@ -355,7 +355,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
 
   return (
     <>
-
       <div className={cn('flex items-center gap-2', className)}>
         <Input
           disabled
@@ -363,7 +362,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
           className="font-mono"
           value={
             stateSummary === 'userLoading' ||
-              stateSummary === 'loggedIn.selectedProject.dataPending'
+            stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
               : stateSummary === 'loggedIn.selectedProject.projectPaused'
                 ? 'PROJECT PAUSED'
@@ -398,8 +397,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
           .
         </p>
       )}
-
-
     </>
   )
 }
