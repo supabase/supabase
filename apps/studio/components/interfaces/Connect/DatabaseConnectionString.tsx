@@ -1,5 +1,6 @@
-import { ChevronDown } from 'lucide-react'
-import { HTMLAttributes, ReactNode, useMemo, useState } from 'react'
+import { ChevronDown, GlobeIcon, InfoIcon } from 'lucide-react'
+import { HTMLAttributes, ReactNode, useMemo, useState, useEffect } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -18,7 +19,6 @@ import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
-  Button,
   CodeBlock,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -35,6 +35,8 @@ import {
 import { Admonition } from 'ui-patterns'
 import {
   CONNECTION_PARAMETERS,
+  type ConnectionMethod,
+  connectionMethodOptions,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
   IPV4_ADDON_TEXT,
@@ -66,11 +68,73 @@ export const DatabaseConnectionString = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
+  // URL state management
+  const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
+  const [querySource, setQuerySource] = useQueryState('source', parseAsString)
+  const [queryMethod, setQueryMethod] = useQueryState('method', parseAsString.withDefault('direct'))
+
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
+  const [selectedMethod, setSelectedMethod] = useState<ConnectionMethod>('direct')
 
   const sharedPoolerPreferred = useMemo(() => {
     return org?.plan?.id === 'free'
   }, [org])
+
+  // Sync URL state with component state on mount and when URL changes
+  useEffect(() => {
+    const validTypes = DATABASE_CONNECTION_TYPES.map((t) => t.id)
+    if (queryType && validTypes.includes(queryType as DatabaseConnectionType)) {
+      setSelectedTab(queryType as DatabaseConnectionType)
+    } else if (queryType && !validTypes.includes(queryType as DatabaseConnectionType)) {
+      setQueryType('uri')
+      setSelectedTab('uri')
+    }
+
+    const validMethods: ConnectionMethod[] = ['direct', 'transaction', 'session']
+    if (queryMethod && validMethods.includes(queryMethod as ConnectionMethod)) {
+      setSelectedMethod(queryMethod as ConnectionMethod)
+    } else if (queryMethod && !validMethods.includes(queryMethod as ConnectionMethod)) {
+      setQueryMethod('direct')
+      setSelectedMethod('direct')
+    }
+
+    if (querySource && querySource !== state.selectedDatabaseId) {
+      state.setSelectedDatabaseId(querySource)
+    } else if (!querySource && state.selectedDatabaseId !== projectRef) {
+      state.setSelectedDatabaseId(projectRef)
+    }
+  }, [queryType, queryMethod, querySource, state])
+
+  // Sync component state changes back to URL
+  const handleTabChange = (connectionType: DatabaseConnectionType) => {
+    setSelectedTab(connectionType)
+    setQueryType(connectionType)
+  }
+
+  const handleMethodChange = (method: ConnectionMethod) => {
+    setSelectedMethod(method)
+    setQueryMethod(method)
+  }
+
+  const handleDatabaseChange = (databaseId: string) => {
+    if (databaseId === projectRef) {
+      setQuerySource(null)
+    } else {
+      setQuerySource(databaseId)
+    }
+  }
+
+  // Sync database selector state changes back to URL
+  useEffect(() => {
+    if (state.selectedDatabaseId && state.selectedDatabaseId !== querySource) {
+      // Only set source in URL if it's not the primary database
+      if (state.selectedDatabaseId === projectRef) {
+        setQuerySource(null)
+      } else {
+        setQuerySource(state.selectedDatabaseId)
+      }
+    }
+  }, [state.selectedDatabaseId, querySource, projectRef])
 
   const {
     data: pgbouncerConfig,
@@ -221,12 +285,7 @@ export const DatabaseConnectionString = () => {
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Type
           </span>
-          <Select_Shadcn_
-            value={selectedTab}
-            onValueChange={(connectionType: DatabaseConnectionType) =>
-              setSelectedTab(connectionType)
-            }
-          >
+          <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
             <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
@@ -239,7 +298,32 @@ export const DatabaseConnectionString = () => {
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </div>
-        <DatabaseSelector portal={false} buttonProps={{ size: 'small' }} />
+        <DatabaseSelector
+          portal={false}
+          buttonProps={{ size: 'small' }}
+          onSelectId={handleDatabaseChange}
+        />
+        <div className="flex">
+          <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+            Method
+          </span>
+          <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
+            <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
+              <SelectValue_Shadcn_ size="tiny">
+                {connectionMethodOptions[selectedMethod].label}
+              </SelectValue_Shadcn_>
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_ className="max-w-sm">
+              {Object.keys(connectionMethodOptions).map((method) => (
+                <ConnectionMethodSelectItem
+                  key={method}
+                  method={method as ConnectionMethod}
+                  poolerBadge={poolerBadge}
+                />
+              ))}
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
+        </div>
       </div>
 
       {isLoading && (
@@ -303,119 +387,81 @@ export const DatabaseConnectionString = () => {
                 <StepLabel number={++stepNumber}>Choose type of connection</StepLabel>
               </div>
             )}
-            <div className="divide-y divide-border-muted [&>div]:px-4 [&>div]:md:px-7 [&>div]:py-8">
-              <ConnectionPanel
-                type="direct"
-                title="Direct connection"
-                contentType={contentType}
-                lang={lang}
-                fileTitle={fileTitle}
-                description="Ideal for applications with persistent, long-lived connections, such as those running on virtual machines or long-standing containers."
-                connectionString={connectionStrings['direct'][selectedTab]}
-                ipv4Status={{
-                  type: !ipv4Addon ? 'error' : 'success',
-                  title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
-                  description:
-                    !sharedPoolerPreferred && !ipv4Addon
-                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-                      : sharedPoolerPreferred
-                        ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
-                        : IPV4_ADDON_TEXT,
-                  links: buttonLinks,
-                }}
-                parameters={[
-                  { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
-                  { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
-                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
-                ]}
-                onCopyCallback={() => handleCopy(selectedTab, 'direct')}
-              />
+            <div className="px-4 md:px-7 py-8">
+              {selectedMethod === 'direct' && (
+                <ConnectionPanel
+                  type="direct"
+                  title={connectionMethodOptions.direct.label}
+                  contentType={contentType}
+                  lang={lang}
+                  fileTitle={fileTitle}
+                  description={connectionMethodOptions.direct.description}
+                  connectionString={connectionStrings['direct'][selectedTab]}
+                  ipv4Status={{
+                    type: !ipv4Addon ? 'error' : 'success',
+                    title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
+                    description:
+                      !sharedPoolerPreferred && !ipv4Addon
+                        ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+                        : sharedPoolerPreferred
+                          ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
+                          : IPV4_ADDON_TEXT,
+                    links: buttonLinks,
+                  }}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+                    { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
+                    { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+                    { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'direct')}
+                />
+              )}
 
-              {IS_PLATFORM && (
+              {selectedMethod === 'transaction' && IS_PLATFORM && (
+                <ConnectionPanel
+                  type="transaction"
+                  title={connectionMethodOptions.transaction.label}
+                  contentType={contentType}
+                  lang={lang}
+                  badge={poolerBadge}
+                  fileTitle={fileTitle}
+                  description={connectionMethodOptions.transaction.description}
+                  connectionString={connectionStrings['pooler'][selectedTab]}
+                  ipv4Status={{
+                    type: !sharedPoolerPreferred && !ipv4Addon ? 'error' : 'success',
+                    title:
+                      !sharedPoolerPreferred && !ipv4Addon
+                        ? 'Not IPv4 compatible'
+                        : 'IPv4 compatible',
+                    description:
+                      !sharedPoolerPreferred && !ipv4Addon
+                        ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+                        : sharedPoolerPreferred
+                          ? 'Transaction pooler connections are IPv4 proxied for free.'
+                          : IPV4_ADDON_TEXT,
+                    links: !sharedPoolerPreferred ? buttonLinks : undefined,
+                  }}
+                  notice={['Does not support PREPARE statements']}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
+                    {
+                      ...CONNECTION_PARAMETERS.port,
+                      value: poolingConfiguration?.db_port.toString() ?? '6543',
+                    },
+                    {
+                      ...CONNECTION_PARAMETERS.database,
+                      value: poolingConfiguration?.db_name ?? '',
+                    },
+                    { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
+                    { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
+                />
+              )}
+
+              {selectedMethod === 'session' && IS_PLATFORM && (
                 <>
-                  <ConnectionPanel
-                    type="transaction"
-                    title="Transaction pooler"
-                    contentType={contentType}
-                    lang={lang}
-                    badge={poolerBadge}
-                    fileTitle={fileTitle}
-                    description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
-                    connectionString={connectionStrings['pooler'][selectedTab]}
-                    ipv4Status={{
-                      type: !sharedPoolerPreferred && !ipv4Addon ? 'error' : 'success',
-                      title:
-                        !sharedPoolerPreferred && !ipv4Addon
-                          ? 'Not IPv4 compatible'
-                          : 'IPv4 compatible',
-                      description:
-                        !sharedPoolerPreferred && !ipv4Addon
-                          ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-                          : sharedPoolerPreferred
-                            ? 'Transaction pooler connections are IPv4 proxied for free.'
-                            : IPV4_ADDON_TEXT,
-                      links: !sharedPoolerPreferred ? buttonLinks : undefined,
-                    }}
-                    notice={['Does not support PREPARE statements']}
-                    parameters={[
-                      { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
-                      {
-                        ...CONNECTION_PARAMETERS.port,
-                        value: poolingConfiguration?.db_port.toString() ?? '6543',
-                      },
-                      {
-                        ...CONNECTION_PARAMETERS.database,
-                        value: poolingConfiguration?.db_name ?? '',
-                      },
-                      { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
-                      { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
-                    ]}
-                    onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
-                  >
-                    {!sharedPoolerPreferred && !ipv4Addon && (
-                      <Collapsible_Shadcn_ className="group">
-                        <CollapsibleTrigger_Shadcn_
-                          asChild
-                          className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light mt-4 px-3"
-                        >
-                          <Button
-                            type="default"
-                            size="large"
-                            iconRight={
-                              <ChevronDown className="transition group-data-[state=open]:rotate-180" />
-                            }
-                            className="text-foreground !bg-dash-sidebar justify-between"
-                          >
-                            <div className="text-xs flex items-center p-2">
-                              <span>Using the Shared Pooler</span>
-                              <Badge variant={'brand'} size={'small'} className="ml-2">
-                                IPv4 compatible
-                              </Badge>
-                            </div>
-                          </Button>
-                        </CollapsibleTrigger_Shadcn_>
-                        <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
-                          <p className="px-3 py-2">
-                            Only recommended when your network does not support IPv6. Added latency
-                            compared to dedicated pooler.
-                          </p>
-                          <CodeBlock
-                            wrapperClassName={cn(
-                              '[&_pre]:border-x-0 [&_pre]:border-b-0 [&_pre]:px-4 [&_pre]:py-3',
-                              '[&_pre]:rounded-t-none'
-                            )}
-                            language={lang}
-                            value={supavisorConnectionStrings['pooler'][selectedTab]}
-                            className="[&_code]:text-[12px] [&_code]:text-foreground"
-                            hideLineNumbers
-                            onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
-                          />
-                        </CollapsibleContent_Shadcn_>
-                      </Collapsible_Shadcn_>
-                    )}
-                  </ConnectionPanel>
-
                   {sharedPoolerPreferred && ipv4Addon && (
                     <Admonition
                       type="warning"
@@ -428,15 +474,14 @@ export const DatabaseConnectionString = () => {
                       </p>
                     </Admonition>
                   )}
-
                   <ConnectionPanel
                     type="session"
-                    title="Session pooler"
+                    title={connectionMethodOptions.session.label}
                     contentType={contentType}
                     lang={lang}
                     badge="Shared Pooler"
                     fileTitle={fileTitle}
-                    description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
+                    description={connectionMethodOptions.session.description}
                     connectionString={supavisorConnectionStrings['pooler'][selectedTab].replace(
                       '6543',
                       '5432'
@@ -536,3 +581,43 @@ export const DatabaseConnectionString = () => {
     </div>
   )
 }
+
+const ConnectionMethodSelectItem = ({
+  method,
+  poolerBadge,
+}: {
+  method: ConnectionMethod
+  poolerBadge: string
+}) => (
+  <SelectItem_Shadcn_ value={method}>
+    <div className="flex flex-col w-full py-1">
+      <div>{connectionMethodOptions[method].label}</div>
+      <div className="text-foreground-lighter text-xs">
+        {connectionMethodOptions[method].description}
+      </div>
+      <div className="flex items-center gap-1 mt-2">
+        {method === 'session' ? (
+          <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
+            <InfoIcon className="w-3 h-3" />
+            {connectionMethodOptions[method].badge}
+          </Badge>
+        ) : (
+          <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
+            <GlobeIcon className="w-3 h-3" />
+            {connectionMethodOptions[method].badge}
+          </Badge>
+        )}
+        {method === 'transaction' && (
+          <Badge variant="outline" size="small" className="text-foreground-lighter">
+            {poolerBadge}
+          </Badge>
+        )}
+        {method === 'session' && (
+          <Badge variant="outline" size="small" className="text-foreground-lighter">
+            Shared Pooler
+          </Badge>
+        )}
+      </div>
+    </div>
+  </SelectItem_Shadcn_>
+)

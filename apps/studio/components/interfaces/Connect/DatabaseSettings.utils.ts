@@ -38,7 +38,7 @@ export const getConnectionStrings = ({
 } => {
   const isMd5 = poolingInfo?.connectionString.includes('options=reference')
   const { projectRef } = metadata
-  const password = '[YOUR-PASSWORD]'
+  const password = '[YOUR_PASSWORD]'
 
   // Direct connection variables
   const directUser = connectionInfo.db_user
