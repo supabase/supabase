@@ -80,6 +80,7 @@ export const parsePgStatMonitorLogs = (logData: any[]): ParsedLogEntry[] => {
       parsedEventMessage: transformLogsToJSON(log.event_message),
     }))
     .filter((log) => log.parsedEventMessage !== null)
+    .filter((log) => log.parsedEventMessage?.event === 'bucket_query')
 
   console.log(`Successfully parsed: ${validParsedLogs.length}/${logData.length}`)
 

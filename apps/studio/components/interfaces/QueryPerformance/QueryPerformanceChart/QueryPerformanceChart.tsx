@@ -54,13 +54,12 @@ export const QueryPerformanceChart = ({
 
     switch (selectedMetric) {
       case 'query_latency': {
-        // Calculate average p95 across all time periods
         const avgP95 = chartData.reduce((sum, d) => sum + d.p95_time, 0) / chartData.length
 
         return [
           {
             label: 'Average p95',
-            value: `${avgP95.toFixed(2)}ms`,
+            value: avgP95 >= 100 ? `${(avgP95 / 1000).toFixed(2)}s` : `${Math.round(avgP95)}ms`,
           },
         ]
       }
@@ -112,7 +111,9 @@ export const QueryPerformanceChart = ({
   const transformedChartData = useMemo(() => {
     if (selectedMetric !== 'query_latency') return chartData
 
-    return chartData.map((dataPoint) => ({
+    console.log('Original chartData:', chartData)
+
+    const transformed = chartData.map((dataPoint) => ({
       ...dataPoint,
       p50_time:
         dataPoint.p50_time >= 1000
@@ -139,6 +140,9 @@ export const QueryPerformanceChart = ({
           ? parseFloat((dataPoint.p99_9_time / 1000).toFixed(1))
           : parseFloat(dataPoint.p99_9_time.toFixed(1)),
     }))
+
+    console.log('Transformed chartData:', transformed)
+    return transformed
   }, [chartData, selectedMetric])
 
   // Update the chart attributes to show the correct units
@@ -276,7 +280,7 @@ export const QueryPerformanceChart = ({
                   YAxisProps={{
                     tick: true,
                     width: 60,
-                    tickFormatter: formatTimeValue, // Use custom formatter for Y-axis
+                    tickFormatter: formatTimeValue,
                   }}
                   xAxisIsDate={true}
                   className="mt-6"
