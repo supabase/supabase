@@ -389,6 +389,10 @@ export const NewOrgForm = ({
                         autoFocus
                         type="text"
                         placeholder="Organization name"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
                         {...field}
                       />
                     </FormControl_Shadcn_>
