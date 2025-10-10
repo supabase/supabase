@@ -133,25 +133,25 @@ const useVibeCodersContent: () => {
         "Your AI assistant nails the prototype. Users actually want it. Then reality hits. Authentication breaks. Databases crash. Deployment becomes a nightmare. You're not alone. Every vibe coder hits this wall.",
       features: [
         {
-          id: 'instant-backend',
+          id: 'built-for-how-you-build',
           icon: Zap,
-          heading: 'Break through with our Vibe Coding Toolkit',
-          subheading:
-            'Supabase gives you the tools to easily manage databases, authentication, and backend infrastructure so you can build faster and ship with confidence.',
-        },
-        {
-          id: 'ai-tools-integration',
-          icon: Timer,
           heading: 'Built for how you build',
           subheading:
-            'Supabase is a production-ready backend that works with your AI tools from day one. No DevOps degree required. No months of setup. No "learning the hard way." Just ship.',
+            'Supabase is a complete production-ready back-end that includes everything you need to ship full-featured apps.',
         },
         {
-          id: 'production-ready',
-          icon: CheckCircle,
+          id: 'prototype-to-production',
+          icon: Timer,
           heading: 'From prototype to production',
           subheading:
             'Start with a weekend project and scale to millions of users. Supabase handles the complexity so you can focus on what matters - building great products.',
+        },
+        {
+          id: 'vibe-coding-toolkit',
+          icon: CheckCircle,
+          heading: 'Break through with our Vibe Coding Toolkit',
+          subheading:
+            'Tools, articles, and other resources to help you deploy your application to production with confidence.',
         },
       ],
     },

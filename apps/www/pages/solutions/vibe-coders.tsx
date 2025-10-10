@@ -44,22 +44,21 @@ const VibeCodersPage: NextPage<{ posts: Post[] }> = ({ posts }) => {
         <PlatformSection {...content.platform} />
         <PlatformStarterSection {...content.platformStarterSection} />
         <MPCSection {...content.mcp} />
-        <PostGrid posts={posts} {...content.postGrid} />
-        <SectionContainer className="flex flex-col items-center gap-8 mb-32">
+        <SectionContainer className="flex flex-col items-center gap-8">
           <h2 className="h3">
             Supabase is the backend platform for apps created by your favorite AI Builders.
           </h2>
 
           <AIBuildersLogos className="" />
         </SectionContainer>
+        <PostGrid posts={posts} {...content.postGrid} />
       </Layout>
     </>
   )
 }
 
 export const getStaticProps = async () => {
-  // TODO: add `vibe-coders` tag to the posts when merging PR
-  const posts = getSortedPosts({ directory: '_blog', limit: 3 })
+  const posts = getSortedPosts({ directory: '_blog', limit: 3, tags: ['vibe-coding'] })
   return { props: { posts } }
 }
 
