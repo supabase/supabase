@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
 import { BarChart, FileText, Shield } from 'lucide-react'
-// End of third-party imports
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
@@ -59,7 +58,7 @@ export const AIOnboarding = ({
               <h3 className="heading-meta text-foreground-light mb-3 mx-4">Suggestions</h3>
               {prompts.map((item, index) => (
                 <motion.div
-                  key={index}
+                  key={item.title}
                   initial={{ y: 5, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -86,7 +85,7 @@ export const AIOnboarding = ({
               {isLintsLoading ? (
                 <div className="px-4 flex flex-col gap-2">
                   {Array.from({ length: 6 }).map((_, index) => (
-                    <Skeleton className="h-4 w-full" />
+                    <Skeleton key={`loader-${index}`} className="h-4 w-full" />
                   ))}
                 </div>
               ) : (
@@ -99,6 +98,7 @@ export const AIOnboarding = ({
                       {performanceErrorLints.map((lint, index) => {
                         return (
                           <Button
+                            key={`${lint.name}-${index}`}
                             size="small"
                             type="text"
                             className="w-full justify-start"
@@ -129,6 +129,7 @@ export const AIOnboarding = ({
                       {securityErrorLints.map((lint, index) => {
                         return (
                           <Button
+                            key={`${lint.name}-${index}`}
                             size="small"
                             type="text"
                             className="w-full justify-start"
@@ -149,6 +150,7 @@ export const AIOnboarding = ({
                     <h3 className="heading-meta text-foreground-light mb-3 mx-4">Ideas</h3>
                     {prompts.map((item, index) => (
                       <Button
+                        key={`${item.title}-${index}`}
                         size="small"
                         type="text"
                         className="w-full justify-start"

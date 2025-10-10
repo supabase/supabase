@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
-  Clipboard,
+  Copy,
   Download,
   Edit,
   File,
@@ -183,7 +183,7 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
           },
           {
             name: 'Copy path to folder',
-            icon: <Clipboard size={14} strokeWidth={1} />,
+            icon: <Copy size={14} strokeWidth={1} />,
             onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
@@ -204,14 +204,14 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <Clipboard size={14} strokeWidth={1} />,
+                        icon: <Copy size={14} strokeWidth={1} />,
                         onClick: () => onCopyUrl(itemWithColumnIndex.name),
                       },
                     ]
                   : [
                       {
                         name: 'Get URL',
-                        icon: <Clipboard size={14} strokeWidth={1} />,
+                        icon: <Copy size={14} strokeWidth={1} />,
                         children: [
                           {
                             name: 'Expire in 1 week',

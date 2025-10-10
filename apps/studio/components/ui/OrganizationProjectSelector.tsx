@@ -1,5 +1,5 @@
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
@@ -98,8 +98,7 @@ export const OrganizationProjectSelector = ({
       !isFetching &&
       entry?.isIntersecting &&
       hasNextPage &&
-      !isFetchingNextPage &&
-      !isLoadingProjects
+      !isFetchingNextPage
     ) {
       fetchNextPage()
     }

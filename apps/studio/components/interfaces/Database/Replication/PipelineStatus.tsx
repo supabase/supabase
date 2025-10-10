@@ -8,14 +8,7 @@ import { ResponseError } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getPipelineStateMessages } from './Pipeline.utils'
-
-export enum PipelineStatusName {
-  FAILED = 'failed',
-  STARTING = 'starting',
-  STARTED = 'started',
-  STOPPED = 'stopped',
-  UNKNOWN = 'unknown',
-}
+import { PipelineStatusName } from './Replication.constants'
 
 interface PipelineStatusProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined

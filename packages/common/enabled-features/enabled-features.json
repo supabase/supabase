@@ -1,6 +1,8 @@
 {
   "$schema": "./enabled-features.schema.json",
 
+  "account:show_security_settings": true,
+
   "ai:opt_in_level_disabled": true,
   "ai:opt_in_level_schema": true,
   "ai:opt_in_level_schema_and_log": true,

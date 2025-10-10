@@ -6,6 +6,11 @@
       "type": "string"
     },
 
+    "account:show_security_settings": {
+      "type": "boolean",
+      "description": "Show the account security settings page"
+    },
+
     "ai:opt_in_level_disabled": {
       "type": "boolean",
       "description": "Enable the AI opt in level 'disabled'"
@@ -395,6 +400,7 @@
     }
   },
   "required": [
+    "account:show_security_settings",
     "ai:opt_in_level_disabled",
     "ai:opt_in_level_schema",
     "ai:opt_in_level_schema_and_log",

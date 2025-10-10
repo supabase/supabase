@@ -1190,6 +1190,35 @@ export interface AiAssistantInSupportFormClickedEvent {
 }
 
 /**
+ * User rated an AI assistant message with thumbs up or thumbs down.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantMessageRatingSubmittedEvent {
+  action: 'assistant_message_rating_submitted'
+  properties: {
+    /**
+     * The rating given by the user: positive (thumbs up) or negative (thumbs down)
+     */
+    rating: 'positive' | 'negative'
+    /**
+     * The category of the conversation
+     */
+    category:
+      | 'sql_generation'
+      | 'schema_design'
+      | 'rls_policies'
+      | 'edge_functions'
+      | 'database_optimization'
+      | 'debugging'
+      | 'general_help'
+      | 'other'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User copied the command for a Supabase UI component.
  *
  * @group Events
@@ -1833,12 +1862,54 @@ export interface TableRLSEnabledEvent {
 }
 
 /**
+ * User opened API docs panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with API docs button
+ */
+export interface ApiDocsOpenedEvent {
+  action: 'api_docs_opened'
+  properties: {
+    /**
+     * Source of the API docs button click, e.g. table_editor, sidebar
+     */
+    source: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked copy button in API docs panel.
+ *
+ * @group Events
+ * @source studio
+ * @page API docs panel
+ */
+export interface ApiDocsCodeCopyButtonClickedEvent {
+  action: 'api_docs_code_copy_button_clicked'
+  properties: {
+    /**
+     * Title of the content being copied
+     */
+    title?: string
+    /**
+     * Selected programming language, e.g. js, bash
+     */
+    selectedLanguage?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
   | ConnectionStringCopiedEvent
+  | ApiDocsOpenedEvent
+  | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
   | CronJobUpdatedEvent
   | CronJobDeletedEvent
@@ -1871,6 +1942,7 @@ export type TelemetryEvent =
   | AssistantSuggestionRunQueryClickedEvent
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
+  | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent

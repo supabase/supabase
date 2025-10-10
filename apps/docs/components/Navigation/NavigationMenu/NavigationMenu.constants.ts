@@ -67,6 +67,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       icon: 'getting-started',
       href: '/guides/getting-started',
       level: 'gettingstarted',
+      enabled: frameworkQuickstartsEnabled,
     },
   ],
   [
@@ -1390,7 +1391,13 @@ export const queues: NavMenuConstant = {
     {
       name: 'Getting Started',
       url: undefined,
-      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+      items: [
+        { name: 'Quickstart', url: '/guides/queues/quickstart' },
+        {
+          name: 'Consuming Messages with Edge Functions',
+          url: '/guides/queues/consuming-messages-with-edge-functions',
+        },
+      ],
     },
     {
       name: 'References',
@@ -2543,6 +2550,32 @@ export const platform: NavMenuConstant = {
         {
           name: 'Credits',
           url: '/guides/platform/credits' as `/${string}`,
+        },
+        {
+          name: 'AWS Marketplace',
+          url: '/guides/platform/aws-marketplace',
+          items: [
+            {
+              name: 'Getting Started',
+              url: '/guides/platform/aws-marketplace/getting-started',
+            },
+            {
+              name: 'Account Setup',
+              url: '/guides/platform/aws-marketplace/account-setup',
+            },
+            {
+              name: 'Manage your subscription',
+              url: '/guides/platform/aws-marketplace/manage-your-subscription',
+            },
+            {
+              name: 'Invoices',
+              url: '/guides/platform/aws-marketplace/invoices',
+            },
+            {
+              name: 'FAQ',
+              url: '/guides/platform/aws-marketplace/faq',
+            },
+          ],
         },
         {
           name: 'Billing FAQ',

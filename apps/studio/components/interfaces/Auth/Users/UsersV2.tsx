@@ -503,7 +503,9 @@ export const UsersV2 = () => {
               </div>
 
               <div className="flex items-center gap-x-2">
-                {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
+                {isNewAPIDocsEnabled && (
+                  <APIDocsButton section={['user-management']} source="auth-users" />
+                )}
                 <Button
                   size="tiny"
                   icon={<RefreshCw />}
