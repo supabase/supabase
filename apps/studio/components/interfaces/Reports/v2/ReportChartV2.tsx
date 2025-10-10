@@ -70,6 +70,8 @@ export const ReportChartV2 = ({
     {
       enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      staleTime: 5_000, // Enough for multiple metrics with the same query to share the fetch request.
     }
   )
 

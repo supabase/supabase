@@ -466,7 +466,6 @@ export const createUsageReportConfig = ({
   const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
 
   const usageSql = buildUsageAllSQL(interval, filters, startDate, endDate)
-  const usageDataPromise = fetchLogs(projectRef, usageSql, startDate, endDate)
 
   return [
     {
@@ -486,13 +485,12 @@ export const createUsageReportConfig = ({
         const attributes = [
           { attribute: 'ActiveUsers', provider: 'logs', label: 'Active Users', enabled: true },
         ]
-        const sql = usageSql
-        const rawData = await usageDataPromise
+        const rawData = await fetchLogs(projectRef, usageSql, startDate, endDate)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
         return {
           data: transformedData.data,
           attributes: transformedData.chartAttributes,
-          query: sql,
+          query: usageSql,
         }
       },
     },
@@ -540,13 +538,12 @@ export const createUsageReportConfig = ({
             enabled: true,
           },
         ]
-        const sql = usageSql
-        const rawData = await usageDataPromise
+        const rawData = await fetchLogs(projectRef, usageSql, startDate, endDate)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
         return {
           data: transformedData.data,
           attributes: transformedData.chartAttributes,
-          query: sql,
+          query: usageSql,
         }
       },
     },
@@ -572,13 +569,12 @@ export const createUsageReportConfig = ({
             enabled: true,
           },
         ]
-        const sql = usageSql
-        const rawData = await usageDataPromise
+        const rawData = await fetchLogs(projectRef, usageSql, startDate, endDate)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
         return {
           data: transformedData.data,
           attributes: transformedData.chartAttributes,
-          query: sql,
+          query: usageSql,
         }
       },
     },
@@ -604,13 +600,12 @@ export const createUsageReportConfig = ({
             enabled: true,
           },
         ]
-        const sql = usageSql
-        const rawData = await usageDataPromise
+        const rawData = await fetchLogs(projectRef, usageSql, startDate, endDate)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
         return {
           data: transformedData.data,
           attributes: transformedData.chartAttributes,
-          query: sql,
+          query: usageSql,
         }
       },
     },
