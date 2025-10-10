@@ -367,6 +367,10 @@ export const NewOrgForm = ({
               </Button>
             </div>
           }
+          // Allow address dropdown in Stripe Elements to overflow the panel
+          noHideOverflow
+          // Prevent resulting rounded corners in footer being clipped by squared corners of bg
+          footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
             <Panel.Content className="Form section-block--body has-inputs-centered">
