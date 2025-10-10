@@ -1,55 +1,40 @@
 import { DataPoint } from 'data/analytics/constants'
-import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
+import {
+  PricingMetric,
+  useOrgDailyStatsQuery,
+  type OrgDailyUsageResponse,
+} from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import UsageSection from './UsageSection/UsageSection'
+import { dailyUsageToDataPoints } from './Usage.utils'
 
 export interface SizeAndCountsProps {
   orgSlug: string
   projectRef?: string
-  startDate: string | undefined
-  endDate: string | undefined
   subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
+  orgDailyStats: OrgDailyUsageResponse | undefined
+  isLoadingOrgDailyStats: boolean
 }
 
 const SizeAndCounts = ({
   orgSlug,
   projectRef,
-  startDate,
-  endDate,
   subscription,
   currentBillingCycleSelected,
+  orgDailyStats,
+  isLoadingOrgDailyStats,
 }: SizeAndCountsProps) => {
-  const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useOrgDailyStatsQuery({
-    orgSlug,
-    projectRef,
-    metric: PricingMetric.DATABASE_SIZE,
-    interval: '1d',
-    startDate,
-    endDate,
-  })
-
-  const { data: storageSizeData, isLoading: isLoadingStorageSizeData } = useOrgDailyStatsQuery({
-    orgSlug,
-    projectRef,
-    metric: PricingMetric.STORAGE_SIZE,
-    interval: '1d',
-    startDate,
-    endDate,
-  })
-
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
-    [PricingMetric.DATABASE_SIZE]: {
-      isLoading: isLoadingDbSizeData,
-      margin: 14,
-      data: dbSizeData?.data ?? [],
-    },
     [PricingMetric.STORAGE_SIZE]: {
-      isLoading: isLoadingStorageSizeData,
+      isLoading: isLoadingOrgDailyStats,
       margin: 14,
-      data: storageSizeData?.data ?? [],
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.STORAGE_SIZE
+      ),
     },
   }
 

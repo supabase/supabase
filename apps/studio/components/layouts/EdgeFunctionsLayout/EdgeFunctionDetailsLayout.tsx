@@ -168,6 +168,7 @@ const EdgeFunctionDetailsLayout = ({
                 section={
                   functionSlug !== undefined ? ['edge-functions', functionSlug] : ['edge-functions']
                 }
+                source="edge-functions"
               />
             )}
             <DocsButton href={`${DOCS_URL}/guides/functions`} />

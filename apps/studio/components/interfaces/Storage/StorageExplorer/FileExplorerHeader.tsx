@@ -517,7 +517,7 @@ export const FileExplorerHeader = ({
           <>
             <div className="h-6 border-r border-control" />
             <div className="mx-2">
-              <APIDocsButton section={['storage', selectedBucket.name]} />
+              <APIDocsButton section={['storage', selectedBucket.name]} source="storage" />
             </div>
           </>
         )}
