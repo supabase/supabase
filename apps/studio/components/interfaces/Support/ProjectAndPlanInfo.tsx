@@ -11,9 +11,9 @@ import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSe
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
-  cn,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
+  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
 } from 'ui'
@@ -225,7 +225,7 @@ const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps
             </p>
           )}
 
-          {billingAll && (
+          {billingAll && planId !== 'enterprise' && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
               <Button asChild>
                 <Link
