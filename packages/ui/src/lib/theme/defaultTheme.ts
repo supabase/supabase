@@ -1189,7 +1189,7 @@ export default {
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
-            bg-sidebar-accent dark:bg-surface-200
+            bg-sidebar-accent
             text-foreground-lighter
             z-10 rounded-md
           `,
