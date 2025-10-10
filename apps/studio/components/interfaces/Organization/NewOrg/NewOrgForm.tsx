@@ -1,18 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 import _ from 'lodash'
-import { ExternalLink, HelpCircle } from 'lucide-react'
+import { HelpCircle } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { loadStripe } from '@stripe/stripe-js'
-import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
@@ -29,11 +29,12 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useTheme } from 'next-themes'
 import {
   Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
-  Label_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -45,6 +46,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
@@ -97,6 +99,8 @@ type FormState = z.infer<typeof formSchema>
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
+const FORM_ID = 'new-org-form'
+
 /**
  * No org selected yet, create a new one
  * [Joshen] Need to refactor to use Form_Shadcn here
@@ -147,34 +151,37 @@ export const NewOrgForm = ({
   const [searchParams] = useQueryStates({
     returnTo: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
+    token: parseAsString.withDefault(''),
+  })
+
+  const [defaultValues] = useQueryStates({
+    name: parseAsString.withDefault(''),
+    kind: parseAsString.withDefault(ORG_KIND_DEFAULT),
+    plan: parseAsString.withDefault('FREE'),
+    size: parseAsString.withDefault(ORG_SIZE_DEFAULT),
+    spend_cap: parseAsBoolean.withDefault(true),
   })
 
   const form = useForm<FormState>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      plan: 'FREE',
-      name: '',
-      kind: ORG_KIND_DEFAULT,
-      size: ORG_SIZE_DEFAULT,
-      spend_cap: true,
+      plan: defaultValues.plan.toUpperCase() as (typeof plans)[number],
+      name: defaultValues.name,
+      kind: defaultValues.kind as typeof ORG_KIND_DEFAULT,
+      size: defaultValues.size as keyof typeof ORG_SIZE_TYPES,
+      spend_cap: defaultValues.spend_cap,
     },
   })
 
   useEffect(() => {
-    if (!router.isReady) return
-
-    const { name, kind, plan, size, spend_cap } = router.query
-
-    if (typeof name === 'string') form.setValue('name', name)
-    if (typeof kind === 'string') form.setValue('kind', kind)
-    if (typeof plan === 'string' && plans.includes(plan.toUpperCase() as (typeof plans)[number])) {
-      const uppercasedPlan = plan.toUpperCase() as (typeof plans)[number]
-      form.setValue('plan', uppercasedPlan)
-      onPlanSelected(uppercasedPlan)
-    }
-    if (typeof size === 'string') form.setValue('size', size as any)
-    if (typeof spend_cap === 'string') form.setValue('spend_cap', spend_cap === 'true')
-  }, [router.isReady, router.query, form, onPlanSelected])
+    form.reset({
+      plan: defaultValues.plan.toUpperCase() as (typeof plans)[number],
+      name: defaultValues.name,
+      kind: defaultValues.kind as typeof ORG_KIND_DEFAULT,
+      size: defaultValues.size as keyof typeof ORG_SIZE_TYPES,
+      spend_cap: defaultValues.spend_cap,
+    })
+  }, [defaultValues, form])
 
   useEffect(() => {
     const currentName = form.getValues('name')
@@ -221,9 +228,9 @@ export const NewOrgForm = ({
     if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded') {
       await confirmPendingSubscriptionChange({
         payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
-        name: formState.name,
-        kind: formState.kind,
-        size: formState.size,
+        name: form.getValues('name'),
+        kind: form.getValues('kind'),
+        size: form.getValues('size'),
       })
     } else {
       // If the payment intent is not successful, we reset the payment method and show an error
@@ -240,10 +247,16 @@ export const NewOrgForm = ({
       ? user.profile.username + `'s Project`
       : 'My Project'
 
-    if (searchParams.returnTo && searchParams.auth_id) {
-      router.push(`${searchParams.returnTo}?auth_id=${searchParams.auth_id}`, undefined, {
-        shallow: false,
-      })
+    if (searchParams.returnTo) {
+      const url = new URL(searchParams.returnTo, window.location.origin)
+      if (searchParams.auth_id) {
+        url.searchParams.set('auth_id', searchParams.auth_id)
+      }
+      if (searchParams.token) {
+        url.searchParams.set('token', searchParams.token)
+      }
+
+      router.push(url.toString(), undefined, { shallow: false })
     } else {
       router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
     }
@@ -257,6 +270,7 @@ export const NewOrgForm = ({
   }, [paymentIntentSecret, resolvedTheme])
 
   async function createOrg(
+    formValues: z.infer<typeof formSchema>,
     paymentMethodId?: string,
     customerData?: {
       address: CustomerAddress | null
@@ -264,7 +278,6 @@ export const NewOrgForm = ({
       tax_id: CustomerTaxId | null
     }
   ) {
-    const formValues = form.getValues()
     const dbTier = formValues.plan === 'PRO' && !formValues.spend_cap ? 'PAYG' : formValues.plan
 
     createOrganization({
@@ -285,12 +298,19 @@ export const NewOrgForm = ({
 
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
 
-  const handleSubmit = async () => {
+  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (formValues) => {
+    debugger
+    const hasFreeOrgWithProjects = freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0)
+
+    if (hasFreeOrgWithProjects && formValues.plan !== 'FREE') {
+      setIsOrgCreationConfirmationModalVisible(true)
+      return
+    }
+
     setNewOrgLoading(true)
-    const formValues = form.getValues()
 
     if (formValues.plan === 'FREE') {
-      await createOrg()
+      await createOrg(formValues)
     } else if (!paymentMethod) {
       const result = await paymentRef.current?.createPaymentMethod()
       if (result) {
@@ -301,12 +321,12 @@ export const NewOrgForm = ({
           tax_id: result.taxId,
         }
 
-        createOrg(result.paymentMethod.id, customerData)
+        createOrg(formValues, result.paymentMethod.id, customerData)
       } else {
         setNewOrgLoading(false)
       }
     } else {
-      createOrg(paymentMethod.id)
+      createOrg(formValues, paymentMethod.id)
     }
   }
 
@@ -315,25 +335,9 @@ export const NewOrgForm = ({
     return onPaymentMethodReset()
   }
 
-  const onSubmitWithOrgCreation = async () => {
-    const formValues = form.getValues()
-    const isOrgNameValid = formValues.name.trim().length > 0
-    if (!isOrgNameValid) {
-      return toast.error('Organization name is empty')
-    }
-
-    const hasFreeOrgWithProjects = freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0)
-
-    if (hasFreeOrgWithProjects && formValues.plan !== 'FREE') {
-      setIsOrgCreationConfirmationModalVisible(true)
-    } else {
-      await handleSubmit()
-    }
-  }
-
   return (
     <Form_Shadcn_ {...form}>
-      <form onSubmit={form.handleSubmit(onSubmitWithOrgCreation)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
         <Panel
           title={
             <div key="panel-title">
@@ -358,6 +362,7 @@ export const NewOrgForm = ({
               </Button>
 
               <Button
+                form={FORM_ID}
                 htmlType="submit"
                 type="primary"
                 loading={newOrgLoading}
@@ -576,7 +581,7 @@ export const NewOrgForm = ({
           confirmLabel="Create new organization"
           onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
           onConfirm={async () => {
-            await handleSubmit()
+            await onSubmit(form.getValues())
             setIsOrgCreationConfirmationModalVisible(false)
           }}
           variant={'warning'}
