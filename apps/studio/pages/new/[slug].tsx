@@ -256,12 +256,16 @@ const Wizard: NextPageWithLayout = () => {
       }
     )
 
-  const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
-    : defaultProvider === 'AWS_NIMBUS'
+  const regionError =
+    smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
+      ? availableRegionsError
+      : defaultRegionError
+  const defaultRegion =
+    defaultProvider === 'AWS_NIMBUS'
       ? AWS_REGIONS.EAST_US.displayName
-      : _defaultRegion
+      : smartRegionEnabled
+        ? availableRegionsData?.recommendations.smartGroup.name
+        : _defaultRegion
 
   const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 
