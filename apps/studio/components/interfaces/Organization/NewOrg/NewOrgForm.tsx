@@ -578,53 +578,62 @@ export const NewOrgForm = ({
         >
           <p className="text-sm text-foreground-light">
             Supabase{' '}
-            <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
+            <InlineLink
+              href="https://supabase.com/docs/guides/platform/billing-on-supabase"
+              target="_blank"
+              rel="noreferrer"
+              className="text-inherit hover:text-foreground transition-colors"
+            >
               bills per organization
             </InlineLink>
             . If you want to upgrade your existing projects, upgrade your existing organization
             instead.
           </p>
 
-          <ul className="mt-4 space-y-6">
+          <ul className="mt-4 divide-y divide-border-muted border-t border-t-border-muted">
             {freeOrgs
               .filter((it) => projectsByOrg[it.slug]?.length > 0)
               .map((org) => {
                 const orgProjects = projectsByOrg[org.slug].map((it) => it.name)
 
                 return (
-                  <li key={`org_${org.slug}`}>
-                    <div className="flex justify-between text-sm">
-                      <span>{org.name}</span>
-                      <Button asChild type="primary" size="tiny">
-                        <Link href={`/org/${org.slug}/billing?panel=subscriptionPlan`}>
-                          Change Plan
-                        </Link>
-                      </Button>
+                  <li
+                    key={`org_${org.slug}`}
+                    className="pt-3 [&:not(:last-child)]:pb-3 flex items-center justify-between"
+                  >
+                    <div className="flex flex-col">
+                      <h3 className="text-sm">{org.name}</h3>
+
+                      <div className="text-foreground-lighter text-xs">
+                        {orgProjects.length <= 2 ? (
+                          <span>{orgProjects.join(' and ')}</span>
+                        ) : (
+                          <div>
+                            {orgProjects.slice(0, 2).join(', ')} and{' '}
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="underline decoration-dotted">
+                                  {orgProjects.length - 2} other{' '}
+                                  {orgProjects.length === 3 ? 'project' : 'project'}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <ul className="list-disc list-inside">
+                                  {orgProjects.slice(2).map((project) => (
+                                    <li>{project}</li>
+                                  ))}
+                                </ul>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-foreground-light text-xs">
-                      {orgProjects.length <= 2 ? (
-                        <span>{orgProjects.join(' and ')}</span>
-                      ) : (
-                        <div>
-                          {orgProjects.slice(0, 2).join(', ')} and{' '}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="underline decoration-dotted">
-                                {orgProjects.length - 2} other{' '}
-                                {orgProjects.length === 3 ? 'project' : 'project'}
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <ul className="list-disc list-inside">
-                                {orgProjects.slice(2).map((project) => (
-                                  <li>{project}</li>
-                                ))}
-                              </ul>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      )}
-                    </div>
+                    <Button asChild type="default" size="tiny">
+                      <Link href={`/org/${org.slug}/billing?panel=subscriptionPlan`}>
+                        Change plan
+                      </Link>
+                    </Button>
                   </li>
                 )
               })}
