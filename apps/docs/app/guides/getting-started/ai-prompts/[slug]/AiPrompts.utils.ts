@@ -28,7 +28,7 @@ function parseMarkdown(markdown: string) {
     }
   })
 
-  return { heading, content: withoutFrontmatter }
+  return { heading, content: withoutFrontmatter.trim() }
 }
 
 /**
