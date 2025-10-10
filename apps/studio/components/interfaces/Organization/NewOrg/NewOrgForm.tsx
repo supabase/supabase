@@ -381,7 +381,7 @@ export const NewOrgForm = ({
                   <FormItemLayout
                     label="Name"
                     layout="horizontal"
-                    description="What's the name of your company or team? You can change this name later."
+                    description="What's the name of your company or team? You can change this later."
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
