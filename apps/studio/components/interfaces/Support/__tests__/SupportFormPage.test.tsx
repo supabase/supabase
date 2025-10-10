@@ -985,7 +985,7 @@ describe('SupportFormPage', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/feedback/send',
-      response: async ({ request }) => {
+      response: async () => {
         return HttpResponse.json({ message: errorMessage }, { status: 500 })
       },
     })
