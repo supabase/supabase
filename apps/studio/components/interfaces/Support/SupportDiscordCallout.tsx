@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { AnimatePresence, motion } from 'framer-motion'
 import { MoveUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { IconDiscord } from 'ui'
-import { motion, AnimatePresence } from 'framer-motion'
 
 interface DynamicStatusProps {
   interval?: number
@@ -30,20 +30,20 @@ export function SupportFormDiscordCallout({ interval = 4000 }: DynamicStatusProp
 
   return (
     <div
-      className="flex items-center gap-4 border-t border-b border-default px-6 py-2"
+      className="flex items-center gap-4 border-t border-b border-default px-6 py-2 overflow-hidden"
       style={{
         backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px)',
         backgroundSize: '8px 8px',
       }}
     >
-      <div className="relative flex-1 overflow-hidden h-5">
+      <div className="relative flex-1 h-5">
         <AnimatePresence mode="wait">
           <motion.span
             key={currentIndex}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="absolute inset-0 block text-sm font-medium"
           >
             {statuses[currentIndex]}
