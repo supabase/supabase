@@ -106,6 +106,16 @@ export const QueryPerformance = ({
     return transformLogsToChartData(parsedLogs)
   }, [parsedLogs])
 
+  console.log(
+    '⚡️ Cache Stats:',
+    chartData.map((d) => ({
+      timestamp: d.timestamp,
+      cache_hits: d.cache_hits,
+      cache_misses: d.cache_misses,
+      hit_rate: ((d.cache_hits / (d.cache_hits + d.cache_misses)) * 100).toFixed(2) + '%',
+    }))
+  )
+
   const aggregatedGridData = useMemo(() => {
     return aggregateLogsByQuery(parsedLogs)
   }, [parsedLogs])

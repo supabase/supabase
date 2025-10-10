@@ -40,6 +40,10 @@ const formatTimeValue = (value: number): string => {
   return `${value.toFixed(1)}ms`
 }
 
+const formatNumberValue = (value: number): string => {
+  return value.toLocaleString()
+}
+
 export const QueryPerformanceChart = ({
   // dateRange,
   onDateRangeChange,
@@ -87,18 +91,12 @@ export const QueryPerformanceChart = ({
         const totalHits = chartData.reduce((sum, d) => sum + d.cache_hits, 0)
         const totalMisses = chartData.reduce((sum, d) => sum + d.cache_misses, 0)
         const total = totalHits + totalMisses
-
         const hitRate = total > 0 ? (totalHits / total) * 100 : 0
-        const missRate = total > 0 ? (totalMisses / total) * 100 : 0
 
         return [
           {
             label: 'Cache Hit Rate',
             value: `${hitRate.toFixed(2)}%`,
-          },
-          {
-            label: 'Cache Miss Rate',
-            value: `${missRate.toFixed(2)}%`,
           },
         ]
       }
@@ -111,7 +109,7 @@ export const QueryPerformanceChart = ({
   const transformedChartData = useMemo(() => {
     if (selectedMetric !== 'query_latency') return chartData
 
-    console.log('Original chartData:', chartData)
+    console.log('🟢 Original chartData:', chartData)
 
     const transformed = chartData.map((dataPoint) => ({
       ...dataPoint,
@@ -141,7 +139,7 @@ export const QueryPerformanceChart = ({
           : parseFloat(dataPoint.p99_9_time.toFixed(1)),
     }))
 
-    console.log('Transformed chartData:', transformed)
+    console.log('🟣 Transformed chartData:', transformed)
     return transformed
   }, [chartData, selectedMetric])
 
@@ -202,7 +200,7 @@ export const QueryPerformanceChart = ({
       calls: [
         {
           attribute: 'calls',
-          label: 'Number of Calls',
+          label: 'Calls',
           provider: 'logs',
         },
       ],
@@ -211,6 +209,15 @@ export const QueryPerformanceChart = ({
           attribute: 'cache_hits',
           label: 'Cache Hits',
           provider: 'logs',
+          type: 'line',
+          color: { light: '#10B981', dark: '#10B981' },
+        },
+        {
+          attribute: 'cache_misses',
+          label: 'Cache Misses',
+          provider: 'logs',
+          type: 'line',
+          color: { light: '#65BCD9', dark: '#65BCD9' },
         },
       ],
     }
@@ -219,9 +226,17 @@ export const QueryPerformanceChart = ({
   }, [selectedMetric])
 
   const updateDateRange = (from: string, to: string) => {
-    console.log('Date range update:', from, to)
     onDateRangeChange?.(from, to)
   }
+
+  const getYAxisFormatter = useMemo(() => {
+    // Only use time formatting for query latency metrics
+    if (selectedMetric === 'query_latency') {
+      return formatTimeValue
+    }
+    // For other metrics (rows_read, calls, cache_hits), use number formatting
+    return formatNumberValue
+  }, [selectedMetric])
 
   return (
     <div className="bg-surface-200 border-t">
@@ -280,7 +295,7 @@ export const QueryPerformanceChart = ({
                   YAxisProps={{
                     tick: true,
                     width: 60,
-                    tickFormatter: formatTimeValue,
+                    tickFormatter: getYAxisFormatter,
                   }}
                   xAxisIsDate={true}
                   className="mt-6"

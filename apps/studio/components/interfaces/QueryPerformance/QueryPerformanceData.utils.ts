@@ -82,8 +82,6 @@ export const parsePgStatMonitorLogs = (logData: any[]): ParsedLogEntry[] => {
     .filter((log) => log.parsedEventMessage !== null)
     .filter((log) => log.parsedEventMessage?.event === 'bucket_query')
 
-  console.log(`Successfully parsed: ${validParsedLogs.length}/${logData.length}`)
-
   return validParsedLogs.map((log) => log.parsedEventMessage)
 }
 
@@ -92,7 +90,7 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
 
   // [kemal]: here for debugging
   if (parsedLogs.length > 0) {
-    console.log('Parsed logs:', parsedLogs)
+    console.log('🟡 Parsed logs:', parsedLogs)
   }
 
   return parsedLogs
@@ -116,29 +114,10 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
         return null
       }
 
-      // DEBUG: Log the raw log object to see what fields are available
-      console.log('Raw log object keys:', Object.keys(log))
-
-      // Check specifically for histogram-related fields
-      const histogramFields = Object.keys(log).filter(
-        (key) =>
-          key.toLowerCase().includes('resp') ||
-          key.toLowerCase().includes('histogram') ||
-          key.toLowerCase().includes('time')
-      )
-      console.log('Potential histogram fields:', histogramFields)
-
-      // Log the actual values
-      console.log('resp_calls value:', log.resp_calls)
-      console.log('Full log object:', log)
-
-      // Calculate percentiles from histogram
       const percentiles =
         log.resp_calls && Array.isArray(log.resp_calls)
           ? calculatePercentilesFromHistogram(log.resp_calls)
           : { p50: 0, p75: 0, p90: 0, p95: 0, p99: 0, p99_9: 0 }
-
-      console.log('Calculated percentiles:', percentiles)
 
       return {
         period_start: periodStart,
@@ -276,7 +255,7 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQu
     })
   })
 
-  console.log('Aggregated data:', aggregatedData)
+  console.log('🏓 Aggregated data:', aggregatedData)
 
   return aggregatedData.sort((a, b) => b.total_time - a.total_time)
 }
@@ -292,66 +271,69 @@ export const calculatePercentilesFromHistogram = (
   p99: number
   p99_9: number
 } => {
-  console.log('Input respCalls:', respCalls)
-
-  // pg_stat_monitor histogram buckets (in milliseconds)
-  // Bucket boundaries: [1, 10, 100, 1000, 10000, Infinity]
   const bucketBoundaries = [
-    { min: 0, max: 1 }, // Index 0
-    { min: 1, max: 10 }, // Index 1
-    { min: 10, max: 100 }, // Index 2
-    { min: 100, max: 1000 }, // Index 3
-    { min: 1000, max: 10000 }, // Index 4
-    { min: 10000, max: 100000 }, // Index 5+
+    { min: 0, max: 1 },
+    { min: 1, max: 10 },
+    { min: 10, max: 100 },
+    { min: 100, max: 1000 },
+    { min: 1000, max: 10000 },
+    { min: 10000, max: 100000 },
   ]
 
-  // Build cumulative distribution
   const totalCalls = respCalls.reduce((sum, count) => sum + count, 0)
-  console.log('Total calls:', totalCalls)
 
   if (totalCalls === 0) {
-    console.log('No calls found, returning zeros')
     return { p50: 0, p75: 0, p90: 0, p95: 0, p99: 0, p99_9: 0 }
   }
 
-  // Create cumulative counts with bucket midpoints
-  const distribution: { value: number; cumulativeCount: number }[] = []
+  // Create distribution with better interpolation within buckets
+  const distribution: {
+    minValue: number
+    maxValue: number
+    cumulativeCount: number
+    count: number
+  }[] = []
   let cumulativeCount = 0
 
   respCalls.forEach((count, index) => {
     if (count > 0 && index < bucketBoundaries.length) {
       const bucket = bucketBoundaries[index]
-      // Use geometric mean of bucket boundaries as representative value
-      const value = Math.sqrt(bucket.min * bucket.max)
       cumulativeCount += count
-      distribution.push({ value, cumulativeCount })
+      distribution.push({
+        minValue: bucket.min,
+        maxValue: bucket.max,
+        cumulativeCount,
+        count,
+      })
     }
   })
 
-  // Calculate percentiles using linear interpolation
+  // Calculate percentiles with linear interpolation within buckets
   const getPercentile = (percentile: number): number => {
     const targetCount = totalCalls * percentile
 
-    // Find the bucket containing this percentile
     for (let i = 0; i < distribution.length; i++) {
+      const prevCumulativeCount = i > 0 ? distribution[i - 1].cumulativeCount : 0
+
       if (distribution[i].cumulativeCount >= targetCount) {
-        if (i === 0) {
-          return distribution[i].value
-        }
+        // How far into this bucket is our target percentile?
+        const positionInBucket = (targetCount - prevCumulativeCount) / distribution[i].count
 
-        // Linear interpolation between previous and current bucket
-        const prevCount = i > 0 ? distribution[i - 1].cumulativeCount : 0
-        const prevValue = i > 0 ? distribution[i - 1].value : 0
-        const currCount = distribution[i].cumulativeCount
-        const currValue = distribution[i].value
+        // Linear interpolation within the bucket range (log scale would be better for large ranges)
+        const bucketMin = distribution[i].minValue
+        const bucketMax = distribution[i].maxValue
 
-        const ratio = (targetCount - prevCount) / (currCount - prevCount)
-        return prevValue + ratio * (currValue - prevValue)
+        // Use log interpolation for better distribution across wide buckets
+        const logMin = Math.log10(Math.max(bucketMin, 0.1))
+        const logMax = Math.log10(bucketMax)
+        const logValue = logMin + positionInBucket * (logMax - logMin)
+
+        return Math.pow(10, logValue)
       }
     }
 
-    // If we get here, return the last value
-    return distribution[distribution.length - 1]?.value || 0
+    // Return max of last bucket if we somehow get here
+    return distribution[distribution.length - 1]?.maxValue || 0
   }
 
   const result = {
@@ -363,6 +345,7 @@ export const calculatePercentilesFromHistogram = (
     p99_9: getPercentile(0.999),
   }
 
-  console.log('Final percentile result:', result)
+  console.log('📊 Percentile calculation:', { respCalls, result })
+
   return result
 }
