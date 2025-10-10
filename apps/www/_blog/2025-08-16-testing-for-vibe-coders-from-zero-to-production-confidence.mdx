@@ -87,7 +87,7 @@ test('sign up creates a profile row via trigger', async () => {
   const email = `test-${Date.now()}@example.com`
   const { data, error } = await supabase.auth.signUp({
     email,
-    password: 'Pass1234!'
+    password: 'Pass1234!',
   })
 
   expect(error).toBeNull()
@@ -183,7 +183,7 @@ export async function createTestUser(overrides = {}) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password: 'TestPass123!',
-    ...overrides
+    ...overrides,
   })
 
   if (error) throw error
@@ -197,7 +197,7 @@ export async function createTestPost(userId: string, overrides = {}) {
       user_id: userId,
       title: 'Test post',
       content: 'Test content',
-      ...overrides
+      ...overrides,
     })
     .select()
     .single()
@@ -215,10 +215,7 @@ test('search returns relevant posts', async () => {
   await createTestPost(user.id, { title: 'JavaScript tips' })
   await createTestPost(user.id, { title: 'Python tricks' })
 
-  const { data } = await supabase
-    .from('posts')
-    .select()
-    .textSearch('title', 'JavaScript')
+  const { data } = await supabase.from('posts').select().textSearch('title', 'JavaScript')
 
   expect(data).toHaveLength(1)
 })
@@ -237,7 +234,7 @@ export async function createTestUser(overrides = {}) {
   const { data, error } = await supabase.auth.signUp({
     email: faker.internet.email(),
     password: 'TestPass123!',
-    ...overrides
+    ...overrides,
   })
 
   if (error) throw error
@@ -247,7 +244,7 @@ export async function createTestUser(overrides = {}) {
     .update({
       display_name: faker.person.fullName(),
       bio: faker.lorem.paragraph(),
-      avatar_url: faker.image.avatar()
+      avatar_url: faker.image.avatar(),
     })
     .eq('id', data.user.id)
 
@@ -262,10 +259,7 @@ For tests that need volume, write a seed script that populates your database wit
 import { createClient } from '@supabase/supabase-js'
 import { faker } from '@faker-js/faker'
 
-const supabase = createClient(
-  'http://localhost:54321',
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
+const supabase = createClient('http://localhost:54321', process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 async function seed() {
   // Create 10 users with posts
@@ -273,7 +267,7 @@ async function seed() {
     const { data: user } = await supabase.auth.admin.createUser({
       email: faker.internet.email(),
       password: 'TestPass123!',
-      email_confirm: true
+      email_confirm: true,
     })
 
     // Each user gets 3-7 posts
@@ -283,7 +277,7 @@ async function seed() {
         user_id: user.user.id,
         title: faker.lorem.sentence(),
         content: faker.lorem.paragraphs(3),
-        published_at: faker.date.recent({ days: 30 })
+        published_at: faker.date.recent({ days: 30 }),
       })
     }
   }
@@ -358,8 +352,8 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     environment: 'node',
-    setupFiles: ['./tests/setup.ts']
-  }
+    setupFiles: ['./tests/setup.ts'],
+  },
 })
 ```
 
@@ -374,27 +368,24 @@ Most weekend projects have basic authentication but skip Row Level Security. Wri
 ```tsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'http://localhost:54321',
-  process.env.SUPABASE_ANON_KEY
-)
+const supabase = createClient('http://localhost:54321', process.env.SUPABASE_ANON_KEY)
 
 test('users cannot access each other data', async () => {
   // Create two test users
   const user1 = await supabase.auth.signUp({
     email: 'user1@test.com',
-    password: 'password123'
+    password: 'password123',
   })
 
   const user2 = await supabase.auth.signUp({
     email: 'user2@test.com',
-    password: 'password123'
+    password: 'password123',
   })
 
   // User 1 creates some data
   await supabase.auth.signInWithPassword({
     email: 'user1@test.com',
-    password: 'password123'
+    password: 'password123',
   })
 
   const { data: created } = await supabase
@@ -406,13 +397,10 @@ test('users cannot access each other data', async () => {
   // User 2 tries to access it
   await supabase.auth.signInWithPassword({
     email: 'user2@test.com',
-    password: 'password123'
+    password: 'password123',
   })
 
-  const { data: accessed } = await supabase
-    .from('posts')
-    .select()
-    .eq('id', created.id)
+  const { data: accessed } = await supabase.from('posts').select().eq('id', created.id)
 
   expect(accessed).toHaveLength(0)
 })
@@ -430,7 +418,7 @@ For a new feature like user profiles, write the test first:
 test('users can update their own profile', async () => {
   const { data: user } = await supabase.auth.signUp({
     email: 'profile@test.com',
-    password: 'password123'
+    password: 'password123',
   })
 
   const { error } = await supabase

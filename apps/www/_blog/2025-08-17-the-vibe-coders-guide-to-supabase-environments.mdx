@@ -39,35 +39,35 @@ Here is the basic workflow:
 
 1. Create a migration whenever you need to change the schema:
 
-    ```bash
-    supabase migration new add_user_profiles
-    ```
+   ```bash
+   supabase migration new add_user_profiles
+   ```
 
 2. Fill in the SQL, and always enable [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security). Without RLS, anyone with your project URL can read all your data.
 
-    ```sql
-    CREATE TABLE public.profiles (
-      id UUID REFERENCES auth.users ON DELETE CASCADE,
-      username TEXT UNIQUE,
-      avatar_url TEXT,
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    );
-    ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-    CREATE POLICY "Users can view own profile" ON profiles
-      FOR SELECT USING (auth.uid() = id);
-    ```
+   ```sql
+   CREATE TABLE public.profiles (
+     id UUID REFERENCES auth.users ON DELETE CASCADE,
+     username TEXT UNIQUE,
+     avatar_url TEXT,
+     created_at TIMESTAMPTZ DEFAULT NOW()
+   );
+   ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+   CREATE POLICY "Users can view own profile" ON profiles
+     FOR SELECT USING (auth.uid() = id);
+   ```
 
 3. Test locally before touching any remote environment:
 
-    ```bash
-    supabase db reset
-    ```
+   ```bash
+   supabase db reset
+   ```
 
 4. If you make changes in the Dashboard instead of SQL, capture them:
 
-    ```bash
-    supabase db diff -f capture_dashboard_changes
-    ```
+   ```bash
+   supabase db diff -f capture_dashboard_changes
+   ```
 
 Because migrations must run in order on a fresh database, always reset locally to prove they work. If `supabase db reset` works, production will too. This habit prevents the subtle drift that causes late night panics.
 
