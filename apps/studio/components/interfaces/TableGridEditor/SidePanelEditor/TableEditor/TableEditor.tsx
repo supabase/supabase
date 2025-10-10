@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -97,6 +97,9 @@ export const TableEditor = ({
     | QuickstartVariant
     | false
     | undefined
+  const quickstartMetadataRef = useRef<{ templateName?: string; source?: string } | null>(
+    null
+  )
 
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
@@ -236,6 +239,7 @@ export const TableEditor = ({
           isDuplicateRows: isDuplicateRows,
           existingForeignKeyRelations: foreignKeys,
           primaryKey,
+          quickstartMetadata: quickstartMetadataRef.current,
         }
         const columns = tableFields.columns.map((column) => {
           return { ...column, name: column.name.trim() }
@@ -310,6 +314,11 @@ export const TableEditor = ({
             <TableTemplateSelector
               variant={tableQuickstartVariant}
               onSelectTemplate={(template) => {
+                // Store quickstart metadata for tracking
+                quickstartMetadataRef.current = {
+                  templateName: template.name,
+                  source: (template as any).source,
+                }
                 const updates: Partial<TableField> = {}
                 if (template.name) updates.name = template.name
                 if (template.comment) updates.comment = template.comment
