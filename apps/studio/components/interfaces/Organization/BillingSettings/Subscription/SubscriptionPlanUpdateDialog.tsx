@@ -14,7 +14,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
-import { ProjectInfo } from 'data/projects/projects-query'
+import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
@@ -64,7 +64,7 @@ interface Props {
   subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse | undefined
   subscription: any
   currentPlanMeta: any
-  projects: ProjectInfo[]
+  projects: OrgProject[]
 }
 
 export const SubscriptionPlanUpdateDialog = ({

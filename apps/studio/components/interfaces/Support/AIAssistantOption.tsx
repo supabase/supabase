@@ -1,9 +1,9 @@
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Button } from 'ui'
 
 interface AIAssistantOptionProps {
@@ -17,9 +17,6 @@ export const AIAssistantOption = ({
   organizationSlug,
   isCondensed = false,
 }: AIAssistantOptionProps) => {
-  const { data } = useProjectsQuery()
-  const projects = data?.projects ?? []
-
   const { mutate: sendEvent } = useSendEventMutation()
   const [isVisible, setIsVisible] = useState(isCondensed ? true : false)
 
@@ -42,16 +39,8 @@ export const AIAssistantOption = ({
     return null
   }
 
-  const getProjectRef = () => {
-    if (projectRef !== 'no-project') {
-      return projectRef
-    }
-    // If no specific project selected, use first project from the org
-    const orgProjects = projects?.filter((p) => p.organization_slug === organizationSlug)
-    return orgProjects?.[0]?.ref || '_'
-  }
-
-  const aiLink = `/project/${getProjectRef()}?aiAssistantPanelOpen=true`
+  // If no specific project selected, use the wildcard route
+  const aiLink = `/project/${projectRef !== 'no-project' ? projectRef : '_'}?aiAssistantPanelOpen=true&slug=${organizationSlug}`
 
   return (
     <AnimatePresence initial={false}>

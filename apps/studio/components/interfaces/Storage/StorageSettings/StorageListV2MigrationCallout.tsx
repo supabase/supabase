@@ -1,10 +1,13 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useState } from 'react'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Dialog,
@@ -67,6 +70,10 @@ export const StorageListV2MigratingCallout = () => {
 
 const StorageListV2MigrationDialog = () => {
   const { ref } = useParams()
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const [open, setOpen] = useState(false)
 
@@ -86,7 +93,20 @@ const StorageListV2MigrationDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="primary">Upgrade Storage</Button>
+        <ButtonTooltip
+          type="primary"
+          disabled={!canUpdateStorageSettings}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canUpdateStorageSettings
+                ? 'You need additional permissions to upgrade storage'
+                : undefined,
+            },
+          }}
+        >
+          Upgrade Storage
+        </ButtonTooltip>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

@@ -1,19 +1,18 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 
+import type { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { AnalyticsData } from './constants'
+import { ResponseError } from 'types'
 import { analyticsKeys } from './keys'
 
 export enum EgressType {
-  DATABASE = 'egress_database',
+  REST = 'egress_rest',
   AUTH = 'egress_auth',
   STORAGE = 'egress_storage',
   REALTIME = 'egress_realtime',
   FUNCTIONS = 'egress_functions',
   SUPAVISOR = 'egress_supavisor',
   LOGDRAIN = 'egress_logdrain',
-  UNIFIED = 'egress',
 }
 
 // [Joshen] Get this from common package instead of API and dashboard having one copy each
@@ -113,33 +112,27 @@ export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) 
 export type OrgDailyStatsVariables = {
   // API parameters
   orgSlug?: string
-  metric?: PricingMetric
   startDate?: string
   endDate?: string
-  interval?: string
   projectRef?: string
-  // Client specific
-  dateFormat?: string
-  modifier?: (x: number) => number
 }
 
+export type OrgDailyUsageResponse = components['schemas']['OrgDailyUsageResponse']
+
 export async function getOrgDailyStats(
-  { orgSlug, metric, startDate, endDate, interval = '1d', projectRef }: OrgDailyStatsVariables,
+  { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,
   signal?: AbortSignal
 ) {
   if (!orgSlug) throw new Error('Org slug is required')
-  if (!metric) throw new Error('Metric is required')
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('Start date is required')
 
-  const { data, error } = await get('/platform/organizations/{slug}/daily-stats', {
+  const { data, error } = await get('/platform/organizations/{slug}/usage/daily', {
     params: {
       path: { slug: orgSlug },
       query: {
-        metric,
-        startDate,
-        endDate,
-        interval,
+        start: startDate,
+        end: endDate,
         projectRef,
       },
     },
@@ -148,52 +141,25 @@ export async function getOrgDailyStats(
 
   if (error) handleError(error)
 
-  return data as unknown as AnalyticsData
+  return data
 }
 
 export type OrgDailyStatsData = Awaited<ReturnType<typeof getOrgDailyStats>>
-export type OrgDailyStatsError = unknown
+export type OrgDailyStatsError = ResponseError
 
 export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
-  {
-    orgSlug,
-    metric,
-    startDate,
-    endDate,
-    interval = '1d',
-    projectRef,
-    dateFormat = 'DD MMM',
-    modifier,
-  }: OrgDailyStatsVariables,
+  { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,
   { enabled = true, ...options }: UseQueryOptions<OrgDailyStatsData, OrgDailyStatsError, TData> = {}
 ) =>
   useQuery<OrgDailyStatsData, OrgDailyStatsError, TData>(
-    analyticsKeys.orgDailyStats(orgSlug, { metric, startDate, endDate, interval, projectRef }),
-    ({ signal }) =>
-      getOrgDailyStats({ orgSlug, metric, startDate, endDate, interval, projectRef }, signal),
+    analyticsKeys.orgDailyStats(orgSlug, { startDate, endDate, projectRef }),
+    ({ signal }) => getOrgDailyStats({ orgSlug, startDate, endDate, projectRef }, signal),
     {
       enabled:
         enabled &&
         typeof orgSlug !== 'undefined' &&
-        typeof metric !== 'undefined' &&
         typeof startDate !== 'undefined' &&
         typeof endDate !== 'undefined',
-
-      select(data) {
-        return {
-          ...data,
-          data: data.data.map((x) => {
-            return {
-              ...x,
-              [metric as string]:
-                modifier !== undefined
-                  ? modifier(Number(x[metric as string]))
-                  : Number(x[metric as string]),
-              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
-            }
-          }),
-        } as TData
-      },
       staleTime: 1000 * 60 * 60, // default good for an hour for now
       ...options,
     }
