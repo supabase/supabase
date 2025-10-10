@@ -8,8 +8,8 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
-
 import { loadStripe } from '@stripe/stripe-js'
+import { Form_Shadcn_ } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
@@ -333,334 +333,333 @@ export const NewOrgForm = ({
   }
 
   return (
-    <form onSubmit={onSubmitWithOrgCreation}>
-      <Panel
-        title={
-          <div key="panel-title">
-            <h4>Create a new organization</h4>
-          </div>
-        }
-        footer={
-          <div key="panel-footer" className="flex w-full items-center justify-between">
-            <Button
-              type="default"
-              disabled={newOrgLoading || paymentConfirmationLoading}
-              onClick={() => {
-                if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-                else router.push('/organizations')
-              }}
-            >
-              Cancel
-            </Button>
-            <div className="flex items-center space-x-3">
-              <p className="text-xs text-foreground-lighter">
-                You can rename your organization later
+    <Form_Shadcn_ {...formState}>
+      <form onSubmit={onSubmitWithOrgCreation}>
+        <Panel
+          title={
+            <div key="panel-title">
+              <h3>Create a new organization</h3>
+              <p className="text-sm text-foreground-lighter text-balance">
+                This is your organization within Supabase. You could use the name of your company or
+                department, for example.
               </p>
+            </div>
+          }
+          footer={
+            <div key="panel-footer" className="flex w-full items-center justify-between">
               <Button
-                htmlType="submit"
-                type="primary"
-                loading={newOrgLoading}
-                disabled={newOrgLoading}
+                type="default"
+                disabled={newOrgLoading || paymentConfirmationLoading}
+                onClick={() => {
+                  if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+                  else router.push('/organizations')
+                }}
               >
-                Create organization
+                Cancel
               </Button>
-            </div>
-          </div>
-        }
-        className="overflow-visible"
-      >
-        <Panel.Content>
-          <p className="text-sm">This is your organization within Supabase.</p>
-          <p className="text-sm text-foreground-light">
-            For example, you can use the name of your company or department.
-          </p>
-        </Panel.Content>
-        <Panel.Content className="Form section-block--body has-inputs-centered">
-          <div className="grid grid-cols-3 w-full">
-            <div>
-              <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
-            </div>
-            <div className="col-span-2">
-              <Input_Shadcn_
-                id="name"
-                autoFocus
-                type="text"
-                placeholder="Organization name"
-                value={formState.name}
-                onChange={(e) => updateForm('name', e.target.value)}
-              />
-              <div className="mt-1">
-                <Label_Shadcn_
-                  htmlFor="name"
-                  className="text-foreground-lighter leading-normal text-sm"
+              <div className="flex items-center space-x-3">
+                <p className="text-xs text-foreground-lighter">
+                  You can rename your organization later
+                </p>
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  loading={newOrgLoading}
+                  disabled={newOrgLoading}
                 >
-                  What's the name of your company or team?
-                </Label_Shadcn_>
+                  Create organization
+                </Button>
               </div>
             </div>
-          </div>
-        </Panel.Content>
-        <Panel.Content className="Form section-block--body has-inputs-centered">
-          <div className="grid grid-cols-3">
-            <div>
-              <Label_Shadcn_ htmlFor="kind">Type</Label_Shadcn_>
-            </div>
-            <div className="col-span-2">
-              <Select_Shadcn_
-                value={formState.kind}
-                onValueChange={(value) => updateForm('kind', value)}
-              >
-                <SelectTrigger_Shadcn_ id="kind" className="w-full">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
-
-                <SelectContent_Shadcn_>
-                  {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-                    <SelectItem_Shadcn_ key={k} value={k}>
-                      {v}
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-
-              <div className="mt-1">
-                <Label_Shadcn_
-                  htmlFor="kind"
-                  className="text-foreground-lighter leading-normal text-sm"
-                >
-                  What would best describe your organization?
-                </Label_Shadcn_>
-              </div>
-            </div>
-          </div>
-        </Panel.Content>
-
-        {formState.kind == 'COMPANY' && (
-          <Panel.Content className="Form section-block--body has-inputs-centered">
-            <div className="grid grid-cols-3">
-              <div>
-                <Label_Shadcn_ htmlFor="size">Company size</Label_Shadcn_>
-              </div>
-              <div className="col-span-2">
-                <Select_Shadcn_
-                  value={formState.size}
-                  onValueChange={(value) => updateForm('size', value)}
-                >
-                  <SelectTrigger_Shadcn_ id="size" className="w-full">
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
-
-                  <SelectContent_Shadcn_>
-                    {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                      <SelectItem_Shadcn_ key={k} value={k}>
-                        {v}
-                      </SelectItem_Shadcn_>
-                    ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
-
-                <div className="mt-2">
-                  <Label_Shadcn_
-                    htmlFor="size"
-                    className="text-foreground-lighter leading-normal text-sm"
-                  >
-                    How many people are in your company?
-                  </Label_Shadcn_>
+          }
+        >
+          <div className="divide-y divide-border-muted">
+            <Panel.Content className="Form section-block--body has-inputs-centered">
+              <div className="grid grid-cols-3 w-full">
+                <div>
+                  <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
+                </div>
+                <div className="col-span-2">
+                  <Input_Shadcn_
+                    id="name"
+                    autoFocus
+                    type="text"
+                    placeholder="Organization name"
+                    value={formState.name}
+                    onChange={(e) => updateForm('name', e.target.value)}
+                  />
+                  <div className="mt-1">
+                    <Label_Shadcn_
+                      htmlFor="name"
+                      className="text-foreground-lighter leading-normal text-sm"
+                    >
+                      What's the name of your company or team?
+                    </Label_Shadcn_>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Panel.Content>
-        )}
-
-        {isBillingEnabled && (
-          <Panel.Content>
-            <div className="grid grid-cols-3">
-              <div className="flex flex-col gap-2">
-                <Label_Shadcn_ htmlFor="plan" className=" text-sm">
-                  Plan
-                </Label_Shadcn_>
-
-                <a
-                  href="https://supabase.com/pricing"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="text-sm flex items-center gap-2 opacity-75 hover:opacity-100 transition"
-                >
-                  Pricing
-                  <ExternalLink size={16} strokeWidth={1.5} />
-                </a>
-              </div>
-              <div className="col-span-2">
-                <Select_Shadcn_
-                  value={formState.plan}
-                  onValueChange={(value) => {
-                    updateForm('plan', value)
-                    onPlanSelected(value)
-                  }}
-                >
-                  <SelectTrigger_Shadcn_ id="plan" className="w-full">
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
-
-                  <SelectContent_Shadcn_>
-                    {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-                      <SelectItem_Shadcn_ key={k} value={k} translate="no">
-                        {v}
-                      </SelectItem_Shadcn_>
-                    ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
-
-                <div className="mt-1">
-                  <Label_Shadcn_
-                    htmlFor="plan"
-                    className="text-foreground-lighter leading-normal text-sm"
-                  >
-                    The Plan applies to your new organization.
-                  </Label_Shadcn_>
-                </div>
-              </div>
-            </div>
-          </Panel.Content>
-        )}
-
-        {formState.plan === 'PRO' && (
-          <>
-            <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+            </Panel.Content>
+            <Panel.Content className="Form section-block--body has-inputs-centered">
               <div className="grid grid-cols-3">
-                <div className="col-span-1 flex space-x-2 text-sm">
-                  <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
-                    Spend Cap
-                  </Label_Shadcn_>
-
-                  <HelpCircle
-                    size={16}
-                    strokeWidth={1.5}
-                    className="transition opacity-50 cursor-pointer hover:opacity-100"
-                    onClick={() => setShowSpendCapHelperModal(true)}
-                  />
+                <div>
+                  <Label_Shadcn_ htmlFor="kind">Type</Label_Shadcn_>
                 </div>
-                <div className="col-span-2 flex items-center space-x-2">
-                  <Switch
-                    id="spend-cap"
-                    checked={formState.spend_cap}
-                    onCheckedChange={() => updateForm('spend_cap', !formState.spend_cap)}
-                  />
-                  <Label_Shadcn_ htmlFor="spend-cap">
-                    {formState.spend_cap
-                      ? `Usage is limited to the plan's quota.`
-                      : `You pay for overages beyond the plan's quota.`}
-                  </Label_Shadcn_>
+                <div className="col-span-2">
+                  <Select_Shadcn_
+                    value={formState.kind}
+                    onValueChange={(value) => updateForm('kind', value)}
+                  >
+                    <SelectTrigger_Shadcn_ id="kind" className="w-full">
+                      <SelectValue_Shadcn_ />
+                    </SelectTrigger_Shadcn_>
+
+                    <SelectContent_Shadcn_>
+                      {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
+                        <SelectItem_Shadcn_ key={k} value={k}>
+                          {v}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+
+                  <div className="mt-1">
+                    <Label_Shadcn_
+                      htmlFor="kind"
+                      className="text-foreground-lighter leading-normal text-sm"
+                    >
+                      What would best describe your organization?
+                    </Label_Shadcn_>
+                  </div>
                 </div>
               </div>
             </Panel.Content>
 
-            <SpendCapModal
-              visible={showSpendCapHelperModal}
-              onHide={() => setShowSpendCapHelperModal(false)}
-            />
-          </>
-        )}
+            {formState.kind == 'COMPANY' && (
+              <Panel.Content className="Form section-block--body has-inputs-centered">
+                <div className="grid grid-cols-3">
+                  <div>
+                    <Label_Shadcn_ htmlFor="size">Company size</Label_Shadcn_>
+                  </div>
+                  <div className="col-span-2">
+                    <Select_Shadcn_
+                      value={formState.size}
+                      onValueChange={(value) => updateForm('size', value)}
+                    >
+                      <SelectTrigger_Shadcn_ id="size" className="w-full">
+                        <SelectValue_Shadcn_ />
+                      </SelectTrigger_Shadcn_>
 
-        {setupIntent && formState.plan !== 'FREE' && (
-          <Panel.Content>
-            <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
-              <Panel.Content>
-                <NewPaymentMethodElement
-                  ref={paymentRef}
-                  email={user.profile?.primary_email}
-                  readOnly={newOrgLoading || paymentConfirmationLoading}
-                />
+                      <SelectContent_Shadcn_>
+                        {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
+                          <SelectItem_Shadcn_ key={k} value={k}>
+                            {v}
+                          </SelectItem_Shadcn_>
+                        ))}
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
+
+                    <div className="mt-2">
+                      <Label_Shadcn_
+                        htmlFor="size"
+                        className="text-foreground-lighter leading-normal text-sm"
+                      >
+                        How many people are in your company?
+                      </Label_Shadcn_>
+                    </div>
+                  </div>
+                </div>
               </Panel.Content>
-            </Elements>
-          </Panel.Content>
+            )}
+
+            {isBillingEnabled && (
+              <Panel.Content>
+                <div className="grid grid-cols-3">
+                  <Label_Shadcn_ htmlFor="plan" className=" text-sm">
+                    Plan
+                  </Label_Shadcn_>
+
+                  <div className="col-span-2">
+                    <Select_Shadcn_
+                      value={formState.plan}
+                      onValueChange={(value) => {
+                        updateForm('plan', value)
+                        onPlanSelected(value)
+                      }}
+                    >
+                      <SelectTrigger_Shadcn_ id="plan" className="w-full">
+                        <SelectValue_Shadcn_ />
+                      </SelectTrigger_Shadcn_>
+
+                      <SelectContent_Shadcn_>
+                        {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
+                          <SelectItem_Shadcn_ key={k} value={k} translate="no">
+                            {v}
+                          </SelectItem_Shadcn_>
+                        ))}
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
+
+                    <div className="mt-1">
+                      <Label_Shadcn_
+                        htmlFor="plan"
+                        className="text-foreground-lighter leading-normal text-sm"
+                      >
+                        Which plan fits your organization’s needs best?{' '}
+                        <InlineLink
+                          href="https://supabase.com/pricing"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-inherit hover:text-foreground transition-colors"
+                        >
+                          More information
+                        </InlineLink>
+                        .
+                      </Label_Shadcn_>
+                    </div>
+                  </div>
+                </div>
+              </Panel.Content>
+            )}
+
+            {formState.plan === 'PRO' && (
+              <>
+                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                  <div className="grid grid-cols-3">
+                    <div className="col-span-1 flex space-x-2 text-sm">
+                      <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
+                        Spend Cap
+                      </Label_Shadcn_>
+
+                      <HelpCircle
+                        size={16}
+                        strokeWidth={1.5}
+                        className="transition opacity-50 cursor-pointer hover:opacity-100"
+                        onClick={() => setShowSpendCapHelperModal(true)}
+                      />
+                    </div>
+                    <div className="col-span-2 flex items-center space-x-2">
+                      <Switch
+                        id="spend-cap"
+                        checked={formState.spend_cap}
+                        onCheckedChange={() => updateForm('spend_cap', !formState.spend_cap)}
+                      />
+                      <Label_Shadcn_ htmlFor="spend-cap">
+                        {formState.spend_cap
+                          ? `Usage is limited to the plan's quota.`
+                          : `You pay for overages beyond the plan's quota.`}
+                      </Label_Shadcn_>
+                    </div>
+                  </div>
+                </Panel.Content>
+
+                <SpendCapModal
+                  visible={showSpendCapHelperModal}
+                  onHide={() => setShowSpendCapHelperModal(false)}
+                />
+              </>
+            )}
+
+            {setupIntent && formState.plan !== 'FREE' && (
+              <Panel.Content>
+                <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
+                  <Panel.Content>
+                    <NewPaymentMethodElement
+                      ref={paymentRef}
+                      email={user.profile?.primary_email}
+                      readOnly={newOrgLoading || paymentConfirmationLoading}
+                    />
+                  </Panel.Content>
+                </Elements>
+              </Panel.Content>
+            )}
+          </div>
+        </Panel>
+
+        <ConfirmationModal
+          size="large"
+          loading={newOrgLoading}
+          visible={isOrgCreationConfirmationModalVisible}
+          title="Confirm organization creation"
+          confirmLabel="Create new organization"
+          onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
+          onConfirm={async () => {
+            await handleSubmit()
+            setIsOrgCreationConfirmationModalVisible(false)
+          }}
+          variant={'warning'}
+        >
+          <p className="text-sm text-foreground-light">
+            Supabase{' '}
+            <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
+              bills per organization
+            </InlineLink>
+            . If you want to upgrade your existing projects, upgrade your existing organization
+            instead.
+          </p>
+
+          <ul className="mt-4 space-y-6">
+            {freeOrgs
+              .filter((it) => projectsByOrg[it.slug]?.length > 0)
+              .map((org) => {
+                const orgProjects = projectsByOrg[org.slug].map((it) => it.name)
+
+                return (
+                  <li key={`org_${org.slug}`}>
+                    <div className="flex justify-between text-sm">
+                      <span>{org.name}</span>
+                      <Button asChild type="primary" size="tiny">
+                        <Link href={`/org/${org.slug}/billing?panel=subscriptionPlan`}>
+                          Change Plan
+                        </Link>
+                      </Button>
+                    </div>
+                    <div className="text-foreground-light text-xs">
+                      {orgProjects.length <= 2 ? (
+                        <span>{orgProjects.join(' and ')}</span>
+                      ) : (
+                        <div>
+                          {orgProjects.slice(0, 2).join(', ')} and{' '}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="underline decoration-dotted">
+                                {orgProjects.length - 2} other{' '}
+                                {orgProjects.length === 3 ? 'project' : 'project'}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <ul className="list-disc list-inside">
+                                {orgProjects.slice(2).map((project) => (
+                                  <li>{project}</li>
+                                ))}
+                              </ul>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                )
+              })}
+          </ul>
+        </ConfirmationModal>
+
+        {stripePromise && paymentIntentSecret && paymentMethod && (
+          <Elements stripe={stripePromise} options={stripeOptionsConfirm}>
+            <PaymentConfirmation
+              paymentIntentSecret={paymentIntentSecret}
+              onPaymentIntentConfirm={(paymentIntentConfirmation) =>
+                paymentIntentConfirmed(paymentIntentConfirmation)
+              }
+              onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
+              onError={(err) => {
+                toast.error(err.message, { duration: 10_000 })
+                setNewOrgLoading(false)
+                resetPaymentMethod()
+              }}
+            />
+          </Elements>
         )}
-      </Panel>
-
-      <ConfirmationModal
-        size="large"
-        loading={newOrgLoading}
-        visible={isOrgCreationConfirmationModalVisible}
-        title="Confirm organization creation"
-        confirmLabel="Create new organization"
-        onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
-        onConfirm={async () => {
-          await handleSubmit()
-          setIsOrgCreationConfirmationModalVisible(false)
-        }}
-        variant={'warning'}
-      >
-        <p className="text-sm text-foreground-light">
-          Supabase{' '}
-          <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
-            bills per organization
-          </InlineLink>
-          . If you want to upgrade your existing projects, upgrade your existing organization
-          instead.
-        </p>
-
-        <ul className="mt-4 space-y-6">
-          {freeOrgs
-            .filter((it) => projectsByOrg[it.slug]?.length > 0)
-            .map((org) => {
-              const orgProjects = projectsByOrg[org.slug].map((it) => it.name)
-
-              return (
-                <li key={`org_${org.slug}`}>
-                  <div className="flex justify-between text-sm">
-                    <span>{org.name}</span>
-                    <Button asChild type="primary" size="tiny">
-                      <Link href={`/org/${org.slug}/billing?panel=subscriptionPlan`}>
-                        Change Plan
-                      </Link>
-                    </Button>
-                  </div>
-                  <div className="text-foreground-light text-xs">
-                    {orgProjects.length <= 2 ? (
-                      <span>{orgProjects.join(' and ')}</span>
-                    ) : (
-                      <div>
-                        {orgProjects.slice(0, 2).join(', ')} and{' '}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="underline decoration-dotted">
-                              {orgProjects.length - 2} other{' '}
-                              {orgProjects.length === 3 ? 'project' : 'project'}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <ul className="list-disc list-inside">
-                              {orgProjects.slice(2).map((project) => (
-                                <li>{project}</li>
-                              ))}
-                            </ul>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    )}
-                  </div>
-                </li>
-              )
-            })}
-        </ul>
-      </ConfirmationModal>
-
-      {stripePromise && paymentIntentSecret && paymentMethod && (
-        <Elements stripe={stripePromise} options={stripeOptionsConfirm}>
-          <PaymentConfirmation
-            paymentIntentSecret={paymentIntentSecret}
-            onPaymentIntentConfirm={(paymentIntentConfirmation) =>
-              paymentIntentConfirmed(paymentIntentConfirmation)
-            }
-            onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
-            onError={(err) => {
-              toast.error(err.message, { duration: 10_000 })
-              setNewOrgLoading(false)
-              resetPaymentMethod()
-            }}
-          />
-        </Elements>
-      )}
-    </form>
+      </form>
+    </Form_Shadcn_>
   )
 }

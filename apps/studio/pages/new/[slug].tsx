@@ -483,11 +483,9 @@ const Wizard: NextPageWithLayout = () => {
           title={
             <div key="panel-title">
               <h3>Create a new project</h3>
-              <p className="text-sm text-foreground-lighter">
-                Your project will have its own dedicated instance and full Postgres database.
-                <br />
-                An API will be set up so you can easily interact with your new database.
-                <br />
+              <p className="text-sm text-foreground-lighter text-balance">
+                Your project will have its own dedicated instance and full Postgres database. An API
+                will be set up so you can easily interact with your new database.
               </p>
             </div>
           }
