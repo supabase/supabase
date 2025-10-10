@@ -14,8 +14,8 @@ export const OverviewLearnMore = () => {
   const LearnMoreCards = [
     {
       label: 'Docs',
-      title: 'Authentication docs',
-      description: 'Read more on authentication and benefits of using Supabase policies.',
+      title: 'Auth docs',
+      description: 'Read more on Supabase auth, managing users and more.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
         {
@@ -27,7 +27,7 @@ export const OverviewLearnMore = () => {
     },
     {
       label: 'Assistant',
-      title: 'Explain authentication errors',
+      title: 'Explain auth errors',
       description: 'Our Assistant can help you debug and fix authentication errors.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-assistant.jpg`,
       actions: [
@@ -35,9 +35,10 @@ export const OverviewLearnMore = () => {
           label: 'Ask Assistant',
           onClick: () => {
             aiSnap.newChat({
-              name: 'Authentication Help',
+              name: 'Auth Help',
               open: true,
-              initialInput: 'Help me debug and fix authentication errors in my Supabase project',
+              initialInput:
+                'Look at my logs related to Supabase Auth and help me debug the recent errors.',
               suggestions: {
                 title: 'I can help you with authentication issues. Here are some common problems:',
                 prompts: [
@@ -68,8 +69,7 @@ export const OverviewLearnMore = () => {
     {
       label: 'Logs',
       title: 'Dive into the logs',
-      description:
-        'Our authentication logs provide a deeper view into your auth requests and errors.',
+      description: 'Auth logs provide a deeper view into your auth requests.',
       image: `${BASE_PATH}/img/auth-overview/auth-overview-logs.jpg`,
       actions: [
         {
@@ -84,7 +84,7 @@ export const OverviewLearnMore = () => {
   return (
     <ScaffoldSection isFullWidth>
       <ScaffoldSectionTitle className="mb-4">Learn more</ScaffoldSectionTitle>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {LearnMoreCards.map((card) => (
           <Card key={card.label} className="relative">
             <CardHeader className="absolute top-0 left-0 right-0 border-b-0">
@@ -100,12 +100,12 @@ export const OverviewLearnMore = () => {
                   className="object-fit"
                 />
               </div>
-              <div className="p-4">
-                <div className="flex flex-col gap-1 mb-4">
+              <div className="p-4 flex flex-col">
+                <div className="flex flex-col gap-1 mb-4 flex-1">
                   <h4>{card.title}</h4>
                   <p className="text-sm text-foreground-lighter">{card.description}</p>
                 </div>
-                <div className="flex flex-col gap-2 items-start">
+                <div className="flex flex-col gap-2 items-start mt-auto">
                   {card.actions.map((action) => {
                     if ('href' in action) {
                       return (

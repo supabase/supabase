@@ -203,7 +203,7 @@ export const AwsMarketplaceLinkExistingOrg = ({
                                   showIndicator={false}
                                   value={org.slug}
                                   className={cn(
-                                    'relative text-sm text-left flex flex-col gap-0 p-0 [&_label]:w-full group] w-full'
+                                    'relative text-sm text-left flex flex-col gap-0 p-0 [&_label]:w-full group w-full'
                                   )}
                                   label={
                                     <OrganizationCard

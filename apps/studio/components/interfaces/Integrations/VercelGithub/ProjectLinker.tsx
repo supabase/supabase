@@ -1,6 +1,6 @@
 import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { ReactNode, useEffect, useRef, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
@@ -84,10 +84,8 @@ const ProjectLinker = ({
   const router = useRouter()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
-  const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
-  const foreignProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
   const [openProjectsDropdown, setOpenProjectsDropdown] = useState(false)
-  const [foreignProjectsComboBoxOpen, setForeignProjectsComboboxOpen] = useState(false)
+  const [openForeignProjectsComboBox, setOpenForeignProjectsComboBox] = useState(false)
   const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
     defaultForeignProjectId
   )
@@ -233,7 +231,6 @@ const ProjectLinker = ({
                 renderTrigger={() => {
                   return (
                     <Button
-                      ref={supabaseProjectsComboBoxRef}
                       type="default"
                       block
                       disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
@@ -300,12 +297,11 @@ const ProjectLinker = ({
               </div>
 
               <Popover_Shadcn_
-                open={foreignProjectsComboBoxOpen}
-                onOpenChange={setForeignProjectsComboboxOpen}
+                open={openForeignProjectsComboBox}
+                onOpenChange={setOpenForeignProjectsComboBox}
               >
                 <PopoverTrigger_Shadcn_ asChild>
                   <Button
-                    ref={foreignProjectsComboBoxRef}
                     type="default"
                     block
                     disabled={loadingForeignProjects}
@@ -328,10 +324,10 @@ const ProjectLinker = ({
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
-                  className="p-0 !w-72"
+                  className="p-0"
                   side="bottom"
                   align="center"
-                  style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
+                  sameWidthAsTrigger
                 >
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />
@@ -346,7 +342,7 @@ const ProjectLinker = ({
                               className="flex gap-2 items-center"
                               onSelect={() => {
                                 if (project.id) setForeignProjectId(project.id)
-                                setForeignProjectsComboboxOpen(false)
+                                setOpenForeignProjectsComboBox(false)
                               }}
                             >
                               <div>{getForeignProjectIcon?.(project) ?? integrationIcon}</div>
