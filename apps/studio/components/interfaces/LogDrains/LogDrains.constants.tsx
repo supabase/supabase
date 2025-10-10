@@ -1,5 +1,5 @@
 import { BracesIcon } from 'lucide-react'
-import { Datadog, Grafana } from 'icons'
+import { Datadog, Grafana, Sentry } from 'icons'
 
 const iconProps = {
   height: 24,
@@ -26,6 +26,13 @@ export const LOG_DRAIN_TYPES = [
     description:
       'Loki is an open-source log aggregation system designed to store and query logs from multiple sources',
     icon: <Grafana {...iconProps} fill="currentColor" strokeWidth={0} />,
+  },
+  {
+    value: 'sentry',
+    name: 'Sentry',
+    description:
+      'Sentry is an application monitoring service that helps developers identify and debug performance issues and errors',
+    icon: <Sentry {...iconProps} fill="currentColor" strokeWidth={0} />,
   },
 ] as const
 
