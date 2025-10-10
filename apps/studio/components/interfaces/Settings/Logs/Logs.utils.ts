@@ -320,7 +320,7 @@ const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] =>
   return [its.add(-extendValue, trunc), trunc]
 }
 // or 
-const basePgCronWhere = `where ( parsed.application_name = 'pg_cron' and regexp_contains(event_message, 'cron job') )`
+const basePgCronWhere = `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
 /**
  *
  * generates log event chart query
