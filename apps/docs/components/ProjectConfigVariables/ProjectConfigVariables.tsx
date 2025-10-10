@@ -310,26 +310,8 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     },
     { enabled: isLoggedIn && !!ref && !projectPaused && needsSupavisorQuery }
   )
-  // Currently not used
-  function isInvalidKeysData(apiData: ProjectKeys) {
-    console.log(variable)
-    switch (variable) {
-      case 'url':
-        return !apiData.app_config?.endpoint
-      case 'publishable':
-        console.log(apiData)
-        return !apiData.api_key?.some((key) => key.type === 'publishable')
-
-      // service_api_keys?.some((key) => key.tags === 'publishable')
-
-      case 'anon':
-        // console.log(!apiData.api_key?.some((key) => key.type === 'legacy'))
-        return !apiData.api_key?.some((key) => key.type === 'legacy')
-    }
-  }
 
   function isInvalidSupavisorData(supavisorData: SupavisorConfigData) {
-    console.log(supavisorData)
     return supavisorData.length === 0
   }
 
@@ -352,29 +334,21 @@ function VariableView({ variable, className }: { variable: Variable; className?:
               : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = ''
-  console.log(stateSummary)
-  if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
-    console.log("I made it" + variable)
 
+  if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
-        console.log(apiSettingsData)
         variableValue = `https://${apiSettingsData?.app_config?.endpoint}`
         break
       case 'anon':
-        console.log(apiKeysData)
-
-        variableValue = apiSettingsData?.service_api_keys?.find((key) => key.tags === 'anon')?.api_key || ''
+        variableValue = apiKeysData?.find((key) => key.type === 'legacy')?.api_key || ''
         break
       case 'publishable':
-        console.log("I made it again" + variable)
-        console.log(apiKeysData)
-        // variableValue = apiSettingsData?.service_api_keys?.find((key) => key.tags === 'publishable')?.api_key || ''
+        variableValue = apiKeysData?.find((key) => key.type === 'publishable')?.api_key || ''
         break
       case 'sessionPooler':
         variableValue = supavisorConfig?.[0]?.connection_string || ''
     }
-    console.log(variableValue)
   }
 
   const { copied, handleCopy } = useCopy()

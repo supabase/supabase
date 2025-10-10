@@ -28,8 +28,6 @@ async function getProjectKeys({ projectRef }: ProjectApiVariables, signal?: Abor
     signal,
   })
   if (error) throw error
-  console.log('Fetching project keys for projectRef:', projectRef)
-  console.log(data)
   return data
 }
 
@@ -45,8 +43,6 @@ async function getProjectSettings({ projectRef }: ProjectApiVariables, signal?: 
     signal,
   })
   if (error) throw error
-  console.log('Fetching project settings for projectRef:', projectRef)
-  console.log(data)
   return data
 }
 
