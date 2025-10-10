@@ -179,7 +179,7 @@ The Logflare server uses the a Base64 encryption key set on the `LOGFLARE_DB_ENC
 
 To perform encryption key rotation, move the retired key to the `LOGFLARE_DB_ENCRYPTION_KEY_RETIRED` environment variable, and replace the `LOGFLARE_DB_ENCRYPTION_KEY` environement variable with the new key. Perform a server restart and check `info` logs for the migration to be detected and performed.
 
-Once migration is complete, the retired key can be safely removed.
+Once migration is complete, you can safely remove the retired key.
 
   </RefSubLayout.Details>
 
