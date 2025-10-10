@@ -55,6 +55,7 @@ export function CustomReportSection() {
   const [editableReport, setEditableReport] = useState<Dashboards.Content | undefined>(
     reportContent
   )
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
 
   const { can: canCreateReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -153,51 +154,74 @@ export function CustomReportSection() {
     []
   )
 
-  const addSnippetToReport = useCallback((snippet: { id: string; name: string }) => {
-    if (
-      editableReport?.layout?.some(
-        (x) =>
-          String(x.id) === String(snippet.id) || String(x.attribute) === `snippet_${snippet.id}`
-      )
-    ) {
-      toast('This block is already in your report')
-      return
-    }
-    // If the Home report doesn't exist yet, create it with the new block
-    if (!editableReport || !homeReport) {
-      if (!ref || !profile) return
-
-      // Initial placement for first block
-      const initialBlock = createSnippetChartBlock(snippet, { x: 0, y: 0 })
-
-      const newReport: Dashboards.Content = {
-        schema_version: 1,
-        period_start: { time_period: '7d', date: '' },
-        period_end: { time_period: 'today', date: '' },
-        interval: '1d',
-        layout: [initialBlock],
+  const addSnippetToReport = useCallback(
+    (snippet: { id: string; name: string }) => {
+      if (
+        editableReport?.layout?.some(
+          (x) =>
+            String(x.id) === String(snippet.id) || String(x.attribute) === `snippet_${snippet.id}`
+        )
+      ) {
+        toast('This block is already in your report')
+        return
       }
+      // If the Home report doesn't exist yet, create it with the new block
+      if (!editableReport || !homeReport) {
+        if (!ref || !profile) return
 
-      setEditableReport(newReport)
-      upsertContent({
-        projectRef: ref,
-        payload: {
-          id: uuidv4(),
-          type: 'report',
-          name: 'Home',
-          description: '',
-          visibility: 'project',
-          owner_id: profile.id,
-          content: newReport,
-        },
-      })
+        // Initial placement for first block
+        const initialBlock = createSnippetChartBlock(snippet, { x: 0, y: 0 })
+
+        const newReport: Dashboards.Content = {
+          schema_version: 1,
+          period_start: { time_period: '7d', date: '' },
+          period_end: { time_period: 'today', date: '' },
+          interval: '1d',
+          layout: [initialBlock],
+        }
+
+        setEditableReport(newReport)
+        upsertContent({
+          projectRef: ref,
+          payload: {
+            id: uuidv4(),
+            type: 'report',
+            name: 'Home',
+            description: '',
+            visibility: 'project',
+            owner_id: profile.id,
+            content: newReport,
+          },
+        })
+
+        if (ref && organization?.slug) {
+          sendEvent({
+            action: 'home_custom_report_block_added',
+            properties: {
+              block_id: snippet.id,
+              position: 0,
+            },
+            groups: {
+              project: ref,
+              organization: organization.slug,
+            },
+          })
+        }
+        return
+      }
+      const current = [...editableReport.layout]
+      const { x, y } = findNextPlacement(current)
+      current.push(createSnippetChartBlock(snippet, { x, y }))
+      const updated = { ...editableReport, layout: current }
+      setEditableReport(updated)
+      persistReport(updated)
 
       if (ref && organization?.slug) {
         sendEvent({
           action: 'home_custom_report_block_added',
           properties: {
             block_id: snippet.id,
-            position: 0,
+            position: current.length - 1,
           },
           groups: {
             project: ref,
@@ -205,40 +229,20 @@ export function CustomReportSection() {
           },
         })
       }
-      return
-    }
-    const current = [...editableReport.layout]
-    const { x, y } = findNextPlacement(current)
-    current.push(createSnippetChartBlock(snippet, { x, y }))
-    const updated = { ...editableReport, layout: current }
-    setEditableReport(updated)
-    persistReport(updated)
-
-    if (ref && organization?.slug) {
-      sendEvent({
-        action: 'home_custom_report_block_added',
-        properties: {
-          block_id: snippet.id,
-          position: current.length - 1,
-        },
-        groups: {
-          project: ref,
-          organization: organization.slug,
-        },
-      })
-    }
-  }, [
-    editableReport,
-    homeReport,
-    ref,
-    profile,
-    upsertContent,
-    organization,
-    sendEvent,
-    findNextPlacement,
-    createSnippetChartBlock,
-    persistReport,
-  ])
+    },
+    [
+      editableReport,
+      homeReport,
+      ref,
+      profile,
+      upsertContent,
+      organization,
+      sendEvent,
+      findNextPlacement,
+      createSnippetChartBlock,
+      persistReport,
+    ]
+  )
 
   const handleRemoveChart = ({ metric }: { metric: { key: string } }) => {
     if (!editableReport) return
@@ -289,6 +293,7 @@ export function CustomReportSection() {
   const handleDrop = useCallback(
     async (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault()
+      setIsDraggingOver(false)
       if (!ref || !profile || !project) return
 
       const data = e.dataTransfer.getData('application/json')
@@ -308,28 +313,26 @@ export function CustomReportSection() {
         project_id: project.id,
       }) as UpsertContentPayload
 
-      upsertContent(
-        { projectRef: ref, payload },
-        {
-          onSuccess: () => {
-            toast.success(`Successfully created new query: ${label}`, { id: toastId })
-            addSnippetToReport({ id, name: label })
-            sendEvent({
-              action: 'custom_report_assistant_sql_block_added',
-              groups: { project: ref, organization: organization?.slug ?? 'Unknown' },
-            })
-          },
-          onError: () => {
-            toast.error(`Failed to create query: ${label}`, { id: toastId })
-          },
-        }
-      )
+      upsertContent({ projectRef: ref, payload })
+
+      // Handle success optimistically
+      toast.success(`Successfully created new query: ${label}`, { id: toastId })
+      addSnippetToReport({ id, name: label })
+      sendEvent({
+        action: 'custom_report_assistant_sql_block_added',
+        groups: { project: ref, organization: organization?.slug ?? 'Unknown' },
+      })
     },
     [ref, profile, project, upsertContent, addSnippetToReport, sendEvent, organization]
   )
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    setIsDraggingOver(true)
     e.preventDefault()
+  }
+
+  const handleDragLeave = () => {
+    setIsDraggingOver(false)
   }
 
   const layout = useMemo(() => editableReport?.layout ?? [], [editableReport])
@@ -358,11 +361,15 @@ export function CustomReportSection() {
         ) : null}
       </div>
       <div className="relative">
+        {isDraggingOver && (
+          <div className="absolute inset-0 rounded bg-brand/10 pointer-events-none z-10" />
+        )}
         {layout.length === 0 ? (
           <div
-            className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 border-default"
+            className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 transition-colors"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
           >
             <h4>Build a custom report</h4>
             <p className="text-sm text-foreground-light mb-4">
@@ -396,28 +403,35 @@ export function CustomReportSection() {
               items={(editableReport?.layout ?? []).map((x) => String(x.id))}
               strategy={rectSortingStrategy}
             >
-              <Row columns={[3, 2, 1]} onDrop={handleDrop} onDragOver={handleDragOver}>
-                {layout.map((item) => (
-                  <SortableReportBlock key={item.id} id={String(item.id)}>
-                    <div className="h-64">
-                      <ReportBlock
-                        key={item.id}
-                        item={item}
-                        startDate={startDate}
-                        endDate={endDate}
-                        interval={
-                          (editableReport?.interval as AnalyticsInterval) ??
-                          ('1d' as AnalyticsInterval)
-                        }
-                        disableUpdate={false}
-                        isRefreshing={false}
-                        onRemoveChart={handleRemoveChart}
-                        onUpdateChart={(config) => handleUpdateChart(item.id, config)}
-                      />
-                    </div>
-                  </SortableReportBlock>
-                ))}
-              </Row>
+              <div className="relative">
+                <Row
+                  columns={[3, 2, 1]}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                >
+                  {layout.map((item) => (
+                    <SortableReportBlock key={item.id} id={String(item.id)}>
+                      <div className="h-64">
+                        <ReportBlock
+                          key={item.id}
+                          item={item}
+                          startDate={startDate}
+                          endDate={endDate}
+                          interval={
+                            (editableReport?.interval as AnalyticsInterval) ??
+                            ('1d' as AnalyticsInterval)
+                          }
+                          disableUpdate={false}
+                          isRefreshing={false}
+                          onRemoveChart={handleRemoveChart}
+                          onUpdateChart={(config) => handleUpdateChart(item.id, config)}
+                        />
+                      </div>
+                    </SortableReportBlock>
+                  ))}
+                </Row>
+              </div>
             </SortableContext>
           </DndContext>
         )}
