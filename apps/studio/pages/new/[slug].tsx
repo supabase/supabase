@@ -143,6 +143,7 @@ const Wizard: NextPageWithLayout = () => {
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
 
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+  const defaultProvider = useDefaultProvider()
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -155,7 +156,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const smartRegionEnabled = useFlag('enableSmartRegion')
+  const smartRegionEnabled = useFlag('enableSmartRegion') && defaultProvider !== 'AWS_NIMBUS'
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -225,8 +226,6 @@ const Wizard: NextPageWithLayout = () => {
   const organizationProjects =
     allProjects?.filter((project) => project.status !== PROJECT_STATUS.INACTIVE) ?? []
 
-  const defaultProvider = useDefaultProvider()
-
   const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[defaultProvider].id,
@@ -256,16 +255,10 @@ const Wizard: NextPageWithLayout = () => {
       }
     )
 
-  const regionError =
-    smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
-      ? availableRegionsError
-      : defaultRegionError
-  const defaultRegion =
-    defaultProvider === 'AWS_NIMBUS'
-      ? AWS_REGIONS.EAST_US.displayName
-      : smartRegionEnabled
-        ? availableRegionsData?.recommendations.smartGroup.name
-        : _defaultRegion
+  const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
+  const defaultRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : _defaultRegion
 
   const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 
