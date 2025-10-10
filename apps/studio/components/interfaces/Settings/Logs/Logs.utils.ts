@@ -319,7 +319,7 @@ const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] =>
   // @ts-ignore
   return [its.add(-extendValue, trunc), trunc]
 }
-// or 
+
 const basePgCronWhere = `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
 /**
  *
