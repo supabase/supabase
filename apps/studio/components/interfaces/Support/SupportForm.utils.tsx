@@ -1,6 +1,7 @@
 import { Book, Github, Hash, MessageSquare } from 'lucide-react'
 import {
   createLoader,
+  createParser,
   createSerializer,
   type inferParserType,
   parseAsString,
@@ -98,10 +99,22 @@ export function getOrgSubscriptionPlan(orgs: Organization[] | undefined, orgSlug
   return subscriptionPlanId
 }
 
+const categoryOptionsLower = CATEGORY_OPTIONS.map((option) => option.value.toLowerCase())
+const parseAsCategoryOption = createParser({
+  parse(queryValue) {
+    const lowerValue = queryValue.toLowerCase()
+    const matchingIndex = categoryOptionsLower.indexOf(lowerValue)
+    return matchingIndex !== -1 ? CATEGORY_OPTIONS[matchingIndex].value : null
+  },
+  serialize(value) {
+    return value ?? null
+  },
+})
+
 const supportFormUrlState = {
   projectRef: parseAsString.withDefault(NO_PROJECT_MARKER),
   orgSlug: parseAsString.withDefault(NO_ORG_MARKER),
-  category: parseAsStringLiteral(CATEGORY_OPTIONS.map((option) => option.value)),
+  category: parseAsCategoryOption,
   subject: parseAsString.withDefault(''),
   message: parseAsString.withDefault(''),
   error: parseAsString,

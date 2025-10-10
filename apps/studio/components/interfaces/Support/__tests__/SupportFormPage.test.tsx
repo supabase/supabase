@@ -422,6 +422,20 @@ describe('SupportFormPage', () => {
     })
   })
 
+  test('loading a URL with a category prefills the category field (case-insensitive)', async () => {
+    const testCategory = 'dashboard_bug'
+    Object.defineProperty(window, 'location', {
+      value: { search: `?category=${encodeURIComponent(testCategory)}` },
+      writable: true,
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+  })
+
   test('loading a URL with an invalid category gracefully falls back', async () => {
     const testCategory = 'Invalid'
     Object.defineProperty(window, 'location', {
