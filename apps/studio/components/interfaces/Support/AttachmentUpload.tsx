@@ -1,4 +1,3 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { compact } from 'lodash'
 import { Plus, X } from 'lucide-react'
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -7,28 +6,9 @@ import { toast } from 'sonner'
 
 import { uuidv4 } from 'lib/helpers'
 import { cn } from 'ui'
+import { createSupportStorageClient } from './support-storage-client'
 
 const MAX_ATTACHMENTS = 5
-
-export const createSupportStorageClient = (): SupabaseClient => {
-  const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL || ''
-  const SUPPORT_API_KEY = process.env.NEXT_PUBLIC_SUPPORT_ANON_KEY || ''
-
-  return createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      // @ts-expect-error
-      multiTab: false,
-      detectSessionInUrl: false,
-      localStorage: {
-        getItem: (_key: string) => undefined,
-        setItem: (_key: string, _value: string) => {},
-        removeItem: (_key: string) => {},
-      },
-    },
-  })
-}
 
 const uploadAttachments = async (ref: string, files: File[]) => {
   const supportSupabaseClient = createSupportStorageClient()
@@ -153,7 +133,7 @@ export function AttachmentUploadDisplay({
   uploadedDataUrls,
 }: AttachmentUploadDisplayProps) {
   return (
-    <>
+    <div className="flex flex-col gap-y-4">
       <div className="flex flex-col gap-y-1">
         <p className="text-sm text-foreground-light">Attachments</p>
         <p className="text-sm text-foreground-lighter">
@@ -169,7 +149,7 @@ export function AttachmentUploadDisplay({
         accept="image/png, image/jpeg"
         onChange={handleFileUpload}
       />
-      <div className="flex items-center gap-x-2 mt-4">
+      <div className="flex items-center gap-x-2">
         {uploadedDataUrls.map((url, idx) => (
           <div
             key={url}
@@ -202,6 +182,6 @@ export function AttachmentUploadDisplay({
           </button>
         )}
       </div>
-    </>
+    </div>
   )
 }

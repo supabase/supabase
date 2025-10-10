@@ -33,7 +33,7 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
         return (
-          <FormItemLayout layout="vertical" label="Which organization is affected?">
+          <FormItemLayout hideMessage layout="vertical" label="Which organization is affected?">
             <FormControl_Shadcn_>
               <Select_Shadcn_
                 {...fieldWithoutRef}

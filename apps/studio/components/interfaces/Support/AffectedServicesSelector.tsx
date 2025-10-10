@@ -26,7 +26,7 @@ export function AffectedServicesSelector({ form, category }: AffectedServicesSel
       name="affectedServices"
       control={form.control}
       render={({ field }) => (
-        <FormItemLayout layout="vertical" label="Which services are affected?">
+        <FormItemLayout hideMessage layout="vertical" label="Which services are affected?">
           <FormControl_Shadcn_>
             <MultiSelectV2
               options={SERVICE_OPTIONS}

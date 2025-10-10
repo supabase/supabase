@@ -7,8 +7,8 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Button } from 'ui'
 
 interface AIAssistantOptionProps {
-  projectRef: string
-  organizationSlug: string
+  projectRef?: string | null
+  organizationSlug?: string | null
   isCondensed?: boolean
 }
 
@@ -29,18 +29,16 @@ export const AIAssistantOption = ({
     sendEvent({
       action: 'ai_assistant_in_support_form_clicked',
       groups: {
-        project: projectRef === 'no-project' ? undefined : projectRef,
-        organization: organizationSlug,
+        project: projectRef === null || projectRef === 'no-project' ? undefined : projectRef,
+        organization: organizationSlug ?? undefined,
       },
     })
   }, [projectRef, organizationSlug, sendEvent])
 
-  if (!organizationSlug || organizationSlug === 'no-org') {
-    return null
-  }
-
   // If no specific project selected, use the wildcard route
   const aiLink = `/project/${projectRef !== 'no-project' ? projectRef : '_'}?aiAssistantPanelOpen=true&slug=${organizationSlug}`
+
+  if (!organizationSlug || organizationSlug === 'no-org') return null
 
   return (
     <AnimatePresence initial={false}>

@@ -1060,7 +1060,7 @@ describe('SupportFormPage', () => {
       'https://storage.example.com/signed/file2.jpg?token=def456',
     ]
 
-    const { createSupportStorageClient } = await import('../AttachmentUpload')
+    const { createSupportStorageClient } = await import('../support-storage-client')
     const mockStorageClient = {
       storage: {
         from: vi.fn(() => ({

@@ -9,7 +9,7 @@ import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { cn, Form_Shadcn_, Separator } from 'ui'
+import { DialogSectionSeparator, Form_Shadcn_, Separator } from 'ui'
 import { AFFECTED_SERVICES_CATEGORIES, AffectedServicesSelector } from './AffectedServicesSelector'
 import { AttachmentUploadDisplay, useAttachmentUpload } from './AttachmentUpload'
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
@@ -122,40 +122,51 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
   return (
     <Form_Shadcn_ {...form}>
-      <form id="support-form" className={cn('px-6', 'flex flex-col gap-y-8')}>
-        <h3 className={'text-xl'}>How can we help?</h3>
-        <OrganizationSelector form={form} orgSlug={organizationSlug} />
-        <ProjectAndPlanInfo
-          form={form}
-          orgSlug={selectedOrgSlug}
-          projectRef={selectedProjectRef}
-          subscriptionPlanId={subscriptionPlanId}
-          category={category}
-        />
-        <CategoryAndSeverityInfo
-          form={form}
-          category={category}
-          severity={severity}
-          projectRef={projectRef}
-        />
-        <Separator />
-        <SubjectAndSuggestionsInfo form={form} subject={subject} category={category} />
-        <ClientLibraryInfo form={form} library={library} category={category} />
-        <AffectedServicesSelector form={form} category={category} />
-        <MessageField form={form} originalError={initialError} />
-        <AttachmentUploadDisplay {...attachmentUpload} />
-        <Separator />
-        {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
-          <>
-            <SupportAccessToggle form={form} />
-            <Separator />
-          </>
-        )}
-        <SubmitButton
-          isSubmitting={state.type === 'submitting'}
-          userEmail={respondToEmail}
-          onClick={handleSubmitButtonClick}
-        />
+      <form id="support-form" className="flex flex-col gap-y-6">
+        <h3 className="px-6 text-xl">How can we help?</h3>
+
+        <div className="px-6 flex flex-col gap-y-8">
+          <OrganizationSelector form={form} orgSlug={organizationSlug} />
+          <ProjectAndPlanInfo
+            form={form}
+            orgSlug={selectedOrgSlug}
+            projectRef={selectedProjectRef}
+            subscriptionPlanId={subscriptionPlanId}
+            category={category}
+          />
+          <CategoryAndSeverityInfo
+            form={form}
+            category={category}
+            severity={severity}
+            projectRef={projectRef}
+          />
+        </div>
+
+        <DialogSectionSeparator />
+
+        <div className="px-6 flex flex-col gap-y-8">
+          <SubjectAndSuggestionsInfo form={form} subject={subject} category={category} />
+          <ClientLibraryInfo form={form} library={library} category={category} />
+          <AffectedServicesSelector form={form} category={category} />
+          <MessageField form={form} originalError={initialError} />
+          <AttachmentUploadDisplay {...attachmentUpload} />
+        </div>
+
+        <DialogSectionSeparator />
+
+        <div className="px-6 flex flex-col gap-y-8">
+          {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+            <>
+              <SupportAccessToggle form={form} />
+              <Separator />
+            </>
+          )}
+          <SubmitButton
+            isSubmitting={state.type === 'submitting'}
+            userEmail={respondToEmail}
+            onClick={handleSubmitButtonClick}
+          />
+        </div>
       </form>
     </Form_Shadcn_>
   )

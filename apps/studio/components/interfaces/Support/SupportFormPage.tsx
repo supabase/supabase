@@ -23,8 +23,8 @@ import type { SupportFormValues } from './SupportForm.schema'
 import {
   createInitialSupportFormState,
   type SupportFormActions,
-  type SupportFormState,
   supportFormReducer,
+  type SupportFormState,
 } from './SupportForm.state'
 import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
@@ -88,9 +88,7 @@ function SupportFormPageContent() {
   return (
     <SupportFormWrapper>
       <SupportFormHeader />
-      {!!projectRef && !!orgSlug && (
-        <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
-      )}
+      <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
       <SupportFormBody
         form={form}
         state={state}

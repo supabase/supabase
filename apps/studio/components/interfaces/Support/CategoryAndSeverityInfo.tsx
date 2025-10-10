@@ -44,11 +44,12 @@ export function CategoryAndSeverityInfo({
       <IssueSuggestion category={category} projectRef={projectRef} />
 
       {(severity === 'Urgent' || severity === 'High') && (
-        <p className="text-sm text-foreground-light mt-2 sm:col-span-2">
-          We do our best to respond to everyone as quickly as possible; however, prioritization will
-          be based on production status. We ask that you reserve High and Urgent severity for
-          production-impacting issues only.
-        </p>
+        <Admonition
+          type="default"
+          className="mb-0 sm:col-span-2"
+          title="We do our best to respond to everyone as quickly as possible"
+          description="Prioritization will be based on production status. We ask that you reserve High and Urgent severity for production-impacting issues only."
+        />
       )}
     </div>
   )
@@ -66,7 +67,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
         return (
-          <FormItemLayout layout="vertical" label="What are you having issues with?">
+          <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
             <FormControl_Shadcn_>
               <Select_Shadcn_
                 {...fieldWithoutRef}
@@ -113,7 +114,7 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
       render={({ field }) => {
         const { ref, ...fieldWithoutRef } = field
         return (
-          <FormItemLayout layout="vertical" label="Severity">
+          <FormItemLayout hideMessage layout="vertical" label="Severity">
             <FormControl_Shadcn_>
               <Select_Shadcn_
                 {...fieldWithoutRef}
