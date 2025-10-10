@@ -103,7 +103,7 @@ const SignInLayout = ({
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }
                     alt="Supabase Logo"
-                    className={largeLogo ? 'h-[40px]' : 'h-[24px]'}
+                    className={largeLogo ? 'h-[48px]' : 'h-[24px]'}
                   />
                 </Link>
               </div>
