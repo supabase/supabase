@@ -39,6 +39,8 @@ import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advi
 interface QueryPerformanceGridProps {
   aggregatedData: AggregatedQueryData[]
   isLoading: boolean
+  currentSelectedQuery: string | null
+  onCurrentSelectQuery: (query: string) => void
 }
 
 interface QueryPerformanceRow {
@@ -77,7 +79,12 @@ const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
   return Math.min(maxWidth, 300)
 }
 
-export const QueryPerformanceGrid = ({ aggregatedData, isLoading }: QueryPerformanceGridProps) => {
+export const QueryPerformanceGrid = ({
+  aggregatedData,
+  isLoading,
+  currentSelectedQuery,
+  onCurrentSelectQuery,
+}: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { sort: urlSort, order, roles, search } = useParams()
@@ -420,9 +427,12 @@ export const QueryPerformanceGrid = ({ aggregatedData, isLoading }: QueryPerform
           rows={reportData}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
+            const query = reportData[idx]?.query
+            const isCharted = currentSelectedQuery === query
+
             return [
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+              `${isSelected || isCharted ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+              `${isSelected || isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
               '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell.column-prop_total_time]:relative',
             ].join(' ')
@@ -437,12 +447,16 @@ export const QueryPerformanceGrid = ({ aggregatedData, isLoading }: QueryPerform
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      setSelectedRow(idx)
-                      gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                      // setSelectedRow(idx)
+                      // gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
 
-                      const rowQuery = reportData[idx]?.query ?? ''
-                      if (!rowQuery.trim().toLowerCase().startsWith('select')) {
-                        setView('details')
+                      // const rowQuery = reportData[idx]?.query ?? ''
+                      // if (!rowQuery.trim().toLowerCase().startsWith('select')) {
+                      //   setView('details')
+                      // }
+                      const query = reportData[idx]?.query
+                      if (query) {
+                        onCurrentSelectQuery(query)
                       }
                     }
                   }}

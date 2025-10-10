@@ -59,6 +59,7 @@ export const QueryPerformance = ({
   const formattedDatabaseId = formatDatabaseID(state.selectedDatabaseId ?? '')
 
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
+  const [selectedQuery, setSelectedQuery] = useState<string | null>(null)
 
   const [showBottomSection, setShowBottomSection] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
@@ -129,6 +130,10 @@ export const QueryPerformance = ({
 
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 
+  const handleSelectQuery = (query: string) => {
+    setSelectedQuery((prev) => (prev === query ? null : query))
+  }
+
   useEffect(() => {
     state.setSelectedDatabaseId(ref)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,11 +147,18 @@ export const QueryPerformance = ({
         chartData={chartData}
         isLoading={isLogsLoading}
         error={logsError}
+        currentSelectedQuery={selectedQuery}
+        parsedLogs={parsedLogs}
       />
       <QueryPerformanceFilterBar aggregatedData={aggregatedGridData} />
       <LoadingLine loading={isLoading || isRefetching || isLogsLoading} />
 
-      <QueryPerformanceGrid aggregatedData={aggregatedGridData} isLoading={isLogsLoading} />
+      <QueryPerformanceGrid
+        aggregatedData={aggregatedGridData}
+        isLoading={isLogsLoading}
+        currentSelectedQuery={selectedQuery}
+        onCurrentSelectQuery={handleSelectQuery}
+      />
 
       <div
         className={cn('px-6 py-6 flex gap-x-4 border-t relative', {

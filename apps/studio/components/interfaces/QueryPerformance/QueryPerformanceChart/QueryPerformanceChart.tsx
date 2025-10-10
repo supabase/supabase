@@ -16,6 +16,8 @@ interface QueryPerformanceChartProps {
   chartData: ChartDataPoint[]
   isLoading: boolean
   error: any
+  currentSelectedQuery: string | null
+  parsedLogs: any[]
 }
 
 const QueryMetricBlock = ({
@@ -50,6 +52,8 @@ export const QueryPerformanceChart = ({
   chartData,
   isLoading,
   error,
+  currentSelectedQuery,
+  parsedLogs,
 }: QueryPerformanceChartProps) => {
   const [selectedMetric, setSelectedMetric] = useState('query_latency')
 
@@ -143,6 +147,52 @@ export const QueryPerformanceChart = ({
     return transformed
   }, [chartData, selectedMetric])
 
+  const querySpecificData = useMemo(() => {
+    if (!currentSelectedQuery || !parsedLogs.length) return null
+
+    const normalizedSelected = currentSelectedQuery.replace(/\s+/g, ' ').trim()
+
+    // Filter logs for the selected query
+    const queryLogs = parsedLogs.filter((log) => {
+      const normalized = (log.query || '').replace(/\s+/g, ' ').trim()
+      return normalized === normalizedSelected
+    })
+
+    // Build a map of timestamp -> meanTime for the selected query
+    const queryTimeMap = new Map<number, number>()
+
+    queryLogs.forEach((log) => {
+      const timestamps = [log.bucket_start_time, log.bucket, log.timestamp, log.ts]
+      const validTimestamp = timestamps.find((t) => t && !isNaN(new Date(t).getTime()))
+
+      if (!validTimestamp) return
+
+      const time = new Date(validTimestamp).getTime()
+      const meanTime = log.mean_time ?? log.mean_exec_time ?? log.mean_query_time ?? 0
+
+      queryTimeMap.set(time, parseFloat(String(meanTime)))
+    })
+
+    return queryTimeMap
+  }, [currentSelectedQuery, parsedLogs])
+
+  // Merge selected query data with the aggregate chart data
+  const mergedChartData = useMemo(() => {
+    if (!querySpecificData || !currentSelectedQuery) {
+      return transformedChartData
+    }
+
+    // Add the selected query values to each data point
+    return transformedChartData.map((dataPoint) => {
+      const queryValue = querySpecificData.get(dataPoint.period_start)
+
+      return {
+        ...dataPoint,
+        selected_query_time: queryValue !== undefined ? queryValue : null,
+      }
+    })
+  }, [transformedChartData, querySpecificData, currentSelectedQuery])
+
   // Update the chart attributes to show the correct units
   const getChartAttributes = useMemo((): MultiAttribute[] => {
     const attributeMap: Record<string, MultiAttribute[]> = {
@@ -187,7 +237,7 @@ export const QueryPerformanceChart = ({
           label: 'p99.9',
           provider: 'logs',
           type: 'line',
-          color: { light: '#DC2626', dark: '#DC2626' },
+          color: { light: '#8B5CF6', dark: '#8B5CF6' },
         },
       ],
       rows_read: [
@@ -222,8 +272,25 @@ export const QueryPerformanceChart = ({
       ],
     }
 
-    return attributeMap[selectedMetric] || []
-  }, [selectedMetric])
+    const baseAttributes = attributeMap[selectedMetric] || []
+
+    // If a query is selected, add it as an additional line
+    if (currentSelectedQuery && querySpecificData && selectedMetric === 'query_latency') {
+      return [
+        ...baseAttributes,
+        {
+          attribute: 'selected_query_time',
+          label: 'Selected Query',
+          provider: 'logs',
+          type: 'line',
+          color: { light: '#DC2626', dark: '#DC2626' },
+          strokeWidth: 3, // Make it thicker to stand out
+        },
+      ]
+    }
+
+    return baseAttributes
+  }, [selectedMetric, currentSelectedQuery, querySpecificData])
 
   const updateDateRange = (from: string, to: string) => {
     onDateRangeChange?.(from, to)
@@ -273,7 +340,7 @@ export const QueryPerformanceChart = ({
                   ))}
                 </div>
                 <ComposedChart
-                  data={transformedChartData as any}
+                  data={mergedChartData as any}
                   attributes={getChartAttributes}
                   yAxisKey={getChartAttributes[0]?.attribute || ''}
                   xAxisKey="period_start"
