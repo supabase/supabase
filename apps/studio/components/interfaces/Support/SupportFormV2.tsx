@@ -10,7 +10,10 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { DialogSectionSeparator, Form_Shadcn_, Separator } from 'ui'
-import { AFFECTED_SERVICES_CATEGORIES, AffectedServicesSelector } from './AffectedServicesSelector'
+import {
+  CATEGORIES_WITHOUT_AFFECTED_SERVICES,
+  AffectedServicesSelector,
+} from './AffectedServicesSelector'
 import { AttachmentUploadDisplay, useAttachmentUpload } from './AttachmentUpload'
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
 import { ClientLibraryInfo } from './ClientLibraryInfo'
@@ -91,12 +94,12 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       tags: ['dashboard-support-form'],
       siteUrl: '',
       additionalRedirectUrls: '',
-      affectedServices: AFFECTED_SERVICES_CATEGORIES.includes(values.category)
-        ? values.affectedServices
+      affectedServices: CATEGORIES_WITHOUT_AFFECTED_SERVICES.includes(values.category)
+        ? ''
+        : values.affectedServices
             .split(',')
             .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
-            .join(';')
-        : '',
+            .join(';'),
       browserInformation: detectBrowser(),
     }
 

@@ -13,13 +13,13 @@ interface AffectedServicesSelectorProps {
   category: ExtendedSupportCategories
 }
 
-export const AFFECTED_SERVICES_CATEGORIES: ExtendedSupportCategories[] = [
+export const CATEGORIES_WITHOUT_AFFECTED_SERVICES: ExtendedSupportCategories[] = [
   SupportCategories.LOGIN_ISSUES,
   'Plan_upgrade',
 ]
 
 export function AffectedServicesSelector({ form, category }: AffectedServicesSelectorProps) {
-  if (AFFECTED_SERVICES_CATEGORIES.includes(category)) return null
+  if (CATEGORIES_WITHOUT_AFFECTED_SERVICES.includes(category)) return null
 
   return (
     <FormField_Shadcn_
