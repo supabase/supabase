@@ -7,6 +7,7 @@ import { CLIENT_LIBRARIES } from 'common/constants'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
+  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Select_Shadcn_,
@@ -104,10 +105,10 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
           )
         })}
         <div
-          className={[
+          className={cn(
             'px-4 py-3 rounded border border-control bg-surface-100',
-            'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3',
-          ].join(' ')}
+            'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3'
+          )}
         >
           <div className="space-y-1">
             <p className="text-sm">supabase</p>

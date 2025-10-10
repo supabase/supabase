@@ -9,8 +9,8 @@ import { createMockOrganization, createMockProject } from 'tests/helpers'
 import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock, mswServer } from 'tests/lib/msw'
 import { createMockProfileContext } from 'tests/lib/profile-helpers'
-import { SupportFormPage } from '../SupportFormPage'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
+import { SupportFormPage } from '../SupportFormPage'
 
 type Screen = typeof screen
 
@@ -1060,7 +1060,7 @@ describe('SupportFormPage', () => {
       'https://storage.example.com/signed/file2.jpg?token=def456',
     ]
 
-    const { createSupportStorageClient } = await import('../support-storage-client')
+    const { createSupportStorageClient } = await import('../AttachmentUpload')
     const mockStorageClient = {
       storage: {
         from: vi.fn(() => ({

@@ -2,17 +2,17 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
+import { toast } from 'sonner'
 // End of third-party imports
 
 import CopyButton from 'components/ui/CopyButton'
 import InformationBox from 'components/ui/InformationBox'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import { toast } from 'sonner'
 import {
   Button,
+  cn,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
-  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
 } from 'ui'
@@ -198,8 +198,8 @@ const PlanExpectationInfoBox = ({ orgSlug, projectRef, planId }: PlanExpectation
           ? 'Please note that no project has been selected'
           : "Expected response times are based on your organization's plan"
       }
-      {...(hasProjectSelected && {
-        description: (
+      description={
+        hasProjectSelected ? (
           <div className="flex flex-col gap-y-4 mb-1">
             {planId === 'free' && (
               <p>
@@ -247,8 +247,8 @@ const PlanExpectationInfoBox = ({ orgSlug, projectRef, planId }: PlanExpectation
               </Button>
             </div>
           </div>
-        ),
-      })}
+        ) : undefined
+      }
     />
   )
 }

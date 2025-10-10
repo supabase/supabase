@@ -6,8 +6,8 @@ import type { UseFormReturn } from 'react-hook-form'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { DocsSuggestions } from './DocsSuggestions'
 import type { ExtendedSupportCategories } from './Support.constants'
-import { DocsSuggestions } from './SupportForm.DocsSuggestions'
 import type { SupportFormValues } from './SupportForm.schema'
 
 const INCLUDE_DISCUSSIONS: ExtendedSupportCategories[] = [
