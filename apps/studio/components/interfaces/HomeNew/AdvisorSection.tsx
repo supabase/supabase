@@ -2,6 +2,7 @@ import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import {
   createLintSummaryPrompt,
@@ -28,7 +29,6 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import LintDetail from 'components/interfaces/Linter/LintDetail'
 
 export const AdvisorSection = () => {
   const { ref: projectRef } = useParams()
