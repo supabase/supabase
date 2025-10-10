@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_ANALYTICS_URL } from 'pages/api/constants'
-import { get } from 'lib/common/fetch'
+import { PROJECT_ANALYTICS_URL } from 'lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -46,7 +45,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then(async r =>  await r.json())
+      }).then(async r =>  await r.json()).catch((err) => {
+        console.error('error updating log drain', err)
+        return res.status(500).json({ error: { message: 'Error updating log drain' } })
+      })
       return res.status(200).json(putResult)
 
     case 'DELETE':
@@ -61,7 +63,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           Accept: 'application/json',
         },
         method: 'DELETE',
-      }).then(async r =>  await r.json())
+      }).catch((err) => {
+        console.error('error deleting log drain', err)
+        return res.status(500).json({ error: { message: 'Error deleting log drain' } })
+      })
       return res.status(204).json({error: null})
     default:
       res.setHeader('Allow', ['GET', 'POST'])
@@ -71,7 +76,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const envVarsSet = () => {
   const missingEnvVars = [
-    process.env.LOGFLARE_PUBLIC_ACCESS_TOKEN ? null : 'LOGFLARE_PUBLIC_ACCESS_TOKEN',
+    process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN ? null : 'LOGFLARE_PRIVATE_ACCESS_TOKEN',
     process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
   ].filter((v) => v)
   if (missingEnvVars.length == 0) {

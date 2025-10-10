@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_ANALYTICS_URL } from 'pages/api/constants'
+import { PROJECT_ANALYTICS_URL } from 'lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -86,16 +86,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           ].includes(source.name.toLocaleLowerCase())
         )
         .map((source: { name: string; id: number }) => {
-          const name = (source.name as string).toLowerCase()
-          if (name.includes('realtime')) {
-            return {
-              backend_id: postResult.id,
-              lql_string: `~".*?"`,
-              source_id: source.id,
-            }
-          } else {
-            return { backend_id: postResult.id, lql_string: `~".*?"`, source_id: source.id }
-          }
+          return { backend_id: postResult.id, lql_string: `~".*?"`, source_id: source.id }
         })
       const rulesPostUrl = new URL(PROJECT_ANALYTICS_URL)
       rulesPostUrl.pathname = '/api/rules'
@@ -115,7 +106,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(201).json(postResult)
 
     default:
-      res.setHeader('Allow', ['GET', 'POST'])
+      res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }

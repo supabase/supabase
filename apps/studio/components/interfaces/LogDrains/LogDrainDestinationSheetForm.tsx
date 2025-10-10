@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { DOCS_URL } from 'lib/constants'
@@ -570,7 +570,9 @@ export function LogDrainDestinationSheetForm({
         </SheetSection>
 
         <div className="mt-auto">
-          <SheetSection className="border-t bg-background-alternative-200 mt-auto">
+          <SheetSection
+            className={`border-t bg-background-alternative-200 mt-auto ${!IS_PLATFORM ? 'hidden' : ''}`}
+          >
             <FormItemLayout
               isReactForm={false}
               layout="horizontal"

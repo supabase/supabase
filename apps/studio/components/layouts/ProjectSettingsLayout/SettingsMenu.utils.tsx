@@ -28,11 +28,7 @@ export const generateSettingsMenu = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
-  const logDrainsEnabled = features?.logDrains ?? true
   const billingEnabled = features?.billing ?? true
-
-  // If user is in self hosted mode, show log drains, otherwise show only if they are enabled
-  const showLogDrains = IS_PLATFORM ? logDrainsEnabled : true
 
   return [
     {
@@ -68,16 +64,7 @@ export const generateSettingsMenu = (
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
               },
-              ...(logDrainsEnabled
-                ? [
-                    {
-                      name: `Log Drains`,
-                      key: `log-drains`,
-                      url: `/project/${ref}/settings/log-drains`,
-                      items: [],
-                    },
-                  ]
-                : []),
+
               {
                 name: 'Data API',
                 key: 'api',
@@ -102,6 +89,12 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
+        {
+          name: `Log Drains`,
+          key: `log-drains`,
+          url: `/project/${ref}/settings/log-drains`,
+          items: [],
+        },
         {
           name: 'Add Ons',
           key: 'addons',
