@@ -18,7 +18,6 @@ type GettingStartedStatuses = {
   hasCliSetup: boolean
   hasSampleData: boolean
   hasRlsPolicies: boolean
-  hasConfiguredAuth: boolean
   hasAppConnected: boolean
   hasFirstUser: boolean
   hasStorageObjects: boolean
@@ -94,7 +93,6 @@ export const useGettingStartedProgress = (): GettingStartedStatuses => {
     const hasRlsPolicies = (policiesData?.length ?? 0) > 0
     const allowSignupsEnabled = authConfig ? !authConfig.DISABLE_SIGNUP : false
     const emailProviderEnabled = !!authConfig?.EXTERNAL_EMAIL_ENABLED
-    const hasConfiguredAuth = allowSignupsEnabled && emailProviderEnabled
     const hasFirstUser = !!usersCountData && !usersCountData.is_estimate && usersCountData.count > 0
     const hasStorageObjects = (storageTablesData ?? []).some(
       (table) => table.name === 'objects' && Number(table?.live_rows_estimate ?? 0) > 0
@@ -119,7 +117,6 @@ export const useGettingStartedProgress = (): GettingStartedStatuses => {
       hasCliSetup,
       hasSampleData,
       hasRlsPolicies,
-      hasConfiguredAuth,
       hasAppConnected,
       hasFirstUser,
       hasStorageObjects,

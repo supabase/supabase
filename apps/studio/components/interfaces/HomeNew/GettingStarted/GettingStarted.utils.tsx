@@ -37,7 +37,6 @@ export const getCodeWorkflowSteps = ({
     hasCliSetup,
     hasSampleData,
     hasRlsPolicies,
-    hasConfiguredAuth,
     hasAppConnected,
     hasFirstUser,
     hasStorageObjects,
@@ -139,15 +138,6 @@ export const getCodeWorkflowSteps = ({
             ),
         },
       ],
-    },
-    {
-      key: 'setup-auth',
-      status: hasConfiguredAuth ? 'complete' : 'incomplete',
-      title: 'Allow user signups',
-      icon: <User strokeWidth={1} className="text-foreground-muted" size={16} />,
-      description:
-        "It's time to configure your authentication providers and settings for Supabase Auth, so jump into the configuration page and tailor the providers you need.",
-      actions: [{ label: 'Configure', href: `/project/${ref}/auth/providers`, variant: 'default' }],
     },
     {
       key: 'connect-app',
@@ -321,17 +311,6 @@ export const getNoCodeWorkflowSteps = ({
               'Generate RLS policies for my existing tables in the public schema. '
             ),
         },
-      ],
-    },
-    {
-      key: 'setup-auth',
-      status: hasConfiguredAuth ? 'complete' : 'incomplete',
-      title: 'Allow user signups',
-      icon: <User strokeWidth={1} className="text-foreground-muted" size={16} />,
-      description:
-        "It's time to set up authentication so you can start signing up users, configuring providers and settings from the auth dashboard.",
-      actions: [
-        { label: 'Configure auth', href: `/project/${ref}/auth/providers`, variant: 'default' },
       ],
     },
     {
