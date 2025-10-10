@@ -1,20 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import {
-  ArrowDown,
-  ArrowDownNarrowWide,
-  ArrowDownWideNarrow,
-  ArrowUp,
-  HelpCircle,
-  Loader2,
-  LoaderPinwheel,
-  RefreshCw,
-  Search,
-  Trash,
-  Users,
-  X,
-  Zap,
-} from 'lucide-react'
+import { RefreshCw, Search, Trash, Users, X } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -37,14 +23,6 @@ import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   Button,
   cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
@@ -54,23 +32,23 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
+import { ModeSwitcher } from './ModeSwitcher'
+import { PerformanceSearch } from './PerformanceSearch'
+import { SortDropdown } from './SortDropdown'
 import { UserPanel } from './UserPanel'
 import {
   ColumnConfiguration,
   MAX_BULK_DELETE,
+  PHONE_NUMBER_LEFT_PREFIX_REGEX,
   PROVIDER_FILTER_OPTIONS,
   USERS_TABLE_COLUMNS,
   UUIDV4_LEFT_PREFIX_REGEX,
-  PHONE_NUMBER_LEFT_PREFIX_REGEX,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
 
@@ -111,7 +89,9 @@ export const UsersV2 = () => {
   }, [showEmailPhoneColumns])
 
   const [mode, setMode] = useState<'performance' | 'freeform'>('performance' as const)
-  const [column, setColumn] = useState<'id' | 'email' | 'phone'>('id' as const)
+  const [specificFilterColumn, setSpecificFilterColumn] = useState<'id' | 'email' | 'phone'>(
+    'id' as const
+  )
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
@@ -161,8 +141,7 @@ export const UsersV2 = () => {
       providers: selectedProviders,
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
-
-      ...(mode === 'performance' ? { column } : { column: undefined }),
+      ...(mode === 'performance' ? { column: specificFilterColumn } : { column: undefined }),
     },
     {
       keepPreviousData: Boolean(filterKeywords),
@@ -287,15 +266,12 @@ export const UsersV2 = () => {
     selectedUsers,
   ])
 
-  const searchInvalid = !search
-    ? false
-    : mode !== 'performance'
+  const searchInvalid =
+    !search || mode === 'freeform' || specificFilterColumn === 'email'
       ? false
-      : column === 'email'
-        ? false
-        : column === 'id'
-          ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
-          : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
+      : specificFilterColumn === 'id'
+        ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
+        : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
 
   return (
     <>
@@ -318,143 +294,60 @@ export const UsersV2 = () => {
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                <Select_Shadcn_
-                  value={mode}
-                  onValueChange={(v) => {
-                    setMode(v as typeof mode)
-                  }}
-                >
-                  <SelectTrigger_Shadcn_
+                <ModeSwitcher mode={mode} setMode={setMode} />
+
+                {mode === 'performance' ? (
+                  <PerformanceSearch
+                    search={search}
+                    searchInvalid={searchInvalid}
+                    specificFilterColumn={specificFilterColumn}
+                    setSearch={setSearch}
+                    setFilterKeywords={setFilterKeywords}
+                    setSpecificFilterColumn={setSpecificFilterColumn}
+                  />
+                ) : (
+                  <Input
                     size="tiny"
                     className={cn(
-                      'w-[140px] border-none !bg-transparent',
-                      mode === 'performance' ? 'text-brand' : 'text-warning'
+                      'w-52 pl-7 bg-transparent',
+                      searchInvalid ? 'text-red-900 dark:border-red-900' : ''
                     )}
-                  >
-                    {mode === 'performance' ? (
-                      <>
-                        <Zap className="size-4" /> Optimized
-                      </>
-                    ) : (
-                      <>
-                        <LoaderPinwheel className="size-4" /> Freeform
-                      </>
-                    )}
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectGroup_Shadcn_>
-                      <SelectItem_Shadcn_ value="performance">
-                        <div className="py-2 flex flex-col gap-2 max-w-[200px]">
-                          <div className="flex flex-row items-center gap-2 text-xs text-brand">
-                            <Zap className="size-4" /> Optimized search
-                          </div>
-                          <p className="prose text-xs">
-                            Uses fast and light prefix search, ideal for most day-to-day operations.
-                          </p>
-                        </div>
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="freeform">
-                        <div className="py-2 flex flex-col gap-2 max-w-[200px]">
-                          <div className="flex flex-row items-center gap-2 text-xs text-warning">
-                            <LoaderPinwheel className="size-4" /> Freeform search
-                          </div>
-                          <p className="prose text-xs">
-                            Uses full-table scans accross mutliple columns. Can be very heavy on
-                            your database if the table has a large number of rows.{' '}
-                            <span className="text-warning">Use with caution!</span>
-                          </p>
-                        </div>
-                      </SelectItem_Shadcn_>
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
-
-                <Input
-                  size="tiny"
-                  className={cn(
-                    'w-52 pl-7 bg-transparent',
-                    searchInvalid ? 'text-red-900 dark:border-red-900' : ''
-                  )}
-                  iconContainerClassName="pl-2"
-                  icon={
-                    <Search
-                      size={14}
-                      className={cn('text-foreground-lighter', searchInvalid ? 'text-red-900' : '')}
-                    />
-                  }
-                  placeholder={
-                    mode === 'performance'
-                      ? `${column === 'id' ? 'User ID' : column === 'email' ? 'Email' : 'Phone'} or prefix...`
-                      : 'Search email, phone, name, user ID'
-                  }
-                  value={search}
-                  onChange={(e) => {
-                    const value =
-                      mode === 'performance'
-                        ? e.target.value.replace(/\s+/g, '').toLowerCase()
-                        : e.target.value.trimStart()
-                    setSearch(value)
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-                      setSearch((s) => {
-                        if (
-                          s &&
-                          mode === 'performance' &&
-                          column === 'phone' &&
-                          !s.startsWith('+')
-                        ) {
-                          return `+${s}`
-                        }
-
-                        return s
-                      })
-
-                      if (!searchInvalid) {
-                        setFilterKeywords(search.trim().toLocaleLowerCase())
-                      }
-                    }
-                  }}
-                  actions={[
-                    search && (
-                      <Button
-                        size="tiny"
-                        type="text"
-                        icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
-                        onClick={() => clearSearch()}
-                        className="p-0 h-5 w-5"
+                    iconContainerClassName="pl-2"
+                    icon={
+                      <Search
+                        size={14}
+                        className={cn(
+                          'text-foreground-lighter',
+                          searchInvalid ? 'text-red-900' : ''
+                        )}
                       />
-                    ),
-                  ]}
-                />
-
-                {mode === 'performance' && (
-                  <Select_Shadcn_
-                    value={column}
-                    onValueChange={(v) => {
-                      setColumn(v as typeof column)
+                    }
+                    placeholder={'Search by email, phone, name, user ID'}
+                    value={search}
+                    onChange={(e) => {
+                      const value = e.target.value.trimStart()
+                      setSearch(value)
                     }}
-                  >
-                    <SelectTrigger_Shadcn_ size="tiny" className={cn('w-[140px] !bg-transparent')}>
-                      <SelectValue_Shadcn_ />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="id" className="text-xs">
-                          User ID
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="email" className="text-xs">
-                          Email address
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="phone" className="text-xs">
-                          Phone number
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    onKeyDown={(e) => {
+                      if (e.code === 'Enter' || e.code === 'NumpadEnter') {
+                        if (!searchInvalid) setFilterKeywords(search.trim().toLocaleLowerCase())
+                      }
+                    }}
+                    actions={
+                      search ? (
+                        <Button
+                          size="tiny"
+                          type="text"
+                          icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
+                          onClick={() => clearSearch()}
+                          className="p-0 h-5 w-5"
+                        />
+                      ) : null
+                    }
+                  />
                 )}
 
-                {showUserTypeFilter && mode !== 'performance' && (
+                {showUserTypeFilter && mode === 'freeform' && (
                   <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
                     <SelectContent_Shadcn_>
                       <SelectTrigger_Shadcn_
@@ -484,7 +377,7 @@ export const UsersV2 = () => {
                   </Select_Shadcn_>
                 )}
 
-                {showProviderFilter && mode !== 'performance' && (
+                {showProviderFilter && mode === 'freeform' && (
                   <FilterPopover
                     name="Provider"
                     options={PROVIDER_FILTER_OPTIONS}
@@ -547,83 +440,16 @@ export const UsersV2 = () => {
                   }}
                 />
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild disabled={mode === 'performance'}>
-                    <Button
-                      icon={
-                        mode === 'performance' ? (
-                          <ArrowDownNarrowWide />
-                        ) : sortOrder === 'desc' ? (
-                          <ArrowDownWideNarrow />
-                        ) : (
-                          <ArrowDownNarrowWide />
-                        )
-                      }
-                    >
-                      Sorted by{' '}
-                      {mode === 'performance'
-                        ? column === 'id'
-                          ? 'user ID'
-                          : column
-                        : sortColumn === 'id'
-                          ? 'user ID'
-                          : sortColumn.replaceAll('_', ' ')}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-44" align="start">
-                    <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
-                      <DropdownMenuSub>
-                        <DropdownMenuRadioItem value="id:asc">User ID</DropdownMenuRadioItem>
-                        <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="created_at:asc">
-                            Ascending
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="created_at:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by last sign in at</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="last_sign_in_at:asc">
-                            Ascending
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="last_sign_in_at:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      {showSortByEmail && (
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent>
-                            <DropdownMenuRadioItem value="email:asc">
-                              Ascending
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="email:desc">
-                              Descending
-                            </DropdownMenuRadioItem>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                      )}
-                      {showSortByPhone && (
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent>
-                            <DropdownMenuRadioItem value="phone:asc">
-                              Ascending
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="phone:desc">
-                              Descending
-                            </DropdownMenuRadioItem>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                      )}
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <SortDropdown
+                  mode={mode}
+                  specificFilterColumn={specificFilterColumn}
+                  sortColumn={sortColumn}
+                  sortOrder={sortOrder}
+                  sortByValue={sortByValue}
+                  setSortByValue={setSortByValue}
+                  showSortByEmail={showSortByEmail}
+                  showSortByPhone={showSortByPhone}
+                />
               </div>
 
               <div className="flex items-center gap-x-2">
