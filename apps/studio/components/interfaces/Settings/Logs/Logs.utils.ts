@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import dayjs, { Dayjs } from 'dayjs'
-import { get, isEqual } from 'lodash'
+import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 
@@ -142,7 +142,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
 
   switch (table) {
     case 'edge_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 -- local dev edge_logs query
 select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
@@ -162,7 +162,7 @@ limit ${limit};
   `
 
     case 'postgres_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
@@ -196,6 +196,14 @@ limit ${limit}
     `
 
     case 'function_edge_logs':
+      if (!IS_PLATFORM) {
+        return `
+select id, function_edge_logs.timestamp, event_message
+from function_edge_logs
+${orderBy}
+limit ${limit}
+`
+      }
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
@@ -216,11 +224,9 @@ limit ${limit}
   `
 
     case 'pg_cron_logs':
-      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+      const pgCronWhere = where ? `${basePgCronWhere} AND ${where.substring(6)}` : basePgCronWhere
 
-      const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
-
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.query
+      return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
 from postgres_logs
   cross join unnest(metadata) as m
   cross join unnest(m.parsed) as parsed
@@ -242,6 +248,7 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
   cross join unnest(m.request) as request
   cross join unnest(m.response) as response`
 
+    case 'pg_cron_logs':
     case 'postgres_logs':
       return `cross join unnest(metadata) as m
   cross join unnest(m.parsed) as parsed`
@@ -313,6 +320,7 @@ const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] =>
   return [its.add(-extendValue, trunc), trunc]
 }
 
+const basePgCronWhere = `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
 /**
  *
  * generates log event chart query
@@ -331,7 +339,7 @@ export const genChartQuery = (
   // to calculate the chart, we need to query postgres logs
   if (table === LogsTableName.PG_CRON) {
     table = LogsTableName.POSTGRES
-    where = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+    where = basePgCronWhere
   }
 
   let joins = genCrossJoinUnnests(table)
