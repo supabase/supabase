@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import dayjs, { Dayjs } from 'dayjs'
-import { get, isEqual } from 'lodash'
+import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 
@@ -142,7 +142,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
 
   switch (table) {
     case 'edge_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 -- local dev edge_logs query
 select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
@@ -162,7 +162,7 @@ limit ${limit};
   `
 
     case 'postgres_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
@@ -196,7 +196,7 @@ limit ${limit}
     `
 
     case 'function_edge_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 select id, function_edge_logs.timestamp, event_message
 from function_edge_logs
