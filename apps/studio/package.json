@@ -57,7 +57,7 @@
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.5.0",
     "@supabase/auth-js": "catalog:",
-    "@supabase/mcp-server-supabase": "^0.5.4",
+    "@supabase/mcp-server-supabase": "^0.5.6",
     "@supabase/mcp-utils": "^0.2.0",
     "@supabase/pg-meta": "workspace:*",
     "@supabase/realtime-js": "catalog:",
