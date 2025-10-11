@@ -32,6 +32,17 @@ function errorReducer(state: any, action: any) {
 }
 
 /**
+ * A form component that integrates with Formik for form state management.
+ * @param {object} props - The component props.
+ * @param {Function} [props.validate] - A validation function for the form.
+ * @param {React.ReactNode} props.children - A function that receives formik props and returns the form content.
+ * @param {Function} [props.handleIsSubmitting] - A callback to handle the submission state.
+ * @param {Function} [props.handleIsValidating] - A callback to handle the validation state.
+ * @param {string} [props.name] - The name of the form.
+ * @param {string} [props.id] - The ID of the form.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @param {React.CSSProperties} [props.style] - Inline CSS styles.
+ * @returns {React.ReactElement} The form component.
  * @deprecated Use `import { Form_shadcn_ } from "ui"` instead
  */
 export default function Form({ validate, ...props }: Props) {

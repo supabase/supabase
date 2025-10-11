@@ -38,6 +38,30 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
 }
 
 /**
+ * A listbox component for selecting an option from a list.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - The options for the listbox.
+ * @param {string} [props.className] - Additional CSS class names for the container.
+ * @param {string} [props.buttonClassName] - Additional CSS class names for the button.
+ * @param {string | React.ReactNode} [props.descriptionText] - A description for the listbox.
+ * @param {string} [props.error] - An error message to display.
+ * @param {any} [props.icon] - An icon to be displayed inside the listbox.
+ * @param {string} [props.id] - The ID of the listbox.
+ * @param {string} [props.name] - The name of the listbox.
+ * @param {string | React.ReactNode} [props.label] - The label for the listbox.
+ * @param {string} [props.labelOptional] - Optional text to display next to the label.
+ * @param {'horizontal' | 'vertical'} [props.layout] - The layout of the listbox and label.
+ * @param {any} [props.value] - The currently selected value.
+ * @param {Function} [props.onChange] - A callback function to be called when the value changes.
+ * @param {Function} [props.onFocus] - A callback function to be called when the listbox gains focus.
+ * @param {Function} [props.onBlur] - A callback function to be called when the listbox loses focus.
+ * @param {React.CSSProperties} [props.style] - Inline CSS styles.
+ * @param {'tiny' | 'small' | 'medium' | 'large' | 'xlarge'} [props.size='medium'] - The size of the listbox.
+ * @param {any} [props.defaultValue] - The default selected value.
+ * @param {Function} [props.validation] - A validation function for the listbox.
+ * @param {boolean} [props.disabled] - If `true`, the listbox will be disabled.
+ * @param {number} [props.optionsWidth] - The width of the options popover.
+ * @returns {React.ReactElement} The listbox component.
  * @deprecated Use `import { Select_shadcn_ } from "ui"` or follow ComboBox convention or use ./ui-patterns/multi-select
  */
 function Listbox({
@@ -281,6 +305,16 @@ type addOnBefore = {
 }
 
 /**
+ * An option within a Listbox component.
+ * @param {object} props - The component props.
+ * @param {string} [props.id] - The ID of the option.
+ * @param {any} props.value - The value of the option.
+ * @param {string} props.label - The label of the option.
+ * @param {boolean} [props.disabled=false] - If `true`, the option will be disabled.
+ * @param {React.ReactNode | (({ active, selected }: any) => React.ReactNode)} [props.children] - The content of the option.
+ * @param {string} [props.className=''] - Additional CSS class names.
+ * @param {({ active, selected }: any) => React.ReactNode} [props.addOnBefore] - A component to render before the label.
+ * @returns {React.ReactElement} The listbox option component.
  * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
  */
 function SelectOption({

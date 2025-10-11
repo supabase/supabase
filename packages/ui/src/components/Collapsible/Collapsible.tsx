@@ -9,6 +9,12 @@ export interface CollapsibleProps extends RadixCollapsible.CollapsibleProps {
 }
 
 /**
+ * An interactive component that expands or collapses its content.
+ * @param {object} props - The component props.
+ * @param {boolean} [props.open] - The controlled open state of the collapsible.
+ * @param {React.ReactNode} props.children - The content of the collapsible.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @returns {React.ReactElement} The collapsible component.
  * @deprecated Use `import { Collapsible_shadcn_ } from "ui"` instead
  */
 export const Collapsible = ({
@@ -32,6 +38,11 @@ export const Collapsible = ({
 }
 
 /**
+ * The button that toggles the collapsible's open and closed states.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - The content of the trigger.
+ * @param {boolean} [props.asChild] - Renders the component as a child, forwarding props to the first child.
+ * @returns {React.ReactElement} The collapsible trigger component.
  * @deprecated Use ./CollapsibleTrigger_shadcn_ instead
  */
 export function Trigger({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) {
@@ -39,6 +50,12 @@ export function Trigger({ children, asChild }: { children: React.ReactNode; asCh
 }
 
 /**
+ * The content of the collapsible that is hidden or shown.
+ * @param {object} props - The component props.
+ * @param {boolean} [props.asChild] - Renders the component as a child, forwarding props to the first child.
+ * @param {React.ReactNode} props.children - The content of the collapsible.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @returns {React.ReactElement} The collapsible content component.
  * @deprecated Use ./CollapsibleContent_shadcn_ instead
  */
 export function Content({
