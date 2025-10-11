@@ -41,13 +41,21 @@ export const ProjectClaimConfirm = ({
   const queryClient = useQueryClient()
 
   const { mutateAsync: approveRequest, isLoading: isApproving } =
-    useApiAuthorizationApproveMutation()
+    useApiAuthorizationApproveMutation({ onError: () => {} })
 
   const { mutateAsync: claimProject, isLoading: isClaiming } = useOrganizationProjectClaimMutation()
 
   const onClaimProject = async () => {
     try {
-      await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+      try {
+        await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+      } catch (error: any) {
+        // if the org is already approved with this auth id, we can ignore the error. Otherwise, we throw it again
+        if (!error.message.includes('already approved')) {
+          throw error
+        }
+      }
+
       await claimProject({
         slug: selectedOrganization.slug,
         token: claimToken!,
