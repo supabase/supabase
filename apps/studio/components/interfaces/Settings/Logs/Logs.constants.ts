@@ -539,29 +539,33 @@ export const FILTER_OPTIONS: FilterTableSet = {
     },
   },
   // function_edge_logs
-  function_edge_logs: IS_PLATFORM ? {
-    status_code: {
-      label: 'Status',
-      key: 'status_code',
-      options: [
-        {
-          key: 'error',
-          label: 'Error',
-          description: '500 error codes',
+  ...(IS_PLATFORM
+    ? {
+        function_edge_logs: {
+          status_code: {
+            label: 'Status',
+            key: 'status_code',
+            options: [
+              {
+                key: 'error',
+                label: 'Error',
+                description: '500 error codes',
+              },
+              {
+                key: 'success',
+                label: 'Success',
+                description: '200 codes',
+              },
+              {
+                key: 'warning',
+                label: 'Warning',
+                description: '400 codes',
+              },
+            ],
+          },
         },
-        {
-          key: 'success',
-          label: 'Success',
-          description: '200 codes',
-        },
-        {
-          key: 'warning',
-          label: 'Warning',
-          description: '400 codes',
-        },
-      ],
-    },
-  } : {},
+      }
+    : {}),
   // function_logs
   function_logs: {
     severity: {
