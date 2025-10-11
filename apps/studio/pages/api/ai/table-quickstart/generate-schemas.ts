@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
+import { LIMITS } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/constants'
 
 // See https://vercel.com/docs/functions/configuring-functions/duration
 export const maxDuration = 30
@@ -43,8 +44,8 @@ const TableSchema = z.object({
 const ResponseSchema = z.object({
   tables: z
     .array(TableSchema)
-    .min(2)
-    .max(3)
+    .min(LIMITS.MIN_TABLES_TO_GENERATE)
+    .max(LIMITS.MAX_TABLES_TO_GENERATE)
     .describe('Array of related database tables for the application'),
   summary: z.string().optional().describe('Brief summary of the generated schema'),
 })
@@ -88,8 +89,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Prompt is required' })
   }
 
-  if (typeof prompt !== 'string' || prompt.length > 500) {
-    return res.status(400).json({ error: 'Prompt must be a string under 500 characters' })
+  if (typeof prompt !== 'string' || prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
+    return res.status(400).json({ error: `Prompt must be a string under ${LIMITS.MAX_PROMPT_LENGTH} characters` })
   }
 
   try {

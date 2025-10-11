@@ -3,6 +3,7 @@ import { BASE_PATH } from 'lib/constants'
 import { constructHeaders } from 'data/fetchers'
 import { toast } from 'sonner'
 import { TableSource } from './types'
+import { LIMITS } from './constants'
 import type { TableSuggestion, PostgresType, AIGeneratedSchema } from './types'
 
 const mapColumnType = (type: string): PostgresType => {
@@ -61,9 +62,12 @@ export const useAITableGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const isMountedRef = useRef(true)
 
   useEffect(() => {
+    isMountedRef.current = true
     return () => {
+      isMountedRef.current = false
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
@@ -75,8 +79,8 @@ export const useAITableGeneration = () => {
       abortControllerRef.current.abort()
     }
 
-    if (prompt.length > 500) {
-      const error = 'Description is too long. Please keep it under 500 characters.'
+    if (prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
+      const error = `Description is too long. Please keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.`
       toast.error(error)
       return []
     }
@@ -113,7 +117,9 @@ export const useAITableGeneration = () => {
       const data: AIGeneratedSchema = await response.json()
       const tables = convertAISchemaToTableSuggestions(data)
 
-      setError(null)
+      if (isMountedRef.current) {
+        setError(null)
+      }
       return tables
     } catch (e) {
       if (e instanceof Error && e.name === 'AbortError') {
@@ -121,7 +127,10 @@ export const useAITableGeneration = () => {
       }
 
       const errorMessage = e instanceof Error ? e.message : 'Failed to generate schemas'
-      setError(errorMessage)
+
+      if (isMountedRef.current) {
+        setError(errorMessage)
+      }
 
       toast.error('Unable to generate tables', {
         description: errorMessage,
@@ -130,7 +139,9 @@ export const useAITableGeneration = () => {
 
       return []
     } finally {
-      setIsGenerating(false)
+      if (isMountedRef.current) {
+        setIsGenerating(false)
+      }
       abortControllerRef.current = null
     }
   }, [])

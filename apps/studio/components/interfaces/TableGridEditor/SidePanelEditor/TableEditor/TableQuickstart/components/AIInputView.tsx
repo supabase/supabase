@@ -42,7 +42,9 @@ export const AIInputView = memo(
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
-              onGenerate()
+              if (prompt.trim()) {
+                onGenerate()
+              }
             }
           }}
           disabled={isGenerating || isLoading}
