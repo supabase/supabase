@@ -45,10 +45,7 @@ export const useUserCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-          queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
-        ])
+        await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
 
         await onSuccess?.(data, variables, context)
       },

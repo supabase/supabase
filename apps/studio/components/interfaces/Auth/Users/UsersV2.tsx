@@ -1,16 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import {
-  ArrowDown,
-  ArrowUp,
-  HelpCircle,
-  Loader2,
-  RefreshCw,
-  Search,
-  Trash,
-  Users,
-  X,
-} from 'lucide-react'
+import { RefreshCw, Search, Trash, Users, X } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -24,7 +14,6 @@ import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { THRESHOLD_COUNT } from 'data/table-rows/table-rows-count-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -34,14 +23,6 @@ import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   Button,
   cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
@@ -51,21 +32,23 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
+import { ModeSwitcher } from './ModeSwitcher'
+import { PerformanceSearch } from './PerformanceSearch'
+import { SortDropdown } from './SortDropdown'
 import { UserPanel } from './UserPanel'
 import {
   ColumnConfiguration,
   MAX_BULK_DELETE,
+  PHONE_NUMBER_LEFT_PREFIX_REGEX,
   PROVIDER_FILTER_OPTIONS,
   USERS_TABLE_COLUMNS,
+  UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
 
@@ -105,13 +88,18 @@ export const UsersV2 = () => {
     }
   }, [showEmailPhoneColumns])
 
+  const [mode, setMode] = useState<'performance' | 'freeform'>('performance' as const)
+  const [specificFilterColumn, setSpecificFilterColumn] = useState<'id' | 'email' | 'phone'>(
+    'id' as const
+  )
+
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
-  const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
+  const [sortByValue, setSortByValue] = useState<string>('id:asc')
 
   const [selectedUser, setSelectedUser] = useState<string>()
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
@@ -149,10 +137,11 @@ export const UsersV2 = () => {
       projectRef,
       connectionString: project?.connectionString,
       keywords: filterKeywords,
-      filter: filter === 'all' ? undefined : filter,
+      filter: mode === 'performance' || filter === 'all' ? undefined : filter,
       providers: selectedProviders,
-      sort: sortColumn as 'created_at' | 'email' | 'phone',
+      sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
+      ...(mode === 'performance' ? { column: specificFilterColumn } : { column: undefined }),
     },
     {
       keepPreviousData: Boolean(filterKeywords),
@@ -162,31 +151,11 @@ export const UsersV2 = () => {
     }
   )
 
-  const {
-    data: countData,
-    refetch: refetchCount,
-    isLoading: isLoadingCount,
-  } = useUsersCountQuery({
-    projectRef,
-    connectionString: project?.connectionString,
-    keywords: filterKeywords,
-    filter: filter === 'all' ? undefined : filter,
-    providers: selectedProviders,
-    forceExactCount,
-  })
-
   const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
-  const totalUsers = countData?.count ?? 0
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
-
-  const formatEstimatedCount = (count: number) => {
-    if (count >= 1e6) return `${(count / 1e6).toFixed(1)}M`
-    if (count >= 1e3) return `${(count / 1e3).toFixed(1)}K`
-    return count.toString()
-  }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
@@ -252,10 +221,7 @@ export const UsersV2 = () => {
         userIds.map((id) => deleteUser({ projectRef, userId: id, skipInvalidation: true }))
       )
       // [Joshen] Skip invalidation within RQ to prevent multiple requests, then invalidate once at the end
-      await Promise.all([
-        queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-        queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
-      ])
+      await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
       toast.success(
         `Successfully deleted the selected ${selectedUsers.size} user${selectedUsers.size > 1 ? 's' : ''}`
       )
@@ -300,6 +266,13 @@ export const UsersV2 = () => {
     selectedUsers,
   ])
 
+  const searchInvalid =
+    !search || mode === 'freeform' || specificFilterColumn === 'email'
+      ? false
+      : specificFilterColumn === 'id'
+        ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
+        : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
+
   return (
     <>
       <div className="h-full flex flex-col">
@@ -321,45 +294,71 @@ export const UsersV2 = () => {
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                <Input
-                  size="tiny"
-                  className="w-52 pl-7 bg-transparent"
-                  iconContainerClassName="pl-2"
-                  icon={<Search size={14} className="text-foreground-lighter" />}
-                  placeholder="Search email, phone or UID"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-                      setSearch(search.trim())
-                      setFilterKeywords(search.trim().toLocaleLowerCase())
-                    }
-                  }}
-                  actions={[
-                    search && (
-                      <Button
-                        size="tiny"
-                        type="text"
-                        icon={<X />}
-                        onClick={() => clearSearch()}
-                        className="p-0 h-5 w-5"
-                      />
-                    ),
-                  ]}
-                />
+                <ModeSwitcher mode={mode} setMode={setMode} />
 
-                {showUserTypeFilter && (
+                {mode === 'performance' ? (
+                  <PerformanceSearch
+                    search={search}
+                    searchInvalid={searchInvalid}
+                    specificFilterColumn={specificFilterColumn}
+                    setSearch={setSearch}
+                    setFilterKeywords={setFilterKeywords}
+                    setSpecificFilterColumn={setSpecificFilterColumn}
+                  />
+                ) : (
+                  <Input
+                    size="tiny"
+                    className={cn(
+                      'w-52 pl-7 bg-transparent',
+                      searchInvalid ? 'text-red-900 dark:border-red-900' : ''
+                    )}
+                    iconContainerClassName="pl-2"
+                    icon={
+                      <Search
+                        size={14}
+                        className={cn(
+                          'text-foreground-lighter',
+                          searchInvalid ? 'text-red-900' : ''
+                        )}
+                      />
+                    }
+                    placeholder={'Search by email, phone, name, user ID'}
+                    value={search}
+                    onChange={(e) => {
+                      const value = e.target.value.trimStart()
+                      setSearch(value)
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.code === 'Enter' || e.code === 'NumpadEnter') {
+                        if (!searchInvalid) setFilterKeywords(search.trim().toLocaleLowerCase())
+                      }
+                    }}
+                    actions={
+                      search ? (
+                        <Button
+                          size="tiny"
+                          type="text"
+                          icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
+                          onClick={() => clearSearch()}
+                          className="p-0 h-5 w-5"
+                        />
+                      ) : null
+                    }
+                  />
+                )}
+
+                {showUserTypeFilter && mode === 'freeform' && (
                   <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-                    <SelectTrigger_Shadcn_
-                      size="tiny"
-                      className={cn(
-                        'w-[140px] !bg-transparent',
-                        filter === 'all' && 'border-dashed'
-                      )}
-                    >
-                      <SelectValue_Shadcn_ />
-                    </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
+                      <SelectTrigger_Shadcn_
+                        size="tiny"
+                        className={cn(
+                          'w-[140px] !bg-transparent',
+                          filter === 'all' && 'border-dashed'
+                        )}
+                      >
+                        <SelectValue_Shadcn_ />
+                      </SelectTrigger_Shadcn_>
                       <SelectGroup_Shadcn_>
                         <SelectItem_Shadcn_ value="all" className="text-xs">
                           All users
@@ -378,7 +377,7 @@ export const UsersV2 = () => {
                   </Select_Shadcn_>
                 )}
 
-                {showProviderFilter && (
+                {showProviderFilter && mode === 'freeform' && (
                   <FilterPopover
                     name="Provider"
                     options={PROVIDER_FILTER_OPTIONS}
@@ -441,65 +440,16 @@ export const UsersV2 = () => {
                   }}
                 />
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                      Sorted by {sortColumn.replaceAll('_', ' ')}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-44" align="start">
-                    <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="created_at:asc">
-                            Ascending
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="created_at:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by last sign in at</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="last_sign_in_at:asc">
-                            Ascending
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="last_sign_in_at:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      {showSortByEmail && (
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent>
-                            <DropdownMenuRadioItem value="email:asc">
-                              Ascending
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="email:desc">
-                              Descending
-                            </DropdownMenuRadioItem>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                      )}
-                      {showSortByPhone && (
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent>
-                            <DropdownMenuRadioItem value="phone:asc">
-                              Ascending
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="phone:desc">
-                              Descending
-                            </DropdownMenuRadioItem>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                      )}
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <SortDropdown
+                  mode={mode}
+                  specificFilterColumn={specificFilterColumn}
+                  sortColumn={sortColumn}
+                  sortOrder={sortOrder}
+                  sortByValue={sortByValue}
+                  setSortByValue={setSortByValue}
+                  showSortByEmail={showSortByEmail}
+                  showSortByPhone={showSortByPhone}
+                />
               </div>
 
               <div className="flex items-center gap-x-2">
@@ -513,7 +463,6 @@ export const UsersV2 = () => {
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={() => {
                     refetch()
-                    refetchCount()
                   }}
                 >
                   Refresh
@@ -618,51 +567,6 @@ export const UsersV2 = () => {
             />
           )}
         </ResizablePanelGroup>
-
-        <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
-          <div className="flex items-center gap-x-2">
-            {isLoadingCount ? (
-              'Loading user count...'
-            ) : (
-              <>
-                <span>
-                  Total:{' '}
-                  {countData?.is_estimate
-                    ? formatEstimatedCount(totalUsers)
-                    : totalUsers.toLocaleString()}{' '}
-                  user{totalUsers !== 1 ? 's' : ''}
-                  {countData?.is_estimate && ' (estimated)'}
-                </span>
-                {countData?.is_estimate && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="tiny"
-                        type="text"
-                        className="px-1.5"
-                        icon={<HelpCircle />}
-                        onClick={() => {
-                          setShowFetchExactCountModal(true)
-                        }}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="w-72">
-                      This is an estimated value as your project has more than{' '}
-                      {THRESHOLD_COUNT.toLocaleString()} users.
-                      <br />
-                      <span className="text-brand">Click to retrieve the exact count.</span>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </>
-            )}
-          </div>
-          {(isLoading || isRefetching || isFetchingNextPage) && (
-            <span className="flex items-center gap-2">
-              <Loader2 size={14} className="animate-spin" /> Loading...
-            </span>
-          )}
-        </div>
       </div>
 
       <ConfirmationModal
