@@ -1,14 +1,18 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { toast } from 'sonner'
-import { Button, cn } from 'ui'
+import { useAITableGeneration } from './useAITableGeneration'
 import { tableTemplates } from './templates'
-import { QuickstartVariant } from './types'
+import { QuickstartVariant, ViewMode } from './types'
 import { convertTableSuggestionToTableField } from './utils'
+import { InitialView } from './components/InitialView'
+import { CategoryView } from './components/CategoryView'
+import { AIInputView } from './components/AIInputView'
+import { ResultsView } from './components/ResultsView'
 import type { TableSuggestion } from './types'
 import type { TableField } from '../TableEditor.types'
 
 interface TableTemplateSelectorProps {
-  variant: Exclude<QuickstartVariant, QuickstartVariant.CONTROL> // [Sean] this will be used in PR #38934
+  variant: Exclude<QuickstartVariant, QuickstartVariant.CONTROL> 
   onSelectTemplate: (tableField: Partial<TableField>) => void
   onDismiss?: () => void
   disabled?: boolean
@@ -16,20 +20,45 @@ interface TableTemplateSelectorProps {
 
 const SUCCESS_MESSAGE_DURATION_MS = 3000
 
+interface ViewState {
+  mode: ViewMode
+  selectedCategory: string | null
+  selectedTemplate: TableSuggestion | null
+  generatedTables: TableSuggestion[]
+  isLoading: boolean
+}
+
+const initialViewState: ViewState = {
+  mode: ViewMode.INITIAL,
+  selectedCategory: null,
+  selectedTemplate: null,
+  generatedTables: [],
+  isLoading: false,
+}
+
 export const TableTemplateSelector = ({
-  variant: _variant,
+  variant,
   onSelectTemplate,
   onDismiss,
   disabled,
 }: TableTemplateSelectorProps) => {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null) // null => All
-  const [selectedTemplate, setSelectedTemplate] = useState<TableSuggestion | null>(null)
+  const [viewState, setViewState] = useState<ViewState>(initialViewState)
+  const [aiPrompt, setAiPrompt] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const { generateTables, isGenerating, error: apiError } = useAITableGeneration()
+
+  // Focus management
+  useEffect(() => {
+    if (viewState.mode === ViewMode.AI_INPUT && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [viewState.mode])
 
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
-      setSelectedTemplate(template)
+      setViewState((prev) => ({ ...prev, selectedTemplate: template }))
       toast.success(
         `${template.tableName} template applied. You can add or modify the fields below.`,
         {
@@ -40,82 +69,122 @@ export const TableTemplateSelector = ({
     [onSelectTemplate]
   )
 
-  const categories = useMemo(() => Object.keys(tableTemplates), [])
+  const handleGenerateTables = useCallback(async (promptOverride?: string) => {
+    const promptToUse = promptOverride ?? aiPrompt
+    if (!promptToUse.trim() || isGenerating) return
 
-  useEffect(() => {
-    if (activeCategory === null && categories.length > 0) {
-      setActiveCategory(categories[0])
+    setViewState((prev) => ({ ...prev, isLoading: true }))
+
+    try {
+      const tables = await generateTables(promptToUse)
+
+      if (tables.length > 0) {
+        setViewState({
+          mode: ViewMode.AI_RESULTS,
+          selectedCategory: null,
+          selectedTemplate: tables[0],
+          generatedTables: tables,
+          isLoading: false,
+        })
+        handleSelectTemplate(tables[0])
+      } else {
+        setViewState((prev) => ({
+          ...prev,
+          isLoading: false,
+        }))
+      }
+    } catch (error) {
+      setViewState((prev) => ({
+        ...prev,
+        isLoading: false,
+      }))
     }
-  }, [categories, activeCategory])
+  }, [aiPrompt, generateTables, isGenerating, handleSelectTemplate])
 
-  const displayed = useMemo(
-    () => (activeCategory ? tableTemplates[activeCategory] || [] : []),
-    [activeCategory]
+  const handleQuickIdea = useCallback(
+    (idea: string) => {
+      setAiPrompt(idea)
+      setViewState((prev) => ({ ...prev, mode: ViewMode.AI_INPUT }))
+      handleGenerateTables(idea)
+    },
+    [handleGenerateTables]
   )
 
-  return (
-    <div className="rounded-lg border border-default bg-surface-75 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <h3 className="text-sm font-medium">Start faster with a table template</h3>
-          <p className="text-xs text-foreground-lighter mt-1">
-            Save time by starting from a ready-made table schema.
-          </p>
-        </div>
-        {onDismiss && (
-          <Button type="text" size="tiny" onClick={onDismiss}>
-            Dismiss
-          </Button>
-        )}
-      </div>
+  const handleCategorySelect = useCallback((category: string) => {
+    setViewState((prev) => ({
+      ...prev,
+      mode: ViewMode.CATEGORY_SELECTED,
+      selectedCategory: category,
+    }))
+  }, [])
 
-      <div className="flex flex-wrap gap-2 mb-3">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
-            disabled={disabled}
-            className={cn(
-              'px-2 py-1 rounded-md text-xs capitalize border',
-              activeCategory === category
-                ? 'border-foreground bg-surface-200'
-                : 'border-default hover:border-foreground-muted hover:bg-surface-100',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
-            )}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
+  const handleAISelect = useCallback(() => {
+    setViewState((prev) => ({ ...prev, mode: ViewMode.AI_INPUT }))
+  }, [])
 
-      <div className="grid gap-2">
-        {displayed.map((t) => (
-          <button
-            key={`${activeCategory}:${t.tableName}`}
-            onClick={() => handleSelectTemplate(t)}
-            disabled={disabled}
-            className={cn(
-              'text-left p-3 rounded-md border transition-all w-full',
-              selectedTemplate?.tableName === t.tableName
-                ? 'border-foreground bg-surface-200'
-                : 'border-default hover:border-foreground-muted hover:bg-surface-100',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="text-sm font-medium font-mono">{t.tableName}</div>
-                {t.rationale && (
-                  <div className="text-sm text-foreground-light mt-1">{t.rationale}</div>
-                )}
-              </div>
-              <div className="flex items-center gap-1 text-sm text-foreground-muted ml-3">
-                <span>{t.fields.length} columns</span>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
+  const handleBack = useCallback(() => {
+    setViewState(initialViewState)
+    setAiPrompt('')
+  }, [])
+
+  const { mode, selectedCategory, selectedTemplate, generatedTables } = viewState
+
+  // Initial view
+  if (mode === ViewMode.INITIAL) {
+    return (
+      <InitialView
+        variant={variant}
+        disabled={disabled}
+        onDismiss={onDismiss}
+        onCategorySelect={handleCategorySelect}
+        onAISelect={handleAISelect}
+        onQuickIdea={handleQuickIdea}
+      />
+    )
+  }
+
+  // Category selection view
+  if (mode === ViewMode.CATEGORY_SELECTED && selectedCategory) {
+    const templates = tableTemplates[selectedCategory] ?? []
+    return (
+      <CategoryView
+        category={selectedCategory}
+        templates={templates}
+        selectedTemplate={selectedTemplate}
+        onBack={handleBack}
+        onSelectTemplate={handleSelectTemplate}
+      />
+    )
+  }
+
+  // AI input view
+  if (mode === ViewMode.AI_INPUT) {
+    return (
+      <AIInputView
+        prompt={aiPrompt}
+        error={apiError}
+        isGenerating={isGenerating}
+        isLoading={viewState.isLoading}
+        inputRef={inputRef}
+        onBack={handleBack}
+        onPromptChange={setAiPrompt}
+        onGenerate={handleGenerateTables}
+      />
+    )
+  }
+
+  // AI results view
+  if (mode === ViewMode.AI_RESULTS && generatedTables.length > 0) {
+    return (
+      <ResultsView
+        tables={generatedTables}
+        selectedTemplate={selectedTemplate}
+        title="AI Generated Tables"
+        onBack={handleBack}
+        onSelectTemplate={handleSelectTemplate}
+      />
+    )
+  }
+
+  return null
 }

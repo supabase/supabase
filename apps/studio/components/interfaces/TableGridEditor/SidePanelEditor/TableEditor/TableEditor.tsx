@@ -1,7 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import dayjs from 'dayjs'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -23,8 +22,8 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
 import { usePHFlag } from 'hooks/ui/useFlag'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -50,8 +49,6 @@ import { TableTemplateSelector } from './TableQuickstart/TableTemplateSelector'
 import { QuickstartVariant } from './TableQuickstart/types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-
-const NEW_PROJECT_THRESHOLD_DAYS = 7
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -96,31 +93,25 @@ export const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
+  const tableQuickstartVariant = usePHFlag('tableQuickstart') as
+    | QuickstartVariant
+    | false
+    | undefined
 
-  /**
-   * Returns:
-   * - `QuickstartVariant`: user variation (if bucketed)
-   * - `false`: user not yet bucketed or targeted
-   * - `undefined`: posthog still loading
-   */
-  const tableQuickstartVariant = usePHFlag<QuickstartVariant | false | undefined>('tableQuickstart')
-
+  const { data: tables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const publicTables = (tables ?? []).filter((table) => table.schema === 'public')
+  const hasTables = publicTables.length > 0
   const [quickstartDismissed, setQuickstartDismissed] = useLocalStorage(
     LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
     false
   )
 
-  const isRecentProject = useMemo(() => {
-    if (!project?.inserted_at) return false
-    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
-  }, [project?.inserted_at])
-
-  const shouldShowTemplateQuickstart =
-    isNewRecord &&
-    !isDuplicating &&
-    tableQuickstartVariant === QuickstartVariant.TEMPLATES &&
-    !quickstartDismissed &&
-    isRecentProject
+  const handleQuickstartDismiss = useCallback(() => {
+    setQuickstartDismissed(true)
+  }, [setQuickstartDismissed])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -310,20 +301,25 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        {shouldShowTemplateQuickstart && (
-          <TableTemplateSelector
-            variant={tableQuickstartVariant}
-            onSelectTemplate={(template) => {
-              const updates: Partial<TableField> = {}
-              if (template.name) updates.name = template.name
-              if (template.comment) updates.comment = template.comment
-              if (template.columns) updates.columns = template.columns
-              onUpdateField(updates)
-            }}
-            onDismiss={() => setQuickstartDismissed(true)}
-            disabled={false}
-          />
-        )}
+        {isNewRecord &&
+          !isDuplicating &&
+          (tableQuickstartVariant === QuickstartVariant.TEMPLATES ||
+            tableQuickstartVariant === QuickstartVariant.AI) &&
+          !hasTables &&
+          !quickstartDismissed && (
+            <TableTemplateSelector
+              variant={tableQuickstartVariant}
+              onSelectTemplate={(template) => {
+                const updates: Partial<TableField> = {}
+                if (template.name) updates.name = template.name
+                if (template.comment) updates.comment = template.comment
+                if (template.columns) updates.columns = template.columns
+                onUpdateField(updates)
+              }}
+              onDismiss={handleQuickstartDismiss}
+              disabled={false}
+            />
+          )}
         <Input
           data-testid="table-name-input"
           label="Name"
@@ -382,7 +378,7 @@ export const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href={`${DOCS_URL}/guides/auth/row-level-security`}
+              href="https://supabase.com/docs/guides/auth/row-level-security"
             />
           </Admonition>
         ) : (
@@ -400,7 +396,7 @@ export const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href={`${DOCS_URL}/guides/auth/row-level-security`}
+              href="https://supabase.com/docs/guides/auth/row-level-security"
             />
           </Admonition>
         )}
