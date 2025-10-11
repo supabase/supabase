@@ -17,6 +17,7 @@ export { default as Realtime } from './realtime';
 export { default as ReplaceCode } from './replace-code';
 export { default as Reports } from './reports';
 export { default as Settings } from './settings';
+export { default as Sentry } from './sentry';
 export { default as SqlEditor } from './sql-editor';
 export { default as Storage } from './storage';
 export { default as TableEditor } from './table-editor';
