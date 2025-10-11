@@ -27,6 +27,22 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>,
 }
 
 /**
+ * A number input component.
+ * @param {object} props - The component props.
+ * @param {string | number} [props.defaultValue] - The default value of the input.
+ * @param {string | React.ReactNode} [props.descriptionText] - A description for the input.
+ * @param {string} [props.error] - An error message to display.
+ * @param {any} [props.icon] - An icon to be displayed inside the input.
+ * @param {React.RefObject<HTMLInputElement>} [props.inputRef] - A ref for the input element.
+ * @param {string} [props.label] - The label for the input.
+ * @param {string} [props.afterLabel] - Text to display after the label.
+ * @param {string} [props.beforeLabel] - Text to display before the label.
+ * @param {string | React.ReactNode} [props.labelOptional] - Optional text to display next to the label.
+ * @param {React.ReactNode} [props.actions] - Custom action buttons.
+ * @param {'horizontal' | 'vertical'} [props.layout] - The layout of the input and label.
+ * @param {'tiny' | 'small' | 'medium' | 'large' | 'xlarge'} [props.size='medium'] - The size of the input.
+ * @param {Function} [props.validation] - A validation function for the input.
+ * @returns {React.ReactElement} The number input component.
  * @deprecated Use `import { Input_shadcn_ } from "ui"` with `type="number"` instead or ./ui-patterns/data-inputs/input with `type="number"`
  */
 function InputNumber({

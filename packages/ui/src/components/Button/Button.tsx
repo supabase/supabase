@@ -220,6 +220,22 @@ export interface ButtonProps
   rounded?: boolean
 }
 
+/**
+ * A customizable button component with different styles and states.
+ * @param {object} props - The component props.
+ * @param {boolean} [props.asChild=false] - Renders the component as a child, forwarding props to the first child.
+ * @param {'tiny' | 'small' | 'medium' | 'large' | 'xlarge'} [props.size='tiny'] - The size of the button.
+ * @param {'primary' | 'default' | 'secondary' | 'outline' | 'dashed' | 'link' | 'text' | 'danger' | 'warning'} [props.type='primary'] - The visual style of the button.
+ * @param {React.ReactNode} [props.children] - The content of the button.
+ * @param {boolean} [props.loading] - If `true`, the button will be in a loading state.
+ * @param {boolean} [props.block] - If `true`, the button will take up the full width of its container.
+ * @param {React.ReactNode} [props.icon] - Deprecated. Use `iconLeft` instead. An icon to be displayed in the button.
+ * @param {React.ReactNode} [props.iconLeft] - An icon to be displayed on the left of the button text.
+ * @param {React.ReactNode} [props.iconRight] - An icon to be displayed on the right of the button text.
+ * @param {boolean} [props.rounded] - If `true`, the button will have fully rounded corners.
+ * @param {'button' | 'submit' | 'reset'} [props.htmlType='button'] - The native HTML `type` attribute for the button.
+ * @returns {React.ReactElement} The button component.
+ */
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
