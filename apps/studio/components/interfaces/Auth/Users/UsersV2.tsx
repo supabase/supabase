@@ -68,6 +68,8 @@ import {
   USERS_TABLE_COLUMNS,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
@@ -77,9 +79,11 @@ export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const {
     authenticationShowProviderFilter: showProviderFilter,
@@ -181,6 +185,18 @@ export const UsersV2 = () => {
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
+
+  const telemetryProps = {
+    sort_column: sortColumn,
+    sort_order: sortOrder,
+    providers: selectedProviders,
+    user_type: filter,
+    keywords: filterKeywords,
+  }
+  const telemetryGroups = {
+    project: projectRef ?? 'Unknown',
+    organization: selectedOrg?.slug ?? 'Unknown',
+  }
 
   const formatEstimatedCount = (count: number) => {
     if (count >= 1e6) return `${(count / 1e6).toFixed(1)}M`
@@ -331,8 +347,18 @@ export const UsersV2 = () => {
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-                      setSearch(search.trim())
-                      setFilterKeywords(search.trim().toLocaleLowerCase())
+                      const query = search.trim()
+                      setSearch(query)
+                      setFilterKeywords(query.toLocaleLowerCase())
+                      sendEvent({
+                        action: 'auth_users_searched',
+                        properties: {
+                          trigger: 'search_input',
+                          ...telemetryProps,
+                          keywords: query,
+                        },
+                        groups: telemetryGroups,
+                      })
                     }
                   }}
                   actions={[
@@ -349,7 +375,21 @@ export const UsersV2 = () => {
                 />
 
                 {showUserTypeFilter && (
-                  <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
+                  <Select_Shadcn_
+                    value={filter}
+                    onValueChange={(val) => {
+                      setFilter(val as Filter)
+                      sendEvent({
+                        action: 'auth_users_searched',
+                        properties: {
+                          trigger: 'user_type_filter',
+                          ...telemetryProps,
+                          user_type: val,
+                        },
+                        groups: telemetryGroups,
+                      })
+                    }}
+                  >
                     <SelectTrigger_Shadcn_
                       size="tiny"
                       className={cn(
@@ -389,7 +429,18 @@ export const UsersV2 = () => {
                     labelClass="text-xs"
                     maxHeightClass="h-[190px]"
                     className="w-52"
-                    onSaveFilters={setSelectedProviders}
+                    onSaveFilters={(providers) => {
+                      setSelectedProviders(providers)
+                      sendEvent({
+                        action: 'auth_users_searched',
+                        properties: {
+                          trigger: 'provider_filter',
+                          ...telemetryProps,
+                          providers,
+                        },
+                        groups: telemetryGroups,
+                      })
+                    }}
                   />
                 )}
 
@@ -448,7 +499,23 @@ export const UsersV2 = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-44" align="start">
-                    <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
+                    <DropdownMenuRadioGroup
+                      value={sortByValue}
+                      onValueChange={(value) => {
+                        const [sortColumn, sortOrder] = value.split(':')
+                        setSortByValue(value)
+                        sendEvent({
+                          action: 'auth_users_searched',
+                          properties: {
+                            trigger: 'sort_change',
+                            ...telemetryProps,
+                            sort_column: sortColumn,
+                            sort_order: sortOrder,
+                          },
+                          groups: telemetryGroups,
+                        })
+                      }}
+                    >
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
@@ -514,6 +581,14 @@ export const UsersV2 = () => {
                   onClick={() => {
                     refetch()
                     refetchCount()
+                    sendEvent({
+                      action: 'auth_users_searched',
+                      properties: {
+                        trigger: 'refresh_button',
+                        ...telemetryProps,
+                      },
+                      groups: telemetryGroups,
+                    })
                   }}
                 >
                   Refresh
