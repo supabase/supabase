@@ -1,6 +1,8 @@
 {
   "$schema": "./enabled-features.schema.json",
 
+  "account:show_security_settings": true,
+
   "ai:opt_in_level_disabled": true,
   "ai:opt_in_level_schema": true,
   "ai:opt_in_level_schema_and_log": true,
@@ -22,7 +24,10 @@
   "authentication:show_sort_by_email": true,
   "authentication:show_sort_by_phone": true,
   "authentication:show_user_type_filter": true,
+
   "billing:all": true,
+
+  "branding:large_logo": false,
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,

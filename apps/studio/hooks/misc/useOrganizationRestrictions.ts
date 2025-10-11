@@ -44,7 +44,7 @@ export function useOrganizationRestrictions() {
     !org.billing_partner
   ) {
     warnings.push({
-      type: 'warning',
+      type: 'danger',
       title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
       message: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.message,
       link: `/org/${org?.slug}/billing#address`,

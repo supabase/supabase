@@ -35,18 +35,40 @@ Realtime uses several database connections to perform several operations. As a u
 
 ### Database connections
 
-Realtime uses several database connections to do several operations. Some of them, as a user, you are able to tune them.
+Realtime uses several database connections to perform various operations. You can configure some of these connections through [Realtime Settings](/docs/guides/realtime/settings).
 
-The connections are:
+The connections include:
 
 - **Migrations**: Two temporary connections to run database migrations when needed
-- **Authorization**: Configurable connection pool to check authorization policies on join
-- **Postgres Changes**: 3 connection pools required
+- **Authorization**: Configurable connection pool to check authorization policies on join that are always started.
+- **Broadcast from database**: One connection to receive data from replication slot used to broadcast the changes to the clients that is always started.
+- **Postgres Changes**: Multiple connection pools required. These pools are only started if you use Postgres Changes.
   - **Subscription management**: To manage the subscribers to Postgres Changes
   - **Subscription cleanup**: To cleanup the subscribers to Postgres Changes
   - **WAL pull**: To pull the changes from the database
 
-The number of connections varies based on the instance size and your configuration in [Realtime Settings](/docs/guides/realtime/settings).
+The number of connections varies based on your compute add-on size and configuration. The following table shows the default connection pool sizes for different compute add-on variants:
+
+| Compute Add-on | Broadcast from database | Authorization Pool Size | Subscription management | Subscription cleanup | WAL pull |
+| -------------- | ----------------------- | ----------------------- | ----------------------- | -------------------- | -------- |
+| Nano           | 1                       | 2                       | 2                       | 2                    | 2        |
+| Micro          | 1                       | 2                       | 2                       | 2                    | 2        |
+| Small          | 1                       | 5                       | 4                       | 4                    | 4        |
+| Medium         | 1                       | 5                       | 4                       | 4                    | 4        |
+| Large          | 1                       | 5                       | 4                       | 4                    | 4        |
+| XL             | 1                       | 10                      | 7                       | 7                    | 7        |
+| 2XL            | 1                       | 10                      | 7                       | 7                    | 7        |
+| 4XL            | 1                       | 10                      | 7                       | 7                    | 7        |
+| 8XL            | 1                       | 15                      | 9                       | 9                    | 9        |
+| 12XL           | 1                       | 15                      | 9                       | 9                    | 9        |
+| 16XL           | 1                       | 15                      | 9                       | 9                    | 9        |
+| >16XL          | 1                       | 15                      | 9                       | 9                    | 9        |
+
+<Admonition type="note">
+
+You can customize `Authorization Pool Size` through the `Database connection pool size` parameter in your Realtime configuration. If not specified, the default values shown in the table will be used.
+
+</Admonition>
 
 ### Replication slots
 

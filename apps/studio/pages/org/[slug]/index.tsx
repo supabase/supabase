@@ -6,17 +6,15 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
-  const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
+  const { data: org } = useSelectedOrganizationQuery()
 
-  useAutoProjectsPrefetch()
+  const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
   return (
     <ScaffoldContainer className="flex-grow flex">

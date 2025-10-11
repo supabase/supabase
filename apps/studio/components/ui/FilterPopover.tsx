@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useIntersectionObserver } from '@uidotdev/usehooks'
+import { noop } from 'lodash'
+import { X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -9,6 +12,8 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface FilterPopoverProps<T> {
   title?: string
@@ -26,8 +31,20 @@ interface FilterPopoverProps<T> {
   clearButtonText?: string
   className?: string
   onSaveFilters: (options: string[]) => void
+
+  // [Joshen] These props are to support async data with infinite loading if applicable
+  search?: string
+  setSearch?: (value: string) => void
+  hasNextPage?: boolean
+  isLoading?: boolean
+  isFetching?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
 }
 
+// [Joshen] Known issue currently that FilterPopover trigger label will not show selected options properly
+// for async data with infinite loading. Thinking this requires quite a bit of change that I'd rather do in
+// a separate PR
 export const FilterPopover = <T extends Record<string, any>>({
   title,
   options = [],
@@ -44,9 +61,24 @@ export const FilterPopover = <T extends Record<string, any>>({
   maxHeightClass = 'h-[205px]',
   clearButtonText = 'Clear',
   onSaveFilters,
+
+  search,
+  setSearch = noop,
+  hasNextPage = false,
+  isLoading = false,
+  isFetching = false,
+  isFetchingNextPage = false,
+  fetchNextPage = noop,
 }: FilterPopoverProps<T>) => {
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
+
+  const scrollRootRef = useRef<HTMLDivElement | null>(null)
+  const [sentinelRef, entry] = useIntersectionObserver({
+    root: scrollRootRef.current,
+    threshold: 0,
+    rootMargin: '0px',
+  })
 
   const formattedOptions = activeOptions.map((option) => {
     const base = options.find((x) => x[valueKey] === option)
@@ -58,7 +90,30 @@ export const FilterPopover = <T extends Record<string, any>>({
 
   useEffect(() => {
     if (!open && activeOptions.length > 0) setSelectedOptions(activeOptions)
+    if (!open) setSearch('')
   }, [open, activeOptions])
+
+  useEffect(() => {
+    if (
+      open &&
+      entry?.isIntersecting &&
+      hasNextPage &&
+      !isLoading &&
+      !isFetching &&
+      !isFetchingNextPage
+    ) {
+      console.log('Fetch next page')
+      fetchNextPage()
+    }
+  }, [
+    open,
+    entry?.isIntersecting,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isLoading,
+  ])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
@@ -83,20 +138,46 @@ export const FilterPopover = <T extends Record<string, any>>({
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className={cn('p-0 w-44', className)} align="start" portal={true}>
+      <PopoverContent_Shadcn_
+        className={cn('p-0', search !== undefined ? 'w-64' : 'w-44', className)}
+        align="start"
+        portal={true}
+      >
         <div className="border-b border-overlay bg-surface-200 rounded-t pb-1 px-3">
           <span className="text-xs text-foreground-light">
             {title ?? `Select ${name.toLowerCase()}`}
           </span>
         </div>
+        {search !== undefined && (
+          <Input
+            size="tiny"
+            value={search}
+            onChange={(e) => {
+              if (!!setSearch) setSearch(e.target.value)
+            }}
+            className="rounded-none border-x-0 border-t-0 bg-surface-100 px-3"
+            placeholder="Search for a project..."
+            actions={
+              (search ?? '').length > 0 ? (
+                <X size={14} className="cursor-pointer mr-1" onClick={() => setSearch('')} />
+              ) : null
+            }
+          />
+        )}
+        {(search ?? '').length > 0 && options.length === 0 && (
+          <p className="text-xs text-foreground-lighter pt-3 px-3">No results found</p>
+        )}
         <ScrollArea className={options.length > 7 ? maxHeightClass : ''}>
-          <div className="p-3 flex flex-col gap-y-2">
+          <div className="px-3 pt-3 flex flex-col gap-y-2">
             {options.map((option) => {
               const value = option[valueKey]
               const icon = iconKey ? option[iconKey] : undefined
 
               return (
-                <div key={value} className="flex items-center gap-x-2">
+                <div
+                  key={value}
+                  className={cn('flex items-center gap-x-2', !hasNextPage && 'last:pb-3')}
+                >
                   <Checkbox_Shadcn_
                     id={value}
                     checked={selectedOptions.includes(value)}
@@ -125,6 +206,12 @@ export const FilterPopover = <T extends Record<string, any>>({
               )
             })}
           </div>
+          <div ref={sentinelRef} className="h-1 -mt-1" />
+          {hasNextPage && (
+            <div className="px-3 py-2">
+              <ShimmeringLoader className="py-2" />
+            </div>
+          )}
         </ScrollArea>
         <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
           <Button

@@ -53,7 +53,7 @@
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
-    "supabase": "^1.151.1",
+    "supabase": "^2.50.3",
     "supports-color": "^8.0.0",
     "turbo": "2.3.3",
     "typescript": "catalog:"
@@ -63,9 +63,9 @@
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "pnpm": ">=10.16",
+    "pnpm": "10.18",
     "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@10.16.1"
+  "packageManager": "pnpm@10.18.0"
 }

@@ -25,13 +25,18 @@ interface SimpleCodeBlockProps {
   parentClassName?: string
   className?: string
   showCopy?: boolean
+  onCopy?: () => void
+  handleCopy?: (value: string) => void
 }
 
+// [Joshen] Refactor: De-dupe with CodeBlock.tsx
 export const SimpleCodeBlock = ({
   children,
   parentClassName,
   className: languageClassName,
   showCopy = true,
+  onCopy,
+  handleCopy,
 }: PropsWithChildren<SimpleCodeBlockProps>) => {
   const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
@@ -51,7 +56,13 @@ export const SimpleCodeBlock = ({
   }
 
   const handleCopyCode = (code: any) => {
-    copyToClipboard(code, () => setShowCopied(true))
+    if (!!handleCopy) {
+      handleCopy(code)
+    } else {
+      copyToClipboard(code)
+    }
+    setShowCopied(true)
+    onCopy?.()
   }
 
   return (

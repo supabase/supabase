@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -11,13 +12,17 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 
 const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
+
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
+
   const [dateSortDesc, setDateSortDesc] = useState(true)
   const [dateRange, setDateRange] = useState({
     from: currentTime.subtract(1, 'day').toISOString(),
@@ -29,8 +34,20 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
-  const { data: projectsData } = useProjectsQuery()
-  const projects = projectsData?.projects ?? []
+  const {
+    data: projectsData,
+    isLoading: isLoadingProjects,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useProjectsInfiniteQuery(
+    { search: search.length === 0 ? search : debouncedSearch },
+    { keepPreviousData: true }
+  )
+  const projects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
+
   const { data: organizations } = useOrganizationsQuery()
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useProfileAuditLogsQuery(
@@ -88,6 +105,13 @@ const AuditLogs = () => {
               valueKey="ref"
               activeOptions={filters.projects}
               onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+              search={search}
+              setSearch={setSearch}
+              hasNextPage={hasNextPage}
+              isLoading={isLoadingProjects}
+              isFetching={isFetching}
+              isFetchingNextPage={isFetchingNextPage}
+              fetchNextPage={fetchNextPage}
             />
             <LogsDatePicker
               hideWarnings
