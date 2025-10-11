@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import { ReportSectionHeader } from 'components/interfaces/Reports/v2/ReportSectionHeader'
@@ -160,6 +160,14 @@ const AuthUsage = () => {
 
     setIsRefreshing(true)
 
+    const duration = dayjs(selectedDateRange.period_end.date).diff(
+      selectedDateRange.period_start.date
+    )
+    const newEnd = dayjs().toISOString()
+    const newStart = dayjs().subtract(duration, 'milliseconds').toISOString()
+
+    updateDateRange(newStart, newEnd)
+
     refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
@@ -269,6 +277,7 @@ const AuthUsage = () => {
                   syncId={chartSyncId}
                   filters={{ provider: usageProviderFilter }}
                   highlightActions={highlightActions}
+                  queryKeys={metric.queryKeys}
                 />
               ))}
             </div>
