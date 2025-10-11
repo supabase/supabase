@@ -3,7 +3,7 @@ import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 import { useFlag, useParams } from 'common'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
-import { BASE_PATH, PROVIDERS } from 'lib/constants'
+import { BASE_PATH, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -37,7 +37,8 @@ export const RegionSelector = ({
 }: RegionSelectorProps) => {
   const { slug } = useParams()
 
-  const smartRegionEnabled = useFlag('enableSmartRegion')
+  const defaultProvider = useDefaultProvider()
+  const smartRegionEnabled = useFlag('enableSmartRegion') && defaultProvider !== 'AWS_NIMBUS'
 
   const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
