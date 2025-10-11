@@ -23,13 +23,13 @@ const defaultEnv = {
   STUDIO_PG_META_URL: '$API_URL/pg',
   SUPABASE_PUBLIC_URL: '$API_URL',
   SENTRY_IGNORE_API_RESOLUTION_ERROR: '1',
-  LOGFLARE_URL: 'http://localhost:54329',
+  LOGFLARE_URL: 'http://127.0.0.1:54327',
   LOGFLARE_API_KEY: 'api-key',
   NEXT_PUBLIC_SITE_URL: 'http://localhost:8082',
   NEXT_PUBLIC_GOTRUE_URL: '$SUPABASE_PUBLIC_URL/auth/v1',
   NEXT_PUBLIC_HCAPTCHA_SITE_KEY: '10000000-ffff-ffff-ffff-000000000001',
   NEXT_PUBLIC_NODE_ENV: 'test',
-}
+} 
 
 const environment = { ...generatedEnv, ...defaultEnv }
 
