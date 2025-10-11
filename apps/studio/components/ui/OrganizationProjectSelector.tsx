@@ -123,7 +123,7 @@ export const OrganizationProjectSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        {!!renderTrigger ? (
+        {renderTrigger ? (
           renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
         ) : (
           <Button

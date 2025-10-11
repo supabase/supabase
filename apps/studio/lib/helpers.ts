@@ -348,3 +348,5 @@ export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 300) => {
     }, timeoutMs)
   }
 }
+
+export function neverGuard(_: never): any {}
