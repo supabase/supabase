@@ -62,10 +62,14 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data } = useProjectsQuery()
-  const projects = data?.projects ?? []
-  const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
+  const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
+
+  // [Joshen] We only need this data if the org has project scoped roles
+  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
+  const projects = data?.projects ?? []
+
+  const { data: permissions } = usePermissionsQuery()
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []

@@ -45,11 +45,15 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: permissions } = usePermissionsQuery()
-  const { data } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
-  const { data: allRoles } = useOrganizationRolesV2Query({ slug })
 
+  const { data: allRoles } = useOrganizationRolesV2Query({ slug })
+  const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
+
+  // [Joshen] We only need this data if the org has project scoped roles
+  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
   const allProjects = data?.projects ?? []
+
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
