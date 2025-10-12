@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { DOCS_URL } from 'lib/constants'
@@ -246,7 +246,8 @@ export function LogDrainDestinationSheetForm({
 
                 // Temp check to make sure the name is unique
                 const logDrainName = form.getValues('name')
-                const logDrainExists = logDrains?.find((drain) => drain.name === logDrainName)
+                const logDrainExists =
+                  !!logDrains?.length && logDrains?.find((drain) => drain.name === logDrainName)
                 if (logDrainExists && mode === 'create') {
                   toast.error('Log drain name already exists')
                   return
@@ -523,7 +524,9 @@ export function LogDrainDestinationSheetForm({
         </SheetSection>
 
         <div className="mt-auto">
-          <SheetSection className="border-t bg-background-alternative-200 mt-auto">
+          <SheetSection
+            className={`border-t bg-background-alternative-200 mt-auto ${!IS_PLATFORM ? 'hidden' : ''}`}
+          >
             <FormItemLayout
               isReactForm={false}
               layout="horizontal"
