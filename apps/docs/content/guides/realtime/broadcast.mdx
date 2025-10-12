@@ -6,6 +6,23 @@ description: 'Send low-latency messages using the client libs, REST, or your Dat
 
 You can use Realtime Broadcast to send low-latency messages between users. Messages can be sent using the client libraries, REST APIs, or directly from your database.
 
+## How Broadcast works
+
+When a message is sent whether from your client, a REST request, or your database using realtime.send(), the message gets inserted into the table realtime.messages.
+
+The Realtime service continuously listens for new rows in this table (using logical replication). When a new message is inserted and passes any applicable RLS policies, Realtime reads it and broadcasts it to all connected clients that are subscribed to the topic.
+
+<Admonition type="note">
+
+The public flag (the last argument in `realtime.send(payload, event, topic, is_private))` only affects who can subscribe to the topic not who can read messages from the database.
+
+- Public (false) → Anyone can subscribe to that topic without authentication
+- Private (true) → Only authenticated clients can subscribe to that topic
+
+However, regardless of whether it's public or private, the Realtime service connects to your database as the authenticated Postgres role, and must be allowed to SELECT from realtime.messages under your RLS policies.
+
+</Admonition>
+
 ## Subscribe to messages
 
 You can use the Supabase client libraries to receive Broadcast messages.
@@ -384,6 +401,7 @@ You can use the Supabase client libraries to send Broadcast messages.
   </$Show>
 </Tabs>
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### Broadcast from the Database
 
 <Admonition type="caution">
@@ -410,6 +428,14 @@ select
     false -- Public / Private flag
   );
 ```
+
+<Admonition type="note">
+The realtime.send function in the database includes a flag that determines whether the broadcast is private or public, and client channels also have the same configuration. For broadcasts to work correctly, these settings must match a public broadcast will only reach public channels, and a private broadcast will only reach private ones.
+
+By default, all database broadcasts are private, meaning clients must authenticate to receive them. If the database sends a public message but the client subscribes to a private channel, the message won't be delivered since private channels only accept signed, authenticated messages.
+them.
+
+</Admonition>
 
 It's a common use case to broadcast messages when a record is created, updated, or deleted. We provide a helper function specific to this use case, `realtime.broadcast_changes()`. For more details, check out the [Subscribing to Database Changes](/docs/guides/realtime/subscribing-to-database-changes) guide.
 
