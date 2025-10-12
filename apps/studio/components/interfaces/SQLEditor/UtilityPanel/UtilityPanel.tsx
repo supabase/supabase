@@ -154,18 +154,23 @@ const UtilityPanel = ({
           executeQuery={executeQuery}
         />
       </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-grow">
-        <UtilityTabResults
-          id={id}
-          isExecuting={isExecuting}
-          isDisabled={isDisabled}
-          onDebug={onDebug}
-          isDebugging={isDebugging}
-        />
+      <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-1 overflow-hidden">
+        <div className="h-full overflow-auto">
+          {/* Enable scrolling for large result sets in bottom panel */}
+          <UtilityTabResults
+            id={id}
+            isExecuting={isExecuting}
+            isDisabled={isDisabled}
+            onDebug={onDebug}
+            isDebugging={isDebugging}
+          />
+        </div>
       </TabsContent_Shadcn_>
 
-      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
-        <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
+      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-1 overflow-hidden">
+        <div className="h-full overflow-auto">
+          <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
+        </div>
       </TabsContent_Shadcn_>
     </Tabs_Shadcn_>
   )

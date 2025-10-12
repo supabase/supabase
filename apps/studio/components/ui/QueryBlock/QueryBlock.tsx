@@ -203,12 +203,12 @@ export const QueryBlock = ({
           disabled={!sql}
           {...(showWarning !== 'hasWriteOperation'
             ? {
-                message: 'Run this query now and send the results to the Assistant? ',
-                subMessage:
-                  'We will execute the query and provide the result rows back to the Assistant to continue the conversation.',
-                cancelLabel: 'Skip',
-                confirmLabel: 'Run & send',
-              }
+              message: 'Run this query now and send the results to the Assistant? ',
+              subMessage:
+                'We will execute the query and provide the result rows back to the Assistant to continue the conversation.',
+              cancelLabel: 'Skip',
+              confirmLabel: 'Run & send',
+            }
             : {})}
         />
       )}
@@ -317,7 +317,8 @@ export const QueryBlock = ({
             </div>
           ) : (
             results && (
-              <div className={cn('flex-1 w-full overflow-auto relative max-h-64')}>
+              <div className={cn('flex-1 w-full overflow-auto relative max-h-[40vh]')}>
+                {/* Enable scrolling for large result sets in bottom panel */}
                 <Results rows={results} />
               </div>
             )
