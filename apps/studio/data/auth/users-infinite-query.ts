@@ -154,7 +154,11 @@ export const getUsersSQL = ({
 
     actualQuery = `where phone ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and phone < '${range[1]}'` : ''} order by phone asc limit ${USERS_PAGE_LIMIT}`
   } else if (column === 'id') {
-    actualQuery = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${USERS_PAGE_LIMIT}`
+    if (!!keywords) {
+      actualQuery = `where id = '${keywords}' order by id asc limit ${USERS_PAGE_LIMIT}`
+    } else {
+      actualQuery = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${USERS_PAGE_LIMIT}`
+    }
   }
 
   let usersData = `
