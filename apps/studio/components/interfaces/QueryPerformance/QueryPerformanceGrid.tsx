@@ -199,7 +199,7 @@ export const QueryPerformanceGrid = ({
                   setView('details')
                   gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
                 }}
-                className="p-1 flex-shrink-0 -translate-x-4 group-hover:flex hidden"
+                className="p-1 flex-shrink-0 -translate-x-2 group-hover:flex hidden"
               />
             </div>
           )
@@ -443,8 +443,10 @@ export const QueryPerformanceGrid = ({
             const isCharted = currentSelectedQuery === query
 
             return [
-              `${isSelected || isCharted ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-              `${isSelected || isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground' : ''}`,
+              `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
+              `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
               '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell.column-prop_total_time]:relative',
             ].join(' ')
