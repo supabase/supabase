@@ -29,6 +29,7 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { AdvisorEmpty } from './AdvisorEmpty'
 
 export const AdvisorSection = () => {
   const { ref: projectRef } = useParams()
@@ -199,14 +200,7 @@ export const AdvisorSection = () => {
           </Sheet>
         </>
       ) : (
-        <Card className="bg-transparent">
-          <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
-            <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
-            <p className="text-sm text-foreground-light text-center">
-              No security or performance errors found
-            </p>
-          </CardContent>
-        </Card>
+        <AdvisorEmpty />
       )}
     </div>
   )
