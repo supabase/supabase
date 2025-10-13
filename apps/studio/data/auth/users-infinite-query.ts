@@ -32,8 +32,6 @@ function prefixToUUID(prefix: string, max: boolean) {
     .split('')
     .map((c, i) => (c === '-' ? c : prefix[i] ?? c))
 
-  console.log('prefix', prefix, 'max', max, mapped)
-
   if (prefix.length >= mapped.length) {
     return mapped.join('')
   }

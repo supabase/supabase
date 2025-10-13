@@ -44,6 +44,7 @@ import { SortDropdown } from './SortDropdown'
 import { UserPanel } from './UserPanel'
 import {
   ColumnConfiguration,
+  Filter,
   MAX_BULK_DELETE,
   PHONE_NUMBER_LEFT_PREFIX_REGEX,
   PROVIDER_FILTER_OPTIONS,
@@ -51,8 +52,7 @@ import {
   UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
-
-export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
+import { UsersFooter } from './UsersFooter'
 
 // [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
 // Can change it to remove V2 thereafter
@@ -567,6 +567,14 @@ export const UsersV2 = () => {
             />
           )}
         </ResizablePanelGroup>
+
+        {mode === 'freeform' && (
+          <UsersFooter
+            filter={filter}
+            filterKeywords={filterKeywords}
+            selectedProviders={selectedProviders}
+          />
+        )}
       </div>
 
       <ConfirmationModal

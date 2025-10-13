@@ -69,6 +69,8 @@ const Pagination = () => {
     }
   )
 
+  console.log('enforceExactCount', snap.enforceExactCount)
+
   const count = data?.count ?? 0
   const countString = data?.is_estimate ? formatEstimatedCount(count) : count.toLocaleString()
   const maxPages = Math.ceil(count / tableEditorSnap.rowsPerPage)
