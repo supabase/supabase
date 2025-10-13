@@ -251,11 +251,10 @@ export const ServiceStatus = () => {
   // Check if project or branch is in a startup state
   const isProjectNew =
     project?.status === 'COMING_UP' ||
-    (isBranch && (
-      currentBranch?.status === 'CREATING_PROJECT' ||
-      currentBranch?.status === 'RUNNING_MIGRATIONS' ||
-      isMigrationLoading
-    ))
+    (isBranch &&
+      (currentBranch?.status === 'CREATING_PROJECT' ||
+        currentBranch?.status === 'RUNNING_MIGRATIONS' ||
+        isMigrationLoading))
 
   const anyUnhealthy = services.some(
     (service) => !service.isHealthy && service.status !== 'COMING_UP'
@@ -280,7 +279,9 @@ export const ServiceStatus = () => {
                   key={`${service.name}-${index}`}
                   className={cn(
                     'w-1.5 h-1.5 rounded-full',
-                    service.isLoading || service.status === 'COMING_UP' || (isProjectNew && !service.isHealthy)
+                    service.isLoading ||
+                      service.status === 'COMING_UP' ||
+                      (isProjectNew && !service.isHealthy)
                       ? 'bg-foreground-lighter animate-pulse'
                       : service.isHealthy
                         ? 'bg-brand'
