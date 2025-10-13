@@ -260,9 +260,6 @@ const ReportsMenu = () => {
                           className="flex-grow h-7 flex justify-between items-center pl-3"
                         >
                           <span>{subItem.name}</span>
-                          {subItem.rightIcon && (
-                            <span className="shrink-0">{subItem.rightIcon}</span>
-                          )}
                         </Link>
                       </li>
                     ))}
