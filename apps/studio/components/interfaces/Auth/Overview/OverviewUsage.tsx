@@ -17,7 +17,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
-const StatCard = ({
+export const StatCard = ({
   title,
   current,
   previous,
@@ -59,8 +59,8 @@ const StatCard = ({
         ) : (
           <>
             <h4 className="text-sm text-foreground-lighter font-normal mb-0 truncate">{title}</h4>
-            <p className="text-xl font-mono">{`${formattedCurrent}${suffix}`}</p>
-            <div className={cn('flex items-center gap-1 font-mono text-sm', changeColor)}>
+            <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
+            <div className={cn('flex items-center gap-1 text-sm', changeColor)}>
               <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
             </div>
           </>
@@ -130,28 +130,6 @@ export const OverviewUsage = () => {
             previous={signUpsChange}
             loading={isLoading}
             href={`/project/${ref}/reports/auth#usage`}
-          />
-          <StatCard
-            title="Auth API Success Rate"
-            current={Math.max(0, 100 - metrics.current.apiErrorRate)}
-            previous={calculatePercentageChange(
-              Math.max(0, 100 - metrics.current.apiErrorRate),
-              Math.max(0, 100 - metrics.previous.apiErrorRate)
-            )}
-            loading={isLoading}
-            suffix="%"
-            href={`/project/${ref}/reports/auth#monitoring`}
-          />
-          <StatCard
-            title="Auth Server Success Rate"
-            current={Math.max(0, 100 - metrics.current.authErrorRate)}
-            previous={calculatePercentageChange(
-              Math.max(0, 100 - metrics.current.authErrorRate),
-              Math.max(0, 100 - metrics.previous.authErrorRate)
-            )}
-            loading={isLoading}
-            suffix="%"
-            href={`/project/${ref}/reports/auth#monitoring`}
           />
         </div>
       </ScaffoldSectionContent>
