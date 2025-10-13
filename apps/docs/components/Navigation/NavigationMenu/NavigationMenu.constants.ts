@@ -3231,6 +3231,7 @@ export const ui: NavMenuConstant = {
         { name: 'Social Auth', url: '/guides/ui/blocks/social-auth' },
         { name: 'Dropzone', url: '/guides/ui/blocks/dropzone' },
         { name: 'Realtime Cursor', url: '/guides/ui/blocks/realtime-cursor' },
+        { name: 'Current User Avatar', url: '/guides/ui/blocks/current-user-avatar' },
       ]
     },
     {
