@@ -1,11 +1,10 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
-import type { Project } from './project-detail-query'
 
 type PaginatedProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
 export type ProjectInfo = PaginatedProjectsResponse['projects'][number]
@@ -43,39 +42,5 @@ export const useProjectsQuery = <TData = ProjectsData>({
       staleTime: 30 * 60 * 1000, // 30 minutes
       ...options,
     }
-  )
-}
-
-export function setProjectStatus(
-  client: QueryClient,
-  projectRef: Project['ref'],
-  status: Project['status']
-) {
-  client.setQueriesData<PaginatedProjectsResponse | undefined>(
-    projectKeys.list(),
-    (old) => {
-      if (!old) return old
-
-      return {
-        ...old,
-        projects: old.projects.map((project) => {
-          if (project.ref === projectRef) {
-            return { ...project, status }
-          }
-          return project
-        }),
-      }
-    },
-    { updatedAt: Date.now() }
-  )
-
-  client.setQueriesData<Project>(
-    projectKeys.detail(projectRef),
-    (old) => {
-      if (!old) return old
-
-      return { ...old, status }
-    },
-    { updatedAt: Date.now() }
   )
 }
