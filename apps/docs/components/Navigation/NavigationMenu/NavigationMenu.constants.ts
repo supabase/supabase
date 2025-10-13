@@ -3230,6 +3230,7 @@ export const ui: NavMenuConstant = {
         { name: 'Password-based Authentication', url: '/guides/ui/blocks/password-based-auth' },
         { name: 'Social Auth', url: '/guides/ui/blocks/social-auth' },
         { name: 'Dropzone', url: '/guides/ui/blocks/dropzone' },
+        { name: 'Realtime Cursor', url: '/guides/ui/blocks/realtime-cursor' },
       ]
     },
     {
