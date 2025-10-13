@@ -21,8 +21,8 @@ import {
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { hasIndexRecommendations } from './index-advisor.utils'
-import { IndexSuggestionIcon } from './IndexSuggestionIcon'
+import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
+import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
 import {
@@ -32,29 +32,14 @@ import {
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { formatDuration } from './QueryPerformance.utils'
-import { AggregatedQueryData } from './QueryPerformanceData.utils'
-import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { QueryPerformanceRow } from './QueryPerformance.types'
 
 interface QueryPerformanceGridProps {
-  aggregatedData: AggregatedQueryData[]
+  aggregatedData: QueryPerformanceRow[]
   isLoading: boolean
-  currentSelectedQuery: string | null
-  onCurrentSelectQuery: (query: string) => void
-}
-
-interface QueryPerformanceRow {
-  query: string
-  prop_total_time: number
-  total_time: number
-  calls: number
-  max_time: number
-  mean_time: number
-  min_time: number
-  rows_read: number
-  cache_hit_rate: string
-  rolname: string
-  index_advisor_result: GetIndexAdvisorResultResponse | null
+  currentSelectedQuery?: string | null // Make optional
+  onCurrentSelectQuery?: (query: string) => void // Make optional
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -188,19 +173,21 @@ export const QueryPerformanceGrid = ({
                 value={value.replace(/\s+/g, ' ').trim() as string}
                 wrapLines={false}
               />
-              <ButtonTooltip
-                tooltip={{ content: { text: 'Query details' } }}
-                icon={<ArrowRight size={14} />}
-                size="tiny"
-                type="default"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setSelectedRow(props.rowIdx)
-                  setView('details')
-                  gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
-                }}
-                className="p-1 flex-shrink-0 -translate-x-2 group-hover:flex hidden"
-              />
+              {onCurrentSelectQuery && (
+                <ButtonTooltip
+                  tooltip={{ content: { text: 'Query details' } }}
+                  icon={<ArrowRight size={14} />}
+                  size="tiny"
+                  type="default"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setSelectedRow(props.rowIdx)
+                    setView('details')
+                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
+                  }}
+                  className="p-1 flex-shrink-0 -translate-x-2 group-hover:flex hidden"
+                />
+              )}
             </div>
           )
         }
@@ -364,8 +351,8 @@ export const QueryPerformanceGrid = ({
       })
     } else if (sort?.column && sort.column !== 'query') {
       data.sort((a, b) => {
-        const aValue = a[sort.column as keyof AggregatedQueryData] || 0
-        const bValue = b[sort.column as keyof AggregatedQueryData] || 0
+        const aValue = a[sort.column as keyof QueryPerformanceRow] || 0
+        const bValue = b[sort.column as keyof QueryPerformanceRow] || 0
 
         if (typeof aValue === 'number' && typeof bValue === 'number') {
           return sort.order === 'asc' ? aValue - bValue : bValue - aValue
@@ -440,7 +427,7 @@ export const QueryPerformanceGrid = ({
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query
-            const isCharted = currentSelectedQuery === query
+            const isCharted = currentSelectedQuery ? currentSelectedQuery === query : false
 
             return [
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
@@ -461,9 +448,17 @@ export const QueryPerformanceGrid = ({
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      const query = reportData[idx]?.query
-                      if (query) {
-                        onCurrentSelectQuery(query)
+                      // If onCurrentSelectQuery is provided, use the chart selection logic
+                      if (onCurrentSelectQuery) {
+                        const query = reportData[idx]?.query
+                        if (query) {
+                          onCurrentSelectQuery(query)
+                        }
+                      } else {
+                        // Otherwise, open the detail panel
+                        setSelectedRow(idx)
+                        setView('details')
+                        gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       }
                     }
                   }}

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { transformLogsToJSON } from './QueryPerformanceChart/QueryPerformanceChart.utils'
+import { transformLogsToJSON } from '../QueryPerformance.utils'
+import { QueryPerformanceRow } from '../QueryPerformance.types'
 
 dayjs.extend(utc)
 
@@ -50,23 +51,6 @@ export interface ChartDataPoint {
   calls: number
   cache_hits: number
   cache_misses: number
-}
-
-export interface AggregatedQueryData {
-  query: string
-  rolname?: string
-  calls: number
-  mean_time: number
-  min_time: number
-  max_time: number
-  total_time: number
-  rows_read: number
-  cache_hit_rate: number
-  prop_total_time: number
-  index_advisor_result?: any // [kemal]: This needs proper typing.
-  _total_cache_hits: number
-  _total_cache_misses: number
-  _count: number
 }
 
 export const parsePgStatMonitorLogs = (logData: any[]): ParsedLogEntry[] => {
@@ -151,7 +135,7 @@ const normalizeQuery = (query: string): string => {
   return query.replace(/\s+/g, ' ').trim()
 }
 
-export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQueryData[] => {
+export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): QueryPerformanceRow[] => {
   if (!parsedLogs || parsedLogs.length === 0) return []
 
   const queryGroups = new Map<string, ParsedLogEntry[]>()
@@ -166,7 +150,7 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQu
     queryGroups.get(query)!.push(log)
   })
 
-  const aggregatedData: AggregatedQueryData[] = []
+  const aggregatedData: QueryPerformanceRow[] = []
   let totalExecutionTime = 0
 
   const queryStats = Array.from(queryGroups.entries()).map(([query, logs]) => {
@@ -243,6 +227,7 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): AggregatedQu
       rows_read: stats.totalRowsRead,
       cache_hit_rate: cacheHitRate,
       prop_total_time: propTotalTime,
+      index_advisor_result: null,
       _total_cache_hits: stats.totalCacheHits,
       _total_cache_misses: stats.totalCacheMisses,
       _count: stats.count,

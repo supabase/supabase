@@ -1,21 +1,18 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { Search, X } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 
-import { useParams } from 'common'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { AggregatedQueryData } from './QueryPerformanceData.utils'
+import { FilterPopover } from 'components/ui/FilterPopover'
 
 export const QueryPerformanceFilterBar = ({
-  aggregatedData = [],
+  actions, // Now just accepts actions, no aggregatedData needed here
 }: {
-  aggregatedData?: AggregatedQueryData[]
+  actions?: ReactNode
 }) => {
-  const { ref } = useParams()
   const { sort, clearSort } = useQueryPerformanceSort()
 
   const [{ search: searchQuery }, setSearchParams] = useQueryStates({
@@ -77,14 +74,7 @@ export const QueryPerformanceFilterBar = ({
           )}
         </div>
       </div>
-
-      <div className="flex gap-2 items-center pl-2">
-        <DownloadResultsButton
-          results={aggregatedData}
-          fileName={`Supabase Query Performance (${ref})`}
-          align="end"
-        />
-      </div>
+      <div className="flex gap-2 items-center pl-2">{actions}</div>
     </div>
   )
 }

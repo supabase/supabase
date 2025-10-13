@@ -1,7 +1,7 @@
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 
 import { useParams } from 'common'
-import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/EnableIndexAdvisorButton'
+import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
@@ -19,9 +19,11 @@ import type { NextPageWithLayout } from 'types'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
@@ -53,6 +55,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     runIndexAdvisor: isIndexAdvisorEnabled,
   })
 
+  const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'
+
   return (
     <div className="h-full flex flex-col">
       <FormHeader
@@ -65,16 +69,18 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
               href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
             />
             <DatabaseSelector />
-            <LogsDatePicker
-              value={datePickerValue}
-              helpers={datePickerHelpers.filter(
-                (h) =>
-                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
-                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
-                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
-              )}
-              onSubmit={handleDatePickerChange}
-            />
+            {isPgStatMonitorEnabled && (
+              <LogsDatePicker
+                value={datePickerValue}
+                helpers={datePickerHelpers.filter(
+                  (h) =>
+                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
+                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
+                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
+                )}
+                onSubmit={handleDatePickerChange}
+              />
+            )}
           </div>
         }
       />
@@ -82,6 +88,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}
         queryMetrics={queryMetrics}
+        isPgStatMonitorEnabled={isPgStatMonitorEnabled}
         dateRange={selectedDateRange}
         onDateRangeChange={updateDateRange}
       />
