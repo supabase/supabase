@@ -1,10 +1,12 @@
+export const INFINITE_PROJECTS_KEY_PREFIX = 'all-projects-infinite'
+
 export const projectKeys = {
   list: () => ['all-projects'] as const,
   infiniteList: (params?: {
     limit: number
     sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
     search?: string
-  }) => ['all-projects-infinite', params].filter(Boolean),
+  }) => [INFINITE_PROJECTS_KEY_PREFIX, params].filter(Boolean),
   infiniteListByOrg: (
     slug: string | undefined,
     params?: {
@@ -13,7 +15,7 @@ export const projectKeys = {
       search?: string
       statuses?: string[]
     }
-  ) => ['all-projects-infinite', slug, params].filter(Boolean),
+  ) => [INFINITE_PROJECTS_KEY_PREFIX, slug, params].filter(Boolean),
   status: (projectRef: string | undefined) => ['project', projectRef, 'status'] as const,
   types: (projectRef: string | undefined) => ['project', projectRef, 'types'] as const,
   detail: (projectRef: string | undefined) => ['project', projectRef, 'detail'] as const,
