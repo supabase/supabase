@@ -7,6 +7,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
 import { OverviewUsage } from 'components/interfaces/Auth/Overview/OverviewUsage'
 import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
+import { OverviewMonitoring } from 'components/interfaces/Auth/Overview/OverviewMonitoring'
 import { useRouter } from 'next/router'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { useContext, useEffect } from 'react'
@@ -32,6 +33,7 @@ const AuthOverview: NextPageWithLayout = () => {
     <ScaffoldContainer size="large">
       <div className="mb-4 flex flex-col gap-2">
         <OverviewUsage />
+        <OverviewMonitoring />
         <OverviewLearnMore />
       </div>
     </ScaffoldContainer>
