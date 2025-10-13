@@ -3,6 +3,7 @@ import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/dat
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAnalyticsIntegrationStatus } from 'hooks/useAnalyticsIntegrationStatus'
 import { toast } from 'sonner'
 
 export const useAnalyticsIntegrationInstaller = () => {
@@ -19,6 +20,9 @@ export const useAnalyticsIntegrationInstaller = () => {
   const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
+  // Get current integration status to determine what needs to be installed
+  const { needsWrappersExtension, needsIcebergWrapper } = useAnalyticsIntegrationStatus('page')
+
   const installIntegrations = async () => {
     if (!ref) {
       toast.error('Project reference is required')
@@ -26,11 +30,10 @@ export const useAnalyticsIntegrationInstaller = () => {
     }
 
     try {
-      // Find the wrappers extension
-      const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
+      // Install wrappers extension if needed
+      if (needsWrappersExtension) {
+        const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
 
-      // Install wrappers extension if not already installed
-      if (!wrappersExtension?.installed_version) {
         await enableExtension({
           projectRef: ref,
           connectionString: undefined,
@@ -43,10 +46,20 @@ export const useAnalyticsIntegrationInstaller = () => {
         toast.success('Successfully installed wrappers extension')
       }
 
-      // Install Iceberg Wrapper integration
-      await createIcebergWrapper({ bucketName: 'default' })
+      // Install Iceberg Wrapper integration if needed
+      if (needsIcebergWrapper) {
+        await createIcebergWrapper({ bucketName: 'default' })
+        toast.success('Successfully installed Iceberg Wrapper integration')
+      }
 
-      toast.success('Successfully installed analytics integrations')
+      // Show appropriate success message based on what was installed
+      if (needsWrappersExtension && needsIcebergWrapper) {
+        toast.success('Successfully installed all required analytics integrations')
+      } else if (needsWrappersExtension) {
+        toast.success('Successfully installed wrappers extension')
+      } else if (needsIcebergWrapper) {
+        toast.success('Successfully installed Iceberg Wrapper integration')
+      }
     } catch (error: any) {
       toast.error(`Failed to install integrations: ${error.message}`)
     }

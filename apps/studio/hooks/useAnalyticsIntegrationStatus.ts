@@ -1,5 +1,4 @@
 import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { wrapperMetaComparator } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -50,13 +49,15 @@ export const useAnalyticsIntegrationStatus = (
 
   // Check if wrappers extension is installed
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
-  const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
+  // const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
+  const isWrappersExtensionInstalled = false
 
   // Check if Iceberg Wrapper integration is installed
   const icebergWrapperMeta = WRAPPERS.find((w) => w.name === 'iceberg_wrapper')
-  const isIcebergWrapperInstalled = icebergWrapperMeta
-    ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
-    : false
+  // const isIcebergWrapperInstalled = icebergWrapperMeta
+  //   ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
+  //   : false
+  const isIcebergWrapperInstalled = false
 
   const isLoading = isExtensionsLoading || isFDWsLoading
 
@@ -75,24 +76,40 @@ export const useAnalyticsIntegrationStatus = (
       }
     }
 
-    if (needsWrappersExtension) {
-      return {
-        canAutoInstall: context === 'modal', // Only modal can auto-install
-        requiresUserAction: context !== 'modal', // Pages require user action
-        installationMessage:
-          context === 'modal'
-            ? 'Supabase will install these on your behalf.'
-            : 'Please install the required extensions to continue.',
-      }
-    }
+    // Determine what specifically needs to be installed
+    const needsBoth = needsWrappersExtension && needsIcebergWrapper
+    const needsOnlyWrappers = needsWrappersExtension && !needsIcebergWrapper
+    const needsOnlyIceberg = !needsWrappersExtension && needsIcebergWrapper
 
-    if (needsIcebergWrapper) {
+    if (needsBoth) {
       return {
         canAutoInstall: context === 'modal',
         requiresUserAction: context !== 'modal',
         installationMessage:
           context === 'modal'
-            ? 'Supabase will install it on your behalf.'
+            ? 'Supabase will install the Wrappers extension and Iceberg Wrapper integration on your behalf.'
+            : 'Please install the Wrappers extension and Iceberg Wrapper integration to continue.',
+      }
+    }
+
+    if (needsOnlyWrappers) {
+      return {
+        canAutoInstall: context === 'modal',
+        requiresUserAction: context !== 'modal',
+        installationMessage:
+          context === 'modal'
+            ? 'Supabase will install the Wrappers extension on your behalf.'
+            : 'Please install the Wrappers extension to continue.',
+      }
+    }
+
+    if (needsOnlyIceberg) {
+      return {
+        canAutoInstall: context === 'modal',
+        requiresUserAction: context !== 'modal',
+        installationMessage:
+          context === 'modal'
+            ? 'Supabase will install the Iceberg Wrapper integration on your behalf.'
             : 'Please install the Iceberg Wrapper integration to continue.',
       }
     }

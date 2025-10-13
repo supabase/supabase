@@ -38,8 +38,7 @@ export const AnalyticsIntegrationAlert = ({
       // Modal context - passive installation
       return (
         <p>
-          The Wrappers extension and Iceberg Wrapper integration are required for querying
-          analytical data. {installationContext.installationMessage}{' '}
+          {installationContext.installationMessage}{' '}
           <InlineLink
             href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
             target="_blank"
@@ -52,13 +51,9 @@ export const AnalyticsIntegrationAlert = ({
       )
     } else {
       // Page context - requires user action
-      const integrationText = needsWrappersExtension
-        ? 'The Wrappers extension and Iceberg Wrapper integration'
-        : 'The Iceberg Wrapper integration'
-
       return (
         <p>
-          {integrationText} is required for querying analytical data.{' '}
+          {installationContext.installationMessage}{' '}
           <InlineLink
             href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
             target="_blank"

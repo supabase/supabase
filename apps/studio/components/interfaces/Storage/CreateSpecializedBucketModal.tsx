@@ -118,6 +118,7 @@ export const CreateSpecializedBucketModal = ({
     canCreateBuckets: canCreateAnalyticsBuckets,
     icebergCatalogEnabled,
     needsWrappersExtension,
+    needsIcebergWrapper,
     extensionState,
   } = useAnalyticsIntegrationStatus('modal')
 
@@ -144,7 +145,7 @@ export const CreateSpecializedBucketModal = ({
     }
 
     try {
-      // Install wrappers extension if not already installed
+      // Install wrappers extension if needed
       if (needsWrappersExtension) {
         await enableExtension({
           projectRef: ref,
@@ -156,6 +157,12 @@ export const CreateSpecializedBucketModal = ({
           createSchema: false,
         })
         toast.success('Successfully installed wrappers extension')
+      }
+
+      // Install Iceberg Wrapper integration if needed
+      if (needsIcebergWrapper) {
+        await createIcebergWrapper({ bucketName: 'default' })
+        toast.success('Successfully installed Iceberg Wrapper integration')
       }
 
       await createBucket({
@@ -173,7 +180,7 @@ export const CreateSpecializedBucketModal = ({
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
-      // Create iceberg wrapper for analytics buckets if extension is installed
+      // Create iceberg wrapper for analytics buckets if everything is properly installed
       if (bucketType === 'analytics' && extensionState === 'installed') {
         await createIcebergWrapper({ bucketName: values.name })
       }
