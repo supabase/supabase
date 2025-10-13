@@ -8,9 +8,11 @@ You can use Realtime Broadcast to send low-latency messages between users. Messa
 
 ## How Broadcast works
 
-When a message is sent whether from your client, a REST request, or your database using realtime.send(), the message gets inserted into the table realtime.messages.
+The way Broadcast works changes based on the channel you are using:
+* From REST API will receive an HTTP request which then will be sent via Websocket to connected clients
+* From Client libraries we have an established websocket connection and we use that to send a message to the server which then will be sent via Websocket to connected clients
+* From Database we add a new entry to `realtime.messages` where we have logical replication set to listen for changes which then will be sent via Websocket to connected clients
 
-The Realtime service continuously listens for new rows in this table (using logical replication). When a new message is inserted and passes any applicable RLS policies, Realtime reads it and broadcasts it to all connected clients that are subscribed to the topic.
 
 <Admonition type="note">
 
@@ -19,9 +21,11 @@ The public flag (the last argument in `realtime.send(payload, event, topic, is_p
 - Public (false) → Anyone can subscribe to that topic without authentication
 - Private (true) → Only authenticated clients can subscribe to that topic
 
-However, regardless of whether it's public or private, the Realtime service connects to your database as the authenticated Postgres role, and must be allowed to SELECT from realtime.messages under your RLS policies.
+However, regardless of whether it's public or private, the Realtime service connects to your database as the authenticated Supabase Admin role.
 
 </Admonition>
+
+For Authorization we do insert a message and try to read it and then we it back as way to verify that the RLS policies set by the user are being respected by the user joining the channel but this messages won't be sent to the user. You can read more about it in the [Authorization](/docs/guides/realtime/authorization) docs
 
 ## Subscribe to messages
 
