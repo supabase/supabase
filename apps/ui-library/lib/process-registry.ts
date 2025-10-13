@@ -22,11 +22,28 @@ const DEFAULT_PATHS = {
   util: '/lib',
 } as const
 
+async function fetchRegistryFileFromUrl(url: string) {
+  const response = await fetch(url);
+
+  return await response.json() as { files: RegistryFile[] };
+}
+
+async function fetchRegistryFileFromLocalPath(path: string) {
+  const file = fs.readFileSync(path, 'utf-8')
+
+  return JSON.parse(file) as { files: RegistryFile[] }
+}
+
 /**
  * Converts a flat registry array into a hierarchical file tree structure
  */
-export function generateRegistryTree(registryPath: string): RegistryNode[] {
-  const registry = JSON.parse(fs.readFileSync(registryPath, 'utf-8')) as { files: RegistryFile[] }
+export async function generateRegistryTree(registryPath: string): Promise<RegistryNode[]> {
+  const isURL = URL.canParse(registryPath);
+
+  const registry = isURL
+    ? await fetchRegistryFileFromUrl(registryPath)
+    : await fetchRegistryFileFromLocalPath(registryPath);
+
   const tree: RegistryNode[] = []
 
   const sortedRegistry = [...registry.files].sort((a, b) => a.path.localeCompare(b.path))
