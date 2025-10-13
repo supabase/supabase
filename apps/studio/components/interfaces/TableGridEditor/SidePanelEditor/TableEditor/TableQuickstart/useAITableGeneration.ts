@@ -3,7 +3,7 @@ import { BASE_PATH } from 'lib/constants'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LIMITS } from './constants'
-import type { AIGeneratedSchema, PostgresType, TableRelationship, TableSuggestion } from './types'
+import type { AIGeneratedSchema, PostgresType, TableSuggestion } from './types'
 import { TableSource } from './types'
 
 type PartialColumn = Partial<AIGeneratedSchema['tables'][number]['columns'][number]>
@@ -13,9 +13,6 @@ type PartialTable = Partial<AIGeneratedSchema['tables'][number]> & {
 type PartialSchema = Partial<AIGeneratedSchema> & {
   tables?: PartialTable[]
 }
-
-// Narrow helper to strip null/undefined from arrays
-const isNotNull = <T>(value: T | null | undefined): value is T => value != null
 
 const STREAM_QUERY = 'stream=true&streamMode=object'
 
@@ -112,7 +109,7 @@ const convertPartialSchemaToTableSuggestions = (schema: PartialSchema): TableSug
             references: column.references ?? undefined,
           }
         })
-        .filter(isNotNull)
+        .filter((field): field is TableSuggestion['fields'][number] => field !== null)
 
       if (fields.length === 0 && !table.name) {
         return null
@@ -126,7 +123,7 @@ const convertPartialSchemaToTableSuggestions = (schema: PartialSchema): TableSug
               ): relationship is NonNullable<PartialTable['relationships']>[number] & {
                 from: string
                 to: string
-                type: TableRelationship['type']
+                type: TableSuggestion['relationships'][number]['type']
               } =>
                 !!relationship &&
                 typeof relationship.from === 'string' &&
@@ -148,7 +145,7 @@ const convertPartialSchemaToTableSuggestions = (schema: PartialSchema): TableSug
         relationships: relationships && relationships.length > 0 ? relationships : undefined,
       }
     })
-    .filter(isNotNull)
+    .filter((table): table is TableSuggestion => table !== null)
 }
 
 const mergeDeep = (

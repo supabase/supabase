@@ -14,7 +14,15 @@ const ColumnSchema = z.object({
   type: z.string().describe('PostgreSQL data type (e.g., bigint, text, timestamp with time zone)'),
   isPrimary: z.boolean().optional().nullable().describe('Whether this is a primary key'),
   isForeign: z.boolean().optional().nullable().describe('Whether this is a foreign key'),
-  references: z.string().optional().nullable().describe('Table.column this foreign key references'),
+  references: z
+    .object({
+      table: z.string(),
+      column: z.string(),
+    })
+    .passthrough()
+    .optional()
+    .nullable()
+    .describe('Foreign key reference details'),
   isNullable: z.boolean().optional().nullable().describe('Whether the column can be null'),
   defaultValue: z.string().optional().nullable().describe('Default value or expression'),
   isUnique: z
@@ -28,25 +36,17 @@ const TableSchema = z.object({
   name: z.string().describe('The table name in snake_case'),
   description: z.string().describe('A brief description of what this table stores'),
   columns: z.array(ColumnSchema).describe('Array of columns in the table'),
+  // Note: The model is not reliable about which format it returns (array vs object)
+  // so we accept both to avoid validation errors
   relationships: z
-    .array(
-      z.object({
-        from: z.string().describe('Source column in this table'),
-        to: z.string().describe('Target table.column'),
-        type: z.enum(['one-to-one', 'one-to-many', 'many-to-many', 'many-to-one']),
-      })
-    )
+    .union([z.record(z.any()), z.array(z.any())])
     .optional()
     .nullable()
-    .describe('Relationships to other tables'),
+    .describe('Foreign key relationships'),
 })
 
 const ResponseSchema = z.object({
-  tables: z
-    .array(TableSchema)
-    .min(LIMITS.MIN_TABLES_TO_GENERATE)
-    .max(LIMITS.MAX_TABLES_TO_GENERATE)
-    .describe('Array of related database tables for the application'),
+  tables: z.array(TableSchema).describe('Array of related database tables for the application'),
   summary: z.string().optional().describe('Brief summary of the generated schema'),
 })
 
@@ -124,6 +124,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Use snake_case naming consistently
       - Add created_at, updated_at timestamps with type: 'timestamptz' and defaultValue: 'now()'
       - Reference auth.users(id) for user relations when appropriate
+      - For foreign key columns, use references as an object: { "table": "table_name", "column": "column_name" }
       - Keep descriptions brief (one sentence)
       - Focus on the most essential tables only
 
@@ -167,6 +168,8 @@ function shouldStream(req: NextApiRequest) {
 }
 
 async function streamSchemaResponse(res: NextApiResponse, result: SchemaStreamResult) {
+  const requestId = `stream-${Date.now()}`
+
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
@@ -178,16 +181,55 @@ async function streamSchemaResponse(res: NextApiResponse, result: SchemaStreamRe
     res.write(`data: ${JSON.stringify(data)}\n\n`)
   }
 
+  let lastPartial: any = null
+  let chunkCount = 0
+
   try {
     for await (const partial of result.partialObjectStream) {
       if (!partial) continue
+
+      chunkCount++
+      console.log(`[${requestId}] Chunk #${chunkCount}:`, JSON.stringify(partial, null, 2))
+
+      lastPartial = partial
       writeEvent('partial', partial)
     }
 
+    console.log(`[${requestId}] Stream complete. Total chunks: ${chunkCount}`)
+    console.log(`[${requestId}] Last partial:`, JSON.stringify(lastPartial, null, 2))
+
     const finalObject = await result.object
-    writeEvent('complete', finalObject)
+    console.log(`[${requestId}] Final object from SDK:`, JSON.stringify(finalObject, null, 2))
+
+    // Truncate tables if there are too many
+    if (finalObject && finalObject.tables && Array.isArray(finalObject.tables) && finalObject.tables.length > LIMITS.MAX_TABLES) {
+      console.log(`[${requestId}] Truncating ${finalObject.tables.length} tables to ${LIMITS.MAX_TABLES}`)
+      finalObject.tables = finalObject.tables.slice(0, LIMITS.MAX_TABLES)
+    }
+
+    // Validate against schema
+    const parseResult = ResponseSchema.safeParse(finalObject)
+    if (parseResult.success) {
+      console.log(`[${requestId}] Schema validation succeeded`)
+      writeEvent('complete', parseResult.data)
+    } else {
+      console.error(`[${requestId}] Schema validation failed:`, JSON.stringify(parseResult.error.format(), null, 2))
+      console.log(`[${requestId}] Invalid object was:`, JSON.stringify(finalObject, null, 2))
+
+      // If we have usable tables, send them anyway
+      if (finalObject && finalObject.tables && Array.isArray(finalObject.tables) && finalObject.tables.length > 0) {
+        console.log(`[${requestId}] Sending ${finalObject.tables.length} tables despite validation failure`)
+        writeEvent('complete', finalObject)
+      } else if (lastPartial && lastPartial.tables && Array.isArray(lastPartial.tables) && lastPartial.tables.length > 0) {
+        console.log(`[${requestId}] Using last partial with ${lastPartial.tables.length} tables as fallback`)
+        writeEvent('complete', lastPartial)
+      } else {
+        throw new Error('No valid tables generated')
+      }
+    }
   } catch (error) {
-    console.error('Error while streaming schema:', error)
+    console.error(`[${requestId}] Error while streaming schema:`, error)
+    console.log(`[${requestId}] Last partial before error:`, JSON.stringify(lastPartial, null, 2))
     writeEvent('error', {
       message: error instanceof Error ? error.message : 'Failed to stream schema',
     })
