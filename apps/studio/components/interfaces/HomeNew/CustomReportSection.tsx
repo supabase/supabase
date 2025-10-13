@@ -7,7 +7,6 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
-import { useQueryClient } from '@tanstack/react-query'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { Plus, RefreshCw } from 'lucide-react'
@@ -16,13 +15,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SnippetDropdown } from 'components/interfaces/HomeNew/SnippetDropdown'
 import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
 import type { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
-import { analyticsKeys } from 'data/analytics/keys'
+import { useInvalidateAnalyticsQuery } from 'data/analytics/utils'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
@@ -39,12 +38,14 @@ import { Row } from 'ui-patterns'
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
   const endDate = dayjs().toISOString()
+
   const { ref } = useParams()
   const { profile } = useProfile()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { invalidateInfraMonitoringQuery } = useInvalidateAnalyticsQuery()
+
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
   const { data: reportsData } = useContentInfiniteQuery(
@@ -277,20 +278,20 @@ export function CustomReportSection() {
   }
 
   const onRefreshReport = () => {
+    if (!ref) return
+
     setIsRefreshing(true)
     const monitoringCharts = editableReport?.layout.filter(
       (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'
     )
     monitoringCharts?.forEach((x) => {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
-          attribute: x.attribute,
-          startDate,
-          endDate,
-          interval: editableReport?.interval || '1d',
-          databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
+      invalidateInfraMonitoringQuery(ref, {
+        attribute: x.attribute,
+        startDate,
+        endDate,
+        interval: editableReport?.interval || '1d',
+        databaseIdentifier: state.selectedDatabaseId,
+      })
     })
     setTimeout(() => setIsRefreshing(false), 1000)
   }
