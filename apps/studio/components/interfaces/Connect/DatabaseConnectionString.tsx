@@ -52,7 +52,7 @@ const StepLabel = ({
   ...props
 }: { number: number; children: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
   <div {...props} className={cn('flex items-center gap-2', props.className)}>
-    <div className="flex font-mono text-xs items-center justify-center w-6 h-6 border border-strong rounded-md bg-surface-100">
+    <div className="flex font-mono text-xs items-center justify-center min-w-6 w-6 h-6 border border-strong rounded-md bg-surface-100">
       {number}
     </div>
     <span>{children}</span>
@@ -342,15 +342,16 @@ export const DatabaseConnectionString = () => {
         <div className="flex flex-col divide-y divide-border">
           {/* // handle non terminal examples */}
           {hasCodeExamples && (
-            <div className="grid grid-cols-2 gap-x-20 w-full px-4 md:px-7 py-8">
-              <div>
-                <StepLabel number={++stepNumber} className="mb-4">
+            <div className="flex flex-col w-full">
+              <div className="grid lg:grid-cols-3 gap-4 lg:gap-5 py-8 px-4 md:px-7">
+                <StepLabel number={++stepNumber} className="items-start">
                   Install the following
                 </StepLabel>
                 {exampleInstallCommands?.map((cmd, i) => (
                   <CodeBlock
                     key={i}
                     className="[&_code]:text-[12px] [&_code]:text-foreground"
+                    wrapperClassName="lg:col-span-2"
                     value={cmd}
                     hideLineNumbers
                     language="bash"
@@ -360,12 +361,12 @@ export const DatabaseConnectionString = () => {
                 ))}
               </div>
               {exampleFiles && exampleFiles?.length > 0 && (
-                <div>
-                  <StepLabel number={++stepNumber} className="mb-4">
+                <div className="grid lg:grid-cols-3 gap-4 lg:gap-5 border-t py-8 px-4 md:px-7">
+                  <StepLabel number={++stepNumber} className="items-start">
                     Add file to project
                   </StepLabel>
                   {exampleFiles?.map((file, i) => (
-                    <div key={i}>
+                    <div key={i} className="lg:col-span-2">
                       <CodeBlockFileHeader title={file.name} />
                       <CodeBlock
                         wrapperClassName="[&_pre]:max-h-40 [&_pre]:px-4 [&_pre]:py-3 [&_pre]:rounded-t-none"
@@ -510,23 +511,22 @@ export const DatabaseConnectionString = () => {
           </div>
 
           {examplePostInstallCommands && (
-            <div className="grid grid-cols-2 gap-20 w-full px-4 md:px-7 py-10">
-              <div>
-                <StepLabel number={++stepNumber} className="mb-4">
-                  Add the configuration package to read the settings
-                </StepLabel>
-                {examplePostInstallCommands?.map((cmd, i) => (
-                  <CodeBlock
-                    key={i}
-                    className="text-sm"
-                    value={cmd}
-                    hideLineNumbers
-                    language="bash"
-                  >
-                    {cmd}
-                  </CodeBlock>
-                ))}
-              </div>
+            <div className="grid lg:grid-cols-3 gap-4 lg:gap-5 w-full px-4 md:px-7 py-8">
+              <StepLabel number={++stepNumber} className="items-start">
+                Add the configuration package to read the settings
+              </StepLabel>
+              {examplePostInstallCommands?.map((cmd, i) => (
+                <CodeBlock
+                  key={i}
+                  className="text-sm"
+                  wrapperClassName="lg:col-span-2"
+                  value={cmd}
+                  hideLineNumbers
+                  language="bash"
+                >
+                  {cmd}
+                </CodeBlock>
+              ))}
             </div>
           )}
         </div>

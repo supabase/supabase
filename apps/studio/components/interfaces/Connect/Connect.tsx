@@ -322,7 +322,7 @@ export const Connect = () => {
         </Button>
       </DialogTrigger>
       <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
-        <DialogHeader className={DIALOG_PADDING_X}>
+        <DialogHeader className={cn('text-left', DIALOG_PADDING_X)}>
           <DialogTitle>
             Connect to your project
             {connectionTypes.length === 1 ? ` via ${connectionTypes[0].label.toLowerCase()}` : null}
