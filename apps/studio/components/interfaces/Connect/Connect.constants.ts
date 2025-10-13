@@ -357,17 +357,17 @@ export const PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT =
   'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
 export const IPV4_ADDON_TEXT = 'Connections are IPv4 proxied with IPv4 add-on'
 
-export type ConnectionMethod = 'direct' | 'transaction' | 'session'
+export type ConnectionStringMethod = 'direct' | 'transaction' | 'session'
 
-export const connectionMethodOptions: Record<
-  ConnectionMethod,
+export const connectionStringMethodOptions: Record<
+  ConnectionStringMethod,
   { value: string; label: string; description: string; badge: string }
 > = {
   direct: {
     value: 'direct',
     label: 'Direct connection',
     description:
-      'Ideal for applications with persistent, long-lived connections, such as those running on virtual machines or long-standing containers.',
+      'Ideal for applications with persistent and long-lived connections, such as those running on virtual machines or long-standing containers.',
     badge: 'IPv4 Compatible',
   },
   transaction: {

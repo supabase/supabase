@@ -19,7 +19,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConnectionParameters } from './ConnectionParameters'
-import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
@@ -132,18 +131,6 @@ export const ConnectionPanel = ({
           {!!badge && <Badge>{badge}</Badge>}
         </div>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
-        {type !== 'session' && (
-          <div className="relative flex items-center">
-            <div className="flex h-full">
-              {type === 'transaction' ? <TransactionIcon /> : <DirectConnectionIcon />}
-            </div>
-            <div className="flex items-center p-4 text-xs text-foreground">
-              {type === 'transaction'
-                ? 'Suitable for a large number of connected clients that share a dedicated connection pool'
-                : 'Each client has a dedicated, long-lived connection to Postgres'}
-            </div>
-          </div>
-        )}
       </div>
       <div className="col-span-8 flex flex-col gap-2">
         <div className="flex flex-col -space-y-px">

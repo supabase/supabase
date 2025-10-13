@@ -245,17 +245,20 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
+  const resetQueryStates = () => {
+    setQueryFramework(null)
+    setQueryUsing(null)
+    setQueryWith(null)
+    setQueryType(null)
+    setQuerySource(null)
+    setQueryMethod(null)
+  }
+
   const handleDialogChange = (open: boolean) => {
     if (!open) {
       setShowConnect(null)
       setTab(null)
-      setQueryFramework(null)
-      setQueryUsing(null)
-      setQueryWith(null)
-      // Clear connection string URL parameters
-      setQueryType(null)
-      setQuerySource(null)
-      setQueryMethod(null)
+      resetQueryStates()
     } else {
       setShowConnect(open)
     }
@@ -329,7 +332,13 @@ export const Connect = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
+        <Tabs_Shadcn_
+          defaultValue={tab}
+          onValueChange={(value) => {
+            resetQueryStates()
+            handleConnectionType(value)
+          }}
+        >
           {connectionTypes.length > 1 ? (
             <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
               {connectionTypes.map((type) => (

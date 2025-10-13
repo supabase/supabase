@@ -35,8 +35,8 @@ import {
 import { Admonition } from 'ui-patterns'
 import {
   CONNECTION_PARAMETERS,
-  type ConnectionMethod,
-  connectionMethodOptions,
+  type ConnectionStringMethod,
+  connectionStringMethodOptions,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
   IPV4_ADDON_TEXT,
@@ -74,7 +74,7 @@ export const DatabaseConnectionString = () => {
   const [queryMethod, setQueryMethod] = useQueryState('method', parseAsString.withDefault('direct'))
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
-  const [selectedMethod, setSelectedMethod] = useState<ConnectionMethod>('direct')
+  const [selectedMethod, setSelectedMethod] = useState<ConnectionStringMethod>('direct')
 
   const sharedPoolerPreferred = useMemo(() => {
     return org?.plan?.id === 'free'
@@ -90,10 +90,10 @@ export const DatabaseConnectionString = () => {
       setSelectedTab('uri')
     }
 
-    const validMethods: ConnectionMethod[] = ['direct', 'transaction', 'session']
-    if (queryMethod && validMethods.includes(queryMethod as ConnectionMethod)) {
-      setSelectedMethod(queryMethod as ConnectionMethod)
-    } else if (queryMethod && !validMethods.includes(queryMethod as ConnectionMethod)) {
+    const validMethods: ConnectionStringMethod[] = ['direct', 'transaction', 'session']
+    if (queryMethod && validMethods.includes(queryMethod as ConnectionStringMethod)) {
+      setSelectedMethod(queryMethod as ConnectionStringMethod)
+    } else if (queryMethod && !validMethods.includes(queryMethod as ConnectionStringMethod)) {
       setQueryMethod('direct')
       setSelectedMethod('direct')
     }
@@ -111,7 +111,7 @@ export const DatabaseConnectionString = () => {
     setQueryType(connectionType)
   }
 
-  const handleMethodChange = (method: ConnectionMethod) => {
+  const handleMethodChange = (method: ConnectionStringMethod) => {
     setSelectedMethod(method)
     setQueryMethod(method)
   }
@@ -200,14 +200,14 @@ export const DatabaseConnectionString = () => {
 
   const handleCopy = (
     connectionTypeId: string,
-    connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
+    connectionStringMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
   ) => {
     const connectionInfo = DATABASE_CONNECTION_TYPES.find((type) => type.id === connectionTypeId)
     const connectionType = connectionInfo?.label ?? 'Unknown'
     const lang = connectionInfo?.lang ?? 'Unknown'
     sendEvent({
       action: 'connection_string_copied',
-      properties: { connectionType, lang, connectionMethod },
+      properties: { connectionType, lang, connectionMethod: connectionStringMethod },
       groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
@@ -310,14 +310,14 @@ export const DatabaseConnectionString = () => {
           <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
             <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
               <SelectValue_Shadcn_ size="tiny">
-                {connectionMethodOptions[selectedMethod].label}
+                {connectionStringMethodOptions[selectedMethod].label}
               </SelectValue_Shadcn_>
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_ className="max-w-sm">
-              {Object.keys(connectionMethodOptions).map((method) => (
-                <ConnectionMethodSelectItem
+              {Object.keys(connectionStringMethodOptions).map((method) => (
+                <ConnectionStringMethodSelectItem
                   key={method}
-                  method={method as ConnectionMethod}
+                  method={method as ConnectionStringMethod}
                   poolerBadge={poolerBadge}
                 />
               ))}
@@ -391,11 +391,11 @@ export const DatabaseConnectionString = () => {
               {selectedMethod === 'direct' && (
                 <ConnectionPanel
                   type="direct"
-                  title={connectionMethodOptions.direct.label}
+                  title={connectionStringMethodOptions.direct.label}
                   contentType={contentType}
                   lang={lang}
                   fileTitle={fileTitle}
-                  description={connectionMethodOptions.direct.description}
+                  description={connectionStringMethodOptions.direct.description}
                   connectionString={connectionStrings['direct'][selectedTab]}
                   ipv4Status={{
                     type: !ipv4Addon ? 'error' : 'success',
@@ -421,12 +421,12 @@ export const DatabaseConnectionString = () => {
               {selectedMethod === 'transaction' && IS_PLATFORM && (
                 <ConnectionPanel
                   type="transaction"
-                  title={connectionMethodOptions.transaction.label}
+                  title={connectionStringMethodOptions.transaction.label}
                   contentType={contentType}
                   lang={lang}
                   badge={poolerBadge}
                   fileTitle={fileTitle}
-                  description={connectionMethodOptions.transaction.description}
+                  description={connectionStringMethodOptions.transaction.description}
                   connectionString={connectionStrings['pooler'][selectedTab]}
                   ipv4Status={{
                     type: !sharedPoolerPreferred && !ipv4Addon ? 'error' : 'success',
@@ -476,12 +476,12 @@ export const DatabaseConnectionString = () => {
                   )}
                   <ConnectionPanel
                     type="session"
-                    title={connectionMethodOptions.session.label}
+                    title={connectionStringMethodOptions.session.label}
                     contentType={contentType}
                     lang={lang}
                     badge="Shared Pooler"
                     fileTitle={fileTitle}
-                    description={connectionMethodOptions.session.description}
+                    description={connectionStringMethodOptions.session.description}
                     connectionString={supavisorConnectionStrings['pooler'][selectedTab].replace(
                       '6543',
                       '5432'
@@ -582,29 +582,29 @@ export const DatabaseConnectionString = () => {
   )
 }
 
-const ConnectionMethodSelectItem = ({
+const ConnectionStringMethodSelectItem = ({
   method,
   poolerBadge,
 }: {
-  method: ConnectionMethod
+  method: ConnectionStringMethod
   poolerBadge: string
 }) => (
   <SelectItem_Shadcn_ value={method}>
     <div className="flex flex-col w-full py-1">
-      <div>{connectionMethodOptions[method].label}</div>
+      <div>{connectionStringMethodOptions[method].label}</div>
       <div className="text-foreground-lighter text-xs">
-        {connectionMethodOptions[method].description}
+        {connectionStringMethodOptions[method].description}
       </div>
       <div className="flex items-center gap-1 mt-2">
         {method === 'session' ? (
           <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
             <InfoIcon className="w-3 h-3" />
-            {connectionMethodOptions[method].badge}
+            {connectionStringMethodOptions[method].badge}
           </Badge>
         ) : (
           <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
             <GlobeIcon className="w-3 h-3" />
-            {connectionMethodOptions[method].badge}
+            {connectionStringMethodOptions[method].badge}
           </Badge>
         )}
         {method === 'transaction' && (
