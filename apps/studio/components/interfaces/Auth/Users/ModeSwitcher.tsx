@@ -32,7 +32,7 @@ export const ModeSwitcher = ({ mode, setMode }: ModeSwitcherProps) => {
             'w-[100px] rounded-l-none -ml-[1px] pr-1.5 transition focus:!ring-0 focus:!ring-offset-0',
             mode === 'performance'
               ? '!bg-transparent'
-              : 'text-warning !bg-warning-200 border-warning-500 hover:border-warning-600/60'
+              : 'text-warning !bg-warning-200 !border-warning-500 hover:!border-warning-600/60'
           )}
         >
           {mode === 'performance' ? 'Optimized' : 'Freeform'}

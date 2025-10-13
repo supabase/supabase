@@ -44,7 +44,7 @@ export const SortDropdown = ({
           content: { side: 'bottom', text: 'Sort cannot be changed in optimized search mode' },
         }}
       >
-        Sorted by User ID
+        Sorted by user ID
       </ButtonTooltip>
     )
   }
@@ -53,11 +53,18 @@ export const SortDropdown = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button icon={sortOrder === 'desc' ? <ArrowDownWideNarrow /> : <ArrowDownNarrowWide />}>
-          Sorted by {sortColumn.replaceAll('_', ' ')}
+          Sorted by {sortColumn === 'id' ? 'user ID' : sortColumn.replaceAll('_', ' ')}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-44" align="start">
         <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Sort by user ID</DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuRadioItem value="id:asc">Ascending</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="id:desc">Descending</DropdownMenuRadioItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>

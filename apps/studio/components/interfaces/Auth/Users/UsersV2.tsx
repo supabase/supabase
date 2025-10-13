@@ -294,8 +294,7 @@ export const UsersV2 = () => {
                   mode={mode}
                   setMode={(m) => {
                     setMode(m)
-                    if (m === 'freeform') setSortByValue('created_at:desc')
-                    else setSortByValue('id:asc')
+                    if (m === 'performance') setSortByValue('id:asc')
                   }}
                 />
 
