@@ -80,8 +80,8 @@ const admonitionBase = cva('', {
   variants: {
     type: {
       default: `bg-surface-200/25 border border-default`,
-      warning: `bg-alternative border border-default`,
-      destructive: `bg-alternative border border-default`,
+      warning: `bg-warning-200 border border-warning-400`,
+      destructive: `bg-destructive-200 border border-destructive-400`,
     },
   },
 })
