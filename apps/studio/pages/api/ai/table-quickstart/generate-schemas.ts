@@ -1,10 +1,10 @@
-import { generateObject } from 'ai'
+import { streamObject } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
+import { LIMITS } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/constants'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
-import { LIMITS } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/constants'
 
 // See https://vercel.com/docs/functions/configuring-functions/duration
 export const maxDuration = 30
@@ -50,6 +50,8 @@ const ResponseSchema = z.object({
   summary: z.string().optional().describe('Brief summary of the generated schema'),
 })
 
+type SchemaStreamResult = ReturnType<typeof streamObject<typeof ResponseSchema>>
+
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
@@ -71,9 +73,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   // Generate unique request ID for tracing
   const requestId = `table-gen-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
 
-  const { model, error: modelError } = await getModel({
-    provider: 'openai',
-    model: 'gpt-5-mini',
+  const {
+    model,
+    error: modelError,
+    providerOptions,
+  } = await getModel({
+    provider: 'bedrock',
+    model: 'openai.gpt-oss-120b-1:0',
     routingKey: 'table-quickstart',
     isLimited: false,
   })
@@ -90,13 +96,24 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (typeof prompt !== 'string' || prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
-    return res.status(400).json({ error: `Prompt must be a string under ${LIMITS.MAX_PROMPT_LENGTH} characters` })
+    return res
+      .status(400)
+      .json({ error: `Prompt must be a string under ${LIMITS.MAX_PROMPT_LENGTH} characters` })
   }
 
   try {
-    const { object } = await generateObject({
+    const wantsStream = shouldStream(req)
+
+    const abortController = new AbortController()
+    req.on('close', () => abortController.abort())
+    req.on('aborted', () => abortController.abort())
+
+    const result = streamObject({
       model,
+      abortSignal: abortController.signal,
       schema: ResponseSchema,
+      mode: 'json',
+      ...(providerOptions && { providerOptions }),
       system: `You are a Supabase PostgreSQL schema designer. Generate exactly 2-3 core tables based on the user's description.
 
       Rules:
@@ -116,6 +133,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       Create a practical, production-ready schema with related tables that would be needed for this application.`,
     })
 
+    if (wantsStream) {
+      await streamSchemaResponse(res, result)
+      return
+    }
+
+    const object = await result.object
+
     return res.status(200).json(object)
   } catch (error) {
     if (error instanceof Error) {
@@ -129,5 +153,45 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({
       error: 'Failed to generate database schemas. Please try again.',
     })
+  }
+}
+
+function shouldStream(req: NextApiRequest) {
+  if (req.headers['accept']?.includes('text/event-stream')) return true
+  if (req.headers['x-ai-stream'] === 'true') return true
+  const { stream } = req.query
+  if (typeof stream === 'string') {
+    return stream === 'true'
+  }
+  return false
+}
+
+async function streamSchemaResponse(res: NextApiResponse, result: SchemaStreamResult) {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+  })
+
+  const writeEvent = (event: string, data: unknown) => {
+    res.write(`event: ${event}\n`)
+    res.write(`data: ${JSON.stringify(data)}\n\n`)
+  }
+
+  try {
+    for await (const partial of result.partialObjectStream) {
+      if (!partial) continue
+      writeEvent('partial', partial)
+    }
+
+    const finalObject = await result.object
+    writeEvent('complete', finalObject)
+  } catch (error) {
+    console.error('Error while streaming schema:', error)
+    writeEvent('error', {
+      message: error instanceof Error ? error.message : 'Failed to stream schema',
+    })
+  } finally {
+    res.end()
   }
 }
