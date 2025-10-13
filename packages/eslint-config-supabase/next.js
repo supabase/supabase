@@ -3,6 +3,7 @@ const js = require('@eslint/js')
 const { FlatCompat } = require('@eslint/eslintrc')
 const prettierConfig = require('eslint-config-prettier/flat')
 const { default: turboConfig } = require('eslint-config-turbo/flat')
+const { off } = require('process')
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -11,8 +12,6 @@ const compat = new FlatCompat({
 })
 
 module.exports = defineConfig([
-  // Global files include for all rules
-  { files: ['pages/**.tsx', 'app/**.tsx'] },
   // Global ignore for the .next folder
   { ignores: ['.next', 'public'] },
   turboConfig,
@@ -25,6 +24,12 @@ module.exports = defineConfig([
     rules: {
       '@next/next/no-html-link-for-pages': 'off',
       'react/jsx-key': 'off',
+    },
+  },
+  {
+    // check for default exports in all files except app and pages folders.
+    ignores: ['pages/**.tsx', 'app/**.tsx'],
+    rules: {
       'no-restricted-exports': [
         'warn',
         {
@@ -33,7 +38,6 @@ module.exports = defineConfig([
           },
         },
       ],
-      'no-restricted-exports': 'off',
     },
   },
 ])
