@@ -161,7 +161,7 @@ export const OverviewMonitoring = () => {
                       />
                     ),
                   },
-                  { key: 'path', header: 'Path' },
+                  { key: 'path', header: 'Path', className: 'w-full' },
                   { key: 'count', header: 'Count', className: 'text-right' },
                   {
                     key: 'actions',
