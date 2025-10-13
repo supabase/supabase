@@ -382,7 +382,7 @@ export function CustomReportSection() {
                           ('1d' as AnalyticsInterval)
                         }
                         disableUpdate={false}
-                        isRefreshing={false}
+                        isRefreshing={isRefreshing}
                         onRemoveChart={handleRemoveChart}
                         onUpdateChart={(config) => handleUpdateChart(item.id, config)}
                       />
