@@ -49,15 +49,15 @@ export const useAnalyticsIntegrationStatus = (
 
   // Check if wrappers extension is installed
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
-  // const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
-  const isWrappersExtensionInstalled = false
+  const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
+  // const isWrappersExtensionInstalled = false // Debugging
 
   // Check if Iceberg Wrapper integration is installed
   const icebergWrapperMeta = WRAPPERS.find((w) => w.name === 'iceberg_wrapper')
-  // const isIcebergWrapperInstalled = icebergWrapperMeta
-  //   ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
-  //   : false
-  const isIcebergWrapperInstalled = false
+  const isIcebergWrapperInstalled = icebergWrapperMeta
+    ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
+    : false
+  // const isIcebergWrapperInstalled = false // Debugging
 
   const isLoading = isExtensionsLoading || isFDWsLoading
 
@@ -88,7 +88,7 @@ export const useAnalyticsIntegrationStatus = (
         installationMessage:
           context === 'modal'
             ? 'Supabase will install the Wrappers extension and Iceberg Wrapper integration on your behalf.'
-            : 'Please install the Wrappers extension and Iceberg Wrapper integration to continue.',
+            : 'The Wrappers extension and Iceberg Wrapper integration are required for querying analytics tables.',
       }
     }
 
@@ -99,7 +99,7 @@ export const useAnalyticsIntegrationStatus = (
         installationMessage:
           context === 'modal'
             ? 'Supabase will install the Wrappers extension on your behalf.'
-            : 'Please install the Wrappers extension to continue.',
+            : 'The Wrappers extension is required to query analytics tables.',
       }
     }
 
@@ -110,7 +110,7 @@ export const useAnalyticsIntegrationStatus = (
         installationMessage:
           context === 'modal'
             ? 'Supabase will install the Iceberg Wrapper integration on your behalf.'
-            : 'Please install the Iceberg Wrapper integration to continue.',
+            : 'The Iceberg Wrapper integration is required to query analytics tables.',
       }
     }
 

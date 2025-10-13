@@ -68,7 +68,11 @@ export const AnalyticsIntegrationAlert = ({
   }
 
   return (
-    <Admonition type={variant} className={className}>
+    <Admonition
+      type={variant}
+      title={context === 'page' ? 'Missing required integration' : undefined}
+      className={className}
+    >
       {getMessage()}
       {showInstallButton && onInstall && installationContext.requiresUserAction && (
         <Button type="warning" className="mt-3" onClick={onInstall}>
