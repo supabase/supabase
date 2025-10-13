@@ -31,9 +31,14 @@ export const TableTemplateSelector = ({
 
   // AI variant state
   const [aiPrompt, setAiPrompt] = useState('')
-  const [generatedTables, setGeneratedTables] = useState<TableSuggestion[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
-  const { generateTables, isGenerating, error: apiError } = useAITableGeneration()
+  const {
+    generateTables,
+    isGenerating,
+    error: apiError,
+    tables,
+    clearTables,
+  } = useAITableGeneration()
 
   const isAI = variant === QuickstartVariant.AI
   const categories = useMemo(() => Object.keys(tableTemplates), [])
@@ -73,11 +78,10 @@ export const TableTemplateSelector = ({
       if (!promptToUse.trim() || isGenerating) return
 
       try {
-        const tables = await generateTables(promptToUse)
+        const generated = await generateTables(promptToUse)
 
-        if (tables.length > 0) {
-          setGeneratedTables(tables)
-          handleSelectTemplate(tables[0])
+        if (generated.length > 0) {
+          handleSelectTemplate(generated[0])
         }
       } catch (error) {
         // Error handling is done in the hook
@@ -96,10 +100,10 @@ export const TableTemplateSelector = ({
 
   const displayedTemplates = useMemo(() => {
     if (isAI) {
-      return generatedTables
+      return tables
     }
     return activeCategory ? tableTemplates[activeCategory] || [] : []
-  }, [isAI, generatedTables, activeCategory])
+  }, [isAI, tables, activeCategory])
 
   return (
     <div className="rounded-lg border border-default bg-surface-75 p-4">
@@ -162,7 +166,7 @@ export const TableTemplateSelector = ({
           )}
 
           {/* Quick Ideas */}
-          {generatedTables.length === 0 && (
+          {tables.length === 0 && (
             <div>
               <div className="text-xs text-foreground-light mb-2">Quick ideas:</div>
               <div className="flex flex-wrap gap-2">
@@ -216,13 +220,14 @@ export const TableTemplateSelector = ({
           {isAI && (
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-foreground-light">
-                Generated {generatedTables.length} table{generatedTables.length !== 1 ? 's' : ''}
+                Generated {tables.length} table{tables.length !== 1 ? 's' : ''}
               </span>
               <Button
                 type="text"
                 size="tiny"
                 onClick={() => {
-                  setGeneratedTables([])
+                  clearTables()
+                  setSelectedTemplate(null)
                   setAiPrompt('')
                   if (inputRef.current) inputRef.current.focus()
                 }}
