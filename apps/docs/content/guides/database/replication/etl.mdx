@@ -55,6 +55,7 @@ Before setting up replication to BigQuery, you need:
 1. Navigate to the [Database](/dashboard/project/_/database/tables) section in your Supabase Dashboard and select the **Replication** tab.
 2. Click **Add destination** to open the New Destination panel.
 3. Configure the replication settings:
+
    - **Name**: Enter a descriptive name for your replication destination
    - **Publication**: Select an existing publication or create a new one
    - **Type**: Select "BigQuery" from the destination types
@@ -63,11 +64,12 @@ Before setting up replication to BigQuery, you need:
 
     <Admonition type="note">
 
-      The BigQuery Data set ID shows the project ID and Data set ID as one string, separated by a ".". The Data set ID is the part after the ".".
-    
+   The BigQuery Data set ID shows the project ID and Data set ID as one string, separated by a ".". The Data set ID is the part after the ".".
+
     </Admonition>
 
    - **Service Account Key**: Enter your GCP service account key
+
 4. Review the [Advanced Settings](#advanced-settings) to change the limits for the replication.
 
    - **Max fill milliseconds**: Change are sent in batches. Max fill milliseconds are number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size.
