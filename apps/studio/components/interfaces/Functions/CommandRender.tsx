@@ -1,4 +1,4 @@
-import { Check, Clipboard } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
 import { forwardRef, useState } from 'react'
 
 import { cn, copyToClipboard } from 'ui'
@@ -45,7 +45,7 @@ const Command = ({ item }: any) => {
               {isCopied ? (
                 <Check size={14} strokeWidth={3} className="text-brand" />
               ) : (
-                <Clipboard size={14} />
+                <Copy size={14} />
               )}
             </button>
           </span>

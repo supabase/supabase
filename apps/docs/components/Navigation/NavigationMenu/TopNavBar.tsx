@@ -9,7 +9,7 @@ import { memo, useState } from 'react'
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
-import { useCustomContent } from '../../../hooks/custom-content/useCustomContent'
+import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
 
@@ -110,7 +110,7 @@ const TopNavBar: FC = () => {
 }
 
 const HeaderLogo = memo(() => {
-  const { navigationLogo } = useCustomContent(['navigation:logo'])
+  const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
     <Link

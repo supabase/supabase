@@ -5,6 +5,8 @@
 
   "dashboard_auth:custom_provider": null,
 
+  "docs:row_level_security_guide_path": "/guides/auth/row-level-security",
+
   "organization:legal_documents": null,
 
   "project_homepage:client_libraries": [

@@ -20,14 +20,6 @@ Choose your Supabase platform, project, and MCP client and follow the installati
 
 <McpConfigPanel />
 
-<Admonition type="note" title="Authentication" className="mt-3">
-
-Your MCP client will automatically prompt you to login to Supabase during setup. This will open a browser window where you can login to your Supabase account and grant access to the MCP client. Be sure to choose the organization that contains the project you wish to work with. In the future, we'll offer more fine grain control over these permissions.
-
-Previously Supabase MCP required you to generate a personal access token (PAT), but this is no longer required.
-
-</Admonition>
-
 ### Next steps
 
 Your AI tool is now connected to your Supabase project or account using remote MCP. Try asking the AI tool to query your database using natural language commands.
@@ -63,33 +55,3 @@ We recommend the following best practices to mitigate security risks when using 
 - **Project scoping**: Scope your MCP server to a [specific project](https://github.com/supabase-community/supabase-mcp#project-scoped-mode), limiting access to only that project's resources. This prevents LLMs from accessing data from other projects in your Supabase account.
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
 - **Feature groups**: The server allows you to enable or disable specific [tool groups](https://github.com/supabase-community/supabase-mcp#feature-groups), so you can control which tools are available to the LLM. This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
-
-## MCP for local Supabase instances
-
-The Supabase MCP server connects directly to the cloud platform to access your database. If you are running a local instance of Supabase, you can instead use the [Postgres MCP server](https://github.com/modelcontextprotocol/servers-archived/tree/main/src/postgres) to connect to your local database. This MCP server runs all queries as read-only transactions.
-
-### Step 1: Find your database connection string
-
-To connect to your local Supabase instance, you need to get the connection string for your local database. You can find your connection string by running:
-
-```shell
-supabase status
-```
-
-or if you are using `npx`:
-
-```shell
-npx supabase status
-```
-
-This will output a list of details about your local Supabase instance. Copy the `DB URL` field in the output.
-
-### Step 2: Configure the MCP server
-
-Configure your client with the following:
-
-<$Partial path="mcp_postgres_config.mdx" variables={{ "app": "your MCP client" }} />
-
-### Next steps
-
-Your AI tool is now connected to your local Supabase instance using MCP. Try asking the AI tool to query your database using natural language commands.
