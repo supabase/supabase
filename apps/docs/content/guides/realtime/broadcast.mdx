@@ -10,7 +10,7 @@ You can use Realtime Broadcast to send low-latency messages between users. Messa
 
 The way Broadcast works changes based on the channel you are using:
 * From REST API will receive an HTTP request which then will be sent via WebSocket to connected clients
-* From Client libraries we have an established websocket connection and we use that to send a message to the server which then will be sent via WebSocket to connected clients
+* From Client libraries we have an established WebSocket connection and we use that to send a message to the server which then will be sent via WebSocket to connected clients
 * From Database we add a new entry to `realtime.messages` where we have logical replication set to listen for changes which then will be sent via WebSocket to connected clients
 
 
