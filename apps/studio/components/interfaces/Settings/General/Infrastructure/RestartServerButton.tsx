@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -8,12 +7,13 @@ import { toast } from 'sonner'
 import { useFlag } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -26,10 +26,11 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 const RestartServerButton = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
 
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
@@ -85,7 +86,7 @@ const RestartServerButton = () => {
   }
 
   const onRestartSuccess = () => {
-    setProjectStatus(queryClient, projectRef, 'RESTARTING')
+    setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESTARTING })
     toast.success('Restarting server...')
     router.push(`/project/${projectRef}`)
     setServiceToRestart(undefined)

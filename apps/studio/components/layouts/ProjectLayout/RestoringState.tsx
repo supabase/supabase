@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -7,7 +6,7 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -15,7 +14,6 @@ import { Button } from 'ui'
 
 const RestoringState = () => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
 
   const [loading, setLoading] = useState(false)
@@ -24,6 +22,8 @@ const RestoringState = () => {
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
   const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
+
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   useProjectStatusQuery(
     { projectRef: ref },
@@ -36,7 +36,7 @@ const RestoringState = () => {
         if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
           setIsCompleted(true)
         } else {
-          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+          if (ref) invalidateProjectDetailsQuery(ref)
         }
       },
     }
@@ -66,7 +66,7 @@ const RestoringState = () => {
     if (!project) return console.error('Project is required')
 
     setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+    if (ref) await invalidateProjectDetailsQuery(ref)
   }
 
   return (

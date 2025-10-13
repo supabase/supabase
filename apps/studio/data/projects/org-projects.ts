@@ -29,6 +29,9 @@ export async function getOrgProjects(
 export type OrgProjectsData = Awaited<ReturnType<typeof getOrgProjects>>
 export type OrgProjectsError = ResponseError
 
+/**
+ * @deprecated, can use useOrgProjectsInfinteQuery instead
+ */
 export const useOrgProjectsQuery = <TData = OrgProjectsData>(
   { orgSlug }: OrgProjectsVariables,
   { enabled = true, ...options }: UseQueryOptions<OrgProjectsData, OrgProjectsError, TData> = {}
