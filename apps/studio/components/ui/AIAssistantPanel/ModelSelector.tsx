@@ -27,19 +27,16 @@ interface ModelSelectorProps {
 export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorProps) => {
   const router = useRouter()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
   const [open, setOpen] = useState(false)
 
-  const canAccessGpt5 = organization?.plan?.id !== 'free'
+  const canAccessProModels = organization?.plan?.id !== 'free'
   const slug = organization?.slug ?? '_'
 
-  const upgradeHref = billingAll
-    ? `/org/${slug}/billing?panel=subscriptionPlan&source=ai-assistant-model`
-    : `/support/new?slug=${slug}&projectRef=no-project&category=Plan_upgrade&subject=${encodeURIComponent('Enquiry to upgrade to Pro plan for organization')}&message=${encodeURIComponent(`Name: ${organization?.name ?? ''}\nSlug: ${organization?.slug ?? ''}\nRequested plan: Pro`)}`
+  const upgradeHref = `/org/${slug ?? '_'}/billing?panel=costControl&source=ai-assistant-model`
 
   const handleSelectModel = (model: 'gpt-5' | 'gpt-5-mini') => {
-    if (model === 'gpt-5' && !canAccessGpt5) {
+    if (model === 'gpt-5' && !canAccessProModels) {
       setOpen(false)
       void router.push(upgradeHref)
       return
@@ -78,7 +75,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                 className="flex justify-between"
               >
                 <span>gpt-5</span>
-                {canAccessGpt5 ? (
+                {canAccessProModels ? (
                   selectedModel === 'gpt-5' ? (
                     <Check className="h-3.5 w-3.5" />
                   ) : null
