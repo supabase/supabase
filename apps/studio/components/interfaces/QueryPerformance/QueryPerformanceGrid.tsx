@@ -3,25 +3,27 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
+import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
+  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Sheet,
   SheetContent,
+  SheetTitle,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
   cn,
-  CodeBlock,
-  SheetTitle,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { hasIndexRecommendations } from './index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
@@ -31,9 +33,7 @@ import {
   QUERY_PERFORMANCE_REPORT_TYPES,
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
-import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { formatDuration } from './QueryPerformance.utils'
-import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
@@ -357,7 +357,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
   useEffect(() => {
     setSelectedRow(undefined)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, roles, urlSort, order])
 
   const handleKeyDown = useCallback(
