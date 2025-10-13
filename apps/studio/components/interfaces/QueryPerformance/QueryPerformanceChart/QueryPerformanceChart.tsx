@@ -234,13 +234,6 @@ export const QueryPerformanceChart = ({
           type: 'line',
           color: { light: '#10B981', dark: '#10B981' },
         },
-        {
-          attribute: 'cache_misses',
-          label: 'Cache Misses',
-          provider: 'logs',
-          type: 'line',
-          color: { light: '#65BCD9', dark: '#65BCD9' },
-        },
       ],
     }
 
