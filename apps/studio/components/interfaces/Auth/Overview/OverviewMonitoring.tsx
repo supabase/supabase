@@ -31,6 +31,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import dayjs from 'dayjs'
 
 const LogsLink = ({ href }: { href: string }) => (
   <Tooltip>
@@ -62,6 +63,8 @@ function isAuthErrorCodeRow(row: unknown): row is AuthErrorCodeRow {
 
 export const OverviewMonitoring = () => {
   const { ref } = useParams()
+  const endDate = dayjs().toISOString()
+  const startDate = dayjs().subtract(24, 'hour').toISOString()
 
   // Success rate metrics (reuse OverviewUsage fetching)
   const { data: currentData, isLoading: currentLoading } = useQuery({
@@ -112,7 +115,7 @@ export const OverviewMonitoring = () => {
             )}
             loading={currentLoading || previousLoading}
             suffix="%"
-            href={`/project/${ref}/reports/auth#monitoring`}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#monitoring`}
           />
           <StatCard
             title="Auth Server Success Rate"
@@ -123,7 +126,7 @@ export const OverviewMonitoring = () => {
             )}
             loading={currentLoading || previousLoading}
             suffix="%"
-            href={`/project/${ref}/reports/auth#monitoring`}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#monitoring`}
           />
         </div>
 
