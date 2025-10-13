@@ -158,11 +158,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Alert',
-          href: '/docs/components/alert',
-          items: [],
-        },
-        {
           title: 'Alert Dialog',
           href: '/docs/components/alert-dialog',
           items: [],
