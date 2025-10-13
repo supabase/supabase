@@ -3,6 +3,7 @@ const barrelFiles = require('eslint-plugin-barrel-files')
 const supabaseConfig = require('eslint-config-supabase/next')
 
 module.exports = defineConfig([
+  { files: ['**/*.ts', '**/*.tsx'] },
   supabaseConfig,
   {
     plugins: {
