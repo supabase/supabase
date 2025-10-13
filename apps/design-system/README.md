@@ -55,8 +55,17 @@ The design system _references_ components rather than housing them. That’s an 
 - [`packages/ui`](https://github.com/supabase/supabase/tree/master/packages/ui): basic UI components
 - [`packages/ui-patterns`](https://github.com/supabase/supabase/tree/master/packages/ui-patterns): components which are built using NPM libraries or amalgamations of components from `patterns/ui`
 
-With that out of the way, there are several parts of this design system that need to be updated when components have been added or removed. These include:
+With that out of the way, there are several parts of this design system that need to be manually updated after components have been added or removed (from documentation). These include:
 
 - `config/docs.ts`: list of components in the sidebar
 - `content/docs`: the actual component documentation
-- `registry/index.tsx`: TODO, is this where to add/remove components to the registry?
+- `registry/examples.ts`: Example components
+- `registry/charts.ts`: Chart components
+- `registry/fragments.ts`: Fragment components
+
+You may need to rebuild the design system’s registry. You can do that via:
+
+```bash
+cd apps/design-system
+pnpm build:registry
+```
