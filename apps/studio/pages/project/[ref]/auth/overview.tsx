@@ -1,7 +1,7 @@
 import { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
