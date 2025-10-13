@@ -1,8 +1,8 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-import { type UseSupabaseUploadReturn } from '@/registry/default/blocks/dropzone/hooks/use-supabase-upload'
-import { Button } from '@/registry/default/components/ui/button'
+import { cn } from '../../../../../lib/utils';//'@/lib/utils'
+import { type UseSupabaseUploadReturn } from '../hooks/use-supabase-upload';//'@/registry/default/blocks/dropzone/hooks/use-supabase-upload'
+import { Button } from '../../../components/ui/button'; //'@/registry/default/components/ui/button'
 import { CheckCircle, File, Loader2, Upload, X } from 'lucide-react'
 import { createContext, type PropsWithChildren, useCallback, useContext } from 'react'
 

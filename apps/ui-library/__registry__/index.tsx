@@ -6,38 +6,38 @@ import * as React from "react"
 
 export const Index = {
   "default": {
-    
+
     "dropzone-demo": {
-      component: React.lazy(() => import("@/registry/default/examples/dropzone-demo.tsx")),
+      component: React.lazy(() => import("../registry/default/examples/dropzone-demo.tsx")),
     }
     ,
     "realtime-cursor-demo": {
-      component: React.lazy(() => import("@/registry/default/examples/realtime-cursor-demo.tsx")),
+      component: React.lazy(() => import("../registry/default/examples/realtime-cursor-demo.tsx")),
     }
     ,
     "password-based-auth-demo": {
-      component: React.lazy(() => import("@/registry/default/examples/password-based-auth.tsx")),
+      component: React.lazy(() => import("../registry/default/examples/password-based-auth.tsx")),
     }
     ,
     "current-user-avatar-demo": {
-      component: React.lazy(() => import("@/registry/default/examples/current-user-avatar-demo.tsx")),
+      component: React.lazy(() => import("../registry/default/examples/current-user-avatar-demo.tsx")),
     }
     ,
     "current-user-avatar-preview": {
-      component: React.lazy(() => import("@/registry/default/examples/current-user-avatar-preview.tsx")),
+      component: React.lazy(() => import("../registry/default/examples/current-user-avatar-preview.tsx")),
     }
     ,
     "realtime-avatar-stack-demo": {
-      component: React.lazy(() => import("@/registry/default/examples/realtime-avatar-stack-demo.tsx")),
+      component: React.lazy(() => import("../registry/default/examples/realtime-avatar-stack-demo.tsx")),
     }
     ,
     "realtime-avatar-stack-preview": {
-      component: React.lazy(() => import("@/registry/default/examples/realtime-avatar-stack-preview.tsx")),
+      component: React.lazy(() => import("../registry/default/examples/realtime-avatar-stack-preview.tsx")),
     }
     ,
     "infinite-query-hook-demo": {
-      component: React.lazy(() => import("@/registry/default/examples/infinite-query-hook-demo.tsx")),
+      component: React.lazy(() => import("../registry/default/examples/infinite-query-hook-demo.tsx")),
     }
-    
+
   },
 } as const
