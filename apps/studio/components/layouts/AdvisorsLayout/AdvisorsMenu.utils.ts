@@ -24,12 +24,6 @@ export const generateAdvisorsMenu = (
           url: `/project/${ref}/advisors/performance`,
           items: [],
         },
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/advisors/query-performance`,
-          items: [],
-        },
       ],
     },
     ...(IS_PLATFORM && features?.advisorRules
