@@ -72,8 +72,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const requestId = `table-gen-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
 
   const { model, error: modelError } = await getModel({
-    provider: 'openai',
-    model: 'gpt-5-mini',
+    provider: 'bedrock',
+    model: 'openai.gpt-oss-120b-1:0',
     routingKey: 'table-quickstart',
     isLimited: false,
   })
