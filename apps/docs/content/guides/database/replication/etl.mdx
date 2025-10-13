@@ -38,6 +38,7 @@ Choose what data to sync by creating a publication in your database. A publicati
 Currently available destinations:
 
 - [BigQuery](#bigquery)
+- [Analytics Buckets](#analytics-buckets)
 
 ### BigQuery
 
@@ -69,17 +70,37 @@ Before setting up replication to BigQuery, you need:
    - **Service Account Key**: Enter your GCP service account key
 4. Review the [Advanced Settings](#advanced-settings) to change the limits for the replication.
 
-   - **Max size**: Changes are sent in batches. Max size limits the size of an individual batch.
-   - **Max fill seconds**: Number of seconds after which a batch should be sent, even if it hasn't reached the max size.
-   - **Max staleness**: See BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option
+   - **Max fill milliseconds**: Change are sent in batches. Max fill milliseconds are number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size.
+   - **Max staleness minutes**: See BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option
 
-5. Click **Create** to start the replication process.
+5. Click **Create and start** to start the replication process.
 
 <Admonition type="note">
 
 Due to ingestion latency in BigQuery, there may be a delay in the data flow.
 
 </Admonition>
+
+### Analytics Buckets
+
+#### Configuring Analytics Buckets replication
+
+1. Navigate to the [Database](/dashboard/project/_/database/tables) section in your Supabase Dashboard and select the **Replication** tab.
+2. Click **Add destination** to open the New Destination panel.
+3. Configure the replication settings:
+   - **Name**: Enter a descriptive name for your replication destination
+   - **Publication**: Select an existing publication or create a new one
+   - **Type**: Select "Analytics Bucket" from the destination types
+   - **Bucket**: Select an analytics bucket
+   - **Namespace**: Select a namespace in the analytics bucket
+   - **Catalog Token**: Will be automatically retrieved from your project's [API Secret key](/dashboard/project/_/settings/api-keys/new)
+   - **S3 Access Key ID**: Select an existing key id if you have its secret access key, or create a new one by selecting "Create a new key".
+   - **S3 Secret Access Key**: If you selected an existing key id in **S3 Access Key ID**, enter the corresponding S3 secret access key.
+4. Review the [Advanced Settings](#advanced-settings) to change the limits for the replication.
+
+   - **Max fill milliseconds**: Change are sent in batches. Max fill milliseconds are number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size.
+
+5. Click **Create and start** to start the replication process.
 
 ## Monitoring replication
 
