@@ -1,4 +1,4 @@
-import { getPaginatedUsersSQL } from '@supabase/pg-meta/src/sql/studio/get-paginated-users'
+import { getPaginatedUsersSQL } from '@supabase/pg-meta/src/sql/studio/get-users-paginated'
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
