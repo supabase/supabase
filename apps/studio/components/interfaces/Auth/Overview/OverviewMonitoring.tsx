@@ -130,7 +130,7 @@ export const OverviewMonitoring = () => {
         <div className="grid grid-cols-2 gap-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm text-foreground-lighter">Auth API Errors</CardTitle>
+              <CardTitle className="text-foreground-lighter">Auth API Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<ResponseErrorRow>
@@ -177,7 +177,7 @@ export const OverviewMonitoring = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm text-foreground-lighter">Auth Server Errors</CardTitle>
+              <CardTitle className="text-foreground-lighter">Auth Server Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<AuthErrorCodeRow>

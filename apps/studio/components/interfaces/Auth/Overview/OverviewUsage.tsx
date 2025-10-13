@@ -3,7 +3,7 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, cn } from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
 import { ChevronRight, Loader2 } from 'lucide-react'
@@ -48,6 +48,9 @@ export const StatCard = ({
 
   const Inner = (
     <Card className={cn(href && 'cursor-pointer hover:bg-muted')}>
+      <CardHeader>
+        <CardTitle className="text-foreground-lighter">{title}</CardTitle>
+      </CardHeader>
       <CardContent
         className={cn(
           'flex flex-col my-1 gap-1',
@@ -58,7 +61,6 @@ export const StatCard = ({
           <Loader2 className="size-5 animate-spin text-foreground-light" />
         ) : (
           <>
-            <h4 className="text-sm text-foreground-lighter font-normal mb-0 truncate">{title}</h4>
             <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
             <div className={cn('flex items-center gap-1 text-sm', changeColor)}>
               <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
