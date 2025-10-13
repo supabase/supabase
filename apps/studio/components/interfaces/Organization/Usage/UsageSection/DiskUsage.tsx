@@ -43,7 +43,7 @@ export const DiskUsage = ({
     { slug },
     { enabled: currentBillingCycleSelected }
   )
-  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
 
   const relevantProjects = useMemo(() => {
     return isSuccess
