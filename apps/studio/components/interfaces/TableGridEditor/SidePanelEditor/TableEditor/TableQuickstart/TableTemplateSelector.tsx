@@ -1,18 +1,17 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { Columns3, Wand2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useAITableGeneration } from './useAITableGeneration'
-import { tableTemplates } from './templates'
-import { QuickstartVariant, ViewMode } from './types'
-import { convertTableSuggestionToTableField } from './utils'
-import { InitialView } from './components/InitialView'
-import { CategoryView } from './components/CategoryView'
-import { AIInputView } from './components/AIInputView'
-import { ResultsView } from './components/ResultsView'
-import type { TableSuggestion } from './types'
+import { Button, Input_Shadcn_ as Input, cn } from 'ui'
 import type { TableField } from '../TableEditor.types'
+import { AI_QUICK_IDEAS } from './constants'
+import { tableTemplates } from './templates'
+import type { TableSuggestion } from './types'
+import { QuickstartVariant } from './types'
+import { useAITableGeneration } from './useAITableGeneration'
+import { convertTableSuggestionToTableField } from './utils'
 
 interface TableTemplateSelectorProps {
-  variant: Exclude<QuickstartVariant, QuickstartVariant.CONTROL> 
+  variant: Exclude<QuickstartVariant, QuickstartVariant.CONTROL>
   onSelectTemplate: (tableField: Partial<TableField>) => void
   onDismiss?: () => void
   disabled?: boolean
@@ -20,45 +19,44 @@ interface TableTemplateSelectorProps {
 
 const SUCCESS_MESSAGE_DURATION_MS = 3000
 
-interface ViewState {
-  mode: ViewMode
-  selectedCategory: string | null
-  selectedTemplate: TableSuggestion | null
-  generatedTables: TableSuggestion[]
-  isLoading: boolean
-}
-
-const initialViewState: ViewState = {
-  mode: ViewMode.INITIAL,
-  selectedCategory: null,
-  selectedTemplate: null,
-  generatedTables: [],
-  isLoading: false,
-}
-
 export const TableTemplateSelector = ({
   variant,
   onSelectTemplate,
   onDismiss,
   disabled,
 }: TableTemplateSelectorProps) => {
-  const [viewState, setViewState] = useState<ViewState>(initialViewState)
+  // Templates variant state
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<TableSuggestion | null>(null)
+
+  // AI variant state
   const [aiPrompt, setAiPrompt] = useState('')
+  const [generatedTables, setGeneratedTables] = useState<TableSuggestion[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const { generateTables, isGenerating, error: apiError } = useAITableGeneration()
 
-  // Focus management
+  const isAI = variant === QuickstartVariant.AI
+  const categories = useMemo(() => Object.keys(tableTemplates), [])
+
+  // Auto-select first category for templates variant
   useEffect(() => {
-    if (viewState.mode === ViewMode.AI_INPUT && inputRef.current) {
+    if (!isAI && activeCategory === null && categories.length > 0) {
+      setActiveCategory(categories[0])
+    }
+  }, [categories, activeCategory, isAI])
+
+  // Focus AI input when in AI mode
+  useEffect(() => {
+    if (isAI && inputRef.current) {
       inputRef.current.focus()
     }
-  }, [viewState.mode])
+  }, [isAI])
 
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
-      setViewState((prev) => ({ ...prev, selectedTemplate: template }))
+      setSelectedTemplate(template)
       toast.success(
         `${template.tableName} template applied. You can add or modify the fields below.`,
         {
@@ -69,122 +67,200 @@ export const TableTemplateSelector = ({
     [onSelectTemplate]
   )
 
-  const handleGenerateTables = useCallback(async (promptOverride?: string) => {
-    const promptToUse = promptOverride ?? aiPrompt
-    if (!promptToUse.trim() || isGenerating) return
+  const handleGenerateTables = useCallback(
+    async (promptOverride?: string) => {
+      const promptToUse = promptOverride ?? aiPrompt
+      if (!promptToUse.trim() || isGenerating) return
 
-    setViewState((prev) => ({ ...prev, isLoading: true }))
+      try {
+        const tables = await generateTables(promptToUse)
 
-    try {
-      const tables = await generateTables(promptToUse)
-
-      if (tables.length > 0) {
-        setViewState({
-          mode: ViewMode.AI_RESULTS,
-          selectedCategory: null,
-          selectedTemplate: tables[0],
-          generatedTables: tables,
-          isLoading: false,
-        })
-        handleSelectTemplate(tables[0])
-      } else {
-        setViewState((prev) => ({
-          ...prev,
-          isLoading: false,
-        }))
+        if (tables.length > 0) {
+          setGeneratedTables(tables)
+          handleSelectTemplate(tables[0])
+        }
+      } catch (error) {
+        // Error handling is done in the hook
       }
-    } catch (error) {
-      setViewState((prev) => ({
-        ...prev,
-        isLoading: false,
-      }))
-    }
-  }, [aiPrompt, generateTables, isGenerating, handleSelectTemplate])
+    },
+    [aiPrompt, generateTables, isGenerating, handleSelectTemplate]
+  )
 
   const handleQuickIdea = useCallback(
     (idea: string) => {
       setAiPrompt(idea)
-      setViewState((prev) => ({ ...prev, mode: ViewMode.AI_INPUT }))
       handleGenerateTables(idea)
     },
     [handleGenerateTables]
   )
 
-  const handleCategorySelect = useCallback((category: string) => {
-    setViewState((prev) => ({
-      ...prev,
-      mode: ViewMode.CATEGORY_SELECTED,
-      selectedCategory: category,
-    }))
-  }, [])
+  const displayedTemplates = useMemo(() => {
+    if (isAI) {
+      return generatedTables
+    }
+    return activeCategory ? tableTemplates[activeCategory] || [] : []
+  }, [isAI, generatedTables, activeCategory])
 
-  const handleAISelect = useCallback(() => {
-    setViewState((prev) => ({ ...prev, mode: ViewMode.AI_INPUT }))
-  }, [])
+  return (
+    <div className="rounded-lg border border-default bg-surface-75 p-4">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h3 className="text-sm font-medium">
+            {isAI ? 'Generate tables with AI' : 'Start faster with a table template'}
+          </h3>
+          <p className="text-xs text-foreground-lighter mt-1">
+            {isAI
+              ? "Describe the app you're building and AI will create ready-made table schema."
+              : 'Save time by starting from a ready-made table schema.'}
+          </p>
+        </div>
+        {onDismiss && (
+          <Button type="text" size="tiny" onClick={onDismiss}>
+            Dismiss
+          </Button>
+        )}
+      </div>
 
-  const handleBack = useCallback(() => {
-    setViewState(initialViewState)
-    setAiPrompt('')
-  }, [])
+      {/* AI Variant: Input and Quick Ideas */}
+      {isAI && (
+        <div className="space-y-3">
+          <div className="relative">
+            <Input
+              ref={inputRef}
+              placeholder="Describe your app (e.g., 'recipe sharing app')"
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  if (aiPrompt.trim()) {
+                    handleGenerateTables()
+                  }
+                }
+              }}
+              disabled={isGenerating || disabled}
+              aria-label="Table description for AI generation"
+              className="pr-24"
+            />
+            <Button
+              type="default"
+              size="tiny"
+              disabled={!aiPrompt.trim() || isGenerating || disabled}
+              onClick={() => handleGenerateTables()}
+              loading={isGenerating}
+              className="absolute right-1 top-1/2 -translate-y-1/2"
+            >
+              {isGenerating ? 'Generating...' : 'Generate'}
+            </Button>
+          </div>
 
-  const { mode, selectedCategory, selectedTemplate, generatedTables } = viewState
+          {apiError && (
+            <div className="text-sm text-red-600" role="alert">
+              {apiError}
+            </div>
+          )}
 
-  // Initial view
-  if (mode === ViewMode.INITIAL) {
-    return (
-      <InitialView
-        variant={variant}
-        disabled={disabled}
-        onDismiss={onDismiss}
-        onCategorySelect={handleCategorySelect}
-        onAISelect={handleAISelect}
-        onQuickIdea={handleQuickIdea}
-      />
-    )
-  }
+          {/* Quick Ideas */}
+          {generatedTables.length === 0 && (
+            <div>
+              <div className="text-xs text-foreground-light mb-2">Quick ideas:</div>
+              <div className="flex flex-wrap gap-2">
+                {AI_QUICK_IDEAS.map((idea) => (
+                  <button
+                    key={idea}
+                    onClick={() => handleQuickIdea(idea)}
+                    disabled={isGenerating || disabled}
+                    className={cn(
+                      'px-2 py-1 rounded-md text-xs border border-default',
+                      'hover:border-foreground-muted hover:bg-surface-100',
+                      'disabled:opacity-50 disabled:cursor-not-allowed',
+                      'transition-all'
+                    )}
+                  >
+                    <Wand2 size={12} className="inline mr-1" />
+                    {idea}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
-  // Category selection view
-  if (mode === ViewMode.CATEGORY_SELECTED && selectedCategory) {
-    const templates = tableTemplates[selectedCategory] ?? []
-    return (
-      <CategoryView
-        category={selectedCategory}
-        templates={templates}
-        selectedTemplate={selectedTemplate}
-        onBack={handleBack}
-        onSelectTemplate={handleSelectTemplate}
-      />
-    )
-  }
+      {/* Templates Variant: Category Tabs */}
+      {!isAI && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              disabled={disabled}
+              className={cn(
+                'px-2 py-1 rounded-md text-xs capitalize border',
+                activeCategory === category
+                  ? 'border-foreground bg-surface-200'
+                  : 'border-default hover:border-foreground-muted hover:bg-surface-100',
+                'disabled:opacity-50 disabled:cursor-not-allowed'
+              )}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      )}
 
-  // AI input view
-  if (mode === ViewMode.AI_INPUT) {
-    return (
-      <AIInputView
-        prompt={aiPrompt}
-        error={apiError}
-        isGenerating={isGenerating}
-        isLoading={viewState.isLoading}
-        inputRef={inputRef}
-        onBack={handleBack}
-        onPromptChange={setAiPrompt}
-        onGenerate={handleGenerateTables}
-      />
-    )
-  }
-
-  // AI results view
-  if (mode === ViewMode.AI_RESULTS && generatedTables.length > 0) {
-    return (
-      <ResultsView
-        tables={generatedTables}
-        selectedTemplate={selectedTemplate}
-        title="AI Generated Tables"
-        onBack={handleBack}
-        onSelectTemplate={handleSelectTemplate}
-      />
-    )
-  }
-
-  return null
+      {/* Templates List (both variants use this) */}
+      {displayedTemplates.length > 0 && (
+        <div className="grid gap-2">
+          {isAI && (
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-foreground-light">
+                Generated {generatedTables.length} table{generatedTables.length !== 1 ? 's' : ''}
+              </span>
+              <Button
+                type="text"
+                size="tiny"
+                onClick={() => {
+                  setGeneratedTables([])
+                  setAiPrompt('')
+                  if (inputRef.current) inputRef.current.focus()
+                }}
+                disabled={isGenerating}
+              >
+                Generate new
+              </Button>
+            </div>
+          )}
+          {displayedTemplates.map((template) => (
+            <button
+              key={`${isAI ? 'ai' : activeCategory}:${template.tableName}`}
+              onClick={() => handleSelectTemplate(template)}
+              disabled={disabled}
+              className={cn(
+                'text-left p-3 rounded-md border transition-all w-full',
+                selectedTemplate?.tableName === template.tableName
+                  ? 'border-foreground bg-surface-200'
+                  : 'border-default hover:border-foreground-muted hover:bg-surface-100',
+                'disabled:opacity-50 disabled:cursor-not-allowed'
+              )}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="text-sm font-medium font-mono">{template.tableName}</div>
+                  {template.rationale && (
+                    <div className="text-sm text-foreground-light mt-1">{template.rationale}</div>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 text-sm text-foreground-muted ml-3">
+                  <Columns3 size={14} aria-hidden="true" />
+                  <span>{template.fields.length}</span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }

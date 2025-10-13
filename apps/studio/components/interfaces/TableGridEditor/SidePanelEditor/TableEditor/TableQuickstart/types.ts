@@ -47,13 +47,6 @@ export enum QuickstartVariant {
   TEMPLATES = 'templates',
 }
 
-export enum ViewMode {
-  INITIAL = 'initial',
-  AI_INPUT = 'ai-input',
-  AI_RESULTS = 'ai-results',
-  CATEGORY_SELECTED = 'category-selected',
-}
-
 export type TableSuggestion = {
   tableName: string
   fields: TableField[]
