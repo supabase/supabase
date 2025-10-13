@@ -70,6 +70,7 @@ export const useRealtimeCursors = ({
   const [color] = useState(generateRandomColor())
   const [userId] = useState(generateRandomNumber())
   const [cursors, setCursors] = useState<Record<string, CursorEventPayload>>({})
+  const cursorPayload = useRef<CursorEventPayload | null>(null)
 
   const channelRef = useRef<RealtimeChannel | null>(null)
 
@@ -90,6 +91,8 @@ export const useRealtimeCursors = ({
         timestamp: new Date().getTime(),
       }
 
+      cursorPayload.current = payload
+
       channelRef.current?.send({
         type: 'broadcast',
         event: EVENT_NAME,
@@ -106,6 +109,27 @@ export const useRealtimeCursors = ({
     channelRef.current = channel
 
     channel
+      .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+        leftPresences.forEach(function(element) {
+           // Remove cursor when user leaves
+          setCursors((prev) => {
+            if (prev[element.key]) {
+              delete prev[element.key]
+            }
+
+            return {...prev}
+          })
+        })
+      })
+      .on('presence', { event: 'join' }, () => {
+        if (!cursorPayload.current) return
+
+        channelRef.current?.send({
+          type: 'broadcast',
+          event: EVENT_NAME,
+          payload: cursorPayload.current,
+        })
+      })
       .on('broadcast', { event: EVENT_NAME }, (data: { payload: CursorEventPayload }) => {
         const { user } = data.payload
         // Don't render your own cursor
@@ -122,7 +146,11 @@ export const useRealtimeCursors = ({
           }
         })
       })
-      .subscribe()
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          const status = await channel.track({ key: userId, color: color })
+        }
+      })
 
     return () => {
       channel.unsubscribe()
