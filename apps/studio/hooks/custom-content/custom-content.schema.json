@@ -96,6 +96,7 @@
   },
   "required": [
     "app:title",
+    "docs:row_level_security_guide_path",
     "organization:legal_documents",
     "project_homepage:client_libraries",
     "project_homepage:example_projects",
