@@ -91,7 +91,7 @@ export const HomePageActions = ({
                   { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
                   { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
                 ].map(({ key, label }) => (
-                  <div className="flex items-center gap-x-2 py-1">
+                  <div className="flex items-center gap-x-2 py-1" key={key}>
                     <Checkbox_Shadcn_
                       id={key}
                       name={key}
