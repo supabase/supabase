@@ -1,5 +1,11 @@
+import path from 'path';
 import { cn } from '../lib/utils'
 import { Button_Shadcn_ } from 'ui'
+
+const REGISTRY_BASE_URL = process.env.NEXT_PUBLIC_UI_LIBRARY_REGISTRY_URL
+  || process.env.NEXT_PUBLIC_BASE_PATH
+  || '';
+
 
 export function OpenInV0Button({
   name,
@@ -15,7 +21,7 @@ export function OpenInV0Button({
       asChild
     >
       <a
-        href={`https://v0.dev/chat/api/open?url=https://supabase.com${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/r/${name}.json`}
+        href={`https://v0.dev/chat/api/open?url=${REGISTRY_BASE_URL}/r/${name}.json`}
         target="_blank"
         rel="noreferrer"
       >
