@@ -18,13 +18,18 @@ const LOCAL_STORAGE_KEY = 'package-manager-copy-command'
 
 const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
-    // we have a special alias for the production environment, added in https://github.com/shadcn-ui/ui/pull/8161
-    return `@supabase`
-  } else if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'preview') {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  } else {
-    return 'http://localhost:3004'
+  // we have a special alias for the production environment, added in https://github.com/shadcn-ui/ui/pull/8161
+  return `@supabase`
   }
+
+  if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'preview') {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
+  }
+
+  const registryUrl = process.env.NEXT_PUBLIC_UI_LIBRARY_REGISTRY_URL
+    || `http://localhost:3004${process.env.NEXT_PUBLIC_BASE_PATH}`;
+
+  return registryUrl;
 }
 
 const getComponentPath = (name: string) => {
@@ -44,17 +49,17 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
   const commands: Record<PackageManager, string> =
     framework === 'vue'
       ? {
-          npm: `npx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          pnpm: `pnpm dlx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          yarn: `yarn dlx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          bun: `bunx --bun shadcn-vue@latest add ${baseUrl}${componentPath}`,
-        }
+        npm: `npx shadcn@latest add ${baseUrl}${componentPath}`,
+        pnpm: `pnpm dlx shadcn@latest add ${baseUrl}${componentPath}`,
+        yarn: `yarn dlx shadcn@latest add ${baseUrl}${componentPath}`,
+        bun: `bunx --bun shadcn@latest add ${baseUrl}${componentPath}`,
+      }
       : {
-          npm: `npx shadcn@latest add ${baseUrl}${componentPath}`,
-          pnpm: `pnpm dlx shadcn@latest add ${baseUrl}${componentPath}`,
-          yarn: `yarn dlx shadcn@latest add ${baseUrl}${componentPath}`,
-          bun: `bunx --bun shadcn@latest add ${baseUrl}${componentPath}`,
-        }
+        npm: `npx shadcn@latest add ${baseUrl}${componentPath}`,
+        pnpm: `pnpm dlx shadcn@latest add ${baseUrl}${componentPath}`,
+        yarn: `yarn dlx shadcn@latest add ${baseUrl}${componentPath}`,
+        bun: `bunx --bun shadcn@latest add ${baseUrl}${componentPath}`,
+      }
 
   return (
     <Tabs_Shadcn_ value={value} onValueChange={setValue} className="w-full">
