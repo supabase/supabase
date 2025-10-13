@@ -1,15 +1,15 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError, isValidConnString } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { OrgProjectsResponse } from './org-projects-infinite-query'
 
-export type ProjectDetailVariables = { ref?: string }
+type ProjectDetailVariables = { ref?: string }
+type PaginatedProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
 
-export type ProjectMinimal = components['schemas']['ProjectInfo']
 export type ProjectDetail = components['schemas']['ProjectDetailResponse']
-
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
    * postgrestStatus is available on client side only.
@@ -17,7 +17,7 @@ export interface Project extends Omit<ProjectDetail, 'status'> {
    * If not we will show ConnectingState and run a polling until it's back online
    */
   postgrestStatus?: 'ONLINE' | 'OFFLINE'
-  status: components['schemas']['ProjectDetailResponse']['status']
+  status: ProjectDetail['status']
 }
 
 export async function getProjectDetail(
@@ -69,12 +69,123 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
     }
   )
 
-export function invalidateProjectDetailsQuery(client: QueryClient, ref: string) {
-  return client.invalidateQueries(projectKeys.detail(ref))
-}
-
 export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
   return client.fetchQuery(projectKeys.detail(ref), ({ signal }) =>
     getProjectDetail({ ref }, signal)
   )
+}
+
+export const useInvalidateProjectDetailsQuery = () => {
+  const queryClient = useQueryClient()
+
+  const invalidateProjectDetailsQuery = (ref: string) => {
+    return queryClient.invalidateQueries(projectKeys.detail(ref))
+  }
+
+  return { invalidateProjectDetailsQuery }
+}
+
+export const useSetProjectPostgrestStatus = () => {
+  const queryClient = useQueryClient()
+
+  const setProjectPostgrestStatus = (ref: Project['ref'], status: Project['postgrestStatus']) => {
+    return queryClient.setQueriesData<Project>(
+      projectKeys.detail(ref),
+      (old) => {
+        if (!old) return old
+        return { ...old, postgrestStatus: status }
+      },
+      { updatedAt: Date.now() }
+    )
+  }
+
+  return { setProjectPostgrestStatus }
+}
+
+export const useSetProjectStatus = () => {
+  const queryClient = useQueryClient()
+
+  const setProjectStatus = ({
+    ref,
+    slug,
+    status,
+  }: {
+    ref: Project['ref']
+    slug?: string
+    status: Project['status']
+  }) => {
+    // Org projects infinite query
+    if (slug) {
+      queryClient.setQueriesData<{ pageParams: any; pages: OrgProjectsResponse[] } | undefined>(
+        projectKeys.infiniteListByOrg(slug),
+        (old) => {
+          if (!old) return old
+          return {
+            ...old,
+            pages: old.pages.map((page) => {
+              return {
+                ...page,
+                projects: page.projects.map((project) =>
+                  project.ref === ref ? { ...project, status } : project
+                ),
+              }
+            }),
+          }
+        },
+        { updatedAt: Date.now() }
+      )
+    }
+
+    // Projects infinite query
+    queryClient.setQueriesData<{ pageParams: any; pages: OrgProjectsResponse[] } | undefined>(
+      projectKeys.infiniteList(),
+      (old) => {
+        if (!old) return old
+        return {
+          ...old,
+          pages: old.pages.map((page) => {
+            return {
+              ...page,
+              projects: page.projects.map((project) =>
+                project.ref === ref ? { ...project, status } : project
+              ),
+            }
+          }),
+        }
+      },
+      { updatedAt: Date.now() }
+    )
+
+    // Project details query
+    queryClient.setQueriesData<Project>(
+      projectKeys.detail(ref),
+      (old) => {
+        if (!old) return old
+        return { ...old, status }
+      },
+      { updatedAt: Date.now() }
+    )
+
+    // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
+    // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
+    queryClient.setQueriesData<PaginatedProjectsResponse | undefined>(
+      projectKeys.list(),
+      (old) => {
+        if (!old) return old
+
+        return {
+          ...old,
+          projects: old.projects.map((project) => {
+            if (project.ref === ref) {
+              return { ...project, status }
+            }
+            return project
+          }),
+        }
+      },
+      { updatedAt: Date.now() }
+    )
+  }
+
+  return { setProjectStatus }
 }
