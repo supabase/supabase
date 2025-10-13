@@ -130,6 +130,8 @@ export const NewTableModal = ({ visible, onClose }: NewTableModalProps) => {
                           <SelectValue_Shadcn_ placeholder="Select or create a schema" />
                         </SelectTrigger_Shadcn_>
                         <SelectContent_Shadcn_>
+                          {/* TODO: We could use SchemaSelector here but those are for database schemas */}
+                          {/* Should we use it anyway and only show schemas that are for foreign data? Is that possible? Yes, we can! */}
                           {mockSchemas.map((schema) => (
                             <SelectItem_Shadcn_ key={schema.value} value={schema.value}>
                               {schema.label}
