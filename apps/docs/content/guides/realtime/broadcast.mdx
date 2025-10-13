@@ -430,6 +430,7 @@ select
 ```
 
 <Admonition type="note">
+
 The realtime.send function in the database includes a flag that determines whether the broadcast is private or public, and client channels also have the same configuration. For broadcasts to work correctly, these settings must match a public broadcast will only reach public channels, and a private broadcast will only reach private ones.
 
 By default, all database broadcasts are private, meaning clients must authenticate to receive them. If the database sends a public message but the client subscribes to a private channel, the message won't be delivered since private channels only accept signed, authenticated messages.
