@@ -130,7 +130,8 @@ export const getPaginatedUsersSQL = ({
 
     actualQuery = `where phone ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and phone < '${range[1]}'` : ''} order by phone asc limit ${limit}`
   } else if (column === 'id') {
-    if (!!keywords) {
+    const isMatchingUUIDValue = prefixToUUID(keywords ?? '', false) === keywords
+    if (isMatchingUUIDValue) {
       actualQuery = `where id = '${keywords}' order by id asc limit ${limit}`
     } else {
       actualQuery = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${limit}`
