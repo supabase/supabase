@@ -32,6 +32,17 @@ import Link from 'next/link'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 
+const LogsLink = ({ href }: { href: string }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Link className="block text-foreground-lighter hover:text-foreground p-1.5" href={href}>
+        <ChevronRight className="size-4" />
+      </Link>
+    </TooltipTrigger>
+    <TooltipContent>Go to logs</TooltipContent>
+  </Tooltip>
+)
+
 function isResponseErrorRow(row: unknown): row is ResponseErrorRow {
   if (!row || typeof row !== 'object') return false
   const r = row as Record<string, unknown>
@@ -155,17 +166,7 @@ export const OverviewMonitoring = () => {
                     className: 'text-right',
                     render: (row) => (
                       <div>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Link
-                              className="block text-foreground-lighter hover:text-foreground p-1.5"
-                              href={`/project/${ref}/logs/edge-logs?s=${row.path}`}
-                            >
-                              <ChevronRight className="size-4" />
-                            </Link>
-                          </TooltipTrigger>
-                          <TooltipContent>Go to logs</TooltipContent>
-                        </Tooltip>
+                        <LogsLink href={`/project/${ref}/logs/edge-logs?s=${row.path}`} />
                       </div>
                     ),
                   },
@@ -183,8 +184,18 @@ export const OverviewMonitoring = () => {
                 isLoading={isLoadingCodes || currentLoading || previousLoading}
                 data={errorCodes}
                 columns={[
-                  { key: 'error_code', header: 'Error code' },
+                  { key: 'error_code', header: 'Error code', className: 'w-full' },
                   { key: 'count', header: 'Count', className: 'text-right' },
+                  {
+                    key: 'actions',
+                    header: '',
+                    className: 'text-right',
+                    render: (row) => (
+                      <div>
+                        <LogsLink href={`/project/${ref}/logs/auth-logs?s=${row.error_code}`} />
+                      </div>
+                    ),
+                  },
                 ]}
               />
             </CardContent>
