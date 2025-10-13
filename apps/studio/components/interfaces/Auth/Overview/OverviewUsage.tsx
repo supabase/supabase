@@ -3,7 +3,16 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
 import { ChevronRight, Loader2 } from 'lucide-react'
@@ -46,10 +55,21 @@ export const StatCard = ({
     suffix === 'ms' ? current.toFixed(2) : suffix === '%' ? current.toFixed(1) : Math.round(current)
   const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
-  const Inner = (
-    <Card className={cn(href && 'cursor-pointer hover:bg-muted')}>
-      <CardHeader>
+  return (
+    <Card className={cn(href)}>
+      <CardHeader className="flex flex-row items-center justify-between p-2 pl-4 pr-2 space-y-0">
         <CardTitle className="text-foreground-lighter">{title}</CardTitle>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={href || ''}
+              className="text-foreground-lighter hover:text-foreground block p-2"
+            >
+              <ChevronRight className="size-4" />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>Go to Auth Report</TooltipContent>
+        </Tooltip>
       </CardHeader>
       <CardContent
         className={cn(
@@ -70,8 +90,6 @@ export const StatCard = ({
       </CardContent>
     </Card>
   )
-
-  return href ? <Link href={href}>{Inner}</Link> : Inner
 }
 
 export const OverviewUsage = () => {
