@@ -73,7 +73,7 @@ export const StatCard = ({
       </CardHeader>
       <CardContent
         className={cn(
-          'flex flex-col my-1 gap-1',
+          'flex flex-col my-1 gap-1 px-5',
           loading && 'opacity-50 items-center justify-center min-h-[108px]'
         )}
       >
@@ -142,14 +142,14 @@ export const OverviewUsage = () => {
             current={metrics.current.activeUsers}
             previous={activeUsersChange}
             loading={isLoading}
-            href={`/project/${ref}/reports/auth#usage`}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
           />
           <StatCard
             title="Sign ups"
             current={metrics.current.signUps}
             previous={signUpsChange}
             loading={isLoading}
-            href={`/project/${ref}/reports/auth#usage`}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
           />
         </div>
       </ScaffoldSectionContent>
