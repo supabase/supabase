@@ -16,7 +16,6 @@ import {
 } from './OverviewUsage.constants'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react'
 
 const StatCard = ({
   title,
@@ -45,7 +44,6 @@ const StatCard = ({
       : getChangeColor(previous)
   const formattedCurrent =
     suffix === 'ms' ? current.toFixed(2) : suffix === '%' ? current.toFixed(1) : Math.round(current)
-  const ArrowIcon = previous >= 0 ? ArrowUpIcon : ArrowDownIcon
   const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
   const Inner = (
@@ -63,7 +61,6 @@ const StatCard = ({
             <h4 className="text-sm text-foreground-lighter font-normal mb-0 truncate">{title}</h4>
             <p className="text-xl font-mono">{`${formattedCurrent}${suffix}`}</p>
             <div className={cn('flex items-center gap-1 font-mono text-sm', changeColor)}>
-              {!isZeroChange && <ArrowIcon className="size-3" />}
               <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
             </div>
           </>
@@ -119,7 +116,7 @@ export const OverviewUsage = () => {
         </Link>
       </div>
       <ScaffoldSectionContent className="gap-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <StatCard
             title="Active users"
             current={metrics.current.activeUsers}
@@ -135,7 +132,7 @@ export const OverviewUsage = () => {
             href={`/project/${ref}/reports/auth#usage`}
           />
           <StatCard
-            title="Auth API success rate"
+            title="Auth API Success Rate"
             current={Math.max(0, 100 - metrics.current.apiErrorRate)}
             previous={calculatePercentageChange(
               Math.max(0, 100 - metrics.current.apiErrorRate),
@@ -146,7 +143,7 @@ export const OverviewUsage = () => {
             href={`/project/${ref}/reports/auth#monitoring`}
           />
           <StatCard
-            title="Auth success rate"
+            title="Auth Server Success Rate"
             current={Math.max(0, 100 - metrics.current.authErrorRate)}
             previous={calculatePercentageChange(
               Math.max(0, 100 - metrics.current.authErrorRate),
