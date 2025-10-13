@@ -113,30 +113,12 @@ export const QueryPerformanceChart = ({
 
     const transformed = chartData.map((dataPoint) => ({
       ...dataPoint,
-      p50_time:
-        dataPoint.p50_time >= 1000
-          ? parseFloat((dataPoint.p50_time / 1000).toFixed(1))
-          : parseFloat(dataPoint.p50_time.toFixed(1)),
-      p75_time:
-        dataPoint.p75_time >= 1000
-          ? parseFloat((dataPoint.p75_time / 1000).toFixed(1))
-          : parseFloat(dataPoint.p75_time.toFixed(1)),
-      p90_time:
-        dataPoint.p90_time >= 1000
-          ? parseFloat((dataPoint.p90_time / 1000).toFixed(1))
-          : parseFloat(dataPoint.p90_time.toFixed(1)),
-      p95_time:
-        dataPoint.p95_time >= 1000
-          ? parseFloat((dataPoint.p95_time / 1000).toFixed(1))
-          : parseFloat(dataPoint.p95_time.toFixed(1)),
-      p99_time:
-        dataPoint.p99_time >= 1000
-          ? parseFloat((dataPoint.p99_time / 1000).toFixed(1))
-          : parseFloat(dataPoint.p99_time.toFixed(1)),
-      p99_9_time:
-        dataPoint.p99_9_time >= 1000
-          ? parseFloat((dataPoint.p99_9_time / 1000).toFixed(1))
-          : parseFloat(dataPoint.p99_9_time.toFixed(1)),
+      p50_time: parseFloat((dataPoint.p50_time / 1000).toFixed(3)),
+      p75_time: parseFloat((dataPoint.p75_time / 1000).toFixed(3)),
+      p90_time: parseFloat((dataPoint.p90_time / 1000).toFixed(3)),
+      p95_time: parseFloat((dataPoint.p95_time / 1000).toFixed(3)),
+      p99_time: parseFloat((dataPoint.p99_time / 1000).toFixed(3)),
+      p99_9_time: parseFloat((dataPoint.p99_9_time / 1000).toFixed(3)),
     }))
 
     console.log('🟣 Transformed chartData:', transformed)
@@ -272,7 +254,7 @@ export const QueryPerformanceChart = ({
           label: 'Selected Query',
           provider: 'logs',
           type: 'line',
-          color: { light: '#DC2626', dark: '#DC2626' },
+          color: { light: '#10B981', dark: '#10B981' },
           strokeWidth: 3,
         },
       ]
