@@ -321,7 +321,7 @@ export const Connect = () => {
           <span>Connect</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
+      <DialogContent className={cn('sm:max-w-5xl p-0 rounded-lg')} centered={false}>
         <DialogHeader className={cn('text-left', DIALOG_PADDING_X)}>
           <DialogTitle>
             Connect to your project
