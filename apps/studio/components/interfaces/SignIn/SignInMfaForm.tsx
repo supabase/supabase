@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 
+import { useAuthError } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
@@ -85,6 +86,22 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       }
     }
   }, [factors?.totp, isSuccessFactors, router, queryClient])
+
+  const error = useAuthError()
+
+  if (error) {
+    return (
+      <AlertError
+        error={error}
+        subject="Error while signing in"
+        additionalActions={
+          <Button asChild type="warning" className="w-min">
+            <Link href="/sign-in">Back to sign in</Link>
+          </Button>
+        }
+      />
+    )
+  }
 
   return (
     <>

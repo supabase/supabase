@@ -3,54 +3,31 @@ import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-ki
 import { useEffect, useRef } from 'react'
 
 import { IS_PLATFORM, useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
 import { TopSection } from 'components/interfaces/HomeNew/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { useBranchesQuery } from 'data/branches/branches-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsOrioleDb,
-  useProjectByRefQuery,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { cn } from 'ui'
 import { AdvisorSection } from './AdvisorSection'
 import { CustomReportSection } from './CustomReportSection'
-import {
-  GettingStartedSection,
-  type GettingStartedState,
-} from './GettingStarted/GettingStartedSection'
+import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
+import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
 import { ProjectUsageSection } from './ProjectUsageSection'
 
 export const HomeV2 = () => {
-  const { ref, enableBranching } = useParams()
-  const isOrioleDb = useIsOrioleDb()
+  const { enableBranching } = useParams()
   const snap = useAppStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
   const { mutate: sendEvent } = useSendEventMutation()
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-
-  const { data: branches } = useBranchesQuery({
-    projectRef: project?.parent_project_ref ?? project?.ref,
-  })
-
-  const mainBranch = branches?.find((branch) => branch.is_default)
-  const currentBranch = branches?.find((branch) => branch.project_ref === project?.ref)
-  const isMainBranch = currentBranch?.name === mainBranch?.name
-
-  const projectName =
-    currentBranch && !isMainBranch
-      ? currentBranch.name
-      : project?.name
-        ? project.name
-        : 'Welcome to your project'
 
   const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
     `home-section-order-${project?.ref || 'default'}`,
@@ -99,19 +76,13 @@ export const HomeV2 = () => {
   }, [enableBranching, snap])
 
   return (
-    <div className="w-full">
-      <ScaffoldContainer size="large">
-        <ScaffoldSection isFullWidth className="pt-16 pb-0">
-          <TopSection
-            projectName={projectName}
-            isMainBranch={isMainBranch}
-            parentProject={parentProject}
-            isOrioleDb={!!isOrioleDb}
-            project={project}
-            organization={organization}
-            projectRef={ref}
-            isPaused={isPaused}
-          />
+    <div className="w-full h-full">
+      <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
+        <ScaffoldSection
+          isFullWidth
+          className={cn(isPaused ? 'h-full flex justify-center !p-0' : 'pt-16 pb-0')}
+        >
+          <TopSection />
         </ScaffoldSection>
       </ScaffoldContainer>
 

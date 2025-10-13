@@ -2,7 +2,7 @@
 
 import { createClient } from '@/registry/default/fixtures/lib/supabase/client'
 import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
-import { SupabaseClient } from '@supabase/supabase-js'
+import { type SupabaseClient } from '@supabase/supabase-js'
 import { useEffect, useRef, useSyncExternalStore } from 'react'
 
 const supabase = createClient()
@@ -27,7 +27,13 @@ type Database =
         },
         U
       >
-    : never
+    : {
+        public: {
+          Tables: Record<string, any>
+          Views: Record<string, any>
+          Functions: Record<string, any>
+        }
+      }
 
 // Change this to the database schema you want to use
 type DatabaseSchema = Database['public']
@@ -114,12 +120,8 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
       console.error('An unexpected error occurred:', error)
       setState({ error })
     } else {
-      const deduplicatedData = ((newData || []) as TData[]).filter(
-        (item) => !state.data.find((old) => old.id === item.id)
-      )
-
       setState({
-        data: [...state.data, ...deduplicatedData],
+        data: [...state.data, ...(newData as TData[])],
         count: count || 0,
         isSuccess: true,
         error: null,
