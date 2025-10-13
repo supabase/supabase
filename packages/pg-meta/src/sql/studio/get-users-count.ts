@@ -1,5 +1,7 @@
 import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from './get-count-estimate'
 
+export const USERS_COUNT_ESTIMATE_SQL = `select reltuples as estimate from pg_class where oid = 'auth.users'::regclass`
+
 export const getUsersCountSQL = ({
   filter,
   keywords,
@@ -61,11 +63,7 @@ export const getUsersCountSQL = ({
     const sql = `
 ${COUNT_ESTIMATE_SQL}
 
-with approximation as (
-    select reltuples as estimate
-    from pg_class
-    where oid = 'auth.users'::regclass
-)
+with approximation as (${USERS_COUNT_ESTIMATE_SQL})
 select 
   case 
     when estimate = -1 then (select pg_temp.count_estimate('${escapedSelectSql}'))::int
