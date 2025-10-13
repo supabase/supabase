@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DOCS_URL } from 'lib/constants'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -9,20 +8,16 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAnalyticsIntegrationStatus } from 'hooks/useAnalyticsIntegrationStatus'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
@@ -39,8 +34,8 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { AnalyticsIntegrationAlert } from './AnalyticsIntegrationAlert'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { BUCKET_TYPES } from './Storage.constants'
 
@@ -119,16 +114,12 @@ export const CreateSpecializedBucketModal = ({
     useDatabaseExtensionEnableMutation()
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-  const { data: extensions, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
-    projectRef: ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: fdws, isLoading: isFDWsLoading } = useFDWsQuery({
-    projectRef: ref,
-    connectionString: project?.connectionString,
-  })
-  const icebergWrapperExtensionState = useIcebergWrapperExtension()
-  const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
+  const {
+    canCreateBuckets: canCreateAnalyticsBuckets,
+    icebergCatalogEnabled,
+    needsWrappersExtension,
+    extensionState,
+  } = useAnalyticsIntegrationStatus('modal')
 
   const config = BUCKET_TYPES['analytics']
 
@@ -138,18 +129,6 @@ export const CreateSpecializedBucketModal = ({
       name: '',
     },
   })
-
-  // Check if wrappers extension is installed
-  const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
-  // const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
-  const isWrappersExtensionInstalled = false
-
-  // Check if Iceberg Wrapper integration is installed
-  const icebergWrapperMeta = WRAPPERS.find((w) => w.name === 'iceberg_wrapper')
-  // const isIcebergWrapperInstalled = icebergWrapperMeta
-  //   ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
-  //   : false
-  const isIcebergWrapperInstalled = false
 
   const onSubmit: SubmitHandler<CreateSpecializedBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -166,13 +145,13 @@ export const CreateSpecializedBucketModal = ({
 
     try {
       // Install wrappers extension if not already installed
-      if (!isWrappersExtensionInstalled) {
+      if (needsWrappersExtension) {
         await enableExtension({
           projectRef: ref,
           connectionString: undefined,
           name: 'wrappers',
           schema: 'extensions',
-          version: wrappersExtension?.default_version || '1.0',
+          version: '1.0',
           cascade: true,
           createSchema: false,
         })
@@ -195,7 +174,7 @@ export const CreateSpecializedBucketModal = ({
       })
 
       // Create iceberg wrapper for analytics buckets if extension is installed
-      if (bucketType === 'analytics' && icebergWrapperExtensionState === 'installed') {
+      if (bucketType === 'analytics' && extensionState === 'installed') {
         await createIcebergWrapper({ bucketName: values.name })
       }
 
@@ -212,78 +191,6 @@ export const CreateSpecializedBucketModal = ({
     form.reset()
     setVisible(false)
   }
-
-  const getIntegrationAlert = () => {
-    console.log({ bucketType })
-    if (bucketType === 'analytics') {
-      // Don't show alert while data is loading
-      if (isExtensionsLoading || isFDWsLoading) {
-        return null
-      }
-
-      // Don't show alert if wrappers extension is properly installed (success state)
-      if (icebergWrapperExtensionState === 'installed') {
-        return null
-      }
-
-      // Determine what needs to be installed
-      // Wrappers extension missing implies Iceberg Wrapper is missing too
-      // const needsWrappersExtension = icebergWrapperExtensionState === 'not-installed'
-      const needsWrappersExtension = true // Testing
-      // Iceberg Wrapper can only be installed if wrappers extension is installed
-      const needsIcebergWrapper = !isIcebergWrapperInstalled
-      //   const needsIcebergWrapper = true // Testing
-
-      if (needsWrappersExtension) {
-        // If wrappers extension is missing, show alert for both (since Iceberg Wrapper depends on it)
-        return (
-          <Admonition type="default">
-            <p>
-              The Wrappers extension and Iceberg Wrapper integration are required for querying
-              analytical data. Supabase will install these on your behalf.{' '}
-              <InlineLink
-                href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-foreground-lighter hover:text-foreground transition-colors"
-              >
-                Learn more
-              </InlineLink>
-            </p>
-          </Admonition>
-        )
-      } else if (needsIcebergWrapper) {
-        // Wrappers extension is installed, but Iceberg Wrapper integration is missing
-        return (
-          <Admonition type="default">
-            <p>
-              The Iceberg Wrapper integration is required for querying analytical data. Supabase
-              will install it on your behalf.{' '}
-              <InlineLink
-                href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-foreground-lighter hover:text-foreground transition-colors"
-              >
-                Learn more
-              </InlineLink>
-            </p>
-          </Admonition>
-        )
-      }
-
-      return null
-    }
-
-    if (bucketType === 'vectors') {
-      // Vector integration is still in development, return null for now
-      return null
-    }
-
-    return null
-  }
-
-  const integrationAlert = getIntegrationAlert()
 
   return (
     <Dialog
@@ -354,10 +261,12 @@ export const CreateSpecializedBucketModal = ({
               />
             </DialogSection>
 
-            {integrationAlert && (
+            {bucketType === 'analytics' && (
               <>
                 <DialogSectionSeparator />
-                <DialogSection className="space-y-3">{integrationAlert}</DialogSection>
+                <DialogSection className="space-y-3">
+                  <AnalyticsIntegrationAlert context="modal" variant="default" />
+                </DialogSection>
               </>
             )}
           </form>
