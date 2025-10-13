@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -11,9 +10,9 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { wrapperMetaComparator } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -40,7 +39,7 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { BUCKET_TYPES } from './Storage.constants'
@@ -131,7 +130,7 @@ export const CreateSpecializedBucketModal = ({
   const icebergWrapperExtensionState = useIcebergWrapperExtension()
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
-  const config = BUCKET_TYPES[bucketType]
+  const config = BUCKET_TYPES['analytics']
 
   const form = useForm<CreateSpecializedBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -142,18 +141,15 @@ export const CreateSpecializedBucketModal = ({
 
   // Check if wrappers extension is installed
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
-  const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
-
-  //   TODO: installed_version is returning null, we should check for >= 0.5.3
-  //   console.log('wrappersExtension:', wrappersExtension)
-  //   console.log('isWrappersExtensionInstalled:', isWrappersExtensionInstalled)
+  // const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
+  const isWrappersExtensionInstalled = false
 
   // Check if Iceberg Wrapper integration is installed
   const icebergWrapperMeta = WRAPPERS.find((w) => w.name === 'iceberg_wrapper')
-  const isIcebergWrapperInstalled = icebergWrapperMeta
-    ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
-    : false
-  // TODO: We should complete all other checks (e.g. icebergCatalogEnabled) that are defined in CreateBucketModal
+  // const isIcebergWrapperInstalled = icebergWrapperMeta
+  //   ? fdws?.some((fdw) => wrapperMetaComparator(icebergWrapperMeta, fdw))
+  //   : false
+  const isIcebergWrapperInstalled = false
 
   const onSubmit: SubmitHandler<CreateSpecializedBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -218,6 +214,7 @@ export const CreateSpecializedBucketModal = ({
   }
 
   const getIntegrationAlert = () => {
+    console.log({ bucketType })
     if (bucketType === 'analytics') {
       // Don't show alert while data is loading
       if (isExtensionsLoading || isFDWsLoading) {
@@ -230,9 +227,11 @@ export const CreateSpecializedBucketModal = ({
       }
 
       // Determine what needs to be installed
+      // Wrappers extension missing implies Iceberg Wrapper is missing too
       // const needsWrappersExtension = icebergWrapperExtensionState === 'not-installed'
+      const needsWrappersExtension = true // Testing
+      // Iceberg Wrapper can only be installed if wrappers extension is installed
       const needsIcebergWrapper = !isIcebergWrapperInstalled
-      const needsWrappersExtension = false // Testing
       //   const needsIcebergWrapper = true // Testing
 
       if (needsWrappersExtension) {

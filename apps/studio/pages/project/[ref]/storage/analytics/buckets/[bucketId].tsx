@@ -21,9 +21,10 @@ import CopyButton from 'components/ui/CopyButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
-import { ExternalLink, Eye, EyeOff, Plus, Copy } from 'lucide-react'
+import { Copy, ExternalLink, Eye, EyeOff, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+
 import type { NextPageWithLayout } from 'types'
 import {
   Button,
@@ -79,7 +80,8 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
   // Mock data
   // TODO: Replace with actual data from API
   const connectionData = {
-    catalog_uri: `https://${ref}.storage.supabase.co/storage/v1/iceberg`,
+    // catalog_uri: `https://${ref}.storage.supabase.co/storage/v1/iceberg`,
+    catalog_uri: `http://localhost:8080/storage/v1/iceberg`,
     vault_token: 'sk_test_1234567890abcdef1234567890abcdef12345678',
     warehouse: bucketId,
     's3.endpoint': `https://${ref}.storage.supabase.co`,

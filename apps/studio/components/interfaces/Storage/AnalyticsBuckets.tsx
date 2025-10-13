@@ -1,4 +1,4 @@
-import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -8,9 +8,7 @@ import { ScaffoldHeader, ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
-import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { IS_PLATFORM } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import {
   Badge,
   Button,
@@ -18,7 +16,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -27,13 +24,11 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
-import { CreateBucketModal } from './CreateBucketModal'
-import { DeleteBucketModal } from './DeleteBucketModal'
-import { EditBucketModal } from './EditBucketModal'
-import { EmptyBucketModal } from './EmptyBucketModal'
-import { EmptyBucketState } from './EmptyBucketState'
 import { TimestampInfo } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
+import { DeleteBucketModal } from './DeleteBucketModal'
+import { EmptyBucketState } from './EmptyBucketState'
 
 export const AnalyticsBuckets = () => {
   const router = useRouter()
@@ -45,6 +40,7 @@ export const AnalyticsBuckets = () => {
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
+
   const analyticsBuckets = buckets
     .filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS')
     .filter((bucket) =>
@@ -52,7 +48,6 @@ export const AnalyticsBuckets = () => {
         ? true
         : bucket.name.toLowerCase().includes(filterString.toLowerCase())
     )
-  console.log({ analyticsBuckets })
 
   // Placeholder component - will be implemented in a later PR
   return (
@@ -74,7 +69,11 @@ export const AnalyticsBuckets = () => {
               onChange={(e) => setFilterString(e.target.value)}
               icon={<Search size={12} />}
             />
-            <CreateBucketModal buttonType="primary" buttonClassName="w-fit" />
+            <CreateSpecializedBucketModal
+              buttonType="primary"
+              buttonClassName="w-fit"
+              bucketType="analytics"
+            />
           </div>
 
           {isLoadingBuckets ? (
