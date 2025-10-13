@@ -66,7 +66,7 @@ export const PerformanceSearch = ({
           'w-52 bg-transparent rounded-l-none -ml-[1px] pr-6',
           searchInvalid ? 'text-red-900 dark:border-red-900' : ''
         )}
-        placeholder={`Search by ${specificFilterColumn === 'id' ? 'User ID' : specificFilterColumn === 'email' ? 'Email' : 'Phone'} or prefix`}
+        placeholder={`Search by ${specificFilterColumn === 'id' ? 'User ID' : specificFilterColumn === 'email' ? 'Email' : 'Phone'}`}
         value={search}
         onChange={(e) => {
           const value = e.target.value.replace(/\s+/g, '').toLowerCase()

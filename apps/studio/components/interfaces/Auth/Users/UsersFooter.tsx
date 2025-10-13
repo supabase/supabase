@@ -11,12 +11,18 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Filter } from './Users.constants'
 
 interface UsersFooterProps {
+  mode: 'performance' | 'freeform'
   filter: Filter
   filterKeywords: string
   selectedProviders: string[]
 }
 
-export const UsersFooter = ({ filter, filterKeywords, selectedProviders }: UsersFooterProps) => {
+export const UsersFooter = ({
+  mode,
+  filter,
+  filterKeywords,
+  selectedProviders,
+}: UsersFooterProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -42,11 +48,11 @@ export const UsersFooter = ({ filter, filterKeywords, selectedProviders }: Users
   const totalUsers = countData?.count ?? 0
 
   useEffect(() => {
-    if (isSuccessCount) {
+    if (isSuccessCount && mode === 'freeform') {
       setForceExactCount(countData.is_estimate && countData.count <= THRESHOLD_COUNT)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessCount])
+  }, [isSuccessCount, mode])
 
   return (
     <>
@@ -80,10 +86,27 @@ export const UsersFooter = ({ filter, filterKeywords, selectedProviders }: Users
                     />
                   </TooltipTrigger>
                   <TooltipContent side="top" className="w-72">
-                    This is an estimated value as your project has more than{' '}
-                    {THRESHOLD_COUNT.toLocaleString()} users.
-                    <br />
-                    <span className="text-brand">Click to retrieve the exact count.</span>
+                    {mode === 'performance' && (
+                      <>
+                        <p className="mb-1">
+                          This is an estimated value while using optimized search mode which may not
+                          be accurate.
+                        </p>
+                        <p>
+                          If you'd like to retrieve the exact count, swap to the{' '}
+                          <span className="text-warning">freeform search</span> mode from the
+                          header.
+                        </p>{' '}
+                      </>
+                    )}
+                    {mode === 'freeform' && (
+                      <>
+                        This is an estimated value as your project has more than{' '}
+                        {THRESHOLD_COUNT.toLocaleString()} users.
+                        <br />
+                        <span className="text-brand">Click to retrieve the exact count.</span>{' '}
+                      </>
+                    )}
                   </TooltipContent>
                 </Tooltip>
               )}

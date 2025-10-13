@@ -239,6 +239,7 @@ export const UsersV2 = () => {
         (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
     ) {
       const columns = formatUserColumns({
+        mode,
         columns: userTableColumns,
         config: columnConfiguration ?? [],
         users: users ?? [],
@@ -260,6 +261,7 @@ export const UsersV2 = () => {
     errorStorage,
     users,
     selectedUsers,
+    mode,
   ])
 
   const searchInvalid =
@@ -314,7 +316,7 @@ export const UsersV2 = () => {
                   <Input
                     size="tiny"
                     className={cn(
-                      'w-52 pl-7 bg-transparent',
+                      'w-80 pl-7 bg-transparent',
                       searchInvalid ? 'text-red-900 dark:border-red-900' : ''
                     )}
                     iconContainerClassName="pl-2"
@@ -327,7 +329,7 @@ export const UsersV2 = () => {
                         )}
                       />
                     }
-                    placeholder={'Search by email, phone, name, user ID'}
+                    placeholder={'Search by email, phone, name, or user ID'}
                     value={search}
                     onChange={(e) => {
                       const value = e.target.value.trimStart()
@@ -434,6 +436,7 @@ export const UsersV2 = () => {
                     }
 
                     const updatedColumns = formatUserColumns({
+                      mode,
                       columns: userTableColumns,
                       config: updatedConfig,
                       users: users ?? [],
@@ -464,17 +467,15 @@ export const UsersV2 = () => {
                 {isNewAPIDocsEnabled && (
                   <APIDocsButton section={['user-management']} source="auth-users" />
                 )}
-                <Button
+                <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
                   type="default"
+                  className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
-                  onClick={() => {
-                    refetch()
-                  }}
-                >
-                  Refresh
-                </Button>
+                  onClick={() => refetch()}
+                  tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
+                />
                 <AddUserDropdown />
               </div>
             </>
@@ -576,13 +577,12 @@ export const UsersV2 = () => {
           )}
         </ResizablePanelGroup>
 
-        {mode === 'freeform' && (
-          <UsersFooter
-            filter={filter}
-            filterKeywords={filterKeywords}
-            selectedProviders={selectedProviders}
-          />
-        )}
+        <UsersFooter
+          mode={mode}
+          filter={filter}
+          filterKeywords={filterKeywords}
+          selectedProviders={selectedProviders}
+        />
       </div>
 
       <ConfirmationModal
