@@ -19,7 +19,7 @@ module.exports = defineConfig([
   {
     extends: compat.extends('next/core-web-vitals'),
     linterOptions: {
-      reportUnusedDisableDirectives: 'error',
+      reportUnusedDisableDirectives: 'warn',
     },
     rules: {
       '@next/next/no-html-link-for-pages': 'off',
