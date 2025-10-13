@@ -487,11 +487,9 @@ const Wizard: NextPageWithLayout = () => {
           title={
             <div key="panel-title">
               <h3>Create a new project</h3>
-              <p className="text-sm text-foreground-lighter">
-                Your project will have its own dedicated instance and full Postgres database.
-                <br />
-                An API will be set up so you can easily interact with your new database.
-                <br />
+              <p className="text-sm text-foreground-lighter text-balance">
+                Your project will have its own dedicated instance and full Postgres database. An API
+                will be set up so you can easily interact with your new database.
               </p>
             </div>
           }
@@ -757,38 +755,30 @@ const Wizard: NextPageWithLayout = () => {
                           render={({ field }) => (
                             <FormItemLayout
                               layout="horizontal"
-                              label={
-                                <div className="flex flex-col gap-y-4">
-                                  <span>Compute size</span>
-
-                                  <div className="flex flex-col gap-y-2">
-                                    <Link
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      href={`${DOCS_URL}/guides/platform/compute-add-ons`}
-                                    >
-                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute add-ons</p>
-                                        <ExternalLink size={16} strokeWidth={1.5} />
-                                      </div>
-                                    </Link>
-                                    <Link
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                                    >
-                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute billing</p>
-                                        <ExternalLink size={16} strokeWidth={1.5} />
-                                      </div>
-                                    </Link>
-                                  </div>
-                                </div>
-                              }
+                              label="Compute size"
                               description={
                                 <>
                                   <p>
                                     The size for your dedicated database. You can change this later.
+                                    Learn more about{' '}
+                                    <InlineLink
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-inherit hover:text-foreground transition-colors"
+                                      href={`${DOCS_URL}/guides/platform/compute-add-ons`}
+                                    >
+                                      compute add-ons
+                                    </InlineLink>{' '}
+                                    and{' '}
+                                    <InlineLink
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-inherit hover:text-foreground transition-colors"
+                                      href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
+                                    >
+                                      compute billing
+                                    </InlineLink>
+                                    .
                                   </p>
                                 </>
                               }
