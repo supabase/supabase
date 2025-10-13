@@ -15,15 +15,24 @@ interface ModeSwitcherProps {
 export const ModeSwitcher = ({ mode, setMode }: ModeSwitcherProps) => {
   return (
     <div className="flex items-center">
-      <div className="text-xs h-[26px] flex items-center px-2 border border-strong rounded-l-md bg-surface-300">
+      <div
+        className={cn(
+          'text-xs h-[26px] flex items-center px-2 border rounded-l-md transition',
+          mode === 'performance'
+            ? 'bg-surface-300 text-foreground-light border-strong'
+            : 'bg-warning-300 text-warning text-opacity-70 border-warning-500'
+        )}
+      >
         Mode
       </div>
       <Select_Shadcn_ value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
         <SelectTrigger_Shadcn_
           size="tiny"
           className={cn(
-            'w-min rounded-l-none -ml-[1px] pr-1.5 !bg-transparent',
-            mode === 'freeform' && 'text-warning'
+            'w-[100px] rounded-l-none -ml-[1px] pr-1.5 transition focus:!ring-0 focus:!ring-offset-0',
+            mode === 'performance'
+              ? '!bg-transparent'
+              : 'text-warning !bg-warning-200 border-warning-500 hover:border-warning-600/60'
           )}
         >
           {mode === 'performance' ? 'Optimized' : 'Freeform'}

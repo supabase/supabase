@@ -15,7 +15,6 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import { THRESHOLD_COUNT } from 'data/table-rows/table-rows-count-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -106,9 +105,6 @@ export const UsersV2 = () => {
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
-
-  const [forceExactCount, setForceExactCount] = useState(false)
-  const [showFetchExactCountModal, setShowFetchExactCountModal] = useState(false)
 
   const [
     columnConfiguration,
@@ -294,7 +290,14 @@ export const UsersV2 = () => {
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                <ModeSwitcher mode={mode} setMode={setMode} />
+                <ModeSwitcher
+                  mode={mode}
+                  setMode={(m) => {
+                    setMode(m)
+                    if (m === 'freeform') setSortByValue('created_at:desc')
+                    else setSortByValue('id:asc')
+                  }}
+                />
 
                 {mode === 'performance' ? (
                   <PerformanceSearch
@@ -302,7 +305,10 @@ export const UsersV2 = () => {
                     searchInvalid={searchInvalid}
                     specificFilterColumn={specificFilterColumn}
                     setSearch={setSearch}
-                    setFilterKeywords={setFilterKeywords}
+                    setFilterKeywords={(s) => {
+                      setFilterKeywords(s)
+                      setSelectedUser(undefined)
+                    }}
                     setSpecificFilterColumn={setSpecificFilterColumn}
                   />
                 ) : (
@@ -330,7 +336,10 @@ export const UsersV2 = () => {
                     }}
                     onKeyDown={(e) => {
                       if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-                        if (!searchInvalid) setFilterKeywords(search.trim().toLocaleLowerCase())
+                        if (!searchInvalid) {
+                          setFilterKeywords(search.trim().toLocaleLowerCase())
+                          setSelectedUser(undefined)
+                        }
                       }
                     }}
                     actions={
@@ -618,23 +627,6 @@ export const UsersV2 = () => {
           cleanPointerEventsNoneOnBody(500)
         }}
       />
-
-      <ConfirmationModal
-        variant="warning"
-        visible={showFetchExactCountModal}
-        title="Fetch exact user count"
-        confirmLabel="Fetch exact count"
-        onCancel={() => setShowFetchExactCountModal(false)}
-        onConfirm={() => {
-          setForceExactCount(true)
-          setShowFetchExactCountModal(false)
-        }}
-      >
-        <p className="text-sm text-foreground-light">
-          Your project has more than {THRESHOLD_COUNT.toLocaleString()} users, and fetching the
-          exact count may cause performance issues on your database.
-        </p>
-      </ConfirmationModal>
     </>
   )
 }
