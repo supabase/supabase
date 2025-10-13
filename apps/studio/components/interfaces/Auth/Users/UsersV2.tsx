@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { RefreshCw, Search, Trash, Users, X } from 'lucide-react'
+import { RefreshCw, Trash, Users, X } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -32,13 +32,10 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
-import { ModeSwitcher } from './ModeSwitcher'
-import { PerformanceSearch } from './PerformanceSearch'
 import { SortDropdown } from './SortDropdown'
 import { UserPanel } from './UserPanel'
 import {
@@ -52,9 +49,8 @@ import {
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
+import { UsersSearch } from './UsersSearch'
 
-// [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
-// Can change it to remove V2 thereafter
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
@@ -87,10 +83,9 @@ export const UsersV2 = () => {
     }
   }, [showEmailPhoneColumns])
 
-  const [mode, setMode] = useState<'performance' | 'freeform'>('performance' as const)
-  const [specificFilterColumn, setSpecificFilterColumn] = useState<'id' | 'email' | 'phone'>(
-    'id' as const
-  )
+  const [specificFilterColumn, setSpecificFilterColumn] = useState<
+    'id' | 'email' | 'phone' | 'freeform'
+  >('id' as const)
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
@@ -105,6 +100,7 @@ export const UsersV2 = () => {
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
+  const [showFreeformWarning, setShowFreeformWarning] = useState(false)
 
   const [
     columnConfiguration,
@@ -133,11 +129,13 @@ export const UsersV2 = () => {
       projectRef,
       connectionString: project?.connectionString,
       keywords: filterKeywords,
-      filter: mode === 'performance' || filter === 'all' ? undefined : filter,
+      filter: specificFilterColumn !== 'freeform' || filter === 'all' ? undefined : filter,
       providers: selectedProviders,
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
-      ...(mode === 'performance' ? { column: specificFilterColumn } : { column: undefined }),
+      ...(specificFilterColumn !== 'freeform'
+        ? { column: specificFilterColumn }
+        : { column: undefined }),
     },
     {
       keepPreviousData: Boolean(filterKeywords),
@@ -167,11 +165,6 @@ export const UsersV2 = () => {
       return
     }
     fetchNextPage()
-  }
-
-  const clearSearch = () => {
-    setSearch('')
-    setFilterKeywords('')
   }
 
   const swapColumns = (data: any[], sourceIdx: number, targetIdx: number) => {
@@ -239,7 +232,7 @@ export const UsersV2 = () => {
         (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
     ) {
       const columns = formatUserColumns({
-        mode,
+        specificFilterColumn,
         columns: userTableColumns,
         config: columnConfiguration ?? [],
         users: users ?? [],
@@ -261,11 +254,11 @@ export const UsersV2 = () => {
     errorStorage,
     users,
     selectedUsers,
-    mode,
+    specificFilterColumn,
   ])
 
   const searchInvalid =
-    !search || mode === 'freeform' || specificFilterColumn === 'email'
+    !search || specificFilterColumn === 'freeform' || specificFilterColumn === 'email'
       ? false
       : specificFilterColumn === 'id'
         ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
@@ -292,72 +285,25 @@ export const UsersV2 = () => {
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                <ModeSwitcher
-                  mode={mode}
-                  setMode={(m) => {
-                    setMode(m)
-                    if (m === 'performance') setSortByValue('id:asc')
+                <UsersSearch
+                  search={search}
+                  searchInvalid={searchInvalid}
+                  specificFilterColumn={specificFilterColumn}
+                  setSearch={setSearch}
+                  setFilterKeywords={(s) => {
+                    setFilterKeywords(s)
+                    setSelectedUser(undefined)
+                  }}
+                  setSpecificFilterColumn={(value) => {
+                    if (value === 'freeform') {
+                      setShowFreeformWarning(true)
+                    } else {
+                      setSpecificFilterColumn(value)
+                    }
                   }}
                 />
 
-                {mode === 'performance' ? (
-                  <PerformanceSearch
-                    search={search}
-                    searchInvalid={searchInvalid}
-                    specificFilterColumn={specificFilterColumn}
-                    setSearch={setSearch}
-                    setFilterKeywords={(s) => {
-                      setFilterKeywords(s)
-                      setSelectedUser(undefined)
-                    }}
-                    setSpecificFilterColumn={setSpecificFilterColumn}
-                  />
-                ) : (
-                  <Input
-                    size="tiny"
-                    className={cn(
-                      'w-80 pl-7 bg-transparent',
-                      searchInvalid ? 'text-red-900 dark:border-red-900' : ''
-                    )}
-                    iconContainerClassName="pl-2"
-                    icon={
-                      <Search
-                        size={14}
-                        className={cn(
-                          'text-foreground-lighter',
-                          searchInvalid ? 'text-red-900' : ''
-                        )}
-                      />
-                    }
-                    placeholder={'Search by email, phone, name, or user ID'}
-                    value={search}
-                    onChange={(e) => {
-                      const value = e.target.value.trimStart()
-                      setSearch(value)
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-                        if (!searchInvalid) {
-                          setFilterKeywords(search.trim().toLocaleLowerCase())
-                          setSelectedUser(undefined)
-                        }
-                      }
-                    }}
-                    actions={
-                      search ? (
-                        <Button
-                          size="tiny"
-                          type="text"
-                          icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
-                          onClick={() => clearSearch()}
-                          className="p-0 h-5 w-5"
-                        />
-                      ) : null
-                    }
-                  />
-                )}
-
-                {showUserTypeFilter && mode === 'freeform' && (
+                {showUserTypeFilter && specificFilterColumn === 'freeform' && (
                   <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
                     <SelectContent_Shadcn_>
                       <SelectTrigger_Shadcn_
@@ -387,7 +333,7 @@ export const UsersV2 = () => {
                   </Select_Shadcn_>
                 )}
 
-                {showProviderFilter && mode === 'freeform' && (
+                {showProviderFilter && specificFilterColumn === 'freeform' && (
                   <FilterPopover
                     name="Provider"
                     options={PROVIDER_FILTER_OPTIONS}
@@ -436,7 +382,7 @@ export const UsersV2 = () => {
                     }
 
                     const updatedColumns = formatUserColumns({
-                      mode,
+                      specificFilterColumn,
                       columns: userTableColumns,
                       config: updatedConfig,
                       users: users ?? [],
@@ -452,7 +398,6 @@ export const UsersV2 = () => {
                 />
 
                 <SortDropdown
-                  mode={mode}
                   specificFilterColumn={specificFilterColumn}
                   sortColumn={sortColumn}
                   sortOrder={sortOrder}
@@ -578,10 +523,10 @@ export const UsersV2 = () => {
         </ResizablePanelGroup>
 
         <UsersFooter
-          mode={mode}
           filter={filter}
           filterKeywords={filterKeywords}
           selectedProviders={selectedProviders}
+          specificFilterColumn={specificFilterColumn}
         />
       </div>
 
@@ -609,6 +554,31 @@ export const UsersV2 = () => {
             </span>
           ) : null}
           ?
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="medium"
+        variant="warning"
+        visible={showFreeformWarning}
+        confirmLabel="Confirm"
+        title="Confirm to search across all columns"
+        onConfirm={() => {
+          setSpecificFilterColumn('freeform')
+          setShowFreeformWarning(false)
+        }}
+        onCancel={() => setShowFreeformWarning(false)}
+        alert={{
+          base: { variant: 'warning' },
+          title: 'Searching across all columns is not recommended',
+          description:
+            'This may adversely impact your database, in particular if your project has a large number of users - use with caution.',
+        }}
+      >
+        <p className="text-foreground-light text-sm">
+          This will allow you to search across user ID, email, phone number, and display name
+          through a single input field. You will also be able to filter users by provider and sort
+          on users across different columns.
         </p>
       </ConfirmationModal>
 

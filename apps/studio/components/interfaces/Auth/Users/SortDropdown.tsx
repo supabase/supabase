@@ -14,7 +14,6 @@ import {
 } from 'ui'
 
 interface SortDropdownProps {
-  mode: 'performance' | 'freeform'
   specificFilterColumn: string
   sortColumn: string
   sortOrder: string
@@ -25,7 +24,6 @@ interface SortDropdownProps {
 }
 
 export const SortDropdown = ({
-  mode,
   specificFilterColumn,
   sortColumn,
   sortOrder,
@@ -34,14 +32,24 @@ export const SortDropdown = ({
   showSortByPhone,
   setSortByValue,
 }: SortDropdownProps) => {
-  if (mode === 'performance') {
+  if (specificFilterColumn !== 'freeform') {
     return (
       <ButtonTooltip
         disabled
         type="default"
         icon={<ArrowDownNarrowWide />}
         tooltip={{
-          content: { side: 'bottom', text: 'Sort cannot be changed in optimized search mode' },
+          content: {
+            side: 'bottom',
+            className: 'w-80 text-center',
+            text: (
+              <>
+                Sorting cannot be changed which searching on a specific column. If you'd like to
+                sort on other columns, change the search to{' '}
+                <span className="text-warning">all columns</span> from the header.
+              </>
+            ),
+          },
         }}
       >
         Sorted by user ID

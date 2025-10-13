@@ -250,7 +250,7 @@ export function getAvatarUrl(user: User): string | undefined {
 }
 
 export const formatUserColumns = ({
-  mode,
+  specificFilterColumn,
   columns,
   config,
   users,
@@ -258,7 +258,7 @@ export const formatUserColumns = ({
   setSortByValue,
   onSelectDeleteUser,
 }: {
-  mode: 'performance' | 'freeform'
+  specificFilterColumn: string
   columns: UsersTableColumn[]
   config: ColumnConfiguration[]
   users: User[]
@@ -285,7 +285,13 @@ export const formatUserColumns = ({
         // to support - the component is ready as such: Just pass selectedUsers and allRowsSelected as props from parent
         // <SelectHeaderCell selectedUsers={selectedUsers} allRowsSelected={allRowsSelected} />
         if (col.id === 'img') return undefined
-        return <HeaderCell col={col} mode={mode} setSortByValue={setSortByValue} />
+        return (
+          <HeaderCell
+            col={col}
+            specificFilterColumn={specificFilterColumn}
+            setSortByValue={setSortByValue}
+          />
+        )
       },
       renderCell: ({ row }) => {
         // This is actually a valid React component, so we can use hooks here

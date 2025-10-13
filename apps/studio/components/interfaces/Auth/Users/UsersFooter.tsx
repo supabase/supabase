@@ -11,17 +11,17 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Filter } from './Users.constants'
 
 interface UsersFooterProps {
-  mode: 'performance' | 'freeform'
   filter: Filter
   filterKeywords: string
   selectedProviders: string[]
+  specificFilterColumn: string
 }
 
 export const UsersFooter = ({
-  mode,
   filter,
   filterKeywords,
   selectedProviders,
+  specificFilterColumn,
 }: UsersFooterProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -48,11 +48,11 @@ export const UsersFooter = ({
   const totalUsers = countData?.count ?? 0
 
   useEffect(() => {
-    if (isSuccessCount && mode === 'freeform') {
+    if (isSuccessCount && specificFilterColumn === 'freeform') {
       setForceExactCount(countData.is_estimate && countData.count <= THRESHOLD_COUNT)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessCount, mode])
+  }, [isSuccessCount, specificFilterColumn])
 
   return (
     <>
@@ -81,30 +81,29 @@ export const UsersFooter = ({
                       className="px-1.5"
                       icon={<HelpCircle />}
                       onClick={() => {
-                        setShowFetchExactCountModal(true)
+                        if (specificFilterColumn === 'freeform') {
+                          setShowFetchExactCountModal(true)
+                        }
                       }}
                     />
                   </TooltipTrigger>
-                  <TooltipContent side="top" className="w-72">
-                    {mode === 'performance' && (
-                      <>
-                        <p className="mb-1">
-                          This is an estimated value while using optimized search mode which may not
-                          be accurate.
-                        </p>
-                        <p>
-                          If you'd like to retrieve the exact count, swap to the{' '}
-                          <span className="text-warning">freeform search</span> mode from the
-                          header.
-                        </p>{' '}
-                      </>
-                    )}
-                    {mode === 'freeform' && (
+                  <TooltipContent side="top" className="w-80">
+                    {specificFilterColumn === 'freeform' ? (
                       <>
                         This is an estimated value as your project has more than{' '}
                         {THRESHOLD_COUNT.toLocaleString()} users.
                         <br />
                         <span className="text-brand">Click to retrieve the exact count.</span>{' '}
+                      </>
+                    ) : (
+                      <>
+                        <p className="mb-1">
+                          This is an estimated value which may not be accurate.
+                        </p>
+                        <p>
+                          If you'd like to retrieve the exact count, change the search to{' '}
+                          <span className="text-warning">all columns</span> from the header.
+                        </p>{' '}
                       </>
                     )}
                   </TooltipContent>
