@@ -3233,6 +3233,7 @@ export const ui: NavMenuConstant = {
         { name: 'Realtime Cursor', url: '/guides/ui/blocks/realtime-cursor' },
         { name: 'Current User Avatar', url: '/guides/ui/blocks/current-user-avatar' },
         { name: 'Realtime Avatar Stack', url: '/guides/ui/blocks/realtime-avatar-stack' },
+        { name: 'Realtime Chat', url: '/guides/ui/blocks/realtime-chat' },
       ]
     },
     {
