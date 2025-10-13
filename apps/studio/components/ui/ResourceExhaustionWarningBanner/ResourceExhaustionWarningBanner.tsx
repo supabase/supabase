@@ -11,7 +11,7 @@ import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ project_ref: ref })
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
   )
