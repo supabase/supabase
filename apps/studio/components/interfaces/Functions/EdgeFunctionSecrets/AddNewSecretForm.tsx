@@ -48,6 +48,14 @@ const FormSchema = z.object({
 const defaultValues = {
   secrets: [{ name: '', value: '' }],
 }
+
+const removeWrappingQuotes = (str: string): string => {
+  if ((str.startsWith('"') && str.endsWith('"')) || (str.startsWith("'") && str.endsWith("'"))) {
+    return str.slice(1, -1)
+  }
+  return str
+}
+
 const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
   const [showSecretValue, setShowSecretValue] = useState(false)
@@ -102,9 +110,10 @@ const AddNewSecretForm = () => {
       lines.forEach((line) => {
         const [key, ...valueParts] = line.split('=')
         if (key && valueParts.length) {
+          const valueStr = valueParts.join('=').trim()
           pairs.push({
             name: key.trim(),
-            value: valueParts.join('=').trim(),
+            value: removeWrappingQuotes(valueStr),
           })
         }
       })
