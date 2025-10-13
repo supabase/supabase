@@ -27,7 +27,11 @@ import { executeQuery } from 'lib/api/self-hosted/query'
 export const maxDuration = 120
 
 export const config = {
-  api: { bodyParser: true },
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb',
+    },
+  },
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {

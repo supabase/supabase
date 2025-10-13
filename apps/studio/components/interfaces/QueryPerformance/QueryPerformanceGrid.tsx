@@ -33,9 +33,46 @@ import {
 } from './QueryPerformance.constants'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { formatDuration } from './QueryPerformance.utils'
+import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
+}
+
+interface QueryPerformanceRow {
+  query: string
+  prop_total_time: number
+  total_time: number
+  calls: number
+  max_time: number
+  mean_time: number
+  min_time: number
+  rows_read: number
+  cache_hit_rate: string
+  rolname: string
+  index_advisor_result: GetIndexAdvisorResultResponse | null
+}
+
+const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
+  if (!data || data.length === 0) return 150
+
+  let maxWidth = 150
+
+  data.forEach((row) => {
+    const percentage = row.prop_total_time || 0
+    const totalTime = row.total_time || 0
+
+    if (percentage && totalTime) {
+      const percentageText = `${percentage.toFixed(1)}%`
+      const durationText = formatDuration(totalTime)
+      const fullText = `${percentageText} / ${durationText}`
+      const estimatedWidth = fullText.length * 8 + 40
+
+      maxWidth = Math.max(maxWidth, estimatedWidth)
+    }
+  })
+
+  return Math.min(maxWidth, 300)
 }
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
@@ -57,7 +94,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       name: col.name,
       cellClass: `column-${col.id}`,
       resizable: true,
-      minWidth: col.minWidth ?? 120,
+      minWidth:
+        col.id === 'prop_total_time' ? calculateTimeConsumedWidth(data ?? []) : col.minWidth ?? 120,
       sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {

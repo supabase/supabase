@@ -77,6 +77,7 @@ import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
+const ALLOW_SUPPORT_ACCESS_CATEGORIES = ['Problem', 'Database_unresponsive', 'Performance']
 const CONTAINER_CLASSES = 'px-6'
 
 const createFormSchema = (showClientLibraries: boolean) => {
@@ -285,6 +286,9 @@ export const SupportFormV2 = ({
     const payload = {
       ...values,
       organizationSlug: values.organizationSlug === 'no-org' ? undefined : values.organizationSlug,
+      allowSupportAccess: ALLOW_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
+        ? values.allowSupportAccess
+        : false,
       library:
         values.category === 'Problem' && selectedLibrary !== undefined ? selectedLibrary.key : '',
       message: formatMessage(values.message, attachments, error),
@@ -885,7 +889,7 @@ export const SupportFormV2 = ({
 
         <Separator />
 
-        {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
+        {ALLOW_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
           <>
             <FormField_Shadcn_
               name="allowSupportAccess"

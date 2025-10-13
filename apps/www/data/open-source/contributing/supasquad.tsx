@@ -160,6 +160,17 @@ export const data = {
       "These are the areas where we need the most help right now. If you have expertise in any of these domains, we'd love to hear from you!",
     features: [
       {
+        id: 'expo',
+        icon: 'smartphone',
+        heading: (
+          <div className="flex items-center gap-2">
+            Expo <Badge variant="success">High Priority</Badge>
+          </div>
+        ),
+        subheading:
+          'Know Expo really well? Come help the team by writing docs, creating examples, and making sure our guides are up to date. ',
+      },
+      {
         id: 'ai-builders',
         icon: 'bot',
         heading: (
@@ -170,7 +181,6 @@ export const data = {
         subheading:
           "Help our users who are building with AI + Supabase. If you've vibed a bunch of projects but understand what's happening under the hood, we'd love to talke with you .",
       },
-
       {
         id: 'realtime',
         icon: 'zap',

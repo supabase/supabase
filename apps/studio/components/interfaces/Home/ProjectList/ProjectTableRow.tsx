@@ -4,7 +4,7 @@ import InlineSVG from 'react-inlinesvg'
 
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { OrgProject } from 'data/projects/projects-infinite-query'
+import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
 import { Organization } from 'types'

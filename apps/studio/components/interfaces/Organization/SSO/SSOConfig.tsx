@@ -157,7 +157,7 @@ export const SSOConfig = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection isFullWidth className="!pt-8">
+      <ScaffoldSection isFullWidth>
         {!!plan && !canSetupSSOConfig ? (
           <Alert_Shadcn_
             variant="default"

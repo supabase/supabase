@@ -1,4 +1,6 @@
-import { groupBy, difference } from 'lodash'
+import { difference, groupBy } from 'lodash'
+import { useRouter } from 'next/router'
+
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
 
@@ -187,4 +189,9 @@ export const createSQLPolicies = (
 
 export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: any) => {
   return definition.replace('{bucket_id}', `'${bucketId}'`)
+}
+
+export const useStorageV2Page = () => {
+  const router = useRouter()
+  return router.pathname.split('/')[4] as undefined | 'files' | 'analytics' | 'vectors' | 's3'
 }

@@ -1197,14 +1197,14 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          const { error } = await supabase.auth.signOut('local')
+          const { error } = await supabase.auth.signOut({ scope: 'local' })
           ```
       - id: sign-out-other-sessions
         name: Sign out (other sessions)
         isSpotlight: false
         code: |
           ```js
-          const { error } = await supabase.auth.signOut('others')
+          const { error } = await supabase.auth.signOut({ scope: 'others' })
           ```
   - id: verify-otp
     title: 'verifyOtp()'

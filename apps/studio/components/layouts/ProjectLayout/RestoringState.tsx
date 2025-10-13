@@ -111,7 +111,7 @@ const RestoringState = () => {
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
               <Button asChild type="default">
                 <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Ongoing%20restoration%20for%20project`}
                 >
                   Contact support
                 </Link>
