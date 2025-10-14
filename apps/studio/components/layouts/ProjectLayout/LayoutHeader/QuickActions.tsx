@@ -24,6 +24,9 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useEffect, useState } from 'react'
+import { useSendEventMutation } from '../../../../data/telemetry/send-event-mutation'
+import { useParams } from 'common'
+import { useSelectedOrganizationQuery } from '../../../../hooks/misc/useSelectedOrganization'
 
 const KbdSlot = ({ option }: { option: QuickActionOption }) => (
   <div>
@@ -172,6 +175,8 @@ const ReorderableList = ({
 }
 
 const QuickActions = () => {
+  const { ref } = useParams()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const [open, setOpen] = useState(false)
   const {
     allActions,
@@ -182,7 +187,11 @@ const QuickActions = () => {
     saveSelectedActions,
     resetSelectedActions,
     keyboardShortcuts,
-  } = useQuickActionOptions()
+  } = useQuickActionOptions({
+    organization: selectedOrg?.slug,
+  })
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const handleReorder = (newOrder: QuickActionOption[]) => setSelectedActions(newOrder)
 
@@ -220,7 +229,19 @@ const QuickActions = () => {
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger className="w-7 h-7 rounded-full hover:!cursor-pointer">
+      <DropdownMenuTrigger
+        onClick={() =>
+          // Track quick actions button click
+          sendEvent({
+            action: 'quick_actions_button_clicked',
+            groups: {
+              project: ref ?? 'Unknown',
+              organization: selectedOrg?.slug ?? 'Unknown',
+            },
+          })
+        }
+        className="w-7 h-7 rounded-full hover:!cursor-pointer"
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button type="primary" className="!p-0 rounded-full w-7 h-7">
@@ -264,7 +285,12 @@ const QuickActions = () => {
               <DropdownMenuItem asChild key={option.label}>
                 <button
                   type="button"
-                  onClick={option.onClick}
+                  onClick={() =>
+                    option.onClick?.({
+                      organization: selectedOrg?.slug,
+                      triggerMethod: 'click',
+                    })
+                  }
                   className="group w-full cursor-pointer flex items-center gap-2 text-foreground-light hover:text-foreground"
                 >
                   <option.icon size={14} className="text-foreground-lighter" />
@@ -281,7 +307,6 @@ const QuickActions = () => {
               Cancel
             </Button>
             <Button
-              type="secondary"
               onClick={(e) => {
                 e.preventDefault()
                 if (editQuickActions) {

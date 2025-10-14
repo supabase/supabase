@@ -18,19 +18,24 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { EdgeFunctions, Reports, Storage, TableEditor } from 'icons'
 import { useAppStateSnapshot } from '../../../../state/app-state'
+import { useSendEventMutation } from '../../../../data/telemetry/send-event-mutation'
 
 export interface QuickActionOption {
   id: string
   label: string
   icon: React.ElementType
-  onClick?: () => void
+  onClick?: (context?: { organization?: string; triggerMethod?: string }) => void
   href?: string
   kbd?: string[]
   badge?: boolean
 }
 
 // Custom hook for keyboard shortcut detection
-export const useKeyboardShortcuts = (actions: QuickActionOption[], enabled: boolean = true) => {
+export const useKeyboardShortcuts = (
+  actions: QuickActionOption[],
+  enabled: boolean = true,
+  context?: { organization?: string }
+) => {
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set())
   const [sequence, setSequence] = useState<string[]>([])
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -158,7 +163,10 @@ export const useKeyboardShortcuts = (actions: QuickActionOption[], enabled: bool
     // Check simultaneous match
     const simultaneousMatch = checkSimultaneousMatch(pressedKeys)
     if (simultaneousMatch?.onClick) {
-      simultaneousMatch.onClick()
+      simultaneousMatch.onClick({
+        organization: context?.organization,
+        triggerMethod: 'keyboard',
+      })
       setPressedKeys(new Set())
       return
     }
@@ -166,7 +174,10 @@ export const useKeyboardShortcuts = (actions: QuickActionOption[], enabled: bool
     // Check sequential match
     const sequentialMatch = checkSequentialMatch(sequence)
     if (sequentialMatch?.onClick) {
-      sequentialMatch.onClick()
+      sequentialMatch.onClick({
+        organization: context?.organization,
+        triggerMethod: 'keyboard',
+      })
       setSequence([])
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
@@ -211,7 +222,7 @@ export const useKeyboardShortcuts = (actions: QuickActionOption[], enabled: bool
   }
 }
 
-export const useQuickActionOptions: () => {
+export const useQuickActionOptions: (context?: { organization?: string }) => {
   allActions: QuickActionOption[]
   selectedActions: QuickActionOption[]
   editQuickActions: boolean
@@ -224,16 +235,42 @@ export const useQuickActionOptions: () => {
     clearPressedKeys: () => void
     reset: () => void
   }
-} = () => {
-  const router = useRouter()
-  const { ref } = useParams()
-  const tableEditorStateSnap = useTableEditorStateSnapshot()
-  const appStateSnap = useAppStateSnapshot()
+} = (context) => {
+  const { mutate: sendEvent } = useSendEventMutation()
   const [selectedActions, setSelectedActions] = useState<QuickActionOption[]>([])
   const [editQuickActions, setEditQuickActions] = useState(false)
+  const router = useRouter()
+  const { ref } = useParams()
+  const projectRef = ref ?? '_'
+  const keyboardShortcuts = useKeyboardShortcuts(selectedActions, !editQuickActions, context)
 
-  // Initialize keyboard shortcuts
-  const keyboardShortcuts = useKeyboardShortcuts(selectedActions, !editQuickActions)
+  const tableEditorStateSnap = useTableEditorStateSnapshot()
+  const appStateSnap = useAppStateSnapshot()
+
+  // Wrapper function to add telemetry to action onClick handlers
+  const createActionWithTelemetry = useCallback(
+    (action: QuickActionOption) => {
+      return (context?: { organization?: string; triggerMethod?: string }) => {
+        sendEvent({
+          action: 'quick_actions_option_selected',
+          properties: {
+            action: action.id,
+            selectionMethod: context?.triggerMethod || 'unknown',
+          },
+          groups: {
+            project: projectRef,
+            organization: context?.organization || 'Unknown',
+          },
+        })
+
+        // Call the original onClick function
+        if (action.onClick) {
+          action.onClick(context)
+        }
+      }
+    },
+    [sendEvent, projectRef]
+  )
 
   const resetSelectedActions = useCallback(() => {
     const savedActions = localStorage.getItem('quick-actions-selected')
@@ -279,14 +316,14 @@ export const useQuickActionOptions: () => {
     'custom-report',
   ]
 
-  const allActions = [
+  const allActionsRaw = [
     // Database
     {
       id: 'new-table',
       label: 'New Table',
       icon: TableEditor,
       onClick: () => {
-        router.push(`/project/${ref}/editor`)
+        router.push(`/project/${projectRef}/editor`)
         tableEditorStateSnap.onAddTable()
       },
       kbd: ['c', 't'],
@@ -295,71 +332,55 @@ export const useQuickActionOptions: () => {
       id: 'database-schema',
       label: 'Database Schema',
       icon: Network,
-      onClick: () => null,
       kbd: ['c', 'd', 's'],
     },
     {
       id: 'database-function',
       label: 'Database Function',
       icon: FunctionSquare,
-      onClick: () => null,
       kbd: ['c', 'd', 'f'],
     },
     {
       id: 'database-trigger',
       label: 'Database Trigger',
       icon: DatabaseZap,
-      onClick: () => null,
       kbd: ['c', 'd', 't'],
     },
     {
       id: 'database-index',
       label: 'Database Index',
       icon: TextSearch,
-      onClick: () => null,
       kbd: ['c', 'd', 'i'],
     },
     {
       id: 'database-role',
       label: 'Database Role',
       icon: UserCheck,
-      onClick: () => null,
       kbd: ['c', 'd', 'r'],
     },
     {
       id: 'database-backup',
       label: 'Database Backup',
       icon: DatabaseBackup,
-      onClick: () => null,
       kbd: ['c', 'd', 'b'],
     },
-    // {
-    //   id: 'database-migration',
-    //   label: 'Database Migration',
-    //   icon: DatabaseBackup,
-    //   onClick: () => null,
-    //   kbd: ['c', 'd', 'b'],
-    //   badge: 'Coming Soon',
-    // },
     {
       id: 'database-webhook',
       label: 'Database Webhook',
       icon: Webhook,
-      onClick: () => null,
       kbd: ['c', 'd', 'w'],
     },
     {
       id: 'database-sql-snippet',
       label: 'SQL Snippet',
       icon: Webhook,
-      onClick: () => router.push(`/project/${ref ?? '_'}/sql/new`),
+      onClick: () => router.push(`/project/${projectRef}/sql/new`),
       kbd: ['c', 'd', 's'],
     },
     {
       id: 'database-enumerated-type',
       label: 'Enumerated Type',
       icon: Type,
-      onClick: () => null,
       kbd: ['c', 'e', 't'],
     },
     // Branching
@@ -375,14 +396,12 @@ export const useQuickActionOptions: () => {
       id: 'auth-user',
       label: 'Auth User',
       icon: User2,
-      onClick: () => null,
       kbd: ['c', 'u'],
     },
     {
       id: 'rls-policy',
       label: 'RLS Policy',
       icon: Lock,
-      onClick: () => null,
       kbd: ['c', 'r'],
     },
     // Storage
@@ -390,14 +409,12 @@ export const useQuickActionOptions: () => {
       id: 'storage-bucket',
       label: 'Storage Bucket',
       icon: Storage,
-      onClick: () => null,
       kbd: ['c', 's', 'b'],
     },
     {
       id: 'storage-bucket-policy',
       label: 'Storage Bucket Policy',
       icon: Storage,
-      onClick: () => null,
       kbd: ['c', 'b', 'p'],
     },
     // Edge Functions
@@ -405,7 +422,7 @@ export const useQuickActionOptions: () => {
       id: 'edge-function',
       label: 'Edge Function',
       icon: EdgeFunctions,
-      onClick: () => router.push(`/project/${ref ?? '_'}/functions/new`),
+      onClick: () => router.push(`/project/${projectRef}/functions/new`),
       kbd: ['c', 'f'],
     },
     // Realtime
@@ -413,7 +430,6 @@ export const useQuickActionOptions: () => {
       id: 'realtime-rls-policy',
       label: 'Realtime RLS Policy',
       icon: Lock,
-      onClick: () => null,
       kbd: ['c', 'r', 'p'],
     },
     // Observability
@@ -421,18 +437,22 @@ export const useQuickActionOptions: () => {
       id: 'custom-report',
       label: 'Custom Report',
       icon: Reports,
-      onClick: () => null,
       kbd: ['c', 'r'],
     },
-    // Extentions, if enabled
+    // Extensions, if enabled (TODO)
     {
       id: 'vault-secret',
       label: 'Vault Secret',
       icon: Vault,
-      onClick: () => null,
       kbd: ['c', 'v', 's'],
     },
   ]
+
+  // Wrap all actions with telemetry
+  const allActions = allActionsRaw.map((action) => ({
+    ...action,
+    onClick: createActionWithTelemetry(action),
+  }))
 
   return {
     allActions,

@@ -232,7 +232,7 @@ const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
-                <QuickActions />
+                {projectRef && <QuickActions />}
                 <UserDropdown />
               </>
             ) : (

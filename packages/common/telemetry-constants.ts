@@ -1902,6 +1902,40 @@ export interface ApiDocsCodeCopyButtonClickedEvent {
 }
 
 /**
+ * User clicked quick actions button in top navbar
+ *
+ * @group Events
+ * @source studio
+ * @page Quick Actions in top navbar
+ */
+export interface QuickActionsButtonClickedEvent {
+  action: 'quick_actions_button_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User selected a quick action option
+ *
+ * @group Events
+ * @source studio
+ * @page Quick Actions global menu
+ */
+export interface QuickActionsOptionSelectedEvent {
+  action: 'quick_actions_option_selected'
+  properties: {
+    /**
+     * Action being selected
+     */
+    action: string
+    /**
+     * if the action was selected by clicking the button or by keyboard shortcut
+     */
+    selectionMethod?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2014,3 +2048,5 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
+  | QuickActionsButtonClickedEvent
+  | QuickActionsOptionSelectedEvent
