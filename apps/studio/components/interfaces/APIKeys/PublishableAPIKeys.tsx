@@ -51,7 +51,7 @@ export const PublishableAPIKeys = () => {
             description={
               error && canReadAPIKeys
                 ? `Failed to load publishable key: ${error?.message}`
-                : 'This publishable key can be safely shared publicly.'
+                : 'This publishable key is safe to share publicly.'
             }
             isReactForm={false}
           >
@@ -75,6 +75,7 @@ export const PublishableAPIKeys = () => {
                 copy
                 value={apiKey?.api_key}
                 disabled={isPermissionsLoading || isLoadingApiKeys || !canReadAPIKeys}
+                className="font-mono"
               />
             )}
           </FormItemLayout>

@@ -1,18 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
 import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 export function ApiKeyPill({
   apiKey,
@@ -69,7 +66,7 @@ export function ApiKeyPill({
     }
   }, [show, data?.api_key, projectRef, queryClient, apiKey.id])
 
-  async function onSubmitToggle() {
+  async function handleReveal() {
     // Don't reveal key if not allowed or loading
     if (isSecret && !canManageSecretKeys) return
     if (isLoadingPermission) return
@@ -78,7 +75,7 @@ export function ApiKeyPill({
     setShowState(!show)
   }
 
-  async function onCopy() {
+  async function handleCopy(): Promise<string> {
     // If key is already revealed, use that value
     if (data?.api_key) return data?.api_key ?? ''
 
@@ -105,75 +102,33 @@ export function ApiKeyPill({
     return apiKey.api_key
   }
 
+  function handleAutoHide() {
+    setShowState(false)
+    // Clear the cached key from memory
+    queryClient.removeQueries({
+      queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
+      exact: true,
+    })
+  }
+
   // States for disabling buttons/showing tooltips
   const isRestricted = isSecret && !canManageSecretKeys
 
+  // Format the display value for secret keys
+  const displayValue = isSecret
+    ? `${apiKey?.api_key.slice(0, 15)}${show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}`
+    : apiKey?.api_key
+
   return (
-    <>
-      <div
-        className={cn(
-          InputVariants({ size: 'tiny' }),
-          'w-[100px] sm:w-[140px] md:w-[180px] lg:w-[340px] gap-0 font-mono rounded-full',
-          isSecret ? 'overflow-hidden' : '',
-          show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
-          'transition-all',
-          'cursor-text',
-          'relative'
-        )}
-        style={{ userSelect: 'all' }}
-      >
-        {isSecret ? (
-          <>
-            <span>{apiKey?.api_key.slice(0, 15)}</span>
-            <span>{show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}</span>
-          </>
-        ) : (
-          <span>{apiKey?.api_key}</span>
-        )}
-      </div>
-
-      {/* Toggle button */}
-      {isSecret && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="outline"
-              className="rounded-full px-2 pointer-events-auto"
-              icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
-              onClick={onSubmitToggle}
-              disabled={isRestricted}
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {isRestricted
-              ? 'You need additional permissions to reveal secret API keys'
-              : isLoadingPermission
-                ? 'Loading permissions...'
-                : show
-                  ? 'Hide API key'
-                  : 'Reveal API key'}
-          </TooltipContent>
-        </Tooltip>
-      )}
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <CopyButton
-            type="default"
-            asyncText={onCopy}
-            iconOnly
-            className="rounded-full px-2 pointer-events-auto"
-            disabled={isRestricted || isLoadingPermission}
-          />
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          {isRestricted
-            ? 'You need additional permissions to copy secret API keys'
-            : isLoadingPermission
-              ? 'Loading permissions...'
-              : 'Copy API key'}
-        </TooltipContent>
-      </Tooltip>
-    </>
+    <Input
+      readOnly
+      value={displayValue}
+      className="font-mono w-full"
+      style={{ userSelect: 'all' }}
+      copy={true}
+      onCopy={handleCopy}
+      reveal={isSecret}
+      onReveal={handleReveal}
+    />
   )
 }
