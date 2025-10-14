@@ -1,5 +1,10 @@
 import { Query } from '@supabase/pg-meta/src/query'
+import {
+  COUNT_ESTIMATE_SQL,
+  THRESHOLD_COUNT,
+} from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { QueryClient, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
+
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
@@ -14,20 +19,6 @@ type GetTableRowsCountArgs = {
   filters?: Filter[]
   enforceExactCount?: boolean
 }
-
-export const THRESHOLD_COUNT = 50000
-export const COUNT_ESTIMATE_SQL = /* SQL */ `
-CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
-    query text
-) RETURNS integer LANGUAGE plpgsql AS $$
-DECLARE
-    plan jsonb;
-BEGIN
-    EXECUTE 'EXPLAIN (FORMAT JSON)' || query INTO plan;
-    RETURN plan->0->'Plan'->'Plan Rows';
-END;
-$$;
-`.trim()
 
 export const getTableRowsCountSql = ({
   table,
