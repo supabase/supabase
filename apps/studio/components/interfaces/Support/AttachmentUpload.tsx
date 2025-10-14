@@ -1,9 +1,11 @@
 import { compact } from 'lodash'
 import { Plus, X } from 'lucide-react'
-import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { toast } from 'sonner'
 // End of third-party imports
 
+import { gotrueClient } from 'common'
+import { constructHeaders } from 'data/fetchers'
 import { uuidv4 } from 'lib/helpers'
 import { cn } from 'ui'
 import { createSupportStorageClient } from './support-storage-client'
@@ -12,12 +14,20 @@ const MAX_ATTACHMENTS = 5
 
 const uploadAttachments = async (ref: string, files: File[]) => {
   const supportSupabaseClient = createSupportStorageClient()
+  const userId = await gotrueClient.getSession().then((res) => res?.data.session?.user.id)
+  if (!userId) {
+    console.error(
+      '[Support Form > uploadAttachments] Could not upload attachments because no user ID found'
+    )
+    toast.error('Could not upload attachments')
+    return []
+  }
 
   const filesToUpload = Array.from(files)
   const uploadedFiles = await Promise.all(
     filesToUpload.map(async (file) => {
       const suffix = file.type.split('/')[1]
-      const prefix = `${ref}/${uuidv4()}.${suffix}`
+      const prefix = `${userId}/${uuidv4()}.${suffix}`
       const options = { cacheControl: '3600' }
 
       const { data, error } = await supportSupabaseClient.storage
@@ -32,13 +42,26 @@ const uploadAttachments = async (ref: string, files: File[]) => {
 
   if (keys.length === 0) return []
 
-  const { data, error } = await supportSupabaseClient.storage
-    .from('support-attachments')
-    .createSignedUrls(keys, 10 * 365 * 24 * 60 * 60)
-  if (error) {
-    console.error('Failed to retrieve URLs for attachments', error)
+  try {
+    const headers = await constructHeaders()
+    const response = await fetch('/api/generate-attachment-url', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ filenames: keys }),
+    })
+    if (!response.ok) {
+      const status = response.status
+      const message = await response.text()
+      throw new Error(`Failed to generate attachment URLs at endpoint: ${status} ${message}`)
+    }
+    const signedUrls = await response.json()
+    console.log('Generated signed URLs:', signedUrls)
+    return signedUrls
+  } catch (error) {
+    console.error('[Support Form > uploadAttachments] Failed to generate signed URLs', error)
+    toast.error('Failed to generate attachment URLs')
+    return []
   }
-  return data ? data.map((file) => file.signedUrl) : []
 }
 
 export function useAttachmentUpload() {

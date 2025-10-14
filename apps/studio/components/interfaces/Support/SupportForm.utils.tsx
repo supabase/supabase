@@ -3,17 +3,16 @@ import {
   createLoader,
   createParser,
   createSerializer,
-  type inferParserType,
   parseAsString,
-  parseAsStringLiteral,
+  type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
 // End of third-party imports
 
 import {
+  DocsSearchResultType as PageType,
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
-  DocsSearchResultType as PageType,
 } from 'common'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { DOCS_URL } from 'lib/constants'
