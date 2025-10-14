@@ -238,7 +238,7 @@ export const CreateSpecializedBucketModal = ({
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-2">
+            <DialogSection className="flex flex-col gap-y-4">
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -264,10 +264,8 @@ export const CreateSpecializedBucketModal = ({
                   </FormItemLayout>
                 )}
               />
-            </DialogSection>
 
-            {bucketType === 'analytics' && (
-              <DialogSection>
+              {bucketType === 'analytics' && (
                 <Admonition type="default">
                   <p>
                     Supabase will install the{' '}
@@ -279,8 +277,8 @@ export const CreateSpecializedBucketModal = ({
                     .
                   </p>
                 </Admonition>
-              </DialogSection>
-            )}
+              )}
+            </DialogSection>
           </form>
         </Form_Shadcn_>
 
