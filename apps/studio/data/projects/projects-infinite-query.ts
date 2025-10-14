@@ -5,8 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
 import { projectKeys } from './keys'
-
-const DEFAULT_LIMIT = 100
+import { PROJECT_PAGINATION_DEFAULT_LIMIT } from './constants'
 
 interface GetProjectsInfiniteVariables {
   limit?: number
@@ -20,7 +19,7 @@ export type ProjectInfoInfinite =
 
 async function getProjects(
   {
-    limit = DEFAULT_LIMIT,
+    limit = PROJECT_PAGINATION_DEFAULT_LIMIT,
     page = 0,
     sort = 'name_asc',
     search: _search = '',
@@ -46,7 +45,7 @@ export type ProjectsInfiniteData = Awaited<ReturnType<typeof getProjects>>
 export type ProjectsInfiniteError = ResponseError
 
 export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
-  { limit = DEFAULT_LIMIT, sort = 'name_asc', search }: GetProjectsInfiniteVariables,
+  { limit = PROJECT_PAGINATION_DEFAULT_LIMIT, sort = 'name_asc', search }: GetProjectsInfiniteVariables,
   {
     enabled = true,
     ...options

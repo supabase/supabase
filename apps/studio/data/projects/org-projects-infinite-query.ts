@@ -5,11 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
 import { INFINITE_PROJECTS_KEY_PREFIX, projectKeys } from './keys'
-
-// [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards view
-// So that the last row will always be a full row of cards while there's a next page
-// API max rows is 100, I'm just choosing 96 here as the highest value thats a multiple of 6
-const DEFAULT_LIMIT = 96
+import { PROJECT_PAGINATION_DEFAULT_LIMIT } from './constants'
 
 interface GetOrgProjectsInfiniteVariables {
   slug?: string
@@ -26,7 +22,7 @@ export type OrgProject = OrgProjectsResponse['projects'][number]
 async function getOrganizationProjects(
   {
     slug,
-    limit = DEFAULT_LIMIT,
+    limit = PROJECT_PAGINATION_DEFAULT_LIMIT,
     page = 0,
     sort = 'name_asc',
     search: _search = '',
@@ -57,7 +53,7 @@ export type OrgProjectsInfiniteError = ResponseError
 export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
   {
     slug,
-    limit = DEFAULT_LIMIT,
+    limit = PROJECT_PAGINATION_DEFAULT_LIMIT,
     sort = 'name_asc',
     search,
     statuses = [],
