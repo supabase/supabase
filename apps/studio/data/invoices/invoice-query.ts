@@ -12,10 +12,13 @@ export async function getInvoice({ invoiceId, slug }: InvoiceVariables, signal?:
   if (!invoiceId) throw new Error('Invoice ID is required')
   if (!slug) throw new Error('Slug is required')
 
-  const { data, error } = await get(`/platform/organizations/{slug}/billing/invoices/{invoiceId}`, {
-    params: { path: { invoiceId, slug } },
-    signal,
-  })
+  const { data, error } = await get(
+    `/platform/organizations/{slug}/billing/invoices/{invoice_id}`,
+    {
+      params: { path: { invoice_id: invoiceId, slug } },
+      signal,
+    }
+  )
 
   if (error) handleError(error)
   return data
