@@ -1,11 +1,13 @@
 'use client'
 
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { useBreakpoint } from 'common'
-import { CommandInput_Shadcn_, cn } from 'ui'
+import { CommandInput_Shadcn_, cn, Badge, Button } from 'ui'
+import { X } from 'lucide-react'
 
 import { useQuery, useSetQuery } from './hooks/queryHooks'
+import { useCommandMenuTriggerSource, useSetCommandMenuTriggerSource } from './hooks/viewHooks'
 
 function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) {
   const isBelowSm = useBreakpoint('sm')
@@ -46,6 +48,8 @@ const CommandInput = forwardRef<
 
   const query = useQuery()
   const setQuery = useSetQuery()
+  const triggerSource = useCommandMenuTriggerSource()
+  const setTriggerSource = useSetCommandMenuTriggerSource()
 
   const [inputValue, setInputValue] = useState(query)
   useEffect(() => {
@@ -60,25 +64,59 @@ const CommandInput = forwardRef<
     }
   }, [inputValue, imeComposing])
 
+  const handleClearTriggerSource = () => {
+    setTriggerSource('other')
+  }
+
+  const getTriggerSourceLabel = (source: string) => {
+    switch (source) {
+      case 'quick-actions':
+        return 'Quick Actions'
+      default:
+        return null
+    }
+  }
+
+  const triggerSourceLabel = getTriggerSourceLabel(triggerSource)
+
   return (
-    <CommandInput_Shadcn_
-      // Focus needs to be manually handled to check breakpoint first, due to
-      // delays from useEffect
-      autoFocus={false}
-      ref={inputRef}
-      value={inputValue}
-      onValueChange={setInputValue}
-      placeholder="Type a command or search..."
-      onCompositionStart={() => setImeComposing(true)}
-      onCompositionEnd={() => setImeComposing(false)}
-      className={cn(
-        'flex h-11 w-full rounded-md bg-transparent px-4 py-7 outline-none',
-        'focus:shadow-none focus:ring-transparent',
-        'text-base text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
-        className
+    <div className="relative flex items-center w-full">
+      <CommandInput_Shadcn_
+        // Focus needs to be manually handled to check breakpoint first, due to
+        // delays from useEffect
+        autoFocus={false}
+        ref={inputRef}
+        value={inputValue}
+        onValueChange={setInputValue}
+        placeholder="Type a command or search..."
+        onCompositionStart={() => setImeComposing(true)}
+        onCompositionEnd={() => setImeComposing(false)}
+        wrapperClassName="w-full"
+        className={cn(
+          'flex h-11 w-full rounded-md bg-transparent px-4 py-7 outline-none',
+          'focus:shadow-none focus:ring-transparent',
+          'text-base text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
+          triggerSourceLabel && 'pr-20', // Add right padding when badge is present
+          className
+        )}
+        {...props}
+      />
+      {triggerSourceLabel && (
+        <div className="absolute right-2 flex items-center gap-1">
+          <Badge variant="default" className="text-xs pr-1">
+            {triggerSourceLabel}
+            <Button
+              type="text"
+              size="tiny"
+              onClick={handleClearTriggerSource}
+              className="h-5 w-5 p-0 hover:bg-muted"
+            >
+              <X size={12} />
+            </Button>
+          </Badge>
+        </div>
       )}
-      {...props}
-    />
+    </div>
   )
 })
 

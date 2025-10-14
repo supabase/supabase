@@ -34,7 +34,7 @@ const CommandShortcut = ({ openKey }: { openKey: string }) => {
 
       if (evt.key === openKey && evt.metaKey) {
         evt.preventDefault()
-        toggleOpen()
+        toggleOpen('keyboard')
       }
     }
 

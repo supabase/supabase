@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 import { useCommandContext } from '../../internal/Context'
-import { type DialogSize, type ITouchHandlers } from '../../internal/state/viewState.types'
+import type { DialogSize } from '../../internal/state/viewState.types'
 
 const useCommandMenuInitiated = () => {
   const { viewState } = useCommandContext()
@@ -27,6 +27,18 @@ const useToggleCommandMenu = () => {
   const { viewState } = useCommandContext()
   const { toggleOpen } = useSnapshot(viewState)
   return toggleOpen
+}
+
+const useCommandMenuTriggerSource = () => {
+  const { viewState } = useCommandContext()
+  const { triggerSource } = useSnapshot(viewState)
+  return triggerSource
+}
+
+const useSetCommandMenuTriggerSource = () => {
+  const { viewState } = useCommandContext()
+  const { setTriggerSource } = useSnapshot(viewState)
+  return setTriggerSource
 }
 
 const useCommandMenuSize = () => {
@@ -66,6 +78,8 @@ export {
   useCommandMenuOpen,
   useSetCommandMenuOpen,
   useToggleCommandMenu,
+  useCommandMenuTriggerSource,
+  useSetCommandMenuTriggerSource,
   useCommandMenuSize,
   useSetCommandMenuSize,
   useSetupCommandMenuTouchEvents,

@@ -8,7 +8,7 @@ import { CommandItem } from '../internal/Command'
 import { CommandEmpty } from '../internal/CommandEmpty'
 import { CommandGroup } from '../internal/CommandGroup'
 import { useCommands } from './hooks/commandsHooks'
-import { useQuery } from './hooks/queryHooks'
+import { useCommandMenuTriggerSource } from './hooks/viewHooks'
 import { TextHighlighter } from './TextHighlighter'
 
 const CommandList = forwardRef<
@@ -16,15 +16,33 @@ const CommandList = forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandList_Shadcn_>
 >(({ className, ...props }, ref) => {
   const commandSections = useCommands()
-  const query = useQuery()
+  const triggerSource = useCommandMenuTriggerSource()
 
   const innerRef = useRef<HTMLDivElement | undefined>(undefined)
-  const setInnerRef = (elem: HTMLDivElement) => (innerRef.current = elem)
+  const setInnerRef = (elem: HTMLDivElement) => {
+    innerRef.current = elem
+  }
 
   const setRef = (elem: HTMLDivElement) => {
-    if (ref) typeof ref === 'function' ? ref(elem) : (ref.current = elem)
+    if (ref) {
+      if (typeof ref === 'function') {
+        ref(elem)
+      } else {
+        ref.current = elem
+      }
+    }
     setInnerRef(elem)
   }
+
+  // Filter sections based on trigger source
+  const filteredSections = commandSections.filter((section) => {
+    // If triggered from quick-actions, only show the "Quick Actions" section
+    if (triggerSource === 'quick-actions') {
+      return section.name === 'Quick Actions'
+    }
+    // For all other trigger sources, show all sections
+    return true
+  })
 
   return (
     <CommandList_Shadcn_
@@ -33,18 +51,17 @@ const CommandList = forwardRef<
       {...props}
     >
       <CommandEmpty listRef={innerRef}>No results found.</CommandEmpty>
-      {commandSections.map((section) => {
-        if (section.commands.every((command) => command.defaultHidden) && !query) return null
+      {filteredSections.map((section) => {
+        // Always show sections that have commands, regardless of defaultHidden status
+        if (section.commands.length === 0) return null
 
         return (
           <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
-            {section.commands
-              .filter((command) => !command.defaultHidden || query)
-              .map((command) => (
-                <CommandItem key={command.id} command={command}>
-                  <TextHighlighter>{command.name}</TextHighlighter>
-                </CommandItem>
-              ))}
+            {section.commands.map((command) => (
+              <CommandItem key={command.id} command={command}>
+                <TextHighlighter>{command.name}</TextHighlighter>
+              </CommandItem>
+            ))}
           </CommandGroup>
         )
       })}

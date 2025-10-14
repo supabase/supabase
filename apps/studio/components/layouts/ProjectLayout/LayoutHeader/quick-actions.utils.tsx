@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   DatabaseBackup,
   DatabaseZap,
@@ -448,11 +448,15 @@ export const useQuickActionOptions: (context?: { organization?: string }) => {
     },
   ]
 
-  // Wrap all actions with telemetry
-  const allActions = allActionsRaw.map((action) => ({
-    ...action,
-    onClick: createActionWithTelemetry(action),
-  }))
+  // Wrap all actions with telemetry - memoize to prevent infinite re-renders
+  const allActions = useMemo(
+    () =>
+      allActionsRaw.map((action) => ({
+        ...action,
+        onClick: createActionWithTelemetry(action),
+      })),
+    [createActionWithTelemetry]
+  )
 
   return {
     allActions,

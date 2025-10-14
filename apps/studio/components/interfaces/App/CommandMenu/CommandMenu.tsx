@@ -16,6 +16,7 @@ import { useApiUrlCommand } from './ApiUrl'
 import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
+import { useQuickActionsCommands } from 'components/layouts/QuickActions.Commands'
 
 export default function StudioCommandMenu() {
   useApiKeysCommands()
@@ -27,6 +28,7 @@ export default function StudioCommandMenu() {
   useBranchCommands()
   useSnippetCommands()
   useLayoutNavCommands()
+  useQuickActionsCommands()
   useDocsSearchCommands({
     options: { orderSection: orderCommandSectionsByPriority, sectionMeta: { priority: 3 } },
   })
