@@ -3,7 +3,7 @@ import { BASE_PATH } from 'lib/constants'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LIMITS } from './constants'
-import type { AIGeneratedSchema, PostgresType, TableRelationship, TableSuggestion } from './types'
+import type { AIGeneratedSchema, PostgresType, TableSuggestion } from './types'
 import { TableSource } from './types'
 
 type PartialColumn = Partial<AIGeneratedSchema['tables'][number]['columns'][number]>
@@ -22,9 +22,8 @@ const isIdColumn = (name: string) => name === 'id'
 const isPrimaryColumn = (column: { isPrimary?: boolean | null; name: string }) =>
   column.isPrimary || isIdColumn(column.name)
 
-const getColumnDescription = (column: { isPrimary?: boolean | null; name: string; isForeign?: boolean | null; references?: any }) => {
+const getColumnDescription = (column: { isPrimary?: boolean | null; name: string }) => {
   if (isPrimaryColumn(column)) return 'Primary key'
-  if (column.isForeign && column.references) return `References ${column.references}`
   return undefined
 }
 
@@ -66,12 +65,9 @@ const convertAISchemaToTableSuggestions = (schema: AIGeneratedSchema): TableSugg
       default: column.defaultValue ?? undefined,
       description: getColumnDescription(column),
       isPrimary: isPrimaryColumn(column) || undefined,
-      isForeign: column.isForeign ?? undefined,
-      references: column.references ?? undefined,
     })),
     rationale: table.description,
     source: TableSource.AI,
-    relationships: table.relationships ?? undefined,
   }))
 }
 
@@ -107,8 +103,6 @@ const convertPartialSchemaToTableSuggestions = (schema: PartialSchema): TableSug
             default: column.defaultValue ?? undefined,
             description: getColumnDescription({ ...column, name: columnName }),
             isPrimary: isPrimaryColumn({ ...column, name: columnName }) || undefined,
-            isForeign: column.isForeign ?? undefined,
-            references: column.references ?? undefined,
           }
         })
         .filter(isNotNull)
@@ -117,34 +111,11 @@ const convertPartialSchemaToTableSuggestions = (schema: PartialSchema): TableSug
         return null
       }
 
-      const relationships = Array.isArray(table.relationships)
-        ? (table.relationships
-            .filter(
-              (
-                relationship
-              ): relationship is NonNullable<PartialTable['relationships']>[number] & {
-                from: string
-                to: string
-                type: TableRelationship['type']
-              } =>
-                !!relationship &&
-                typeof relationship.from === 'string' &&
-                typeof relationship.to === 'string' &&
-                typeof relationship.type === 'string'
-            )
-            .map((relationship) => ({
-              from: relationship.from,
-              to: relationship.to,
-              type: relationship.type,
-            })) as TableSuggestion['relationships'])
-        : undefined
-
       return {
         tableName,
         fields,
         rationale: typeof table.description === 'string' ? table.description : undefined,
         source: TableSource.AI,
-        relationships: relationships && relationships.length > 0 ? relationships : undefined,
       }
     })
     .filter(isNotNull)

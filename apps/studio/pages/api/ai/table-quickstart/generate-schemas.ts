@@ -12,16 +12,6 @@ const ColumnSchema = z.object({
   name: z.string().describe('The column name in snake_case'),
   type: z.string().describe('PostgreSQL data type (e.g., bigint, text, timestamp with time zone)'),
   isPrimary: z.boolean().optional().nullable().describe('Whether this is a primary key'),
-  isForeign: z.boolean().optional().nullable().describe('Whether this is a foreign key'),
-  references: z
-    .object({
-      table: z.string(),
-      column: z.string(),
-    })
-    .passthrough()
-    .optional()
-    .nullable()
-    .describe('Foreign key reference details'),
   isNullable: z.boolean().optional().nullable().describe('Whether the column can be null'),
   defaultValue: z.string().optional().nullable().describe('Default value or expression'),
   isUnique: z
@@ -35,11 +25,6 @@ const TableSchema = z.object({
   name: z.string().describe('The table name in snake_case'),
   description: z.string().describe('A brief description of what this table stores'),
   columns: z.array(ColumnSchema).describe('Array of columns in the table'),
-  relationships: z
-    .union([z.record(z.any()), z.array(z.any())])
-    .optional()
-    .nullable()
-    .describe('Foreign key relationships'),
 })
 
 const ResponseSchema = z.object({
@@ -110,8 +95,7 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
       - Use 'text' for string data, 'timestamptz' for timestamps
       - Use snake_case naming consistently
       - Add created_at, updated_at timestamps with type: 'timestamptz' and defaultValue: 'now()'
-      - Reference auth.users(id) for user relations when appropriate
-      - For foreign key columns, use references as an object: { "table": "table_name", "column": "column_name" }
+      - Do NOT generate foreign key constraints or relationships
       - Keep descriptions brief (one sentence)
       - Focus on the most essential tables only
 
