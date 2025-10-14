@@ -6,13 +6,8 @@ import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { FilterPopover } from 'components/ui/FilterPopover'
 
-export const QueryPerformanceFilterBar = ({
-  actions, // Now just accepts actions, no aggregatedData needed here
-}: {
-  actions?: ReactNode
-}) => {
+export const QueryPerformanceFilterBar = ({ actions }: { actions?: ReactNode }) => {
   const { sort, clearSort } = useQueryPerformanceSort()
 
   const [{ search: searchQuery }, setSearchParams] = useQueryStates({

@@ -279,11 +279,6 @@ export const QueryPerformanceGrid = ({
           )
         }
 
-        const cacheHitRateToNumber = (value: number | string) => {
-          if (typeof value === 'number') return value
-          return parseFloat(value.toString().replace('%', '')) || 0
-        }
-
         if (col.id === 'cache_hit_rate') {
           return (
             <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
