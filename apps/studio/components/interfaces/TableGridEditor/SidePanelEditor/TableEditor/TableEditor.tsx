@@ -1,9 +1,10 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import {
@@ -19,13 +20,14 @@ import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -49,8 +51,6 @@ import {
 } from './TableEditor.utils'
 import { TableTemplateSelector } from './TableQuickstart/TableTemplateSelector'
 import { QuickstartVariant } from './TableQuickstart/types'
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 
 const NEW_PROJECT_THRESHOLD_DAYS = 7
 

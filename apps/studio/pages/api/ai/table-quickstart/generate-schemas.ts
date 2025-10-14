@@ -35,23 +35,10 @@ const ResponseSchema = z.object({
 type SchemaStreamResult = ReturnType<typeof streamObject<typeof ResponseSchema>>
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: { message: `Method ${req.method} Not Allowed` } })
   }
-}
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-export default wrapper
-
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     model,
     error: modelError,
@@ -70,7 +57,7 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { prompt } = req.body
 
   if (!prompt) {
-    return res.status(400).json({ error: 'Please provide a description of your application.' })
+    return res.status(400).json({ error: 'Please provide a description of your app.' })
   }
 
   if (typeof prompt !== 'string' || prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
@@ -80,8 +67,6 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const wantsStream = shouldStream(req)
-
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
@@ -116,15 +101,7 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
         prompt: userPrompt,
       })
 
-    if (wantsStream) {
-      await streamSchemaResponse(res, generateStream)
-      return
-    }
-
-    const result = generateStream()
-    const object = await result.object
-
-    return res.status(200).json(object)
+    await streamSchemaResponse(res, generateStream)
   } catch (error) {
     if (error instanceof Error) {
       if (error.message.includes('context_length') || error.message.includes('too long')) {
@@ -140,11 +117,10 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-const shouldStream = (req: NextApiRequest) => {
-  if (req.headers['accept']?.includes('text/event-stream')) return true
-  if (req.headers['x-ai-stream'] === 'true') return true
-  return false
-}
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper
 
 const streamSchemaResponse = async (
   res: NextApiResponse,
