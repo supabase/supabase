@@ -6,19 +6,19 @@
   "registryDependencies": ["button", "card", "input", "label"],
   "files": [
     {
-      "path": "components/login-form.vue",
+      "path": "registry/default/password-based-auth/vue/components/login-form.vue",
       "type": "registry:component"
     },
     {
-      "path": "components/sign-up-form.vue",
+      "path": "registry/default/password-based-auth/vue/components/sign-up-form.vue",
       "type": "registry:component"
     },
     {
-      "path": "components/forgot-password-form.vue",
+      "path": "registry/default/password-based-auth/vue/components/forgot-password-form.vue",
       "type": "registry:component"
     },
     {
-      "path": "components/update-password-form.vue",
+      "path": "registry/default/password-based-auth/vue/components/update-password-form.vue",
       "type": "registry:component"
     }
   ],
