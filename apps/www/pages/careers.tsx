@@ -199,7 +199,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
                     <div className="relative w-full aspect-[148/125]">
                       <Image
-                        src="/images/career/team.jpg"
+                        src="/images/career/team.jpeg"
                         alt="supabase team"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
@@ -214,7 +214,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     <div className="w-full md:w-5/6 rounded-md mt-6">
                       <div className="relative w-full aspect-[29/22]">
                         <Image
-                          src="/images/career/founders.jpg"
+                          src="/images/career/founders.jpeg"
                           alt="supabase founders"
                           fill
                           sizes="(min-width: 767px) 45vw, 100vw"
@@ -275,7 +275,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   <div className="w-full rounded-md mt-6">
                     <div className="relative w-full aspect-[16/9]">
                       <Image
-                        src="/images/career/supateam.jpg"
+                        src="/images/career/supateam.jpeg"
                         alt="supabase company"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
