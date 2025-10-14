@@ -1,7 +1,7 @@
-import { Columns3, Wand2 } from 'lucide-react'
+import { Columns3 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Input_Shadcn_ as Input, cn } from 'ui'
+import { AiIconAnimation, Button, Input_Shadcn_ as Input, cn } from 'ui'
 import type { TableField } from '../TableEditor.types'
 import { AI_QUICK_IDEAS } from './constants'
 import { tableTemplates } from './templates'
@@ -18,6 +18,7 @@ interface TableTemplateSelectorProps {
 }
 
 const SUCCESS_MESSAGE_DURATION_MS = 3000
+const CATEGORIES = Object.keys(tableTemplates)
 
 export const TableTemplateSelector = ({
   variant,
@@ -25,11 +26,11 @@ export const TableTemplateSelector = ({
   onDismiss,
   disabled,
 }: TableTemplateSelectorProps) => {
-  // Templates variant state
+  // State for `templates` variant
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [selectedTemplate, setSelectedTemplate] = useState<TableSuggestion | null>(null)
 
-  // AI variant state
+  // State for `ai` variant
   const [aiPrompt, setAiPrompt] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const {
@@ -41,14 +42,13 @@ export const TableTemplateSelector = ({
   } = useAITableGeneration()
 
   const isAI = variant === QuickstartVariant.AI
-  const categories = useMemo(() => Object.keys(tableTemplates), [])
 
   // Auto-select first category for templates variant
   useEffect(() => {
-    if (!isAI && activeCategory === null && categories.length > 0) {
-      setActiveCategory(categories[0])
+    if (!isAI && activeCategory === null && CATEGORIES.length > 0) {
+      setActiveCategory(CATEGORIES[0])
     }
-  }, [categories, activeCategory, isAI])
+  }, [CATEGORIES, activeCategory, isAI])
 
   // Focus AI input when in AI mode
   useEffect(() => {
@@ -148,7 +148,7 @@ export const TableTemplateSelector = ({
               size="tiny"
               disabled={!aiPrompt.trim() || isGenerating || disabled}
               onClick={() => handleGenerateTables()}
-              loading={isGenerating}
+              icon={<AiIconAnimation />}
               className="absolute right-1 top-1/2 -translate-y-1/2"
             >
               {isGenerating ? 'Generating...' : 'Generate'}
@@ -179,7 +179,7 @@ export const TableTemplateSelector = ({
                       'transition-all'
                     )}
                   >
-                    <Wand2 size={12} className="inline mr-1" aria-hidden="true" />
+                    <AiIconAnimation size={12} className="inline mr-1" />
                     {idea}
                   </button>
                 ))}
