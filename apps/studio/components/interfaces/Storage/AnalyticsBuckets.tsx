@@ -1,16 +1,12 @@
+import { useParams } from 'common'
+import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
-import { IS_PLATFORM } from 'lib/constants'
 import {
-  Badge,
   Button,
   Card,
   DropdownMenu,
@@ -38,7 +34,6 @@ export const AnalyticsBuckets = () => {
   const [selectedBucket, setSelectedBucket] = useState<Bucket>()
   const [filterString, setFilterString] = useState('')
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
 
   const analyticsBuckets = buckets
@@ -111,10 +106,7 @@ export const AnalyticsBuckets = () => {
                       }}
                     >
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <p className="text-foreground">{bucket.name}</p>
-                          {bucket.public && <Badge variant="warning">Public</Badge>}
-                        </div>
+                        <p className="text-foreground">{bucket.name}</p>
                       </TableCell>
 
                       <TableCell>
