@@ -8,7 +8,6 @@ import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'component
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
-import { useAnalyticsIntegrationInstaller } from 'hooks/useAnalyticsIntegrationInstaller'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Badge,
@@ -27,7 +26,6 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { AnalyticsIntegrationAlert } from './AnalyticsIntegrationAlert'
 import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
 import { DeleteBucketModal } from './DeleteBucketModal'
 import { EmptyBucketState } from './EmptyBucketState'
@@ -42,7 +40,6 @@ export const AnalyticsBuckets = () => {
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
-  const { installIntegrations, isLoading: isInstalling } = useAnalyticsIntegrationInstaller()
 
   const analyticsBuckets = buckets
     .filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS')
@@ -62,12 +59,6 @@ export const AnalyticsBuckets = () => {
       ) : (
         // Override the default first:pt-12 to match other storage types
         <ScaffoldSection isFullWidth className="gap-y-4 first:pt-8">
-          <AnalyticsIntegrationAlert
-            context="page"
-            variant="warning"
-            showInstallButton={true}
-            onInstall={installIntegrations}
-          />
           <ScaffoldHeader className="py-0">
             <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
           </ScaffoldHeader>

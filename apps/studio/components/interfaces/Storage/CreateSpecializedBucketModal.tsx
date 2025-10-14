@@ -9,6 +9,7 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
@@ -17,8 +18,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useAnalyticsIntegrationStatus } from 'hooks/useAnalyticsIntegrationStatus'
-import { IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -34,8 +34,8 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { AnalyticsIntegrationAlert } from './AnalyticsIntegrationAlert'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { BUCKET_TYPES } from './Storage.constants'
 
@@ -114,13 +114,6 @@ export const CreateSpecializedBucketModal = ({
     useDatabaseExtensionEnableMutation()
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-  const {
-    canCreateBuckets: canCreateAnalyticsBuckets,
-    icebergCatalogEnabled,
-    needsWrappersExtension,
-    needsIcebergWrapper,
-    extensionState,
-  } = useAnalyticsIntegrationStatus('modal')
 
   const config = BUCKET_TYPES['analytics']
 
@@ -137,12 +130,6 @@ export const CreateSpecializedBucketModal = ({
     // Determine bucket type based on the bucketType prop
     // [Danny] Change STANDARD to VECTORS when ready
     const bucketTypeValue = bucketType === 'analytics' ? 'ANALYTICS' : 'STANDARD'
-
-    if (bucketType === 'analytics' && !icebergCatalogEnabled) {
-      return toast.error(
-        'The Analytics catalog feature is not enabled for your project. Please contact support to enable it.'
-      )
-    }
 
     try {
       // Install wrappers extension if needed
@@ -269,12 +256,22 @@ export const CreateSpecializedBucketModal = ({
             </DialogSection>
 
             {bucketType === 'analytics' && (
-              <>
-                <DialogSectionSeparator />
-                <DialogSection className="space-y-3">
-                  <AnalyticsIntegrationAlert context="modal" variant="default" />
-                </DialogSection>
-              </>
+              <DialogSection className="space-y-3">
+                <Admonition type="default">
+                  <p>
+                    Supabase will install the Wrappers extension and Iceberg Wrapper integration on
+                    your behalf.{' '}
+                    <InlineLink
+                      href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-foreground-lighter hover:text-foreground transition-colors"
+                    >
+                      Learn more
+                    </InlineLink>
+                  </p>
+                </Admonition>
+              </DialogSection>
             )}
           </form>
         </Form_Shadcn_>
