@@ -171,6 +171,7 @@ export const TableTemplateSelector = ({
                     key={idea}
                     onClick={() => handleQuickIdea(idea)}
                     disabled={isGenerating || disabled}
+                    aria-label={`Generate table for ${idea}`}
                     className={cn(
                       'px-2 py-1 rounded-md text-xs border border-default',
                       'hover:border-foreground-muted hover:bg-surface-100',
@@ -178,7 +179,7 @@ export const TableTemplateSelector = ({
                       'transition-all'
                     )}
                   >
-                    <Wand2 size={12} className="inline mr-1" />
+                    <Wand2 size={12} className="inline mr-1" aria-hidden="true" />
                     {idea}
                   </button>
                 ))}
@@ -196,6 +197,9 @@ export const TableTemplateSelector = ({
               key={category}
               onClick={() => setActiveCategory(category)}
               disabled={disabled}
+              role="tab"
+              aria-selected={activeCategory === category}
+              aria-label={`${category} templates category`}
               className={cn(
                 'px-2 py-1 rounded-md text-xs capitalize border',
                 activeCategory === category
@@ -228,6 +232,7 @@ export const TableTemplateSelector = ({
                   if (inputRef.current) inputRef.current.focus()
                 }}
                 disabled={isGenerating}
+                aria-label="Clear results and generate new tables"
               >
                 Generate new
               </Button>
@@ -238,6 +243,8 @@ export const TableTemplateSelector = ({
               key={`${isAI ? 'ai' : activeCategory}:${template.tableName}`}
               onClick={() => handleSelectTemplate(template)}
               disabled={disabled}
+              aria-label={`Select ${template.tableName} template with ${template.fields.length} fields`}
+              aria-pressed={selectedTemplate?.tableName === template.tableName}
               className={cn(
                 'text-left p-3 rounded-md border transition-all w-full',
                 selectedTemplate?.tableName === template.tableName
