@@ -11,10 +11,10 @@ import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { DialogSectionSeparator, Form_Shadcn_, Separator } from 'ui'
 import {
-  CATEGORIES_WITHOUT_AFFECTED_SERVICES,
   AffectedServicesSelector,
+  CATEGORIES_WITHOUT_AFFECTED_SERVICES,
 } from './AffectedServicesSelector'
-import { AttachmentUploadDisplay, useAttachmentUpload } from './AttachmentUpload'
+import { useAttachmentUpload } from './AttachmentUpload'
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
 import { ClientLibraryInfo } from './ClientLibraryInfo'
 import { MessageField } from './MessageField'
@@ -153,7 +153,14 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           <ClientLibraryInfo form={form} library={library} category={category} />
           <AffectedServicesSelector form={form} category={category} />
           <MessageField form={form} originalError={initialError} />
-          <AttachmentUploadDisplay {...attachmentUpload} />
+          {/* <AttachmentUploadDisplay {...attachmentUpload} /> */}
+          <div>
+            <h3 className="text-sm text-foreground">Attachments</h3>
+            <p className="text-sm text-foreground-lighter mt-2">
+              Uploads have been temporarily disabled. Please reply to the acknowledgement email you
+              will receive with any screenshots you'd like to upload
+            </p>
+          </div>
         </div>
 
         <DialogSectionSeparator />
