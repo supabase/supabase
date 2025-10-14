@@ -27,17 +27,20 @@ export const formatMessage = ({
   attachments = [],
   error,
   commit,
+  dashboardLogUrl,
 }: {
   message: string
   attachments?: string[]
   error: string | null | undefined
   commit: string | undefined
+  dashboardLogUrl?: string
 }) => {
   const errorString = error != null ? `\n\nError: ${error}` : ''
   const attachmentsString =
     attachments.length > 0 ? `\n\nAttachments:\n${attachments.join('\n')}` : ''
   const commitString = commit != undefined ? `\n\n---\nSupabase Studio version:  SHA ${commit}` : ''
-  return `${message}${errorString}${attachmentsString}${commitString}`
+  const logString = dashboardLogUrl ? `\nDashboard logs: ${dashboardLogUrl}` : ''
+  return `${message}${errorString}${attachmentsString}${commitString}${logString}`
 }
 
 export function getPageIcon(page: Page) {

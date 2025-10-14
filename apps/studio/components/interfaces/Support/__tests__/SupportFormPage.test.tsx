@@ -81,10 +81,20 @@ vi.mock('react-inlinesvg', () => ({
   default: () => null,
 }))
 
-// Mock the support storage client module - will be configured per test
 vi.mock('../support-storage-client', () => ({
   createSupportStorageClient: vi.fn(),
 }))
+
+vi.mock(import('lib/breadcrumbs'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    getBreadcrumbSnapshot: vi.fn(),
+  }
+})
+
+let createSupportStorageClientMock: ReturnType<typeof vi.fn>
+let getBreadcrumbSnapshotMock: ReturnType<typeof vi.fn>
 
 // Mock sonner toast
 vi.mock('sonner', () => ({
@@ -214,6 +224,13 @@ const selectLibraryOption = async (screen: Screen, optionLabel: string) => {
   await userEvent.click(option)
 }
 
+const getDashboardLogsToggle = (screen: Screen, type: 'find' | 'query' = 'find') => {
+  const labelMatcher = /dashboard .* log/i
+  return type === 'find'
+    ? screen.findByRole('switch', { name: labelMatcher })
+    : screen.queryByRole('switch', { name: labelMatcher })
+}
+
 const getSupportForm = () => {
   const form = document.querySelector<HTMLFormElement>('form#support-form')
   expect(form).not.toBeNull()
@@ -266,10 +283,45 @@ describe('SupportFormPage', () => {
     })
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     mockUseDeploymentCommitQuery.mockReturnValue({
       data: { commitSha: mockCommitSha, commitTime: '2024-01-01T00:00:00Z' },
     })
+    const { createSupportStorageClient } = await import('../support-storage-client')
+    createSupportStorageClientMock = vi.mocked(createSupportStorageClient)
+    createSupportStorageClientMock.mockReset()
+    createSupportStorageClientMock.mockReturnValue({
+      storage: {
+        from: vi.fn(() => ({
+          upload: vi.fn(async (path: string) => ({
+            data: { path },
+            error: null,
+          })),
+          createSignedUrls: vi.fn(async (paths: string[]) => ({
+            data: paths.map((path) => ({
+              signedUrl: `https://storage.example.com/${path}`,
+              path,
+              error: null,
+            })),
+            error: null,
+          })),
+        })),
+      },
+    } as any)
+
+    const breadcrumbsModule = await import('lib/breadcrumbs')
+    getBreadcrumbSnapshotMock = vi.mocked(breadcrumbsModule.getBreadcrumbSnapshot)
+    getBreadcrumbSnapshotMock.mockReset()
+    getBreadcrumbSnapshotMock.mockReturnValue([
+      {
+        timestamp: 1_710_000_000,
+        category: 'ui.action',
+        message: 'Clicked button',
+        level: 'info',
+        data: { route: '/project/_/dashboard' },
+      },
+    ])
+
     Object.defineProperty(window.navigator, 'userAgent', {
       value:
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -1039,6 +1091,236 @@ describe('SupportFormPage', () => {
     }
   }, 10_000)
 
+  test('shows dashboard logs toggle only for Dashboard bug issues', async () => {
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+    })
+
+    expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
+
+    await selectCategoryOption(screen, 'Dashboard bug')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+
+    const dashboardLogToggle = await getDashboardLogsToggle(screen)
+    expect(dashboardLogToggle).toBeChecked()
+
+    await selectCategoryOption(screen, 'APIs and client libraries')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('APIs and client libraries')
+    })
+    await waitFor(() => {
+      expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
+    })
+
+    await selectCategoryOption(screen, 'Dashboard bug')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+    const dashboardLogToggleAgain = await getDashboardLogsToggle(screen)
+    expect(dashboardLogToggleAgain).toBeChecked()
+  })
+
+  test('skips dashboard log upload when toggle is disabled', async () => {
+    const submitSpy = vi.fn()
+    const upload = vi.fn(async () => ({
+      data: { path: 'dashboard-logs/mock.log.json' },
+      error: null,
+    }))
+    const createSignedUrls = vi.fn(async (paths: string[]) => ({
+      data: paths.map((path) => ({
+        signedUrl: `https://storage.example.com/${path}`,
+        path,
+        error: null,
+      })),
+      error: null,
+    }))
+
+    createSupportStorageClientMock.mockReturnValue({
+      storage: {
+        from: vi.fn(() => ({
+          upload,
+          createSignedUrls,
+        })),
+      },
+    } as any)
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json({ ok: true })
+      },
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+    })
+
+    await selectCategoryOption(screen, 'Dashboard bug')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+
+    const dashboardLogToggle = await getDashboardLogsToggle(screen)
+    expect(dashboardLogToggle).toBeChecked()
+    await userEvent.click(dashboardLogToggle!)
+    expect(dashboardLogToggle).not.toBeChecked()
+
+    await userEvent.type(getSummaryField(screen), 'Dashboard charts crashing')
+    await userEvent.type(getMessageField(screen), 'Charts throw error on load')
+
+    await userEvent.click(getSubmitButton(screen))
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledTimes(1)
+    })
+
+    expect(upload).not.toHaveBeenCalled()
+    expect(createSignedUrls).not.toHaveBeenCalled()
+
+    const payload = submitSpy.mock.calls[0]?.[0]
+    expect(payload.message).toContain('Charts throw error on load')
+    expect(payload.message).not.toContain('Dashboard logs:')
+  })
+
+  test('skips dashboard log upload when toggle hidden', async () => {
+    const submitSpy = vi.fn()
+    const upload = vi.fn(async () => ({
+      data: { path: 'dashboard-logs/mock.log.json' },
+      error: null,
+    }))
+    const createSignedUrls = vi.fn(async (paths: string[]) => ({
+      data: paths.map((path) => ({
+        signedUrl: `https://storage.example.com/${path}`,
+        path,
+        error: null,
+      })),
+      error: null,
+    }))
+
+    createSupportStorageClientMock.mockReturnValue({
+      storage: {
+        from: vi.fn(() => ({
+          upload,
+          createSignedUrls,
+        })),
+      },
+    } as any)
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json({ ok: true })
+      },
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+    })
+
+    await selectCategoryOption(screen, 'Database unresponsive')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Database unresponsive')
+    })
+
+    expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
+
+    await userEvent.type(getSummaryField(screen), 'Dashboard charts crashing')
+    await userEvent.type(getMessageField(screen), 'Charts throw error on load')
+
+    await userEvent.click(getSubmitButton(screen))
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledTimes(1)
+    })
+
+    expect(upload).not.toHaveBeenCalled()
+    expect(createSignedUrls).not.toHaveBeenCalled()
+
+    const payload = submitSpy.mock.calls[0]?.[0]
+    expect(payload.message).toContain('Charts throw error on load')
+    expect(payload.message).not.toContain('Dashboard logs:')
+  })
+
+  test('uploads dashboard logs when enabled and appends link to message', async () => {
+    const submitSpy = vi.fn()
+    const upload = vi.fn(async (path: string) => ({ data: { path }, error: null }))
+    const createSignedUrls = vi.fn(async (paths: string[], _expiry: number) => ({
+      data: paths.map((path) => ({
+        signedUrl: `https://storage.example.com/signed/${path}`,
+        path,
+        error: null,
+      })),
+      error: null,
+    }))
+
+    createSupportStorageClientMock.mockReturnValue({
+      storage: {
+        from: vi.fn(() => ({
+          upload,
+          createSignedUrls,
+        })),
+      },
+    } as any)
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json({ ok: true })
+      },
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+    })
+
+    await selectCategoryOption(screen, 'Dashboard bug')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+
+    const dashboardLogToggle = await screen.findByRole('switch', {
+      name: /include dashboard activity log/i,
+    })
+    expect(dashboardLogToggle).toBeChecked()
+
+    await userEvent.type(getSummaryField(screen), 'Dashboard navigation broken')
+    await userEvent.type(
+      getMessageField(screen),
+      'Navigation menu does not respond after latest deploy'
+    )
+
+    await userEvent.click(getSubmitButton(screen))
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledTimes(1)
+    })
+
+    expect(upload).toHaveBeenCalledTimes(1)
+    expect(createSignedUrls).toHaveBeenCalledTimes(1)
+
+    const payload = submitSpy.mock.calls[0]?.[0]
+    expect(payload.message).toContain('Navigation menu does not respond after latest deploy')
+    expect(payload.message).toMatch(
+      /Dashboard logs: https:\/\/storage\.example\.com\/signed\/.+\.json/
+    )
+  })
+
   test('shows toast on submission error and allows form re-editing and resubmission', async () => {
     const submitSpy = vi.fn()
     const toastErrorSpy = vi.fn()
@@ -1107,10 +1389,10 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.subject).toBe('Cannot access settings')
-    expect(payload.message).toBe(
-      'Settings page shows 500 error - updated description\n\n---\nSupabase Studio version:  SHA ' +
-        mockCommitSha
+    expect(payload.message).toContain(
+      `Settings page shows 500 error - updated description\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}\nDashboard logs: https://storage.example.com`
     )
+    expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
 
     await waitFor(() => {
       expect(toastSuccessSpy).toHaveBeenCalledWith('Support request sent. Thank you!')
@@ -1146,7 +1428,6 @@ describe('SupportFormPage', () => {
       'https://storage.example.com/signed/file2.jpg?token=def456',
     ]
 
-    const { createSupportStorageClient } = await import('../support-storage-client')
     const mockStorageClient = {
       storage: {
         from: vi.fn(() => ({
@@ -1157,7 +1438,8 @@ describe('SupportFormPage', () => {
         })),
       },
     }
-    vi.mocked(createSupportStorageClient).mockReturnValue(mockStorageClient as any)
+
+    createSupportStorageClientMock.mockReturnValue(mockStorageClient as any)
 
     mswServer.use(
       http.post('http://localhost:3000/api/generate-attachment-url', async ({ request }) => {
@@ -1268,7 +1550,7 @@ describe('SupportFormPage', () => {
       unmount?.()
       url.createObjectURL = originalCreateObjectURL
       url.revokeObjectURL = originalRevokeObjectURL
-      vi.mocked(createSupportStorageClient).mockReset()
+      createSupportStorageClientMock.mockReset()
     }
   }, 10_000)
 
@@ -1332,10 +1614,9 @@ describe('SupportFormPage', () => {
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
     })
-    const expectedMessage =
-      'I need help accessing my Supabase account\n\n---\nSupabase Studio version:  SHA ' +
-      mockCommitSha
-    expect(payload.message).toBe(expectedMessage)
+    const expectedMessage = `I need help accessing my Supabase account\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}\nDashboard logs:/https://storage.example.com`
+    expect(payload.message).toContain(expectedMessage)
+    expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
