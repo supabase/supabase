@@ -31,7 +31,7 @@ export function ApiKeyPill({
 
   // Function to fetch the full API key
   async function fetchFullApiKey(): Promise<string> {
-    if (!apiKey.id) return apiKey.api_key // Early return if no id
+    if (!apiKey.id || !projectRef) return apiKey.api_key // Early return if missing params
 
     try {
       const { data, error } = await get('/v1/projects/{ref}/api-keys/{id}', {
@@ -101,7 +101,7 @@ export function ApiKeyPill({
       onCopy={handleCopy}
       reveal={isSecret}
       onReveal={handleReveal}
-      hiddenPlaceholder={hiddenPlaceholder}
+      {...(hiddenPlaceholder ? { hiddenPlaceholder } : {})}
       disabled={isRestricted || isLoadingPermission}
     />
   )
