@@ -1,0 +1,48 @@
+---
+title = "Inspecting Query Plans Inside Postgres Functions"
+topics = [ "platform", "database", "functions"]
+keywords = [ "postgres", "RPC", "database", "EXPLAIN", "ANALYZE", "auto_explain", "PLPGSQL ]
+---
+
+# Inspecting Postgres Query Plans Inside Functions
+
+To understand how queries inside a Postgres function perform, you might try running `explain analyze` on the function itself. 
+However, this usually only returns a **function scan or result node**, providing little insight into the actual execution of the function’s internal queries.
+
+
+There are 4 work-arounds to get the underlying plans:
+1. *Extract and Explain*: Run `explain analyze` directly on the function’s internal queries.
+2. *Exploit Inlining*: Rewrite the function so Postgres can inline its queries during planning.
+3. *Use CTEs*: Restructure the function as a single query with Common Table Expressions.
+4. *Auto-Explain*: Use the preinstalled [auto_explain extension](https://www.postgresql.org/docs/current/auto-explain.html) to automatically log query plans.
+
+Of these, auto_explain is the simplest option. It logs the plans of queries that exceed the `auto_explain.log_min_duration threshold` setting, and it’s the only method that doesn’t require rewriting any SQL. For that reason, it’s usually the best place to start.
+
+To get useful query plans from auto_explain, the following settings will need to be updated:
+- `auto_explain.log_nested_statements`: Log plans for queries inside functions.
+- `auto_explain.log_analyze`: Use `explain analyze` (not just `explain`) to include timing details.
+- `auto_explain.log_min_duration`: Only log plans for queries exceeding this duration threshold.
+
+Unfortunately, changing these settings at the database or even role level will result in excess logging and could even cause server stress. Instead, one can change the configs within a `begin/rollback` block with the `SET LOCAL` command. This ensures the changes are isolated to the transaction, and any writes made during testing are undone.
+
+```sql
+begin;
+
+set local auto_explain.log_min_duration = '0';          -- log all query plans
+set local auto_explain.log_analyze = true;              -- use explain analyze
+set local auto_explain.log_nested_statements = true;    -- log query plans in functions
+
+select example_func(); ---<--ADD YOUR FUNCTION HERE
+
+rollback;
+```
+
+After running your test, you should be able to find the plan in the postgres logs. The auto_explain module always starts logs with the term "duration:". You can use this term to isolate results:
+
+![image](/docs/img/troubleshooting/duration.png)
+
+The query and its plan can be found in a duration log's event message:
+
+![image](/docs/img/troubleshooting/duration_as_a_log.png)
+
+It may be difficult to read directly in the log explorer, but you could paste the output into "https://removelinebreaks.net" or ask an LLM to format it.
