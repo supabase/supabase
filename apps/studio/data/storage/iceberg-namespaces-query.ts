@@ -19,7 +19,7 @@ async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVari
   headers = await constructHeaders({
     'Content-Type': 'application/json',
     apikey: `${token}`,
-    Authorization: `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   })
   // headers.delete('Authorization')
   // } else {
