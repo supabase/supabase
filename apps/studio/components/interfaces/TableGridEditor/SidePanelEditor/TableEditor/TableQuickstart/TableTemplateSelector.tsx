@@ -148,7 +148,7 @@ export const TableTemplateSelector = ({
               size="tiny"
               disabled={!aiPrompt.trim() || isGenerating || disabled}
               onClick={() => handleGenerateTables()}
-              icon={<AiIconAnimation />}
+              icon={<AiIconAnimation loading={isGenerating} />}
               className="absolute right-1 top-1/2 -translate-y-1/2"
             >
               {isGenerating ? 'Generating...' : 'Generate'}
@@ -173,14 +173,14 @@ export const TableTemplateSelector = ({
                     disabled={isGenerating || disabled}
                     aria-label={`Generate table for ${idea}`}
                     className={cn(
-                      'px-2 py-1 rounded-md text-xs border border-default',
+                      'flex items-center gap-1 px-2 py-1 rounded-md text-xs border border-default',
                       'hover:border-foreground-muted hover:bg-surface-100',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                       'transition-all'
                     )}
                   >
-                    <AiIconAnimation size={12} className="inline mr-1" />
-                    {idea}
+                    <AiIconAnimation size={12} />
+                    <span>{idea}</span>
                   </button>
                 ))}
               </div>
@@ -192,7 +192,7 @@ export const TableTemplateSelector = ({
       {/* Templates Variant: Category Tabs */}
       {!isAI && (
         <div className="flex flex-wrap gap-2 mb-3">
-          {categories.map((category) => (
+          {CATEGORIES.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
