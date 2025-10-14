@@ -8,6 +8,8 @@ import apiWrapper from 'lib/api/apiWrapper'
 
 export const maxDuration = 30
 
+const MAX_RETRIES = 1
+
 const ColumnSchema = z.object({
   name: z.string().describe('The column name in snake_case'),
   type: z.string().describe('PostgreSQL data type (e.g., bigint, text, timestamp with time zone)'),
@@ -137,7 +139,6 @@ const streamSchemaResponse = async (
     res.write(`data: ${JSON.stringify(data)}\n\n`)
   }
 
-  const MAX_RETRIES = 1
   let attempt = 0
   let lastPartial: any = null
   let chunkCount = 0
