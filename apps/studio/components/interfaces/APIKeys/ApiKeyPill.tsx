@@ -123,7 +123,8 @@ export function ApiKeyPill({
     <Input
       readOnly
       value={displayValue}
-      className="font-mono w-full"
+      containerClassName="w-full"
+      className="font-mono"
       style={{ userSelect: 'all' }}
       copy={true}
       onCopy={handleCopy}
