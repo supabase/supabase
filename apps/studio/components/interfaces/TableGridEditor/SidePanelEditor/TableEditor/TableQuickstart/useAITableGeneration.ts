@@ -241,8 +241,6 @@ export const useAITableGeneration = () => {
       const headers = await constructHeaders()
       headers.set('Content-Type', 'application/json')
       headers.set('Accept', 'text/event-stream')
-      headers.set('X-AI-Stream', 'true')
-      headers.set('X-AI-Stream-Object', 'true')
 
       const response = await fetch(
         `${BASE_PATH}/api/ai/table-quickstart/generate-schemas`,
