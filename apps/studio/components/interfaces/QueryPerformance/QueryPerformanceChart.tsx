@@ -129,7 +129,15 @@ export const QueryPerformanceChart = ({
       return normalized === normalizedSelected
     })
 
-    const queryTimeMap = new Map<number, number>()
+    const queryDataMap = new Map<
+      number,
+      {
+        time: number
+        rows_read: number
+        calls: number
+        cache_hits: number
+      }
+    >()
 
     queryLogs.forEach((log) => {
       const timestamps = [log.bucket_start_time, log.bucket, log.timestamp, log.ts]
@@ -139,11 +147,19 @@ export const QueryPerformanceChart = ({
 
       const time = new Date(validTimestamp).getTime()
       const meanTime = log.mean_time ?? log.mean_exec_time ?? log.mean_query_time ?? 0
+      const rowsRead = log.rows_read ?? log.rows ?? 0
+      const calls = log.calls ?? 0
+      const cacheHits = log.shared_blks_hit ?? log.cache_hits ?? 0
 
-      queryTimeMap.set(time, parseFloat(String(meanTime)))
+      queryDataMap.set(time, {
+        time: parseFloat(String(meanTime)),
+        rows_read: parseFloat(String(rowsRead)),
+        calls: parseFloat(String(calls)),
+        cache_hits: parseFloat(String(cacheHits)),
+      })
     })
 
-    return queryTimeMap
+    return queryDataMap
   }, [currentSelectedQuery, parsedLogs])
 
   const mergedChartData = useMemo(() => {
@@ -152,14 +168,23 @@ export const QueryPerformanceChart = ({
     }
 
     return transformedChartData.map((dataPoint) => {
-      const queryValue = querySpecificData.get(dataPoint.period_start)
+      const queryData = querySpecificData.get(dataPoint.period_start)
 
       return {
         ...dataPoint,
-        selected_query_time: queryValue !== undefined ? queryValue : null,
+        selected_query_time:
+          queryData?.time !== undefined
+            ? selectedMetric === 'query_latency'
+              ? queryData.time / 1000
+              : queryData.time
+            : null,
+        selected_query_rows_read: queryData?.rows_read !== undefined ? queryData.rows_read : null,
+        selected_query_calls: queryData?.calls !== undefined ? queryData.calls : null,
+        selected_query_cache_hits:
+          queryData?.cache_hits !== undefined ? queryData.cache_hits : null,
       }
     })
-  }, [transformedChartData, querySpecificData, currentSelectedQuery])
+  }, [transformedChartData, querySpecificData, currentSelectedQuery, selectedMetric])
 
   const getChartAttributes = useMemo((): MultiAttribute[] => {
     const attributeMap: Record<string, MultiAttribute[]> = {
@@ -206,10 +231,10 @@ export const QueryPerformanceChart = ({
 
     const baseAttributes = attributeMap[selectedMetric] || []
 
-    if (currentSelectedQuery && querySpecificData && selectedMetric === 'query_latency') {
-      return [
-        ...baseAttributes,
-        {
+    // Add selected query line based on current metric
+    if (currentSelectedQuery && querySpecificData) {
+      const selectedQueryAttributes: Record<string, MultiAttribute> = {
+        query_latency: {
           attribute: 'selected_query_time',
           label: 'Selected Query',
           provider: 'logs',
@@ -217,7 +242,36 @@ export const QueryPerformanceChart = ({
           color: { light: '#10B981', dark: '#10B981' },
           strokeWidth: 3,
         },
-      ]
+        rows_read: {
+          attribute: 'selected_query_rows_read',
+          label: 'Selected Query',
+          provider: 'logs',
+          type: 'line',
+          color: { light: '#F59E0B', dark: '#F59E0B' },
+          strokeWidth: 3,
+        },
+        calls: {
+          attribute: 'selected_query_calls',
+          label: 'Selected Query',
+          provider: 'logs',
+          type: 'line',
+          color: { light: '#EC4899', dark: '#EC4899' },
+          strokeWidth: 3,
+        },
+        cache_hits: {
+          attribute: 'selected_query_cache_hits',
+          label: 'Selected Query',
+          provider: 'logs',
+          type: 'line',
+          color: { light: '#8B5CF6', dark: '#8B5CF6' },
+          strokeWidth: 3,
+        },
+      }
+
+      const selectedQueryAttr = selectedQueryAttributes[selectedMetric]
+      if (selectedQueryAttr) {
+        return [...baseAttributes, selectedQueryAttr]
+      }
     }
 
     return baseAttributes
