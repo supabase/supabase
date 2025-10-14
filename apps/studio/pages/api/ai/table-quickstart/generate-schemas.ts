@@ -61,11 +61,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   if (typeof prompt !== 'string' || prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
-    return res
-      .status(400)
-      .json({
-        error: `Your description is too long. Please keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.`,
-      })
+    return res.status(400).json({
+      error: `Your description is too long. Please keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.`,
+    })
   }
 
   try {
@@ -159,12 +157,12 @@ const streamSchemaResponse = async (
         return false
       }
 
-      const hasTables = (obj: unknown): obj is { tables: unknown[] } =>
-        typeof obj === 'object' &&
-        obj !== null &&
-        'tables' in obj &&
-        Array.isArray((obj as { tables: unknown }).tables) &&
-        (obj as { tables: unknown[] }).tables.length > 0
+      const hasTablesProp = (obj: unknown): obj is { tables: unknown[] } => {
+        if (typeof obj !== 'object' || obj === null || !('tables' in obj)) {
+          return false
+        }
+        return Array.isArray((obj as any).tables)
+      }
 
       let finalObject: unknown = null
       try {
@@ -173,16 +171,16 @@ const streamSchemaResponse = async (
         finalObject = null
       }
 
-      if (hasTables(finalObject) && finalObject.tables.length > LIMITS.MAX_TABLES) {
+      if (hasTablesProp(finalObject) && finalObject.tables.length > LIMITS.MAX_TABLES) {
         finalObject.tables = finalObject.tables.slice(0, LIMITS.MAX_TABLES)
       }
 
       const parseResult = finalObject ? ResponseSchema.safeParse(finalObject) : null
       const objectToSend = parseResult?.success
         ? parseResult.data
-        : hasTables(finalObject)
+        : hasTablesProp(finalObject)
           ? finalObject
-          : hasTables(lastPartial)
+          : hasTablesProp(lastPartial)
             ? lastPartial
             : null
 
