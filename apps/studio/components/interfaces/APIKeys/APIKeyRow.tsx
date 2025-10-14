@@ -1,5 +1,4 @@
 import { APIKeysData } from 'data/api-keys/api-keys-query'
-import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
 import {
   Button,
@@ -19,21 +18,8 @@ export const APIKeyRow = ({
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
   lastSeen?: { timestamp: string }
 }) => {
-  const MotionTableRow = motion.create(TableRow)
-
   return (
-    <MotionTableRow
-      layout
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 500,
-        damping: 50,
-        mass: 1,
-      }}
-    >
+    <TableRow>
       <TableCell className="py-2">
         <div className="flex flex-col">
           <span className="font-medium">{apiKey.name}</span>
@@ -70,6 +56,6 @@ export const APIKeyRow = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
-    </MotionTableRow>
+    </TableRow>
   )
 }
