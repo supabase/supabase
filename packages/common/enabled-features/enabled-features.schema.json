@@ -276,6 +276,10 @@
       "type": "boolean",
       "description": "Show the security settings tab in the organization settings page"
     },
+    "organization:show_legal_documents": {
+      "type": "boolean",
+      "description": "Show the legal documents tab in the organization settings page"
+    },
 
     "profile:show_email": {
       "type": "boolean",
@@ -472,6 +476,8 @@
     "logs:metadata",
     "logs:show_metadata_ip_template",
     "organization:show_sso_settings",
+    "organization:show_security_settings",
+    "organization:show_legal_documents",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
