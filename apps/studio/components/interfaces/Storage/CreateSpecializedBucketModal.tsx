@@ -132,26 +132,6 @@ export const CreateSpecializedBucketModal = ({
     const bucketTypeValue = bucketType === 'analytics' ? 'ANALYTICS' : 'STANDARD'
 
     try {
-      // Install wrappers extension if needed
-      if (needsWrappersExtension) {
-        await enableExtension({
-          projectRef: ref,
-          connectionString: undefined,
-          name: 'wrappers',
-          schema: 'extensions',
-          version: '1.0',
-          cascade: true,
-          createSchema: false,
-        })
-        toast.success('Successfully installed wrappers extension')
-      }
-
-      // Install Iceberg Wrapper integration if needed
-      if (needsIcebergWrapper) {
-        await createIcebergWrapper({ bucketName: 'default' })
-        toast.success('Successfully installed Iceberg Wrapper integration')
-      }
-
       await createBucket({
         projectRef: ref,
         id: values.name,
@@ -166,11 +146,6 @@ export const CreateSpecializedBucketModal = ({
         properties: { bucketType: bucketTypeValue },
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
-
-      // Create iceberg wrapper for analytics buckets if everything is properly installed
-      if (bucketType === 'analytics' && extensionState === 'installed') {
-        await createIcebergWrapper({ bucketName: values.name })
-      }
 
       toast.success(`Created bucket “${values.name}”`)
       form.reset()
@@ -277,19 +252,10 @@ export const CreateSpecializedBucketModal = ({
         </Form_Shadcn_>
 
         <DialogFooter>
-          <Button
-            type="default"
-            disabled={isCreating || isCreatingIcebergWrapper || isEnablingExtension}
-            onClick={() => setVisible(false)}
-          >
+          <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button
-            form={formId}
-            htmlType="submit"
-            loading={isCreating || isCreatingIcebergWrapper || isEnablingExtension}
-            disabled={isCreating || isCreatingIcebergWrapper || isEnablingExtension}
-          >
+          <Button form={formId} htmlType="submit" loading={isCreating} disabled={isCreating}>
             Create
           </Button>
         </DialogFooter>
