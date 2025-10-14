@@ -9,7 +9,7 @@ import {
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { Plus } from 'lucide-react'
+import { Plus, RefreshCw } from 'lucide-react'
 import type { CSSProperties, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,8 +18,10 @@ import { useParams } from 'common'
 import { SnippetDropdown } from 'components/interfaces/HomeNew/SnippetDropdown'
 import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
 import type { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { useInvalidateAnalyticsQuery } from 'data/analytics/utils'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
@@ -28,6 +30,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
@@ -35,10 +38,15 @@ import { Row } from 'ui-patterns'
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
   const endDate = dayjs().toISOString()
+
   const { ref } = useParams()
   const { profile } = useProfile()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const state = useDatabaseSelectorStateSnapshot()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { invalidateInfraMonitoringQuery } = useInvalidateAnalyticsQuery()
+
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
@@ -269,6 +277,25 @@ export function CustomReportSection() {
     persistReport(updated)
   }
 
+  const onRefreshReport = () => {
+    if (!ref) return
+
+    setIsRefreshing(true)
+    const monitoringCharts = editableReport?.layout.filter(
+      (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'
+    )
+    monitoringCharts?.forEach((x) => {
+      invalidateInfraMonitoringQuery(ref, {
+        attribute: x.attribute,
+        startDate,
+        endDate,
+        interval: editableReport?.interval || '1d',
+        databaseIdentifier: state.selectedDatabaseId,
+      })
+    })
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }
+
   const layout = useMemo(() => editableReport?.layout ?? [], [editableReport])
 
   useEffect(() => {
@@ -279,20 +306,32 @@ export function CustomReportSection() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="heading-section">Reports</h3>
-        {canUpdateReport || canCreateReport ? (
-          <SnippetDropdown
-            projectRef={ref}
-            onSelect={addSnippetToReport}
-            trigger={
-              <Button type="default" icon={<Plus />}>
-                Add block
-              </Button>
-            }
-            side="bottom"
-            align="end"
-            autoFocus
-          />
-        ) : null}
+        <div className="flex items-center gap-x-2">
+          {layout.length > 0 && (
+            <ButtonTooltip
+              type="default"
+              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              disabled={isRefreshing}
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
+            />
+          )}
+          {canUpdateReport || canCreateReport ? (
+            <SnippetDropdown
+              projectRef={ref}
+              onSelect={addSnippetToReport}
+              trigger={
+                <Button type="default" icon={<Plus />}>
+                  Add block
+                </Button>
+              }
+              side="bottom"
+              align="end"
+              autoFocus
+            />
+          ) : null}
+        </div>
       </div>
       <div className="relative">
         {layout.length === 0 ? (
@@ -343,7 +382,7 @@ export function CustomReportSection() {
                           ('1d' as AnalyticsInterval)
                         }
                         disableUpdate={false}
-                        isRefreshing={false}
+                        isRefreshing={isRefreshing}
                         onRemoveChart={handleRemoveChart}
                         onUpdateChart={(config) => handleUpdateChart(item.id, config)}
                       />

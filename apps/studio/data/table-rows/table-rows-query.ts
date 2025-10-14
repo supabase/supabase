@@ -7,6 +7,7 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query'
 
+import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
@@ -19,7 +20,6 @@ import {
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
-import { THRESHOLD_COUNT } from './table-rows-count-query'
 import { formatFilterValue } from './utils'
 
 export interface GetTableRowsArgs {

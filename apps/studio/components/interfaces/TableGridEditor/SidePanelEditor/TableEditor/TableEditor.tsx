@@ -16,12 +16,14 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -93,6 +95,10 @@ export const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
+
+  /**
+   * PostHog flag to enable a specific variant of the table quickstart experiment.
+   */
   const tableQuickstartVariant = usePHFlag('tableQuickstart') as
     | QuickstartVariant
     | false
@@ -112,6 +118,8 @@ export const TableEditor = ({
   const handleQuickstartDismiss = useCallback(() => {
     setQuickstartDismissed(true)
   }, [setQuickstartDismissed])
+
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -378,7 +386,7 @@ export const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         ) : (
@@ -396,7 +404,7 @@ export const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         )}
