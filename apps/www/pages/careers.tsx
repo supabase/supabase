@@ -184,7 +184,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               <div className="md:flex md:gap-6">
                 <div className="md:w-1/2">
                   <div>
-                    <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">
+                    <h2 className="text-2xl pb-2 sm:text-3xl xl:text-4xl tracking-[-1px]">
                       What is Supabase
                     </h2>
                     <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
@@ -275,7 +275,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   <div className="w-full rounded-md mt-6">
                     <div className="relative w-full aspect-[16/9]">
                       <Image
-                        src="/images/career/supateam.jpeg"
+                        src="/images/career/supateam.jpg"
                         alt="supabase company"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
