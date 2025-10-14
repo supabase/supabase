@@ -18,12 +18,12 @@ export async function updateInvoicePaymentLink({
   if (!invoiceId) throw new Error('Invoice ID is required')
 
   const { data, error } = await get(
-    '/platform/organizations/{slug}/billing/invoices/{invoiceId}/payment-link',
+    '/platform/organizations/{slug}/billing/invoices/{invoice_id}/payment-link',
     {
       params: {
         path: {
           slug,
-          invoiceId,
+          invoice_id: invoiceId,
         },
       },
     }
