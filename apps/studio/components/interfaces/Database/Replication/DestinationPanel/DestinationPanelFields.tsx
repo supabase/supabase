@@ -295,7 +295,7 @@ export const AnalyticsBucketFields = ({
 
       <DialogSectionSeparator />
 
-      <p className="px-5 text-sm text-foreground-light px-5">Credentials</p>
+      <p className="px-5 text-sm text-foreground-light">Credentials</p>
 
       <FormField_Shadcn_
         control={form.control}
