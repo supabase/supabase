@@ -1908,8 +1908,8 @@ export interface ApiDocsCodeCopyButtonClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/auth/users
  */
-export interface AuthUsersSearchedEvent {
-  action: 'auth_users_searched'
+export interface AuthUsersSearchSubmittedEvent {
+  action: 'auth_users_search_submitted'
   properties: {
     /**
      * The trigger that initiated the search
@@ -1940,6 +1940,11 @@ export interface AuthUsersSearchedEvent {
      * The keywords being searched for
      */
     keywords?: string
+    /**
+     * The column being filtered on, e.g. email, phone
+     * (only included if filtering by a specific column and not all columns)
+     */
+    filter_column?: string
   }
   groups: TelemetryGroups
 }
@@ -2057,4 +2062,4 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
-  | AuthUsersSearchedEvent
+  | AuthUsersSearchSubmittedEvent
