@@ -202,7 +202,7 @@ const streamSchemaResponse = async (
 
       if (attempt === MAX_RETRIES) {
         throw new Error(
-          'The AI had trouble understanding your request. Try describing your application differently.'
+          'The AI had trouble understanding your request. Try describing your app differently.'
         )
       }
     }
