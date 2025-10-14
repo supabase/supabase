@@ -1729,6 +1729,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/available-regions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Gets the list of available regions that can be used for a new project */
+    get: operations['v1-get-available-regions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/snippets': {
     parameters: {
       query?: never
@@ -1951,6 +1968,9 @@ export interface components {
       external_zoom_email_optional: boolean | null
       external_zoom_enabled: boolean | null
       external_zoom_secret: string | null
+      hook_after_user_created_enabled: boolean | null
+      hook_after_user_created_secrets: string | null
+      hook_after_user_created_uri: string | null
       hook_before_user_created_enabled: boolean | null
       hook_before_user_created_secrets: string | null
       hook_before_user_created_uri: string | null
@@ -2139,6 +2159,8 @@ export interface components {
        */
       latest_check_run_id?: number
       name: string
+      /** Format: uri */
+      notify_url?: string
       parent_project_ref: string
       persistent: boolean
       /** Format: int32 */
@@ -2232,6 +2254,11 @@ export interface components {
         | '48xlarge_high_memory'
       git_branch?: string
       is_default?: boolean
+      /**
+       * Format: uri
+       * @description HTTP endpoint to receive branch status updates.
+       */
+      notify_url?: string
       persistent?: boolean
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.
@@ -2900,10 +2927,11 @@ export interface components {
       redirect_uri?: string
       refresh_token?: string
       /**
+       * Format: uri
        * @description Resource indicator for MCP (Model Context Protocol) clients
-       * @enum {string}
        */
-      resource?: 'https://api.supabase.green/mcp' | 'https://mcp.supabase.green/mcp'
+      resource?: string
+      scope?: string
     }
     OAuthTokenResponse: {
       access_token: string
@@ -2932,8 +2960,6 @@ export interface components {
         }[]
         /** @enum {string} */
         source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
-        target_organization_eligible: boolean | null
-        target_organization_has_free_project_slots: boolean | null
         /** @enum {string|null} */
         target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
         valid: boolean
@@ -3027,6 +3053,46 @@ export interface components {
       enabled: boolean
       override_active_until: string
       override_enabled: boolean
+    }
+    RegionsInfo: {
+      all: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'emea' | 'apac'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }[]
+        specific: {
+          code: string
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
+      recommendations: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'emea' | 'apac'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }
+        specific: {
+          code: string
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
     }
     RemoveNetworkBanRequest: {
       identifier?: string
@@ -3332,6 +3398,9 @@ export interface components {
       external_zoom_email_optional?: boolean | null
       external_zoom_enabled?: boolean | null
       external_zoom_secret?: string | null
+      hook_after_user_created_enabled?: boolean | null
+      hook_after_user_created_secrets?: string | null
+      hook_after_user_created_uri?: string | null
       hook_before_user_created_enabled?: boolean | null
       hook_before_user_created_secrets?: string | null
       hook_before_user_created_uri?: string | null
@@ -3469,6 +3538,11 @@ export interface components {
     UpdateBranchBody: {
       branch_name?: string
       git_branch?: string
+      /**
+       * Format: uri
+       * @description HTTP endpoint to receive branch status updates.
+       */
+      notify_url?: string
       persistent?: boolean
       request_review?: boolean
       /**
@@ -3751,10 +3825,17 @@ export interface components {
        */
       plan?: 'free' | 'pro'
       /**
-       * @description Region you want your server to reside in
+       * @deprecated
+       * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
-      region:
+      postgres_engine?: '15' | '17' | '17-oriole'
+      /**
+       * @deprecated
+       * @description Region you want your server to reside in. Use region_selection instead.
+       * @enum {string}
+       */
+      region?:
         | 'us-east-1'
         | 'us-east-2'
         | 'us-west-1'
@@ -3773,6 +3854,54 @@ export interface components {
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
+      /**
+       * @description Region selection. Only one of region or region_selection can be specified.
+       * @example { type: 'smartGroup', code: 'americas' }
+       */
+      region_selection?:
+        | {
+            /**
+             * @description Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.
+             * @enum {string}
+             */
+            code:
+              | 'us-east-1'
+              | 'us-east-2'
+              | 'us-west-1'
+              | 'us-west-2'
+              | 'ap-east-1'
+              | 'ap-southeast-1'
+              | 'ap-northeast-1'
+              | 'ap-northeast-2'
+              | 'ap-southeast-2'
+              | 'eu-west-1'
+              | 'eu-west-2'
+              | 'eu-west-3'
+              | 'eu-north-1'
+              | 'eu-central-1'
+              | 'eu-central-2'
+              | 'ca-central-1'
+              | 'ap-south-1'
+              | 'sa-east-1'
+            /** @enum {string} */
+            type: 'specific'
+          }
+        | {
+            /**
+             * @description The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.
+             * @example apac
+             * @enum {string}
+             */
+            code: 'americas' | 'emea' | 'apac'
+            /** @enum {string} */
+            type: 'smartGroup'
+          }
+      /**
+       * @deprecated
+       * @description Release channel. If not provided, GA will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
@@ -4322,7 +4451,7 @@ export interface operations {
         organization_slug?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
-        resource?: 'https://api.supabase.green/mcp' | 'https://mcp.supabase.green/mcp'
+        resource?: string
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
@@ -10672,6 +10801,30 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  'v1-get-available-regions': {
+    parameters: {
+      query: {
+        /** @description Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica) */
+        continent?: 'NA' | 'SA' | 'EU' | 'AF' | 'AS' | 'OC' | 'AN'
+        /** @description Slug of your organization */
+        organization_slug: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RegionsInfo']
+        }
       }
     }
   }
