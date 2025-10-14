@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { usePrevious } from '@uidotdev/usehooks'
 import { useParams } from 'common/hooks/useParams'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -22,6 +23,7 @@ import { Admonition } from 'ui-patterns'
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const { id, ref, content, skip } = useParams()
+  const previousRoute = usePrevious(id)
   const { data: project } = useSelectedProjectQuery()
 
   const editor = useEditorType()
@@ -34,8 +36,6 @@ const SqlEditor: NextPageWithLayout = () => {
 
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
 
-  // [Refactor] There's an unnecessary request getting triggered when we start typing while on /new
-  // the URL ID gets updated and we attempt to fetch content for a snippet that's not been created yet
   // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
   // the snapV2 valtio store for some reason hence why the added typeof check here
   const canFetchContentBasedOnId = Boolean(
@@ -53,6 +53,14 @@ const SqlEditor: NextPageWithLayout = () => {
     isError && error.code === 404 && error.message.includes('Content not found')
   const invalidId = isError && error.code === 400 && error.message.includes('Invalid uuid')
 
+  // [Joshen] Atm we suspect that replication lag is causing this to happen whereby a newly created snippet
+  // shows the "Unable to find snippet" error which blocks the whole UI
+  // Am opting to silently swallow this error, since the saves are still going through and we're scoping this behaviour
+  // behaviour down to a very specific use case too with all these conditionals
+  // More details: https://github.com/supabase/supabase/pull/39389
+  const snippetMissingImmediatelyAfterCreating =
+    !!snippet && snippetMissing && previousRoute === 'new' && 'isNotSavedInDatabaseYet' in snippet
+
   useEffect(() => {
     if (ref && data && project) {
       // [Joshen] Check if snippet belongs to the current project
@@ -63,6 +71,7 @@ const SqlEditor: NextPageWithLayout = () => {
         router.push(`/project/${ref}/sql/new`)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, data, project])
 
   // Load the last visited snippet when landing on /new
@@ -95,9 +104,10 @@ const SqlEditor: NextPageWithLayout = () => {
         name: snippet?.name,
       },
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, id])
 
-  if (snippetMissing || invalidId) {
+  if ((snippetMissing || invalidId) && !snippetMissingImmediatelyAfterCreating) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="w-[400px]">
@@ -122,7 +132,12 @@ const SqlEditor: NextPageWithLayout = () => {
                 Close tab
               </Button>
             ) : (
-              <Button asChild type="default" className="mt-2">
+              <Button
+                asChild
+                type="default"
+                className="mt-2"
+                onClick={() => setLastVisitedSnippet(undefined)}
+              >
                 <Link href={`/project/${ref}/sql`}>Head back</Link>
               </Button>
             )}

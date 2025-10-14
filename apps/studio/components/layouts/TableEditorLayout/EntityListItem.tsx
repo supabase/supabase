@@ -1,5 +1,5 @@
 import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -309,7 +309,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   copyToClipboard(entity.name)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy name</span>
               </DropdownMenuItem>
 
@@ -341,7 +341,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                     }
                   }}
                 >
-                  <Clipboard size={12} />
+                  <Copy size={12} />
                   <span>Copy table schema</span>
                 </DropdownMenuItem>
               )}

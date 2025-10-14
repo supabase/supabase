@@ -95,6 +95,11 @@
       "description": "Enable the billing settings page"
     },
 
+    "branding:large_logo": {
+      "type": "boolean",
+      "description": "Show larger logo sizes throughout the apps"
+    },
+
     "dashboard_auth:sign_up": {
       "type": "boolean",
       "description": "Enable the sign up page in the dashboard"

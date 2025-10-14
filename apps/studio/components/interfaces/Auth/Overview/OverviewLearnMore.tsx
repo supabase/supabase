@@ -6,17 +6,29 @@ import { Logs } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import { useParams } from 'common'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 
 export const OverviewLearnMore = () => {
+  const [isMounted, setIsMounted] = useState(false)
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { theme, resolvedTheme } = useTheme()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const isLight = resolvedTheme === 'light'
 
   const LearnMoreCards = [
     {
       label: 'Docs',
-      title: 'Authentication docs',
-      description: 'Read more on authentication and the benefits of using Supabase policies.',
-      image: `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
+      title: 'Auth docs',
+      description: 'Read more on Supabase auth, managing users and more.',
+      image: isLight
+        ? `${BASE_PATH}/img/auth-overview/auth-overview-docs-light.jpg`
+        : `${BASE_PATH}/img/auth-overview/auth-overview-docs.jpg`,
       actions: [
         {
           label: 'Docs',
@@ -27,17 +39,20 @@ export const OverviewLearnMore = () => {
     },
     {
       label: 'Assistant',
-      title: 'Explain authentication errors',
+      title: 'Explain auth errors',
       description: 'Our Assistant can help you debug and fix authentication errors.',
-      image: `${BASE_PATH}/img/auth-overview/auth-overview-assistant.jpg`,
+      image: isLight
+        ? `${BASE_PATH}/img/auth-overview/auth-overview-assistant-light.jpg`
+        : `${BASE_PATH}/img/auth-overview/auth-overview-assistant.jpg`,
       actions: [
         {
           label: 'Ask Assistant',
           onClick: () => {
             aiSnap.newChat({
-              name: 'Authentication Help',
+              name: 'Auth Help',
               open: true,
-              initialInput: 'Help me debug and fix authentication errors in my Supabase project',
+              initialInput:
+                'Look at my logs related to Supabase Auth and help me debug the recent errors.',
               suggestions: {
                 title: 'I can help you with authentication issues. Here are some common problems:',
                 prompts: [
@@ -68,8 +83,10 @@ export const OverviewLearnMore = () => {
     {
       label: 'Logs',
       title: 'Dive into the logs',
-      description: 'Authentication logs provide a deeper view into your auth requests.',
-      image: `${BASE_PATH}/img/auth-overview/auth-overview-logs.jpg`,
+      description: 'Auth logs provide a deeper view into your auth requests.',
+      image: isLight
+        ? `${BASE_PATH}/img/auth-overview/auth-overview-logs-light.jpg`
+        : `${BASE_PATH}/img/auth-overview/auth-overview-logs.jpg`,
       actions: [
         {
           label: 'Go to logs',
@@ -79,6 +96,8 @@ export const OverviewLearnMore = () => {
       ],
     },
   ]
+
+  if (!isMounted) return null
 
   return (
     <ScaffoldSection isFullWidth>
