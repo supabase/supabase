@@ -49,7 +49,6 @@ export const AnalyticsBuckets = () => {
         : bucket.name.toLowerCase().includes(filterString.toLowerCase())
     )
 
-  // Placeholder component - will be implemented in a later PR
   return (
     <>
       {!isLoadingBuckets &&
