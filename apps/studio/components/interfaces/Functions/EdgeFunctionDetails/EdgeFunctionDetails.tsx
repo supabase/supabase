@@ -19,6 +19,7 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
@@ -32,6 +33,7 @@ import {
   CardTitle,
   cn,
   CodeBlock,
+  copyToClipboard,
   CriticalIcon,
   Form_Shadcn_,
   FormControl_Shadcn_,
@@ -59,7 +61,19 @@ const FormSchema = z.object({
 export const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
+
+  const showAllEdgeFunctionInvocationExamples = useIsFeatureEnabled(
+    'edge_functions:show_all_edge_function_invocation_examples'
+  )
+  const invocationTabs = useMemo(() => {
+    if (showAllEdgeFunctionInvocationExamples) return INVOCATION_TABS
+    return INVOCATION_TABS.filter((tab) => tab.id === 'curl' || tab.id === 'supabase-js')
+  }, [showAllEdgeFunctionInvocationExamples])
+
+  const [showKey, setShowKey] = useState(false)
+  const [selectedTab, setSelectedTab] = useState(invocationTabs[0].id)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+
   const { can: canUpdateEdgeFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_WRITE,
     '*'
@@ -222,34 +236,69 @@ export const EdgeFunctionDetails = () => {
             </form>
           </Form_Shadcn_>
         </ScaffoldSection>
+
         <ScaffoldSection isFullWidth>
           <ScaffoldSectionTitle className="mb-4">Invoke function</ScaffoldSectionTitle>
           <Card>
-            <CardContent>
-              <Tabs defaultValue="curl" className="w-full">
-                <TabsList className="flex flex-wrap gap-4">
-                  {INVOCATION_TABS.map((tab) => (
+            <CardContent className="px-0">
+              <Tabs
+                className="w-full"
+                defaultValue="curl"
+                value={selectedTab}
+                onValueChange={setSelectedTab}
+              >
+                <TabsList className="flex flex-wrap gap-4 px-6">
+                  {invocationTabs.map((tab) => (
                     <TabsTrigger key={tab.id} value={tab.id}>
                       {tab.label}
                     </TabsTrigger>
                   ))}
+                  {selectedTab === 'curl' && (
+                    <Button
+                      type="default"
+                      className="ml-auto -translate-y-2 translate-x-3"
+                      onClick={() => setShowKey(!showKey)}
+                    >
+                      {showKey ? 'Hide' : 'Show'} anon key
+                    </Button>
+                  )}
                 </TabsList>
-                {INVOCATION_TABS.map((tab) => (
-                  <TabsContent key={tab.id} value={tab.id} className="mt-4">
-                    <div className="overflow-x-auto">
-                      <CodeBlock
-                        language={tab.language}
-                        hideLineNumbers={tab.hideLineNumbers}
-                        className="p-0 text-xs !mt-0 border-none"
-                        value={tab.code(functionUrl, selectedFunction?.name ?? '', apiKey)}
-                      />
-                    </div>
-                  </TabsContent>
-                ))}
+                {invocationTabs.map((tab) => {
+                  const code = tab.code({
+                    showKey,
+                    functionUrl,
+                    functionName: selectedFunction?.name ?? '',
+                    apiKey,
+                  })
+
+                  return (
+                    <TabsContent key={tab.id} value={tab.id} className="mt-4 px-6">
+                      <div className="overflow-x-auto">
+                        <CodeBlock
+                          value={code}
+                          className="p-0 text-xs !mt-0 border-none"
+                          language={tab.language}
+                          hideLineNumbers={tab.hideLineNumbers}
+                          handleCopy={() => {
+                            copyToClipboard(
+                              tab.code({
+                                showKey: true,
+                                functionUrl,
+                                functionName: selectedFunction?.name ?? '',
+                                apiKey,
+                              })
+                            )
+                          }}
+                        />
+                      </div>
+                    </TabsContent>
+                  )
+                })}
               </Tabs>
             </CardContent>
           </Card>
         </ScaffoldSection>
+
         <ScaffoldSection isFullWidth>
           <ScaffoldSectionTitle className="mb-4">Develop locally</ScaffoldSectionTitle>
           <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">

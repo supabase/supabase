@@ -124,7 +124,7 @@ export const RedirectUrlList = ({
         <div
           className={[
             'flex items-center border-overlay bg-studio text-foreground',
-            'justify-center gap-2 rounded border px-6 py-8 text-sm',
+            'justify-center gap-2 rounded-b border px-6 py-8 text-sm',
           ].join(' ')}
         >
           <EmptyListState

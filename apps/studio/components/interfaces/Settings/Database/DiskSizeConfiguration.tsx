@@ -13,8 +13,9 @@ import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
@@ -28,6 +29,9 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
+  const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
   const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
   const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
@@ -80,9 +84,10 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       Supabase employs auto-scaling storage and allows for manual disk size
                       adjustments when necessary
                     </p>
-                    <div className="flex items-end justify-end">
+                    {!isAwsNimbus && (
                       <ButtonTooltip
                         type="default"
+                        className="w-min ml-auto"
                         disabled={!canUpdateDiskSizeConfig || disabled}
                         onClick={() => setShowIncreaseDiskSizeModal(true)}
                         tooltip={{
@@ -96,7 +101,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       >
                         Increase disk size
                       </ButtonTooltip>
-                    </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-12 gap-2 mt-12 items-start">
@@ -112,15 +117,17 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                         <span className="text-lg">{currentDiskSize} GB</span>
                       </div>
 
-                      <div className="col-span-2 mt-4">
-                        <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                          <Link
-                            href={`/project/${projectRef}/reports/database#database-size-report`}
-                          >
-                            View detailed summary
-                          </Link>
-                        </Button>
-                      </div>
+                      {reportsAll && (
+                        <div className="col-span-2 mt-4">
+                          <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                            <Link
+                              href={`/project/${projectRef}/reports/database#database-size-report`}
+                            >
+                              View detailed summary
+                            </Link>
+                          </Button>
+                        </div>
+                      )}
                     </div>
 
                     <div className="col-span-8">

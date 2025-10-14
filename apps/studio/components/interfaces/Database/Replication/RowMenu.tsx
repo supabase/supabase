@@ -1,4 +1,4 @@
-import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash, ArrowUpCircle } from 'lucide-react'
+import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -28,7 +28,7 @@ import {
   PIPELINE_ERROR_MESSAGES,
   getStatusName,
 } from './Pipeline.utils'
-import { PipelineStatusName } from './PipelineStatus'
+import { PipelineStatusName } from './Replication.constants'
 
 interface RowMenuProps {
   pipeline: Pipeline | undefined

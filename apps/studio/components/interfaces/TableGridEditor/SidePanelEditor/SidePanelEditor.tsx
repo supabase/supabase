@@ -21,6 +21,7 @@ import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-muta
 import { tableKeys } from 'data/tables/keys'
 import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
@@ -74,6 +75,7 @@ const SidePanelEditor = ({
 
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
@@ -454,6 +456,7 @@ const SidePanelEditor = ({
           foreignKeyRelations,
           isRLSEnabled,
           importContent,
+          organizationSlug: org?.slug,
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
@@ -477,6 +480,7 @@ const SidePanelEditor = ({
           foreignKeyRelations,
           existingForeignKeyRelations,
           primaryKey,
+          organizationSlug: org?.slug,
         })
 
         if (table === undefined) {

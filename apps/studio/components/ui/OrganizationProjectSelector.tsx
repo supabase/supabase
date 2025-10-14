@@ -1,5 +1,5 @@
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
@@ -86,7 +86,7 @@ export const OrganizationProjectSelector = ({
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true }
+    { enabled: open, keepPreviousData: true }
   )
 
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
@@ -98,8 +98,7 @@ export const OrganizationProjectSelector = ({
       !isFetching &&
       entry?.isIntersecting &&
       hasNextPage &&
-      !isFetchingNextPage &&
-      !isLoadingProjects
+      !isFetchingNextPage
     ) {
       fetchNextPage()
     }
@@ -113,16 +112,18 @@ export const OrganizationProjectSelector = ({
   ])
 
   useEffect(() => {
-    if (isSuccessProjects && !isFetching && !isFetchingNextPage && !!onInitialLoad) {
-      onInitialLoad(projects)
+    // isLoadingProjects is true only during initial load. If the variables for the query change (slug), isLoadingProjects
+    // will be true again.
+    if (!isLoadingProjects && isSuccessProjects) {
+      onInitialLoad?.(projects)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessProjects, isFetching, isFetchingNextPage, slug])
+  }, [isLoadingProjects, isSuccessProjects])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        {!!renderTrigger ? (
+        {renderTrigger ? (
           renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
         ) : (
           <Button

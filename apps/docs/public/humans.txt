@@ -3,20 +3,24 @@ TEAM
 Supabase is 100% remote.
 
 Aaron Byrne
+Adam Mokan
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
 Alexander Korotkov
 Amy Q
 Andrew Valleteau
+Andrey A
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
 Artur Zakirov
 Artyom Borissov
+Barco Fourie
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
+Brendan Stephens
 Brent Newson
 Carel de Waal
 Cameron Blackwood
@@ -43,9 +47,11 @@ Deji I
 Div Arora
 Divit D
 Douglas Hunley
+Dustin Keib
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
+Eliot Whalan
 Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
@@ -56,7 +62,9 @@ Francesco Sansalvadore
 Greg Kress
 Greg P
 Greg Richardson
+Gregor Vand
 Guilherme Souza
+Hannah Bowers
 Hardik Maheshwari
 Haydn Maley
 Hieu Pham
@@ -99,6 +107,7 @@ Matt Johnston
 Matt Rossman
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Nick Littman
 Nyannyacha
 Oli R
 Pamela Chia
@@ -116,7 +125,9 @@ Riccardo Busetti
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
+Ryan Goulet
 Sam Meech-Ward
+Sam Rome
 Sam Rose
 Sean Oliver
 Sergio Cioban Filho
@@ -124,6 +135,7 @@ Sreyas Udayavarman
 Stanislav M
 Stephen Morgan
 Steve Chavez
+Steven Eubank
 Stojan Dimitrovski
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
@@ -140,8 +152,10 @@ Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
+Yorvi Arias
 Yuliya Marinova
 Yuri Santana
+Zsolt Pazmandy
 ____________
 
 JOBS

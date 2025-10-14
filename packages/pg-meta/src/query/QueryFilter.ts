@@ -1,5 +1,5 @@
-import type { Filter, FilterOperator, QueryTable, Sort, Dictionary } from './types'
 import { IQueryModifier, QueryModifier } from './QueryModifier'
+import type { Dictionary, Filter, FilterOperator, QueryTable, Sort } from './types'
 
 export interface IQueryFilter {
   filter: (column: string, operator: FilterOperator, value: string) => IQueryFilter
