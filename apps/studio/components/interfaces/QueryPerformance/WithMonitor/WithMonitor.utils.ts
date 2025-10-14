@@ -71,9 +71,9 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
   if (!parsedLogs || parsedLogs.length === 0) return []
 
   // [kemal]: here for debugging
-  if (parsedLogs.length > 0) {
-    console.log('🟡 Parsed logs:', parsedLogs)
-  }
+  // if (parsedLogs.length > 0) {
+  //   console.log('🟡 Parsed logs:', parsedLogs)
+  // }
 
   return parsedLogs
     .map((log: ParsedLogEntry) => {
@@ -233,8 +233,6 @@ export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): QueryPerform
       _count: stats.count,
     })
   })
-
-  console.log('🏓 Aggregated data:', aggregatedData)
 
   return aggregatedData.sort((a, b) => b.total_time - a.total_time)
 }

@@ -121,7 +121,6 @@ export const QueryPerformanceChart = ({
       p99_9_time: parseFloat((dataPoint.p99_9_time / 1000).toFixed(3)),
     }))
 
-    console.log('🟣 Transformed chartData:', transformed)
     return transformed
   }, [chartData, selectedMetric])
 

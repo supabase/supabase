@@ -1,6 +1,5 @@
 import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import { LoadingLine } from 'ui'
-import { ChartData } from 'components/ui/Charts/Charts.types'
 import { QueryPerformanceChart } from '../QueryPerformanceChart'
 import { QueryPerformanceFilterBar } from '../QueryPerformanceFilterBar'
 import { useMemo, useState } from 'react'
