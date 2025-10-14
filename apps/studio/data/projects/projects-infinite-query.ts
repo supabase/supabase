@@ -58,6 +58,7 @@ export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
     ({ signal, pageParam }) => getProjects({ limit, page: pageParam, sort, search }, signal),
     {
       enabled: enabled && profile !== undefined,
+      staleTime: 30 * 60 * 1000, // 30 minutes
       getNextPageParam(lastPage, pages) {
         const page = pages.length
         const currentTotalCount = page * limit
