@@ -125,8 +125,7 @@ export function ApiKeyPill({
       value={displayValue}
       containerClassName="w-full"
       className="font-mono"
-      style={{ userSelect: 'all' }}
-      copy={true}
+      copy
       onCopy={handleCopy}
       reveal={isSecret}
       onReveal={handleReveal}
