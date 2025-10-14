@@ -17,6 +17,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { EdgeFunctions, Reports, Storage, TableEditor } from 'icons'
+import { useAppStateSnapshot } from '../../../../state/app-state'
 
 export interface QuickActionOption {
   id: string
@@ -226,17 +227,13 @@ export const useQuickActionOptions: () => {
 } = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const snap = useTableEditorStateSnapshot()
+  const tableEditorStateSnap = useTableEditorStateSnapshot()
+  const appStateSnap = useAppStateSnapshot()
   const [selectedActions, setSelectedActions] = useState<QuickActionOption[]>([])
   const [editQuickActions, setEditQuickActions] = useState(false)
 
   // Initialize keyboard shortcuts
   const keyboardShortcuts = useKeyboardShortcuts(selectedActions, !editQuickActions)
-
-  const handleNewTable = useCallback(() => {
-    router.push(`/project/${ref}/editor`)
-    snap.onAddTable()
-  }, [])
 
   const resetSelectedActions = useCallback(() => {
     const savedActions = localStorage.getItem('quick-actions-selected')
@@ -288,7 +285,10 @@ export const useQuickActionOptions: () => {
       id: 'new-table',
       label: 'New Table',
       icon: TableEditor,
-      onClick: handleNewTable,
+      onClick: () => {
+        router.push(`/project/${ref}/editor`)
+        tableEditorStateSnap.onAddTable()
+      },
       kbd: ['c', 't'],
     },
     {
@@ -296,7 +296,7 @@ export const useQuickActionOptions: () => {
       label: 'Database Schema',
       icon: Network,
       onClick: () => null,
-      kbd: ['c', 'd', 'f'],
+      kbd: ['c', 'd', 's'],
     },
     {
       id: 'database-function',
@@ -367,7 +367,7 @@ export const useQuickActionOptions: () => {
       id: 'branch',
       label: 'Branch',
       icon: GitBranch,
-      onClick: () => null,
+      onClick: () => appStateSnap.setShowCreateBranchModal(true),
       kbd: ['c', 'b'],
     },
     // Auth
@@ -391,7 +391,7 @@ export const useQuickActionOptions: () => {
       label: 'Storage Bucket',
       icon: Storage,
       onClick: () => null,
-      kbd: ['c', 'b'],
+      kbd: ['c', 's', 'b'],
     },
     {
       id: 'storage-bucket-policy',
@@ -405,7 +405,7 @@ export const useQuickActionOptions: () => {
       id: 'edge-function',
       label: 'Edge Function',
       icon: EdgeFunctions,
-      onClick: () => null,
+      onClick: () => router.push(`/project/${ref ?? '_'}/functions/new`),
       kbd: ['c', 'f'],
     },
     // Realtime
