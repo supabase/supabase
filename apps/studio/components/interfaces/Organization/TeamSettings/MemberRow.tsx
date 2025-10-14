@@ -35,14 +35,16 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { data } = useProjectsQuery()
-  const projects = data?.projects ?? []
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
+  const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
+
+  // [Joshen] We only need this data if the org has project scoped roles
+  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
+  const projects = data?.projects ?? []
 
   const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)
-  const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))

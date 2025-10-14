@@ -2,11 +2,11 @@ import { isError } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import CopyButton from './CopyButton'
 
-import Image from 'next/image'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+import CopyButton from './CopyButton'
 import { InlineLinkClassName } from './InlineLink'
 
 export type FallbackProps = {
@@ -17,6 +17,8 @@ export type FallbackProps = {
 export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps) => {
   const router = useRouter()
   const checkIsError = isError(error)
+
+  const largeLogo = useIsFeatureEnabled('branding:large_logo')
 
   const errorMessage = checkIsError ? error.message : ''
   const urlMessage = checkIsError ? `Path name: ${router.pathname}\n\n${error?.stack}` : ''
@@ -44,12 +46,10 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
     <div className="w-screen mx-auto h-screen flex items-center justify-center">
       <header className="h-12 absolute top-0 w-full border-b px-4 flex items-center">
         <Link href="/" className="items-center justify-center">
-          <Image
+          <img
             alt="Supabase"
             src={`${router.basePath}/img/supabase-logo.svg`}
-            width={18}
-            height={18}
-            className="w-[18px] h-[18px]"
+            className={largeLogo ? 'h-[20px]' : 'h-[18px]'}
           />
         </Link>
       </header>

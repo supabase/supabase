@@ -24,7 +24,10 @@
   "authentication:show_sort_by_email": true,
   "authentication:show_sort_by_phone": true,
   "authentication:show_user_type_filter": true,
+
   "billing:all": true,
+
+  "branding:large_logo": false,
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,
