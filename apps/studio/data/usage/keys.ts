@@ -3,5 +3,5 @@ export const usageKeys = {
   orgUsage: (orgSlug: string | undefined, projectRef?: string, start?: string, end?: string) =>
     ['organizations', orgSlug, 'usage', projectRef, start, end] as const,
   resourceWarnings: (slug?: string, projectRef?: string) =>
-    ['projects', 'resource-warnings', slug ?? '-', projectRef ?? '-'] as const,
+    ['projects', 'resource-warnings', { slug, projectRef }] as const,
 }

@@ -12,6 +12,7 @@ export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
   )
