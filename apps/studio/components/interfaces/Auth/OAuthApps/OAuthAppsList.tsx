@@ -35,6 +35,7 @@ import { useParams } from 'common'
 
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 import { get, post } from 'common/fetchWrappers'
+import { useAuthConfigQuery } from '../../../../data/auth/auth-config-query'
 
 export const OAUTH_APP_SCOPES_OPTIONS = [
   { name: 'email', value: 'email' },
@@ -49,6 +50,7 @@ export const OAUTH_APP_TYPE_OPTIONS = [
 
 const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
+  const { data: authConfig } = useAuthConfigQuery({ projectRef })
 
   // State for OAuth apps
   const [oAuthApps, setOAuthApps] = useState<OAuthApp[]>([])
@@ -100,23 +102,6 @@ const OAuthAppsList = () => {
     loadOAuthApps()
   }, [])
 
-  // Load OAuth server settings from localStorage
-  useEffect(() => {
-    const loadOAuthServerSettings = () => {
-      try {
-        const stored = localStorage.getItem('oauth_server_settings')
-        if (stored) {
-          const parsedSettings = JSON.parse(stored)
-          setIsOAuthServerEnabled(parsedSettings.GOTRUE_OAUTH_SERVER_ENABLED)
-        }
-      } catch (error) {
-        console.error('Error loading OAuth server settings from localStorage:', error)
-      }
-    }
-
-    loadOAuthServerSettings()
-  }, [])
-
   // Handle successful OAuth app creation
   const handleOAuthAppCreated = (newApp: OAuthApp) => {
     setOAuthApps((prev) => [...prev, newApp])
@@ -156,7 +141,7 @@ const OAuthAppsList = () => {
     setShowDeleteModal(true)
   }
 
-  const [isOAuthServerEnabled, setIsOAuthServerEnabled] = useState(false)
+  const isOAuthServerEnabled = authConfig?.OAUTH_SERVER_ENABLED
   const [filterString, setFilterString] = useState<string>('')
 
   const { can: canCreateTriggers } = useAsyncCheckPermissions(
