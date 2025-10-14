@@ -1,5 +1,5 @@
 import { Kbd } from 'components/ui/DataTable/primitives/Kbd'
-import { GripVertical, Pencil, PlusIcon, Save, Star, X } from 'lucide-react'
+import { GripVertical, Pencil, PlusIcon, Star, X } from 'lucide-react'
 import {
   Button,
   cn,
@@ -23,6 +23,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { useEffect, useState } from 'react'
 
 const KbdSlot = ({ option }: { option: QuickActionOption }) => (
   <div>
@@ -128,7 +129,7 @@ const ReorderableList = ({
     <div className="overflow-y-auto">
       {/* Selected Actions */}
       <DropdownMenuGroup>
-        <DropdownMenuLabel>Favourite Actions</DropdownMenuLabel>
+        <DropdownMenuLabel>Your Quick Actions</DropdownMenuLabel>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <SortableContext
             items={selectedActions.map((action) => action.id)}
@@ -171,6 +172,7 @@ const ReorderableList = ({
 }
 
 const QuickActions = () => {
+  const [open, setOpen] = useState(false)
   const {
     allActions,
     selectedActions,
@@ -178,18 +180,16 @@ const QuickActions = () => {
     editQuickActions,
     setEditQuickActions,
     saveSelectedActions,
+    resetSelectedActions,
+    keyboardShortcuts,
   } = useQuickActionOptions()
 
-  const handleReorder = (newOrder: QuickActionOption[]) => {
-    setSelectedActions(newOrder)
-  }
+  const handleReorder = (newOrder: QuickActionOption[]) => setSelectedActions(newOrder)
 
   const handleToggleAction = (action: QuickActionOption, isSelected: boolean) => {
     if (isSelected) {
-      // Add action to the end of selected actions
       setSelectedActions([...selectedActions, action])
     } else {
-      // Remove action from selected actions
       setSelectedActions(selectedActions.filter((a) => a.id !== action.id))
     }
   }
@@ -199,8 +199,27 @@ const QuickActions = () => {
     setEditQuickActions(false)
   }
 
+  const reset = () => {
+    setEditQuickActions(false)
+    resetSelectedActions()
+    keyboardShortcuts.reset()
+  }
+
+  useEffect(() => {
+    if (!open) {
+      reset()
+    }
+  }, [open])
+
+  // Clear keyboard shortcuts when editing
+  useEffect(() => {
+    if (editQuickActions) {
+      keyboardShortcuts.reset()
+    }
+  }, [editQuickActions, keyboardShortcuts])
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger className="w-7 h-7 rounded-full hover:!cursor-pointer">
         <Tooltip>
           <TooltipTrigger asChild>
@@ -208,13 +227,13 @@ const QuickActions = () => {
               <PlusIcon size={14} />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Create</TooltipContent>
+          {!open && <TooltipContent>Create</TooltipContent>}
         </Tooltip>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         side="bottom"
         align="end"
-        className="flex flex-col w-64 max-h-[calc(100vh-50px)]"
+        className="flex flex-col w-60 max-h-[calc(100vh-50px)]"
       >
         {editQuickActions ? (
           <ReorderableList
@@ -225,7 +244,22 @@ const QuickActions = () => {
           />
         ) : (
           <div className="overflow-y-auto">
-            <DropdownMenuLabel>Create...</DropdownMenuLabel>
+            <DropdownMenuLabel className="cursor-default flex items-center gap-2 w-full">
+              <span className="flex-1">Create...</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="tiny"
+                    type="text"
+                    className="!p-0 !w-4 !h-4 text-foreground-lighter hover:text-foreground-light"
+                    onClick={() => setEditQuickActions(true)}
+                  >
+                    <Pencil size={12} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Manage quick actions</TooltipContent>
+              </Tooltip>
+            </DropdownMenuLabel>
             {selectedActions.map((option) => (
               <DropdownMenuItem asChild key={option.label}>
                 <button
@@ -241,28 +275,27 @@ const QuickActions = () => {
             ))}
           </div>
         )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.preventDefault()
-            if (editQuickActions) {
-              handleSave()
-            } else {
-              setEditQuickActions(true)
-            }
-          }}
-          className="text-center cursor-pointer flex justify-center items-center gap-2 w-full text-foreground-light hover:text-foreground"
-        >
-          {editQuickActions ? (
-            <>
-              Save <Save size={12} className="text-foreground-lighter" />
-            </>
-          ) : (
-            <>
-              Manage <Pencil size={12} className="text-foreground-lighter" />
-            </>
-          )}
-        </DropdownMenuItem>
+        {editQuickActions && (
+          <div className="flex items-center gap-1 w-full border-t pt-1 -mx-1 px-1">
+            <Button type="default" onClick={reset} className="w-1/2">
+              Cancel
+            </Button>
+            <Button
+              type="secondary"
+              onClick={(e) => {
+                e.preventDefault()
+                if (editQuickActions) {
+                  handleSave()
+                } else {
+                  setEditQuickActions(true)
+                }
+              }}
+              className="w-full"
+            >
+              Save
+            </Button>
+          </div>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

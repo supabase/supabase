@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   DatabaseBackup,
   DatabaseZap,
+  FunctionSquare,
   GitBranch,
   Lock,
+  Network,
   TextSearch,
   Type,
   User2,
@@ -14,7 +16,7 @@ import {
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { Database, EdgeFunctions, Reports, Storage, TableEditor } from 'icons'
+import { EdgeFunctions, Reports, Storage, TableEditor } from 'icons'
 
 export interface QuickActionOption {
   id: string
@@ -26,6 +28,188 @@ export interface QuickActionOption {
   badge?: boolean
 }
 
+// Custom hook for keyboard shortcut detection
+export const useKeyboardShortcuts = (actions: QuickActionOption[], enabled: boolean = true) => {
+  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set())
+  const [sequence, setSequence] = useState<string[]>([])
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const normalizeKey = (key: string): string => {
+    // Normalize key names for consistent matching
+    const keyMap: Record<string, string> = {
+      Control: 'ctrl',
+      Meta: 'cmd',
+      Alt: 'alt',
+      Shift: 'shift',
+      ' ': 'space',
+      Enter: 'enter',
+      Escape: 'escape',
+      Backspace: 'backspace',
+      Tab: 'tab',
+      ArrowUp: 'up',
+      ArrowDown: 'down',
+      ArrowLeft: 'left',
+      ArrowRight: 'right',
+    }
+    return keyMap[key] || key.toLowerCase()
+  }
+
+  const isFormElement = (element: Element): boolean => {
+    const formElements = ['input', 'textarea', 'select', 'button']
+    const isFormElement = formElements.includes(element.tagName.toLowerCase())
+    const isContentEditable = element.getAttribute('contenteditable') === 'true'
+    const isCodeEditor =
+      element.closest('[data-lexical-editor]') ||
+      element.closest('.monaco-editor') ||
+      element.closest('[data-testid="sql-editor"]') ||
+      element.closest('.cm-editor')
+
+    return isFormElement || isContentEditable || !!isCodeEditor
+  }
+
+  const checkSimultaneousMatch = useCallback(
+    (keys: Set<string>) => {
+      return actions.find((action) => {
+        if (!action.kbd || action.kbd.length === 0) return false
+
+        const actionKeys = new Set(action.kbd.map((k) => normalizeKey(k)))
+        const pressedKeysSet = new Set(Array.from(keys).map((k) => normalizeKey(k)))
+
+        // Check if all action keys are pressed
+        return (
+          actionKeys.size === pressedKeysSet.size &&
+          Array.from(actionKeys).every((key) => pressedKeysSet.has(key))
+        )
+      })
+    },
+    [actions]
+  )
+
+  const checkSequentialMatch = useCallback(
+    (seq: string[]) => {
+      return actions.find((action) => {
+        if (!action.kbd || action.kbd.length === 0) return false
+
+        const actionKeys = action.kbd.map((k) => normalizeKey(k))
+        const normalizedSeq = seq.map((k) => normalizeKey(k))
+
+        // Check if sequence matches action keys
+        return (
+          actionKeys.length === normalizedSeq.length &&
+          actionKeys.every((key, index) => key === normalizedSeq[index])
+        )
+      })
+    },
+    [actions]
+  )
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      // Don't listen if disabled or if user is typing in a form field
+      if (!enabled || isFormElement(event.target as Element)) {
+        return
+      }
+
+      const key = normalizeKey(event.key)
+
+      // Ignore modifier keys when checking sequences
+      if (['ctrl', 'cmd', 'alt', 'shift'].includes(key)) {
+        return
+      }
+
+      // Add to pressed keys for simultaneous detection
+      setPressedKeys((prev) => new Set([...prev, key]))
+
+      // Add to sequence for sequential detection
+      setSequence((prev) => [...prev, key])
+
+      // Clear existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      // Set new timeout for sequence reset
+      timeoutRef.current = setTimeout(() => {
+        setSequence([])
+      }, 2000)
+    },
+    [enabled]
+  )
+
+  const handleKeyUp = useCallback(
+    (event: KeyboardEvent) => {
+      if (!enabled) return
+
+      const key = normalizeKey(event.key)
+      setPressedKeys((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(key)
+        return newSet
+      })
+    },
+    [enabled]
+  )
+
+  // Check for matches on key press
+  useEffect(() => {
+    if (!enabled) return
+
+    // Check simultaneous match
+    const simultaneousMatch = checkSimultaneousMatch(pressedKeys)
+    if (simultaneousMatch?.onClick) {
+      simultaneousMatch.onClick()
+      setPressedKeys(new Set())
+      return
+    }
+
+    // Check sequential match
+    const sequentialMatch = checkSequentialMatch(sequence)
+    if (sequentialMatch?.onClick) {
+      sequentialMatch.onClick()
+      setSequence([])
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
+  }, [pressedKeys, sequence, checkSimultaneousMatch, checkSequentialMatch, enabled])
+
+  useEffect(() => {
+    if (!enabled) return
+
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('keyup', handleKeyUp)
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [handleKeyDown, handleKeyUp, enabled])
+
+  // Return functions to control the hook
+  return {
+    clearSequence: () => {
+      setSequence([])
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    },
+    clearPressedKeys: () => setPressedKeys(new Set()),
+    reset: () => {
+      setSequence([])
+      setPressedKeys(new Set())
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    },
+  }
+}
+
 export const useQuickActionOptions: () => {
   allActions: QuickActionOption[]
   selectedActions: QuickActionOption[]
@@ -33,6 +217,12 @@ export const useQuickActionOptions: () => {
   setEditQuickActions: (value: boolean) => void
   setSelectedActions: (value: QuickActionOption[]) => void
   saveSelectedActions: () => void
+  resetSelectedActions: () => void
+  keyboardShortcuts: {
+    clearSequence: () => void
+    clearPressedKeys: () => void
+    reset: () => void
+  }
 } = () => {
   const router = useRouter()
   const { ref } = useParams()
@@ -40,13 +230,15 @@ export const useQuickActionOptions: () => {
   const [selectedActions, setSelectedActions] = useState<QuickActionOption[]>([])
   const [editQuickActions, setEditQuickActions] = useState(false)
 
+  // Initialize keyboard shortcuts
+  const keyboardShortcuts = useKeyboardShortcuts(selectedActions, !editQuickActions)
+
   const handleNewTable = useCallback(() => {
     router.push(`/project/${ref}/editor`)
     snap.onAddTable()
   }, [])
 
-  // Load selected actions from localStorage on mount
-  useEffect(() => {
+  const resetSelectedActions = useCallback(() => {
     const savedActions = localStorage.getItem('quick-actions-selected')
     if (savedActions) {
       try {
@@ -72,6 +264,11 @@ export const useQuickActionOptions: () => {
     }
   }, [])
 
+  // Load selected actions from localStorage on mount
+  useEffect(() => {
+    resetSelectedActions()
+  }, [])
+
   const saveSelectedActions = useCallback(() => {
     const actionIds = selectedActions.map((action) => action.id)
     localStorage.setItem('quick-actions-selected', JSON.stringify(actionIds))
@@ -95,9 +292,16 @@ export const useQuickActionOptions: () => {
       kbd: ['c', 't'],
     },
     {
+      id: 'database-schema',
+      label: 'Database Schema',
+      icon: Network,
+      onClick: () => null,
+      kbd: ['c', 'd', 'f'],
+    },
+    {
       id: 'database-function',
       label: 'Database Function',
-      icon: Database,
+      icon: FunctionSquare,
       onClick: () => null,
       kbd: ['c', 'd', 'f'],
     },
@@ -143,6 +347,13 @@ export const useQuickActionOptions: () => {
       icon: Webhook,
       onClick: () => null,
       kbd: ['c', 'd', 'w'],
+    },
+    {
+      id: 'database-sql-snippet',
+      label: 'SQL Snippet',
+      icon: Webhook,
+      onClick: () => router.push(`/project/${ref ?? '_'}/sql/new`),
+      kbd: ['c', 'd', 's'],
     },
     {
       id: 'database-enumerated-type',
@@ -230,5 +441,7 @@ export const useQuickActionOptions: () => {
     editQuickActions,
     setEditQuickActions,
     saveSelectedActions,
+    resetSelectedActions,
+    keyboardShortcuts,
   }
 }
