@@ -49,7 +49,7 @@ const ResponseSchema = z.object({
 
 type SchemaStreamResult = ReturnType<typeof streamObject<typeof ResponseSchema>>
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req
 
   switch (method) {
@@ -66,7 +66,7 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 
 export default wrapper
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     model,
     error: modelError,
@@ -79,19 +79,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   })
 
   if (modelError || !model) {
-    return res.status(500).json({ error: 'AI service temporarily unavailable' })
+    return res.status(500).json({ error: 'The AI service is temporarily unavailable. Please try again in a moment.' })
   }
 
   const { prompt } = req.body
 
   if (!prompt) {
-    return res.status(400).json({ error: 'Prompt is required' })
+    return res.status(400).json({ error: 'Please provide a description of your application.' })
   }
 
   if (typeof prompt !== 'string' || prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
     return res
       .status(400)
-      .json({ error: `Prompt must be a string under ${LIMITS.MAX_PROMPT_LENGTH} characters` })
+      .json({ error: `Your description is too long. Please keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.` })
   }
 
   try {
@@ -145,18 +145,18 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     if (error instanceof Error) {
       if (error.message.includes('context_length') || error.message.includes('too long')) {
         return res.status(400).json({
-          error: 'The prompt is too long. Please provide a shorter description.',
+          error: 'Your description is too long. Try using fewer words to describe your application.',
         })
       }
     }
 
     return res.status(500).json({
-      error: 'Failed to generate database schemas. Please try again.',
+      error: 'Unable to generate table schema. Please try again or use a different description.',
     })
   }
 }
 
-function shouldStream(req: NextApiRequest) {
+const shouldStream = (req: NextApiRequest) => {
   if (req.headers['accept']?.includes('text/event-stream')) return true
   if (req.headers['x-ai-stream'] === 'true') return true
   const { stream } = req.query
@@ -166,10 +166,10 @@ function shouldStream(req: NextApiRequest) {
   return false
 }
 
-async function streamSchemaResponse(
+const streamSchemaResponse = async (
   res: NextApiResponse,
   generateStream: () => SchemaStreamResult
-) {
+) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
@@ -246,7 +246,7 @@ async function streamSchemaResponse(
 
       if (attempt === MAX_RETRIES) {
         throw new Error(
-          'Unable to generate table schema. Please try again with a different description.'
+          'The AI had trouble understanding your request. Try describing your application differently.'
         )
       }
     }
@@ -255,7 +255,7 @@ async function streamSchemaResponse(
       message:
         error instanceof Error
           ? error.message
-          : 'Unable to generate table schema. Please try again.',
+          : 'Something went wrong. Please try again or refresh the page.',
     })
   } finally {
     res.end()

@@ -63,7 +63,7 @@ export const TableTemplateSelector = ({
       onSelectTemplate(tableField)
       setSelectedTemplate(template)
       toast.success(
-        `${template.tableName} template applied. You can add or modify the fields below.`,
+        `Applied ${template.tableName} template. You can customize the fields below.`,
         {
           duration: SUCCESS_MESSAGE_DURATION_MS,
         }
@@ -77,14 +77,10 @@ export const TableTemplateSelector = ({
       const promptToUse = promptOverride ?? aiPrompt
       if (!promptToUse.trim() || isGenerating) return
 
-      try {
-        const generated = await generateTables(promptToUse)
+      const generated = await generateTables(promptToUse)
 
-        if (generated.length > 0) {
-          handleSelectTemplate(generated[0])
-        }
-      } catch (error) {
-        // Error handling is done in the hook
+      if (generated.length > 0) {
+        handleSelectTemplate(generated[0])
       }
     },
     [aiPrompt, generateTables, isGenerating, handleSelectTemplate]
@@ -115,8 +111,8 @@ export const TableTemplateSelector = ({
           </h3>
           <p className="text-xs text-foreground-lighter mt-1">
             {isAI
-              ? "Describe the app you're building and AI will create ready-made table schema."
-              : 'Save time by starting from a ready-made table schema.'}
+              ? "Describe your app and AI will create a complete table schema."
+              : 'Select a pre-built schema to get started quickly.'}
           </p>
         </div>
         {onDismiss && (

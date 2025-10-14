@@ -19,6 +19,17 @@ const isNotNull = <T>(value: T | null | undefined): value is T => value != null
 
 const STREAM_QUERY = 'stream=true&streamMode=object'
 
+const isIdColumn = (name: string) => name === 'id'
+
+const isPrimaryColumn = (column: { isPrimary?: boolean | null; name: string }) =>
+  column.isPrimary || isIdColumn(column.name)
+
+const getColumnDescription = (column: { isPrimary?: boolean | null; name: string; isForeign?: boolean | null; references?: any }) => {
+  if (isPrimaryColumn(column)) return 'Primary key'
+  if (column.isForeign && column.references) return `References ${column.references}`
+  return undefined
+}
+
 const mapColumnType = (type: string): PostgresType => {
   const typeMap: Record<string, PostgresType> = {
     bigint: 'int8',
@@ -55,13 +66,8 @@ const convertAISchemaToTableSuggestions = (schema: AIGeneratedSchema): TableSugg
       nullable: column.isNullable ?? undefined,
       unique: column.isUnique ?? undefined,
       default: column.defaultValue ?? undefined,
-      description:
-        column.isPrimary || column.name === 'id'
-          ? 'Primary key'
-          : column.isForeign && column.references
-            ? `References ${column.references}`
-            : undefined,
-      isPrimary: column.name === 'id' ? true : column.isPrimary ?? undefined,
+      description: getColumnDescription(column),
+      isPrimary: isPrimaryColumn(column) || undefined,
       isForeign: column.isForeign ?? undefined,
       references: column.references ?? undefined,
     })),
@@ -101,13 +107,8 @@ const convertPartialSchemaToTableSuggestions = (schema: PartialSchema): TableSug
             nullable: column.isNullable ?? undefined,
             unique: column.isUnique ?? undefined,
             default: column.defaultValue ?? undefined,
-            description:
-              column.isPrimary || columnName === 'id'
-                ? 'Primary key'
-                : column.isForeign && column.references
-                  ? `References ${column.references}`
-                  : undefined,
-            isPrimary: columnName === 'id' ? true : column.isPrimary ?? undefined,
+            description: getColumnDescription({ ...column, name: columnName }),
+            isPrimary: isPrimaryColumn({ ...column, name: columnName }) || undefined,
             isForeign: column.isForeign ?? undefined,
             references: column.references ?? undefined,
           }
@@ -253,7 +254,7 @@ export const useAITableGeneration = () => {
     }
 
     if (prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
-      const message = `Description is too long. Please keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.`
+      const message = `Your description is too long. Try shortening it to under ${LIMITS.MAX_PROMPT_LENGTH} characters.`
       toast.error(message)
       return []
     }
@@ -288,8 +289,8 @@ export const useAITableGeneration = () => {
       if (!response.ok) {
         const errorData = await response
           .json()
-          .catch(() => ({ error: 'Failed to generate schemas' }))
-        const errorMessage = errorData?.error || 'Failed to generate schemas'
+          .catch(() => ({ error: 'Something went wrong while generating your table schema. Please try again.' }))
+        const errorMessage = errorData?.error || 'Something went wrong while generating your table schema. Please try again.'
         if (isMountedRef.current) {
           setError(errorMessage)
         }
@@ -344,7 +345,7 @@ export const useAITableGeneration = () => {
 
           if (event.event === 'error') {
             const errorPayload = safeJsonParse<{ message?: string }>(event.data)
-            throw new Error(errorPayload?.message ?? 'Failed to stream schemas')
+            throw new Error(errorPayload?.message ?? 'Something went wrong while streaming the response. Please try again.')
           }
         }
 
@@ -405,7 +406,7 @@ export const useAITableGeneration = () => {
         return []
       }
 
-      const message = error instanceof Error ? error.message : 'Failed to generate schemas'
+      const message = error instanceof Error ? error.message : 'Something went wrong. Please try again.'
 
       if (isMountedRef.current) {
         setError(message)
