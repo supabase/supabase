@@ -11,9 +11,9 @@ import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSe
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
+  cn,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
-  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
 } from 'ui'
@@ -76,6 +76,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
             <OrganizationProjectSelector
               key={orgSlug}
               sameWidthAsTrigger
+              fetchOnMount
               checkPosition="left"
               slug={!orgSlug || orgSlug === NO_ORG_MARKER ? undefined : orgSlug}
               selectedRef={field.value}
