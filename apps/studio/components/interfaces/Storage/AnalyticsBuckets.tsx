@@ -121,17 +121,14 @@ export const AnalyticsBuckets = () => {
                       }}
                     >
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <p className="text-foreground">{bucket.name}</p>
-                          {bucket.public && <Badge variant="warning">Public</Badge>}
-                        </div>
+                        <p className="text-foreground">{bucket.name}</p>
                       </TableCell>
 
                       <TableCell>
-                        <p className="text-foreground-light">
+                        <p>
                           <TimestampInfo
                             utcTimestamp={bucket.created_at}
-                            className="text-sm text-foreground-light"
+                            className="text-sm text-foreground-lighter"
                           />
                         </p>
                       </TableCell>

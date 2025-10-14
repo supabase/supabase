@@ -235,7 +235,6 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                     <TableHead className="text-foreground-muted">Name</TableHead>
                     <TableHead className="text-foreground-muted">Schema</TableHead>
                     <TableHead className="text-foreground-muted">Created at</TableHead>
-                    {/* <TableHead /> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -246,8 +245,6 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
                         Create an analytics table to get started
                       </p>
                     </TableCell>
-                    {/* <TableCell /> */}
-                    {/* <TableCell /> */}
                   </TableRow>
                 </TableBody>
               </Table>
