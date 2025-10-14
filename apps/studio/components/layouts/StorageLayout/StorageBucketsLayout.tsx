@@ -1,8 +1,6 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import { useStorageV2Page } from 'components/interfaces/Storage/Storage.utils'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -15,10 +13,7 @@ export const StorageBucketsLayout = ({
   children,
 }: PropsWithChildren<{ title?: string; hideSubtitle?: boolean }>) => {
   const { ref } = useParams()
-  const router = useRouter()
   const page = useStorageV2Page()
-  const isStorageV2 = useIsNewStorageUIEnabled()
-
   const config = !!page && page !== 's3' ? BUCKET_TYPES[page] : undefined
 
   const navigationItems =
@@ -38,10 +33,6 @@ export const StorageBucketsLayout = ({
           },
         ]
       : []
-
-  useEffect(() => {
-    if (!isStorageV2) router.replace(`/project/${ref}/storage/buckets`)
-  }, [isStorageV2, ref, router])
 
   return (
     <PageLayout

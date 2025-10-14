@@ -21,6 +21,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -36,6 +37,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useIcebergWrapperExtension } from './AnalyticBucketDetails/useIcebergWrapper'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { BUCKET_TYPES } from './Storage.constants'
 
@@ -98,13 +100,17 @@ export const CreateSpecializedBucketModal = ({
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
+  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { extension: wrappersExtension, state: wrappersExtensionState } =
+    useIcebergWrapperExtension()
 
   const [visible, setVisible] = useState(false)
 
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+  const { mutateAsync: createBucket, isLoading: isCreatingBucket } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
   })
@@ -113,9 +119,8 @@ export const CreateSpecializedBucketModal = ({
   const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-
   const config = BUCKET_TYPES['analytics']
+  const isCreating = isCreatingBucket || isEnablingExtension || isCreatingIcebergWrapper
 
   const form = useForm<CreateSpecializedBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -126,6 +131,23 @@ export const CreateSpecializedBucketModal = ({
 
   const onSubmit: SubmitHandler<CreateSpecializedBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project details is required')
+    if (!wrappersExtension) return console.error('Unable to find wrappers extension')
+
+    if (wrappersExtensionState === 'needs-upgrade') {
+      // [Joshen] Double check if this is the right CTA
+      return toast.error(
+        <p className="prose max-w-full text-sm">
+          Wrappers extensions needs to be updated to create an Iceberg Wrapper. Update the extension
+          by disabling and enabling the <code className="text-xs">wrappers</code> extension first in
+          the{' '}
+          <InlineLink href={`/project/${ref}/database/extensions?filter=wrappers`}>
+            database extensions page
+          </InlineLink>{' '}
+          before creating an Analytics bucket.
+        </p>
+      )
+    }
 
     // Determine bucket type based on the bucketType prop
     // [Danny] Change STANDARD to VECTORS when ready
@@ -147,6 +169,19 @@ export const CreateSpecializedBucketModal = ({
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
+      if (wrappersExtensionState === 'not-installed') {
+        await enableExtension({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: wrappersExtension.name,
+          schema: wrappersExtension.schema ?? 'extensions',
+          version: wrappersExtension.default_version,
+        })
+        await createIcebergWrapper({ bucketName: values.name })
+      } else if (wrappersExtensionState === 'installed') {
+        await createIcebergWrapper({ bucketName: values.name })
+      }
+
       toast.success(`Created bucket “${values.name}”`)
       form.reset()
       setVisible(false)
@@ -165,9 +200,7 @@ export const CreateSpecializedBucketModal = ({
     <Dialog
       open={visible}
       onOpenChange={(open) => {
-        if (!open) {
-          handleClose()
-        }
+        if (!open) handleClose()
       }}
     >
       <DialogTrigger asChild>
@@ -177,15 +210,18 @@ export const CreateSpecializedBucketModal = ({
           type={buttonType}
           className={buttonClassName}
           icon={<Plus size={14} />}
-          disabled={!canCreateBuckets || disabled}
+          disabled={!canCreateBuckets || !icebergCatalogEnabled || disabled}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
             content: {
               side: tooltip?.content?.side || 'bottom',
-              text: !canCreateBuckets
-                ? 'You need additional permissions to create buckets'
-                : tooltip?.content?.text,
+              className: cn(!icebergCatalogEnabled ? 'w-72 text-center' : ''),
+              text: !icebergCatalogEnabled
+                ? 'Analytics buckets are not enabled for your project. Please contact support to enable it.'
+                : !canCreateBuckets
+                  ? 'You need additional permissions to create buckets'
+                  : tooltip?.content?.text,
             },
           }}
         >
@@ -231,19 +267,16 @@ export const CreateSpecializedBucketModal = ({
             </DialogSection>
 
             {bucketType === 'analytics' && (
-              <DialogSection className="space-y-3">
+              <DialogSection>
                 <Admonition type="default">
                   <p>
-                    Supabase will install the Wrappers extension and Iceberg Wrapper integration on
-                    your behalf.{' '}
-                    <InlineLink
-                      href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-foreground-lighter hover:text-foreground transition-colors"
-                    >
+                    Supabase will install the{' '}
+                    {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
+                    Iceberg Wrapper integration on your behalf.{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
                       Learn more
                     </InlineLink>
+                    .
                   </p>
                 </Admonition>
               </DialogSection>

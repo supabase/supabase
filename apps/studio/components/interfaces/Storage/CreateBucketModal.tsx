@@ -152,7 +152,7 @@ export const CreateBucketModal = ({
   const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
-  const icebergWrapperExtensionState = useIcebergWrapperExtension()
+  const { state: icebergWrapperExtensionState } = useIcebergWrapperExtension()
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
@@ -267,7 +267,7 @@ export const CreateBucketModal = ({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create {isStorageV2 ? config.singularName : 'storage'} bucket</DialogTitle>
+          <DialogTitle>Create a {isStorageV2 ? config.singularName : 'storage'} bucket</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />

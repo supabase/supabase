@@ -1,11 +1,12 @@
-import { useParams } from 'common'
-import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import {
   Button,
   Card,
@@ -163,13 +164,11 @@ export const AnalyticsBuckets = () => {
       )}
 
       {selectedBucket && (
-        <>
-          <DeleteBucketModal
-            visible={modal === `delete`}
-            bucket={selectedBucket}
-            onClose={() => setModal(null)}
-          />
-        </>
+        <DeleteBucketModal
+          visible={modal === `delete`}
+          bucket={selectedBucket}
+          onClose={() => setModal(null)}
+        />
       )}
     </>
   )
