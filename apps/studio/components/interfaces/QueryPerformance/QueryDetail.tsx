@@ -168,7 +168,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
                 return (
                   <li key={x.id} className="flex justify-between pt-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
-                    {typeof rawValue === 'string' ? (
+                    {typeof rawValue === 'string' || typeof rawValue === 'number' ? (
                       <p
                         className={cn(
                           cacheHitRateToNumber(rawValue).toFixed(2) === '0.00' &&
