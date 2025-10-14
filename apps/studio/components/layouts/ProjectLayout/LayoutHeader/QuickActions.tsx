@@ -1,5 +1,5 @@
 import { Kbd } from 'components/ui/DataTable/primitives/Kbd'
-import { DotSquare, Grid2x2, GripVertical, Pencil, PlusIcon, Save, Star, X } from 'lucide-react'
+import { GripVertical, Pencil, PlusIcon, Save, Star, X } from 'lucide-react'
 import {
   Button,
   cn,
@@ -56,21 +56,21 @@ const SortableActionItem = ({ action, onRemove }: SortableActionItemProps) => {
       {...attributes}
       {...listeners}
       className={cn(
-        'cursor-grab active:cursor-grabbing flex items-center gap-2 py-1',
+        'group/grab cursor-grab active:cursor-grabbing flex items-center gap-2 text-foreground-light hover:text-foreground',
         isDragging && 'opacity-50'
       )}
       onClick={(e) => e.preventDefault()}
     >
-      <div className="text-foreground-muted hover:bg-muted/50 rounded">
+      <div className="text-foreground-muted group-hover/grab:text-foreground-lighter hover:bg-muted/50 rounded">
         <GripVertical size={14} />
       </div>
       <action.icon size={14} className="text-foreground-lighter flex-shrink-0" />
-      <span className="text-foreground-light flex-1">{action.label}</span>
+      <span className="flex-1">{action.label}</span>
       <Button
         type="text"
         size="tiny"
         onClick={() => onRemove(action)}
-        className="!p-1 text-destructive hover:text-destructive"
+        className="w-4 h-4 !p-0 text-foreground-lighter hover:text-foreground"
       >
         <X size={12} />
       </Button>
@@ -128,7 +128,7 @@ const ReorderableList = ({
     <div className="overflow-y-auto">
       {/* Selected Actions */}
       <DropdownMenuGroup>
-        <DropdownMenuLabel>Selected Actions</DropdownMenuLabel>
+        <DropdownMenuLabel>Favourite Actions</DropdownMenuLabel>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <SortableContext
             items={selectedActions.map((action) => action.id)}
@@ -150,14 +150,14 @@ const ReorderableList = ({
             {unselectedActions.map((action) => (
               <DropdownMenuItem
                 key={`unselected-action-${action.id}`}
-                className="flex items-center gap-2 cursor-pointer w-full text-left"
+                className="flex items-center gap-2 cursor-pointer w-full text-left text-foreground-light hover:text-foreground"
                 onClick={(e) => {
                   e.preventDefault()
                   addAction(action)
                 }}
               >
                 <action.icon size={14} className="text-foreground-lighter flex-shrink-0" />
-                <span className="text-foreground-light flex-1">{action.label}</span>
+                <span className="flex-1">{action.label}</span>
                 <div className="flex items-center justify-center text-foreground-lighter hover:text-foreground">
                   <Star size={12} />
                 </div>
@@ -211,7 +211,11 @@ const QuickActions = () => {
           <TooltipContent>Create</TooltipContent>
         </Tooltip>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-64 max-h-[calc(100vh-200px)]">
+      <DropdownMenuContent
+        side="bottom"
+        align="end"
+        className="flex flex-col w-64 max-h-[calc(100vh-50px)]"
+      >
         {editQuickActions ? (
           <ReorderableList
             selectedActions={selectedActions}
@@ -220,7 +224,7 @@ const QuickActions = () => {
             onToggleAction={handleToggleAction}
           />
         ) : (
-          <>
+          <div className="overflow-y-auto">
             <DropdownMenuLabel>Create...</DropdownMenuLabel>
             {selectedActions.map((option) => (
               <DropdownMenuItem asChild key={option.label}>
@@ -235,7 +239,7 @@ const QuickActions = () => {
                 </button>
               </DropdownMenuItem>
             ))}
-          </>
+          </div>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -247,15 +251,15 @@ const QuickActions = () => {
               setEditQuickActions(true)
             }
           }}
-          className="text-center flex justify-center items-center gap-2 w-full text-foreground-light hover:text-foreground"
+          className="text-center cursor-pointer flex justify-center items-center gap-2 w-full text-foreground-light hover:text-foreground"
         >
           {editQuickActions ? (
             <>
-              Save <Save size={14} />
+              Save <Save size={12} className="text-foreground-lighter" />
             </>
           ) : (
             <>
-              Manage <Pencil size={14} />
+              Manage <Pencil size={12} className="text-foreground-lighter" />
             </>
           )}
         </DropdownMenuItem>
