@@ -71,6 +71,7 @@ const Input = forwardRef<
           {...props}
           onCopy={onCopy}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : props.value}
+          disabled={reveal && hidden ? true : props.disabled}
           className={cn(...inputClasses, props.className)}
         />
         {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
