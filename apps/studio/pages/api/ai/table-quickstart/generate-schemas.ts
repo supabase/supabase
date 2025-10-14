@@ -8,7 +8,7 @@ import apiWrapper from 'lib/api/apiWrapper'
 
 export const maxDuration = 30
 
-const MAX_RETRIES = 1
+const MAX_RETRIES = 2
 
 const ColumnSchema = z.object({
   name: z.string().describe('The column name in snake_case'),

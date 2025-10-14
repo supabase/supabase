@@ -250,11 +250,9 @@ export const useAITableGeneration = () => {
       })
 
       if (!response.ok) {
-        const errorData = await response
-          .json()
-          .catch(() => ({
-            error: 'Something went wrong while generating your table schema. Please try again.',
-          }))
+        const errorData = await response.json().catch(() => ({
+          error: 'Something went wrong while generating your table schema. Please try again.',
+        }))
         const errorMessage =
           errorData?.error ||
           'Something went wrong while generating your table schema. Please try again.'

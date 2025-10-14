@@ -139,7 +139,7 @@ export const TableTemplateSelector = ({
               disabled={!aiPrompt.trim() || isGenerating || disabled}
               onClick={() => handleGenerateTables()}
               icon={<AiIconAnimation loading={isGenerating} />}
-              className="absolute right-1 top-1/2 -translate-y-1/2"
+              className="absolute right-1 top-1/2 -translate-y-1/2 !space-x-1"
             >
               {isGenerating ? 'Generating...' : 'Generate'}
             </Button>
@@ -162,7 +162,7 @@ export const TableTemplateSelector = ({
                     disabled={isGenerating || disabled}
                     aria-label={`Generate table for ${idea}`}
                     className={cn(
-                      'flex items-center gap-1 px-2 py-1 rounded-md text-xs border border-default',
+                      'flex items-center gap-1.5 px-2 py-1 rounded-md text-xs border border-default',
                       'hover:border-foreground-muted hover:bg-surface-100',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                       'transition-all'
@@ -205,7 +205,7 @@ export const TableTemplateSelector = ({
       {displayedTemplates.length > 0 && (
         <div className="grid gap-2">
           {isAI && (
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between mt-3 mb-2">
               <span className="text-xs text-foreground-light">
                 Generated {tables.length} table{tables.length !== 1 ? 's' : ''}
               </span>
