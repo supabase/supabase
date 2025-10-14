@@ -115,9 +115,8 @@ export const AnalyticsBucketFields = ({
   const { data: project } = useSelectedProjectQuery()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
-  const { serviceKey, secretKey } = getKeys(apiKeys)
-  const hasSecretKey = !!secretKey
-  const serviceApiKey = secretKey?.api_key ?? serviceKey?.api_key ?? ''
+  const { serviceKey } = getKeys(apiKeys)
+  const serviceApiKey = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
@@ -309,14 +308,8 @@ export const AnalyticsBucketFields = ({
             description={
               <>
                 Automatically retrieved from your project's{' '}
-                <InlineLink
-                  href={
-                    hasSecretKey
-                      ? `/project/${projectRef}/settings/api-keys/new`
-                      : `/project/${projectRef}/settings/api-keys`
-                  }
-                >
-                  {hasSecretKey ? 'API Secret' : 'service role'} key
+                <InlineLink href={`/project/${projectRef}/settings/api-keys`}>
+                  service role key
                 </InlineLink>
               </>
             }
