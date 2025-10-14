@@ -375,7 +375,7 @@ export const CreateBranchModal = () => {
                   )}
                 </>
               )}
-              {allowDataBranching && (
+              {allowDataBranching && hasPitrEnabled && (
                 <FormField_Shadcn_
                   control={form.control}
                   name="withData"
