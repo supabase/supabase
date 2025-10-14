@@ -309,6 +309,7 @@ export const UsersV2 = () => {
                   setSearch={setSearch}
                   setFilterKeywords={(s) => {
                     setFilterKeywords(s)
+                    setSelectedUser(undefined)
                     sendEvent({
                       action: 'auth_users_search_submitted',
                       properties: {
