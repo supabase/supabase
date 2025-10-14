@@ -74,6 +74,7 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { SupportFormDiscordCallout } from './SupportDiscordCallout'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -519,7 +520,6 @@ export const SupportFormV2 = ({
               </FormItemLayout>
             )}
           />
-
           <AnimatePresence>
             {projectRef !== 'no-project' && (
               <motion.div
@@ -800,6 +800,8 @@ export const SupportFormV2 = ({
             )}
           />
         )}
+
+        {subscriptionPlanId == 'free' && <SupportFormDiscordCallout />}
 
         <FormField_Shadcn_
           name="message"
