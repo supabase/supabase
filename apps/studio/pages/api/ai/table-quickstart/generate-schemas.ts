@@ -159,10 +159,6 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
 const shouldStream = (req: NextApiRequest) => {
   if (req.headers['accept']?.includes('text/event-stream')) return true
   if (req.headers['x-ai-stream'] === 'true') return true
-  const { stream } = req.query
-  if (typeof stream === 'string') {
-    return stream === 'true'
-  }
   return false
 }
 

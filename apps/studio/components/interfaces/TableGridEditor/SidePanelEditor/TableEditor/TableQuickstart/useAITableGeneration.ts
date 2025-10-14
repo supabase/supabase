@@ -17,8 +17,6 @@ type PartialSchema = Partial<AIGeneratedSchema> & {
 // Narrow helper to strip null/undefined from arrays
 const isNotNull = <T>(value: T | null | undefined): value is T => value != null
 
-const STREAM_QUERY = 'stream=true&streamMode=object'
-
 const isIdColumn = (name: string) => name === 'id'
 
 const isPrimaryColumn = (column: { isPrimary?: boolean | null; name: string }) =>
@@ -276,7 +274,7 @@ export const useAITableGeneration = () => {
       headers.set('X-AI-Stream-Object', 'true')
 
       const response = await fetch(
-        `${BASE_PATH}/api/ai/table-quickstart/generate-schemas?${STREAM_QUERY}`,
+        `${BASE_PATH}/api/ai/table-quickstart/generate-schemas`,
         {
           method: 'POST',
           headers,
