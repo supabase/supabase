@@ -31,10 +31,12 @@ export function ApiKeyPill({
 
   // Function to fetch the full API key
   async function fetchFullApiKey(): Promise<string> {
+    if (!apiKey.id) return apiKey.api_key // Early return if no id
+
     try {
       const { data, error } = await get('/v1/projects/{ref}/api-keys/{id}', {
         params: {
-          path: { ref: projectRef, id: apiKey.id as string },
+          path: { ref: projectRef, id: apiKey.id },
           query: { reveal: true },
         },
       })
@@ -61,10 +63,12 @@ export function ApiKeyPill({
     const fullKey = await fetchFullApiKey()
 
     // Clear from cache after copying
-    queryClient.removeQueries({
-      queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
-      exact: true,
-    })
+    if (apiKey.id) {
+      queryClient.removeQueries({
+        queryKey: apiKeysKeys.single(projectRef, apiKey.id),
+        exact: true,
+      })
+    }
 
     return fullKey
   }
