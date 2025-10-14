@@ -14,7 +14,6 @@ import {
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-// import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -261,10 +260,8 @@ export const S3Connection = () => {
         ) : (
           <>
             {isLoadingStorageCreds ? (
-              // <div className="p-4">
               <GenericSkeletonLoader />
             ) : (
-              // </div>
               <Card>
                 <Table>
                   <TableHeader>
