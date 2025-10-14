@@ -114,11 +114,7 @@ export const QueryPerformanceChart = ({
     const transformed = chartData.map((dataPoint) => ({
       ...dataPoint,
       p50_time: parseFloat((dataPoint.p50_time / 1000).toFixed(3)),
-      p75_time: parseFloat((dataPoint.p75_time / 1000).toFixed(3)),
-      p90_time: parseFloat((dataPoint.p90_time / 1000).toFixed(3)),
       p95_time: parseFloat((dataPoint.p95_time / 1000).toFixed(3)),
-      p99_time: parseFloat((dataPoint.p99_time / 1000).toFixed(3)),
-      p99_9_time: parseFloat((dataPoint.p99_9_time / 1000).toFixed(3)),
     }))
 
     return transformed
@@ -173,42 +169,14 @@ export const QueryPerformanceChart = ({
           label: 'p50',
           provider: 'logs',
           type: 'line',
-          color: { light: '#10B981', dark: '#10B981' },
-        },
-        {
-          attribute: 'p75_time',
-          label: 'p75',
-          provider: 'logs',
-          type: 'line',
-          color: { light: '#3ECF8E', dark: '#3ECF8E' },
-        },
-        {
-          attribute: 'p90_time',
-          label: 'p90',
-          provider: 'logs',
-          type: 'line',
-          color: { light: '#65BCD9', dark: '#65BCD9' },
+          color: { light: '#8B5CF6', dark: '#8B5CF6' },
         },
         {
           attribute: 'p95_time',
           label: 'p95',
           provider: 'logs',
           type: 'line',
-          color: { light: '#F59E0B', dark: '#F59E0B' },
-        },
-        {
-          attribute: 'p99_time',
-          label: 'p99',
-          provider: 'logs',
-          type: 'line',
-          color: { light: '#DA760B', dark: '#DA760B' },
-        },
-        {
-          attribute: 'p99_9_time',
-          label: 'p99.9',
-          provider: 'logs',
-          type: 'line',
-          color: { light: '#8B5CF6', dark: '#8B5CF6' },
+          color: { light: '#65BCD9', dark: '#65BCD9' },
         },
       ],
       rows_read: [

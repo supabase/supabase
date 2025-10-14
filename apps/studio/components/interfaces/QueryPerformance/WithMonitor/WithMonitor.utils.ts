@@ -42,11 +42,7 @@ export interface ChartDataPoint {
   max_time: number
   stddev_time: number
   p50_time: number
-  p75_time: number
-  p90_time: number
   p95_time: number
-  p99_time: number
-  p99_9_time: number
   rows_read: number
   calls: number
   cache_hits: number
@@ -99,7 +95,7 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
       const percentiles =
         log.resp_calls && Array.isArray(log.resp_calls)
           ? calculatePercentilesFromHistogram(log.resp_calls)
-          : { p50: 0, p75: 0, p90: 0, p95: 0, p99: 0, p99_9: 0 }
+          : { p50: 0, p95: 0 }
 
       return {
         period_start: periodStart,
@@ -116,11 +112,7 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
           String(log.stddev_time ?? log.stddev_exec_time ?? log.stddev_query_time ?? 0)
         ),
         p50_time: percentiles.p50,
-        p75_time: percentiles.p75,
-        p90_time: percentiles.p90,
         p95_time: percentiles.p95,
-        p99_time: percentiles.p99,
-        p99_9_time: percentiles.p99_9,
         rows_read: parseInt(String(log.rows ?? 0), 10),
         calls: parseInt(String(log.calls ?? 0), 10),
         cache_hits: parseFloat(String(log.shared_blks_hit ?? 0)),
@@ -241,11 +233,7 @@ export const calculatePercentilesFromHistogram = (
   respCalls: number[]
 ): {
   p50: number
-  p75: number
-  p90: number
   p95: number
-  p99: number
-  p99_9: number
 } => {
   const bucketBoundaries = [
     { min: 0, max: 1 },
@@ -259,7 +247,7 @@ export const calculatePercentilesFromHistogram = (
   const totalCalls = respCalls.reduce((sum, count) => sum + count, 0)
 
   if (totalCalls === 0) {
-    return { p50: 0, p75: 0, p90: 0, p95: 0, p99: 0, p99_9: 0 }
+    return { p50: 0, p95: 0 }
   }
 
   const distribution: {
@@ -306,11 +294,7 @@ export const calculatePercentilesFromHistogram = (
 
   const result = {
     p50: getPercentile(0.5),
-    p75: getPercentile(0.75),
-    p90: getPercentile(0.9),
     p95: getPercentile(0.95),
-    p99: getPercentile(0.99),
-    p99_9: getPercentile(0.999),
   }
 
   return result
