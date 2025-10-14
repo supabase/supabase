@@ -9,7 +9,7 @@ import {
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { Plus } from 'lucide-react'
+import { Plus, RefreshCw } from 'lucide-react'
 import type { CSSProperties, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,8 +18,10 @@ import { useParams } from 'common'
 import { SnippetDropdown } from 'components/interfaces/HomeNew/SnippetDropdown'
 import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
 import type { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { useInvalidateAnalyticsQuery } from 'data/analytics/utils'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
@@ -28,6 +30,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
@@ -35,10 +38,15 @@ import { Row } from 'ui-patterns'
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
   const endDate = dayjs().toISOString()
+
   const { ref } = useParams()
   const { profile } = useProfile()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const state = useDatabaseSelectorStateSnapshot()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { invalidateInfraMonitoringQuery } = useInvalidateAnalyticsQuery()
+
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
@@ -50,9 +58,11 @@ export function CustomReportSection() {
     reportContent
   )
 
-  useEffect(() => {
-    if (reportContent) setEditableReport(reportContent)
-  }, [reportContent])
+  const { can: canCreateReport } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    { resource: { type: 'report', owner_id: profile?.id }, subject: { id: profile?.id } }
+  )
 
   const { can: canUpdateReport } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -65,12 +75,6 @@ export function CustomReportSection() {
       },
       subject: { id: profile?.id },
     }
-  )
-
-  const { can: canCreateReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    { resource: { type: 'report', owner_id: profile?.id }, subject: { id: profile?.id } }
   )
 
   const { mutate: upsertContent } = useContentUpsertMutation()
@@ -273,88 +277,122 @@ export function CustomReportSection() {
     persistReport(updated)
   }
 
+  const onRefreshReport = () => {
+    if (!ref) return
+
+    setIsRefreshing(true)
+    const monitoringCharts = editableReport?.layout.filter(
+      (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'
+    )
+    monitoringCharts?.forEach((x) => {
+      invalidateInfraMonitoringQuery(ref, {
+        attribute: x.attribute,
+        startDate,
+        endDate,
+        interval: editableReport?.interval || '1d',
+        databaseIdentifier: state.selectedDatabaseId,
+      })
+    })
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }
+
   const layout = useMemo(() => editableReport?.layout ?? [], [editableReport])
+
+  useEffect(() => {
+    if (reportContent) setEditableReport(reportContent)
+  }, [reportContent])
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="heading-section">At a glance</h3>
-        {canUpdateReport || canCreateReport ? (
-          <SnippetDropdown
-            projectRef={ref}
-            onSelect={addSnippetToReport}
-            trigger={
-              <Button type="default" icon={<Plus />}>
-                Add block
-              </Button>
-            }
-            side="bottom"
-            align="end"
-            autoFocus
-          />
-        ) : null}
+        <h3 className="heading-section">Reports</h3>
+        <div className="flex items-center gap-x-2">
+          {layout.length > 0 && (
+            <ButtonTooltip
+              type="default"
+              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              disabled={isRefreshing}
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
+            />
+          )}
+          {canUpdateReport || canCreateReport ? (
+            <SnippetDropdown
+              projectRef={ref}
+              onSelect={addSnippetToReport}
+              trigger={
+                <Button type="default" icon={<Plus />}>
+                  Add block
+                </Button>
+              }
+              side="bottom"
+              align="end"
+              autoFocus
+            />
+          ) : null}
+        </div>
       </div>
       <div className="relative">
-        {(() => {
-          if (layout.length === 0) {
-            return (
-              <div className="flex min-h-[270px] items-center justify-center rounded border-2 border-dashed p-16 border-default">
-                {canUpdateReport || canCreateReport ? (
-                  <SnippetDropdown
-                    projectRef={ref}
-                    onSelect={addSnippetToReport}
-                    trigger={
-                      <Button type="default" iconRight={<Plus size={14} />}>
-                        Add your first chart
-                      </Button>
-                    }
-                    side="bottom"
-                    align="center"
-                    autoFocus
-                  />
-                ) : (
-                  <p className="text-sm text-foreground-light">No charts set up yet in report</p>
-                )}
-              </div>
-            )
-          }
-          return (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
+        {layout.length === 0 ? (
+          <div className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 border-default">
+            <h4>Build a custom report</h4>
+            <p className="text-sm text-foreground-light mb-4">
+              Keep track of your most important metrics
+            </p>
+            {canUpdateReport || canCreateReport ? (
+              <SnippetDropdown
+                projectRef={ref}
+                onSelect={addSnippetToReport}
+                trigger={
+                  <Button type="default" iconRight={<Plus size={14} />}>
+                    Add your first block
+                  </Button>
+                }
+                side="bottom"
+                align="center"
+                autoFocus
+              />
+            ) : (
+              <p className="text-sm text-foreground-light">No charts set up yet in report</p>
+            )}
+          </div>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={(editableReport?.layout ?? []).map((x) => String(x.id))}
+              strategy={rectSortingStrategy}
             >
-              <SortableContext
-                items={(editableReport?.layout ?? []).map((x) => String(x.id))}
-                strategy={rectSortingStrategy}
-              >
-                <Row columns={[3, 2, 1]}>
-                  {layout.map((item) => (
-                    <SortableReportBlock key={item.id} id={String(item.id)}>
-                      <div className="h-64">
-                        <ReportBlock
-                          key={item.id}
-                          item={item}
-                          startDate={startDate}
-                          endDate={endDate}
-                          interval={
-                            (editableReport?.interval as AnalyticsInterval) ??
-                            ('1d' as AnalyticsInterval)
-                          }
-                          disableUpdate={false}
-                          isRefreshing={false}
-                          onRemoveChart={handleRemoveChart}
-                          onUpdateChart={(config) => handleUpdateChart(item.id, config)}
-                        />
-                      </div>
-                    </SortableReportBlock>
-                  ))}
-                </Row>
-              </SortableContext>
-            </DndContext>
-          )
-        })()}
+              <Row columns={[3, 2, 1]}>
+                {layout.map((item) => (
+                  <SortableReportBlock key={item.id} id={String(item.id)}>
+                    <div className="h-64">
+                      <ReportBlock
+                        key={item.id}
+                        item={item}
+                        startDate={startDate}
+                        endDate={endDate}
+                        interval={
+                          (editableReport?.interval as AnalyticsInterval) ??
+                          ('1d' as AnalyticsInterval)
+                        }
+                        disableUpdate={false}
+                        isRefreshing={isRefreshing}
+                        onRemoveChart={handleRemoveChart}
+                        onUpdateChart={(config) => handleUpdateChart(item.id, config)}
+                      />
+                    </div>
+                  </SortableReportBlock>
+                ))}
+              </Row>
+            </SortableContext>
+          </DndContext>
+        )}
       </div>
     </div>
   )

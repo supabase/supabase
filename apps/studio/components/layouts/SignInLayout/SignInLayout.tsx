@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
@@ -31,7 +30,8 @@ const SignInLayout = ({
   const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
-  const showTestimonial = useIsFeatureEnabled('dashboard_auth:show_testimonial')
+  const { dashboardAuthShowTestimonial: showTestimonial, brandingLargeLogo: largeLogo } =
+    useIsFeatureEnabled(['dashboard_auth:show_testimonial', 'branding:large_logo'])
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
@@ -96,15 +96,14 @@ const SignInLayout = ({
             <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
-                  <Image
+                  <img
                     src={
                       resolvedTheme?.includes('dark')
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }
                     alt="Supabase Logo"
-                    height={24}
-                    width={120}
+                    className={largeLogo ? 'h-[48px]' : 'h-[24px]'}
                   />
                 </Link>
               </div>
