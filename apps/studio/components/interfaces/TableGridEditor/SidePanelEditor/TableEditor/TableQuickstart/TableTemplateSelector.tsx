@@ -26,11 +26,8 @@ export const TableTemplateSelector = ({
   onDismiss,
   disabled,
 }: TableTemplateSelectorProps) => {
-  // State for `templates` variant
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [selectedTemplate, setSelectedTemplate] = useState<TableSuggestion | null>(null)
-
-  // State for `ai` variant
   const [aiPrompt, setAiPrompt] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const {
@@ -43,14 +40,12 @@ export const TableTemplateSelector = ({
 
   const isAI = variant === QuickstartVariant.AI
 
-  // Auto-select first category for templates variant
   useEffect(() => {
     if (!isAI && activeCategory === null && CATEGORIES.length > 0) {
       setActiveCategory(CATEGORIES[0])
     }
   }, [CATEGORIES, activeCategory, isAI])
 
-  // Focus AI input when in AI mode
   useEffect(() => {
     if (isAI && inputRef.current) {
       inputRef.current.focus()
@@ -62,12 +57,9 @@ export const TableTemplateSelector = ({
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
       setSelectedTemplate(template)
-      toast.success(
-        `Applied ${template.tableName} template. You can customize the fields below.`,
-        {
-          duration: SUCCESS_MESSAGE_DURATION_MS,
-        }
-      )
+      toast.success(`Applied ${template.tableName} template. You can customize the fields below.`, {
+        duration: SUCCESS_MESSAGE_DURATION_MS,
+      })
     },
     [onSelectTemplate]
   )
@@ -103,7 +95,6 @@ export const TableTemplateSelector = ({
 
   return (
     <div className="rounded-lg border border-default bg-surface-75 p-4">
-      {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-sm font-medium">
@@ -111,7 +102,7 @@ export const TableTemplateSelector = ({
           </h3>
           <p className="text-xs text-foreground-lighter mt-1">
             {isAI
-              ? "Describe your app and AI will create a complete table schema."
+              ? 'Describe your app and AI will create a complete table schema.'
               : 'Select a pre-built schema to get started quickly.'}
           </p>
         </div>
@@ -122,7 +113,6 @@ export const TableTemplateSelector = ({
         )}
       </div>
 
-      {/* AI Variant: Input and Quick Ideas */}
       {isAI && (
         <div className="space-y-3">
           <div className="relative">
@@ -161,7 +151,6 @@ export const TableTemplateSelector = ({
             </div>
           )}
 
-          {/* Quick Ideas */}
           {tables.length === 0 && (
             <div>
               <div className="text-xs text-foreground-light mb-2">Quick ideas:</div>
@@ -189,7 +178,6 @@ export const TableTemplateSelector = ({
         </div>
       )}
 
-      {/* Templates Variant: Category Tabs */}
       {!isAI && (
         <div className="flex flex-wrap gap-2 mb-3">
           {CATEGORIES.map((category) => (
@@ -214,7 +202,6 @@ export const TableTemplateSelector = ({
         </div>
       )}
 
-      {/* Templates List (both variants use this) */}
       {displayedTemplates.length > 0 && (
         <div className="grid gap-2">
           {isAI && (

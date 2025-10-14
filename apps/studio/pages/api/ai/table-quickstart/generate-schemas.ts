@@ -41,19 +41,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ error: { message: `Method ${req.method} Not Allowed` } })
   }
 
-  const {
-    model,
-    error: modelError,
-    providerOptions,
-  } = await getModel({
+  const { model, providerOptions } = await getModel({
     provider: 'bedrock',
     model: 'openai.gpt-oss-120b-1:0',
     routingKey: 'table-quickstart',
     isLimited: false,
   })
 
-  if (modelError || !model) {
-    return res.status(500).json({ error: 'The AI service is temporarily unavailable. Please try again in a moment.' })
+  if (!model) {
+    return res
+      .status(500)
+      .json({ error: 'The AI service is temporarily unavailable. Please try again in a moment.' })
   }
 
   const { prompt } = req.body
@@ -65,7 +63,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (typeof prompt !== 'string' || prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
     return res
       .status(400)
-      .json({ error: `Your description is too long. Please keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.` })
+      .json({
+        error: `Your description is too long. Please keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.`,
+      })
   }
 
   try {
@@ -108,7 +108,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (error instanceof Error) {
       if (error.message.includes('context_length') || error.message.includes('too long')) {
         return res.status(400).json({
-          error: 'Your description is too long. Try using fewer words to describe your application.',
+          error:
+            'Your description is too long. Try using fewer words to describe your application.',
         })
       }
     }
@@ -139,14 +140,12 @@ const streamSchemaResponse = async (
     res.write(`data: ${JSON.stringify(data)}\n\n`)
   }
 
-  let attempt = 0
-  let lastPartial: any = null
-  let chunkCount = 0
+  let lastPartial: unknown = null
 
   const tryStream = async (): Promise<boolean> => {
     const result = generateStream()
     lastPartial = null
-    chunkCount = 0
+    let chunkCount = 0
 
     try {
       for await (const partial of result.partialObjectStream) {
@@ -160,17 +159,21 @@ const streamSchemaResponse = async (
         return false
       }
 
-      const hasTables = (obj: any) =>
-        obj?.tables && Array.isArray(obj.tables) && obj.tables.length > 0
+      const hasTables = (obj: unknown): obj is { tables: unknown[] } =>
+        typeof obj === 'object' &&
+        obj !== null &&
+        'tables' in obj &&
+        Array.isArray((obj as { tables: unknown }).tables) &&
+        (obj as { tables: unknown[] }).tables.length > 0
 
-      let finalObject: any = null
+      let finalObject: unknown = null
       try {
         finalObject = await result.object
       } catch {
         finalObject = null
       }
 
-      if (finalObject && hasTables(finalObject) && finalObject.tables.length > LIMITS.MAX_TABLES) {
+      if (hasTables(finalObject) && finalObject.tables.length > LIMITS.MAX_TABLES) {
         finalObject.tables = finalObject.tables.slice(0, LIMITS.MAX_TABLES)
       }
 
@@ -195,7 +198,7 @@ const streamSchemaResponse = async (
   }
 
   try {
-    for (attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       const success = await tryStream()
       if (success) {
         return

@@ -14,7 +14,6 @@ type PartialSchema = Partial<AIGeneratedSchema> & {
   tables?: PartialTable[]
 }
 
-// Narrow helper to strip null/undefined from arrays
 const isNotNull = <T>(value: T | null | undefined): value is T => value != null
 
 const isIdColumn = (name: string) => name === 'id'
@@ -242,28 +241,28 @@ export const useAITableGeneration = () => {
       headers.set('Content-Type', 'application/json')
       headers.set('Accept', 'text/event-stream')
 
-      const response = await fetch(
-        `${BASE_PATH}/api/ai/table-quickstart/generate-schemas`,
-        {
-          method: 'POST',
-          headers,
-          credentials: 'include',
-          body: JSON.stringify({ prompt }),
-          signal: abortController.signal,
-        }
-      )
+      const response = await fetch(`${BASE_PATH}/api/ai/table-quickstart/generate-schemas`, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify({ prompt }),
+        signal: abortController.signal,
+      })
 
       if (!response.ok) {
         const errorData = await response
           .json()
-          .catch(() => ({ error: 'Something went wrong while generating your table schema. Please try again.' }))
-        const errorMessage = errorData?.error || 'Something went wrong while generating your table schema. Please try again.'
+          .catch(() => ({
+            error: 'Something went wrong while generating your table schema. Please try again.',
+          }))
+        const errorMessage =
+          errorData?.error ||
+          'Something went wrong while generating your table schema. Please try again.'
         if (isMountedRef.current) {
           setError(errorMessage)
         }
         toast.error('Unable to generate tables', {
           description: errorMessage,
-          duration: 5000,
         })
         return []
       }
@@ -312,7 +311,10 @@ export const useAITableGeneration = () => {
 
           if (event.event === 'error') {
             const errorPayload = safeJsonParse<{ message?: string }>(event.data)
-            throw new Error(errorPayload?.message ?? 'Something went wrong while streaming the response. Please try again.')
+            throw new Error(
+              errorPayload?.message ??
+                'Something went wrong while streaming the response. Please try again.'
+            )
           }
         }
 
@@ -373,7 +375,8 @@ export const useAITableGeneration = () => {
         return []
       }
 
-      const message = error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+      const message =
+        error instanceof Error ? error.message : 'Something went wrong. Please try again.'
 
       if (isMountedRef.current) {
         setError(message)
@@ -381,7 +384,6 @@ export const useAITableGeneration = () => {
 
       toast.error('Unable to generate tables', {
         description: message,
-        duration: 5000,
       })
 
       return []
