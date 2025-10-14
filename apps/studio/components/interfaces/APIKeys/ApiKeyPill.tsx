@@ -46,7 +46,7 @@ export function ApiKeyPill({
       reveal: true, // Request the unmasked key
     },
     {
-      enabled: show, // Only run query when show is true
+      enabled: show && !!apiKey.id, // Only run query when show is true and id exists
       staleTime: 0, // Always consider data stale
       cacheTime: 0, // Don't cache the key data
     }
