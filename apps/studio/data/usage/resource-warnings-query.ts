@@ -7,7 +7,7 @@ import type { ResponseError } from 'types'
 import { usageKeys } from './keys'
 
 export type ResourceWarningsVariables = {
-  project_ref?: string
+  ref?: string
   slug?: string
 }
 
@@ -18,7 +18,7 @@ export async function getResourceWarnings(
   const { data, error } = await get(`/platform/projects-resource-warnings`, {
     params: {
       query: {
-        project_ref: variables?.project_ref,
+        ref: variables?.ref,
         slug: variables?.slug,
       },
     },
@@ -41,13 +41,11 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>(
   }: UseQueryOptions<ResourceWarningsData, ResourceWarningsError, TData> = {}
 ) =>
   useQuery<ResourceWarningsData, ResourceWarningsError, TData>(
-    usageKeys.resourceWarnings(variables.slug, variables.project_ref),
+    usageKeys.resourceWarnings(variables.slug, variables.ref),
     ({ signal }) => getResourceWarnings(variables, signal),
     {
       enabled:
-        IS_PLATFORM &&
-        enabled &&
-        (variables.project_ref !== undefined || variables.slug !== undefined),
+        IS_PLATFORM && enabled && (variables.ref !== undefined || variables.slug !== undefined),
       staleTime: 1000 * 60 * 60, // default 60 minutes
       ...options,
     }
