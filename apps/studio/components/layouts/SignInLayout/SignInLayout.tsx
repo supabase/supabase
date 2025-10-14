@@ -30,8 +30,15 @@ const SignInLayout = ({
   const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
-  const { dashboardAuthShowTestimonial: showTestimonial, brandingLargeLogo: largeLogo } =
-    useIsFeatureEnabled(['dashboard_auth:show_testimonial', 'branding:large_logo'])
+  const {
+    dashboardAuthShowTestimonial: showTestimonial,
+    brandingLargeLogo: largeLogo,
+    dashboardAuthShowTos: showTos,
+  } = useIsFeatureEnabled([
+    'dashboard_auth:show_testimonial',
+    'branding:large_logo',
+    'dashboard_auth:show_tos',
+  ])
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
@@ -126,7 +133,7 @@ const SignInLayout = ({
               {children}
             </div>
 
-            {showDisclaimer && (
+            {showDisclaimer && showTos && (
               <div className="sm:text-center">
                 <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
                   By continuing, you agree to Supabase's{' '}
