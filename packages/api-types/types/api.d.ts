@@ -2159,6 +2159,8 @@ export interface components {
        */
       latest_check_run_id?: number
       name: string
+      /** Format: uri */
+      notify_url?: string
       parent_project_ref: string
       persistent: boolean
       /** Format: int32 */
@@ -2252,6 +2254,11 @@ export interface components {
         | '48xlarge_high_memory'
       git_branch?: string
       is_default?: boolean
+      /**
+       * Format: uri
+       * @description HTTP endpoint to receive branch status updates.
+       */
+      notify_url?: string
       persistent?: boolean
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.
@@ -3531,6 +3538,11 @@ export interface components {
     UpdateBranchBody: {
       branch_name?: string
       git_branch?: string
+      /**
+       * Format: uri
+       * @description HTTP endpoint to receive branch status updates.
+       */
+      notify_url?: string
       persistent?: boolean
       request_review?: boolean
       /**
@@ -10795,7 +10807,7 @@ export interface operations {
   'v1-get-available-regions': {
     parameters: {
       query: {
-        /** @description Continent code to determine regional recommendations */
+        /** @description Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica) */
         continent?: 'NA' | 'SA' | 'EU' | 'AF' | 'AS' | 'OC' | 'AN'
         /** @description Slug of your organization */
         organization_slug: string
