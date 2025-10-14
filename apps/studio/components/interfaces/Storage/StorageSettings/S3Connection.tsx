@@ -171,7 +171,15 @@ export const S3Connection = () => {
                     </FormItemLayout>
                     {!projectIsLoading && (
                       <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-                        <Input readOnly copy value={project?.region} />
+                        <Input
+                          readOnly
+                          copy
+                          value={project?.region}
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                        />
                       </FormItemLayout>
                     )}
                   </div>
