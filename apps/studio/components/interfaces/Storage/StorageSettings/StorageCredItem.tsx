@@ -49,7 +49,7 @@ export const StorageCredItem = ({
         <span className="text-foreground">{description}</span>
       </td>
       <td>
-        <Input readOnly copy value="foobarfizz" className="font-mono" />
+        <Input readOnly copy value={access_key} className="font-mono" />
       </td>
       <td>{daysSince(created_at)}</td>
       <td className="text-right">
