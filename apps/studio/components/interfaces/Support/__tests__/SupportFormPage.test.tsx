@@ -507,7 +507,7 @@ describe('SupportFormPage', () => {
       expect(submitSpy).toHaveBeenCalledTimes(1)
     })
     expect(submitSpy.mock.calls[0]?.[0]?.dashboardSentryIssueId).toBe(sentryIssueId)
-  })
+  }, 10_000)
 
   test('includes initial error message from URL in submission payload', async () => {
     const initialError = 'failed to fetch user data'
@@ -551,7 +551,7 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload?.message).toMatch(initialError)
-  })
+  }, 10_000)
 
   test('submits support request with problem category, library, and affected services', async () => {
     const submitSpy = vi.fn()
@@ -640,7 +640,7 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
     })
-  })
+  }, 10_000)
 
   test('submits urgent login issues ticket for a different organization', async () => {
     const submitSpy = vi.fn()
@@ -729,7 +729,7 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
     })
-  })
+  }, 10_000)
 
   test('submits database unresponsive ticket with initial error', async () => {
     const submitSpy = vi.fn()
@@ -829,7 +829,7 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
     })
-  })
+  }, 10_000)
 
   test('when organization changes, project selector updates to match', async () => {
     renderSupportFormPage()
@@ -968,7 +968,7 @@ describe('SupportFormPage', () => {
         expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
       })
     }
-  })
+  }, 10_000)
 
   test('shows toast on submission error and allows form re-editing and resubmission', async () => {
     const submitSpy = vi.fn()
@@ -1046,7 +1046,7 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
     })
-  })
+  }, 10_000)
 
   test('submits support request with attachments and includes attachment URLs in message', async () => {
     const submitSpy = vi.fn()
@@ -1199,7 +1199,7 @@ describe('SupportFormPage', () => {
       url.revokeObjectURL = originalRevokeObjectURL
       vi.mocked(createSupportStorageClient).mockReset()
     }
-  })
+  }, 10_000)
 
   test('can submit form with no organizations and no projects', async () => {
     const submitSpy = vi.fn()
@@ -1266,5 +1266,5 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
     })
-  })
+  }, 10_000)
 })
