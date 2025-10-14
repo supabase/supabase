@@ -253,7 +253,7 @@ export const QueryPerformanceChart = ({
           ))}
         </TabsList_Shadcn_>
 
-        <TabsContent_Shadcn_ value={selectedMetric} className="bg-surface-100 mt-0 h-inherit">
+        <TabsContent_Shadcn_ value={selectedMetric} className="bg-surface-200 mt-0 h-inherit">
           <div className="w-full flex items-center justify-center min-h-[320px]">
             {isLoading ? (
               <Loader2 size={20} className="animate-spin text-foreground-lighter" />
