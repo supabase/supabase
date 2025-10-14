@@ -3,7 +3,8 @@ const js = require('@eslint/js')
 const { FlatCompat } = require('@eslint/eslintrc')
 const prettierConfig = require('eslint-config-prettier/flat')
 const { default: turboConfig } = require('eslint-config-turbo/flat')
-const { off } = require('process')
+const { fixupPluginRules } = require('@eslint/compat')
+const tanstackQuery = require('@tanstack/eslint-plugin-query')
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -11,11 +12,23 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 })
 
+const eslintConfig = {
+  name: '@tanstack/query',
+  plugins: { '@tanstack/query': fixupPluginRules(tanstackQuery) },
+  rules: {
+    '@tanstack/query/exhaustive-deps': 'warn',
+    '@tanstack/query/no-deprecated-options': 'warn',
+    '@tanstack/query/prefer-query-object-syntax': 'warn',
+    '@tanstack/query/stable-query-client': 'warn',
+  },
+}
+
 module.exports = defineConfig([
   // Global ignore for the .next folder
   { ignores: ['.next', 'public'] },
   turboConfig,
   prettierConfig,
+  eslintConfig,
   {
     extends: compat.extends('next/core-web-vitals'),
     linterOptions: {
