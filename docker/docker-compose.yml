@@ -343,7 +343,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.22.4
+    image: supabase/logflare:1.22.6
     restart: unless-stopped
     ports:
       - 4000:4000

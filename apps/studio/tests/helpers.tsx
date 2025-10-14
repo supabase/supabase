@@ -1,8 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
-import React, { useState } from 'react'
+import type React from 'react'
+import { useState } from 'react'
 
+// End of third-party imports
+
+import type { Project } from 'data/projects/project-detail-query'
+import type { Organization } from 'types'
 import { TooltipProvider } from 'ui'
+
 interface SelectorOptions {
   container?: HTMLElement
 }
@@ -40,6 +46,48 @@ export const clickDropdown = (elem: HTMLElement) => {
   )
 }
 
+export const createMockOrganization = (details: Partial<Organization>): Organization => {
+  const base: Organization = {
+    id: 1,
+    name: 'Organization 1',
+    slug: 'abcdefghijklmnopqrst',
+    plan: { id: 'free', name: 'Free' },
+    managed_by: 'supabase',
+    is_owner: true,
+    billing_email: 'billing@example.com',
+    billing_partner: null,
+    usage_billing_enabled: false,
+    stripe_customer_id: 'stripe-1',
+    subscription_id: 'subscription-1',
+    organization_requires_mfa: false,
+    opt_in_tags: [],
+    restriction_status: null,
+    restriction_data: null,
+  }
+
+  return Object.assign(base, details)
+}
+
+export const createMockProject = (details: Partial<Project>): Project => {
+  const base: Project = {
+    id: 1,
+    ref: 'abcdefghijklmnopqrst',
+    name: 'Project 1',
+    status: 'ACTIVE_HEALTHY',
+    organization_id: 1,
+    cloud_provider: 'AWS',
+    region: 'us-east-1',
+    inserted_at: new Date().toISOString(),
+    subscription_id: 'subscription-1',
+    db_host: 'db.supabase.co',
+    is_branch_enabled: false,
+    is_physical_backups_enabled: false,
+    restUrl: 'https://project-1.supabase.co',
+  }
+
+  return Object.assign(base, details)
+}
+
 /**
  * A custom render function for react testing library
  * https://testing-library.com/docs/react-testing-library/setup/#custom-render
@@ -70,4 +118,7 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
 }
 type renderParams = Parameters<typeof originalRender>
 export const render = ((ui: renderParams[0], options: renderParams[1]) =>
-  originalRender(ui, { wrapper: ReactQueryTestConfig, ...options })) as typeof originalRender
+  originalRender(ui, {
+    wrapper: ReactQueryTestConfig,
+    ...options,
+  })) as typeof originalRender

@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import type { ResponseError } from 'types'
 
 export type OrganizationAcceptInvitationVariables = {
@@ -38,6 +38,7 @@ export const useOrganizationAcceptInvitationMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<
     OrganizationMemberUpdateData,
@@ -46,7 +47,7 @@ export const useOrganizationAcceptInvitationMutation = ({
   >((vars) => acceptOrganizationInvitation(vars), {
     async onSuccess(data, variables, context) {
       await invalidateOrganizationsQuery(queryClient)
-      await invalidateProjectsQuery(queryClient)
+      await invalidateProjectsQuery()
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

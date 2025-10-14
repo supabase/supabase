@@ -3,7 +3,16 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, cn } from 'ui'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
 import { ChevronRight, Loader2 } from 'lucide-react'
@@ -16,9 +25,8 @@ import {
 } from './OverviewUsage.constants'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react'
 
-const StatCard = ({
+export const StatCard = ({
   title,
   current,
   previous,
@@ -45,14 +53,27 @@ const StatCard = ({
       : getChangeColor(previous)
   const formattedCurrent =
     suffix === 'ms' ? current.toFixed(2) : suffix === '%' ? current.toFixed(1) : Math.round(current)
-  const ArrowIcon = previous >= 0 ? ArrowUpIcon : ArrowDownIcon
   const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
-  const Inner = (
-    <Card className={cn(href && 'cursor-pointer hover:bg-muted')}>
+  return (
+    <Card className={cn(href)}>
+      <CardHeader className="flex flex-row items-center justify-between p-2 pl-4 pr-2 space-y-0">
+        <CardTitle className="text-foreground-lighter">{title}</CardTitle>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={href || ''}
+              className="text-foreground-lighter hover:text-foreground block p-2"
+            >
+              <ChevronRight className="size-4" />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>Go to Auth Report</TooltipContent>
+        </Tooltip>
+      </CardHeader>
       <CardContent
         className={cn(
-          'flex flex-col my-1 gap-1',
+          'flex flex-col my-1 gap-1 px-5',
           loading && 'opacity-50 items-center justify-center min-h-[108px]'
         )}
       >
@@ -60,10 +81,8 @@ const StatCard = ({
           <Loader2 className="size-5 animate-spin text-foreground-light" />
         ) : (
           <>
-            <h4 className="text-sm text-foreground-lighter font-normal mb-0 truncate">{title}</h4>
-            <p className="text-xl font-mono">{`${formattedCurrent}${suffix}`}</p>
-            <div className={cn('flex items-center gap-1 font-mono text-sm', changeColor)}>
-              {!isZeroChange && <ArrowIcon className="size-3" />}
+            <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
+            <div className={cn('flex items-center gap-1 text-sm', changeColor)}>
               <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
             </div>
           </>
@@ -71,8 +90,6 @@ const StatCard = ({
       </CardContent>
     </Card>
   )
-
-  return href ? <Link href={href}>{Inner}</Link> : Inner
 }
 
 export const OverviewUsage = () => {
@@ -119,42 +136,20 @@ export const OverviewUsage = () => {
         </Link>
       </div>
       <ScaffoldSectionContent className="gap-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <StatCard
             title="Active users"
             current={metrics.current.activeUsers}
             previous={activeUsersChange}
             loading={isLoading}
-            href={`/project/${ref}/reports/auth#usage`}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
           />
           <StatCard
             title="Sign ups"
             current={metrics.current.signUps}
             previous={signUpsChange}
             loading={isLoading}
-            href={`/project/${ref}/reports/auth#usage`}
-          />
-          <StatCard
-            title="Auth API success rate"
-            current={Math.max(0, 100 - metrics.current.apiErrorRate)}
-            previous={calculatePercentageChange(
-              Math.max(0, 100 - metrics.current.apiErrorRate),
-              Math.max(0, 100 - metrics.previous.apiErrorRate)
-            )}
-            loading={isLoading}
-            suffix="%"
-            href={`/project/${ref}/reports/auth#monitoring`}
-          />
-          <StatCard
-            title="Auth success rate"
-            current={Math.max(0, 100 - metrics.current.authErrorRate)}
-            previous={calculatePercentageChange(
-              Math.max(0, 100 - metrics.current.authErrorRate),
-              Math.max(0, 100 - metrics.previous.authErrorRate)
-            )}
-            loading={isLoading}
-            suffix="%"
-            href={`/project/${ref}/reports/auth#monitoring`}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
           />
         </div>
       </ScaffoldSectionContent>

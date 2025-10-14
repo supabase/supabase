@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -17,8 +16,8 @@ import {
   useProjectUpgradeEligibilityQuery,
 } from 'data/config/project-upgrade-eligibility-query'
 import { ReleaseChannel } from 'data/projects/new-project.constants'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import {
@@ -62,13 +61,13 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
   return { postgresEngine, releaseChannel } as PostgresVersionDetails
 }
 
-const ProjectUpgradeAlert = () => {
+export const ProjectUpgradeAlert = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const { data: org } = useSelectedOrganizationQuery()
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const { setProjectStatus } = useSetProjectStatus()
 
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
 
   const planId = org?.plan.id ?? 'free'
@@ -87,7 +86,7 @@ const ProjectUpgradeAlert = () => {
 
   const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
     onSuccess: (res, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.UPGRADING)
+      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.UPGRADING })
       toast.success('Upgrading project')
       router.push(`/project/${variables.ref}?upgradeInitiated=true&trackingId=${res.tracking_id}`)
     },
@@ -312,5 +311,3 @@ const ProjectUpgradeAlert = () => {
     </>
   )
 }
-
-export default ProjectUpgradeAlert
