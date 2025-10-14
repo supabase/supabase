@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { WithMonitor } from './WithMonitor/WithMonitor'
 import { WithStatements } from './WithStatements/WithStatements'
@@ -30,15 +30,11 @@ export const QueryPerformance = ({
 }: QueryPerformanceProps) => {
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
-  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     state.setSelectedDatabaseId(ref)
-    setIsMounted(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
-
-  if (!isMounted) return null
 
   if (isPgStatMonitorEnabled) {
     return <WithMonitor dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
