@@ -19,6 +19,7 @@ export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'size'
   icon?: any
   reveal?: boolean
   onReveal?: () => void
+  hiddenPlaceholder?: string
   actions?: React.ReactNode
   iconContainerClassName?: string
   containerClassName?: string
@@ -35,6 +36,7 @@ const Input = forwardRef<
       icon,
       reveal = false,
       onReveal,
+      hiddenPlaceholder = HIDDEN_PLACEHOLDER,
       actions,
       onCopy,
       iconContainerClassName,
@@ -91,7 +93,7 @@ const Input = forwardRef<
           ref={ref}
           {...props}
           onCopy={onCopy}
-          value={reveal && hidden ? HIDDEN_PLACEHOLDER : props.value}
+          value={reveal && hidden ? hiddenPlaceholder : props.value}
           disabled={reveal && hidden ? true : props.disabled}
           className={cn(...inputClasses, props.className)}
         />

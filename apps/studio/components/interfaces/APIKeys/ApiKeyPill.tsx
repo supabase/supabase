@@ -1,13 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
+import { get, handleError } from 'data/fetchers'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -19,9 +18,7 @@ export function ApiKeyPill({
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
 
-  // State that controls whether to show the full API key
-  const [show, setShowState] = useState(false)
-
+  const [revealedValue, setRevealedValue] = useState<string | null>(null)
   const isSecret = apiKey.type === 'secret'
 
   // Permission check for revealing/copying secret API keys
@@ -30,94 +27,65 @@ export function ApiKeyPill({
     'service_api_keys'
   )
 
-  // This query only runs when show=true (enabled: show)
-  // It fetches the fully revealed API key when needed
-  const {
-    data,
-    error,
-    refetch: refetchApiKey,
-  } = useAPIKeyIdQuery(
-    {
-      projectRef,
-      id: apiKey.id as string,
-      reveal: true, // Request the unmasked key
-    },
-    {
-      enabled: show, // Only run query when show is true
-      staleTime: 0, // Always consider data stale
-      cacheTime: 0, // Don't cache the key data
+  const isRestricted = isSecret && !canManageSecretKeys
+
+  // Function to fetch the full API key
+  async function fetchFullApiKey(): Promise<string> {
+    try {
+      const { data, error } = await get('/v1/projects/{ref}/api-keys/{id}', {
+        params: {
+          path: { ref: projectRef, id: apiKey.id as string },
+          query: { reveal: true },
+        },
+      })
+
+      if (error) {
+        handleError(error)
+        return apiKey.api_key // Fallback to masked version
+      }
+
+      return data.api_key ?? apiKey.api_key
+    } catch (error) {
+      console.error('Failed to fetch API key:', error)
+      return apiKey.api_key // Fallback to masked version
     }
-  )
-
-  // Auto-hide timer for the API key (security feature)
-  useEffect(() => {
-    if (show && data?.api_key) {
-      // Auto-hide the key after 10 seconds
-      const timer = setTimeout(() => {
-        setShowState(false)
-        // Clear the cached key from memory
-        queryClient.removeQueries({
-          queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
-          exact: true,
-        })
-      }, 10000) // Hide after 10 seconds
-
-      return () => clearTimeout(timer)
-    }
-  }, [show, data?.api_key, projectRef, queryClient, apiKey.id])
-
-  async function handleReveal() {
-    // Don't reveal key if not allowed or loading
-    if (isSecret && !canManageSecretKeys) return
-    if (isLoadingPermission) return
-
-    // Toggle the show state
-    setShowState(!show)
   }
 
   async function handleCopy(): Promise<string> {
-    // If key is already revealed, use that value
-    if (data?.api_key) return data?.api_key ?? ''
+    if (!isSecret) return apiKey.api_key
 
-    try {
-      // Fetch full key and immediately clear from cache after copying
-      const result = await refetchApiKey()
-      queryClient.removeQueries({
-        queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
-        exact: true,
-      })
+    // If we already have the revealed value, use it
+    if (revealedValue) return revealedValue
 
-      if (result.isSuccess) return result.data.api_key ?? ''
+    // Otherwise fetch it
+    const fullKey = await fetchFullApiKey()
 
-      if (error) {
-        toast.error('Failed to copy secret API key')
-        return ''
-      }
-    } catch (error) {
-      console.error('Failed to fetch API key:', error)
-      return ''
-    }
-
-    // Fallback to the masked version if fetch fails
-    return apiKey.api_key
-  }
-
-  function handleAutoHide() {
-    setShowState(false)
-    // Clear the cached key from memory
+    // Clear from cache after copying
     queryClient.removeQueries({
       queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
       exact: true,
     })
+
+    return fullKey
   }
 
-  // States for disabling buttons/showing tooltips
-  const isRestricted = isSecret && !canManageSecretKeys
+  // Custom reveal handler that fetches the full key
+  async function handleReveal() {
+    if (!isSecret || isRestricted || isLoadingPermission) return
 
-  // Format the display value for secret keys
-  const displayValue = isSecret
-    ? `${apiKey?.api_key.slice(0, 15)}${show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}`
-    : apiKey?.api_key
+    if (!revealedValue) {
+      const fullKey = await fetchFullApiKey()
+      setRevealedValue(fullKey)
+    } else {
+      setRevealedValue(null)
+    }
+  }
+
+  // Create custom hidden placeholder that shows first 15 characters + dots
+  const hiddenPlaceholder = isSecret ? `${apiKey.api_key.slice(0, 15)}••••••••••••••••` : undefined
+
+  // Determine what value to display - use revealed value if available, otherwise use the masked version
+  const displayValue = isSecret ? revealedValue || apiKey.api_key : apiKey.api_key
 
   return (
     <Input
@@ -129,6 +97,8 @@ export function ApiKeyPill({
       onCopy={handleCopy}
       reveal={isSecret}
       onReveal={handleReveal}
+      hiddenPlaceholder={hiddenPlaceholder}
+      disabled={isRestricted || isLoadingPermission}
     />
   )
 }
