@@ -8,6 +8,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -44,15 +46,15 @@ export const StorageCredItem = ({
   }
 
   return (
-    <tr className="h-8 text-ellipsis group">
-      <td>
+    <TableRow className="h-8 text-ellipsis group">
+      <TableCell>
         <span className="text-foreground">{description}</span>
-      </td>
-      <td>
+      </TableCell>
+      <TableCell>
         <Input readOnly copy value={access_key} className="font-mono" />
-      </td>
-      <td>{daysSince(created_at)}</td>
-      <td className="text-right">
+      </TableCell>
+      <TableCell className="text-foreground-lighter">{daysSince(created_at)}</TableCell>
+      <TableCell className="text-right">
         {canRemoveAccessKey && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -76,7 +78,7 @@ export const StorageCredItem = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   )
 }
