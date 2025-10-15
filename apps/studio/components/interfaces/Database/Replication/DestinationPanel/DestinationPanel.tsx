@@ -118,8 +118,8 @@ export const DestinationPanel = ({
   })
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
-  const { serviceKey, secretKey } = getKeys(apiKeys)
-  const catalogToken = secretKey?.api_key ?? serviceKey?.api_key ?? ''
+  const { serviceKey } = getKeys(apiKeys)
+  const catalogToken = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
