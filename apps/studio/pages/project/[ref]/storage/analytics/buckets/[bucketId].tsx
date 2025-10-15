@@ -42,10 +42,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-// TODO:
-// Add dynamic data from /components/interfaces/Storage/AnalyticBucketDetails/index.tsx
-// Mark aforementioned components as deprecated in Linear (to remove post-launch)
-
 const AnalyticsBucketPage: NextPageWithLayout = () => {
   const { bucketId, ref } = useParams()
   const [showToken, setShowToken] = useState(false)
@@ -60,25 +56,26 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     owner: 'mock-owner',
-    // TODO: below properties are irrelevant for analytics buckets, consider removing from DeleteBucketModal props
+    // Below properties are irrelevant for analytics buckets, consider removing from DeleteBucketModal props
     public: false,
     allowed_mime_types: [],
     file_size_limit: undefined,
   }
 
   // If the bucket is not found or the bucket type is STANDARD or VECTOR, show an error message
-  // if (!bucket || bucket.type !== 'ANALYTICS') {
-  //   return (
-  //     <div className="flex h-full w-full items-center justify-center">
-  //       <p className="text-sm text-foreground-light">Bucket "{bucketId}" cannot be found</p>
-  //     </div>
-  //   )
-  // }
+  // Note that this is currently impossible to reach because we mock buckets above
+  if (!mockBucket || mockBucket.type !== 'ANALYTICS') {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <p className="text-sm text-foreground-light">Bucket "{bucketId}" cannot be found</p>
+      </div>
+    )
+  }
 
   const config = BUCKET_TYPES['analytics']
 
   // Mock data
-  // TODO: Replace with actual data from API
+  // Replace with actual data from API
   const connectionData = {
     // catalog_uri: `https://${ref}.storage.supabase.co/storage/v1/iceberg`,
     catalog_uri: `http://localhost:8080/storage/v1/iceberg`,
@@ -118,9 +115,6 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
       <TableRow key={key}>
         <TableCell>
           <p className="text-sm text-foreground">{label}</p>
-          {/* {description && (
-            <p className="text-sm text-foreground-lighter text-balance">{description}</p>
-          )} */}
         </TableCell>
         <TableCell>
           <div className="-mx-3 mr-3 py-1.5 px-3 truncate text-xs font-mono text-foreground-light flex border bg-foreground/[.026] font-mono rounded-full overflow-hidden">
@@ -138,51 +132,51 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
         </TableCell>
         <TableCell>
           <div className="flex flex-row gap-x-2 items-center justify-end">
-            {/* Reveal/Hide button for secret values */}
-            {isSecretValue && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="outline"
-                    className="rounded-full px-2 pointer-events-auto bg-alternative"
-                    icon={showToken ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
-                    onClick={handleToggleToken}
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="bottom">{showToken ? `Hide` : `Reveal`}</TooltipContent>
-              </Tooltip>
-            )}
-
-            {/* Copy button */}
+          {/* Reveal/Hide button for secret values */}
+          {isSecretValue && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <CopyButton
-                  type="default"
-                  asyncText={() => handleCopyValue(key)}
-                  iconOnly
+                <Button
+                  type="outline"
                   className="rounded-full px-2 pointer-events-auto bg-alternative"
+                  icon={showToken ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
+                  onClick={handleToggleToken}
                 />
               </TooltipTrigger>
-              <TooltipContent side="bottom">Copy</TooltipContent>
+              <TooltipContent side="bottom">{showToken ? `Hide` : `Reveal`}</TooltipContent>
             </Tooltip>
+          )}
 
-            {/* Vault button for values that have vault */}
-            {hasVaultValue && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    asChild
-                    type="outline"
-                    className="rounded-full px-2 pointer-events-auto bg-alternative"
-                    icon={<ExternalLink strokeWidth={2} />}
-                    aria-label="Open in Vault"
-                  >
-                    <Link href={`/project/${ref}/integrations/vault/secrets?search=${value}`} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Open in Vault</TooltipContent>
-              </Tooltip>
-            )}
+          {/* Copy button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CopyButton
+                type="default"
+                asyncText={() => handleCopyValue(key)}
+                iconOnly
+                className="rounded-full px-2 pointer-events-auto bg-alternative"
+              />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Copy</TooltipContent>
+          </Tooltip>
+
+          {/* Vault button for values that have vault */}
+          {hasVaultValue && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  asChild
+                  type="outline"
+                  className="rounded-full px-2 pointer-events-auto bg-alternative"
+                  icon={<ExternalLink strokeWidth={2} />}
+                  aria-label="Open in Vault"
+                >
+                  <Link href={`/project/${ref}/integrations/vault/secrets?search=${value}`} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Open in Vault</TooltipContent>
+            </Tooltip>
+          )}
           </div>
         </TableCell>
       </TableRow>
@@ -203,7 +197,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
       >
         <ScaffoldContainer>
           <ScaffoldSection isFullWidth>
-            <Admonition variant="warning" title="Missing required integration">
+            <Admonition type="warning" title="Missing required integration">
               <p>
                 The Wrappers extension and Iceberg Wrapper integration are required for querying
                 analytics tables.{' '}
@@ -266,18 +260,20 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
               <div>
                 <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
                 <ScaffoldSectionDescription>
-                  Use these parameters to connect an Iceberg client to this bucket.
+                  Connect to this bucket from an Iceberg client.{' '}
+                  <InlineLink
+                    href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+                  >
+                    Learn more
+                  </InlineLink>
+                  .
                 </ScaffoldSectionDescription>
               </div>
-              <div className="flex flex-row gap-x-2">
-                {/* TODO replace with CopyEnvButton */}
-                <Button type="default" icon={<Copy size={14} />}>
-                  Copy all
-                </Button>
-                <DocsButton
-                  href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
-                />
-              </div>
+
+              {/* TODO replace with CopyEnvButton */}
+              <Button type="default" icon={<Copy size={14} />}>
+                Copy all
+              </Button>
             </ScaffoldHeader>
             <Card>
               {/* Table should match that in S3 connection page/section */}
