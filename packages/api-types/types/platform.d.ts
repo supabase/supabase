@@ -10071,7 +10071,11 @@ export interface components {
       max_presence_events_per_second?: number
       /** @description Whether to only allow private channels */
       private_only?: boolean
-      /** @description Whether to suspend realtime */
+      /** @description Sets maximum number of presence events per second rate limit */
+      max_presence_events_per_second?: number
+      /** @description Sets maximum number of payload size in KB rate limit */
+      max_payload_size_in_kb?: number
+      /** @description Sets whether to suspend the Realtime service */
       suspend?: boolean
     }
     UpdateReplicationDestinationBody: {
