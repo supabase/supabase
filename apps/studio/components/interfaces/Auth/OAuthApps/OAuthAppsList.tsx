@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import type { OAuthClient } from '@supabase/supabase-js'
+import dayjs from 'dayjs'
 import { Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
-import dayjs from 'dayjs'
+import { useState } from 'react'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
+import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
-  Input,
   Badge,
   Button,
   Card,
@@ -18,24 +21,18 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
   Table,
-  TableHeader,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
-import CreateOAuthAppModal from './CreateOAuthAppModal'
-import UpdateOAuthAppSidePanel from './UpdateOAuthAppSidePanel'
-import DeleteOAuthAppModal from './DeleteOAuthAppModal'
-import { Admonition } from 'ui-patterns'
-
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useParams } from 'common'
-
-import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
-import { get, post } from 'common/fetchWrappers'
-import { useAuthConfigQuery } from '../../../../data/auth/auth-config-query'
+import { Admonition } from 'ui-patterns/admonition'
+import { CreateOAuthAppModal } from './CreateOAuthAppModal'
+import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
+import { UpdateOAuthAppSidePanel } from './UpdateOAuthAppSidePanel'
 
 export const OAUTH_APP_SCOPES_OPTIONS = [
   { name: 'email', value: 'email' },
@@ -53,90 +50,31 @@ const OAuthAppsList = () => {
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
 
   // State for OAuth apps
-  const [oAuthApps, setOAuthApps] = useState<OAuthApp[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isError, setIsError] = useState(false)
   const [showCreatePanel, setShowCreatePanel] = useState(false)
   const [showUpdatePanel, setShowUpdatePanel] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [selectedApp, setSelectedApp] = useState<OAuthApp>()
+  const [selectedApp, setSelectedApp] = useState<OAuthClient>()
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
   const error = { message: 'Failed to retrieve oauth apps' }
 
-  // [Fran]: Test auth.admin.oauth.createClient endpoint
-  const createClient = async () => {
-    const response = await post('/api/platform/auth/oauth-clients', {
-      client_name: 'New Client',
-      client_uri: 'https://new-client.com',
-      redirect_uris: ['https://new-client.com'],
-      scope: 'email',
-    })
+  const { data: supabaseClient } = useSupabaseClientQuery({ projectRef })
 
-    console.log('createClient post', response)
-  }
+  const { data, isLoading, isError } = useOAuthServerAppsQuery({
+    projectRef,
+    supabaseClient,
+  })
+  console.log(isLoading, data)
 
-  // [Fran]: Test auth.admin.oauth.listClients endpoint
-  const getClients = async () => {
-    const { data, error } = await get('/api/platform/auth/oauth-clients')
-    console.log('getClients response', data, error)
-  }
-
-  // Load OAuth apps from localStorage on component mount
-  useEffect(() => {
-    const loadOAuthApps = () => {
-      try {
-        const stored = localStorage.getItem('oauth_apps')
-        if (stored) {
-          const parsedApps = JSON.parse(stored)
-          setOAuthApps(parsedApps)
-        }
-      } catch (error) {
-        console.error('Error loading OAuth apps from localStorage:', error)
-        setIsError(true)
-      }
-
-      setIsLoading(false)
-    }
-
-    loadOAuthApps()
-  }, [])
-
-  // Handle successful OAuth app creation
-  const handleOAuthAppCreated = (newApp: OAuthApp) => {
-    setOAuthApps((prev) => [...prev, newApp])
-    setShowCreatePanel(false)
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('oauth-apps-changed'))
-  }
-
-  // Handle successful OAuth app update
-  const handleOAuthAppUpdated = (updatedApp: OAuthApp) => {
-    setOAuthApps((prev) => prev.map((app) => (app.id === updatedApp.id ? updatedApp : app)))
-    setShowUpdatePanel(false)
-    setSelectedApp(undefined)
-  }
-
-  // Handle successful OAuth app deletion
-  const handleOAuthAppDeleted = () => {
-    if (selectedApp) {
-      setOAuthApps((prev) => prev.filter((app) => app.id !== selectedApp.id))
-      setShowDeleteModal(false)
-      setShowUpdatePanel(false)
-      setSelectedApp(undefined)
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new CustomEvent('oauth-apps-changed'))
-    }
-  }
+  const oAuthApps = data?.clients || []
 
   // Handle edit button click
-  const handleEditClick = (app: OAuthApp) => {
+  const handleEditClick = (app: OAuthClient) => {
     setSelectedApp(app)
     setShowUpdatePanel(true)
   }
 
-  // Handle delete button click
-  const handleDeleteClick = (app: OAuthApp) => {
+  const handleDeleteClick = (app: OAuthClient) => {
     setSelectedApp(app)
     setShowDeleteModal(true)
   }
@@ -144,17 +82,12 @@ const OAuthAppsList = () => {
   const isOAuthServerEnabled = authConfig?.OAUTH_SERVER_ENABLED
   const [filterString, setFilterString] = useState<string>('')
 
-  const { can: canCreateTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
-  )
-
   if (isLoading) {
     return <GenericSkeletonLoader />
   }
 
   if (isError) {
-    return <AlertError error={error} subject="Failed to retrieve database triggers" />
+    return <AlertError error={error} subject="Failed to retrieve OAuth Server apps" />
   }
 
   if (!isOAuthServerEnabled && oAuthApps.length === 0) {
@@ -232,7 +165,7 @@ const OAuthAppsList = () => {
           </div>
           <div className="flex items-center gap-x-2">
             <ButtonTooltip
-              disabled={!isOAuthServerEnabled || !canCreateTriggers}
+              disabled={!isOAuthServerEnabled}
               icon={<Plus />}
               onClick={() => setShowCreatePanel(true)}
               className="flex-grow"
@@ -241,20 +174,14 @@ const OAuthAppsList = () => {
                   side: 'bottom',
                   text: !isOAuthServerEnabled
                     ? 'OAuth server must be enabled in settings'
-                    : !canCreateTriggers
-                      ? 'You need additional permissions to create OAuth apps'
-                      : undefined,
+                    : undefined,
                 },
               }}
             >
               New OAuth App
             </ButtonTooltip>
-            <Button onClick={createClient}>Create Client (DELETE ME)</Button>
-            <Button onClick={getClients}>List Clients (DELETE ME)</Button>
           </div>
         </div>
-
-        {/* {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />} */}
 
         <div className="w-full overflow-hidden overflow-x-auto">
           <Card>
@@ -281,20 +208,18 @@ const OAuthAppsList = () => {
                 )}
                 {oAuthApps.length > 0 &&
                   oAuthApps.map((app) => (
-                    <TableRow key={app.id} className="w-full">
+                    <TableRow key={app.client_id} className="w-full">
                       <TableCell className="max-w-64 truncate">
                         <button type="button" onClick={() => handleEditClick(app)}>
-                          {app.name}
+                          {app.client_name}
                         </button>
                       </TableCell>
                       <TableCell className="w-40">{app.client_id}</TableCell>
                       <TableCell className="w-40">
-                        <Badge>{app.type}</Badge>
+                        <Badge>{app.registration_type}</Badge>
                       </TableCell>
                       <TableCell className="flex flex-wrap gap-2 flex-1 min-w-40">
-                        {app.scopes.map((scope: string) => (
-                          <Badge key={`${app.id}-${scope}-badge`}>{scope}</Badge>
-                        ))}
+                        <Badge key={`${app.client_id}-${app.scope}-badge`}>{app.scope}</Badge>
                       </TableCell>
                       <TableCell className="text-xs text-foreground-light w-1/6">
                         {dayjs(app.created_at).format('D MMM, YYYY')}
@@ -332,22 +257,16 @@ const OAuthAppsList = () => {
         </div>
       </div>
 
-      <CreateOAuthAppModal
-        visible={showCreatePanel}
-        onClose={() => setShowCreatePanel(false)}
-        onSuccess={handleOAuthAppCreated}
-      />
+      <CreateOAuthAppModal visible={showCreatePanel} onClose={() => setShowCreatePanel(false)} />
       <UpdateOAuthAppSidePanel
         visible={showUpdatePanel}
         onClose={() => setShowUpdatePanel(false)}
-        onSuccess={handleOAuthAppUpdated}
         selectedApp={selectedApp}
         onDeleteClick={handleDeleteClick}
       />
       <DeleteOAuthAppModal
         visible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        onSuccess={handleOAuthAppDeleted}
         selectedApp={selectedApp}
       />
     </>

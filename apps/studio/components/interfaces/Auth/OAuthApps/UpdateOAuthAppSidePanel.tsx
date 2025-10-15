@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState, Fragment } from 'react'
-import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { OAuthClient } from '@supabase/supabase-js'
 import { Plus, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import dayjs from 'dayjs'
 import * as z from 'zod'
 
+import Panel from 'components/ui/Panel'
 import {
   Button,
-  Card,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -17,48 +17,59 @@ import {
   Form_Shadcn_,
   Input,
   Input_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
+  Separator,
   SidePanel,
   Switch,
-  Separator,
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Badge,
 } from 'ui'
-import { MultiSelector } from 'ui-patterns/multi-select'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
-import Panel from 'components/ui/Panel'
-
-import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
+import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 
 interface UpdateOAuthAppSidePanelProps {
   visible: boolean
   onClose: () => void
-  onSuccess: (app: OAuthApp) => void
-  selectedApp?: OAuthApp
-  onDeleteClick: (app: OAuthApp) => void
+  selectedApp?: OAuthClient
+  onDeleteClick: (app: OAuthClient) => void
 }
 
-const UpdateOAuthAppSidePanel = ({
+const FormSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Please provide a name for your OAuth app')
+    .max(100, 'Name must be less than 100 characters')
+    .default(''),
+  type: z.enum(['manual', 'dynamic']).default('manual'),
+  scope: z.string().min(1, 'Please select a scope').default('openid'),
+  redirect_uris: z
+    .object({
+      value: z.string().refine((val) => val === '' || z.string().url().safeParse(val).success, {
+        message: 'Please provide a valid URL',
+      }),
+    })
+    .array()
+    .default([{ value: '' }]),
+  is_public: z.boolean().default(false),
+})
+
+export const UpdateOAuthAppSidePanel = ({
   visible,
   onClose,
-  onSuccess,
   selectedApp,
   onDeleteClick,
 }: UpdateOAuthAppSidePanelProps) => {
   const initialValues = {
-    name: selectedApp?.name || '',
-    type: (selectedApp?.type as 'manual' | 'dynamic') || 'manual',
-    scopes: selectedApp?.scopes || ['openid'],
+    name: selectedApp?.client_name || '',
+    type: selectedApp?.registration_type || 'manual',
+    scope: selectedApp?.scope || 'openid',
     redirect_uris: selectedApp?.redirect_uris?.length
       ? selectedApp.redirect_uris.map((uri: string) => ({ value: uri }))
       : [{ value: '' }],
-    is_public: selectedApp?.is_public || false,
+    is_public: selectedApp?.client_type === 'public' || false,
   }
   const submitRef = useRef<HTMLButtonElement>(null)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -71,36 +82,17 @@ const UpdateOAuthAppSidePanel = ({
   useEffect(() => {
     if (selectedApp) {
       const values = {
-        name: selectedApp.name,
-        type: selectedApp.type,
-        scopes: selectedApp.scopes,
+        name: selectedApp.client_name,
+        type: selectedApp.registration_type,
+        scopes: selectedApp.scope,
         redirect_uris: selectedApp.redirect_uris?.length
           ? selectedApp.redirect_uris.map((uri: string) => ({ value: uri }))
           : [{ value: '' }],
-        is_public: selectedApp.is_public,
+        is_public: selectedApp.client_type === 'public',
       }
       form.reset(values)
     }
   }, [visible, selectedApp])
-
-  const FormSchema = z.object({
-    name: z
-      .string()
-      .min(1, 'Please provide a name for your OAuth app')
-      .max(100, 'Name must be less than 100 characters')
-      .default(''),
-    type: z.enum(['manual', 'dynamic']).default('manual'),
-    scopes: z.array(z.string()).min(1, 'Please select at least one scope').default(['openid']),
-    redirect_uris: z
-      .object({
-        value: z.string().refine((val) => val === '' || z.string().url().safeParse(val).success, {
-          message: 'Please provide a valid URL',
-        }),
-      })
-      .array()
-      .default([{ value: '' }]),
-    is_public: z.boolean().default(false),
-  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -129,20 +121,20 @@ const UpdateOAuthAppSidePanel = ({
     const newClientSecret = generateClientSecret()
 
     // Update the app with new secret
-    const updatedApp: OAuthApp = {
+    const updatedApp: OAuthClient = {
       ...selectedApp,
       client_secret: newClientSecret,
     }
 
     // Update in localStorage
     const existingApps = JSON.parse(localStorage.getItem('oauth_apps') || '[]')
-    const updatedApps = existingApps.map((app: OAuthApp) =>
-      app.id === selectedApp.id ? updatedApp : app
+    const updatedApps = existingApps.map((app: OAuthClient) =>
+      app.client_id === selectedApp.client_id ? updatedApp : app
     )
     localStorage.setItem('oauth_apps', JSON.stringify(updatedApps))
 
     toast.success('Client secret regenerated successfully')
-    onSuccess(updatedApp)
+    closePanel()
 
     // Show credentials modal after a brief delay
     setTimeout(() => {
@@ -158,11 +150,11 @@ const UpdateOAuthAppSidePanel = ({
 
     try {
       // Update the OAuth app object
-      const updatedApp: OAuthApp = {
+      const updatedApp: OAuthClient = {
         ...selectedApp,
-        name: data.name,
-        type: data.type,
-        scopes: data.scopes,
+        client_name: data.name,
+        registration_type: data.type,
+        scope: data.scope,
         redirect_uris: data.redirect_uris
           .filter((uri) => uri.value.trim())
           .map((uri) => uri.value.trim()),
@@ -170,13 +162,12 @@ const UpdateOAuthAppSidePanel = ({
 
       // Update in localStorage
       const existingApps = JSON.parse(localStorage.getItem('oauth_apps') || '[]')
-      const updatedApps = existingApps.map((app: OAuthApp) =>
-        app.id === selectedApp.id ? updatedApp : app
+      const updatedApps = existingApps.map((app: OAuthClient) =>
+        app.client_id === selectedApp.client_id ? updatedApp : app
       )
       localStorage.setItem('oauth_apps', JSON.stringify(updatedApps))
 
       toast.success(`Successfully updated OAuth app "${data.name}"`)
-      onSuccess(updatedApp)
       closePanel()
     } catch (error) {
       toast.error('Failed to update OAuth app')
@@ -205,7 +196,7 @@ const UpdateOAuthAppSidePanel = ({
         loading={isUpdating}
         visible={visible}
         onCancel={closePanel}
-        onDelete={() => onDeleteClick(selectedApp as OAuthApp)}
+        onDelete={() => onDeleteClick(selectedApp!)}
         header="Update OAuth App"
         confirmText="Update OAuth App"
         deleteText="Delete OAuth App"
@@ -228,7 +219,7 @@ const UpdateOAuthAppSidePanel = ({
                 )}
               />
 
-              <Card>
+              {/* <Card>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -251,7 +242,7 @@ const UpdateOAuthAppSidePanel = ({
                     </TableRow>
                   </TableBody>
                 </Table>
-              </Card>
+              </Card> */}
 
               <Separator />
 
@@ -286,7 +277,7 @@ const UpdateOAuthAppSidePanel = ({
 
               <FormField_Shadcn_
                 control={form.control}
-                name="scopes"
+                name="scope"
                 render={({ field }) => (
                   <FormItemLayout
                     label="Scopes"
@@ -306,20 +297,18 @@ const UpdateOAuthAppSidePanel = ({
                     }
                   >
                     <FormControl_Shadcn_>
-                      <MultiSelector values={field.value} onValuesChange={field.onChange}>
-                        <MultiSelector.Trigger>
-                          <MultiSelector.Input placeholder="Select scopes..." />
-                        </MultiSelector.Trigger>
-                        <MultiSelector.Content>
-                          <MultiSelector.List>
-                            {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
-                              <MultiSelector.Item key={scope.value} value={scope.value}>
-                                {scope.name}
-                              </MultiSelector.Item>
-                            ))}
-                          </MultiSelector.List>
-                        </MultiSelector.Content>
-                      </MultiSelector>
+                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger_Shadcn_ className="w-full">
+                          <SelectValue_Shadcn_ placeholder="Select scope..." />
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
+                            <SelectItem_Shadcn_ key={scope.value} value={scope.value}>
+                              {scope.name}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -428,5 +417,3 @@ const UpdateOAuthAppSidePanel = ({
     </Fragment>
   )
 }
-
-export default UpdateOAuthAppSidePanel

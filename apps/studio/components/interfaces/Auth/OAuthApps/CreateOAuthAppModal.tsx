@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState, Fragment } from 'react'
-import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2 } from 'lucide-react'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import Link from 'next/link'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { useParams } from 'common'
+import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
+import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
   Button,
   FormControl_Shadcn_,
@@ -15,35 +18,53 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Separator,
   Modal,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
+  Separator,
   Switch,
 } from 'ui'
-import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorTrigger,
-  MultiSelectorList,
-  MultiSelectorItem,
-} from 'ui-patterns/multi-select'
-import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
-import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
+import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 
 interface CreateOAuthAppModalProps {
   visible: boolean
   onClose: () => void
-  onSuccess: (app: OAuthApp) => void
 }
 
-const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModalProps) => {
-  const initialValues = {
-    name: '',
-    type: 'manual' as const,
-    scopes: ['email', 'profile'],
-    redirect_uris: [{ value: '' }],
-    is_public: false,
-  }
+const FormSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Please provide a name for your OAuth app')
+    .max(100, 'Name must be less than 100 characters')
+    .default(''),
+  type: z.enum(['manual', 'dynamic']).default('manual'),
+  scope: z.string().min(1, 'Please select a scope').default('profile'),
+  redirect_uris: z
+    .object({
+      value: z.string().refine((val) => val === '' || z.string().url().safeParse(val).success, {
+        message: 'Please provide a valid URL',
+      }),
+    })
+    .array()
+    .default([{ value: '' }]),
+  is_public: z.boolean().default(false),
+})
+
+const initialValues = {
+  name: '',
+  type: 'manual' as const,
+  scopes: ['email', 'profile'],
+  redirect_uris: [{ value: '' }],
+  is_public: false,
+}
+
+export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalProps) => {
+  const { ref: projectRef } = useParams()
+
   const submitRef = useRef<HTMLButtonElement>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [showCredentialsModal, setShowCredentialsModal] = useState(false)
@@ -55,28 +76,6 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
   useEffect(() => {
     form.reset(initialValues)
   }, [visible])
-
-  const FormSchema = z.object({
-    name: z
-      .string()
-      .min(1, 'Please provide a name for your OAuth app')
-      .max(100, 'Name must be less than 100 characters')
-      .default(''),
-    type: z.enum(['manual', 'dynamic']).default('manual'),
-    scopes: z
-      .array(z.string())
-      .min(1, 'Please select at least one scope')
-      .default(['profile', 'email']),
-    redirect_uris: z
-      .object({
-        value: z.string().refine((val) => val === '' || z.string().url().safeParse(val).success, {
-          message: 'Please provide a valid URL',
-        }),
-      })
-      .array()
-      .default([{ value: '' }]),
-    is_public: z.boolean().default(false),
-  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -99,6 +98,10 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
     return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
   }
 
+  const { data: supabaseClient } = useSupabaseClientQuery({ projectRef })
+
+  const { mutateAsync: createOAuthApp } = useOAuthServerAppCreateMutation()
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     setIsCreating(true)
 
@@ -108,28 +111,20 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
       const client_id = `oauth_${id}`
       const client_secret = generateClientSecret()
 
-      // Create the OAuth app object
-      const newApp: OAuthApp = {
-        id,
-        client_id,
-        client_secret,
-        name: data.name,
-        type: data.type,
-        scopes: data.scopes,
+      await createOAuthApp({
+        projectRef,
+        supabaseClient,
+        client_name: data.name,
+        client_uri: '',
         redirect_uris: data.redirect_uris
           .filter((uri) => uri.value.trim())
           .map((uri) => uri.value.trim()),
-        is_public: data.is_public,
-        created_at: new Date().toISOString(),
-      }
-
-      // Save to localStorage
-      const existingApps = JSON.parse(localStorage.getItem('oauth_apps') || '[]')
-      const updatedApps = [...existingApps, newApp]
-      localStorage.setItem('oauth_apps', JSON.stringify(updatedApps))
+        grant_types: [],
+        response_types: [],
+        scope: data.scope,
+      })
 
       toast.success(`Successfully created OAuth app "${data.name}"`)
-      onSuccess(newApp)
 
       // Close the create modal first, then show credentials
       closeModal()
@@ -186,7 +181,7 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
 
               <FormField_Shadcn_
                 control={form.control}
-                name="scopes"
+                name="scope"
                 render={({ field }) => (
                   <FormItemLayout
                     label="Scopes"
@@ -206,20 +201,18 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
                     }
                   >
                     <FormControl_Shadcn_>
-                      <MultiSelector values={field.value} onValuesChange={field.onChange}>
-                        <MultiSelectorTrigger label="Select scopes..." showIcon={false} />
-                        <MultiSelectorContent>
-                          <MultiSelectorList>
-                            {OAUTH_APP_SCOPES_OPTIONS.map(
-                              (scope: { value: string; name: string }) => (
-                                <MultiSelectorItem key={scope.value} value={scope.value}>
-                                  {scope.name}
-                                </MultiSelectorItem>
-                              )
-                            )}
-                          </MultiSelectorList>
-                        </MultiSelectorContent>
-                      </MultiSelector>
+                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger_Shadcn_ className="w-full">
+                          <SelectValue_Shadcn_ placeholder="Select scope..." />
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
+                            <SelectItem_Shadcn_ key={scope.value} value={scope.value}>
+                              {scope.name}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -336,5 +329,3 @@ const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModa
     </Fragment>
   )
 }
-
-export default CreateOAuthAppModal

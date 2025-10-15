@@ -1,22 +1,29 @@
+import type { OAuthClient } from '@supabase/supabase-js'
+import { useParams } from 'common'
+import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
+import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
+
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 
 interface DeleteOAuthAppModalProps {
   visible: boolean
-  selectedApp?: OAuthApp
+  selectedApp?: OAuthClient
   onClose: () => void
-  onSuccess: () => void
 }
 
-const DeleteOAuthAppModal = ({
+export const DeleteOAuthAppModal = ({
   visible,
   selectedApp,
   onClose,
-  onSuccess,
 }: DeleteOAuthAppModalProps) => {
+  const { ref: projectRef } = useParams()
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const { data: supabaseClient } = useSupabaseClientQuery({ projectRef })
+
+  const { mutateAsync: deleteOAuthApp } = useOAuthServerAppDeleteMutation()
 
   const onConfirmDeleteApp = async () => {
     if (!selectedApp) return console.error('No OAuth app selected')
@@ -24,13 +31,13 @@ const DeleteOAuthAppModal = ({
     setIsDeleting(true)
 
     try {
-      // Remove from localStorage
-      const existingApps = JSON.parse(localStorage.getItem('oauth_apps') || '[]')
-      const updatedApps = existingApps.filter((app: OAuthApp) => app.id !== selectedApp.id)
-      localStorage.setItem('oauth_apps', JSON.stringify(updatedApps))
+      await deleteOAuthApp({
+        projectRef,
+        supabaseClient,
+        clientId: selectedApp.client_id,
+      })
 
-      toast.success(`Successfully deleted OAuth app "${selectedApp.name}"`)
-      onSuccess()
+      toast.success(`Successfully deleted OAuth app "${selectedApp.client_name}"`)
       onClose()
     } catch (error) {
       toast.error('Failed to delete OAuth app')
@@ -48,7 +55,7 @@ const DeleteOAuthAppModal = ({
       visible={visible}
       title={
         <>
-          Confirm to delete OAuth app <code className="text-sm">{selectedApp?.name}</code>
+          Confirm to delete OAuth app <code className="text-sm">{selectedApp?.client_name}</code>
         </>
       }
       confirmLabel="Confirm delete"
@@ -68,5 +75,3 @@ const DeleteOAuthAppModal = ({
     </ConfirmationModal>
   )
 }
-
-export default DeleteOAuthAppModal

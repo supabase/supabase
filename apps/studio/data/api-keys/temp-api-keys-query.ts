@@ -40,7 +40,7 @@ export const useTemporaryAPIKeyQuery = <TData = TemporaryAPIKeyData>(
   { enabled = true, ...options }: UseQueryOptions<TemporaryAPIKeyData, ResponseError, TData> = {}
 ) => {
   return useQuery<TemporaryAPIKeyData, ResponseError, TData>(
-    apiKeysKeys.list(projectRef),
+    apiKeysKeys.temporary(projectRef),
     ({ signal }) => getTemporaryAPIKey({ projectRef, expiry }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',

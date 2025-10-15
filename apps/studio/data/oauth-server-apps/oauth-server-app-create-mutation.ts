@@ -1,5 +1,4 @@
-import { CreateOAuthClientParams } from '@supabase/auth-js'
-import { SupabaseClient } from '@supabase/supabase-js'
+import { CreateOAuthClientParams, SupabaseClient } from '@supabase/supabase-js'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 

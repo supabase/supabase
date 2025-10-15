@@ -9,7 +9,6 @@ import {
   useProjectSettingsV2Query,
   type ProjectSettings,
 } from 'data/config/project-settings-v2-query'
-import { oauthServerAppKeys } from 'data/oauth-server-apps/keys'
 
 const getSupabaseClient = ({
   projectRef,
@@ -47,7 +46,7 @@ export const useSupabaseClientQuery = (
   const { data: temporaryApiKey } = useTemporaryAPIKeyQuery({ projectRef })
 
   return useQuery(
-    oauthServerAppKeys.oauthServerApps(projectRef),
+    [projectRef, 'supabase-client', temporaryApiKey?.api_key],
     () => getSupabaseClient({ projectRef, settings, temporaryApiKey }),
     {
       enabled: enabled && typeof projectRef !== 'undefined' && !!settings && !!temporaryApiKey,
