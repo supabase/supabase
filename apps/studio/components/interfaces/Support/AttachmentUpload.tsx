@@ -55,7 +55,6 @@ const uploadAttachments = async (ref: string, files: File[]) => {
       throw new Error(`Failed to generate attachment URLs at endpoint: ${status} ${message}`)
     }
     const signedUrls = await response.json()
-    console.log('Generated signed URLs:', signedUrls)
     return signedUrls
   } catch (error) {
     console.error('[Support Form > uploadAttachments] Failed to generate signed URLs', error)
