@@ -9,7 +9,6 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -167,13 +166,6 @@ export const AnalyticsBucketFields = ({
     }
   )
 
-  const { mutateAsync: createNamespace, isLoading: isCreatingNamespace } =
-    useIcebergNamespaceCreateMutation({
-      onSuccess: () => {
-        refetchNamespaces()
-      },
-    })
-
   return (
     <>
       <FormField_Shadcn_
@@ -213,6 +205,8 @@ export const AnalyticsBucketFields = ({
                   onValueChange={(value) => {
                     setIsFormInteracting(true)
                     field.onChange(value)
+                    // [Joshen] Ideally should select the first namespace of the selected bucket
+                    form.setValue('namespace', '')
                   }}
                 >
                   <SelectTrigger_Shadcn_>{field.value || 'Select a bucket'}</SelectTrigger_Shadcn_>
@@ -248,7 +242,7 @@ export const AnalyticsBucketFields = ({
             className="px-5"
             description="Select a namespace from your Analytics Bucket"
           >
-            {(isLoadingNamespaces || isCreatingNamespace) && canSelectNamespace ? (
+            {isLoadingNamespaces && canSelectNamespace ? (
               <Button
                 disabled
                 type="default"
@@ -256,7 +250,7 @@ export const AnalyticsBucketFields = ({
                 size="small"
                 iconRight={<Loader2 className="animate-spin" />}
               >
-                {isCreatingNamespace ? 'Creating namespace...' : 'Retrieving namespaces'}
+                Retrieving namespaces
               </Button>
             ) : isErrorNamespaces ? (
               <Button
@@ -276,7 +270,7 @@ export const AnalyticsBucketFields = ({
                     setIsFormInteracting(true)
                     field.onChange(value)
                   }}
-                  disabled={!canSelectNamespace || isCreatingNamespace}
+                  disabled={!canSelectNamespace}
                 >
                   <SelectTrigger_Shadcn_>
                     {!canSelectNamespace
