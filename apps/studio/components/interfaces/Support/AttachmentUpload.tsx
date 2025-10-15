@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 // End of third-party imports
 
 import { useFlag } from 'common'
-import { useGenerateAttachmentURLsMutation } from 'data/misc/generate-attachment-urls-mutation'
+import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { cn } from 'ui'
