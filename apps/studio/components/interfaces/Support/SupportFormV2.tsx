@@ -1,4 +1,4 @@
-import type { Dispatch, MouseEventHandler } from 'react'
+import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
@@ -14,7 +14,7 @@ import {
   AffectedServicesSelector,
   CATEGORIES_WITHOUT_AFFECTED_SERVICES,
 } from './AffectedServicesSelector'
-import { useAttachmentUpload } from './AttachmentUpload'
+import { AttachmentUploadDisplay, useAttachmentUpload } from './AttachmentUpload'
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
 import { ClientLibraryInfo } from './ClientLibraryInfo'
 import { MessageField } from './MessageField'
@@ -72,7 +72,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (values) => {
     dispatch({ type: 'SUBMIT' })
-    const attachments = await attachmentUpload.createAttachments(projectRef)
+    const attachments = await attachmentUpload.createAttachments()
 
     const selectedLibrary = values.library
       ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
@@ -153,14 +153,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           <ClientLibraryInfo form={form} library={library} category={category} />
           <AffectedServicesSelector form={form} category={category} />
           <MessageField form={form} originalError={initialError} />
-          {/* <AttachmentUploadDisplay {...attachmentUpload} /> */}
-          <div>
-            <h3 className="text-sm text-foreground">Attachments</h3>
-            <p className="text-sm text-foreground-lighter mt-2">
-              Uploads have been temporarily disabled. Please reply to the acknowledgement email you
-              will receive with any screenshots you'd like to upload
-            </p>
-          </div>
+          <AttachmentUploadDisplay {...attachmentUpload} />
         </div>
 
         <DialogSectionSeparator />
