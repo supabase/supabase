@@ -159,7 +159,7 @@ export const Destinations = () => {
                   sourceId={sourceId}
                   destinationId={destination.id}
                   destinationName={destination.name}
-                  type={destination.config.big_query ? 'BigQuery' : 'Other'}
+                  type={'big_query' in destination.config ? 'BigQuery' : 'Other'}
                   pipeline={pipeline}
                   error={pipelinesError}
                   isLoading={isPipelinesLoading}

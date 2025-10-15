@@ -3,46 +3,77 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, cn } from 'ui'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
 import { ChevronRight, Loader2 } from 'lucide-react'
 import { Reports } from 'icons'
 import {
-  getChangeSign,
   getChangeColor,
   fetchAllAuthMetrics,
   processAllAuthMetrics,
   calculatePercentageChange,
 } from './OverviewUsage.constants'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
-import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
-import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import dayjs from 'dayjs'
 
-const StatCard = ({
+export const StatCard = ({
   title,
   current,
   previous,
   loading,
   suffix = '',
+  invert = false,
+  href,
 }: {
   title: string
   current: number
   previous: number
   loading: boolean
   suffix?: string
+  invert?: boolean
+  href?: string
 }) => {
-  const changeColor = getChangeColor(previous)
-  const changeSign = getChangeSign(previous)
-  const formattedCurrent = suffix === 'ms' ? current.toFixed(2) : current
+  const isZeroChange = previous === 0
+  const changeColor = isZeroChange
+    ? 'text-foreground-lighter'
+    : invert
+      ? previous >= 0
+        ? 'text-destructive'
+        : 'text-brand'
+      : getChangeColor(previous)
+  const formattedCurrent =
+    suffix === 'ms' ? current.toFixed(2) : suffix === '%' ? current.toFixed(1) : Math.round(current)
+  const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
   return (
-    <Card>
+    <Card className={cn(href)}>
+      <CardHeader className="flex flex-row items-center justify-between p-2 pl-4 pr-2 space-y-0">
+        <CardTitle className="text-foreground-lighter">{title}</CardTitle>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={href || ''}
+              className="text-foreground-lighter hover:text-foreground block p-2"
+            >
+              <ChevronRight className="size-4" />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>Go to Auth Report</TooltipContent>
+        </Tooltip>
+      </CardHeader>
       <CardContent
         className={cn(
-          'flex flex-col my-1 gap-1',
+          'flex flex-col my-1 gap-1 px-5',
           loading && 'opacity-50 items-center justify-center min-h-[108px]'
         )}
       >
@@ -50,11 +81,10 @@ const StatCard = ({
           <Loader2 className="size-5 animate-spin text-foreground-light" />
         ) : (
           <>
-            <h4 className="text-sm text-foreground-lighter font-normal mb-0 truncate">{title}</h4>
             <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
-            <p className={cn('text-sm text-foreground-lighter', changeColor)}>
-              {`${changeSign}${previous.toFixed(1)}%`}
-            </p>
+            <div className={cn('flex items-center gap-1 text-sm', changeColor)}>
+              <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
+            </div>
           </>
         )}
       </CardContent>
@@ -84,55 +114,13 @@ export const OverviewUsage = () => {
     metrics.current.activeUsers,
     metrics.previous.activeUsers
   )
-  const passwordResetChange = calculatePercentageChange(
-    metrics.current.passwordResets,
-    metrics.previous.passwordResets
-  )
-  const signInLatencyChange = calculatePercentageChange(
-    metrics.current.signInLatency,
-    metrics.previous.signInLatency
-  )
-  const signUpLatencyChange = calculatePercentageChange(
-    metrics.current.signUpLatency,
-    metrics.previous.signUpLatency
-  )
+
+  const signUpsChange = calculatePercentageChange(metrics.current.signUps, metrics.previous.signUps)
 
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
 
-  const signUpChartConfig = useMemo(() => {
-    const config = createAuthReportConfig({
-      projectRef: ref as string,
-      startDate,
-      endDate,
-      interval: '1h',
-      filters: { status_code: null },
-    })
-    const chart = config.find((c) => c.id === 'signups')
-    if (chart) {
-      return { ...chart, defaultChartStyle: 'bar' }
-    }
-    return chart
-  }, [ref, startDate, endDate])
-
-  const signInChartConfig = useMemo(() => {
-    const config = createAuthReportConfig({
-      projectRef: ref as string,
-      startDate,
-      endDate,
-      interval: '1h',
-      filters: { status_code: null },
-    })
-    const chart = config.find((c) => c.id === 'sign-in-attempts')
-    if (chart) {
-      return { ...chart, defaultChartStyle: 'bar' }
-    }
-    return chart
-  }, [ref, startDate, endDate])
-
-  const updateDateRange = (from: string, to: string) => {
-    console.log('Date range update:', from, to)
-  }
+  // No charts on overview; keep date range for link only
 
   return (
     <ScaffoldSection isFullWidth>
@@ -148,55 +136,21 @@ export const OverviewUsage = () => {
         </Link>
       </div>
       <ScaffoldSectionContent className="gap-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <StatCard
-            title="Active Users"
+            title="Active users"
             current={metrics.current.activeUsers}
             previous={activeUsersChange}
             loading={isLoading}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
           />
           <StatCard
-            title="Password Reset Requests"
-            current={metrics.current.passwordResets}
-            previous={passwordResetChange}
+            title="Sign ups"
+            current={metrics.current.signUps}
+            previous={signUpsChange}
             loading={isLoading}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
           />
-          <StatCard
-            title="Sign up Latency"
-            current={Number(metrics.current.signUpLatency.toFixed(2))}
-            previous={signUpLatencyChange}
-            loading={isLoading}
-            suffix="ms"
-          />
-          <StatCard
-            title="Sign in Latency"
-            current={Number(metrics.current.signInLatency.toFixed(2))}
-            previous={signInLatencyChange}
-            loading={isLoading}
-            suffix="ms"
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {signUpChartConfig && (
-            <ReportChartV2
-              report={signUpChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
-            />
-          )}
-          {signInChartConfig && (
-            <ReportChartV2
-              report={signInChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
-            />
-          )}
         </div>
       </ScaffoldSectionContent>
     </ScaffoldSection>

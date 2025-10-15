@@ -1,4 +1,4 @@
-import { Clipboard, Edit, Trash } from 'lucide-react'
+import { Copy, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
 import { toast } from 'sonner'
@@ -14,7 +14,7 @@ export type RowContextMenuProps = {
   rows: SupaRow[]
 }
 
-const RowContextMenu = ({ rows }: RowContextMenuProps) => {
+export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
@@ -68,11 +68,11 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   return (
     <Menu id={ROW_CONTEXT_MENU_ID} animation={false} className="!min-w-36">
       <Item onClick={onCopyCellContent}>
-        <Clipboard size={12} />
+        <Copy size={12} />
         <span className="ml-2 text-xs">Copy cell</span>
       </Item>
       <Item onClick={onCopyRowContent}>
-        <Clipboard size={12} />
+        <Copy size={12} />
         <span className="ml-2 text-xs">Copy row</span>
       </Item>
       <DialogSectionSeparator className="my-1.5" />
@@ -88,4 +88,3 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     </Menu>
   )
 }
-export default RowContextMenu

@@ -3,6 +3,7 @@
 import { useCurrentUserImage } from '@/registry/default/blocks/current-user-avatar/hooks/use-current-user-image'
 import { useCurrentUserName } from '@/registry/default/blocks/current-user-avatar/hooks/use-current-user-name'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
+import { REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 
 const supabase = createClient()
@@ -35,14 +36,14 @@ export const useRealtimePresenceRoom = (roomName: string) => {
         setUsers(newUsers)
       })
       .subscribe(async (status) => {
-        if (status !== 'SUBSCRIBED') {
-          return
+        if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
+          await room.track({
+            name: currentUserName,
+            image: currentUserImage,
+          })
+        } else {
+          setUsers({})
         }
-
-        await room.track({
-          name: currentUserName,
-          image: currentUserImage,
-        })
       })
 
     return () => {

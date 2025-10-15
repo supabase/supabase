@@ -1902,6 +1902,54 @@ export interface ApiDocsCodeCopyButtonClickedEvent {
 }
 
 /**
+ * User performed a search via the Auth Users page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/auth/users
+ */
+export interface AuthUsersSearchSubmittedEvent {
+  action: 'auth_users_search_submitted'
+  properties: {
+    /**
+     * The trigger that initiated the search
+     */
+    trigger:
+      | 'search_input'
+      | 'refresh_button'
+      | 'sort_change'
+      | 'provider_filter'
+      | 'user_type_filter'
+    /**
+     * The column being sorted on, e.g. email, phone, created_at, last_sign_in_at
+     */
+    sort_column: string
+    /**
+     * The sort order, either ascending or descending
+     */
+    sort_order: string
+    /**
+     * The authentication provider(s) being filtered on, e.g. email, phone, google, github
+     */
+    providers?: string[]
+    /**
+     * The user role(s) being filtered on, e.g. verified, unverified, anonymous
+     */
+    user_type?: string
+    /**
+     * The keywords being searched for
+     */
+    keywords?: string
+    /**
+     * The column being filtered on, e.g. email, phone
+     * (only included if filtering by a specific column and not all columns)
+     */
+    filter_column?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2014,3 +2062,4 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
+  | AuthUsersSearchSubmittedEvent

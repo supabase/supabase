@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { isFeatureEnabled, useBreakpoint } from 'common'
 import { cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
-import { useCustomContent } from '../hooks/custom-content/useCustomContent'
+import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
 
 const { sdkDart: sdkDartEnabled, sdkKotlin: sdkKotlinEnabled } = isFeatureEnabled([
@@ -37,7 +37,7 @@ function AiPrompt({ className }: { className?: string }) {
 const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
   const iconSize = isXs ? 'sm' : 'lg'
-  const { homepageHeading } = useCustomContent(['homepage:heading'])
+  const { homepageHeading } = getCustomContent(['homepage:heading'])
 
   const frameworks = [
     {

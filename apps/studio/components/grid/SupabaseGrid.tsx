@@ -16,7 +16,7 @@ import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
-import { RowContextMenu } from './components/menu'
+import { RowContextMenu } from './components/menu/RowContextMenu'
 import { GridProps } from './types'
 
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'

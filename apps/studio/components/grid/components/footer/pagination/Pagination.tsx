@@ -1,3 +1,4 @@
+import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -5,7 +6,7 @@ import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTable } from 'data/table-editor/table-editor-types'
-import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
