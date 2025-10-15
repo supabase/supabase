@@ -36,6 +36,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import { useBranchRestoreMutation } from 'data/branches/branch-restore-mutation'
 
 interface OverviewProps {
   isLoading: boolean
@@ -58,8 +59,12 @@ export const Overview = ({
   onSelectDeleteBranch,
   generateCreatePullRequestURL,
 }: OverviewProps) => {
-  const [persistentBranches, ephemeralBranches] = partition(
+  const [scheduledForDeletionBranches, aliveBranches] = partition(
     previewBranches,
+    (branch) => branch.deletion_scheduled_at !== undefined
+  )
+  const [persistentBranches, ephemeralBranches] = partition(
+    aliveBranches,
     (branch) => branch.persistent
   )
   const { ref: projectRef } = useParams()
@@ -150,6 +155,33 @@ export const Overview = ({
             )
           })}
       </BranchManagementSection>
+      {/* Scheduled for deletion branches section */}
+      <BranchManagementSection header="Scheduled for deletion branches">
+        {isLoading && <BranchLoader />}
+        {isSuccess && scheduledForDeletionBranches.length === 0 && (
+          <div className="flex items-center flex-col justify-center w-full py-10">
+            <p>No scheduled for deletion branches</p>
+          </div>
+        )}
+        {isSuccess &&
+          scheduledForDeletionBranches.map((branch) => {
+            return (
+              <BranchRow
+                key={branch.id}
+                repo={repo}
+                branch={branch}
+                rowActions={
+                  <PreviewBranchActions
+                    branch={branch}
+                    repo={repo}
+                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                  />
+                }
+              />
+            )
+          })}
+      </BranchManagementSection>
     </>
   )
 }
@@ -177,6 +209,8 @@ const PreviewBranchActions = ({
     PermissionAction.UPDATE,
     'preview_branches'
   )
+  // If user can update branches, they can restore branches
+  const canRestoreBranches = canUpdateBranches
 
   const { data } = useBranchQuery({ projectRef, branchRef })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
@@ -206,6 +240,16 @@ const PreviewBranchActions = ({
       }
     },
   })
+  const { mutate: restoreBranch } = useBranchRestoreMutation({
+    onSuccess() {
+      toast.success('Success! Please allow a few minutes for the branch to restore.')
+      setShowBranchModeSwitch(false)
+    },
+  })
+
+  const onRestoreBranch = () => {
+    restoreBranch({ branchRef, projectRef })
+  }
 
   const onConfirmReset = () => {
     resetBranch({ branchRef, projectRef })
@@ -258,7 +302,6 @@ const PreviewBranchActions = ({
           >
             <RefreshCw size={14} /> Reset branch
           </DropdownMenuItemTooltip>
-
           <DropdownMenuItemTooltip
             className="gap-x-2"
             disabled={!isBranchActiveHealthy}
@@ -289,7 +332,6 @@ const PreviewBranchActions = ({
               </>
             )}
           </DropdownMenuItemTooltip>
-
           {/* Edit Branch (gitless) */}
           {gitlessBranching && (
             <DropdownMenuItemTooltip
@@ -347,6 +389,32 @@ const PreviewBranchActions = ({
                 <ExternalLink size={14} /> Create pull request
               </a>
             </DropdownMenuItem>
+          )}
+          {branch.deletion_scheduled_at && (
+            <DropdownMenuItemTooltip
+              className="gap-x-2"
+              disabled={!canRestoreBranches || branch.preview_project_status === 'COMING_UP'}
+              onSelect={(e) => {
+                e.stopPropagation()
+                onRestoreBranch()
+              }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onRestoreBranch()
+              }}
+              tooltip={{
+                content: {
+                  side: 'left',
+                  text: !canRestoreBranches
+                    ? 'You need additional permissions to restore branches'
+                    : branch.preview_project_status === 'COMING_UP'
+                      ? 'Preview project is still coming up. Please wait for it to become healthy.'
+                      : undefined,
+                },
+              }}
+            >
+              <Clock size={14} /> Restore branch
+            </DropdownMenuItemTooltip>
           )}
         </DropdownMenuContent>
       </DropdownMenu>

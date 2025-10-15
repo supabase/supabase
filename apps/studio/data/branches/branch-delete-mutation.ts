@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { BranchesData } from './branches-query'
+import type { BranchesData } from './branches-query'
 import { branchKeys } from './keys'
 
 export type BranchDeleteVariables = {
@@ -13,7 +13,7 @@ export type BranchDeleteVariables = {
 
 export async function deleteBranch({ branchRef }: Pick<BranchDeleteVariables, 'branchRef'>) {
   const { data, error } = await del('/v1/branches/{branch_id_or_ref}', {
-    params: { path: { branch_id_or_ref: branchRef } },
+    params: { path: { branch_id_or_ref: branchRef }, query: { force: 'true' } },
   })
 
   if (error) handleError(error)
