@@ -1,0 +1,43 @@
+---
+title: Data Input
+description: InfoTooltip provides a tooltip with an information icon.
+component: true
+source:
+  radix: true
+  shadcn: true
+---
+
+<ComponentPreview name="data-input-demo" peekCode wide />
+
+Referred to as `Input` in code. Not to be confused with the `Input`component from`@/components/ui/input`.
+
+## Usage
+
+The Data Input component is a workhorse.
+
+### Read-only values
+
+<ComponentPreview name="data-input-with-copy" className="[&_input]:max-w-xs" />
+
+An optional button positioned absolutely to the input’s right side. Choices include:
+
+1. Copy (Copied): does not reveal the value (if hidden)
+2. Reveal -> reveals the value and then button changes to Copy (Copied)
+
+We restrict it to only one button that shares roles to simplify the user experience. After all, the use case for _only_ revealing and not copying is rare.
+
+### Sensitive values
+
+<ComponentPreview name="data-input-with-reveal-copy" className="[&_input]:max-w-xs" />
+
+You can also partially truncate the value by adding a placeholder value.
+
+### Password managers
+
+You may need to add the following attribute to your input to prevent password managers from autofilling the value:
+
+```html
+data-1p-ignore data-lpignore="true" data-form-type="other" data-bwignore
+```
+
+They tend to attach themselves to inputs with id="name" or `data-form-type="password"` attributes.
