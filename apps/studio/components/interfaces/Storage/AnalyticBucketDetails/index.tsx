@@ -178,14 +178,12 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             />
           )}
           {state === 'needs-upgrade' && (
-            <ScaffoldSection isFullWidth>
-              <ExtensionNeedsUpgrade
-                bucketName={bucket.name}
-                projectRef={project?.ref!}
-                wrapperMeta={wrapperMeta}
-                wrappersExtension={wrappersExtension!}
-              />
-            </ScaffoldSection>
+            <ExtensionNeedsUpgrade
+              bucketName={bucket.name}
+              projectRef={project?.ref!}
+              wrapperMeta={wrapperMeta}
+              wrappersExtension={wrappersExtension!}
+            />
           )}
 
           {state === 'added' && wrapperInstance && (
