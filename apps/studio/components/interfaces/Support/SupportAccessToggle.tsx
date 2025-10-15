@@ -20,6 +20,7 @@ export const SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
   SupportCategories.DATABASE_UNRESPONSIVE,
   SupportCategories.PERFORMANCE_ISSUES,
   SupportCategories.PROBLEM,
+  SupportCategories.DASHBOARD_BUG,
 ]
 
 interface SupportAccessToggleProps {
