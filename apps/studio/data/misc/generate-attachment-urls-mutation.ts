@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { constructHeaders, fetchHandler } from 'data/fetchers'
+import { constructHeaders } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
 
@@ -17,7 +17,7 @@ export type GenerateAttachmentURLsVariables = {
 export async function generateAttachmentURLs({ filenames }: GenerateAttachmentURLsVariables) {
   const headers = await constructHeaders()
 
-  const response = await fetchHandler(`${BASE_PATH}/api/generate-attachment-url`, {
+  const response = await fetch(`${BASE_PATH}/api/generate-attachment-url`, {
     method: 'POST',
     headers,
     body: JSON.stringify({ filenames }),

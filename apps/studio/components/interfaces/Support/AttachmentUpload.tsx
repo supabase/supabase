@@ -4,24 +4,18 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } f
 import { toast } from 'sonner'
 // End of third-party imports
 
-import { gotrueClient } from 'common'
 import { useGenerateAttachmentURLsMutation } from 'data/misc/generate-attachment-urls-mutation'
 import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { cn } from 'ui'
 import { createSupportStorageClient } from './support-storage-client'
 
 const MAX_ATTACHMENTS = 5
 
-const uploadAttachments = async (files: File[]) => {
+const uploadAttachments = async ({ userId, files }: { userId: string; files: File[] }) => {
+  if (files.length === 0) return []
+
   const supportSupabaseClient = createSupportStorageClient()
-  const userId = await gotrueClient.getSession().then((res) => res?.data.session?.user.id)
-  if (!userId) {
-    console.error(
-      '[Support Form > uploadAttachments] Could not upload attachments because no user ID found'
-    )
-    toast.error('Could not upload attachments')
-    return []
-  }
 
   const filesToUpload = Array.from(files)
   const uploadedFiles = await Promise.all(
@@ -43,6 +37,7 @@ const uploadAttachments = async (files: File[]) => {
 }
 
 export function useAttachmentUpload() {
+  const { profile } = useProfile()
   const uploadButtonRef = useRef<HTMLInputElement>(null)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
@@ -95,7 +90,13 @@ export function useAttachmentUpload() {
   }, [uploadedFiles])
 
   const createAttachments = useCallback(async () => {
-    const filenames = uploadedFiles.length > 0 ? await uploadAttachments(uploadedFiles) : []
+    if (!profile?.id) {
+      console.error('[Support Form > uploadAttachments] Unable to upload files, missing user ID')
+      toast.error('Unable to upload attachments')
+      return []
+    }
+
+    const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
     const urls = await generateAttachmentURLs({ filenames })
     return urls
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,20 +119,34 @@ export function useAttachmentUpload() {
 interface AttachmentUploadDisplayProps {
   uploadButtonRef: React.RefObject<HTMLInputElement>
   isFull: boolean
+  uploadedDataUrls: Array<string>
   addFile: () => void
   handleFileUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   removeFileUpload: (idx: number) => void
-  uploadedDataUrls: Array<string>
 }
 
 export function AttachmentUploadDisplay({
   uploadButtonRef,
   isFull,
+  uploadedDataUrls,
   addFile,
   handleFileUpload,
   removeFileUpload,
-  uploadedDataUrls,
 }: AttachmentUploadDisplayProps) {
+  const { profile } = useProfile()
+
+  if (!profile) {
+    return (
+      <div>
+        <h3 className="text-sm text-foreground">Attachments</h3>
+        <p className="text-sm text-foreground-lighter mt-2">
+          Uploads are only supported when logged in. Please reply to the acknowledgement email you
+          will receive with any screenshots you'd like to upload.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col gap-y-1">
