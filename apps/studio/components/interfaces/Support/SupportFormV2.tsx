@@ -1,4 +1,4 @@
-import { type Dispatch, type MouseEventHandler } from 'react'
+import { useEffect, type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
@@ -85,8 +85,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     dispatch({ type: 'SUBMIT' })
     const attachments = await attachmentUpload.createAttachments()
 
-    const category = simplifiedSupportForm ? 'Others' : values.category
-
     const selectedLibrary = values.library
       ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
       : undefined
@@ -137,6 +135,15 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const handleSubmitButtonClick: MouseEventHandler<HTMLButtonElement> = (event) => {
     handleFormSubmit(event)
   }
+
+  useEffect(() => {
+    if (simplifiedSupportForm) {
+      form.setValue('category', 'Others')
+    } else {
+      form.setValue('category', '' as any)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [simplifiedSupportForm])
 
   return (
     <Form_Shadcn_ {...form}>

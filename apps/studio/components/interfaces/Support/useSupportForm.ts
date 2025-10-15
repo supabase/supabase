@@ -7,10 +7,10 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { SupportFormSchema, type SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions } from './SupportForm.state'
 import {
-  loadSupportFormInitialParams,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
   type SupportFormUrlKeys,
+  loadSupportFormInitialParams,
   selectInitalOrgAndProject,
 } from './SupportForm.utils'
 
