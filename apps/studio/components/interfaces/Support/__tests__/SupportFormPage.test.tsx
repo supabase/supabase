@@ -1297,7 +1297,7 @@ describe('SupportFormPage', () => {
       organizationSlug: NO_ORG_MARKER,
       library: '',
       affectedServices: '',
-      allowSupportAccess: false,
+      allowSupportAccess: true,
       verified: true,
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
