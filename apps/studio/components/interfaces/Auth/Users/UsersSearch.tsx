@@ -19,7 +19,7 @@ interface UsersSearchProps {
   searchInvalid: boolean
   specificFilterColumn: 'id' | 'email' | 'phone' | 'freeform'
   setSearch: (value: SetStateAction<string>) => void
-  setFilterKeywords: (value: SetStateAction<string>) => void
+  setFilterKeywords: (value: string) => void
   setSpecificFilterColumn: (value: 'id' | 'email' | 'phone' | 'freeform') => void
 }
 
