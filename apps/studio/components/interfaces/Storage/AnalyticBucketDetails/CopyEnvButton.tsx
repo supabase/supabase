@@ -34,29 +34,24 @@ export const CopyEnvButton = ({
     ).then((values) => values.join('\n'))
 
     copyToClipboard(envFile, () => {
-      toast.success('Copied to clipboard')
+      toast.success('Copied .env file contents to clipboard')
       setIsLoading(false)
     })
   }, [serverOptions, values])
 
   return (
     <ButtonTooltip
-      type="primary"
+      type="default"
       loading={isLoading}
       icon={<Copy />}
       onClick={onCopy}
       tooltip={{
         content: {
-          text: (
-            <span>
-              Copies an <span className="text-brand">.env file</span> with the configuration details
-              to your clipboard.
-            </span>
-          ),
+          text: <span>Formatted .env file contents</span>,
         },
       }}
     >
-      Copy env values
+      Copy all
     </ButtonTooltip>
   )
 }

@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 export const DecryptedReadOnlyInput = ({
   value,
@@ -45,7 +46,6 @@ export const DecryptedReadOnlyInput = ({
       readOnly
       // If the value is secure, allow copying to clipboard if the value is revealed. Otherwise, always allow copying
       copy={!secureEntry || (!isDecryptedValueLoading && showHidden)}
-      disabled
       label={
         <div className="flex items-center gap-x-2">
           <span>{label}</span>
@@ -62,7 +62,7 @@ export const DecryptedReadOnlyInput = ({
                 />
               </a>
             </TooltipTrigger>
-            <TooltipContent side="bottom">View parameter in Vault</TooltipContent>
+            <TooltipContent side="bottom">Open in Vault</TooltipContent>
           </Tooltip>
         </div>
       }

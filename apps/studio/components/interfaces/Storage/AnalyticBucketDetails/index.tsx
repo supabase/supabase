@@ -2,6 +2,7 @@ import { snakeCase, uniq } from 'lodash'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
+import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
@@ -10,12 +11,14 @@ import {
   formatWrapperTables,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
+  ScaffoldSection,
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
-  ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import {
@@ -51,6 +54,7 @@ import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
+  const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
 
   const { data: extensionsData } = useDatabaseExtensionsQuery({
@@ -131,6 +135,8 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
 
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
 
+  const config = BUCKET_TYPES['analytics']
+
   const state = isFDWsLoading
     ? 'loading'
     : extensionState === 'installed'
@@ -140,131 +146,153 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       : extensionState
 
   return (
-    <div className="flex flex-col w-full">
-      <ScaffoldContainer className="flex flex-row justify-between items-center gap-10">
-        <ScaffoldHeader>
-          <ScaffoldTitle>
-            Analytics Bucket <span className="text-brand">{bucket.name}</span>
-          </ScaffoldTitle>
-          <ScaffoldSectionDescription>
-            Namespaces and tables connected to this bucket.
-          </ScaffoldSectionDescription>
-        </ScaffoldHeader>
-        <DocsButton href={`${DOCS_URL}/guides/storage/analytics/introduction`} />
-      </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-4" bottomPadding>
-        {state === 'loading' && <GenericSkeletonLoader />}
-        {state === 'not-installed' && (
-          <ExtensionNotInstalled
-            bucketName={bucket.name}
-            projectRef={project?.ref!}
-            wrapperMeta={wrapperMeta}
-            wrappersExtension={wrappersExtension!}
-          />
-        )}
-        {state === 'needs-upgrade' && (
-          <ExtensionNeedsUpgrade
-            bucketName={bucket.name}
-            projectRef={project?.ref!}
-            wrapperMeta={wrapperMeta}
-            wrappersExtension={wrappersExtension!}
-          />
-        )}
-        {state === 'added' && wrapperInstance && (
-          <>
-            <div className="flex flex-col gap-4">
-              {isLoadingNamespaces || isFDWsLoading ? (
-                <GenericSkeletonLoader />
-              ) : namespaces.length === 0 ? (
-                <Card className="flex flex-col px-20 py-16 items-center justify-center space-y-3">
-                  <p className="text-sm text-foreground-light">No namespaces in this bucket</p>
-                  <p className="text-sm text-foreground-lighter">
-                    Create a namespace and add some data{' '}
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-brand underline"
-                      href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
-                    >
-                      {' '}
-                      to get started
-                    </a>
-                  </p>
-                </Card>
-              ) : (
-                <Card>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Namespace</TableHead>
-                        <TableHead>Schema</TableHead>
-                        <TableHead>Tables</TableHead>
-                        <TableHead />
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {namespaces.map(({ namespace, schema, tables }) => (
-                        <NamespaceRow
-                          key={namespace}
-                          bucketName={bucket.name}
-                          namespace={namespace}
-                          schema={schema}
-                          tables={tables as any}
-                          token={token!}
-                          wrapperInstance={wrapperInstance}
-                          wrapperValues={wrapperValues}
-                          wrapperMeta={wrapperMeta}
-                        />
-                      ))}
-                    </TableBody>
-                  </Table>
-                </Card>
-              )}
-            </div>
+    <>
+      <PageLayout
+        title={bucket.name}
+        subtitle={
+          !isStorageV2 ? 'Namespaces and tables connected to this analytics bucket.' : undefined
+        }
+        breadcrumbs={
+          isStorageV2
+            ? [
+                {
+                  label: 'Analytics',
+                  href: `/project/${project?.ref}/storage/analytics`,
+                },
+              ]
+            : []
+        }
+        secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
+      >
+        <ScaffoldContainer bottomPadding>
+          {state === 'loading' && (
+            <ScaffoldSection isFullWidth>
+              <GenericSkeletonLoader />
+            </ScaffoldSection>
+          )}
+          {state === 'not-installed' && (
+            <ScaffoldSection isFullWidth>
+              <ExtensionNotInstalled
+                bucketName={bucket.name}
+                projectRef={project?.ref!}
+                wrapperMeta={wrapperMeta}
+                wrappersExtension={wrappersExtension!}
+              />
+            </ScaffoldSection>
+          )}
+          {state === 'needs-upgrade' && (
+            <ScaffoldSection isFullWidth>
+              <ExtensionNeedsUpgrade
+                bucketName={bucket.name}
+                projectRef={project?.ref!}
+                wrapperMeta={wrapperMeta}
+                wrappersExtension={wrappersExtension!}
+              />
+            </ScaffoldSection>
+          )}
 
-            <div>
-              <div className="flex flex-row justify-between items-center">
-                <div>
-                  <ScaffoldSectionTitle>Connection Details</ScaffoldSectionTitle>
-                  <ScaffoldSectionDescription className="mb-4">
-                    You can use the following parameters to connect to the bucket from an Iceberg
-                    client.
-                  </ScaffoldSectionDescription>
+          {state === 'added' && wrapperInstance && (
+            <>
+              <ScaffoldSection isFullWidth>
+                <div className="flex flex-col gap-4">
+                  {isLoadingNamespaces || isFDWsLoading ? (
+                    <GenericSkeletonLoader />
+                  ) : namespaces.length === 0 ? (
+                    <Card className="flex flex-col px-20 py-16 items-center justify-center space-y-3">
+                      <p className="text-sm text-foreground-light">No namespaces in this bucket</p>
+                      <p className="text-sm text-foreground-lighter">
+                        Create a namespace and add some data{' '}
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-brand underline"
+                          href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+                        >
+                          {' '}
+                          to get started
+                        </a>
+                      </p>
+                    </Card>
+                  ) : (
+                    <Card>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Namespace</TableHead>
+                            <TableHead>Schema</TableHead>
+                            <TableHead>Tables</TableHead>
+                            <TableHead />
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {namespaces.map(({ namespace, schema, tables }) => (
+                            <NamespaceRow
+                              key={namespace}
+                              bucketName={bucket.name}
+                              namespace={namespace}
+                              schema={schema}
+                              tables={tables as any}
+                              token={token!}
+                              wrapperInstance={wrapperInstance}
+                              wrapperValues={wrapperValues}
+                              wrapperMeta={wrapperMeta}
+                            />
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </Card>
+                  )}
                 </div>
-                <div className="flex flex-row gap-2">
-                  <CopyEnvButton
-                    serverOptions={wrapperMeta.server.options.filter(
-                      (option) => !option.hidden && wrapperValues[option.name]
-                    )}
-                    values={wrapperValues}
-                  />
-                  <DocsButton
-                    href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
-                  />
-                </div>
-              </div>
-              <Card className="flex flex-col gap-8 p-6">
-                {wrapperMeta.server.options
-                  .filter((option) => !option.hidden && wrapperValues[option.name])
-                  .sort((a, b) => OPTION_ORDER.indexOf(a.name) - OPTION_ORDER.indexOf(b.name))
-                  .map((option) => {
-                    return (
-                      <DecryptedReadOnlyInput
-                        key={option.name}
-                        label={LABELS[option.name]}
-                        value={wrapperValues[option.name]}
-                        secureEntry={option.secureEntry}
-                        descriptionText={DESCRIPTIONS[option.name]}
-                      />
-                    )
-                  })}
-              </Card>
-            </div>
-          </>
-        )}
-        {state === 'missing' && <WrapperMissing bucketName={bucket.name} />}
-      </ScaffoldContainer>
-    </div>
+              </ScaffoldSection>
+
+              <ScaffoldSection isFullWidth>
+                <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
+                  <div>
+                    <ScaffoldSectionTitle>Connection Details</ScaffoldSectionTitle>
+                    <ScaffoldSectionDescription className="mb-4">
+                      You can use the following parameters to connect to the bucket from an Iceberg
+                      client.
+                    </ScaffoldSectionDescription>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    <CopyEnvButton
+                      serverOptions={wrapperMeta.server.options.filter(
+                        (option) => !option.hidden && wrapperValues[option.name]
+                      )}
+                      values={wrapperValues}
+                    />
+                    <DocsButton
+                      href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+                    />
+                  </div>
+                </ScaffoldHeader>
+                <Card className="flex flex-col gap-8 p-6">
+                  {wrapperMeta.server.options
+                    .filter((option) => !option.hidden && wrapperValues[option.name])
+                    .sort((a, b) => OPTION_ORDER.indexOf(a.name) - OPTION_ORDER.indexOf(b.name))
+                    .map((option) => {
+                      return (
+                        <DecryptedReadOnlyInput
+                          key={option.name}
+                          label={LABELS[option.name]}
+                          value={wrapperValues[option.name]}
+                          secureEntry={option.secureEntry}
+                          descriptionText={DESCRIPTIONS[option.name]}
+                        />
+                      )
+                    })}
+                </Card>
+              </ScaffoldSection>
+            </>
+          )}
+          {state === 'missing' && (
+            <ScaffoldSection isFullWidth>
+              <WrapperMissing bucketName={bucket.name} />
+            </ScaffoldSection>
+          )}
+        </ScaffoldContainer>
+      </PageLayout>
+    </>
   )
 }
 

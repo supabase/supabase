@@ -1,13 +1,20 @@
 import Link from '@ui/components/Typography/Link'
-import { ScaffoldSectionDescription, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import {
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+  ScaffoldHeader,
+  ScaffoldSection,
+} from 'components/layouts/Scaffold'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card } from 'ui'
+import { Card, CardContent } from 'ui'
 import { getCatalogURI, getConnectionURL } from '../StorageSettings/StorageSettings.utils'
 import { DESCRIPTIONS } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
+import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
 
 const wrapperMeta = {
   options: [
@@ -37,36 +44,38 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
   }
 
   return (
-    <div>
-      <div className="flex flex-row justify-between items-center">
+    <ScaffoldSection isFullWidth>
+      <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
         <div>
-          <ScaffoldSectionTitle>Configuration Details</ScaffoldSectionTitle>
-          <ScaffoldSectionDescription className="mb-4">
-            You can use the following configuration details to connect to the bucket from your code.
+          <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
+          <ScaffoldSectionDescription>
+            Connect to this bucket from an Iceberg client.{' '}
+            <InlineLink
+              href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+            >
+              Learn more
+            </InlineLink>
+            .
           </ScaffoldSectionDescription>
         </div>
         <CopyEnvButton serverOptions={wrapperMeta.options} values={values} />
-      </div>
-      <Card className="flex flex-col gap-6 p-6 pb-0">
-        <p className="text-sm text-foreground-light mb-4">
-          To get AWS credentials, you can create them using the{' '}
-          <Link href={`/project/${project?.ref}/storage/settings`}>
-            <a className="underline ">S3 Access Keys</a>
-          </Link>{' '}
-          feature.
-        </p>
-        {wrapperMeta.options.map((option) => {
-          return (
-            <DecryptedReadOnlyInput
-              key={option.name}
-              label={option.label}
-              value={values[option.name]}
-              secureEntry={option.secureEntry}
-              descriptionText={DESCRIPTIONS[option.name]}
-            />
-          )
-        })}
+      </ScaffoldHeader>
+
+      <Card>
+        <CardContent className="flex flex-col gap-12">
+          {wrapperMeta.options.map((option) => {
+            return (
+              <DecryptedReadOnlyInput
+                key={option.name}
+                label={option.label}
+                value={values[option.name]}
+                secureEntry={option.secureEntry}
+                descriptionText={DESCRIPTIONS[option.name]}
+              />
+            )
+          })}
+        </CardContent>
       </Card>
-    </div>
+    </ScaffoldSection>
   )
 }
