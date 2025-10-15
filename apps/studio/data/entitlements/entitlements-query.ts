@@ -1,15 +1,19 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types/base'
+import type { components } from 'api-types'
 
 export type EntitlementsVariables = {
   slug: string
 }
 
+export type EntitlementConfig = components['schemas']['ListEntitlementsResponse']['entitlements'][0]['config']
+export type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][0]
+
 export async function getEntitlements({ slug }: EntitlementsVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('slug is required')
 
-  const { data, error } = await get('/v1/organizations/{slug}/entitlements', {
+  const { data, error } = await get('/platform/organizations/{slug}/entitlements', {
     params: { path: { slug } },
     signal,
   })
