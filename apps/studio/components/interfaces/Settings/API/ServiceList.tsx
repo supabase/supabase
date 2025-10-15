@@ -95,7 +95,7 @@ export const ServiceList = () => {
                         : 'RESTful endpoint for querying and managing your database'
                   }
                 >
-                  <Input copy readOnly className="input-mono" value={endpoint} />
+                  <Input copy readOnly className="font-mono" value={endpoint} />
                 </FormLayout>
               )}
             </CardContent>
