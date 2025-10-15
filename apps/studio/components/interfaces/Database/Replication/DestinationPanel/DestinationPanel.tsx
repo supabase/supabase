@@ -6,8 +6,8 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
 import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
@@ -17,8 +17,8 @@ import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
-import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
+import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,

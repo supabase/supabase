@@ -12,6 +12,7 @@ type CreateIcebergNamespaceVariables = {
   namespace: string
 }
 
+// [Joshen] Investigate if we can use the temp API keys here
 async function createIcebergNamespace({
   catalogUri,
   warehouse,

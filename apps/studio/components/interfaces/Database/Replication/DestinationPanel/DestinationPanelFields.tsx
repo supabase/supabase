@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Loader2, Plus } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
@@ -9,8 +9,8 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
+import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
