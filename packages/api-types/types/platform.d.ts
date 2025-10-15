@@ -4738,7 +4738,16 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
+      type:
+        | 'postgres'
+        | 'bigquery'
+        | 'clickhouse'
+        | 'webhook'
+        | 'datadog'
+        | 'elastic'
+        | 'loki'
+        | 'sentry'
+        | 's3'
     }
     CreateCliLoginSessionBody: {
       public_key: string
@@ -5013,7 +5022,6 @@ export interface components {
           is_owner: boolean
           name: string
           opt_in_tags: string[]
-          organization_missing_address: boolean
           organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
@@ -6896,7 +6904,16 @@ export interface components {
       name: string
       token: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
+      type:
+        | 'postgres'
+        | 'bigquery'
+        | 'clickhouse'
+        | 'webhook'
+        | 'datadog'
+        | 'elastic'
+        | 'loki'
+        | 'sentry'
+        | 's3'
       user_id: number
     }
     LFEndpoint: {
@@ -7260,7 +7277,6 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
-      organization_missing_address: boolean
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
@@ -8240,14 +8256,8 @@ export interface components {
       max_events_per_second: number | null
       /** @description Sets maximum number of joins per second rate limit */
       max_joins_per_second: number | null
-      /** @description Sets maximum number of payload size in KB rate limit */
-      max_payload_size_in_kb: number | null
-      /** @description Sets maximum number of presence events per second rate limit */
-      max_presence_events_per_second: number | null
       /** @description Whether to only allow private channels */
       private_only: boolean | null
-      /** @description Whether to suspend realtime */
-      suspend: boolean | null
     }
     RegionsInfo: {
       all: {
@@ -9997,14 +10007,8 @@ export interface components {
       max_events_per_second?: number
       /** @description Sets maximum number of joins per second rate limit */
       max_joins_per_second?: number
-      /** @description Sets maximum number of payload size in KB rate limit */
-      max_payload_size_in_kb?: number
-      /** @description Sets maximum number of presence events per second rate limit */
-      max_presence_events_per_second?: number
       /** @description Whether to only allow private channels */
       private_only?: boolean
-      /** @description Whether to suspend realtime */
-      suspend?: boolean
     }
     UpdateReplicationDestinationBody: {
       /** @description Destination configuration */

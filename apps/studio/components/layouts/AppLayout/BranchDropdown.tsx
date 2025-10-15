@@ -33,6 +33,7 @@ import {
   cn,
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
+import { partition } from 'lodash'
 
 const BranchLink = ({
   branch,
@@ -99,7 +100,11 @@ export const BranchDropdown = () => {
   } as unknown as Branch
 
   const mainBranch = branches?.find((branch) => branch.is_default)
-  const restOfBranches = branches
+  const [_scheduledForDeletionBranches, activeBranches] = partition(
+    branches,
+    (branch) => branch.deletion_scheduled_at !== undefined
+  )
+  const restOfBranches = activeBranches
     ?.filter((branch) => !branch.is_default)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
