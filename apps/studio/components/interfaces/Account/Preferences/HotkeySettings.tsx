@@ -1,0 +1,27 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
+import Panel from 'components/ui/Panel'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { Toggle } from 'ui'
+
+export const HotkeySettings = () => {
+  const [inlineEditorEnabled, setInlineEditorEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_INLINE_EDITOR,
+    true
+  )
+
+  return (
+    <Panel title={<h5 id="keyboard-shortcuts">Keyboard shortcuts</h5>}>
+      <Panel.Content className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Choose which shortcuts stay active while working in the dashboard.
+        </p>
+        <Toggle
+          checked={inlineEditorEnabled}
+          onChange={() => setInlineEditorEnabled(!inlineEditorEnabled)}
+          label="Side panel SQL editor"
+          descriptionText="Cmd/Ctrl + E toggles the side panel SQL editor."
+        />
+      </Panel.Content>
+    </Panel>
+  )
+}
