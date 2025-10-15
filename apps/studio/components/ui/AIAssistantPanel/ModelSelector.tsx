@@ -33,7 +33,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
   const canAccessProModels = organization?.plan?.id !== 'free'
   const slug = organization?.slug ?? '_'
 
-  const upgradeHref = `/org/${slug ?? '_'}/billing?panel=costControl&source=ai-assistant-model`
+  const upgradeHref = `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=ai-assistant-model`
 
   const handleSelectModel = (model: 'gpt-5' | 'gpt-5-mini') => {
     if (model === 'gpt-5' && !canAccessProModels) {
