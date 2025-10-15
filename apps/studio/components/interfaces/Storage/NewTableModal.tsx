@@ -26,9 +26,23 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 const newTableSchema = z.object({
   tableName: z
     .string()
-    .min(1, 'Table name is required')
-    .max(63, 'Table name must be less than 64 characters'),
-  targetSchema: z.string().min(1, 'Target schema is required'),
+    .min(3, 'Table name must be at least 3 characters')
+    .max(63, 'Table name must be less than 64 characters')
+    .regex(
+      /^[a-z0-9_.]+$/,
+      'Table name can only contain lowercase letters, numbers, dots, and underscores'
+    ),
+  targetSchema: z
+    .string()
+    .min(1, 'Target schema is required')
+    .regex(
+      /^[a-z0-9_]+$/,
+      'Target schema can only contain lowercase letters, numbers, and underscores'
+    )
+    .regex(
+      /^[a-z0-9_]+$/,
+      'Target schema can only contain lowercase letters, numbers, and underscores'
+    ),
 })
 
 type NewTableFormValues = z.infer<typeof newTableSchema>
@@ -95,7 +109,7 @@ export const NewTableModal = ({ visible, onClose }: NewTableModalProps) => {
                   <FormItemLayout
                     name="tableName"
                     label="Table name"
-                    description="Must be between 3–63 characters. Use only lowercase letters, numbers, dots, and hyphens."
+                    description="Must be between 3–63 characters. Use only lowercase letters, numbers, dots, and underscores."
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
@@ -122,7 +136,7 @@ export const NewTableModal = ({ visible, onClose }: NewTableModalProps) => {
                   <FormItemLayout
                     name="targetSchema"
                     label="Target schema"
-                    description="This schema will be used as the table’s namespace. Use only lowercase letters, numbers, and underscores."
+                    description="Will be used as the table’s namespace. Use only lowercase letters, numbers, and underscores."
                   >
                     <FormControl_Shadcn_>
                       <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>

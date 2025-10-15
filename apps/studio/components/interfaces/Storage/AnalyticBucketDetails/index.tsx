@@ -47,6 +47,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteBucketModal } from '../DeleteBucketModal'
+import { NewTableModal } from '../NewTableModal'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
@@ -55,7 +56,7 @@ import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
-  const [modal, setModal] = useState<'delete' | null>(null)
+  const [modal, setModal] = useState<'delete' | 'new-table' | null>(null)
   const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
 
@@ -199,7 +200,14 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                         Analytics tables connected to this bucket.
                       </ScaffoldSectionDescription>
                     </div>
-                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
+                    <Button
+                      type="primary"
+                      size="tiny"
+                      icon={<Plus size={14} />}
+                      onClick={() => {
+                        setModal('new-table')
+                      }}
+                    >
                       New table
                     </Button>
                   </ScaffoldHeader>
@@ -368,6 +376,8 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
         bucket={bucket}
         onClose={() => setModal(null)}
       />
+
+      <NewTableModal visible={modal === `new-table`} onClose={() => setModal(null)} />
     </>
   )
 }
