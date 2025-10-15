@@ -1,26 +1,28 @@
-import { ArrowDown, ArrowUp, ChevronDown, ArrowRight, TextSearch } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
+  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Sheet,
   SheetContent,
+  SheetTitle,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
   cn,
-  CodeBlock,
-  SheetTitle,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
@@ -30,10 +32,8 @@ import {
   QUERY_PERFORMANCE_REPORT_TYPES,
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
-import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { formatDuration } from './QueryPerformance.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { QueryPerformanceRow } from './QueryPerformance.types'
+import { formatDuration } from './QueryPerformance.utils'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
@@ -369,7 +369,6 @@ export const QueryPerformanceGrid = ({
 
   useEffect(() => {
     setSelectedRow(undefined)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, roles, urlSort, order])
 
   const handleKeyDown = useCallback(
