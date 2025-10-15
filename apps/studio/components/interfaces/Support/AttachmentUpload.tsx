@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 
 import { gotrueClient } from 'common'
 import { constructHeaders } from 'data/fetchers'
+import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { cn } from 'ui'
 import { createSupportStorageClient } from './support-storage-client'
@@ -44,7 +45,7 @@ const uploadAttachments = async (ref: string, files: File[]) => {
 
   try {
     const headers = await constructHeaders()
-    const response = await fetch('/api/generate-attachment-url', {
+    const response = await fetch(`${BASE_PATH}/api/generate-attachment-url`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ filenames: keys }),
