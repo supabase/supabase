@@ -1,7 +1,3 @@
-import { snakeCase, uniq } from 'lodash'
-import Link from 'next/link'
-import { useMemo } from 'react'
-
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
@@ -21,6 +17,7 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
@@ -32,19 +29,11 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Card,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-  WarningIcon,
-} from 'ui'
+import { snakeCase, uniq } from 'lodash'
+import Link from 'next/link'
+import { useMemo } from 'react'
+import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
@@ -171,14 +160,12 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             </ScaffoldSection>
           )}
           {state === 'not-installed' && (
-            <ScaffoldSection isFullWidth>
-              <ExtensionNotInstalled
-                bucketName={bucket.name}
-                projectRef={project?.ref!}
-                wrapperMeta={wrapperMeta}
-                wrappersExtension={wrappersExtension!}
-              />
-            </ScaffoldSection>
+            <ExtensionNotInstalled
+              bucketName={bucket.name}
+              projectRef={project?.ref!}
+              wrapperMeta={wrapperMeta}
+              wrappersExtension={wrappersExtension!}
+            />
           )}
           {state === 'needs-upgrade' && (
             <ScaffoldSection isFullWidth>
@@ -248,25 +235,25 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
               <ScaffoldSection isFullWidth>
                 <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
                   <div>
-                    <ScaffoldSectionTitle>Connection Details</ScaffoldSectionTitle>
-                    <ScaffoldSectionDescription className="mb-4">
-                      You can use the following parameters to connect to the bucket from an Iceberg
-                      client.
+                    <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
+                    <ScaffoldSectionDescription>
+                      Connect to this bucket from an Iceberg client.{' '}
+                      <InlineLink
+                        href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+                      >
+                        Learn more
+                      </InlineLink>
                     </ScaffoldSectionDescription>
                   </div>
-                  <div className="flex flex-row gap-2">
-                    <CopyEnvButton
-                      serverOptions={wrapperMeta.server.options.filter(
-                        (option) => !option.hidden && wrapperValues[option.name]
-                      )}
-                      values={wrapperValues}
-                    />
-                    <DocsButton
-                      href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
-                    />
-                  </div>
+                  <CopyEnvButton
+                    serverOptions={wrapperMeta.server.options.filter(
+                      (option) => !option.hidden && wrapperValues[option.name]
+                    )}
+                    values={wrapperValues}
+                  />
                 </ScaffoldHeader>
-                <Card className="flex flex-col gap-8 p-6">
+
+                <Card>
                   {wrapperMeta.server.options
                     .filter((option) => !option.hidden && wrapperValues[option.name])
                     .sort((a, b) => OPTION_ORDER.indexOf(a.name) - OPTION_ORDER.indexOf(b.name))
@@ -285,11 +272,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
               </ScaffoldSection>
             </>
           )}
-          {state === 'missing' && (
-            <ScaffoldSection isFullWidth>
-              <WrapperMissing bucketName={bucket.name} />
-            </ScaffoldSection>
-          )}
+          {state === 'missing' && <WrapperMissing bucketName={bucket.name} />}
         </ScaffoldContainer>
       </PageLayout>
     </>
@@ -311,39 +294,35 @@ const ExtensionNotInstalled = ({
     (wrappersExtension?.default_version ?? '') < (wrapperMeta?.minimumExtensionVersion ?? '')
 
   return (
-    <>
-      <Alert_Shadcn_ variant="warning">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>
-          You need to install the wrappers extension to connect this Analytics bucket to the
-          database.
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-          <p>
-            The {wrapperMeta.label} wrapper requires the Wrappers extension to be installed. You can
-            install version {wrappersExtension?.installed_version}
-            {databaseNeedsUpgrading &&
-              ' which is below the minimum version that supports Iceberg wrapper'}
-            . Please {databaseNeedsUpgrading && 'upgrade your database then '}install the{' '}
-            <code className="text-xs">wrappers</code> extension to create this wrapper.
-          </p>
-        </AlertDescription_Shadcn_>
-        <AlertDescription_Shadcn_ className="mt-3">
-          <Button asChild type="default">
-            <Link
-              href={
-                databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
-                  : `/project/${projectRef}/database/extensions?filter=wrappers`
-              }
-            >
-              {databaseNeedsUpgrading ? 'Upgrade database' : 'Install wrappers extension'}
-            </Link>
-          </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+    <ScaffoldSection isFullWidth>
+      <Admonition type="warning" title="Missing required extension">
+        <p>
+          The Wrappers extension is required in order to query analytics tables.{' '}
+          {databaseNeedsUpgrading &&
+            'Please first upgrade your database and then install the extension.'}{' '}
+          <InlineLink
+            href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-foreground-lighter hover:text-foreground transition-colors"
+          >
+            Learn more
+          </InlineLink>
+        </p>
+        <Button type="warning" asChild className="mt-2" onClick={() => {}}>
+          <Link
+            href={
+              databaseNeedsUpgrading
+                ? `/project/${projectRef}/settings/infrastructure`
+                : `/project/${projectRef}/database/extensions?filter=wrappers`
+            }
+          >
+            {databaseNeedsUpgrading ? 'Upgrade database' : 'Install'}
+          </Link>
+        </Button>
+      </Admonition>
       <SimpleConfigurationDetails bucketName={bucketName} />
-    </>
+    </ScaffoldSection>
   )
 }
 
@@ -364,42 +343,33 @@ const ExtensionNeedsUpgrade = ({
     wrappersExtension?.installed_version === wrappersExtension?.default_version
 
   return (
-    <>
-      <Alert_Shadcn_ variant="warning">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>
-          Your extension version is outdated for this wrapper.
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-          <p>
-            The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
-            {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-            {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
-            disabling and enabling the <code className="text-xs">wrappers</code> extension to create
-            this wrapper.
-          </p>
-          <p className="text-warning">
-            Warning: Before reinstalling the wrapper extension, you must first remove all existing
-            wrappers. Afterward, you can recreate the wrappers.
-          </p>
-        </AlertDescription_Shadcn_>
-        <AlertDescription_Shadcn_ className="mt-3">
-          <Button asChild type="default">
-            <Link
-              href={
-                databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
-                  : `/project/${projectRef}/database/extensions?filter=wrappers`
-              }
-            >
-              {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
-            </Link>
-          </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+    <ScaffoldSection isFullWidth>
+      <Admonition type="warning" title="Outdated extension version">
+        <p>
+          The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
+          {wrapperMeta.minimumExtensionVersion}. You have version{' '}
+          {wrappersExtension?.installed_version} installed. Please{' '}
+          {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
+          by disabling and enabling the Wrappers extension.
+        </p>
+        <p>
+          Before reinstalling the wrapper extension, you must first remove all existing wrappers.
+          Afterward, you can recreate the wrappers.
+        </p>
+        <Button asChild type="default">
+          <Link
+            href={
+              databaseNeedsUpgrading
+                ? `/project/${projectRef}/settings/infrastructure`
+                : `/project/${projectRef}/database/extensions?filter=wrappers`
+            }
+          >
+            {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
+          </Link>
+        </Button>
+      </Admonition>
       <SimpleConfigurationDetails bucketName={bucketName} />
-    </>
+    </ScaffoldSection>
   )
 }
 
@@ -412,22 +382,14 @@ const WrapperMissing = ({ bucketName }: { bucketName: string }) => {
   }
 
   return (
-    <>
-      <Alert_Shadcn_ variant="warning">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>
-          This Analytics bucket does not have a foreign data wrapper setup.
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-          <p>You need to setup a wrapper to connect this bucket to the database.</p>
-        </AlertDescription_Shadcn_>
-        <AlertDescription_Shadcn_ className="mt-3">
-          <Button type="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
-            Setup a wrapper
-          </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+    <ScaffoldSection isFullWidth>
+      <Admonition type="warning" title="Missing integration">
+        <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
+        <Button type="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
+          Install
+        </Button>
+      </Admonition>
       <SimpleConfigurationDetails bucketName={bucketName} />
-    </>
+    </ScaffoldSection>
   )
 }

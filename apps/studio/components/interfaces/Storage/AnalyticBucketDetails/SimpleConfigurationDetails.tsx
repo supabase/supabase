@@ -1,26 +1,25 @@
-import Link from '@ui/components/Typography/Link'
 import {
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
   ScaffoldHeader,
   ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
+import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card, CardContent } from 'ui'
+import { DOCS_URL } from 'lib/constants'
+import { Card } from 'ui'
 import { getCatalogURI, getConnectionURL } from '../StorageSettings/StorageSettings.utils'
 import { DESCRIPTIONS } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
 
 const wrapperMeta = {
   options: [
-    { name: 'vault_token', label: 'Vault Token', secureEntry: false },
-    { name: 'warehouse', label: 'Warehouse', secureEntry: false },
-    { name: 's3.endpoint', label: 'S3 Endpoint', secureEntry: false },
+    { name: 'vault_token', label: 'Vault token', secureEntry: false },
+    { name: 'warehouse', label: 'Warehouse name', secureEntry: false },
+    { name: 's3.endpoint', label: 'S3 endpoint', secureEntry: false },
     { name: 'catalog_uri', label: 'Catalog URI', secureEntry: false },
   ],
 }
@@ -55,26 +54,23 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
             >
               Learn more
             </InlineLink>
-            .
           </ScaffoldSectionDescription>
         </div>
         <CopyEnvButton serverOptions={wrapperMeta.options} values={values} />
       </ScaffoldHeader>
 
       <Card>
-        <CardContent className="flex flex-col gap-12">
-          {wrapperMeta.options.map((option) => {
-            return (
-              <DecryptedReadOnlyInput
-                key={option.name}
-                label={option.label}
-                value={values[option.name]}
-                secureEntry={option.secureEntry}
-                descriptionText={DESCRIPTIONS[option.name]}
-              />
-            )
-          })}
-        </CardContent>
+        {wrapperMeta.options.map((option) => {
+          return (
+            <DecryptedReadOnlyInput
+              key={option.name}
+              label={option.label}
+              value={values[option.name]}
+              secureEntry={option.secureEntry}
+              descriptionText={DESCRIPTIONS[option.name]}
+            />
+          )
+        })}
       </Card>
     </ScaffoldSection>
   )
