@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
@@ -10,6 +10,7 @@ import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
+import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
@@ -30,7 +31,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CREATE_NEW_KEY } from './DestinationPanel.constants'
+import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationPanel.constants'
 import { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
@@ -106,7 +107,7 @@ export const AnalyticsBucketFields = ({
   form: UseFormReturn<DestinationPanelSchemaType>
   setIsFormInteracting: (value: boolean) => void
 }) => {
-  const { warehouseName, type, s3AccessKeyId } = form.watch()
+  const { warehouseName, type, s3AccessKeyId, namespace } = form.watch()
   const [showCatalogToken, setShowCatalogToken] = useState(false)
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 
@@ -154,6 +155,7 @@ export const AnalyticsBucketFields = ({
     data: namespaces = [],
     isLoading: isLoadingNamespaces,
     isError: isErrorNamespaces,
+    refetch: refetchNamespaces,
   } = useIcebergNamespacesQuery(
     {
       catalogUri,
@@ -164,6 +166,13 @@ export const AnalyticsBucketFields = ({
       enabled: type === 'Analytics Bucket' && !!catalogUri && !!warehouseName && !!serviceApiKey,
     }
   )
+
+  const { mutateAsync: createNamespace, isLoading: isCreatingNamespace } =
+    useIcebergNamespaceCreateMutation({
+      onSuccess: () => {
+        refetchNamespaces()
+      },
+    })
 
   return (
     <>
@@ -239,7 +248,7 @@ export const AnalyticsBucketFields = ({
             className="px-5"
             description="Select a namespace from your Analytics Bucket"
           >
-            {isLoadingNamespaces && canSelectNamespace ? (
+            {(isLoadingNamespaces || isCreatingNamespace) && canSelectNamespace ? (
               <Button
                 disabled
                 type="default"
@@ -247,7 +256,7 @@ export const AnalyticsBucketFields = ({
                 size="small"
                 iconRight={<Loader2 className="animate-spin" />}
               >
-                Retrieving namespaces
+                {isCreatingNamespace ? 'Creating namespace...' : 'Retrieving namespaces'}
               </Button>
             ) : isErrorNamespaces ? (
               <Button
@@ -263,13 +272,18 @@ export const AnalyticsBucketFields = ({
               <FormControl_Shadcn_>
                 <Select_Shadcn_
                   value={field.value}
-                  onValueChange={field.onChange}
-                  disabled={!canSelectNamespace}
+                  onValueChange={(value) => {
+                    setIsFormInteracting(true)
+                    field.onChange(value)
+                  }}
+                  disabled={!canSelectNamespace || isCreatingNamespace}
                 >
                   <SelectTrigger_Shadcn_>
                     {!canSelectNamespace
                       ? 'Select a warehouse first'
-                      : field.value || 'Select a namespace'}
+                      : field.value === CREATE_NEW_NAMESPACE
+                        ? 'Create a new namespace'
+                        : field.value || 'Select a namespace'}
                   </SelectTrigger_Shadcn_>
                   <SelectContent_Shadcn_>
                     <SelectGroup_Shadcn_>
@@ -284,6 +298,10 @@ export const AnalyticsBucketFields = ({
                           </SelectItem_Shadcn_>
                         ))
                       )}
+                      {namespaces.length > 0 && <SelectSeparator_Shadcn_ />}
+                      <SelectItem_Shadcn_ key={CREATE_NEW_NAMESPACE} value={CREATE_NEW_NAMESPACE}>
+                        Create a new namespace
+                      </SelectItem_Shadcn_>
                     </SelectGroup_Shadcn_>
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
@@ -292,6 +310,25 @@ export const AnalyticsBucketFields = ({
           </FormItemLayout>
         )}
       />
+
+      {namespace === CREATE_NEW_NAMESPACE && (
+        <FormField_Shadcn_
+          control={form.control}
+          name="newNamespaceName"
+          render={({ field }) => (
+            <FormItemLayout
+              label="New Namespace Name"
+              layout="vertical"
+              className="px-5"
+              description="Enter a name for the new namespace"
+            >
+              <FormControl_Shadcn_>
+                <Input_Shadcn_ {...field} placeholder="new-namespace" value={field.value || ''} />
+              </FormControl_Shadcn_>
+            </FormItemLayout>
+          )}
+        />
+      )}
 
       <DialogSectionSeparator />
 

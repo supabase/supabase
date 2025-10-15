@@ -80,6 +80,9 @@ export const useIcebergNamespaceCreateMutation = ({
             variables.namespace
           )
         )
+        await queryClient.invalidateQueries(
+          storageKeys.icebergNamespaces(variables.catalogUri, variables.warehouse)
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

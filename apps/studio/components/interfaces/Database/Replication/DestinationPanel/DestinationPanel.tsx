@@ -7,6 +7,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
+import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
@@ -17,6 +18,7 @@ import { useReplicationPublicationsQuery } from 'data/replication/publications-q
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
@@ -48,7 +50,7 @@ import { NewPublicationPanel } from '../NewPublicationPanel'
 import { PublicationsComboBox } from '../PublicationsComboBox'
 import { ReplicationDisclaimerDialog } from '../ReplicationDisclaimerDialog'
 import { AdvancedSettings } from './AdvancedSettings'
-import { CREATE_NEW_KEY } from './DestinationPanel.constants'
+import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationPanel.constants'
 import { DestinationPanelFormSchema as FormSchema, TypeEnum } from './DestinationPanel.schema'
 import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
 
@@ -100,6 +102,9 @@ export const DestinationPanel = ({
   const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()
 
+  const { mutateAsync: createNamespace, isLoading: isCreatingNamespace } =
+    useIcebergNamespaceCreateMutation()
+
   const {
     data: publications = [],
     isLoading: isLoadingPublications,
@@ -147,6 +152,7 @@ export const DestinationPanel = ({
       // Analytics Bucket fields
       warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
       namespace: isIcebergConfig ? config.iceberg.supabase.namespace : '',
+      newNamespaceName: '',
       catalogToken: isIcebergConfig ? config.iceberg.supabase.catalog_token : catalogToken,
       s3AccessKeyId: isIcebergConfig ? config.iceberg.supabase.s3_access_key_id : '',
       s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
@@ -166,7 +172,8 @@ export const DestinationPanel = ({
     creatingDestinationPipeline ||
     updatingDestinationPipeline ||
     startingPipeline ||
-    isCreatingS3AccessKey
+    isCreatingS3AccessKey ||
+    isCreatingNamespace
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
@@ -185,6 +192,31 @@ export const DestinationPanel = ({
 
   const isSubmitDisabled =
     isSaving || isSelectedPublicationMissing || isLoadingCheck || hasTablesWithNoPrimaryKeys
+
+  // Helper function to handle namespace creation if needed
+  const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
+    if (data.namespace === CREATE_NEW_NAMESPACE) {
+      if (!data.newNamespaceName) {
+        throw new Error('New namespace name is required')
+      }
+
+      // Construct catalog URI for namespace creation
+      const protocol = projectSettings?.app_config?.protocol ?? 'https'
+      const endpoint =
+        projectSettings?.app_config?.storage_endpoint || projectSettings?.app_config?.endpoint
+      const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
+
+      await createNamespace({
+        catalogUri,
+        warehouse: data.warehouseName!,
+        token: catalogToken,
+        namespace: data.newNamespaceName,
+      })
+
+      return data.newNamespaceName
+    }
+    return data.namespace
+  }
 
   // [Joshen] I reckon this function can be refactored to be a bit more modular, it's currently pretty
   // complicated with 4 different types of flows -> edit bigquery/analytics, and create bigquery/analytics
@@ -224,10 +256,13 @@ export const DestinationPanel = ({
             s3Keys = { accessKey: newKeys.access_key, secretKey: newKeys.secret_key }
           }
 
+          // Resolve namespace (create if needed)
+          const finalNamespace = await resolveNamespace(data)
+
           const icebergConfig: any = {
             projectRef: projectRef,
             warehouseName: data.warehouseName,
-            namespace: data.namespace,
+            namespace: finalNamespace,
             catalogToken: data.catalogToken,
             s3AccessKeyId: s3Keys.accessKey,
             s3SecretAccessKey: s3Keys.secretKey,
@@ -296,10 +331,13 @@ export const DestinationPanel = ({
             s3Keys = { accessKey: newKeys.access_key, secretKey: newKeys.secret_key }
           }
 
+          // Resolve namespace (create if needed)
+          const finalNamespace = await resolveNamespace(data)
+
           const icebergConfig: any = {
             projectRef: projectRef,
             warehouseName: data.warehouseName,
-            namespace: data.namespace,
+            namespace: finalNamespace,
             catalogToken: data.catalogToken,
             s3AccessKeyId: s3Keys.accessKey,
             s3SecretAccessKey: s3Keys.secretKey,

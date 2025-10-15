@@ -20,6 +20,7 @@ export const DestinationPanelFormSchema = z
     // Analytics Bucket fields, only warehouse name and namespace are visible + editable fields
     warehouseName: z.string().optional(),
     namespace: z.string().optional(),
+    newNamespaceName: z.string().optional(),
     catalogToken: z.string().optional(),
     s3AccessKeyId: z.string().optional(),
     s3SecretAccessKey: z.string().optional(),
@@ -37,11 +38,16 @@ export const DestinationPanelFormSchema = z
           data.serviceAccountKey.length > 0
         )
       } else if (data.type === 'Analytics Bucket') {
+        const hasValidNamespace =
+          (data.namespace && data.namespace.length > 0) ||
+          (data.namespace === 'create-new-namespace' &&
+            data.newNamespaceName &&
+            data.newNamespaceName.length > 0)
+
         return (
           data.warehouseName &&
           data.warehouseName.length > 0 &&
-          data.namespace &&
-          data.namespace.length > 0 &&
+          hasValidNamespace &&
           data.s3Region &&
           data.s3Region.length > 0
         )
