@@ -315,7 +315,7 @@ export const UsersV2 = () => {
                       properties: {
                         trigger: 'search_input',
                         ...telemetryProps,
-                        keywords: search.trim().toLocaleLowerCase(),
+                        keywords: s,
                       },
                       groups: telemetryGroups,
                     })
