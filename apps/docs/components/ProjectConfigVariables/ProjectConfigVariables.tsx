@@ -38,7 +38,6 @@ import { useProjectSettingsQuery, useProjectKeysQuery } from '~/lib/fetch/projec
 import { isProjectPaused, useProjectsQuery } from '~/lib/fetch/projects'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
-import { isAuthApiError } from '@supabase/supabase-js'
 
 type ProjectOrgDataState =
   | 'userLoading'
