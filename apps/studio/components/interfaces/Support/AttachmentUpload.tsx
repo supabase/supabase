@@ -13,7 +13,7 @@ import { createSupportStorageClient } from './support-storage-client'
 
 const MAX_ATTACHMENTS = 5
 
-const uploadAttachments = async (ref: string, files: File[]) => {
+const uploadAttachments = async (files: File[]) => {
   const supportSupabaseClient = createSupportStorageClient()
   const userId = await gotrueClient.getSession().then((res) => res?.data.session?.user.id)
   if (!userId) {
@@ -115,14 +115,10 @@ export function useAttachmentUpload() {
     }
   }, [uploadedFiles])
 
-  const createAttachments = useCallback(
-    async (projectRef: string) => {
-      const attachments =
-        uploadedFiles.length > 0 ? await uploadAttachments(projectRef, uploadedFiles) : []
-      return attachments
-    },
-    [uploadedFiles]
-  )
+  const createAttachments = useCallback(async () => {
+    const attachments = uploadedFiles.length > 0 ? await uploadAttachments(uploadedFiles) : []
+    return attachments
+  }, [uploadedFiles])
 
   return useMemo(
     () => ({

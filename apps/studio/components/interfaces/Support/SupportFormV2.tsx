@@ -72,7 +72,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (values) => {
     dispatch({ type: 'SUBMIT' })
-    const attachments = await attachmentUpload.createAttachments(projectRef)
+    const attachments = await attachmentUpload.createAttachments()
 
     const selectedLibrary = values.library
       ? CLIENT_LIBRARIES.find((library) => library.language === values.library)

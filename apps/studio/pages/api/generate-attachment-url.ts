@@ -1,15 +1,11 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-
 import { createClient } from '@supabase/supabase-js'
-import { components } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
-import { getUserClaims } from 'lib/gotrue'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-export const maxDuration = 120
+import apiWrapper from 'lib/api/apiWrapper'
+import { getUserClaims } from 'lib/gotrue'
 
-type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
-type Project = ProjectsResponse['projects'][number]
+export const maxDuration = 120
 
 const GenerateAttachmentUrlSchema = z.object({
   filenames: z.array(z.string()),
@@ -55,6 +51,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   )
 
+  // Create signed URLs for 10 years
   const { data, error: signedUrlError } = await adminSupabase.storage
     .from('support-attachments')
     .createSignedUrls(filenames, 10 * 365 * 24 * 60 * 60)
