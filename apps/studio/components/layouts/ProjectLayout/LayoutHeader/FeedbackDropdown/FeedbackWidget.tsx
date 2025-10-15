@@ -15,6 +15,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import { timeout } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import {
   Button,
   DropdownMenu,
@@ -61,6 +62,7 @@ export const FeedbackWidget = ({
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const { profile } = useProfile()
 
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
@@ -163,9 +165,13 @@ export const FeedbackWidget = ({
     } else if (feedback.length > 0) {
       setSending(true)
 
-      const attachmentUrl = screenshot
-        ? await uploadAttachment(ref as string, screenshot)
-        : undefined
+      const attachmentUrl =
+        screenshot && profile?.gotrue_id
+          ? await uploadAttachment({
+              image: screenshot,
+              userId: profile.gotrue_id,
+            })
+          : undefined
       const formattedFeedback =
         attachmentUrl !== undefined ? `${feedback}\n\nAttachments:\n${attachmentUrl}` : feedback
 
