@@ -340,7 +340,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
         variableValue = `https://${apiSettingsData?.app_config?.endpoint}`
         break
       case 'anon':
-        variableValue = apiKeysData?.find((key) => key.type === 'legacy')?.api_key || ''
+        variableValue = apiKeysData?.find((key) => key.type === 'legacy' && key.id === 'anon')?.api_key || ''
         break
       case 'publishable':
         variableValue = apiKeysData?.find((key) => key.type === 'publishable')?.api_key || ''
