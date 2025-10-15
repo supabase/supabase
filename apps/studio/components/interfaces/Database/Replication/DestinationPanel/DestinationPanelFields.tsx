@@ -323,7 +323,7 @@ export const AnalyticsBucketFields = ({
               description="Enter a name for the new namespace"
             >
               <FormControl_Shadcn_>
-                <Input_Shadcn_ {...field} placeholder="new-namespace" value={field.value || ''} />
+                <Input_Shadcn_ {...field} placeholder="new_namespace" value={field.value || ''} />
               </FormControl_Shadcn_>
             </FormItemLayout>
           )}
