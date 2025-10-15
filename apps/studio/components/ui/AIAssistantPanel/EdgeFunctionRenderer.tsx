@@ -17,6 +17,9 @@ interface EdgeFunctionRendererProps {
   onDeployed?: (result: { success: true } | { success: false; errorText: string }) => void
   initialIsDeployed?: boolean
   showConfirmFooter?: boolean
+  confirmFooterMessage?: string
+  confirmFooterConfirmLabel?: string
+  confirmFooterCancelLabel?: string
 }
 
 export const EdgeFunctionRenderer = ({
@@ -26,6 +29,9 @@ export const EdgeFunctionRenderer = ({
   onDeployed,
   initialIsDeployed,
   showConfirmFooter = true,
+  confirmFooterMessage = 'Assistant wants to deploy this Edge Function',
+  confirmFooterConfirmLabel,
+  confirmFooterCancelLabel = 'Skip',
 }: PropsWithChildren<EdgeFunctionRendererProps>) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
@@ -142,9 +148,9 @@ export const EdgeFunctionRenderer = ({
       {showConfirmFooter && (
         <div className="mx-4">
           <ConfirmFooter
-            message="Assistant wants to deploy this Edge Function"
-            cancelLabel="Skip"
-            confirmLabel={isDeploying ? 'Deploying...' : 'Deploy'}
+            message={confirmFooterMessage}
+            cancelLabel={confirmFooterCancelLabel}
+            confirmLabel={confirmFooterConfirmLabel ?? (isDeploying ? 'Deploying...' : 'Deploy')}
             isLoading={isDeploying}
             onCancel={() => {
               onDeployed?.({ success: false, errorText: 'Skipped' })

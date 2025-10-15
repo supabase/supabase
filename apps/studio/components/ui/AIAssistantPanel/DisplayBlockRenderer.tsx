@@ -35,6 +35,9 @@ interface DisplayBlockRendererProps {
   showConfirmFooter?: boolean
   onChartConfigChange?: (chartConfig: ChartConfig) => void
   onQueryRun?: (queryType: 'select' | 'mutation') => void
+  confirmFooterMessage?: string
+  confirmFooterConfirmLabel?: string
+  confirmFooterCancelLabel?: string
 }
 
 export const DisplayBlockRenderer = ({
@@ -50,6 +53,9 @@ export const DisplayBlockRenderer = ({
   showConfirmFooter = true,
   onChartConfigChange,
   onQueryRun,
+  confirmFooterMessage = 'Assistant wants to run this query',
+  confirmFooterConfirmLabel,
+  confirmFooterCancelLabel = 'Skip',
 }: PropsWithChildren<DisplayBlockRendererProps>) => {
   const savedInitialArgs = useRef(initialArgs)
   const savedInitialResults = useRef(initialResults)
@@ -236,9 +242,9 @@ export const DisplayBlockRenderer = ({
       {shouldShowConfirmFooter && (
         <div className="mx-4">
           <ConfirmFooter
-            message="Assistant wants to run this query"
-            cancelLabel="Skip"
-            confirmLabel={executeSqlLoading ? 'Running...' : 'Run Query'}
+            message={confirmFooterMessage}
+            cancelLabel={confirmFooterCancelLabel}
+            confirmLabel={confirmFooterConfirmLabel ?? (executeSqlLoading ? 'Running...' : 'Run Query')}
             isLoading={executeSqlLoading}
             onCancel={async () => {
               onResults?.({ messageId, results: 'User skipped running the query' })
