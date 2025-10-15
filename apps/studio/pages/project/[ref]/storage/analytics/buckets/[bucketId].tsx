@@ -19,13 +19,12 @@ import {
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import CopyButton from 'components/ui/CopyButton'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useAnalyticsIntegrationInstaller } from 'hooks/useAnalyticsIntegrationInstaller'
 import { DOCS_URL } from 'lib/constants'
 import { Copy, ExternalLink, Eye, EyeOff, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { AnalyticsIntegrationAlert } from 'components/interfaces/Storage/AnalyticsIntegrationAlert'
+import { InlineLink } from 'components/ui/InlineLink'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,
@@ -41,6 +40,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 // TODO:
 // Add dynamic data from /components/interfaces/Storage/AnalyticBucketDetails/index.tsx
@@ -51,7 +51,6 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
   const [showToken, setShowToken] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showNewTableModal, setShowNewTableModal] = useState(false)
-  const { installIntegrations, isLoading: isInstalling } = useAnalyticsIntegrationInstaller()
 
   // Temporary mock data
   const mockBucket = {
@@ -204,12 +203,23 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
       >
         <ScaffoldContainer>
           <ScaffoldSection isFullWidth>
-            <AnalyticsIntegrationAlert
-              context="bucket"
-              variant="warning"
-              showInstallButton={true}
-              onInstall={installIntegrations}
-            />
+            <Admonition variant="warning" title="Missing required integration">
+              <p>
+                The Wrappers extension and Iceberg Wrapper integration are required for querying
+                analytics tables.{' '}
+                <InlineLink
+                  href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-foreground-lighter hover:text-foreground transition-colors"
+                >
+                  Learn more
+                </InlineLink>
+              </p>
+              <Button type="warning" className="mt-2" onClick={() => {}}>
+                Install
+              </Button>
+            </Admonition>
 
             <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
               <div>
