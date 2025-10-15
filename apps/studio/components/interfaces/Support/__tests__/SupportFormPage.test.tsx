@@ -93,6 +93,7 @@ vi.mock(import('common'), async (importOriginal) => {
   })
   return {
     ...actual,
+    useFlag: vi.fn().mockReturnValue(true),
     useParams: vi.fn().mockReturnValue({ ref: 'default' }),
     useIsLoggedIn: vi.fn().mockReturnValue(true),
     isFeatureEnabled: vi.fn((feature: any, disabledFeatures: any) => {
