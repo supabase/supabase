@@ -3,7 +3,7 @@ import { isFeatureEnabled } from 'common'
 
 const billingEnabled = isFeatureEnabled('billing:all')
 
-export type ExtendedSupportCategories = SupportCategories | 'Plan_upgrade'
+export type ExtendedSupportCategories = SupportCategories | 'Plan_upgrade' | 'Others'
 
 export const CATEGORY_OPTIONS: {
   value: ExtendedSupportCategories
