@@ -10,7 +10,7 @@
     "build:registry": "rimraf -G public/r/* && tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && shadcn build public/r/registry.json && tsx scripts/clean-registry.ts",
     "build:llms": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-llms-txt.ts",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "content:build": "contentlayer2 build",
     "clean": "rimraf node_modules .next .turbo",
