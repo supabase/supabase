@@ -5,8 +5,7 @@ import { toast } from 'sonner'
 // End of third-party imports
 
 import { gotrueClient } from 'common'
-import { constructHeaders } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
+import { useGenerateAttachmentURLsMutation } from 'data/misc/generate-attachment-urls-mutation'
 import { uuidv4 } from 'lib/helpers'
 import { cn } from 'ui'
 import { createSupportStorageClient } from './support-storage-client'
@@ -40,35 +39,15 @@ const uploadAttachments = async (files: File[]) => {
     })
   )
   const keys = compact(uploadedFiles).map((file) => file.path)
-
-  if (keys.length === 0) return []
-
-  try {
-    const headers = await constructHeaders()
-    const response = await fetch(`${BASE_PATH}/api/generate-attachment-url`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ filenames: keys }),
-    })
-    if (!response.ok) {
-      const status = response.status
-      const message = await response.text()
-      throw new Error(`Failed to generate attachment URLs at endpoint: ${status} ${message}`)
-    }
-    const signedUrls = await response.json()
-    return signedUrls
-  } catch (error) {
-    console.error('[Support Form > uploadAttachments] Failed to generate signed URLs', error)
-    toast.error('Failed to generate attachment URLs')
-    return []
-  }
+  return keys
 }
 
 export function useAttachmentUpload() {
   const uploadButtonRef = useRef<HTMLInputElement>(null)
-
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
+
+  const { mutateAsync: generateAttachmentURLs } = useGenerateAttachmentURLsMutation()
 
   const isFull = uploadedFiles.length >= MAX_ATTACHMENTS
 
@@ -116,8 +95,10 @@ export function useAttachmentUpload() {
   }, [uploadedFiles])
 
   const createAttachments = useCallback(async () => {
-    const attachments = uploadedFiles.length > 0 ? await uploadAttachments(uploadedFiles) : []
-    return attachments
+    const filenames = uploadedFiles.length > 0 ? await uploadAttachments(uploadedFiles) : []
+    const urls = await generateAttachmentURLs({ filenames })
+    return urls
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploadedFiles])
 
   return useMemo(
