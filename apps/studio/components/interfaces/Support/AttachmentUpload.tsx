@@ -12,7 +12,6 @@ import {
 import { toast } from 'sonner'
 // End of third-party imports
 
-import { useFlag } from 'common'
 import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -143,19 +142,6 @@ export function AttachmentUploadDisplay({
   removeFileUpload,
 }: AttachmentUploadDisplayProps) {
   const { profile } = useProfile()
-  const enableUploads = useFlag('supportFormAttachments')
-
-  if (!enableUploads) {
-    return (
-      <div>
-        <h3 className="text-sm text-foreground">Attachments</h3>
-        <p className="text-sm text-foreground-lighter mt-2">
-          Uploads are temporarily disabled. Please reply to the acknowledgement email you will
-          receive with any screenshots you'd like to upload.
-        </p>
-      </div>
-    )
-  }
 
   if (!profile) {
     return (
