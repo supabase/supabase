@@ -7,7 +7,8 @@ export type EntitlementsVariables = {
   slug: string
 }
 
-export type EntitlementConfig = components['schemas']['ListEntitlementsResponse']['entitlements'][0]['config']
+export type EntitlementConfig =
+  components['schemas']['ListEntitlementsResponse']['entitlements'][0]['config']
 export type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][0]
 
 export async function getEntitlements({ slug }: EntitlementsVariables, signal?: AbortSignal) {
