@@ -106,7 +106,6 @@ export const useRealtimeCursors = ({
 
   useEffect(() => {
     const channel = supabase.channel(roomName)
-    channelRef.current = channel
 
     channel
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
@@ -150,18 +149,28 @@ export const useRealtimeCursors = ({
       .subscribe(async (status) => {
         if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
           await channel.track({ key: userId })
-          window.addEventListener('mousemove', handleMouseMove)
+          channelRef.current = channel
         } else {
           setCursors({})
-          window.removeEventListener('mousemove', handleMouseMove)
+          channelRef.current = null
         }
       })
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
       channel.unsubscribe()
+      channelRef.current = null
     }
   }, [])
+
+  useEffect(() => {
+    // Add event listener for mousemove
+    window.addEventListener('mousemove', handleMouseMove)
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [handleMouseMove])
 
   return { cursors }
 }
