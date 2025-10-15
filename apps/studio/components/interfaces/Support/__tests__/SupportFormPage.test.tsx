@@ -82,6 +82,15 @@ vi.mock('sonner', () => ({
 
 vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
+  vi.spyOn((actual as any).gotrueClient, 'getSession').mockResolvedValue({
+    data: {
+      session: {
+        user: {
+          id: '00000000-0000-0000-0000-000000000000',
+        },
+      },
+    },
+  })
   return {
     ...actual,
     useParams: vi.fn().mockReturnValue({ ref: 'default' }),
@@ -212,6 +221,22 @@ const createDeferred = () => {
   return { promise, resolve }
 }
 
+const createMockLocation = (search = '') => {
+  const url = new URL('http://localhost:3000/')
+  url.search = search.startsWith('?') || search === '' ? search : `?${search}`
+  return {
+    href: url.href,
+    origin: url.origin,
+    protocol: url.protocol,
+    host: url.host,
+    hostname: url.hostname,
+    port: url.port,
+    pathname: url.pathname,
+    search: url.search,
+    hash: url.hash,
+  }
+}
+
 const originalUserAgent = window.navigator.userAgent
 
 describe('SupportFormPage', () => {
@@ -228,9 +253,12 @@ describe('SupportFormPage', () => {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       configurable: true,
     })
-
     Object.defineProperty(window, 'location', {
-      value: { search: '' },
+      value: createMockLocation(),
+      writable: true,
+    })
+    Object.defineProperty(window, 'scrollTo', {
+      value: vi.fn(),
       writable: true,
     })
 
@@ -249,7 +277,13 @@ describe('SupportFormPage', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
-      response: mockProjects[0],
+      response: ({ params }) => {
+        const { ref } = params as { ref: string }
+        const project = mockProjects.find((candidate) => candidate.ref === ref)
+        return project
+          ? HttpResponse.json(project)
+          : HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
+      },
     })
 
     addAPIMock({
@@ -327,7 +361,9 @@ describe('SupportFormPage', () => {
 
   test('shows system status: check failed', async () => {
     mswServer.use(
-      http.get(`${API_URL}/platform/status`, () => HttpResponse.json(null, { status: 500 }))
+      http.get(`${API_URL}/platform/status`, () =>
+        HttpResponse.json({ msg: 'Status service unavailable' }, { status: 500 })
+      )
     )
 
     renderSupportFormPage()
@@ -339,7 +375,7 @@ describe('SupportFormPage', () => {
 
   test('loading a URL with a valid project slug prefills the organization and project', async () => {
     Object.defineProperty(window, 'location', {
-      value: { search: '?projectRef=project-3' },
+      value: createMockLocation('?projectRef=project-3'),
       writable: true,
     })
 
@@ -364,10 +400,12 @@ describe('SupportFormPage', () => {
 
   test('loading a URL with an invalid project slug falls back to first organization and project', async () => {
     mswServer.use(
-      http.get(`${API_URL}/platform/projects/:ref`, () => HttpResponse.json(null, { status: 404 }))
+      http.get(`${API_URL}/platform/projects/:ref`, () =>
+        HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
+      )
     )
     Object.defineProperty(window, 'location', {
-      value: { search: '?projectRef=project-nonexistent' },
+      value: createMockLocation('?projectRef=project-nonexistent'),
       writable: true,
     })
 
@@ -382,7 +420,7 @@ describe('SupportFormPage', () => {
   test('loading a URL with a message prefills the message field', async () => {
     const testMessage = 'This is a test support message from URL'
     Object.defineProperty(window, 'location', {
-      value: { search: `?message=${encodeURIComponent(testMessage)}` },
+      value: createMockLocation(`?message=${encodeURIComponent(testMessage)}`),
       writable: true,
     })
 
@@ -396,7 +434,7 @@ describe('SupportFormPage', () => {
   test('loading a URL with a subject prefills the subject field', async () => {
     const testSubject = 'Test Subject'
     Object.defineProperty(window, 'location', {
-      value: { search: `?subject=${encodeURIComponent(testSubject)}` },
+      value: createMockLocation(`?subject=${encodeURIComponent(testSubject)}`),
       writable: true,
     })
 
@@ -411,7 +449,7 @@ describe('SupportFormPage', () => {
   test('loading a URL with a category prefills the category field', async () => {
     const testCategory = 'Problem'
     Object.defineProperty(window, 'location', {
-      value: { search: `?category=${encodeURIComponent(testCategory)}` },
+      value: createMockLocation(`?category=${encodeURIComponent(testCategory)}`),
       writable: true,
     })
 
@@ -425,7 +463,7 @@ describe('SupportFormPage', () => {
   test('loading a URL with a category prefills the category field (case-insensitive)', async () => {
     const testCategory = 'dashboard_bug'
     Object.defineProperty(window, 'location', {
-      value: { search: `?category=${encodeURIComponent(testCategory)}` },
+      value: createMockLocation(`?category=${encodeURIComponent(testCategory)}`),
       writable: true,
     })
 
@@ -439,7 +477,7 @@ describe('SupportFormPage', () => {
   test('loading a URL with an invalid category gracefully falls back', async () => {
     const testCategory = 'Invalid'
     Object.defineProperty(window, 'location', {
-      value: { search: `?category=${encodeURIComponent(testCategory)}` },
+      value: createMockLocation(`?category=${encodeURIComponent(testCategory)}`),
       writable: true,
     })
 
@@ -454,9 +492,9 @@ describe('SupportFormPage', () => {
     const testCategory = 'Problem'
     const testSubject = 'Test Subject'
     Object.defineProperty(window, 'location', {
-      value: {
-        search: `?category=${encodeURIComponent(testCategory)}&subject=${encodeURIComponent(testSubject)}`,
-      },
+      value: createMockLocation(
+        `?category=${encodeURIComponent(testCategory)}&subject=${encodeURIComponent(testSubject)}`
+      ),
       writable: true,
     })
 
@@ -482,7 +520,7 @@ describe('SupportFormPage', () => {
     })
 
     Object.defineProperty(window, 'location', {
-      value: { search: `?sid=${encodeURIComponent(sentryIssueId)}` },
+      value: createMockLocation(`?sid=${encodeURIComponent(sentryIssueId)}`),
       writable: true,
     })
 
@@ -524,7 +562,7 @@ describe('SupportFormPage', () => {
     })
 
     Object.defineProperty(window, 'location', {
-      value: { search: `?error=${encodeURIComponent(initialError)}` },
+      value: createMockLocation(`?error=${encodeURIComponent(initialError)}`),
       writable: true,
     })
 
@@ -761,12 +799,14 @@ describe('SupportFormPage', () => {
       response: ({ params }) => {
         const { ref } = params as { ref: string }
         const project = mockProjects.find((candidate) => candidate.ref === ref)
-        return project ? HttpResponse.json(project) : HttpResponse.json(null, { status: 404 })
+        return project
+          ? HttpResponse.json(project)
+          : HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
       },
     })
 
     Object.defineProperty(window, 'location', {
-      value: { search: '?projectRef=project-3&error=Connection timeout detected' },
+      value: createMockLocation('?projectRef=project-3&error=Connection timeout detected'),
       writable: true,
     })
 
@@ -1082,19 +1122,18 @@ describe('SupportFormPage', () => {
             data: { Id: path, Key: path, path },
             error: null,
           })),
-          createSignedUrls: vi.fn(async (paths: Array<string>) => ({
-            data: paths.map((path, idx) => ({
-              signedUrl: signedUrls[idx] || `https://storage.example.com/signed/${path}`,
-              path,
-              error: null,
-            })),
-            error: null,
-          })),
         })),
       },
     }
-
     vi.mocked(createSupportStorageClient).mockReturnValue(mockStorageClient as any)
+
+    mswServer.use(
+      http.post('http://localhost:3000/api/generate-attachment-url', async ({ request }) => {
+        const { filenames } = (await request.json()) as { filenames: string[] }
+        const urls = filenames.map((_, index) => signedUrls[index] ?? '')
+        return HttpResponse.json(urls)
+      })
+    )
 
     addAPIMock({
       method: 'post',
@@ -1257,7 +1296,7 @@ describe('SupportFormPage', () => {
       organizationSlug: NO_ORG_MARKER,
       library: '',
       affectedServices: '',
-      allowSupportAccess: false,
+      allowSupportAccess: true,
       verified: true,
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',

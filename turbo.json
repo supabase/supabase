@@ -112,7 +112,9 @@
         "VERCEL_URL",
         "IS_THROTTLED",
         "AI_PRO_MODEL",
-        "AI_NORMAL_MODEL"
+        "AI_NORMAL_MODEL",
+        "SUPPORT_SUPABASE_SECRET_KEY",
+        "NIMBUS_PROD_PROJECTS_URL"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]

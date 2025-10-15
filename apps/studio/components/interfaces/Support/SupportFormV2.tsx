@@ -1,4 +1,4 @@
-import type { Dispatch, MouseEventHandler } from 'react'
+import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
@@ -11,8 +11,8 @@ import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { DialogSectionSeparator, Form_Shadcn_, Separator } from 'ui'
 import {
-  CATEGORIES_WITHOUT_AFFECTED_SERVICES,
   AffectedServicesSelector,
+  CATEGORIES_WITHOUT_AFFECTED_SERVICES,
 } from './AffectedServicesSelector'
 import { AttachmentUploadDisplay, useAttachmentUpload } from './AttachmentUpload'
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
@@ -72,7 +72,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (values) => {
     dispatch({ type: 'SUBMIT' })
-    const attachments = await attachmentUpload.createAttachments(projectRef)
+    const attachments = await attachmentUpload.createAttachments()
 
     const selectedLibrary = values.library
       ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
