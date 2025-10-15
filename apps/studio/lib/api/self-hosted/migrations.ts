@@ -34,7 +34,7 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
     -- track statements in history table
     insert into supabase_migrations.schema_migrations (version, name, statements)
     values (
-      to_char(current_timestamp, 'YYYYMMDDHHMISS'),
+      to_char(current_timestamp, 'YYYYMMDDHH24MISS'),
       ${quote(name)},
       array[${quote(query)}]
     );
