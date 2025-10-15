@@ -239,7 +239,6 @@ export const createAiAssistantState = (): AiAssistantState => {
 
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
-    model: initialState.model,
 
     resetAiAssistantPanel: () => {
       Object.assign(state, INITIAL_AI_ASSISTANT)
