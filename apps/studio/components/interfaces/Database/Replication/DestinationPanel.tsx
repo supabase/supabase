@@ -123,20 +123,24 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const defaultValues = useMemo(
-    () => ({
+  const defaultValues = useMemo(() => {
+    const bigQueryConfig =
+      destinationData && 'big_query' in destinationData.config
+        ? destinationData?.config.big_query
+        : null
+
+    return {
       type: TypeEnum.enum.BigQuery,
       name: destinationData?.name ?? '',
-      projectId: destinationData?.config?.big_query?.project_id ?? '',
-      datasetId: destinationData?.config?.big_query?.dataset_id ?? '',
+      projectId: bigQueryConfig?.project_id ?? '',
+      datasetId: bigQueryConfig?.dataset_id ?? '',
       // For now, the password will always be set as empty for security reasons.
-      serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
+      serviceAccountKey: bigQueryConfig?.service_account_key ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
-      maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
-    }),
-    [destinationData, pipelineData]
-  )
+      maxStalenessMins: bigQueryConfig?.max_staleness_mins,
+    }
+  }, [destinationData, pipelineData])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',

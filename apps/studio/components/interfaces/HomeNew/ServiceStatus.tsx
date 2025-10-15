@@ -37,16 +37,17 @@ const StatusMessage = ({
   status,
   isLoading,
   isHealthy,
+  isProjectNew,
 }: {
   isLoading: boolean
   isHealthy: boolean
+  isProjectNew: boolean
   status?: ProjectServiceStatus
 }) => {
-  if (isHealthy) return 'Healthy'
+  if (isHealthy || status === 'ACTIVE_HEALTHY') return 'Healthy'
   if (isLoading) return 'Checking status'
   if (status === 'UNHEALTHY') return 'Unhealthy'
-  if (status === 'COMING_UP') return 'Coming up...'
-  if (status === 'ACTIVE_HEALTHY') return 'Healthy'
+  if (isProjectNew || status === 'COMING_UP') return 'Coming up...'
   if (status) return status
   return 'Unable to connect'
 }
@@ -62,17 +63,16 @@ const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
 const StatusIcon = ({
   isLoading,
   isHealthy,
+  isProjectNew,
   projectStatus,
 }: {
   isLoading: boolean
   isHealthy: boolean
+  isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
-  if (isHealthy) return <CheckIcon />
-  if (isLoading) return <LoaderIcon />
-  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
-  if (projectStatus === 'COMING_UP') return <LoaderIcon />
-  if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (isHealthy || projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (isLoading || isProjectNew || projectStatus === 'COMING_UP') return <LoaderIcon />
   return <AlertIcon />
 }
 
@@ -242,15 +242,23 @@ export const ServiceStatus = () => {
   const isLoadingChecks = services.some((service) => service.isLoading)
   const allServicesOperational = services.every((service) => service.isHealthy)
 
+  // Check if project or branch is in a startup state
+  const isProjectNew =
+    project?.status === 'COMING_UP' ||
+    (isBranch &&
+      (currentBranch?.status === 'CREATING_PROJECT' ||
+        currentBranch?.status === 'RUNNING_MIGRATIONS' ||
+        isMigrationLoading))
+
   const anyUnhealthy = services.some(
     (service) => !service.isHealthy && service.status !== 'COMING_UP'
   )
   const anyComingUp = services.some((service) => service.status === 'COMING_UP')
   const overallStatusLabel = isLoadingChecks
     ? 'Checking...'
-    : anyUnhealthy
+    : anyUnhealthy && !isProjectNew
       ? 'Unhealthy'
-      : anyComingUp || isMigrationLoading
+      : anyComingUp || isMigrationLoading || (isProjectNew && !allServicesOperational)
         ? 'Coming up...'
         : 'Healthy'
 
@@ -265,7 +273,9 @@ export const ServiceStatus = () => {
                   key={`${service.name}-${index}`}
                   className={cn(
                     'w-1.5 h-1.5 rounded-full',
-                    service.isLoading || service.status === 'COMING_UP'
+                    service.isLoading ||
+                      service.status === 'COMING_UP' ||
+                      (isProjectNew && !service.isHealthy)
                       ? 'bg-foreground-lighter animate-pulse'
                       : service.isHealthy
                         ? 'bg-brand'
@@ -290,6 +300,7 @@ export const ServiceStatus = () => {
               <StatusIcon
                 isLoading={service.isLoading}
                 isHealthy={!!service.isHealthy}
+                isProjectNew={isProjectNew}
                 projectStatus={service.status}
               />
               <div className="flex-1">
@@ -298,6 +309,7 @@ export const ServiceStatus = () => {
                   <StatusMessage
                     isLoading={service.isLoading}
                     isHealthy={!!service.isHealthy}
+                    isProjectNew={isProjectNew}
                     status={service.status}
                   />
                 </p>

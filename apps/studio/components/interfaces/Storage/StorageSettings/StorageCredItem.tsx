@@ -10,6 +10,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
 } from 'ui'
 
 export const StorageCredItem = ({
@@ -45,20 +47,20 @@ export const StorageCredItem = ({
   }
 
   return (
-    <tr className="h-8 text-ellipsis group">
-      <td>
+    <TableRow className="h-8 text-ellipsis group">
+      <TableCell>
         <span className="text-foreground">{description}</span>
-      </td>
-      <td>
+      </TableCell>
+      <TableCell>
         <div className="flex items-center justify-between">
           <span className="text-ellipsis font-mono cursor-default">{access_key}</span>
           <span className="w-24 text-right opacity-0 group-hover:opacity-100 transition-opacity">
             <CopyButton text={access_key} type="default" />
           </span>
         </div>
-      </td>
-      <td>{daysSince(created_at)}</td>
-      <td className="text-right">
+      </TableCell>
+      <TableCell className="text-foreground-lighter">{daysSince(created_at)}</TableCell>
+      <TableCell className="text-right">
         {canRemoveAccessKey && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -82,7 +84,7 @@ export const StorageCredItem = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   )
 }

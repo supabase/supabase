@@ -6,12 +6,8 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
-import { useAnalyticsIntegrationInstaller } from 'hooks/useAnalyticsIntegrationInstaller'
-import { IS_PLATFORM } from 'lib/constants'
 import {
-  Badge,
   Button,
   Card,
   DropdownMenu,
@@ -27,7 +23,6 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { AnalyticsIntegrationAlert } from './AnalyticsIntegrationAlert'
 import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
 import { DeleteBucketModal } from './DeleteBucketModal'
 import { EmptyBucketState } from './EmptyBucketState'
@@ -40,9 +35,7 @@ export const AnalyticsBuckets = () => {
   const [selectedBucket, setSelectedBucket] = useState<Bucket>()
   const [filterString, setFilterString] = useState('')
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
-  const { installIntegrations, isLoading: isInstalling } = useAnalyticsIntegrationInstaller()
 
   const analyticsBuckets = buckets
     .filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS')
@@ -52,7 +45,6 @@ export const AnalyticsBuckets = () => {
         : bucket.name.toLowerCase().includes(filterString.toLowerCase())
     )
 
-  // Placeholder component - will be implemented in a later PR
   return (
     <>
       {!isLoadingBuckets &&
@@ -62,12 +54,6 @@ export const AnalyticsBuckets = () => {
       ) : (
         // Override the default first:pt-12 to match other storage types
         <ScaffoldSection isFullWidth className="gap-y-4 first:pt-8">
-          <AnalyticsIntegrationAlert
-            context="page"
-            variant="warning"
-            showInstallButton={true}
-            onInstall={installIntegrations}
-          />
           <ScaffoldHeader className="py-0">
             <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
           </ScaffoldHeader>
@@ -125,10 +111,10 @@ export const AnalyticsBuckets = () => {
                       </TableCell>
 
                       <TableCell>
-                        <p>
+                        <p className="text-foreground-light">
                           <TimestampInfo
                             utcTimestamp={bucket.created_at}
-                            className="text-sm text-foreground-lighter"
+                            className="text-sm text-foreground-light"
                           />
                         </p>
                       </TableCell>
@@ -178,13 +164,11 @@ export const AnalyticsBuckets = () => {
       )}
 
       {selectedBucket && (
-        <>
-          <DeleteBucketModal
-            visible={modal === `delete`}
-            bucket={selectedBucket}
-            onClose={() => setModal(null)}
-          />
-        </>
+        <DeleteBucketModal
+          visible={modal === `delete`}
+          bucket={selectedBucket}
+          onClose={() => setModal(null)}
+        />
       )}
     </>
   )

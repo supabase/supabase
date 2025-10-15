@@ -43,16 +43,39 @@ export const AUTH_COMBINED_QUERY = () => `
   select 'signUpCount' as metric, 
     cast(count(case when action = 'user_signedup' then 1 else null end) as float64)
   from base
-  
+
   union all
-  select 'signInLatency' as metric, 
-    coalesce(round(avg(case when action = 'login' then duration_ns else null end) / 1000000, 2), 0)
-  from base
-  
+  select 'apiTotalRequests' as metric,
+    cast(count(*) as float64) as value
+  from edge_logs
+    cross join unnest(metadata) as m
+    cross join unnest(m.request) as request
+    cross join unnest(m.response) as response
+    cross join unnest(response.headers) as h
+  where path like '%auth/v1%'
+
   union all
-  select 'signUpLatency' as metric, 
-    coalesce(round(avg(case when action = 'user_signedup' then duration_ns else null end) / 1000000, 2), 0)
-  from base
+  select 'apiErrorRequests' as metric,
+    cast(count(*) as float64) as value
+  from edge_logs
+    cross join unnest(metadata) as m
+    cross join unnest(m.request) as request
+    cross join unnest(m.response) as response
+    cross join unnest(response.headers) as h
+  where path like '%auth/v1%'
+    and response.status_code >= 400 and response.status_code <= 599
+
+  union all
+  select 'authErrorRequests' as metric,
+    cast(count(*) as float64) as value
+  from edge_logs
+    cross join unnest(metadata) as m
+    cross join unnest(m.request) as request
+    cross join unnest(m.response) as response
+    cross join unnest(response.headers) as h
+  where path like '%auth/v1%'
+    and response.status_code >= 400 and response.status_code <= 599
+    and h.x_sb_error_code is not null
 `
 
 export const fetchAllAuthMetrics = async (projectRef: string, period: 'current' | 'previous') => {
@@ -66,22 +89,31 @@ export const fetchAllAuthMetrics = async (projectRef: string, period: 'current' 
 export const processAllAuthMetrics = (currentData: any[], previousData: any[]) => {
   const processData = (data: any[]) => {
     if (!data || !Array.isArray(data)) {
-      return { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 }
+      return { activeUsers: 0, signUps: 0, apiErrorRate: 0, authErrorRate: 0 }
     }
 
     const result = data.reduce(
       (acc, row) => {
         const { metric, value } = row
         if (metric === 'activeUsers') acc.activeUsers = value || 0
-        if (metric === 'passwordResetRequests') acc.passwordResets = value || 0
-        if (metric === 'signInLatency') acc.signInLatency = value || 0
-        if (metric === 'signUpLatency') acc.signUpLatency = value || 0
+        if (metric === 'signUpCount') acc.signUps = value || 0
+        if (metric === 'apiTotalRequests') acc._apiTotal = value || 0
+        if (metric === 'apiErrorRequests') acc._apiErrors = value || 0
+        if (metric === 'authErrorRequests') acc._authErrors = value || 0
         return acc
       },
-      { activeUsers: 0, passwordResets: 0, signInLatency: 0, signUpLatency: 0 }
+      { activeUsers: 0, signUps: 0, _apiTotal: 0, _apiErrors: 0, _authErrors: 0 } as any
     )
 
-    return result
+    const apiErrorRate = result._apiTotal > 0 ? (result._apiErrors / result._apiTotal) * 100 : 0
+    const authErrorRate = result._apiTotal > 0 ? (result._authErrors / result._apiTotal) * 100 : 0
+
+    return {
+      activeUsers: result.activeUsers,
+      signUps: result.signUps,
+      apiErrorRate,
+      authErrorRate,
+    }
   }
 
   return {

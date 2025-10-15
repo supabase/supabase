@@ -39,8 +39,12 @@ export const UpdateRolesConfirmationModal = ({
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: organization } = useSelectedOrganizationQuery()
+
   const { data: allRoles } = useOrganizationRolesV2Query({ slug: organization?.slug })
-  const { data } = useProjectsQuery()
+  const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
+
+  // [Joshen] We only need this data if the org has project scoped roles
+  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
   const projects = data?.projects ?? []
 
   // [Joshen] Separate saving state instead of using RQ due to several successive steps

@@ -33,9 +33,7 @@ const PageLayout: NextPageWithLayout = () => {
         ) : (
           <StorageExplorer bucket={bucket} />
         )
-      ) : (
-        <div />
-      )}
+      ) : null}
     </div>
   )
 }
