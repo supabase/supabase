@@ -4,6 +4,7 @@ import type { ComponentProps } from 'react'
 import { isFeatureEnabled } from 'common/enabled-features'
 import type { IconPanel } from 'ui-patterns/IconPanel'
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
+import { url } from 'inspector'
 
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
@@ -2617,8 +2618,14 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/metrics' as `/${string}`,
         },
         {
-          name: 'Sentry integration',
-          url: '/guides/telemetry/sentry-monitoring' as `/${string}`,
+          name: 'Integrations',
+          url: undefined,
+          items: [
+            {
+              name: 'Sentry integration',
+              url: '/guides/telemetry/sentry-monitoring' as `/${string}`,
+            },
+          ],
         },
       ],
     },
