@@ -3,7 +3,7 @@ import type { Block, ViewState } from './types'
 import { useTheme } from 'next-themes'
 
 type CursorData = {
-  position: { x: number; y: number }
+  gridPosition: { x: number; y: number }
   user: { id: number; name: string }
   color: string
 }
@@ -15,7 +15,7 @@ interface PixelCanvasProps {
   canPlaceBlock: (x: number, y: number, z: number) => boolean
   cursors?: Record<string, CursorData>
   onViewStateChange?: (viewState: ViewState) => void
-  onMouseMove?: (canvasX: number, canvasY: number) => void
+  onMouseMove?: (canvasX: number, canvasY: number, gridX: number, gridY: number) => void
   canvasRef?: React.MutableRefObject<HTMLCanvasElement | null>
 }
 
@@ -178,53 +178,75 @@ export const PixelCanvas = ({
 
     ctx.restore()
 
+    const pointerPath = new Path2D(
+      'M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z'
+    )
+
     // Draw cursors (outside the transformed context)
     Object.values(cursors).forEach((cursor) => {
-      const { position, color, user } = cursor
+      const { gridPosition, color, user } = cursor
+      const cellX = gridPosition.x
+      const cellY = gridPosition.y
 
-      // Convert canvas-relative position to screen position
-      const screenX = width / 2 + viewState.offsetX + position.x * viewState.scale
-      const screenY = height / 2 + viewState.offsetY + position.y * viewState.scale
+      const cellScreenX = width / 2 + viewState.offsetX + cellX * CELL_SIZE * viewState.scale
+      const cellScreenY = height / 2 + viewState.offsetY + cellY * CELL_SIZE * viewState.scale
+      const cellScreenSize = CELL_SIZE * viewState.scale
 
-      // Scale cursor based on zoom (but don't let it get too small)
-      const cursorScale = Math.max(0.5, Math.min(2, viewState.scale))
-      const cursorSize = 30 * cursorScale
-
-      // Draw cursor arrow (simplified version)
+      // Highlight the remote hovered cell
       ctx.save()
-      ctx.translate(screenX, screenY)
-      ctx.scale(cursorScale, cursorScale)
-
-      // Draw cursor pointer shape
       ctx.fillStyle = color
-      ctx.beginPath()
-      ctx.moveTo(0, 0)
-      ctx.lineTo(0, 20)
-      ctx.lineTo(5, 15)
-      ctx.lineTo(10, 25)
-      ctx.lineTo(13, 22)
-      ctx.lineTo(8, 12)
-      ctx.lineTo(15, 10)
-      ctx.closePath()
-      ctx.fill()
+      ctx.globalAlpha = 0.25
+      ctx.fillRect(cellScreenX, cellScreenY, cellScreenSize, cellScreenSize)
+      ctx.restore()
 
-      // Draw outline
+      ctx.save()
+      ctx.strokeStyle = color
+      ctx.lineWidth = Math.max(1, Math.min(2.5, viewState.scale))
+      ctx.strokeRect(cellScreenX, cellScreenY, cellScreenSize, cellScreenSize)
+      ctx.restore()
+
+      // Position the cursor so its top-left aligns with the cell center
+      const pointerX = cellScreenX + cellScreenSize / 2
+      const pointerY = cellScreenY + cellScreenSize / 2
+
+      // Scale cursor relative to the current zoom while keeping it legible
+      const basePointerHeight = 24
+      const desiredPointerHeight = Math.min(42, Math.max(16, cellScreenSize * 2.2))
+      const cursorScale = desiredPointerHeight / basePointerHeight
+
+      // Draw cursor pointer using SVG path
+      ctx.save()
+      ctx.translate(pointerX, pointerY)
+      ctx.scale(cursorScale, cursorScale)
+      ctx.translate(-4.037, -4.688)
+
+      ctx.fillStyle = color
+      ctx.fill(pointerPath)
+
       ctx.strokeStyle = 'white'
       ctx.lineWidth = 1.5
-      ctx.stroke()
-
-      // Draw name label
-      ctx.fillStyle = color
-      const nameText = user.name
-      ctx.font = '12px Inter, sans-serif'
-      const textWidth = ctx.measureText(nameText).width
-      const padding = 4
-
-      ctx.fillRect(18, 2, textWidth + padding * 2, 18)
-      ctx.fillStyle = 'white'
-      ctx.fillText(nameText, 18 + padding, 14)
+      ctx.stroke(pointerPath)
 
       ctx.restore()
+
+      // Render label without scaling distortion
+      const nameText = user.name
+      const labelPadding = 4
+      const labelHeight = 18
+      const labelOffsetX = 20 * cursorScale
+      const labelOffsetY = 4 * cursorScale
+
+      ctx.font = '12px Inter, sans-serif'
+      const textWidth = ctx.measureText(nameText).width
+      ctx.fillStyle = color
+      ctx.fillRect(
+        pointerX + labelOffsetX,
+        pointerY + labelOffsetY,
+        textWidth + labelPadding * 2,
+        labelHeight
+      )
+      ctx.fillStyle = 'white'
+      ctx.fillText(nameText, pointerX + labelOffsetX + labelPadding, pointerY + labelOffsetY + 12)
     })
   }, [viewState, blocks, hoveredCell, canPlaceBlock, cursors])
 
@@ -268,11 +290,6 @@ export const PixelCanvas = ({
     const canvasX = e.clientX - rect.left
     const canvasY = e.clientY - rect.top
 
-    // Report canvas-relative position for cursor broadcasting
-    if (onMouseMove) {
-      onMouseMove(canvasX, canvasY)
-    }
-
     const [gridX, gridY] = screenToGrid(e.clientX, e.clientY)
     const topZ = getTopBlockZ(gridX, gridY)
     const nextZ = topZ + 1
@@ -286,6 +303,11 @@ export const PixelCanvas = ({
         offsetX: e.clientX - dragStart.x,
         offsetY: e.clientY - dragStart.y,
       }))
+    }
+
+    // Report canvas-relative and grid positions for cursor broadcasting
+    if (onMouseMove) {
+      onMouseMove(canvasX, canvasY, gridX, gridY)
     }
   }
 

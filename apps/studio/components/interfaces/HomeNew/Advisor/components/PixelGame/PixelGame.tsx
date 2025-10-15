@@ -36,11 +36,12 @@ export const PixelGame = ({ availableResources, onExit }: PixelGameProps) => {
   const [selectedColor, setSelectedColor] = useState(COLORS[0].value)
   const { gameState, isLoading, isAuthenticated, canPlaceBlock } = usePixelGameState(projectRef!)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const onMouseMoveRef = useRef<((canvasX: number, canvasY: number) => void) | undefined>()
+  const onMouseMoveRef =
+    useRef<((canvasX: number, canvasY: number, gridX: number, gridY: number) => void) | undefined>()
 
-  const handleCanvasMouseMove = (canvasX: number, canvasY: number) => {
+  const handleCanvasMouseMove = (canvasX: number, canvasY: number, gridX: number, gridY: number) => {
     if (onMouseMoveRef.current) {
-      onMouseMoveRef.current(canvasX, canvasY)
+      onMouseMoveRef.current(canvasX, canvasY, gridX, gridY)
     }
   }
 

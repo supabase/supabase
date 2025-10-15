@@ -44,7 +44,11 @@ const generateRandomNumber = () => Math.floor(Math.random() * 100)
 const EVENT_NAME = 'realtime-cursor-move'
 
 type CursorEventPayload = {
-  position: {
+  canvasPosition: {
+    x: number
+    y: number
+  }
+  gridPosition: {
     x: number
     y: number
   }
@@ -67,7 +71,9 @@ export const useRealtimeCursors = ({
   username: string
   throttleMs: number
   canvasRef: React.MutableRefObject<HTMLCanvasElement | null>
-  onMouseMoveRef?: React.MutableRefObject<((canvasX: number, canvasY: number) => void) | undefined>
+  onMouseMoveRef?: React.MutableRefObject<
+    ((canvasX: number, canvasY: number, gridX: number, gridY: number) => void) | undefined
+  >
 }) => {
   const [color] = useState(generateRandomColor())
   const [userId] = useState(generateRandomNumber())
@@ -77,7 +83,7 @@ export const useRealtimeCursors = ({
   const lastPositionRef = useRef<{ x: number; y: number } | null>(null)
 
   const callback = useCallback(
-    (canvasX: number, canvasY: number) => {
+    (canvasX: number, canvasY: number, gridX: number, gridY: number) => {
       if (!canvasRef.current) return
 
       const rect = canvasRef.current.getBoundingClientRect()
@@ -90,9 +96,13 @@ export const useRealtimeCursors = ({
       lastPositionRef.current = { x: canvasX, y: canvasY }
 
       const payload: CursorEventPayload = {
-        position: {
+        canvasPosition: {
           x: canvasX,
           y: canvasY,
+        },
+        gridPosition: {
+          x: gridX,
+          y: gridY,
         },
         user: {
           id: userId,
@@ -130,16 +140,10 @@ export const useRealtimeCursors = ({
         // Don't render your own cursor
         if (user.id === userId) return
 
-        setCursors((prev: Record<string, CursorEventPayload>) => {
-          if (prev[userId]) {
-            delete prev[userId]
-          }
-
-          return {
-            ...prev,
-            [user.id]: data.payload,
-          }
-        })
+        setCursors((prev: Record<string, CursorEventPayload>) => ({
+          ...prev,
+          [user.id]: data.payload,
+        }))
       })
       .subscribe()
 
