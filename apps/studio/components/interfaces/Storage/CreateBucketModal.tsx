@@ -53,6 +53,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
+import { BUCKET_TYPES } from './Storage.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 const FormSchema = z
@@ -131,6 +132,8 @@ export const CreateBucketModal = ({
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
+  const config = BUCKET_TYPES['files']
+
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -149,7 +152,7 @@ export const CreateBucketModal = ({
   const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
-  const icebergWrapperExtensionState = useIcebergWrapperExtension()
+  const { state: icebergWrapperExtensionState } = useIcebergWrapperExtension()
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
@@ -264,7 +267,7 @@ export const CreateBucketModal = ({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create storage bucket</DialogTitle>
+          <DialogTitle>Create a {isStorageV2 ? config.singularName : 'storage'} bucket</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -279,8 +282,8 @@ export const CreateBucketModal = ({
                 render={({ field }) => (
                   <FormItemLayout
                     name="name"
-                    label="Name of bucket"
-                    labelOptional="Buckets cannot be renamed once created."
+                    label="Bucket name"
+                    labelOptional="Cannot be changed after creation"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
