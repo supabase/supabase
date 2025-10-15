@@ -139,4 +139,4 @@ const PublicationsComboBox = ({
   )
 }
 
-export default PublicationsComboBox
+export { PublicationsComboBox }

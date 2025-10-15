@@ -171,4 +171,4 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
   )
 }
 
-export default NewPublicationPanel
+export { NewPublicationPanel }
