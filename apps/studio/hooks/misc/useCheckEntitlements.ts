@@ -1,6 +1,7 @@
 import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
 import { useMemo } from 'react'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
+import type { EntitlementConfig } from 'data/entitlements/entitlements-query'
 
 export function useCheckEntitlements(
   featureKey: string,
@@ -23,32 +24,32 @@ export function useCheckEntitlements(
   const enabled = options?.enabled !== false && !!finalOrgSlug
 
   const {
-    data: allEntitlements,
+    data: entitlementsData,
     isLoading: isLoadingEntitlements,
     isSuccess: isSuccessEntitlements,
   } = useEntitlementsQuery({ slug: finalOrgSlug! }, { enabled })
 
-  const { hasAccess, entitlementValue } = useMemo((): {
+  const { hasAccess, entitlementConfig } = useMemo((): {
     hasAccess: boolean
-    entitlementValue: number | null
+    entitlementConfig: EntitlementConfig
   } => {
     // If no organization slug, no access
-    if (!finalOrgSlug) return { hasAccess: false, entitlementValue: null }
+    if (!finalOrgSlug) return { hasAccess: false, entitlementConfig: { enabled: false } }
 
-    const entitlement = allEntitlements?.find(
+    const entitlement = entitlementsData?.entitlements.find(
       (entitlement) => entitlement.feature.key === featureKey
     )
-    const entitlementValue = entitlement?.value ?? null
+    const entitlementConfig = entitlement?.config ?? { enabled: false }
 
-    if (!entitlement) return { hasAccess: false, entitlementValue: null }
+    if (!entitlement) return { hasAccess: false, entitlementConfig: { enabled: false } }
 
-    return { hasAccess: entitlement.hasAccess, entitlementValue }
-  }, [allEntitlements, featureKey, finalOrgSlug])
+    return { hasAccess: entitlement.hasAccess, entitlementConfig }
+  }, [entitlementsData, featureKey, finalOrgSlug])
 
   const isLoading = shouldGetSelectedOrg ? isLoadingSelectedOrg : isLoadingEntitlements
   const isSuccess = shouldGetSelectedOrg
     ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
 
-  return { hasAccess, entitlementValue, isLoading, isSuccess }
+  return { hasAccess, entitlementConfig, isLoading, isSuccess }
 }
