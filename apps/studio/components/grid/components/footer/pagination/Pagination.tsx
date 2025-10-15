@@ -1,12 +1,14 @@
 import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
-import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableSort } from 'components/grid/hooks/useTableSort'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTable } from 'data/table-editor/table-editor-types'
+import { isForeignTable, isTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -24,37 +26,54 @@ const rowsPerPageOptions = [
   { value: 1000, label: '1000 rows' },
 ]
 
-const Pagination = () => {
+const RowCountSelector = ({
+  onRowsPerPageChange,
+}: {
+  onRowsPerPageChange: (value: number | string) => void
+}) => {
+  const tableEditorSnap = useTableEditorStateSnapshot()
+
+  return (
+    <DropdownControl
+      options={rowsPerPageOptions}
+      onSelect={onRowsPerPageChange}
+      side="top"
+      align="start"
+    >
+      <Button asChild type="outline" style={{ padding: '3px 10px' }}>
+        <span>{`${tableEditorSnap.rowsPerPage} rows`}</span>
+      </Button>
+    </DropdownControl>
+  )
+}
+
+export const Pagination = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
+
+  const { sorts } = useTableSort()
+  const { filters } = useTableFilter()
 
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
+  const isForeignTableSelected = isForeignTable(selectedTable)
 
+  const page = snap.page
   // rowsCountEstimate is only applicable to table entities
   const rowsCountEstimate = isTable(selectedTable) ? selectedTable.live_rows_estimate : null
 
-  const { filters } = useTableFilter()
-  const page = snap.page
-
-  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const [value, setValue] = useState<string>(page.toString())
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
-
-  const [value, setValue] = useState<string>(page.toString())
-
-  // keep input value in-sync with actual page
-  useEffect(() => {
-    setValue(String(page))
-  }, [page])
 
   const { data, isLoading, isSuccess, isError, isFetching, error } = useTableRowsCountQuery(
     {
@@ -67,13 +86,32 @@ const Pagination = () => {
     },
     {
       keepPreviousData: true,
+      enabled: !isForeignTableSelected,
     }
   )
-
   const count = data?.count ?? 0
   const countString = data?.is_estimate ? formatEstimatedCount(count) : count.toLocaleString()
   const maxPages = Math.ceil(count / tableEditorSnap.rowsPerPage)
   const totalPages = count > 0 ? maxPages : 1
+
+  // [Joshen] This is only applicable for foreign tables, as we use the number of rows on the page to determine
+  // if we've reached the last page (and hence disable the next button)
+  const { data: rowsData, isLoading: isLoadingRows } = useTableRowsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      tableId: id,
+      sorts,
+      filters,
+      page: snap.page,
+      limit: tableEditorSnap.rowsPerPage,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+    },
+    {
+      enabled: isForeignTableSelected,
+    }
+  )
+  const isLastPage = (rowsData?.rows ?? []).length < tableEditorSnap.rowsPerPage
 
   const onPreviousPage = () => {
     if (page > 1) {
@@ -123,16 +161,23 @@ const Pagination = () => {
     tableEditorSnap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
   }
 
+  // keep input value in-sync with actual page
   useEffect(() => {
-    if (page && page > totalPages) {
+    setValue(String(page))
+  }, [page])
+
+  useEffect(() => {
+    if (!isForeignTableSelected && page && page > totalPages) {
       snap.setPage(totalPages)
     }
-  }, [page, totalPages])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isForeignTableSelected, page, totalPages])
 
   useEffect(() => {
     if (id !== undefined) {
       snap.setEnforceExactCount(rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   useEffect(() => {
@@ -141,11 +186,60 @@ const Pagination = () => {
     if (isError && snap.enforceExactCount && error?.code === 408) {
       snap.setEnforceExactCount(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError, snap.enforceExactCount, error?.code])
+
+  if (isForeignTableSelected) {
+    return (
+      <div className="flex items-center gap-x-2">
+        <Button
+          aria-label="Previous page"
+          icon={<ArrowLeft />}
+          type="outline"
+          className="px-1.5"
+          disabled={page <= 1}
+          onClick={onPreviousPage}
+        />
+        <p className="text-xs text-foreground-light">Page</p>
+        <Input
+          size="tiny"
+          className="w-10"
+          min={1}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            const parsedValue = Number(value)
+            if (
+              (e.code === 'Enter' || e.code === 'NumpadEnter') &&
+              !Number.isNaN(parsedValue) &&
+              parsedValue >= 1
+            ) {
+              onPageChange(parsedValue)
+            }
+          }}
+        />
+        <Button
+          aria-label="Next page"
+          icon={<ArrowRight />}
+          type="outline"
+          className="px-1.5"
+          disabled={isLastPage}
+          loading={isLoadingRows}
+          onClick={goToNextPage}
+        />
+        <RowCountSelector onRowsPerPageChange={onRowsPerPageChange} />
+      </div>
+    )
+  }
 
   return (
     <div className="flex items-center gap-x-4">
-      {isLoading && <p className="text-sm text-foreground-light">Loading records count...</p>}
+      {isLoading && (
+        <div className="flex items-center gap-x-2">
+          <Loader2 size={12} className="animate-spin" />
+          <p className="text-xs text-foreground-light">Loading records count...</p>
+        </div>
+      )}
 
       {isSuccess && (
         <>
@@ -190,51 +284,44 @@ const Pagination = () => {
               onClick={onNextPage}
             />
 
-            <DropdownControl
-              options={rowsPerPageOptions}
-              onSelect={onRowsPerPageChange}
-              side="top"
-              align="start"
-            >
-              <Button asChild type="outline" style={{ padding: '3px 10px' }}>
-                <span>{`${tableEditorSnap.rowsPerPage} rows`}</span>
-              </Button>
-            </DropdownControl>
+            <RowCountSelector onRowsPerPageChange={onRowsPerPageChange} />
           </div>
 
-          <div className="flex items-center gap-x-2">
-            <p className="text-xs text-foreground-light">
-              {`${countString} ${count === 0 || count > 1 ? `records` : 'record'}`}{' '}
-              {data.is_estimate ? '(estimated)' : ''}
-            </p>
+          {!isForeignTableSelected && (
+            <div className="flex items-center gap-x-2">
+              <p className="text-xs text-foreground-light">
+                {`${countString} ${count === 0 || count > 1 ? `records` : 'record'}`}{' '}
+                {data.is_estimate ? '(estimated)' : ''}
+              </p>
 
-            {data.is_estimate && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="tiny"
-                    type="text"
-                    className="px-1.5"
-                    loading={isFetching}
-                    icon={<HelpCircle />}
-                    onClick={() => {
-                      // Show warning if either NOT a table entity, or table rows estimate is beyond threshold
-                      if (rowsCountEstimate === null || count > THRESHOLD_COUNT) {
-                        setIsConfirmFetchExactCountModalOpen(true)
-                      } else snap.setEnforceExactCount(true)
-                    }}
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="top" className="w-72">
-                  This is an estimated value as your table has more than{' '}
-                  {THRESHOLD_COUNT.toLocaleString()} rows. <br />
-                  <span className="text-brand">
-                    Click to retrieve the exact count of the table.
-                  </span>
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
+              {data.is_estimate && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="tiny"
+                      type="text"
+                      className="px-1.5"
+                      loading={isFetching}
+                      icon={<HelpCircle />}
+                      onClick={() => {
+                        // Show warning if either NOT a table entity, or table rows estimate is beyond threshold
+                        if (rowsCountEstimate === null || count > THRESHOLD_COUNT) {
+                          setIsConfirmFetchExactCountModalOpen(true)
+                        } else snap.setEnforceExactCount(true)
+                      }}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="w-72">
+                    This is an estimated value as your table has more than{' '}
+                    {THRESHOLD_COUNT.toLocaleString()} rows. <br />
+                    <span className="text-brand">
+                      Click to retrieve the exact count of the table.
+                    </span>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          )}
         </>
       )}
 
@@ -294,4 +381,3 @@ const Pagination = () => {
     </div>
   )
 }
-export default Pagination
