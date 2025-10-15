@@ -30,11 +30,23 @@ import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decry
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { snakeCase, uniq } from 'lodash'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
-import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { useMemo, useState } from 'react'
+import {
+  Button,
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { DeleteBucketModal } from '../DeleteBucketModal'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
@@ -43,6 +55,7 @@ import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
+  const [modal, setModal] = useState<'delete' | null>(null)
   const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
 
@@ -138,9 +151,6 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
     <>
       <PageLayout
         title={bucket.name}
-        subtitle={
-          !isStorageV2 ? 'Namespaces and tables connected to this analytics bucket.' : undefined
-        }
         breadcrumbs={
           isStorageV2
             ? [
@@ -180,25 +190,77 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
 
           {state === 'added' && wrapperInstance && (
             <>
-              <ScaffoldSection isFullWidth>
-                <div className="flex flex-col gap-4">
+              {isStorageV2 ? (
+                <ScaffoldSection isFullWidth>
+                  <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
+                    <div>
+                      <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
+                      <ScaffoldSectionDescription>
+                        Analytics tables connected to this bucket.
+                      </ScaffoldSectionDescription>
+                    </div>
+                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
+                      New table
+                    </Button>
+                  </ScaffoldHeader>
+
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-foreground-muted">Name</TableHead>
+                          <TableHead className="text-foreground-muted">Schema</TableHead>
+                          <TableHead className="text-foreground-muted">Created at</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell colSpan={4}>
+                            <p className="text-sm text-foreground">No tables yet</p>
+                            <p className="text-sm text-foreground-lighter">
+                              Create an analytics table to get started
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </ScaffoldSection>
+              ) : (
+                <ScaffoldSection isFullWidth>
+                  <ScaffoldHeader>
+                    <ScaffoldSectionTitle>Namespaces</ScaffoldSectionTitle>
+                    <ScaffoldSectionDescription>
+                      Connected namespaces and tables.
+                    </ScaffoldSectionDescription>
+                  </ScaffoldHeader>
+
                   {isLoadingNamespaces || isFDWsLoading ? (
                     <GenericSkeletonLoader />
                   ) : namespaces.length === 0 ? (
-                    <Card className="flex flex-col px-20 py-16 items-center justify-center space-y-3">
-                      <p className="text-sm text-foreground-light">No namespaces in this bucket</p>
-                      <p className="text-sm text-foreground-lighter">
-                        Create a namespace and add some data{' '}
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-brand underline"
-                          href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
-                        >
-                          {' '}
-                          to get started
-                        </a>
-                      </p>
+                    <Card>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-foreground-muted">Namespace</TableHead>
+                            <TableHead className="text-foreground-muted">Schema</TableHead>
+                            <TableHead className="text-foreground-muted">Tables</TableHead>
+                            <TableHead />
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell colSpan={4}>
+                              <p className="text-sm text-foreground">
+                                No namespaces in this bucket
+                              </p>
+                              <p className="text-sm text-foreground-lighter">
+                                Create a namespace and add some data
+                              </p>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
                     </Card>
                   ) : (
                     <Card>
@@ -229,13 +291,13 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                       </Table>
                     </Card>
                   )}
-                </div>
-              </ScaffoldSection>
+                </ScaffoldSection>
+              )}
 
               <ScaffoldSection isFullWidth>
                 <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
                   <div>
-                    <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
+                    <ScaffoldSectionTitle>Configuration</ScaffoldSectionTitle>
                     <ScaffoldSectionDescription>
                       Connect to this bucket from an Iceberg client.{' '}
                       <InlineLink
@@ -273,8 +335,39 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             </>
           )}
           {state === 'missing' && <WrapperMissing bucketName={bucket.name} />}
+
+          <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
+            <header>
+              <ScaffoldSectionTitle>Manage</ScaffoldSectionTitle>
+            </header>
+            <Card>
+              <CardContent className="flex flex-col md:flex-row md:justify-between gap-y-4 gap-x-8 md:items-center">
+                <div className="flex flex-col">
+                  <h3>Delete bucket</h3>
+                  <p className="text-sm text-foreground-lighter">
+                    This will also delete any data in your bucket. Make sure you have a backup if
+                    you want to keep your data.
+                  </p>
+                </div>
+                <Button
+                  type="danger"
+                  onClick={() => {
+                    setModal('delete')
+                  }}
+                >
+                  Delete bucket
+                </Button>
+              </CardContent>
+            </Card>
+          </ScaffoldSection>
         </ScaffoldContainer>
       </PageLayout>
+
+      <DeleteBucketModal
+        visible={modal === `delete`}
+        bucket={bucket}
+        onClose={() => setModal(null)}
+      />
     </>
   )
 }
