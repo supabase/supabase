@@ -96,7 +96,7 @@ export const Pagination = () => {
 
   // [Joshen] This is only applicable for foreign tables, as we use the number of rows on the page to determine
   // if we've reached the last page (and hence disable the next button)
-  const { data: rowsData } = useTableRowsQuery(
+  const { data: rowsData, isLoading: isLoadingRows } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -224,6 +224,7 @@ export const Pagination = () => {
           type="outline"
           className="px-1.5"
           disabled={isLastPage}
+          loading={isLoadingRows}
           onClick={goToNextPage}
         />
         <RowCountSelector onRowsPerPageChange={onRowsPerPageChange} />
