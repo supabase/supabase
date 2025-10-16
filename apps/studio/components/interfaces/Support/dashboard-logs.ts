@@ -5,7 +5,7 @@ import type {
   GenerateAttachmentURLsData,
   GenerateAttachmentURLsVariables,
 } from 'data/support/generate-attachment-urls-mutation'
-import { getBreadcrumbSnapshot, getMirroredBreadcrumbs } from 'lib/breadcrumbs'
+import { getMirroredBreadcrumbs, getOwnershipOfBreadcrumbSnapshot } from 'lib/breadcrumbs'
 import { uuidv4 } from 'lib/helpers'
 import { sanitizeArrayOfObjects } from 'lib/sanitize'
 import { createSupportStorageClient } from './support-storage-client'
@@ -21,7 +21,7 @@ export const DASHBOARD_LOG_CATEGORIES: ExtendedSupportCategories[] = [
 ]
 
 export const getSanitizedBreadcrumbs = (): unknown[] => {
-  const breadcrumbs = getBreadcrumbSnapshot() ?? getMirroredBreadcrumbs()
+  const breadcrumbs = getOwnershipOfBreadcrumbSnapshot() ?? getMirroredBreadcrumbs()
   return sanitizeArrayOfObjects(breadcrumbs)
 }
 

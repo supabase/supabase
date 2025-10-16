@@ -89,12 +89,13 @@ vi.mock(import('lib/breadcrumbs'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
-    getBreadcrumbSnapshot: vi.fn(),
+    getOwnershipOfBreadcrumbSnapshot: vi.fn(),
   }
 })
 
 let createSupportStorageClientMock: ReturnType<typeof vi.fn>
 let getBreadcrumbSnapshotMock: ReturnType<typeof vi.fn>
+let generateAttachmentUrlSpy: ReturnType<typeof vi.fn>
 
 // Mock sonner toast
 vi.mock('sonner', () => ({
@@ -309,8 +310,32 @@ describe('SupportFormPage', () => {
       },
     } as any)
 
+    generateAttachmentUrlSpy = vi.fn()
+    mswServer.use(
+      http.post('*/rest/v1/rpc/docs_search_fts', async () => {
+        return HttpResponse.json([])
+      }),
+      http.post('*/rest/v1/rpc/docs_search_fts_nimbus', async () => {
+        return HttpResponse.json([])
+      }),
+      http.post('*/functions/v1/search-embeddings', async () => {
+        return HttpResponse.json([])
+      }),
+      http.post('http://localhost:3000/api/generate-attachment-url', async ({ request }) => {
+        const body = (await request.json()) as {
+          bucket?: string
+          filenames?: string[]
+        }
+        generateAttachmentUrlSpy(body)
+        const filenames = body.filenames ?? []
+        return HttpResponse.json(
+          filenames.map((filename) => `https://storage.example.com/signed/${filename}`)
+        )
+      })
+    )
+
     const breadcrumbsModule = await import('lib/breadcrumbs')
-    getBreadcrumbSnapshotMock = vi.mocked(breadcrumbsModule.getBreadcrumbSnapshot)
+    getBreadcrumbSnapshotMock = vi.mocked(breadcrumbsModule.getOwnershipOfBreadcrumbSnapshot)
     getBreadcrumbSnapshotMock.mockReset()
     getBreadcrumbSnapshotMock.mockReturnValue([
       {
@@ -1312,7 +1337,12 @@ describe('SupportFormPage', () => {
     })
 
     expect(upload).toHaveBeenCalledTimes(1)
-    expect(createSignedUrls).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(generateAttachmentUrlSpy).toHaveBeenCalledTimes(1)
+    })
+    expect(generateAttachmentUrlSpy.mock.calls[0]?.[0]).toMatchObject({
+      bucket: 'dashboard-logs',
+    })
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.message).toContain('Navigation menu does not respond after latest deploy')
@@ -1390,7 +1420,7 @@ describe('SupportFormPage', () => {
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.subject).toBe('Cannot access settings')
     expect(payload.message).toContain(
-      `Settings page shows 500 error - updated description\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}\nDashboard logs: https://storage.example.com`
+      `Settings page shows 500 error - updated description\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}`
     )
     expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
 
@@ -1614,7 +1644,7 @@ describe('SupportFormPage', () => {
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
     })
-    const expectedMessage = `I need help accessing my Supabase account\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}\nDashboard logs:/https://storage.example.com`
+    const expectedMessage = `I need help accessing my Supabase account\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}`
     expect(payload.message).toContain(expectedMessage)
     expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
 

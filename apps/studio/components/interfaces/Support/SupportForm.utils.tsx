@@ -133,7 +133,7 @@ export const loadSupportFormInitialParams = createLoader(supportFormUrlState)
 
 const serializeSupportFormInitialParams = createSerializer(supportFormUrlState)
 
-export function createSupportFormUrl(initialParams: SupportFormUrlKeys) {
+export function createSupportFormUrl(initialParams: Partial<SupportFormUrlKeys>) {
   const serializedParams = serializeSupportFormInitialParams(initialParams)
   return `/support/new${serializedParams ?? ''}`
 }

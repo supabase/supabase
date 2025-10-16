@@ -14,6 +14,8 @@ export const takeBreadcrumbSnapshot = (): void => {
   BREADCRUMB_SNAPSHOT = getMirroredBreadcrumbs()
 }
 
-export const getBreadcrumbSnapshot = (): Sentry.Breadcrumb[] | null => {
-  return BREADCRUMB_SNAPSHOT
+export const getOwnershipOfBreadcrumbSnapshot = (): Sentry.Breadcrumb[] | null => {
+  const snapshot = BREADCRUMB_SNAPSHOT
+  BREADCRUMB_SNAPSHOT = null
+  return snapshot
 }

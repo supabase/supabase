@@ -10,11 +10,12 @@ import {
   Minimize2,
   Settings,
 } from 'lucide-react'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -108,13 +109,16 @@ const UpgradingState = () => {
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
                   <Button asChild type="default">
-                    <Link
-                      href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                      target="_blank"
-                      rel="noreferrer"
+                    <SupportLink
+                      queryParams={{
+                        category: SupportCategories.DATABASE_UNRESPONSIVE,
+                        projectRef: ref,
+                        subject,
+                        message,
+                      }}
                     >
                       Contact support
-                    </Link>
+                    </SupportLink>
                   </Button>
                   <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
                     Return to project

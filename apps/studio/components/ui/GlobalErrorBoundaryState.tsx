@@ -3,6 +3,8 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -153,13 +155,16 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
         >
           {!isRemoveChildError && !isInsertBeforeError && (
             <Button asChild type="default" icon={<ExternalLink />}>
-              <Link
-                target="_blank"
-                rel="noopenner noreferrer"
-                href={`/support/new?category=dashboard_bug${sentryIssueId ? `&sid=${sentryIssueId}` : ''}&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}`}
+              <SupportLink
+                queryParams={{
+                  category: SupportCategories.DASHBOARD_BUG,
+                  subject: 'Client side exception occurred on dashboard',
+                  sid: sentryIssueId,
+                  message: urlMessage,
+                }}
               >
                 Contact support
-              </Link>
+              </SupportLink>
             </Button>
           )}
 
@@ -176,14 +181,17 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
           )}
 
           {(isRemoveChildError || isInsertBeforeError) && (
-            <Link
-              target="_blank"
-              rel="noopenner noreferrer"
+            <SupportLink
               className="text-center text-xs text-foreground-lighter hover:text-foreground-light transition"
-              href={`/support/new?category=dashboard_bug${sentryIssueId ? `&sid=${sentryIssueId}` : ''}&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}`}
+              queryParams={{
+                category: SupportCategories.DASHBOARD_BUG,
+                subject: 'Client side exception occurred on dashboard',
+                sid: sentryIssueId,
+                message: urlMessage,
+              }}
             >
               Still stuck?
-            </Link>
+            </SupportLink>
           )}
         </div>
       </div>
