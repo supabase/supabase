@@ -12,7 +12,9 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 })
 
-const eslintConfig = {
+// Tanstack Query config is meant for the old non-flat esling configs. This adapts it to work with flat configs. v5 of
+// the plugin supports flat configs natively.
+const tanstackQueryConfig = {
   name: '@tanstack/query',
   plugins: { '@tanstack/query': fixupPluginRules(tanstackQuery) },
   rules: {
@@ -28,7 +30,7 @@ module.exports = defineConfig([
   { ignores: ['.next', 'public'] },
   turboConfig,
   prettierConfig,
-  eslintConfig,
+  tanstackQueryConfig,
   {
     extends: compat.extends('next/core-web-vitals'),
     linterOptions: {
