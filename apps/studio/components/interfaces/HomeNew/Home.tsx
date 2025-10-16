@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useEffect, useRef } from 'react'
@@ -25,6 +26,8 @@ export const HomeV2 = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -85,7 +88,6 @@ export const HomeV2 = () => {
           <TopSection />
         </ScaffoldSection>
       </ScaffoldContainer>
-
       {!isPaused && (
         <ScaffoldContainer size="large">
           <ScaffoldSection isFullWidth className="gap-16 pb-32">
@@ -104,8 +106,13 @@ export const HomeV2 = () => {
                       </SortableSection>
                     )
                   }
-                  if (id === 'getting-started') {
-                    return gettingStartedState === 'hidden' ? null : (
+                  if (
+                    id === 'getting-started' &&
+                    !isMatureProject &&
+                    project &&
+                    gettingStartedState !== 'hidden'
+                  ) {
+                    return (
                       <SortableSection key={id} id={id}>
                         <GettingStartedSection
                           value={gettingStartedState}
