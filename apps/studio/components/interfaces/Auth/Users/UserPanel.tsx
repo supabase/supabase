@@ -110,7 +110,7 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
                 Clear
               </Button>
             </div>
-            <SimpleCodeBlock className="javascript">
+            <SimpleCodeBlock className="javascript" parentClassName="[&>*>span]:text-xs">
               {JSON.stringify(filteredProperties, null, 2)}
             </SimpleCodeBlock>
           </TabsContent_Shadcn_>

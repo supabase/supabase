@@ -15,6 +15,7 @@ export interface AlertErrorProps {
   error?: { message: string } | null
   className?: string
   showIcon?: boolean
+  additionalActions?: React.ReactNode
 }
 
 // [Joshen] To standardize the language for all error UIs
@@ -26,6 +27,7 @@ export const AlertError = ({
   className,
   showIcon = true,
   children,
+  additionalActions,
 }: PropsWithChildren<AlertErrorProps>) => {
   const subjectString = subject?.replace(/ /g, '%20')
   let href = `/support/new?category=dashboard_bug`
@@ -51,9 +53,12 @@ export const AlertError = ({
           </p>
         </div>
         {children}
-        <Button asChild type="warning" className="w-min">
-          <Link href={href}>Contact support</Link>
-        </Button>
+        <div className="flex gap-2">
+          {additionalActions}
+          <Button asChild type="warning" className="w-min">
+            <Link href={href}>Contact support</Link>
+          </Button>
+        </div>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

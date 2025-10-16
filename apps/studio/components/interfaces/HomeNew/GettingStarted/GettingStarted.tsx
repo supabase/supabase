@@ -2,10 +2,9 @@ import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-
+import { cn, Button, Card, CardContent, Badge } from 'ui'
+import { GettingStartedStep, GettingStartedAction } from './GettingStarted.types'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, Card, CardContent, cn } from 'ui'
-import { GettingStartedAction, GettingStartedStep } from './GettingStartedSection'
 
 // Determine action type for tracking
 const getActionType = (action: GettingStartedAction): 'primary' | 'ai_assist' | 'external_link' => {

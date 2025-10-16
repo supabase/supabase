@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -15,9 +14,9 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -53,9 +52,10 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 
 export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const enableProBenefitWording = usePHFlag('proBenefitWording')
 
@@ -89,7 +89,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const { mutate: restoreProject, isLoading: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
       toast.success('Restoring project')
     },
   })
@@ -139,9 +139,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   return (
     <>
       <div className="space-y-4">
-        <div className="w-full mx-auto mb-8 md:mb-16 max-w-7xl">
+        <div className="w-full mx-auto mb-8 md:mb-16">
           <div className="flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
-            <div className="grid w-[550px] gap-4">
+            <div className="grid max-w-2xl gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <PauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
               </div>

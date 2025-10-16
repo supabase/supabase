@@ -14,7 +14,6 @@ import {
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -36,6 +35,12 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   WarningIcon,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -116,7 +121,7 @@ export const S3Connection = () => {
   return (
     <>
       <ScaffoldSection isFullWidth>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-end justify-between mb-6">
           <div>
             <ScaffoldSectionTitle>Connection</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
@@ -225,7 +230,7 @@ export const S3Connection = () => {
       </ScaffoldSection>
 
       <ScaffoldSection isFullWidth>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-end justify-between mb-6">
           <div>
             <ScaffoldSectionTitle>Access keys</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
@@ -255,20 +260,26 @@ export const S3Connection = () => {
         ) : (
           <>
             {isLoadingStorageCreds ? (
-              <div className="p-4">
-                <GenericSkeletonLoader />
-              </div>
+              <GenericSkeletonLoader />
             ) : (
-              <div className="overflow-x-auto">
-                <Table
-                  head={[
-                    <Table.th key="description">Description</Table.th>,
-                    <Table.th key="access-key-id">Access key ID</Table.th>,
-                    <Table.th key="created-at">Created at</Table.th>,
-                    <Table.th key="actions" />,
-                  ]}
-                  body={
-                    hasStorageCreds ? (
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead key="description" className="min-w-40 lg:min-w-64">
+                        Description
+                      </TableHead>
+                      <TableHead key="access-key-id" className="min-w-64 w-full">
+                        Access key ID
+                      </TableHead>
+                      <TableHead key="created-at" className="min-w-48">
+                        Created at
+                      </TableHead>
+                      <TableHead key="actions" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {hasStorageCreds ? (
                       storageCreds.data?.map((cred) => (
                         <StorageCredItem
                           key={cred.id}
@@ -283,18 +294,18 @@ export const S3Connection = () => {
                         />
                       ))
                     ) : (
-                      <Table.tr>
-                        <Table.td colSpan={4} className="!rounded-b-md overflow-hidden">
+                      <TableRow>
+                        <TableCell colSpan={4} className="!rounded-b-md overflow-hidden">
                           <p className="text-sm text-foreground">No access keys created</p>
                           <p className="text-sm text-foreground-light">
                             There are no access keys associated with your project yet
                           </p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  }
-                />
-              </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Card>
             )}
           </>
         )}

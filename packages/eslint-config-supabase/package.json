@@ -8,11 +8,13 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "eslint-config-next": "15.3.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-config-turbo": "^2.0.4"
+    "eslint-config-next": "^15.5.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-config-turbo": "^2.5.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
+    "@eslint/js": "^9.0.0",
     "typescript": "catalog:"
   }
 }
