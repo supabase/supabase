@@ -65,12 +65,12 @@ export const PolicyTableRow = ({
   const isRLSEnabled = table.rls_enabled
   const isTableExposedThroughAPI = exposedSchemas.includes(table.schema)
 
-  const { data: roles = [] } = useTableRolesAccessQuery({
+  const { data: tableRolesAccess = {} } = useTableRolesAccessQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: table.schema,
-    table: table.name,
   })
+  const roles = tableRolesAccess?.[table.name] ?? []
   const hasAnonAuthenticatedRolesAccess = roles.length !== 0
   const isPubliclyReadableWritable =
     !isRLSEnabled && isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
