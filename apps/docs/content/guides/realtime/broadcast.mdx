@@ -956,6 +956,7 @@ This feature is currently in Public Alpha. If you have any issues [submit a supp
 Broadcast Replay enables **private** channels to access messages that were sent earlier. Only messages published via [Broadcast From the Database](#broadcast-from-the-database) are available for replay.
 
 You can configure replay with the following options:
+
 - **`since`** (Required): The epoch timestamp in milliseconds (e.g., `1697472000000`), specifying the earliest point from which messages should be retrieved.
 - **`limit`** (Optional): The number of messages to return. This must be a positive integer, with a maximum value of 25.
 
@@ -996,9 +997,11 @@ You can configure replay with the following options:
     })
     .subscribe()
     ```
+
   </TabPanel>
 
-  <$Show if="sdk:dart">
+<$Show if="sdk:dart">
+
   <TabPanel id="dart" label="Dart">
     <Admonition type="note">
 
@@ -1031,10 +1034,12 @@ You can configure replay with the following options:
       },
     ).subscribe();
     ```
+
   </TabPanel>
   </$Show>
 
-  <$Show if="sdk:swift">
+<$Show if="sdk:swift">
+
   <TabPanel id="swift" label="Swift">
     <Admonition type="note">
 
@@ -1069,10 +1074,12 @@ You can configure replay with the following options:
 
     await channel.subscribe()
     ```
+
   </TabPanel>
   </$Show>
 
-  <$Show if="sdk:kotlin">
+<$Show if="sdk:kotlin">
+
   <TabPanel id="kotlin" label="Kotlin">
     <Admonition type="note">
 
@@ -1082,7 +1089,8 @@ You can configure replay with the following options:
   </TabPanel>
   </$Show>
 
-  <$Show if="sdk:python">
+<$Show if="sdk:python">
+
   <TabPanel id="python" label="Python">
     <Admonition type="note">
 
@@ -1110,6 +1118,7 @@ You can configure replay with the following options:
         if payload.get('meta', {}).get('replayed'):
             print(f"Replayed message: {payload['meta']['id']}")
     ```
+
   </TabPanel>
   </$Show>
 </Tabs>
@@ -1118,7 +1127,7 @@ You can configure replay with the following options:
 
 A few common use cases for Broadcast Replay include:
 
-* Displaying the most recent messages from a chat room
-* Loading the last events that happened during a sports event
-* Ensuring users always see the latest events after a page reload or network interruption
-* Highlighting the most recent sections that changed in a web page
+- Displaying the most recent messages from a chat room
+- Loading the last events that happened during a sports event
+- Ensuring users always see the latest events after a page reload or network interruption
+- Highlighting the most recent sections that changed in a web page
