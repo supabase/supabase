@@ -215,7 +215,7 @@ const CustomTooltip = ({
         )}
       >
         <p className="text-foreground-light text-xs">{localTimeZone}</p>
-        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)} </p>
+        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
           {payload.reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
