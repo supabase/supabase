@@ -2619,10 +2619,23 @@ export const telemetry: NavMenuConstant = {
         },
         {
           name: 'Integrations',
-          url: undefined,
+          url: '/guides/telemetry/integrations',
           items: [
             {
-              name: 'Sentry integration',
+              name: 'Datadog',
+              url: '/guides/telemetry/datadog-monitoring' as `/${string}`,
+            },
+
+            {
+              name: 'Grafana',
+              url: '/guides/telemetry/grafana-monitoring' as `/${string}`,
+            },
+            {
+              name: 'New Relic',
+              url: '/guides/telemetry/new-relic-monitoring' as `/${string}`,
+            },
+            {
+              name: 'Sentry',
               url: '/guides/telemetry/sentry-monitoring' as `/${string}`,
             },
           ],
