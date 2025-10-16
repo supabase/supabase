@@ -8,7 +8,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { Markdown } from '../Markdown'
+import { Markdown } from '../../Markdown'
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
 
 export const IndexAdvisorDisabledState = () => {
