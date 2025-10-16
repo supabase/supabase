@@ -85,7 +85,6 @@ export const HomeV2 = () => {
           <TopSection />
         </ScaffoldSection>
       </ScaffoldContainer>
-
       {!isPaused && (
         <ScaffoldContainer size="large">
           <ScaffoldSection isFullWidth className="gap-16 pb-32">
