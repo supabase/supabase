@@ -197,15 +197,19 @@ Keep code lines short to avoid scrolling. For example, you can split long shell 
 
 Optionally specify a filename for the codeblock by including it after the opening backticks and language specifier:
 
-```md
+````md
 ```ts environment.ts
+
 ```
+````
 
 Optionally highlight lines by using `mark=${lineNumber}`.
 
-```md
+````md
 ```js mark=12:13
+
 ```
+````
 
 ### Footnotes
 
@@ -243,7 +247,7 @@ Don't nest lists more than two deep.
 3. List item
    - List item
    - List item
-   <!-- DON'T ADD ANOTHER LEVEL OF NESTING -->
+     <!-- DON'T ADD ANOTHER LEVEL OF NESTING -->
      - Overly nested list item
 ```
 
