@@ -54,7 +54,7 @@ describe(`CreateBucketModal`, () => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()
     })
 
-    const nameInput = screen.getByLabelText(`Name of bucket`)
+    const nameInput = screen.getByLabelText(`Bucket name`)
     await userEvent.type(nameInput, `test`)
 
     const standardOption = screen.getByLabelText(`Standard bucket`)

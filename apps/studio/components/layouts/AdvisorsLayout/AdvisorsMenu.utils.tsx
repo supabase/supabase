@@ -1,6 +1,7 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { ArrowUpRight } from 'lucide-react'
 
 export const generateAdvisorsMenu = (
   project?: Project,
@@ -27,8 +28,9 @@ export const generateAdvisorsMenu = (
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/advisors/query-performance`,
+          url: `/project/${ref}/reports/query-performance`,
           items: [],
+          rightIcon: <ArrowUpRight size={14} strokeWidth={1.5} className="h-4 w-4" />,
         },
       ],
     },

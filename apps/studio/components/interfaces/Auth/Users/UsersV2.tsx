@@ -18,6 +18,7 @@ import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   Button,
@@ -50,14 +51,17 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const {
     authenticationShowProviderFilter: showProviderFilter,
@@ -150,6 +154,19 @@ export const UsersV2 = () => {
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
+
+  const telemetryProps = {
+    sort_column: sortColumn,
+    sort_order: sortOrder,
+    providers: selectedProviders,
+    user_type: filter === 'all' ? undefined : filter,
+    keywords: filterKeywords,
+    filter_column: specificFilterColumn === 'freeform' ? undefined : specificFilterColumn,
+  }
+  const telemetryGroups = {
+    project: projectRef ?? 'Unknown',
+    organization: selectedOrg?.slug ?? 'Unknown',
+  }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
@@ -293,6 +310,15 @@ export const UsersV2 = () => {
                   setFilterKeywords={(s) => {
                     setFilterKeywords(s)
                     setSelectedUser(undefined)
+                    sendEvent({
+                      action: 'auth_users_search_submitted',
+                      properties: {
+                        trigger: 'search_input',
+                        ...telemetryProps,
+                        keywords: s,
+                      },
+                      groups: telemetryGroups,
+                    })
                   }}
                   setSpecificFilterColumn={(value) => {
                     if (value === 'freeform') {
@@ -304,7 +330,21 @@ export const UsersV2 = () => {
                 />
 
                 {showUserTypeFilter && specificFilterColumn === 'freeform' && (
-                  <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
+                  <Select_Shadcn_
+                    value={filter}
+                    onValueChange={(val) => {
+                      setFilter(val as Filter)
+                      sendEvent({
+                        action: 'auth_users_search_submitted',
+                        properties: {
+                          trigger: 'user_type_filter',
+                          ...telemetryProps,
+                          user_type: val,
+                        },
+                        groups: telemetryGroups,
+                      })
+                    }}
+                  >
                     <SelectContent_Shadcn_>
                       <SelectTrigger_Shadcn_
                         size="tiny"
@@ -344,7 +384,18 @@ export const UsersV2 = () => {
                     labelClass="text-xs"
                     maxHeightClass="h-[190px]"
                     className="w-52"
-                    onSaveFilters={setSelectedProviders}
+                    onSaveFilters={(providers) => {
+                      setSelectedProviders(providers)
+                      sendEvent({
+                        action: 'auth_users_search_submitted',
+                        properties: {
+                          trigger: 'provider_filter',
+                          ...telemetryProps,
+                          providers,
+                        },
+                        groups: telemetryGroups,
+                      })
+                    }}
                   />
                 )}
 
@@ -402,7 +453,20 @@ export const UsersV2 = () => {
                   sortColumn={sortColumn}
                   sortOrder={sortOrder}
                   sortByValue={sortByValue}
-                  setSortByValue={setSortByValue}
+                  setSortByValue={(value) => {
+                    const [sortColumn, sortOrder] = value.split(':')
+                    setSortByValue(value)
+                    sendEvent({
+                      action: 'auth_users_search_submitted',
+                      properties: {
+                        trigger: 'sort_change',
+                        ...telemetryProps,
+                        sort_column: sortColumn,
+                        sort_order: sortOrder,
+                      },
+                      groups: telemetryGroups,
+                    })
+                  }}
                   showSortByEmail={showSortByEmail}
                   showSortByPhone={showSortByPhone}
                 />
@@ -418,7 +482,17 @@ export const UsersV2 = () => {
                   type="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
-                  onClick={() => refetch()}
+                  onClick={() => {
+                    refetch()
+                    sendEvent({
+                      action: 'auth_users_search_submitted',
+                      properties: {
+                        trigger: 'refresh_button',
+                        ...telemetryProps,
+                      },
+                      groups: telemetryGroups,
+                    })
+                  }}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
                 />
                 <AddUserDropdown />

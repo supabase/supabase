@@ -22,7 +22,7 @@
     "embeddings:nimbus:refresh": "ENABLED_FEATURES_OVERRIDE_DISABLE_ALL=true pnpm run embeddings:refresh",
     "last-changed": "tsx scripts/last-changed.ts",
     "last-changed:reset": "pnpm run last-changed -- --reset",
-    "lint": "next lint",
+    "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "postbuild": "pnpm run build:sitemap && pnpm run build:llms && ./../../scripts/upload-static-assets.sh",
     "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
