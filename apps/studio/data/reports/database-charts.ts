@@ -204,11 +204,12 @@ export const getReportAttributesV2: (
       ],
     },
     {
+      // Client Connections metric for free tier
       id: 'client-connections-basic',
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['free', 'pro', 'team', 'enterprise'],
+      availableIn: ['free'],
       hide: !isFreePlan,
       showTooltip: false,
       showLegend: false,
@@ -236,11 +237,12 @@ export const getReportAttributesV2: (
       ],
     },
     {
+      // advanced client connections metric for paid and above
       id: 'client-connections',
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['free', 'pro', 'team', 'enterprise'],
+      availableIn: ['pro', 'team', 'enterprise'],
       hide: isFreePlan,
       showTooltip: true,
       showLegend: true,
