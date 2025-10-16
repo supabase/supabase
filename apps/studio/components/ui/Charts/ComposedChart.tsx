@@ -39,6 +39,7 @@ import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
+  chartId?: string
   attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
@@ -61,6 +62,8 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   titleTooltip?: string
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
+  hideHighlightedLabel?: boolean
+  hideHighlightArea?: boolean
   syncId?: string
   docsUrl?: string
   sql?: string
@@ -68,6 +71,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
 }
 
 export function ComposedChart({
+  chartId,
   data,
   attributes,
   yAxisKey,
@@ -99,10 +103,13 @@ export function ComposedChart({
   updateDateRange,
   hideYAxis,
   hideHighlightedValue,
+  hideHighlightedLabel = false,
+  hideHighlightArea = false,
   syncId,
   docsUrl,
   sql,
   highlightActions,
+  titleTooltip,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -302,6 +309,7 @@ export function ComposedChart({
         className={className}
         attribute={title}
         format={format}
+        titleTooltip={titleTooltip}
       />
     )
   }
@@ -312,6 +320,9 @@ export function ComposedChart({
         hideHighlightedValue={hideHighlightedValue}
         title={title}
         format={format}
+        hideHighlightedLabel={hideHighlightedLabel}
+        hideHighlightArea={hideHighlightArea}
+        titleTooltip={titleTooltip}
         customDateFormat={customDateFormat}
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
         highlightedLabel={resolvedHighlightedLabel}
@@ -498,6 +509,7 @@ export function ComposedChart({
           chartHighlight={chartHighlight}
           updateDateRange={updateDateRange}
           actions={highlightActions}
+          chartId={chartId}
         />
       </Container>
       {data && (

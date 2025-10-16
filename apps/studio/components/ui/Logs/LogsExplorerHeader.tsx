@@ -1,4 +1,4 @@
-import { BookOpen, Check, Clipboard, ExternalLink, List, X } from 'lucide-react'
+import { BookOpen, Check, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -163,7 +163,7 @@ const Field = ({
         ) : (
           <Tooltip>
             <TooltipTrigger>
-              <Clipboard size={14} strokeWidth={1.5} />
+              <Copy size={14} />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="font-sans">
               Copy value

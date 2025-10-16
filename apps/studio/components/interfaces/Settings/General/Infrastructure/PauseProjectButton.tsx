@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -7,8 +6,8 @@ import { toast } from 'sonner'
 
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -17,9 +16,10 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const PauseProjectButton = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const isProjectActive = useIsProjectActive()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -36,7 +36,7 @@ const PauseProjectButton = () => {
 
   const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.PAUSING)
+      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
       toast.success('Pausing project...')
       router.push(`/project/${projectRef}`)
     },

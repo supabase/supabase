@@ -1,9 +1,8 @@
 import Editor from '@monaco-editor/react'
 import { Check, Copy } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
 
-import { Button, cn } from 'ui'
+import { Button, cn, copyToClipboard } from 'ui'
 
 type SqlMonacoBlockProps = {
   value?: string
@@ -28,8 +27,9 @@ export const SqlMonacoBlock = ({
 
   const content = useMemo(() => value ?? '', [value])
 
-  const handleCopy = () => {
+  const handleCopy = (value: string) => {
     setCopied(true)
+    copyToClipboard(value)
     setTimeout(() => setCopied(false), 1000)
   }
 
@@ -73,16 +73,14 @@ export const SqlMonacoBlock = ({
 
       {!hideCopy && (
         <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyToClipboard text={content}>
-            <Button
-              type="default"
-              className="px-1.5"
-              icon={copied ? <Check /> : <Copy />}
-              onClick={handleCopy}
-            >
-              {copied ? 'Copied' : ''}
-            </Button>
-          </CopyToClipboard>
+          <Button
+            type="default"
+            className="px-1.5"
+            icon={copied ? <Check /> : <Copy />}
+            onClick={() => handleCopy(content)}
+          >
+            {copied ? 'Copied' : ''}
+          </Button>
         </div>
       )}
     </div>

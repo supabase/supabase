@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -19,7 +18,7 @@ import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-upd
 import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
 import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale-config-update-mutation'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { setProjectStatus } from 'data/projects/projects-query'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -67,12 +66,13 @@ import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementForm() {
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const { ref: projectRef } = useParams()
-  const queryClient = useQueryClient()
+  const { setProjectStatus } = useSetProjectStatus()
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === project?.ref
   )
@@ -230,7 +230,7 @@ export function DiskManagementForm() {
       onError: () => {},
       onSuccess: () => {
         //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
-        setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
+        if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
       },
     })
   const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =
