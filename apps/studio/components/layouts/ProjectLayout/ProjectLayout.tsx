@@ -71,7 +71,7 @@ export interface ProjectLayoutProps {
   productMenuClassName?: string
 }
 
-const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
+export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
   (
     {
       title,
@@ -261,8 +261,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 ProjectLayout.displayName = 'ProjectLayout'
 
 export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
-
-export default ProjectLayout
 
 interface MenuBarWrapperProps {
   isLoading: boolean
