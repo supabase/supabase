@@ -24,12 +24,12 @@ export const NO_ORG_MARKER = 'no-org'
 
 export const formatMessage = ({
   message,
-  attachments,
+  attachments = [],
   error,
   commit,
 }: {
   message: string
-  attachments: string[]
+  attachments?: string[]
   error: string | null | undefined
   commit: string | undefined
 }) => {
