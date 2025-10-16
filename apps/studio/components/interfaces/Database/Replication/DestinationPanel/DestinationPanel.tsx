@@ -1,11 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { snakeCase } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
@@ -13,16 +17,14 @@ import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
+import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
+import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
   Button,
   DialogSectionSeparator,
   Form_Shadcn_,
@@ -41,28 +43,18 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  TextArea_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import NewPublicationPanel from './NewPublicationPanel'
-import PublicationsComboBox from './PublicationsComboBox'
-import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
+import { NewPublicationPanel } from '../NewPublicationPanel'
+import { PublicationsComboBox } from '../PublicationsComboBox'
+import { ReplicationDisclaimerDialog } from '../ReplicationDisclaimerDialog'
+import { AdvancedSettings } from './AdvancedSettings'
+import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationPanel.constants'
+import { DestinationPanelFormSchema as FormSchema, TypeEnum } from './DestinationPanel.schema'
+import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
 
 const formId = 'destination-editor'
-const types = ['BigQuery'] as const
-const TypeEnum = z.enum(types)
-
-const FormSchema = z.object({
-  type: TypeEnum,
-  name: z.string().min(1, 'Name is required'),
-  projectId: z.string().min(1, 'Project id is required'),
-  datasetId: z.string().min(1, 'Dataset id is required'),
-  serviceAccountKey: z.string().min(1, 'Service account key is required'),
-  publicationName: z.string().min(1, 'Publication is required'),
-  maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
-  maxStalenessMins: z.number().nonnegative().optional(),
-})
 
 interface DestinationPanelProps {
   visible: boolean
@@ -93,6 +85,7 @@ export const DestinationPanel = ({
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
+  const [isFormInteracting, setIsFormInteracting] = useState(false)
 
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -105,6 +98,12 @@ export const DestinationPanel = ({
     })
 
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+
+  const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
+    useS3AccessKeyCreateMutation()
+
+  const { mutateAsync: createNamespace, isLoading: isCreatingNamespace } =
+    useIcebergNamespaceCreateMutation()
 
   const {
     data: publications = [],
@@ -123,24 +122,44 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { serviceKey } = getKeys(apiKeys)
+  const catalogToken = serviceKey?.api_key ?? ''
+
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
+
   const defaultValues = useMemo(() => {
-    const bigQueryConfig =
-      destinationData && 'big_query' in destinationData.config
-        ? destinationData?.config.big_query
-        : null
+    // Type guards to safely access union properties
+    const config = destinationData?.config
+    const isBigQueryConfig = config && 'big_query' in config
+    const isIcebergConfig = config && 'iceberg' in config
 
     return {
-      type: TypeEnum.enum.BigQuery,
+      // Common fields
+      type: (isBigQueryConfig
+        ? TypeEnum.enum.BigQuery
+        : isIcebergConfig
+          ? TypeEnum.enum['Analytics Bucket']
+          : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>,
       name: destinationData?.name ?? '',
-      projectId: bigQueryConfig?.project_id ?? '',
-      datasetId: bigQueryConfig?.dataset_id ?? '',
-      // For now, the password will always be set as empty for security reasons.
-      serviceAccountKey: bigQueryConfig?.service_account_key ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
-      maxStalenessMins: bigQueryConfig?.max_staleness_mins,
+      // BigQuery fields
+      projectId: isBigQueryConfig ? config.big_query.project_id : '',
+      datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
+      serviceAccountKey: isBigQueryConfig ? config.big_query.service_account_key : '',
+      maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined,
+      // Analytics Bucket fields
+      warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
+      namespace: isIcebergConfig ? config.iceberg.supabase.namespace : '',
+      newNamespaceName: '',
+      catalogToken: isIcebergConfig ? config.iceberg.supabase.catalog_token : catalogToken,
+      s3AccessKeyId: isIcebergConfig ? config.iceberg.supabase.s3_access_key_id : '',
+      s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
+      s3Region:
+        projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
     }
-  }, [destinationData, pipelineData])
+  }, [destinationData, pipelineData, catalogToken, projectSettings])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -148,8 +167,13 @@ export const DestinationPanel = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
-  const publicationName = form.watch('publicationName')
-  const isSaving = creatingDestinationPipeline || updatingDestinationPipeline || startingPipeline
+  const { publicationName, type: selectedType, warehouseName } = form.watch()
+  const isSaving =
+    creatingDestinationPipeline ||
+    updatingDestinationPipeline ||
+    startingPipeline ||
+    isCreatingS3AccessKey ||
+    isCreatingNamespace
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
@@ -169,6 +193,35 @@ export const DestinationPanel = ({
   const isSubmitDisabled =
     isSaving || isSelectedPublicationMissing || isLoadingCheck || hasTablesWithNoPrimaryKeys
 
+  // Helper function to handle namespace creation if needed
+  const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
+    if (data.namespace === CREATE_NEW_NAMESPACE) {
+      if (!data.newNamespaceName) {
+        throw new Error('New namespace name is required')
+      }
+
+      // Construct catalog URI for namespace creation
+      const protocol = projectSettings?.app_config?.protocol ?? 'https'
+      const endpoint =
+        projectSettings?.app_config?.storage_endpoint || projectSettings?.app_config?.endpoint
+      const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
+
+      await createNamespace({
+        catalogUri,
+        warehouse: data.warehouseName!,
+        token: catalogToken,
+        namespace: data.newNamespaceName,
+      })
+
+      return data.newNamespaceName
+    }
+    return data.namespace
+  }
+
+  // [Joshen] I reckon this function can be refactored to be a bit more modular, it's currently pretty
+  // complicated with 4 different types of flows -> edit bigquery/analytics, and create bigquery/analytics
+  // At first glance we could try grouping as edit / create bigquery, edit / create analytics
+  // since the destination config seems rather similar between edit and create for the same type
   const submitPipeline = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!sourceId) return console.error('Source id is required')
@@ -180,13 +233,42 @@ export const DestinationPanel = ({
       if (editMode && existingDestination) {
         if (!existingDestination.pipelineId) return console.error('Pipeline id is required')
 
-        const bigQueryConfig: any = {
-          projectId: data.projectId,
-          datasetId: data.datasetId,
-          serviceAccountKey: data.serviceAccountKey,
-        }
-        if (!!data.maxStalenessMins) {
-          bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+        let destinationConfig: any = {}
+
+        if (data.type === 'BigQuery') {
+          const bigQueryConfig: any = {
+            projectId: data.projectId,
+            datasetId: data.datasetId,
+            serviceAccountKey: data.serviceAccountKey,
+          }
+          if (!!data.maxStalenessMins) {
+            bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+          }
+          destinationConfig = { bigQuery: bigQueryConfig }
+        } else if (data.type === 'Analytics Bucket') {
+          let s3Keys = { accessKey: data.s3AccessKeyId, secretKey: data.s3SecretAccessKey }
+
+          if (data.s3AccessKeyId === CREATE_NEW_KEY) {
+            const newKeys = await createS3AccessKey({
+              projectRef,
+              description: `Autogenerated key for replication to ${snakeCase(warehouseName)}`,
+            })
+            s3Keys = { accessKey: newKeys.access_key, secretKey: newKeys.secret_key }
+          }
+
+          // Resolve namespace (create if needed)
+          const finalNamespace = await resolveNamespace(data)
+
+          const icebergConfig: any = {
+            projectRef: projectRef,
+            warehouseName: data.warehouseName,
+            namespace: finalNamespace,
+            catalogToken: data.catalogToken,
+            s3AccessKeyId: s3Keys.accessKey,
+            s3SecretAccessKey: s3Keys.secretKey,
+            s3Region: data.s3Region,
+          }
+          destinationConfig = { iceberg: icebergConfig }
         }
 
         const batchConfig: any = {}
@@ -198,7 +280,7 @@ export const DestinationPanel = ({
           pipelineId: existingDestination.pipelineId,
           projectRef,
           destinationName: data.name,
-          destinationConfig: { bigQuery: bigQueryConfig },
+          destinationConfig,
           pipelineConfig: {
             publicationName: data.publicationName,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
@@ -226,15 +308,43 @@ export const DestinationPanel = ({
         startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
-        const bigQueryConfig: any = {
-          projectId: data.projectId,
-          datasetId: data.datasetId,
-          serviceAccountKey: data.serviceAccountKey,
-        }
-        if (!!data.maxStalenessMins) {
-          bigQueryConfig.maxStalenessMins = data.maxStalenessMins
-        }
+        let destinationConfig: any = {}
 
+        if (data.type === 'BigQuery') {
+          const bigQueryConfig: any = {
+            projectId: data.projectId,
+            datasetId: data.datasetId,
+            serviceAccountKey: data.serviceAccountKey,
+          }
+          if (!!data.maxStalenessMins) {
+            bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+          }
+          destinationConfig = { bigQuery: bigQueryConfig }
+        } else if (data.type === 'Analytics Bucket') {
+          let s3Keys = { accessKey: data.s3AccessKeyId, secretKey: data.s3SecretAccessKey }
+
+          if (data.s3AccessKeyId === CREATE_NEW_KEY) {
+            const newKeys = await createS3AccessKey({
+              projectRef,
+              description: `Autogenerated key for replication to ${snakeCase(warehouseName)}`,
+            })
+            s3Keys = { accessKey: newKeys.access_key, secretKey: newKeys.secret_key }
+          }
+
+          // Resolve namespace (create if needed)
+          const finalNamespace = await resolveNamespace(data)
+
+          const icebergConfig: any = {
+            projectRef: projectRef,
+            warehouseName: data.warehouseName,
+            namespace: finalNamespace,
+            catalogToken: data.catalogToken,
+            s3AccessKeyId: s3Keys.accessKey,
+            s3SecretAccessKey: s3Keys.secretKey,
+            s3Region: data.s3Region,
+          }
+          destinationConfig = { iceberg: icebergConfig }
+        }
         const batchConfig: any = {}
         if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
         const hasBatchFields = Object.keys(batchConfig).length > 0
@@ -242,7 +352,7 @@ export const DestinationPanel = ({
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
           destinationName: data.name,
-          destinationConfig: { bigQuery: bigQueryConfig },
+          destinationConfig,
           sourceId,
           pipelineConfig: {
             publicationName: data.publicationName,
@@ -288,15 +398,16 @@ export const DestinationPanel = ({
   }
 
   useEffect(() => {
-    if (editMode && destinationData && pipelineData) {
+    if (editMode && destinationData && pipelineData && !isFormInteracting) {
       form.reset(defaultValues)
     }
-  }, [destinationData, pipelineData, editMode, defaultValues, form])
+  }, [destinationData, pipelineData, editMode, defaultValues, form, isFormInteracting])
 
   // Ensure the form always reflects the freshest data whenever the panel opens
   useEffect(() => {
     if (visible) {
       form.reset(defaultValues)
+      setIsFormInteracting(false)
     }
   }, [visible, defaultValues, form])
 
@@ -399,8 +510,8 @@ export const DestinationPanel = ({
 
                   <DialogSectionSeparator />
 
-                  <div className="p-5 flex flex-col gap-y-4">
-                    <p className="text-sm text-foreground-light">Where to send that data</p>
+                  <div className="py-5 flex flex-col gap-y-4">
+                    <p className="px-5 text-sm text-foreground-light">Where to send that data</p>
                     <FormField_Shadcn_
                       name="type"
                       control={form.control}
@@ -408,14 +519,24 @@ export const DestinationPanel = ({
                         <FormItemLayout
                           label="Type"
                           layout="vertical"
+                          className="px-5"
                           description="The type of destination to send the data to"
                         >
                           <FormControl_Shadcn_>
-                            <Select_Shadcn_ value={field.value}>
+                            <Select_Shadcn_
+                              value={field.value}
+                              onValueChange={(value) => {
+                                setIsFormInteracting(true)
+                                field.onChange(value)
+                              }}
+                            >
                               <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
                                 <SelectGroup_Shadcn_>
                                   <SelectItem_Shadcn_ value="BigQuery">BigQuery</SelectItem_Shadcn_>
+                                  <SelectItem_Shadcn_ value="Analytics Bucket">
+                                    Analytics Bucket
+                                  </SelectItem_Shadcn_>
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
@@ -424,122 +545,25 @@ export const DestinationPanel = ({
                       )}
                     />
 
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="projectId"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          label="Project ID"
-                          layout="vertical"
-                          description="Which BigQuery project to send data to"
-                        >
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Project ID" />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="datasetId"
-                      render={({ field }) => (
-                        <FormItemLayout label="Project's Dataset ID" layout="vertical">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Dataset ID" />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="serviceAccountKey"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          label="Service Account Key"
-                          layout="vertical"
-                          description="The service account key for BigQuery"
-                        >
-                          <FormControl_Shadcn_>
-                            <TextArea_Shadcn_
-                              {...field}
-                              rows={4}
-                              maxLength={5000}
-                              placeholder="Service account key"
-                            />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
+                    {selectedType === 'BigQuery' ? (
+                      <BigQueryFields form={form} />
+                    ) : selectedType === 'Analytics Bucket' ? (
+                      <AnalyticsBucketFields
+                        form={form}
+                        setIsFormInteracting={setIsFormInteracting}
+                      />
+                    ) : null}
                   </div>
 
                   <DialogSectionSeparator />
 
                   <div className="px-5">
-                    <Accordion_Shadcn_ type="single" collapsible>
-                      <AccordionItem_Shadcn_ value="item-1" className="border-none">
-                        <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-between text-sm">
-                          Advanced Settings
-                        </AccordionTrigger_Shadcn_>
-                        <AccordionContent_Shadcn_ asChild className="!pb-0">
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="maxFillMs"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                className="mb-4"
-                                label="Max fill milliseconds"
-                                layout="vertical"
-                                description="The maximum amount of time to fill the data in milliseconds. Leave empty to use default value."
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_
-                                    {...field}
-                                    type="number"
-                                    value={field.value ?? ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value
-                                      field.onChange(val === '' ? undefined : Number(val))
-                                    }}
-                                    placeholder="Leave empty for default"
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="maxStalenessMins"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                className="mb-4"
-                                label="Max staleness minutes"
-                                layout="vertical"
-                                description="Maximum staleness time allowed in minutes. Leave empty to use default value."
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_
-                                    {...field}
-                                    type="number"
-                                    value={field.value ?? ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value
-                                      field.onChange(val === '' ? undefined : Number(val))
-                                    }}
-                                    placeholder="Leave empty for default"
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </AccordionContent_Shadcn_>
-                      </AccordionItem_Shadcn_>
-                    </Accordion_Shadcn_>
+                    <AdvancedSettings form={form} />
                   </div>
                 </form>
               </Form_Shadcn_>
             </SheetSection>
+
             <SheetFooter>
               <Button disabled={isSaving} type="default" onClick={onClose}>
                 Cancel
