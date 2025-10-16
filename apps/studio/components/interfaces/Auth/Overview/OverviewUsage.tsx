@@ -25,6 +25,7 @@ import {
 } from './OverviewUsage.constants'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+import AlertError from 'components/ui/AlertError'
 
 export const StatCard = ({
   title,
@@ -95,13 +96,21 @@ export const StatCard = ({
 export const OverviewUsage = () => {
   const { ref } = useParams()
 
-  const { data: currentData, isLoading: currentLoading } = useQuery({
+  const {
+    data: currentData,
+    isLoading: currentLoading,
+    error: currentError,
+  } = useQuery({
     queryKey: ['auth-metrics', ref, 'current'],
     queryFn: () => fetchAllAuthMetrics(ref as string, 'current'),
     enabled: !!ref,
   })
 
-  const { data: previousData, isLoading: previousLoading } = useQuery({
+  const {
+    data: previousData,
+    isLoading: previousLoading,
+    error: previousError,
+  } = useQuery({
     queryKey: ['auth-metrics', ref, 'previous'],
     queryFn: () => fetchAllAuthMetrics(ref as string, 'previous'),
     enabled: !!ref,
@@ -109,6 +118,11 @@ export const OverviewUsage = () => {
 
   const metrics = processAllAuthMetrics(currentData?.result || [], previousData?.result || [])
   const isLoading = currentLoading || previousLoading
+  const isError = !!previousError || !!currentError
+  const errorMessage =
+    (previousError as any)?.message ||
+    (currentError as any)?.message ||
+    'There was an error fetching the auth metrics.'
 
   const activeUsersChange = calculatePercentageChange(
     metrics.current.activeUsers,
@@ -124,6 +138,15 @@ export const OverviewUsage = () => {
 
   return (
     <ScaffoldSection isFullWidth>
+      {isError && (
+        <AlertError
+          className="mb-4"
+          subject="Error fetching auth metrics"
+          error={{
+            message: errorMessage,
+          }}
+        />
+      )}
       <div className="flex items-center justify-between mb-4">
         <ScaffoldSectionTitle>Usage</ScaffoldSectionTitle>
         <Link
