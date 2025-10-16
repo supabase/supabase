@@ -7,7 +7,7 @@
     "dev": "next dev --turbopack -p 8082",
     "build": "next build && ./../../scripts/upload-static-assets.sh",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",

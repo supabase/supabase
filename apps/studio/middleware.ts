@@ -21,6 +21,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/check-cname',
   '/edge-functions/test',
   '/edge-functions/body',
+  '/generate-attachment-url',
 ]
 
 export function middleware(request: NextRequest) {

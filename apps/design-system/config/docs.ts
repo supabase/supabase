@@ -118,6 +118,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Data Input',
+          href: '/docs/fragments/data-input',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],

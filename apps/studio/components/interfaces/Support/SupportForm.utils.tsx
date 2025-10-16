@@ -3,17 +3,16 @@ import {
   createLoader,
   createParser,
   createSerializer,
-  type inferParserType,
   parseAsString,
-  parseAsStringLiteral,
+  type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
 // End of third-party imports
 
 import {
+  DocsSearchResultType as PageType,
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
-  DocsSearchResultType as PageType,
 } from 'common'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { DOCS_URL } from 'lib/constants'
@@ -23,18 +22,22 @@ import { CATEGORY_OPTIONS } from './Support.constants'
 export const NO_PROJECT_MARKER = 'no-project'
 export const NO_ORG_MARKER = 'no-org'
 
-export const formatMessage = (
-  message: string,
-  attachments: string[],
+export const formatMessage = ({
+  message,
+  attachments = [],
+  error,
+  commit,
+}: {
+  message: string
+  attachments?: string[]
   error: string | null | undefined
-) => {
-  const errorString = error != null ? `\nError: ${error}` : ''
-  if (attachments.length > 0) {
-    const attachmentsImg = attachments.map((url) => `\n${url}`)
-    return `${message}\n${attachmentsImg.join('')}${errorString}`
-  } else {
-    return `${message}${errorString}`
-  }
+  commit: string | undefined
+}) => {
+  const errorString = error != null ? `\n\nError: ${error}` : ''
+  const attachmentsString =
+    attachments.length > 0 ? `\n\nAttachments:\n${attachments.join('\n')}` : ''
+  const commitString = commit != undefined ? `\n\n---\nSupabase Studio version:  SHA ${commit}` : ''
+  return `${message}${errorString}${attachmentsString}${commitString}`
 }
 
 export function getPageIcon(page: Page) {

@@ -96,7 +96,7 @@ export async function createIndexes({
  * @returns Whether there are index recommendations available
  */
 export function hasIndexRecommendations(
-  result: GetIndexAdvisorResultResponse | undefined,
+  result: GetIndexAdvisorResultResponse | undefined | null,
   isSuccess: boolean
 ): boolean {
   return Boolean(isSuccess && result?.index_statements && result.index_statements.length > 0)

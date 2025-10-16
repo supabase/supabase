@@ -14,8 +14,8 @@ import {
   WarningIcon,
 } from 'ui'
 import { IndexImprovementText } from './IndexImprovementText'
-import { QueryPanelScoreSection } from './QueryPanel'
-import { useIndexInvalidation } from './hooks/useIndexInvalidation'
+import { QueryPanelScoreSection } from '../QueryPanel'
+import { useIndexInvalidation } from '../hooks/useIndexInvalidation'
 import { createIndexes } from './index-advisor.utils'
 
 interface IndexSuggestionIconProps {
