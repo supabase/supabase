@@ -1,6 +1,6 @@
 import { ChevronDown, GlobeIcon, InfoIcon } from 'lucide-react'
-import { HTMLAttributes, ReactNode, useMemo, useState, useEffect } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
+import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -36,11 +36,11 @@ import { Admonition } from 'ui-patterns'
 import {
   CONNECTION_PARAMETERS,
   type ConnectionStringMethod,
-  connectionStringMethodOptions,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
   IPV4_ADDON_TEXT,
   PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
+  connectionStringMethodOptions,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
@@ -589,7 +589,7 @@ const ConnectionStringMethodSelectItem = ({
   method: ConnectionStringMethod
   poolerBadge: string
 }) => (
-  <SelectItem_Shadcn_ value={method}>
+  <SelectItem_Shadcn_ value={method} className="[&>span:first-child]:top-3.5">
     <div className="flex flex-col w-full py-1">
       <div>{connectionStringMethodOptions[method].label}</div>
       <div className="text-foreground-lighter text-xs">
