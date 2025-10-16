@@ -9,6 +9,7 @@ export const maxDuration = 120
 
 const GenerateAttachmentUrlSchema = z.object({
   filenames: z.array(z.string()),
+  bucket: z.enum(['support-attachments', 'feedback-attachments']).default('support-attachments'),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -51,9 +52,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   )
 
+  const bucket = parseResult.data.bucket
   // Create signed URLs for 10 years
   const { data, error: signedUrlError } = await adminSupabase.storage
-    .from('support-attachments')
+    .from(bucket)
     .createSignedUrls(filenames, 10 * 365 * 24 * 60 * 60)
   if (signedUrlError) {
     console.error('Failed to sign URLs for attachments', signedUrlError)
