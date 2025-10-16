@@ -68,7 +68,7 @@ const CommandInput = forwardRef<
       ref={inputRef}
       value={inputValue}
       onValueChange={setInputValue}
-      placeholder="Type a command or search..."
+      placeholder="Run a command or search..."
       onCompositionStart={() => setImeComposing(true)}
       onCompositionEnd={() => setImeComposing(false)}
       className={cn(
