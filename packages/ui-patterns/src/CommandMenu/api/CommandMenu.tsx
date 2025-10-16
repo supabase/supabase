@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, ArrowLeft } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, Command, Search } from 'lucide-react'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -143,6 +143,47 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
   return childWithClickHandler
 }
 
+function CommandMenuTriggerInput({
+  className,
+  placeholder = 'Search...',
+}: {
+  className?: string
+  placeholder?: string | React.ReactNode
+}) {
+  return (
+    <CommandMenuTrigger>
+      <button
+        type="button"
+        className={cn(
+          'group',
+          'flex-grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
+          'pl-1.5 md:pl-2 pr-1',
+          'flex items-center justify-between',
+          'bg-surface-100/75 text-foreground-lighter border',
+          'hover:bg-opacity-100 hover:border-strong',
+          'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+          'transition',
+          className
+        )}
+      >
+        <div className="flex items-center space-x-2 text-foreground-muted">
+          <Search size={18} strokeWidth={2} />
+          <p className="flex text-sm pr-2">{placeholder}</p>
+        </div>
+        <div className="hidden md:flex items-center space-x-1">
+          <div
+            aria-hidden="true"
+            className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
+          >
+            <Command size={12} strokeWidth={1.5} />
+            <span className="text-[12px]">K</span>
+          </div>
+        </div>
+      </button>
+    </CommandMenuTrigger>
+  )
+}
+
 interface CommandMenuProps extends PropsWithChildren {
   trigger?: ReactNode
 }
@@ -202,4 +243,4 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
   )
 }
 
-export { Breadcrumb, CommandMenu, CommandMenuTrigger, CommandWrapper }
+export { Breadcrumb, CommandMenu, CommandMenuTrigger, CommandMenuTriggerInput, CommandWrapper }
