@@ -550,59 +550,61 @@ export const CreateBucketModal = ({
             ) : (
               <>
                 {icebergWrapperExtensionState === 'installed' ? (
-                  <Label_Shadcn_ className="text-foreground-lighter leading-1 flex flex-col gap-y-2">
-                    <p>
-                      <span>Supabase will setup a </span>
-                      <a
-                        href={`${BASE_PATH}/project/${ref}/integrations/iceberg_wrapper/overview`}
-                        target="_blank"
-                        className="underline text-foreground-light"
-                      >
-                        foreign data wrapper
-                        {bucketName && <span className="text-brand"> {`${bucketName}_fdw`}</span>}
-                      </a>
-                      <span>
-                        {' '}
-                        for easier access to the data. This action will also create{' '}
+                  <DialogSection>
+                    <Label_Shadcn_ className="text-foreground-lighter leading-1 flex flex-col gap-y-2">
+                      <p>
+                        <span>Supabase will setup a </span>
                         <a
-                          href={`${BASE_PATH}/project/${ref}/storage/access-keys`}
+                          href={`${BASE_PATH}/project/${ref}/integrations/iceberg_wrapper/overview`}
                           target="_blank"
                           className="underline text-foreground-light"
                         >
-                          S3 Access Keys
-                          {bucketName && (
-                            <>
-                              {' '}
-                              named <span className="text-brand"> {`${bucketName}_keys`}</span>
-                            </>
-                          )}
+                          foreign data wrapper
+                          {bucketName && <span className="text-brand"> {`${bucketName}_fdw`}</span>}
                         </a>
-                        <span> and </span>
-                        <a
-                          href={`${BASE_PATH}/project/${ref}/integrations/vault/secrets`}
-                          target="_blank"
-                          className="underline text-foreground-light"
-                        >
-                          four Vault Secrets
-                          {bucketName && (
-                            <>
-                              {' '}
-                              prefixed with{' '}
-                              <span className="text-brand"> {`${bucketName}_vault_`}</span>
-                            </>
-                          )}
-                        </a>
-                        .
-                      </span>
-                    </p>
-                    <p>
-                      As a final step, you'll need to create an{' '}
-                      <span className="text-foreground-light">Iceberg namespace</span> before you
-                      connect the Iceberg data to your database.
-                    </p>
-                  </Label_Shadcn_>
+                        <span>
+                          {' '}
+                          for easier access to the data. This action will also create{' '}
+                          <a
+                            href={`${BASE_PATH}/project/${ref}/storage/access-keys`}
+                            target="_blank"
+                            className="underline text-foreground-light"
+                          >
+                            S3 Access Keys
+                            {bucketName && (
+                              <>
+                                {' '}
+                                named <span className="text-brand"> {`${bucketName}_keys`}</span>
+                              </>
+                            )}
+                          </a>
+                          <span> and </span>
+                          <a
+                            href={`${BASE_PATH}/project/${ref}/integrations/vault/secrets`}
+                            target="_blank"
+                            className="underline text-foreground-light"
+                          >
+                            four Vault Secrets
+                            {bucketName && (
+                              <>
+                                {' '}
+                                prefixed with{' '}
+                                <span className="text-brand"> {`${bucketName}_vault_`}</span>
+                              </>
+                            )}
+                          </a>
+                          .
+                        </span>
+                      </p>
+                      <p>
+                        As a final step, you'll need to create an{' '}
+                        <span className="text-foreground-light">Iceberg namespace</span> before you
+                        connect the Iceberg data to your database.
+                      </p>
+                    </Label_Shadcn_>
+                  </DialogSection>
                 ) : (
-                  <Alert_Shadcn_ variant="warning">
+                  <Alert_Shadcn_ variant="warning" className="rounded-none border-0">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
                       You need to install the Iceberg wrapper extension to connect your Analytic

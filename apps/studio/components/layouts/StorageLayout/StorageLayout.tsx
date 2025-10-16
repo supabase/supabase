@@ -26,6 +26,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
     const suffix = !!featurePreviewModal ? `?featurePreviewModal=${featurePreviewModal}` : ''
 
     if (isStorageV2) {
+      // From old UI to new UI
       if (pathname.endsWith('/storage/settings')) {
         router.push(`/project/${ref}/storage/files/settings${suffix}`)
       } else if (pathname.endsWith('/storage/policies')) {
@@ -38,6 +39,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
         }
       }
     } else {
+      // From new UI to old UI
       if (pathname.endsWith('/files/settings')) {
         router.push(`/project/${ref}/storage/settings${suffix}`)
       } else if (pathname.endsWith('/files/policies')) {
@@ -47,6 +49,12 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
         pathname.endsWith('/analytics/buckets/[bucketId]')
       ) {
         router.push(`/project/${ref}/storage/buckets/${bucketId}${suffix}`)
+      } else if (
+        pathname.endsWith('/storage/files') ||
+        pathname.endsWith('/storage/analytics') ||
+        pathname.endsWith('/storage/vectors')
+      ) {
+        router.push(`/project/${ref}/storage/buckets`)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
