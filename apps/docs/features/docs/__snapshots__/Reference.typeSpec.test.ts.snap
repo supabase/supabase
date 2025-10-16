@@ -455,7 +455,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "name": "args",
             "type": {
               "type": "nameOnly",
-              "name": "Fn['Args']"
+              "name": "Args"
             },
             "comment": {
               "shortText": "The arguments to pass to the function call"
@@ -31634,7 +31634,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "name": "args",
             "type": {
               "type": "nameOnly",
-              "name": "Fn['Args']"
+              "name": "Args"
             },
             "comment": {
               "shortText": "The arguments to pass to the function call"
@@ -34050,7 +34050,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "PostgrestTransformBuilder"
+            "name": "PostgrestFilterBuilder"
           }
         },
         "comment": {
@@ -35667,7 +35667,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "PostgrestTransformBuilder"
+            "name": "PostgrestFilterBuilder"
           }
         },
         "comment": {
