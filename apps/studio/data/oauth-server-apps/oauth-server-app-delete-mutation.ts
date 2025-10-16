@@ -10,6 +10,7 @@ export type OAuthServerAppDeleteVariables = {
   clientId?: string
   projectRef?: string
   supabaseClient?: SupabaseClient<any>
+  temporaryApiKey?: string
 }
 
 export async function deleteOAuthServerApp({
@@ -21,10 +22,10 @@ export async function deleteOAuthServerApp({
   if (!supabaseClient) throw new Error('Supabase client is required')
   if (!clientId) throw new Error('Client ID is required')
 
-  const { data, error } = await supabaseClient.auth.admin.oauth.deleteClient(clientId)
+  const { error } = await supabaseClient.auth.admin.oauth.deleteClient(clientId)
 
   if (error) handleError(error)
-  return data
+  return null
 }
 
 type OAuthAppDeleteData = Awaited<ReturnType<typeof deleteOAuthServerApp>>
@@ -43,8 +44,8 @@ export const useOAuthServerAppDeleteMutation = ({
     (vars) => deleteOAuthServerApp(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(oauthServerAppKeys.list(projectRef))
+        const { projectRef, temporaryApiKey } = variables
+        await queryClient.invalidateQueries(oauthServerAppKeys.list(projectRef, temporaryApiKey))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

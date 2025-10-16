@@ -36,7 +36,7 @@ export async function getTemporaryAPIKey(
 export type TemporaryAPIKeyData = Awaited<ReturnType<typeof getTemporaryAPIKey>>
 
 export const useTemporaryAPIKeyQuery = <TData = TemporaryAPIKeyData>(
-  { projectRef, expiry = 3600 }: getTemporaryAPIKeyVariables,
+  { projectRef, expiry = 300 }: getTemporaryAPIKeyVariables,
   { enabled = true, ...options }: UseQueryOptions<TemporaryAPIKeyData, ResponseError, TData> = {}
 ) => {
   return useQuery<TemporaryAPIKeyData, ResponseError, TData>(
@@ -44,7 +44,7 @@ export const useTemporaryAPIKeyQuery = <TData = TemporaryAPIKeyData>(
     ({ signal }) => getTemporaryAPIKey({ projectRef, expiry }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      staleTime: expiry * 1000, // convert to ms
+      refetchInterval: expiry * 1000, // convert to ms
       ...options,
     }
   )

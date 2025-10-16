@@ -29,10 +29,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { CreateOAuthAppModal } from './CreateOAuthAppModal'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
-import { UpdateOAuthAppSidePanel } from './UpdateOAuthAppSidePanel'
+import { RegenerateClientSecretDialog } from './RegenerateClientSecretDialog'
 
 export const OAUTH_APP_SCOPES_OPTIONS = [
   { name: 'email', value: 'email' },
@@ -47,42 +46,39 @@ export const OAUTH_APP_TYPE_OPTIONS = [
 
 const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
+  const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
 
   // State for OAuth apps
   const [showCreatePanel, setShowCreatePanel] = useState(false)
-  const [showUpdatePanel, setShowUpdatePanel] = useState(false)
+  const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
   const error = { message: 'Failed to retrieve oauth apps' }
 
-  const { data: supabaseClient } = useSupabaseClientQuery({ projectRef })
+  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
-  const { data, isLoading, isError } = useOAuthServerAppsQuery({
-    projectRef,
-    supabaseClient,
-  })
-  console.log(isLoading, data)
+  const { data, isLoading, isError } = useOAuthServerAppsQuery(
+    {
+      projectRef,
+      supabaseClient: supabaseClientData?.supabaseClient,
+      temporaryApiKey: supabaseClientData?.temporaryApiKey,
+    },
+    { enabled: isOAuthServerEnabled }
+  )
 
   const oAuthApps = data?.clients || []
-
-  // Handle edit button click
-  const handleEditClick = (app: OAuthClient) => {
-    setSelectedApp(app)
-    setShowUpdatePanel(true)
-  }
 
   const handleDeleteClick = (app: OAuthClient) => {
     setSelectedApp(app)
     setShowDeleteModal(true)
   }
 
-  const isOAuthServerEnabled = authConfig?.OAUTH_SERVER_ENABLED
   const [filterString, setFilterString] = useState<string>('')
 
-  if (isLoading) {
+  if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
   }
 
@@ -90,7 +86,7 @@ const OAuthAppsList = () => {
     return <AlertError error={error} subject="Failed to retrieve OAuth Server apps" />
   }
 
-  if (!isOAuthServerEnabled && oAuthApps.length === 0) {
+  if (!isOAuthServerEnabled) {
     return (
       <div className="space-y-4">
         <Card>
@@ -114,20 +110,6 @@ const OAuthAppsList = () => {
   return (
     <>
       <div className="space-y-4">
-        {!isOAuthServerEnabled && (
-          <Admonition
-            type="warning"
-            title="OAuth Server is disabled"
-            description={
-              <div className="flex flex-col items-start gap-2">
-                Enable the OAuth server again to re-activate your OAuth apps.
-                <Button type="default" className="lg:absolute lg:right-4 lg:top-4" asChild>
-                  <Link href={`/project/${projectRef}/auth/oauth-server`}>Go to Settings</Link>
-                </Button>
-              </div>
-            }
-          />
-        )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
             <Input
@@ -193,7 +175,7 @@ const OAuthAppsList = () => {
                   </TableHead>
                   <TableHead key="table">Client ID</TableHead>
                   <TableHead key="function">Type</TableHead>
-                  <TableHead key="function">Scopes</TableHead>
+                  <TableHead key="function">Scope</TableHead>
                   <TableHead key="function">Created</TableHead>
                   <TableHead key="buttons" className="w-8"></TableHead>
                 </TableRow>
@@ -209,17 +191,17 @@ const OAuthAppsList = () => {
                 {oAuthApps.length > 0 &&
                   oAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
-                      <TableCell className="max-w-64 truncate">
-                        <button type="button" onClick={() => handleEditClick(app)}>
-                          {app.client_name}
-                        </button>
-                      </TableCell>
+                      <TableCell className="max-w-64 truncate">{app.client_name}</TableCell>
                       <TableCell className="w-40">{app.client_id}</TableCell>
                       <TableCell className="w-40">
                         <Badge>{app.registration_type}</Badge>
                       </TableCell>
-                      <TableCell className="flex flex-wrap gap-2 flex-1 min-w-40">
-                        <Badge key={`${app.client_id}-${app.scope}-badge`}>{app.scope}</Badge>
+                      <TableCell className="min-w-40">
+                        {app.scope ? (
+                          <Badge key={`${app.client_id}-${app.scope}-badge`}>{app.scope}</Badge>
+                        ) : (
+                          <span className="text-xs text-foreground-light">N/A</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-xs text-foreground-light w-1/6">
                         {dayjs(app.created_at).format('D MMM, YYYY')}
@@ -233,10 +215,13 @@ const OAuthAppsList = () => {
                             <DropdownMenuContent side="bottom" align="end" className="w-32">
                               <DropdownMenuItem
                                 className="space-x-2"
-                                onClick={() => handleEditClick(app)}
+                                onClick={() => {
+                                  setSelectedApp(app)
+                                  setShowRegenerateDialog(true)
+                                }}
                               >
                                 <Edit size={14} />
-                                <p>Edit</p>
+                                <p>Regenerate client secret</p>
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="space-x-2"
@@ -258,11 +243,12 @@ const OAuthAppsList = () => {
       </div>
 
       <CreateOAuthAppModal visible={showCreatePanel} onClose={() => setShowCreatePanel(false)} />
-      <UpdateOAuthAppSidePanel
-        visible={showUpdatePanel}
-        onClose={() => setShowUpdatePanel(false)}
-        selectedApp={selectedApp}
-        onDeleteClick={handleDeleteClick}
+
+      <RegenerateClientSecretDialog
+        visible={showRegenerateDialog}
+        onClose={() => setShowRegenerateDialog(false)}
+        clientId={selectedApp?.client_id ?? ''}
+        clientSecret={selectedApp?.client_secret ?? ''}
       />
       <DeleteOAuthAppModal
         visible={showDeleteModal}

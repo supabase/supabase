@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash2 } from 'lucide-react'
+import { type CreateOAuthClientParams } from '@supabase/supabase-js'
+import { Plus, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -18,14 +19,21 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Modal,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Separator,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
   Switch,
+  cn,
 } from 'ui'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
 import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
@@ -62,11 +70,11 @@ const initialValues = {
   is_public: false,
 }
 
+const FORM_ID = 'create-oauth-app-form'
+
 export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const submitRef = useRef<HTMLButtonElement>(null)
-  const [isCreating, setIsCreating] = useState(false)
   const [showCredentialsModal, setShowCredentialsModal] = useState(false)
   const [generatedCredentials, setGeneratedCredentials] = useState<{
     clientId: string
@@ -98,30 +106,30 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
     return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
   }
 
-  const { data: supabaseClient } = useSupabaseClientQuery({ projectRef })
+  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
-  const { mutateAsync: createOAuthApp } = useOAuthServerAppCreateMutation()
+  const { mutateAsync: createOAuthApp, isLoading } = useOAuthServerAppCreateMutation()
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    setIsCreating(true)
-
     try {
       // Generate a unique ID and client_id
       const id = Date.now().toString()
       const client_id = `oauth_${id}`
       const client_secret = generateClientSecret()
 
-      await createOAuthApp({
-        projectRef,
-        supabaseClient,
+      const payload: CreateOAuthClientParams = {
         client_name: data.name,
         client_uri: '',
+        scope: data.scope,
         redirect_uris: data.redirect_uris
           .filter((uri) => uri.value.trim())
           .map((uri) => uri.value.trim()),
-        grant_types: [],
-        response_types: [],
-        scope: data.scope,
+      }
+
+      await createOAuthApp({
+        projectRef,
+        supabaseClient: supabaseClientData?.supabaseClient,
+        ...payload,
       })
 
       toast.success(`Successfully created OAuth app "${data.name}"`)
@@ -135,10 +143,7 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
         setShowCredentialsModal(true)
       }, 100)
     } catch (error) {
-      toast.error('Failed to create OAuth app')
       console.error('Error creating OAuth app:', error)
-    } finally {
-      setIsCreating(false)
     }
   }
 
@@ -154,169 +159,181 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
 
   return (
     <Fragment>
-      <Modal
-        hideFooter
-        size="large"
-        visible={visible}
-        onCancel={closeModal}
-        header="Create a new OAuth app"
-      >
-        <Form_Shadcn_ {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <Modal.Content className="space-y-4">
-              <FormField_Shadcn_
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Name"
-                    // description=""
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="My OAuth App" />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
+      <Sheet open={visible} onOpenChange={() => onClose()}>
+        <SheetContent
+          size="default"
+          showClose={false}
+          className="flex flex-col gap-0"
+          tabIndex={undefined}
+        >
+          <SheetHeader>
+            <div className="flex flex-row gap-3 items-center">
+              <SheetClose
+                className={cn(
+                  'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
+                  'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  'disabled:pointer-events-none data-[state=open]:bg-secondary',
+                  'transition'
                 )}
-              />
+              >
+                <X className="h-3 w-3" />
+                <span className="sr-only">Close</span>
+              </SheetClose>
+              <SheetTitle className="truncate">Create a new OAuth app</SheetTitle>
+            </div>
+          </SheetHeader>
+          <SheetSection className="overflow-auto flex-grow px-0">
+            <Form_Shadcn_ {...form}>
+              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout label="Name" className="px-5">
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_ {...field} placeholder="My OAuth App" />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
 
-              <FormField_Shadcn_
-                control={form.control}
-                name="scope"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Scopes"
-                    layout="vertical"
-                    description={
-                      <>
-                        Select the permissions your app will request from users.{' '}
-                        <Link
-                          href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#scopes"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-foreground-light underline hover:text-foreground transition"
-                        >
-                          Learn more
-                        </Link>
-                      </>
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_ className="w-full">
-                          <SelectValue_Shadcn_ placeholder="Select scope..." />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
-                            <SelectItem_Shadcn_ key={scope.value} value={scope.value}>
-                              {scope.name}
-                            </SelectItem_Shadcn_>
-                          ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-
-              <FormField_Shadcn_
-                control={form.control}
-                name="redirect_uris"
-                render={() => (
-                  <FormItemLayout
-                    label="Redirect URIs"
-                    layout="vertical"
-                    description="URLs where users will be redirected after authentication."
-                  >
-                    <div className="space-y-2">
-                      {redirectUriFields.map((field, index) => (
-                        <FormField_Shadcn_
-                          control={form.control}
-                          key={field.id}
-                          name={`redirect_uris.${index}.value`}
-                          render={({ field: inputField }) => (
-                            <FormItem_Shadcn_>
-                              <FormControl_Shadcn_>
-                                <div className="flex items-center space-x-2">
-                                  <Input_Shadcn_
-                                    {...inputField}
-                                    placeholder="https://example.com/callback"
-                                    className="flex-1"
-                                  />
-                                  {redirectUriFields.length > 1 && (
-                                    <Button
-                                      type="default"
-                                      size="tiny"
-                                      icon={<Trash2 size={14} />}
-                                      onClick={() => removeRedirectUri(index)}
-                                    />
-                                  )}
-                                </div>
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                            </FormItem_Shadcn_>
-                          )}
-                        />
-                      ))}
-                    </div>
-                    <Button
-                      type="default"
-                      icon={<Plus strokeWidth={1.5} />}
-                      onClick={() => appendRedirectUri({ value: '' })}
-                      className="mt-2"
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="scope"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Scope"
+                      layout="vertical"
+                      description={
+                        <>
+                          Select the permissions your app will request from users.{' '}
+                          <Link
+                            href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#scopes"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-foreground-light underline hover:text-foreground transition"
+                          >
+                            Learn more
+                          </Link>
+                        </>
+                      }
+                      className="px-5"
                     >
-                      Add redirect URI
-                    </Button>
-                  </FormItemLayout>
-                )}
-              />
+                      <FormControl_Shadcn_>
+                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger_Shadcn_ className="w-full">
+                            <SelectValue_Shadcn_ placeholder="Select scope..." />
+                          </SelectTrigger_Shadcn_>
+                          <SelectContent_Shadcn_>
+                            {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
+                              <SelectItem_Shadcn_ key={scope.value} value={scope.value}>
+                                {scope.name}
+                              </SelectItem_Shadcn_>
+                            ))}
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
 
-              <Separator />
-
-              <FormField_Shadcn_
-                control={form.control}
-                name="is_public"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Public"
-                    layout="flex"
-                    description={
-                      <>
-                        If enabled, the Authorization Code with PKCE (Proof Key for Code Exchange)
-                        flow can be used, particularly beneficial for applications that cannot
-                        securely store Client Secrets, such as native and mobile apps.{' '}
-                        <Link
-                          href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-foreground-light underline hover:text-foreground transition"
-                        >
-                          Learn more
-                        </Link>
-                      </>
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end space-x-2">
-              <Button type="default" disabled={isCreating} onClick={closeModal}>
-                Cancel
-              </Button>
-              <Button htmlType="submit" disabled={isCreating} loading={isCreating}>
-                Create app
-              </Button>
-            </Modal.Content>
-            <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
-              Create
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="redirect_uris"
+                  render={() => (
+                    <FormItemLayout
+                      label="Redirect URIs"
+                      layout="vertical"
+                      description="URLs where users will be redirected after authentication."
+                      className="px-5"
+                    >
+                      <div className="space-y-2">
+                        {redirectUriFields.map((field, index) => (
+                          <FormField_Shadcn_
+                            control={form.control}
+                            key={field.id}
+                            name={`redirect_uris.${index}.value`}
+                            render={({ field: inputField }) => (
+                              <FormItem_Shadcn_>
+                                <FormControl_Shadcn_>
+                                  <div className="flex items-center space-x-2">
+                                    <Input_Shadcn_
+                                      {...inputField}
+                                      placeholder="https://example.com/callback"
+                                      className="flex-1"
+                                    />
+                                    {redirectUriFields.length > 1 && (
+                                      <Button
+                                        type="default"
+                                        size="tiny"
+                                        className="h-[34px]"
+                                        icon={<Trash2 size={14} />}
+                                        onClick={() => removeRedirectUri(index)}
+                                      />
+                                    )}
+                                  </div>
+                                </FormControl_Shadcn_>
+                                <FormMessage_Shadcn_ />
+                              </FormItem_Shadcn_>
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <Button
+                        type="default"
+                        icon={<Plus strokeWidth={1.5} />}
+                        onClick={() => appendRedirectUri({ value: '' })}
+                        className="mt-2"
+                      >
+                        Add redirect URI
+                      </Button>
+                    </FormItemLayout>
+                  )}
+                />
+                <Separator />
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="is_public"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Public"
+                      layout="flex"
+                      description={
+                        <>
+                          If enabled, the Authorization Code with PKCE (Proof Key for Code Exchange)
+                          flow can be used, particularly beneficial for applications that cannot
+                          securely store Client Secrets, such as native and mobile apps.{' '}
+                          <Link
+                            href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-foreground-light underline hover:text-foreground transition"
+                          >
+                            Learn more
+                          </Link>
+                        </>
+                      }
+                      className="px-5"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </form>
+            </Form_Shadcn_>
+          </SheetSection>
+          <SheetFooter>
+            <Button type="default" disabled={isLoading} onClick={closeModal}>
+              Cancel
             </Button>
-          </form>
-        </Form_Shadcn_>
-      </Modal>
+            <Button htmlType="submit" form={FORM_ID} loading={isLoading}>
+              Create app
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       {generatedCredentials && (
         <OAuthAppCredentialsModal

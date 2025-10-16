@@ -1,3 +1,5 @@
 export const oauthServerAppKeys = {
-  list: (projectRef: string | undefined) => [projectRef, 'oauth-server-apps'] as const,
+  // temporaryApiKey has to be added to reset the query when it changes
+  list: (projectRef: string | undefined, temporaryApiKey: string | undefined) =>
+    [projectRef, 'oauth-server-apps', temporaryApiKey] as const,
 }

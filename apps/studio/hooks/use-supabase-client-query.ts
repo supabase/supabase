@@ -33,9 +33,9 @@ const getSupabaseClient = ({
     return undefined
   }
 
-  const client = createClient(clientEndpoint, apiKey)
+  const supabaseClient = createClient(clientEndpoint, apiKey)
 
-  return client
+  return { supabaseClient, temporaryApiKey: apiKey }
 }
 
 export const useSupabaseClientQuery = (
