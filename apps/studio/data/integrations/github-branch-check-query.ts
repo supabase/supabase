@@ -14,12 +14,12 @@ export async function checkGithubBranchValidity(
   signal?: AbortSignal
 ) {
   const { data, error } = await get(
-    '/platform/integrations/github/repositories/{repositoryId}/branches/{branchName}',
+    '/platform/integrations/github/repositories/{repository_id}/branches/{branch_name}',
     {
       params: {
         path: {
-          repositoryId,
-          branchName,
+          repository_id: repositoryId,
+          branch_name: branchName,
         },
       },
       signal,

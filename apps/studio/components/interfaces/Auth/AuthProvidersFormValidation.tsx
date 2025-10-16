@@ -448,6 +448,12 @@ const EXTERNAL_PROVIDER_APPLE = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_APPLE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_APPLE_ENABLED: boolean().required(),
@@ -525,6 +531,7 @@ const EXTERNAL_PROVIDER_APPLE = {
         then: (schema) =>
           schema.required('At least one Client ID is required when Apple sign-in is enabled.'),
       }),
+    EXTERNAL_APPLE_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'apple-icon',
@@ -566,6 +573,12 @@ const EXTERNAL_PROVIDER_AZURE = {
       descriptionOptional: 'Optional',
       type: 'string',
     },
+    EXTERNAL_AZURE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_AZURE_ENABLED: boolean().required(),
@@ -580,6 +593,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       otherwise: (schema) => schema,
     }),
     EXTERNAL_AZURE_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    EXTERNAL_AZURE_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -605,6 +619,12 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
       title: 'Secret',
       type: 'string',
       isSecret: true,
+    },
+    EXTERNAL_BITBUCKET_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
     },
   },
   validationSchema: object().shape({
@@ -645,6 +665,12 @@ const EXTERNAL_PROVIDER_DISCORD = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_DISCORD_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_DISCORD_ENABLED: boolean().required(),
@@ -658,6 +684,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_DISCORD_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'discord-icon',
@@ -684,6 +711,12 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_FACEBOOK_ENABLED: boolean().required(),
@@ -697,6 +730,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
       then: (schema) => schema.required('"Facebook secret" is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'facebook-icon',
@@ -723,6 +757,12 @@ const EXTERNAL_PROVIDER_FIGMA = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_FIGMA_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_FIGMA_ENABLED: boolean().required(),
@@ -736,6 +776,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_FIGMA_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'figma-icon',
@@ -762,6 +803,12 @@ const EXTERNAL_PROVIDER_GITHUB = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_GITHUB_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_GITHUB_ENABLED: boolean().required(),
@@ -775,6 +822,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_GITHUB_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'github-icon',
@@ -808,6 +856,12 @@ const EXTERNAL_PROVIDER_GITLAB = {
       descriptionOptional: 'Optional',
       type: 'string',
     },
+    EXTERNAL_GITLAB_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_GITLAB_ENABLED: boolean().required(),
@@ -822,6 +876,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
       otherwise: (schema) => schema,
     }),
     EXTERNAL_GITLAB_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    EXTERNAL_GITLAB_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'gitlab-icon',
@@ -859,6 +914,12 @@ const EXTERNAL_PROVIDER_GOOGLE = {
         "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such as with iOS.",
       type: 'boolean',
     },
+    EXTERNAL_GOOGLE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_GOOGLE_ENABLED: boolean().required(),
@@ -882,6 +943,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
         ),
     }),
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
+    EXTERNAL_GOOGLE_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'google-icon',
@@ -912,6 +974,12 @@ const EXTERNAL_PROVIDER_KAKAO = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_KAKAO_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_KAKAO_ENABLED: boolean().required(),
@@ -925,6 +993,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
       then: (schema) => schema.required('Client Secret Code is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_KAKAO_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'kakao-icon',
@@ -957,6 +1026,12 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
       description: '',
       type: 'string',
     },
+    EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_KEYCLOAK_ENABLED: boolean().required(),
@@ -976,6 +1051,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
         schema.matches(urlRegex(), 'Must be a valid URL').required('Realm URL is required'),
       otherwise: (schema) => schema.matches(urlRegex(), 'Must be a valid URL'),
     }),
+    EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'keycloak-icon',
@@ -1003,6 +1079,12 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean().required(),
@@ -1016,6 +1098,7 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
       then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'linkedin-icon',
@@ -1042,6 +1125,12 @@ const EXTERNAL_PROVIDER_NOTION = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_NOTION_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_NOTION_ENABLED: boolean().required(),
@@ -1055,6 +1144,7 @@ const EXTERNAL_PROVIDER_NOTION = {
       then: (schema) => schema.required('OAuth client secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_NOTION_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'notion-icon',
@@ -1081,6 +1171,12 @@ const EXTERNAL_PROVIDER_TWITCH = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_TWITCH_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_TWITCH_ENABLED: boolean().required(),
@@ -1094,6 +1190,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
       then: (schema) => schema.required('Client secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_TWITCH_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'twitch-icon',
@@ -1120,6 +1217,12 @@ const EXTERNAL_PROVIDER_TWITTER = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_TWITTER_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_TWITTER_ENABLED: boolean().required(),
@@ -1133,6 +1236,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
       then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_TWITTER_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'twitter-icon',
@@ -1159,6 +1263,12 @@ const EXTERNAL_PROVIDER_SLACK = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_SLACK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_SLACK_ENABLED: boolean().required(),
@@ -1172,6 +1282,7 @@ const EXTERNAL_PROVIDER_SLACK = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_SLACK_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'slack-icon',
@@ -1199,6 +1310,12 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_SLACK_OIDC_ENABLED: boolean().required(),
@@ -1212,6 +1329,7 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'slack-icon',
@@ -1238,6 +1356,12 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_SPOTIFY_ENABLED: boolean().required(),
@@ -1251,6 +1375,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'spotify-icon',
@@ -1327,6 +1452,12 @@ const EXTERNAL_PROVIDER_ZOOM = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_ZOOM_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_ZOOM_ENABLED: boolean().required(),
@@ -1340,6 +1471,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
       then: (schema) => schema.required('Client secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_ZOOM_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'zoom-icon',

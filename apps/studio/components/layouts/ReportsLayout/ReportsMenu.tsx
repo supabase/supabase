@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus, ArrowUpRight } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -149,8 +149,7 @@ const ReportsMenu = () => {
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/advisors/query-performance`,
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          url: `/project/${ref}/reports/query-performance${preservedQueryParams}`,
         },
         ...(postgrestReportEnabled
           ? [
@@ -261,9 +260,6 @@ const ReportsMenu = () => {
                           className="flex-grow h-7 flex justify-between items-center pl-3"
                         >
                           <span>{subItem.name}</span>
-                          {subItem.rightIcon && (
-                            <span className="shrink-0">{subItem.rightIcon}</span>
-                          )}
                         </Link>
                       </li>
                     ))}

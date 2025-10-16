@@ -30,14 +30,14 @@ import { WrapperMeta } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
 
+const FORM_ID = 'create-wrapper-form'
+
 export interface CreateWrapperSheetProps {
   isClosing: boolean
   wrapperMeta: WrapperMeta
   setIsClosing: (v: boolean) => void
   onClose: () => void
 }
-
-const FORM_ID = 'create-wrapper-form'
 
 export const CreateWrapperSheet = ({
   wrapperMeta,

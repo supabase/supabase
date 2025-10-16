@@ -74,10 +74,8 @@ export const ChartBlock = ({
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
-      startDate,
-      endDate,
-      interval: interval as AnalyticsInterval,
-      databaseIdentifier,
+      startDate: dayjs(startDate).format('YYYY-MM-DD'),
+      endDate: dayjs(endDate).format('YYYY-MM-DD'),
     },
     { enabled: provider === 'daily-stats' }
   )
