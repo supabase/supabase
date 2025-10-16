@@ -23,11 +23,15 @@ import {
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
-import { IndexImprovementText } from './IndexImprovementText'
+import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
+import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
-import { calculateImprovement, createIndexes, hasIndexRecommendations } from './index-advisor.utils'
+import {
+  calculateImprovement,
+  createIndexes,
+  hasIndexRecommendations,
+} from './IndexAdvisor/index-advisor.utils'
 
 interface QueryIndexesProps {
   selectedRow: any

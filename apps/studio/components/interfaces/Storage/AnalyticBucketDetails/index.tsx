@@ -80,7 +80,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       .find((w) => w.name === snakeCase(`${bucket.name}_fdw`))
   }, [data, bucket.name])
 
-  const extensionState = useIcebergWrapperExtension()
+  const { state: extensionState } = useIcebergWrapperExtension()
 
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
 
