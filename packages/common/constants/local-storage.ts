@@ -71,6 +71,8 @@ export const LOCAL_STORAGE_KEYS = {
     `user-impersonation-selector-previous-searches-${ref}`,
 
   HOTKEY_INLINE_EDITOR: 'supabase-dashboard-hotkey-inline-editor',
+  HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
+  HOTKEY_AI_ASSISTANT: 'supabase-dashboard-hotkey-ai-assistant',
 
   /**
    * COMMON

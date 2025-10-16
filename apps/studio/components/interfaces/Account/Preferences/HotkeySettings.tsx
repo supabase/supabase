@@ -8,6 +8,14 @@ export const HotkeySettings = () => {
     LOCAL_STORAGE_KEYS.HOTKEY_INLINE_EDITOR,
     true
   )
+  const [commandMenuEnabled, setCommandMenuEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU,
+    true
+  )
+  const [aiAssistantEnabled, setAiAssistantEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_AI_ASSISTANT,
+    true
+  )
 
   return (
     <Panel title={<h5 id="keyboard-shortcuts">Keyboard shortcuts</h5>}>
@@ -15,6 +23,18 @@ export const HotkeySettings = () => {
         <p className="text-sm text-foreground-light">
           Choose which shortcuts stay active while working in the dashboard.
         </p>
+        <Toggle
+          checked={commandMenuEnabled}
+          onChange={() => setCommandMenuEnabled(!commandMenuEnabled)}
+          label="Command menu"
+          descriptionText="Cmd/Ctrl + K toggles the global command menu."
+        />
+        <Toggle
+          checked={aiAssistantEnabled}
+          onChange={() => setAiAssistantEnabled(!aiAssistantEnabled)}
+          label="AI Assistant"
+          descriptionText="Cmd/Ctrl + I toggles the AI Assistant panel."
+        />
         <Toggle
           checked={inlineEditorEnabled}
           onChange={() => setInlineEditorEnabled(!inlineEditorEnabled)}
