@@ -1,21 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useLocalStorage } from '@uidotdev/usehooks'
-import { ArrowUpRight, Edit } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useParams } from 'common'
-import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
-import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
-import { DeleteBucketModal } from 'components/interfaces/Storage'
-import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useFlag, useParams } from 'common'
+import { CreateBucketModal } from 'components/interfaces/Storage/CreateBucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -23,25 +19,25 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import BucketRow from './BucketRow'
+import { BucketRow } from './BucketRow'
 
-const StorageMenu = () => {
+export const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
-  const projectDetails = useSelectedProject()
+  const { data: projectDetails } = useSelectedProjectQuery()
+  const snap = useStorageExplorerStateSnapshot()
+
+  const showMigrationCallout = useFlag('storageMigrationCallout')
+  const { data: config } = useProjectStorageConfigQuery(
+    { projectRef: ref },
+    { enabled: showMigrationCallout }
+  )
+  const isListV2UpgradeAvailable =
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'main'
+
   const isBranch = projectDetails?.parent_project_ref !== undefined
 
   const [searchText, setSearchText] = useState<string>('')
-  const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
-  const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<Bucket>()
-  const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<Bucket>()
-  const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<Bucket>()
-  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-
-  const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
-    'storage-explorer-sort',
-    'created-at'
-  )
 
   const page = router.pathname.split('/')[4] as
     | undefined
@@ -58,7 +54,7 @@ const StorageMenu = () => {
     isSuccess,
   } = useBucketsQuery({ projectRef: ref })
   const sortedBuckets =
-    sort === 'alphabetical'
+    snap.sortBucket === 'alphabetical'
       ? buckets.sort((a, b) =>
           a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
         )
@@ -71,26 +67,9 @@ const StorageMenu = () => {
 
   return (
     <>
-      <Menu type="pills" className="my-6 flex flex-grow flex-col">
+      <Menu type="pills" className="mt-6 flex flex-grow flex-col">
         <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
-          <ButtonTooltip
-            block
-            type="default"
-            icon={<Edit />}
-            disabled={!canCreateBuckets}
-            style={{ justifyContent: 'start' }}
-            onClick={() => setShowCreateBucketModal(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canCreateBuckets
-                  ? 'You need additional permissions to create buckets'
-                  : undefined,
-              },
-            }}
-          >
-            New bucket
-          </ButtonTooltip>
+          <CreateBucketModal />
 
           <InnerSideBarFilters className="px-0">
             <InnerSideBarFilterSearchInput
@@ -103,8 +82,8 @@ const StorageMenu = () => {
               }}
             >
               <InnerSideBarFilterSortDropdown
-                value={sort}
-                onValueChange={(value: any) => setSort(value)}
+                value={snap.sortBucket}
+                onValueChange={(value: any) => snap.setSortBucket(value)}
               >
                 <InnerSideBarFilterSortDropdownItem
                   key="alphabetical"
@@ -174,9 +153,6 @@ const StorageMenu = () => {
                       bucket={bucket}
                       projectRef={ref}
                       isSelected={isSelected}
-                      onSelectEmptyBucket={() => setSelectedBucketToEmpty(bucket)}
-                      onSelectDeleteBucket={() => setSelectedBucketToDelete(bucket)}
-                      onSelectEditBucket={() => setSelectedBucketToEdit(bucket)}
                     />
                   )
                 })}
@@ -184,51 +160,28 @@ const StorageMenu = () => {
             )}
           </div>
 
-          <div className="h-px w-full bg-border" />
-
-          <div className="mx-3">
+          <div className="w-full bg-dash-sidebar px-3 py-6 sticky bottom-0 border-t border-border">
             <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
             <Link href={`/project/${ref}/storage/policies`}>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>
               </Menu.Item>
             </Link>
-            <Link href={`/project/${ref}/settings/storage`}>
-              <Menu.Item rounded>
-                <div className="flex items-center justify-between">
-                  <p className="truncate">Settings</p>
-                  <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
-                </div>
-              </Menu.Item>
-            </Link>
+            {IS_PLATFORM && (
+              <Link href={`/project/${ref}/storage/settings`}>
+                <Menu.Item rounded active={page === 'settings'}>
+                  <div className="flex items-center gap-x-2">
+                    <p className="truncate">Settings</p>
+                    {isListV2UpgradeAvailable && (
+                      <InfoTooltip side="right">Upgrade available</InfoTooltip>
+                    )}
+                  </div>
+                </Menu.Item>
+              </Link>
+            )}
           </div>
         </div>
       </Menu>
-
-      <CreateBucketModal
-        visible={showCreateBucketModal}
-        onClose={() => setShowCreateBucketModal(false)}
-      />
-
-      <EditBucketModal
-        visible={selectedBucketToEdit !== undefined}
-        bucket={selectedBucketToEdit}
-        onClose={() => setSelectedBucketToEdit(undefined)}
-      />
-
-      <EmptyBucketModal
-        visible={selectedBucketToEmpty !== undefined}
-        bucket={selectedBucketToEmpty}
-        onClose={() => setSelectedBucketToEmpty(undefined)}
-      />
-
-      <DeleteBucketModal
-        visible={selectedBucketToDelete !== undefined}
-        bucket={selectedBucketToDelete}
-        onClose={() => setSelectedBucketToDelete(undefined)}
-      />
     </>
   )
 }
-
-export default StorageMenu

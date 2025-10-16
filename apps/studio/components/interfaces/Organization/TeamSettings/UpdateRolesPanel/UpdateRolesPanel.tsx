@@ -10,7 +10,8 @@ import { OrganizationMember } from 'data/organizations/organization-members-quer
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -58,12 +59,17 @@ interface UpdateRolesPanelProps {
 
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
   const { slug } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data: projects } = useProjectsQuery()
-  const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
+  const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
+
+  // [Joshen] We only need this data if the org has project scoped roles
+  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
+  const projects = data?.projects ?? []
+
+  const { data: permissions } = usePermissionsQuery()
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -185,7 +191,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               <p className="truncate" title={`Manage access for ${member.username}`}>
                 Manage access for {member.username}
               </p>
-              <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
+              <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
             </SheetHeader>
 
             <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">

@@ -1,11 +1,11 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -32,6 +32,7 @@ export type MonacoEditorProps = {
     startLineNumber: number
     endLineNumber: number
   }) => void
+  placeholder?: string
 }
 
 const MonacoEditor = ({
@@ -39,6 +40,7 @@ const MonacoEditor = ({
   editorRef,
   monacoRef,
   autoFocus = true,
+  placeholder = '',
   className,
   executeQuery,
   onHasSelection,
@@ -48,16 +50,20 @@ const MonacoEditor = ({
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, content } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
-
   const aiSnap = useAiAssistantStateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
+
+  // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
+  const [value, setValue] = useState('')
+  const debouncedValue = useDebounce(value, 1000)
 
   const snippet = snapV2.snippets[id]
   const disableEdit =
@@ -83,6 +89,17 @@ const MonacoEditor = ({
       contextMenuOrder: 0,
       run: () => {
         executeQueryRef.current()
+      },
+    })
+
+    editor.addAction({
+      id: 'save-query',
+      label: 'Save Query',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: () => {
+        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
       },
     })
 
@@ -149,33 +166,31 @@ const MonacoEditor = ({
     onMount?.(editor)
   }
 
-  const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
-
   function handleEditorChange(value: string | undefined) {
-    // make active tab permanent
     tabsSnap.makeActiveTabPermanent()
-
-    const snippetCheck = snapV2.snippets[id]
-
     if (id && value) {
-      if (snippetCheck) {
-        debouncedSetSql(id, value)
-      } else {
-        if (ref && profile !== undefined && project !== undefined) {
-          const snippet = createSqlSnippetSkeletonV2({
-            id,
-            name: untitledSnippetTitle,
-            sql: value,
-            owner_id: profile?.id,
-            project_id: project?.id,
-          })
-          snapV2.addSnippet({ projectRef: ref, snippet })
-          snapV2.addNeedsSaving(snippet.id)
-          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-        }
+      if (!!snippet) {
+        setValue(value)
+      } else if (ref && !!profile && !!project) {
+        const snippet = createSqlSnippetSkeletonV2({
+          id,
+          name: untitledSnippetTitle,
+          sql: value,
+          owner_id: profile?.id,
+          project_id: project?.id,
+        })
+        snapV2.addSnippet({ projectRef: ref, snippet })
+        router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
       }
     }
   }
+
+  useEffect(() => {
+    if (debouncedValue.length > 0 && snippet) {
+      snapV2.setSql(id, value)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue])
 
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.
@@ -204,6 +219,7 @@ const MonacoEditor = ({
         options={{
           tabSize: 2,
           fontSize: 13,
+          placeholder,
           lineDecorationsWidth: 0,
           readOnly: disableEdit,
           minimap: { enabled: false },

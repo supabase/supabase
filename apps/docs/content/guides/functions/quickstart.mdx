@@ -115,7 +115,7 @@ Open a new terminal and test your function with curl:
 
 <Admonition type="tip">
 
-**Need your `SUPABASE_ANON_KEY`?**
+**Need your `SUPABASE_PUBLISHABLE_KEY`?**
 
 Run `supabase status` to see your local anon key and other credentials.
 
@@ -123,7 +123,7 @@ Run `supabase status` to see your local anon key and other credentials.
 
 ```bash
 curl -i --location --request POST 'http://localhost:54321/functions/v1/hello-world' \
-  --header 'Authorization: Bearer SUPABASE_ANON_KEY' \
+  --header 'Authorization: Bearer SUPABASE_PUBLISHABLE_KEY' \
   --header 'Content-Type: application/json' \
   --data '{"name":"Functions"}'
 ```
@@ -229,7 +229,7 @@ Now, you should have your Edge Function deployed and running globally at `https:
 
 ```bash
 curl --request POST 'https://[YOUR_PROJECT_ID].supabase.co/functions/v1/hello-world' \
-  --header 'Authorization: Bearer SUPABASE_ANON_KEY' \
+  --header 'Authorization: Bearer SUPABASE_PUBLISHABLE_KEY' \
   --header 'Content-Type: application/json' \
   --data '{"name":"Production"}'
 ```
@@ -242,7 +242,7 @@ curl --request POST 'https://[YOUR_PROJECT_ID].supabase.co/functions/v1/hello-wo
 
 <Admonition type="note" label="Production vs Development Keys">
 
-The `SUPABASE_ANON_KEY` is different in development and production. To get your production anon key, you can find it in your Supabase dashboard under **Settings > API**.
+The `SUPABASE_PUBLISHABLE_KEY` is different in development and production. To get your production anon key, you can find it in your Supabase dashboard under **Settings > API**.
 
 </Admonition>
 

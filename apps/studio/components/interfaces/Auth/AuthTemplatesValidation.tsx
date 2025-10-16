@@ -1,5 +1,7 @@
-import type { FormSchema } from 'types'
 import { object, string } from 'yup'
+
+import { DOCS_URL } from 'lib/constants'
+import type { FormSchema } from 'types'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -34,7 +36,7 @@ const CONFIRMATION: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -69,7 +71,7 @@ const INVITE: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -104,7 +106,7 @@ const MAGIC_LINK: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -140,7 +142,7 @@ const EMAIL_CHANGE: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -175,7 +177,7 @@ const RECOVERY: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 const REAUTHENTICATION: FormSchema = {
@@ -206,7 +208,7 @@ const REAUTHENTICATION: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 

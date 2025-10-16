@@ -1,8 +1,7 @@
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Button, cn, ResizablePanel } from 'ui'
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'

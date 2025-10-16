@@ -151,14 +151,15 @@ export interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {
   showClose?: boolean
+  hasOverlay?: boolean
 }
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   DialogContentProps
->(({ side, size, className, children, showClose = true, ...props }, ref) => (
+>(({ side, size, className, children, showClose = true, hasOverlay = true, ...props }, ref) => (
   <SheetPortal side={side}>
-    <SheetOverlay />
+    {hasOverlay && <SheetOverlay />}
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ side, size }), className)}

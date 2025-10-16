@@ -222,7 +222,7 @@ export function RotateKeyDialog({
                   onCheckedChange={(value) => setEdgeFunctionsVerifyJWTUnderstood(!!value)}
                 />
                 <p className="text-sm text-foreground-light">
-                  The following Edge Functions may stop funtioning for signed-in users as they
+                  The following Edge Functions may stop functioning for signed-in users as they
                   verify the legacy JWT secret:{' '}
                   {verifyJWTEdgeFunctions
                     .map(({ name }) => (

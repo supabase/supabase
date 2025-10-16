@@ -1,19 +1,20 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GitMerge } from 'lucide-react'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useParams } from 'common'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const MergeRequestButton = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const projectDetails = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: projectDetails } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const projectRef = projectDetails?.parent_project_ref || ref
 
@@ -32,7 +33,7 @@ export const MergeRequestButton = () => {
   if (!projectRef || !selectedBranch || selectedBranch.is_default || selectedBranch.git_branch)
     return null
 
-  const hasReviewRequested = !!selectedBranch?.review_requested_at
+  const hasReviewRequested = !!selectedBranch.review_requested_at
   const buttonLabel = hasReviewRequested ? 'Review merge request' : 'Open merge request'
 
   const handleClick = () => {
@@ -41,7 +42,7 @@ export const MergeRequestButton = () => {
     } else {
       updateBranch(
         {
-          id: selectedBranch.id,
+          branchRef: selectedBranch.project_ref,
           projectRef,
           requestReview: true,
         },

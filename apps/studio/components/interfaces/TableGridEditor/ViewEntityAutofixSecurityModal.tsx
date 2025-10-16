@@ -1,11 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import { lintKeys } from 'data/lint/keys'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Entity, isViewLike } from 'data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ScrollArea, SimpleCodeBlock } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -21,7 +21,7 @@ export default function ViewEntityAutofixSecurityModal({
   isAutofixViewSecurityModalOpen,
   setIsAutofixViewSecurityModalOpen,
 }: ViewEntityAutofixSecurityModalProps) {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
   const { isSuccess, isLoading, data } = useViewDefinitionQuery(
     {

@@ -7,7 +7,7 @@ import { useDataTable } from './providers/DataTableProvider'
 
 export function DataTableResetButton() {
   const { table } = useDataTable()
-  useHotKey(table.resetColumnFilters, 'Escape')
+  useHotKey(() => table.resetColumnFilters(), 'Escape')
 
   return (
     <Tooltip>

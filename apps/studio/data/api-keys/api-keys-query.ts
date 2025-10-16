@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
-
 import { apiKeysKeys } from './keys'
 
 type LegacyKeys = {
@@ -58,9 +58,7 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
     signal,
   })
 
-  if (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
   return data as unknown as APIKey[]
@@ -70,16 +68,17 @@ export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 
 export const useAPIKeysQuery = <TData = APIKeysData>(
   { projectRef, reveal = false }: APIKeysVariables,
-  { enabled, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
-) =>
-  useQuery<APIKeysData, ResponseError, TData>(
+  { enabled = true, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
+) => {
+  return useQuery<APIKeysData, ResponseError, TData>(
     apiKeysKeys.list(projectRef, reveal),
     ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
     {
-      enabled: enabled && !!projectRef,
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
+}
 
 export const getKeys = (apiKeys: APIKey[] = []) => {
   const anonKey = apiKeys.find((x) => x.name === 'anon')

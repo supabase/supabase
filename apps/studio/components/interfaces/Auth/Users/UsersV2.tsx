@@ -1,34 +1,28 @@
 import { useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { ArrowDown, ArrowUp, Loader2, RefreshCw, Search, Trash, Users, X } from 'lucide-react'
+import { RefreshCw, Trash, Users, X } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import APIDocsButton from 'components/ui/APIDocsButton'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   Button,
   cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
@@ -39,31 +33,63 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import AddUserDropdown from './AddUserDropdown'
+import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
+import { SortDropdown } from './SortDropdown'
 import { UserPanel } from './UserPanel'
 import {
   ColumnConfiguration,
+  Filter,
   MAX_BULK_DELETE,
+  PHONE_NUMBER_LEFT_PREFIX_REGEX,
   PROVIDER_FILTER_OPTIONS,
   USERS_TABLE_COLUMNS,
+  UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
-import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
+import { formatUserColumns, formatUsersData } from './Users.utils'
+import { UsersFooter } from './UsersFooter'
+import { UsersSearch } from './UsersSearch'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
-export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
-
-// [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
-// Can change it to remove V2 thereafter
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const {
+    authenticationShowProviderFilter: showProviderFilter,
+    authenticationShowSortByEmail: showSortByEmail,
+    authenticationShowSortByPhone: showSortByPhone,
+    authenticationShowUserTypeFilter: showUserTypeFilter,
+    authenticationShowEmailPhoneColumns: showEmailPhoneColumns,
+  } = useIsFeatureEnabled([
+    'authentication:show_provider_filter',
+    'authentication:show_sort_by_email',
+    'authentication:show_sort_by_phone',
+    'authentication:show_user_type_filter',
+    'authentication:show_email_phone_columns',
+  ])
+
+  const userTableColumns = useMemo(() => {
+    if (showEmailPhoneColumns) return USERS_TABLE_COLUMNS
+    else {
+      return USERS_TABLE_COLUMNS.filter((col) => {
+        if (col.id === 'email' || col.id === 'phone') return false
+        return true
+      })
+    }
+  }, [showEmailPhoneColumns])
+
+  const [specificFilterColumn, setSpecificFilterColumn] = useState<
+    'id' | 'email' | 'phone' | 'freeform'
+  >('id' as const)
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
@@ -71,13 +97,14 @@ export const UsersV2 = () => {
   const [filterKeywords, setFilterKeywords] = useState('')
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
-  const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
+  const [sortByValue, setSortByValue] = useState<string>('id:asc')
 
   const [selectedUser, setSelectedUser] = useState<string>()
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
+  const [showFreeformWarning, setShowFreeformWarning] = useState(false)
 
   const [
     columnConfiguration,
@@ -106,10 +133,13 @@ export const UsersV2 = () => {
       projectRef,
       connectionString: project?.connectionString,
       keywords: filterKeywords,
-      filter: filter === 'all' ? undefined : filter,
+      filter: specificFilterColumn !== 'freeform' || filter === 'all' ? undefined : filter,
       providers: selectedProviders,
-      sort: sortColumn as 'created_at' | 'email' | 'phone',
+      sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
+      ...(specificFilterColumn !== 'freeform'
+        ? { column: specificFilterColumn }
+        : { column: undefined }),
     },
     {
       keepPreviousData: Boolean(filterKeywords),
@@ -119,20 +149,24 @@ export const UsersV2 = () => {
     }
   )
 
-  const { data: countData, refetch: refetchCount } = useUsersCountQuery({
-    projectRef,
-    connectionString: project?.connectionString,
-    keywords: filterKeywords,
-    filter: filter === 'all' ? undefined : filter,
-    providers: selectedProviders,
-  })
-
   const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
-  const totalUsers = countData ?? 0
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
+
+  const telemetryProps = {
+    sort_column: sortColumn,
+    sort_order: sortOrder,
+    providers: selectedProviders,
+    user_type: filter === 'all' ? undefined : filter,
+    keywords: filterKeywords,
+    filter_column: specificFilterColumn === 'freeform' ? undefined : specificFilterColumn,
+  }
+  const telemetryGroups = {
+    project: projectRef ?? 'Unknown',
+    organization: selectedOrg?.slug ?? 'Unknown',
+  }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
@@ -148,11 +182,6 @@ export const UsersV2 = () => {
       return
     }
     fetchNextPage()
-  }
-
-  const clearSearch = () => {
-    setSearch('')
-    setFilterKeywords('')
   }
 
   const swapColumns = (data: any[], sourceIdx: number, targetIdx: number) => {
@@ -198,10 +227,7 @@ export const UsersV2 = () => {
         userIds.map((id) => deleteUser({ projectRef, userId: id, skipInvalidation: true }))
       )
       // [Joshen] Skip invalidation within RQ to prevent multiple requests, then invalidate once at the end
-      await Promise.all([
-        queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-        queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
-      ])
+      await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
       toast.success(
         `Successfully deleted the selected ${selectedUsers.size} user${selectedUsers.size > 1 ? 's' : ''}`
       )
@@ -223,6 +249,8 @@ export const UsersV2 = () => {
         (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
     ) {
       const columns = formatUserColumns({
+        specificFilterColumn,
+        columns: userTableColumns,
         config: columnConfiguration ?? [],
         users: users ?? [],
         visibleColumns: selectedColumns,
@@ -230,7 +258,7 @@ export const UsersV2 = () => {
         onSelectDeleteUser: setSelectedUserToDelete,
       })
       setColumns(columns)
-      if (columns.length < USERS_TABLE_COLUMNS.length) {
+      if (columns.length < userTableColumns.length) {
         setSelectedColumns(columns.filter((col) => col.key !== 'img').map((col) => col.key))
       }
     }
@@ -243,7 +271,15 @@ export const UsersV2 = () => {
     errorStorage,
     users,
     selectedUsers,
+    specificFilterColumn,
   ])
+
+  const searchInvalid =
+    !search || specificFilterColumn === 'freeform' || specificFilterColumn === 'email'
+      ? false
+      : specificFilterColumn === 'id'
+        ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
+        : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
 
   return (
     <>
@@ -266,69 +302,102 @@ export const UsersV2 = () => {
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                <Input
-                  size="tiny"
-                  className="w-52 pl-7 bg-transparent"
-                  iconContainerClassName="pl-2"
-                  icon={<Search size={14} className="text-foreground-lighter" />}
-                  placeholder="Search email, phone or UID"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.code === 'Enter') {
-                      setSearch(search.trim())
-                      setFilterKeywords(search.trim().toLocaleLowerCase())
+                <UsersSearch
+                  search={search}
+                  searchInvalid={searchInvalid}
+                  specificFilterColumn={specificFilterColumn}
+                  setSearch={setSearch}
+                  setFilterKeywords={(s) => {
+                    setFilterKeywords(s)
+                    setSelectedUser(undefined)
+                    sendEvent({
+                      action: 'auth_users_search_submitted',
+                      properties: {
+                        trigger: 'search_input',
+                        ...telemetryProps,
+                        keywords: s,
+                      },
+                      groups: telemetryGroups,
+                    })
+                  }}
+                  setSpecificFilterColumn={(value) => {
+                    if (value === 'freeform') {
+                      setShowFreeformWarning(true)
+                    } else {
+                      setSpecificFilterColumn(value)
                     }
                   }}
-                  actions={[
-                    search && (
-                      <Button
-                        size="tiny"
-                        type="text"
-                        icon={<X />}
-                        onClick={() => clearSearch()}
-                        className="p-0 h-5 w-5"
-                      />
-                    ),
-                  ]}
                 />
 
-                <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-                  <SelectTrigger_Shadcn_
-                    size="tiny"
-                    className={cn('w-[140px] !bg-transparent', filter === 'all' && 'border-dashed')}
+                {showUserTypeFilter && specificFilterColumn === 'freeform' && (
+                  <Select_Shadcn_
+                    value={filter}
+                    onValueChange={(val) => {
+                      setFilter(val as Filter)
+                      sendEvent({
+                        action: 'auth_users_search_submitted',
+                        properties: {
+                          trigger: 'user_type_filter',
+                          ...telemetryProps,
+                          user_type: val,
+                        },
+                        groups: telemetryGroups,
+                      })
+                    }}
                   >
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectGroup_Shadcn_>
-                      <SelectItem_Shadcn_ value="all" className="text-xs">
-                        All users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="verified" className="text-xs">
-                        Verified users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="unverified" className="text-xs">
-                        Unverified users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="anonymous" className="text-xs">
-                        Anonymous users
-                      </SelectItem_Shadcn_>
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      <SelectTrigger_Shadcn_
+                        size="tiny"
+                        className={cn(
+                          'w-[140px] !bg-transparent',
+                          filter === 'all' && 'border-dashed'
+                        )}
+                      >
+                        <SelectValue_Shadcn_ />
+                      </SelectTrigger_Shadcn_>
+                      <SelectGroup_Shadcn_>
+                        <SelectItem_Shadcn_ value="all" className="text-xs">
+                          All users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="verified" className="text-xs">
+                          Verified users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                          Unverified users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                          Anonymous users
+                        </SelectItem_Shadcn_>
+                      </SelectGroup_Shadcn_>
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                )}
 
-                <FilterPopover
-                  name="Provider"
-                  options={PROVIDER_FILTER_OPTIONS}
-                  labelKey="name"
-                  valueKey="value"
-                  iconKey="icon"
-                  activeOptions={selectedProviders}
-                  labelClass="text-xs"
-                  maxHeightClass="h-[190px]"
-                  onSaveFilters={setSelectedProviders}
-                />
+                {showProviderFilter && specificFilterColumn === 'freeform' && (
+                  <FilterPopover
+                    name="Provider"
+                    options={PROVIDER_FILTER_OPTIONS}
+                    labelKey="name"
+                    valueKey="value"
+                    iconKey="icon"
+                    activeOptions={selectedProviders}
+                    labelClass="text-xs"
+                    maxHeightClass="h-[190px]"
+                    className="w-52"
+                    onSaveFilters={(providers) => {
+                      setSelectedProviders(providers)
+                      sendEvent({
+                        action: 'auth_users_search_submitted',
+                        properties: {
+                          trigger: 'provider_filter',
+                          ...telemetryProps,
+                          providers,
+                        },
+                        groups: telemetryGroups,
+                      })
+                    }}
+                  />
+                )}
 
                 <div className="border-r border-strong h-6" />
 
@@ -336,7 +405,7 @@ export const UsersV2 = () => {
                   name={selectedColumns.length === 0 ? 'All columns' : 'Columns'}
                   title="Select columns to show"
                   buttonType={selectedColumns.length === 0 ? 'dashed' : 'default'}
-                  options={USERS_TABLE_COLUMNS.slice(1)} // Ignore user image column
+                  options={userTableColumns.slice(1)} // Ignore user image column
                   labelKey="name"
                   valueKey="id"
                   labelClass="text-xs"
@@ -351,19 +420,21 @@ export const UsersV2 = () => {
 
                     let updatedConfig = (columnConfiguration ?? []).slice()
                     if (value.length === 0) {
-                      updatedConfig = USERS_TABLE_COLUMNS.map((c) => ({ id: c.id, width: c.width }))
+                      updatedConfig = userTableColumns.map((c) => ({ id: c.id, width: c.width }))
                     } else {
                       value.forEach((col) => {
                         const hasExisting = updatedConfig.find((c) => c.id === col)
                         if (!hasExisting)
                           updatedConfig.push({
                             id: col,
-                            width: USERS_TABLE_COLUMNS.find((c) => c.id === col)?.width,
+                            width: userTableColumns.find((c) => c.id === col)?.width,
                           })
                       })
                     }
 
                     const updatedColumns = formatUserColumns({
+                      specificFilterColumn,
+                      columns: userTableColumns,
                       config: updatedConfig,
                       users: users ?? [],
                       visibleColumns: value,
@@ -377,73 +448,53 @@ export const UsersV2 = () => {
                   }}
                 />
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                      Sorted by {sortColumn.replaceAll('_', ' ')}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-44" align="start">
-                    <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="created_at:asc">
-                            Ascending
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="created_at:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by last sign in at</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="last_sign_in_at:asc">
-                            Ascending
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="last_sign_in_at:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="email:asc">Ascending</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="email:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="phone:asc">Ascending</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="phone:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <SortDropdown
+                  specificFilterColumn={specificFilterColumn}
+                  sortColumn={sortColumn}
+                  sortOrder={sortOrder}
+                  sortByValue={sortByValue}
+                  setSortByValue={(value) => {
+                    const [sortColumn, sortOrder] = value.split(':')
+                    setSortByValue(value)
+                    sendEvent({
+                      action: 'auth_users_search_submitted',
+                      properties: {
+                        trigger: 'sort_change',
+                        ...telemetryProps,
+                        sort_column: sortColumn,
+                        sort_order: sortOrder,
+                      },
+                      groups: telemetryGroups,
+                    })
+                  }}
+                  showSortByEmail={showSortByEmail}
+                  showSortByPhone={showSortByPhone}
+                />
               </div>
 
               <div className="flex items-center gap-x-2">
-                {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
-                <Button
+                {isNewAPIDocsEnabled && (
+                  <APIDocsButton section={['user-management']} source="auth-users" />
+                )}
+                <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
                   type="default"
+                  className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={() => {
                     refetch()
-                    refetchCount()
+                    sendEvent({
+                      action: 'auth_users_search_submitted',
+                      properties: {
+                        trigger: 'refresh_button',
+                        ...telemetryProps,
+                      },
+                      groups: telemetryGroups,
+                    })
                   }}
-                >
-                  Refresh
-                </Button>
+                  tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
+                />
                 <AddUserDropdown />
               </div>
             </>
@@ -545,14 +596,12 @@ export const UsersV2 = () => {
           )}
         </ResizablePanelGroup>
 
-        <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
-          {isLoading || isRefetching ? 'Loading users...' : `Total: ${totalUsers} users`}
-          {(isLoading || isRefetching || isFetchingNextPage) && (
-            <span className="flex items-center gap-2">
-              <Loader2 size={14} className="animate-spin" /> Loading...
-            </span>
-          )}
-        </div>
+        <UsersFooter
+          filter={filter}
+          filterKeywords={filterKeywords}
+          selectedProviders={selectedProviders}
+          specificFilterColumn={specificFilterColumn}
+        />
       </div>
 
       <ConfirmationModal
@@ -582,14 +631,43 @@ export const UsersV2 = () => {
         </p>
       </ConfirmationModal>
 
+      <ConfirmationModal
+        size="medium"
+        variant="warning"
+        visible={showFreeformWarning}
+        confirmLabel="Confirm"
+        title="Confirm to search across all columns"
+        onConfirm={() => {
+          setSpecificFilterColumn('freeform')
+          setShowFreeformWarning(false)
+        }}
+        onCancel={() => setShowFreeformWarning(false)}
+        alert={{
+          base: { variant: 'warning' },
+          title: 'Searching across all columns is not recommended',
+          description:
+            'This may adversely impact your database, in particular if your project has a large number of users - use with caution.',
+        }}
+      >
+        <p className="text-foreground-light text-sm">
+          This will allow you to search across user ID, email, phone number, and display name
+          through a single input field. You will also be able to filter users by provider and sort
+          on users across different columns.
+        </p>
+      </ConfirmationModal>
+
       {/* [Joshen] For deleting via context menu, the dialog above is dependent on the selectedUsers state */}
       <DeleteUserModal
         visible={!!selectedUserToDelete}
         selectedUser={selectedUserToDelete}
-        onClose={() => setSelectedUserToDelete(undefined)}
+        onClose={() => {
+          setSelectedUserToDelete(undefined)
+          cleanPointerEventsNoneOnBody()
+        }}
         onDeleteSuccess={() => {
           if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
           setSelectedUserToDelete(undefined)
+          cleanPointerEventsNoneOnBody(500)
         }}
       />
     </>

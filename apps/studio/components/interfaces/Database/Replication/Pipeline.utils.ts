@@ -1,5 +1,6 @@
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
+import { PipelineStatusName } from './Replication.constants'
 
 export const PIPELINE_ERROR_MESSAGES = {
   RETRIEVE_PIPELINE: 'Failed to retrieve pipeline information',
@@ -22,46 +23,55 @@ export const getStatusName = (
   return undefined
 }
 
-export const PIPELINE_STATE_MESSAGES = {
+export const PIPELINE_ENABLE_ALLOWED_FROM = ['stopped'] as const
+export const PIPELINE_DISABLE_ALLOWED_FROM = ['started', 'failed'] as const
+export const PIPELINE_ACTIONABLE_STATES = ['failed', 'started', 'stopped'] as PipelineStatusName[]
+
+const PIPELINE_STATE_MESSAGES = {
   enabling: {
-    title: 'Pipeline Enabling',
-    message: 'Starting the pipeline. Table replication will resume once enabled.',
-    badge: 'Enabling',
+    title: 'Starting pipeline',
+    message: 'Starting the pipeline. Table replication will resume once running.',
+    badge: 'Starting',
   },
   disabling: {
-    title: 'Pipeline Disabling',
-    message: 'Stopping the pipeline. Table replication will be paused once disabled.',
-    badge: 'Disabling',
+    title: 'Stopping pipeline',
+    message: 'Stopping the pipeline. Table replication will be paused once stopped.',
+    badge: 'Stopping',
+  },
+  restarting: {
+    title: 'Restarting pipeline',
+    message: 'Applying settings and restarting the pipeline.',
+    badge: 'Restarting',
   },
   failed: {
-    title: 'Pipeline Failed',
-    message: 'Replication has encountered an error. Check the logs for details.',
+    title: 'Pipeline failed',
+    message: 'Replication has encountered an error.',
     badge: 'Failed',
   },
   stopped: {
-    title: 'Pipeline Stopped',
-    message: 'Replication is paused. Enable the pipeline to resume data synchronization.',
+    title: 'Pipeline stopped',
+    message: 'Replication is paused. Start the pipeline to resume data synchronization.',
     badge: 'Stopped',
   },
   starting: {
-    title: 'Pipeline Starting',
+    title: 'Pipeline starting',
     message: 'Initializing replication. Table status will be available once running.',
     badge: 'Starting',
   },
   running: {
-    title: 'Pipeline Running',
+    title: 'Pipeline running',
     message: 'Replication is active and processing data',
     badge: 'Running',
   },
   unknown: {
-    title: 'Pipeline Status Unknown',
-    message: 'Unable to determine replication status. Check the logs for more information.',
+    title: 'Pipeline status unknown',
+    message: 'Unable to determine replication status.',
     badge: 'Unknown',
   },
   notRunning: {
-    title: 'Pipeline Not Running',
-    message: 'Replication is not active. Enable the pipeline to start data synchronization.',
-    badge: 'Disabled',
+    title: 'Pipeline not running',
+    message: 'Replication is not active. Start the pipeline to begin data synchronization.',
+    badge: 'Stopped',
   },
 } as const
 
@@ -69,23 +79,25 @@ export const getPipelineStateMessages = (
   requestStatus: PipelineStatusRequestStatus | undefined,
   statusName: string | undefined
 ) => {
-  // Always prioritize request status (enabling/disabling) over pipeline status
-  if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
+  // Reflect optimistic request intent immediately after click
+  if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
+    return PIPELINE_STATE_MESSAGES.restarting
+  }
+  if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
     return PIPELINE_STATE_MESSAGES.enabling
   }
-
-  if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
+  if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
     return PIPELINE_STATE_MESSAGES.disabling
   }
 
-  // Only check pipeline status if no request is in progress
+  // Fall back to steady states
   switch (statusName) {
+    case 'starting':
+      return PIPELINE_STATE_MESSAGES.starting
     case 'failed':
       return PIPELINE_STATE_MESSAGES.failed
     case 'stopped':
       return PIPELINE_STATE_MESSAGES.stopped
-    case 'starting':
-      return PIPELINE_STATE_MESSAGES.starting
     case 'started':
       return PIPELINE_STATE_MESSAGES.running
     case 'unknown':

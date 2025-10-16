@@ -1,5 +1,6 @@
-import { detectOS } from 'lib/helpers'
 import { Command, CornerDownLeft, Loader2 } from 'lucide-react'
+
+import { detectOS } from 'lib/helpers'
 import { Button } from 'ui'
 
 interface SqlRunButtonProps {

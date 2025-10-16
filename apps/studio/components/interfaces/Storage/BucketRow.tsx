@@ -1,10 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import { ChevronDown, Columns3, Edit2, Trash, XCircle } from 'lucide-react'
+import { Columns3, Edit2, MoreVertical, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
+import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
+import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
+import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
 import type { Bucket } from 'data/storage/buckets-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,
@@ -23,20 +26,12 @@ export interface BucketRowProps {
   bucket: Bucket
   projectRef?: string
   isSelected: boolean
-  onSelectEmptyBucket: () => void
-  onSelectDeleteBucket: () => void
-  onSelectEditBucket: () => void
 }
 
-const BucketRow = ({
-  bucket,
-  projectRef = '',
-  isSelected = false,
-  onSelectEmptyBucket = noop,
-  onSelectDeleteBucket = noop,
-  onSelectEditBucket = noop,
-}: BucketRowProps) => {
-  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+export const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
+  const { can: canUpdateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const [modal, setModal] = useState<string | null>(null)
+  const onClose = () => setModal(null)
 
   return (
     <div
@@ -49,13 +44,14 @@ const BucketRow = ({
       {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
       <Link
         href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
-        className={'py-1 px-3 grow'}
+        className="py-1 pl-3 pr-1 flex-grow min-w-0"
       >
         <div className="flex items-center justify-between space-x-2 truncate w-full">
           <p
-            className={`text-sm group-hover:text-foreground transition truncate ${
+            className={cn(
+              'text-sm group-hover:text-foreground transition truncate',
               isSelected ? 'text-foreground' : 'text-foreground-light'
-            }`}
+            )}
             title={bucket.name}
           >
             {bucket.name}
@@ -76,7 +72,7 @@ const BucketRow = ({
       {canUpdateBuckets && isSelected ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" icon={<ChevronDown />} className="mr-1 p-1.5 w-7" />
+            <Button type="text" icon={<MoreVertical />} className="mr-1 h-6 w-6" />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
             {bucket.type !== 'ANALYTICS' && (
@@ -84,7 +80,7 @@ const BucketRow = ({
                 <DropdownMenuItem
                   key="toggle-private"
                   className="space-x-2"
-                  onClick={() => onSelectEditBucket()}
+                  onClick={() => setModal(`edit`)}
                 >
                   <Edit2 size={14} />
                   <p>Edit bucket</p>
@@ -93,7 +89,7 @@ const BucketRow = ({
                 <DropdownMenuItem
                   key="empty-bucket"
                   className="space-x-2"
-                  onClick={() => onSelectEmptyBucket()}
+                  onClick={() => setModal(`empty`)}
                 >
                   <XCircle size={14} />
                   <p>Empty bucket</p>
@@ -103,7 +99,7 @@ const BucketRow = ({
             <DropdownMenuItem
               key="delete-bucket"
               className="space-x-2"
-              onClick={() => onSelectDeleteBucket()}
+              onClick={() => setModal(`delete`)}
             >
               <Trash size={14} />
               <p>Delete bucket</p>
@@ -111,10 +107,12 @@ const BucketRow = ({
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <div className="w-7 mr-1" />
+        <div className="min-w-6 mr-1" />
       )}
+
+      <EditBucketModal visible={modal === `edit`} bucket={bucket} onClose={onClose} />
+      <EmptyBucketModal visible={modal === `empty`} bucket={bucket} onClose={onClose} />
+      <DeleteBucketModal visible={modal === `delete`} bucket={bucket} onClose={onClose} />
     </div>
   )
 }
-
-export default BucketRow

@@ -1,33 +1,22 @@
-import { useState } from 'react'
-
+import { useFlag, useParams } from 'common'
 import { ReplicationComingSoon } from 'components/interfaces/Database/Replication/ComingSoon'
 import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
-import { ReplicationPipelineStatus } from 'components/interfaces/Database/Replication/ReplicationPipelineStatus'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { useFlag } from 'hooks/ui/useFlag'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
+  const { ref } = useParams()
   const enablePgReplicate = useFlag('enablePgReplicate')
-  const [selectedPipelineId, setSelectedPipelineId] = useState<number>()
-  const [selectedDestinationName, setSelectedDestinationName] = useState<string>()
+  const showPgReplicate = useIsFeatureEnabled('database:replication')
 
-  // [Joshen] Ideally selecting a pipeline should be a route on its own with pipelineId as the param
-  // e.g /project/ref/database/replication/[pipelineId]
-  // Can destinationName be derived from pipeline ID or something?
-
-  const handleSelectPipeline = (pipelineId: number, destinationName: string) => {
-    setSelectedPipelineId(pipelineId)
-    setSelectedDestinationName(destinationName)
-  }
-
-  const handleSelectBack = () => {
-    setSelectedPipelineId(undefined)
-    setSelectedDestinationName(undefined)
+  if (!showPgReplicate) {
+    return <UnknownInterface urlBack={`/project/${ref}/database/schemas`} />
   }
 
   return (
@@ -38,15 +27,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
             <ScaffoldSection>
               <div className="col-span-12">
                 <FormHeader title="Replication" />
-                {selectedPipelineId === undefined ? (
-                  <Destinations onSelectPipeline={handleSelectPipeline} />
-                ) : (
-                  <ReplicationPipelineStatus
-                    pipelineId={selectedPipelineId}
-                    destinationName={selectedDestinationName}
-                    onSelectBack={handleSelectBack}
-                  />
-                )}
+                <Destinations />
               </div>
             </ScaffoldSection>
           </ScaffoldContainer>
@@ -60,7 +41,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
               </div>
             </ScaffoldSection>
           </ScaffoldContainer>
-          <ReplicationComingSoon />
+          <ReplicationComingSoon projectRef={ref || '_'} />
         </>
       )}
     </>

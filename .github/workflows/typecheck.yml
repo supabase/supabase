@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - 'master'
+  merge_group:
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -16,8 +17,7 @@ permissions:
 jobs:
   typecheck:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on:
-      group: Default Larger Runners
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout

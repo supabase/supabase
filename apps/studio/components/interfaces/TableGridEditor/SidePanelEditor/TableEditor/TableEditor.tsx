@@ -1,9 +1,9 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import dayjs from 'dayjs'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import {
@@ -16,10 +16,16 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -28,7 +34,7 @@ import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import type { ColumnField } from '../SidePanelEditor.types'
-import SpreadsheetImport from '../SpreadsheetImport/SpreadsheetImport'
+import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import HeaderTitle from './HeaderTitle'
@@ -41,8 +47,12 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { TableTemplateSelector } from './TableQuickstart/TableTemplateSelector'
+import { QuickstartVariant } from './TableQuickstart/types'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+
+const NEW_PROJECT_THRESHOLD_DAYS = 7
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -72,7 +82,7 @@ export interface TableEditorProps {
   updateEditorDirty: () => void
 }
 
-const TableEditor = ({
+export const TableEditor = ({
   table,
   isDuplicating,
   visible = false,
@@ -81,12 +91,39 @@ const TableEditor = ({
   updateEditorDirty = noop,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
-  const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
+
+  /**
+   * Returns:
+   * - `QuickstartVariant`: user variation (if bucketed)
+   * - `false`: user not yet bucketed or targeted
+   * - `undefined`: posthog still loading
+   */
+  const tableQuickstartVariant = usePHFlag<QuickstartVariant | false | undefined>('tableQuickstart')
+
+  const [quickstartDismissed, setQuickstartDismissed] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.TABLE_QUICKSTART_DISMISSED,
+    false
+  )
+
+  const isRecentProject = useMemo(() => {
+    if (!project?.inserted_at) return false
+    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
+  }, [project?.inserted_at])
+
+  const shouldShowTemplateQuickstart =
+    isNewRecord &&
+    !isDuplicating &&
+    tableQuickstartVariant === QuickstartVariant.TEMPLATES &&
+    !quickstartDismissed &&
+    isRecentProject
+
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -100,8 +137,9 @@ const TableEditor = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const enumTypes = (types ?? []).filter(
-    (type) => !PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !protectedSchemas.find((s) => s.name === type.schema)
   )
 
   const { data: publications } = useDatabasePublicationsQuery({
@@ -186,6 +224,10 @@ const TableEditor = ({
   const onSaveChanges = (resolve: any) => {
     if (tableFields) {
       const errors: any = validateFields(tableFields)
+      if (errors.name) {
+        toast.error(errors.name)
+      }
+
       if (errors.columns) {
         toast.error(errors.columns)
       }
@@ -271,6 +313,20 @@ const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
+        {shouldShowTemplateQuickstart && (
+          <TableTemplateSelector
+            variant={tableQuickstartVariant}
+            onSelectTemplate={(template) => {
+              const updates: Partial<TableField> = {}
+              if (template.name) updates.name = template.name
+              if (template.comment) updates.comment = template.comment
+              if (template.columns) updates.columns = template.columns
+              onUpdateField(updates)
+            }}
+            onDismiss={() => setQuickstartDismissed(true)}
+            disabled={false}
+          />
+        )}
         <Input
           data-testid="table-name-input"
           label="Name"
@@ -311,6 +367,7 @@ const TableEditor = ({
           }}
           size="medium"
         />
+
         {tableFields.isRLSEnabled ? (
           <Admonition
             type="default"
@@ -328,7 +385,7 @@ const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         ) : (
@@ -346,10 +403,11 @@ const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         )}
+
         {realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
@@ -374,7 +432,9 @@ const TableEditor = ({
           />
         )}
       </SidePanel.Content>
+
       <SidePanel.Separator />
+
       <SidePanel.Content className="space-y-10 py-6">
         {!isDuplicating && (
           <ColumnManagement
@@ -449,5 +509,3 @@ const TableEditor = ({
     </SidePanel>
   )
 }
-
-export default TableEditor

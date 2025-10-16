@@ -6,7 +6,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { cn } from 'ui'
 import InvoicesSection from '../InvoicesSettings/InvoicesSection'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
@@ -14,7 +14,7 @@ import { BillingCustomerData } from './BillingCustomerData/BillingCustomerData'
 import BillingEmail from './BillingEmail'
 import CostControl from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
-import PaymentMethods from './PaymentMethods/PaymentMethods'
+import PaymentMethods from '../../Billing/Payment/PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 
 export const BillingSettings = () => {
@@ -30,7 +30,7 @@ export const BillingSettings = () => {
     'billing:invoices',
   ])
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
 
@@ -57,7 +57,7 @@ export const BillingSettings = () => {
 
       <ScaffoldDivider />
 
-      {org?.plan.id !== 'free' && (
+      {org && org.plan.id !== 'free' && (
         <ScaffoldContainer id="breakdown">
           <BillingBreakdown />
         </ScaffoldContainer>

@@ -14,7 +14,7 @@ This allows you to:
 - Port existing libraries from other languages (C, C++, Rust) to JavaScript
 - Access low-level system operations not available in JavaScript
 
-For example, libraries like [magick-wasm](https://supabase.com/docs/guides/functions/examples/image-manipulation) port existing C libraries to WebAssembly for complex image processing.
+For example, libraries like [magick-wasm](/docs/guides/functions/examples/image-manipulation) port existing C libraries to WebAssembly for complex image processing.
 
 ---
 
@@ -122,7 +122,8 @@ Before deploying, ensure the Wasm module is bundled with your function by defini
 
 <Admonition type="note">
 
-You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+- You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+- Static files cannot be deployed using the `--use-api` API flag. You need to build them with [Docker on the CLI](/docs/guides/functions/quickstart#step-6-deploy-to-production).
 
 </Admonition>
 

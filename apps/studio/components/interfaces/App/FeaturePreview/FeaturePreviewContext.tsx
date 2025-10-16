@@ -10,9 +10,7 @@ import {
   useState,
 } from 'react'
 
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 
@@ -92,20 +90,14 @@ export const useIsInlineEditorEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const organization = useSelectedOrganization()
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
 
-  const isTeamsOrEnterprise = ['team', 'enterprise'].includes(organization?.plan.id ?? '')
-  const isEnabled = isTeamsOrEnterprise && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
-  return { isEnabled, enable, disable }
-}
 
-export const useIsRealtimeSettingsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]
+  return { isEnabled, enable, disable }
 }
 
 export const useIsBranching2Enabled = () => {
@@ -118,13 +110,18 @@ export const useIsAdvisorRulesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
+export const useIsNewStorageUIEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]
+}
+
 export const useFeaturePreviewModal = () => {
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
 
-  const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const isNewStorageUIAvailable = useFlag('storageAnalyticsVector')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -133,24 +130,19 @@ export const useFeaturePreviewModal = () => {
   const isFeaturePreviewReleasedToPublic = useCallback(
     (feature: (typeof FEATURE_PREVIEWS)[number]) => {
       switch (feature.key) {
-        case 'supabase-ui-realtime-settings':
-          return isRealtimeSettingsEnabled
         case 'supabase-ui-branching-2-0':
           return gitlessBranchingEnabled
         case 'supabase-ui-advisor-rules':
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
+        case 'new-storage-ui':
+          return isNewStorageUIAvailable
         default:
           return true
       }
     },
-    [
-      isRealtimeSettingsEnabled,
-      gitlessBranchingEnabled,
-      advisorRulesEnabled,
-      isUnifiedLogsPreviewAvailable,
-    ]
+    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
   )
 
   const selectedFeatureKey = (

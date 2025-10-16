@@ -4,8 +4,8 @@ import { PropsWithChildren, useEffect } from 'react'
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
@@ -18,8 +18,8 @@ interface SettingsLayoutProps {
 const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   useEffect(() => {
     if (!IS_PLATFORM) {
@@ -35,21 +35,33 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
 
   const {
     projectAuthAll: authEnabled,
+    authenticationShowProviders: authProvidersEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
     billingInvoices: invoicesEnabled,
+    projectSettingsLegacyJwtKeys: legacyJWTKeysEnabled,
+    projectSettingsLogDrains,
+    billingAll,
   } = useIsFeatureEnabled([
     'project_auth:all',
+    'authentication:show_providers',
     'project_edge_function:all',
     'project_storage:all',
     'billing:invoices',
+    'project_settings:legacy_jwt_keys',
+    'project_settings:log_drains',
+    'billing:all',
   ])
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
+    authProviders: authProvidersEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,
+    legacyJwtKeys: legacyJWTKeysEnabled,
+    logDrains: projectSettingsLogDrains,
+    billing: billingAll,
   })
 
   return (

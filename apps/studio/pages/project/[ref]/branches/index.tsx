@@ -19,9 +19,10 @@ import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
@@ -31,8 +32,8 @@ const BranchesPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
-  const project = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
@@ -42,7 +43,10 @@ const BranchesPage: NextPageWithLayout = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
+  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'preview_branches'
+  )
 
   const {
     data: connections,
@@ -90,13 +94,13 @@ const BranchesPage: NextPageWithLayout = () => {
 
   const onConfirmDeleteBranch = () => {
     if (selectedBranchToDelete == undefined) return console.error('No branch selected')
-    if (projectRef == undefined) return console.error('Project ref is required')
+    const { project_ref: branchRef, parent_project_ref: projectRef } = selectedBranchToDelete
     deleteBranch(
-      { id: selectedBranchToDelete?.id, projectRef },
+      { branchRef, projectRef },
       {
         onSuccess: () => {
-          if (selectedBranchToDelete.project_ref === ref) {
-            router.push(`/project/${selectedBranchToDelete.parent_project_ref}/branches`)
+          if (branchRef === ref) {
+            router.push(`/project/${projectRef}/branches`)
           }
           // Track delete button click
           sendEvent({
@@ -121,7 +125,7 @@ const BranchesPage: NextPageWithLayout = () => {
         <ScaffoldSection>
           <div className="col-span-12">
             <div className="space-y-4">
-              {!canReadBranches ? (
+              {isPermissionsLoaded && !canReadBranches ? (
                 <NoPermission resourceText="view this project's branches" />
               ) : (
                 <>
@@ -183,9 +187,13 @@ const BranchesPage: NextPageWithLayout = () => {
 BranchesPage.getLayout = (page) => {
   const BranchesPageWrapper = () => {
     const snap = useAppStateSnapshot()
-    const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
-      resource: { is_default: false },
-    })
+    const { can: canCreateBranches } = useAsyncCheckPermissions(
+      PermissionAction.CREATE,
+      'preview_branches',
+      {
+        resource: { is_default: false },
+      }
+    )
 
     const primaryActions = (
       <ButtonTooltip
@@ -216,7 +224,7 @@ BranchesPage.getLayout = (page) => {
             Branching Feedback
           </a>
         </Button>
-        <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
       </div>
     )
 

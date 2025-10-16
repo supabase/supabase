@@ -1,5 +1,4 @@
 import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import {
   AlertCircle,
@@ -17,19 +16,21 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 
 const UpgradingState = () => {
   const { ref } = useParams()
   const queryParams = useSearchParams()
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
+
   const { data } = useProjectUpgradingStatusQuery(
     {
       projectRef: ref,
@@ -61,7 +62,7 @@ const UpgradingState = () => {
   const refetchProjectDetails = async () => {
     setLoading(true)
 
-    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+    if (ref) await invalidateProjectDetailsQuery(ref)
   }
 
   const subject = 'Upgrade%20failed%20for%20project'

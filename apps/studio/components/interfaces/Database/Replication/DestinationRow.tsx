@@ -1,40 +1,43 @@
+import { AlertCircle } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { useDeleteDestinationMutation } from 'data/replication/delete-destination-mutation'
+import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
+import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
+import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
+import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import DeleteDestination from './DeleteDestination'
-import DestinationPanel from './DestinationPanel'
+import { DeleteDestination } from './DeleteDestination'
+import { DestinationPanel } from './DestinationPanel/DestinationPanel'
+import { DestinationPanelSchemaType } from './DestinationPanel/DestinationPanel.schema'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
-import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
+import { PipelineStatus } from './PipelineStatus'
+import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { RowMenu } from './RowMenu'
-
-export type Pipeline = ReplicationPipelinesData['pipelines'][0]
-
-const refreshFrequencyMs: number = 2000
+import { UpdateVersionModal } from './UpdateVersionModal'
 
 interface DestinationRowProps {
-  sourceId: number | undefined
+  sourceId?: number
   destinationId: number
   destinationName: string
-  type: string
-  pipeline: Pipeline | undefined
+  type: DestinationPanelSchemaType['type'] | 'Other'
+  pipeline?: Pipeline
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
-  onSelectPipeline?: (pipelineId: number, destinationName: string) => void
 }
 
 export const DestinationRow = ({
@@ -47,11 +50,12 @@ export const DestinationRow = ({
   isLoading: isPipelineLoading,
   isError: isPipelineError,
   isSuccess: isPipelineSuccess,
-  onSelectPipeline,
 }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
+  const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
 
   const {
     data: pipelineStatusData,
@@ -64,18 +68,34 @@ export const DestinationRow = ({
       projectRef,
       pipelineId: pipeline?.id,
     },
-    { refetchInterval: refreshFrequencyMs }
+    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
-  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { mutateAsync: deleteDestination } = useDeleteDestinationMutation({})
+  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
 
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
+
+  // Fetch table-level replication status to surface errors in list view
+  const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
+    { projectRef, pipelineId: pipeline?.id },
+    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
+  )
+  const tableStatuses = replicationStatusData?.table_statuses ?? []
+  const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
+  const hasTableErrors = errorCount > 0
+
+  // Check if a newer pipeline version is available (one-time check cached for session)
+  const { data: versionData } = useReplicationPipelineVersionQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
+  const hasUpdate = Boolean(versionData?.new_version)
 
   const onDeleteClick = async () => {
     if (!projectRef) {
@@ -86,12 +106,20 @@ export const DestinationRow = ({
     }
 
     try {
+      setIsDeleting(true)
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      // deleting the destination also deletes the pipeline because of cascade delete
-      // so we don't need to call deletePipeline explicitly
-      await deleteDestination({ projectRef, destinationId: destinationId })
+      await deleteDestinationPipeline({
+        projectRef,
+        destinationId: destinationId,
+        pipelineId: pipeline.id,
+      })
+      // Close dialog after successful deletion
+      setShowDeleteDestinationForm(false)
+      toast.success(`Deleted destination "${destinationName}"`)
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -107,13 +135,21 @@ export const DestinationRow = ({
         <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
       )}
       {isPipelineSuccess && (
-        <Table.tr
-          className="hover:!bg-surface-200 transition"
-          onClick={() => {
-            if (pipeline) onSelectPipeline?.(pipeline.id, destinationName)
-          }}
-        >
-          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : destinationName}</Table.td>
+        <Table.tr>
+          <Table.td>
+            {isPipelineLoading ? (
+              <ShimmeringLoader />
+            ) : pipeline?.id ? (
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="cursor-default">{destinationName}</span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Pipeline ID: {pipeline.id}</TooltipContent>
+              </Tooltip>
+            ) : (
+              destinationName
+            )}
+          </Table.td>
           <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : type}</Table.td>
           <Table.td>
             {isPipelineLoading || !pipeline ? (
@@ -126,6 +162,7 @@ export const DestinationRow = ({
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
                 requestStatus={requestStatus}
+                pipelineId={pipeline?.id}
               />
             )}
           </Table.td>
@@ -138,6 +175,23 @@ export const DestinationRow = ({
           </Table.td>
           <Table.td>
             <div className="flex items-center justify-end gap-x-2">
+              <Button asChild type="default" className="relative">
+                <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+                  <span className="inline-flex items-center gap-2">
+                    <span>View status</span>
+                    {hasTableErrors && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <AlertCircle size={14} />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {errorCount} table{errorCount === 1 ? '' : 's'} have replication errors
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </span>
+                </Link>
+              </Button>
               <RowMenu
                 pipeline={pipeline}
                 pipelineStatus={pipelineStatusData?.status}
@@ -146,18 +200,22 @@ export const DestinationRow = ({
                 isError={isPipelineStatusError}
                 onDeleteClick={() => setShowDeleteDestinationForm(true)}
                 onEditClick={() => setShowEditDestinationPanel(true)}
+                hasUpdate={hasUpdate}
+                onUpdateClick={() => setShowUpdateVersionModal(true)}
               />
             </div>
           </Table.td>
         </Table.tr>
       )}
+
       <DeleteDestination
         visible={showDeleteDestinationForm}
         setVisible={setShowDeleteDestinationForm}
         onDelete={onDeleteClick}
-        isLoading={isPipelineStatusLoading}
+        isLoading={isDeleting}
         name={destinationName}
       />
+
       <DestinationPanel
         visible={showEditDestinationPanel}
         onClose={() => setShowEditDestinationPanel(false)}
@@ -166,8 +224,21 @@ export const DestinationRow = ({
           sourceId,
           destinationId: destinationId,
           pipelineId: pipeline?.id,
-          enabled: statusName === PipelineStatusName.STARTED,
+          enabled:
+            statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
+          statusName,
         }}
+      />
+
+      <UpdateVersionModal
+        visible={showUpdateVersionModal}
+        pipeline={pipeline}
+        onClose={() => setShowUpdateVersionModal(false)}
+        confirmLabel={
+          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
+            ? 'Update and restart'
+            : 'Update version'
+        }
       />
     </>
   )

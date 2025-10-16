@@ -14,7 +14,7 @@ function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
   )
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-[300px] space-y-4">
       <Calendar
         initialFocus
         mode="range"

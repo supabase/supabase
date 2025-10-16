@@ -28,7 +28,7 @@ interface FileExplorerAndEditorProps {
   aiMetadata?: {
     projectRef?: string
     connectionString?: string | null
-    includeSchemaMetadata?: boolean
+    orgSlug?: string
   }
 }
 

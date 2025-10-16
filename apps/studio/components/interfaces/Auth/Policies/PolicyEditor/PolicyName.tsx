@@ -8,7 +8,7 @@ interface PolicyNameProps {
 
 const PolicyName = ({ name = '', limit = 100, onUpdatePolicyName }: PolicyNameProps) => {
   return (
-    <div className="flex flex-col md:flew-row gap-4 md:gap-12">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-12">
       <div className="flex md:w-1/3 flex-col space-y-2">
         <label className="text-base text-foreground-light" htmlFor="policy-name">
           Policy name

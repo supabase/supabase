@@ -14,12 +14,12 @@ export async function checkGithubBranchValidity(
   signal?: AbortSignal
 ) {
   const { data, error } = await get(
-    '/platform/integrations/github/repositories/{repositoryId}/branches/{branchName}',
+    '/platform/integrations/github/repositories/{repository_id}/branches/{branch_name}',
     {
       params: {
         path: {
-          repositoryId,
-          branchName,
+          repository_id: repositoryId,
+          branch_name: branchName,
         },
       },
       signal,
@@ -48,7 +48,7 @@ export const useCheckGithubBranchValidity = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to check Github branch: ${data.message}`)
+          toast.error(`Failed to check GitHub branch: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

@@ -26,7 +26,7 @@ permissions:
 jobs:
   supa-mdx-lint:
     name: supa-mdx-lint
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,10 +53,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: 3186b58a532c98d7f470f2b887c2b74a086d5f2e
+          key: 301e0d4b35f8f0c8553b4e93917b8b2685ef2627
       - name: install linter
         if: steps.filter.outputs.docs == 'true' && steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 3186b58a532c98d7f470f2b887c2b74a086d5f2e
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 301e0d4b35f8f0c8553b4e93917b8b2685ef2627
       - name: install reviewdog
         if: steps.filter.outputs.docs == 'true'
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0

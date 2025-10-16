@@ -1,9 +1,9 @@
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const useIcebergWrapperExtension = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: extensionsData, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -13,7 +13,7 @@ export const useIcebergWrapperExtension = () => {
 
   if (!integration || integration.type !== 'wrapper') {
     // This should never happen
-    return 'not-found'
+    return { extension: undefined, state: 'not-found' }
   }
 
   const wrapperMeta = integration.meta
@@ -23,13 +23,13 @@ export const useIcebergWrapperExtension = () => {
   const hasRequiredVersion =
     (wrappersExtension?.installed_version ?? '') >= (wrapperMeta?.minimumExtensionVersion ?? '')
 
-  const state = isExtensionsLoading
+  const state: 'loading' | 'installed' | 'needs-upgrade' | 'not-installed' = isExtensionsLoading
     ? 'loading'
     : isWrappersExtensionInstalled
       ? hasRequiredVersion
         ? 'installed'
         : 'needs-upgrade'
-      : ('not-installed' as const)
+      : 'not-installed'
 
-  return state
+  return { extension: wrappersExtension, state }
 }

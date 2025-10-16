@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -9,19 +8,20 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
-import { PROJECT_STATUS } from 'lib/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import {
   AlertDescription_Shadcn_,
@@ -33,7 +33,6 @@ import {
   Modal,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { useProjectContext } from '../ProjectContext'
 import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
 import { PauseDisabledState } from './PauseDisabledState'
 
@@ -53,9 +52,10 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 
 export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const enableProBenefitWording = usePHFlag('proBenefitWording')
 
@@ -89,12 +89,12 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const { mutate: restoreProject, isLoading: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
       toast.success('Restoring project')
     },
   })
 
-  const canResumeProject = useCheckPermissions(
+  const { can: canResumeProject } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.initialize_or_resume'
   )
@@ -139,9 +139,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   return (
     <>
       <div className="space-y-4">
-        <div className="w-full mx-auto mb-8 md:mb-16 max-w-7xl">
+        <div className="w-full mx-auto mb-8 md:mb-16">
           <div className="flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
-            <div className="grid w-[550px] gap-4">
+            <div className="grid max-w-2xl gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <PauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
               </div>
@@ -207,7 +207,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                               <a
                                 target="_blank"
                                 rel="noreferrer"
-                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+                                href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#time-limits`}
                               >
                                 More information
                               </a>

@@ -74,10 +74,8 @@ export const ChartBlock = ({
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
-      startDate,
-      endDate,
-      interval: interval as AnalyticsInterval,
-      databaseIdentifier,
+      startDate: dayjs(startDate).format('YYYY-MM-DD'),
+      endDate: dayjs(endDate).format('YYYY-MM-DD'),
     },
     { enabled: provider === 'daily-stats' }
   )
@@ -126,19 +124,19 @@ export const ChartBlock = ({
 
   const getCellColor = (attribute: string, value: number) => {
     const threshold = METRIC_THRESHOLDS[attribute as keyof typeof METRIC_THRESHOLDS]
-    if (!threshold) return 'var(--chart-1)'
+    if (!threshold) return 'hsl(var(--chart-1))'
     if (threshold.check === 'gt') {
       return value >= threshold.danger
-        ? 'var(--chart-destructive)'
+        ? 'hsl(var(--chart-destructive))'
         : value >= threshold.warning
-          ? 'var(--chart-warning)'
-          : 'var(--chart-1)'
+          ? 'hsl(var(--chart-warning))'
+          : 'hsl(var(--chart-1))'
     } else {
       return value <= threshold.danger
-        ? 'var(--chart-destructive)'
+        ? 'hsl(var(--chart-destructive))'
         : value <= threshold.warning
-          ? 'var(--chart-warning)'
-          : 'var(--chart-1)'
+          ? 'hsl(var(--chart-warning))'
+          : 'hsl(var(--chart-1))'
     }
   }
 
@@ -286,7 +284,7 @@ export const ChartBlock = ({
                     />
                   }
                 />
-                <Line dataKey={metricLabel} stroke="var(--chart-1)" radius={4} />
+                <Line dataKey={metricLabel} stroke="hsl(var(--chart-1))" radius={4} />
               </LineChart>
             )}
           </ChartContainer>

@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -7,7 +6,7 @@ import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -18,8 +17,8 @@ import {
   Modal,
   WarningIcon,
 } from 'ui'
-import BackupsEmpty from '../BackupsEmpty'
-import BackupsStorageAlert from '../BackupsStorageAlert'
+import { BackupsEmpty } from '../BackupsEmpty'
+import { BackupsStorageAlert } from '../BackupsStorageAlert'
 import type { Timezone } from './PITR.types'
 import { getClientTimezone } from './PITR.utils'
 import PITRStatus from './PITRStatus'
@@ -28,10 +27,11 @@ import { PITRForm } from './pitr-form'
 const PITRSelection = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const queryClient = useQueryClient()
 
   const { data: backups } = useBackupsQuery({ projectRef: ref })
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
+  const { setProjectStatus } = useSetProjectStatus()
+
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
@@ -48,10 +48,10 @@ const PITRSelection = () => {
     isLoading: isRestoring,
     isSuccess: isSuccessPITR,
   } = usePitrRestoreMutation({
-    onSuccess: (res, variables) => {
+    onSuccess: (_, variables) => {
       setTimeout(() => {
         setShowConfirmation(false)
-        setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+        setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
         router.push(`/project/${variables.ref}`)
       }, 3000)
     },

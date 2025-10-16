@@ -1,4 +1,9 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import Link from 'next/link'
+
+import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   return (
@@ -19,36 +24,37 @@ export const ObjectsToBeDroppedWarning = ({
 }: {
   objectsToBeDropped: string[]
 }) => {
+  const { ref } = useParams()
   return (
-    <Alert_Shadcn_
-      variant="warning"
-      title="A new version of Postgres is available for your project"
-    >
-      <AlertTitle_Shadcn_>A new version of Postgres is available</AlertTitle_Shadcn_>
+    <Alert_Shadcn_ title="A newer version of Postgres is available for your project">
+      <AlertTitle_Shadcn_>A newer version of Postgres is available</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-        <div>
-          <p className="mb-1">You'll need to remove the following objects before upgrading:</p>
+        <>
+          <p className="mb-1">
+            The following objects are not supported and must be removed before upgrading.{' '}
+            <InlineLink
+              className="text-foreground-lighter hover:text-foreground transition-colors"
+              href={`${DOCS_URL}/guides/platform/upgrading#extensions`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Learn more
+            </InlineLink>
+          </p>
 
-          <ul className="pl-4">
+          {/* Old */}
+          <ul className="pl-4 pb-3">
             {objectsToBeDropped.map((obj) => (
               <li className="list-disc" key={obj}>
                 {obj}
               </li>
             ))}
           </ul>
-        </div>
-        <p>Check the docs for which objects need to be removed.</p>
-        <div>
-          <Button size="tiny" type="default" asChild>
-            <a
-              href="https://supabase.com/docs/guides/platform/upgrading#extensions"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View docs
-            </a>
+
+          <Button className="w-fit" size="tiny" type="default" asChild>
+            <Link href={`/project/${ref}/database/functions`}>Manage functions</Link>
           </Button>
-        </div>
+        </>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )
@@ -59,39 +65,42 @@ export const UnsupportedExtensionsWarning = ({
 }: {
   unsupportedExtensions: string[]
 }) => {
-  return (
-    <Alert_Shadcn_
-      variant="warning"
-      title="A new version of Postgres is available for your project"
-    >
-      <AlertTitle_Shadcn_>A new version of Postgres is available</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-        <div>
-          <p className="mb-1">You'll need to remove the following extensions before upgrading:</p>
+  const { ref } = useParams()
 
-          <ul className="pl-4">
+  return (
+    <Alert_Shadcn_ title="A newer version of Postgres is available">
+      <AlertTitle_Shadcn_>A newer version of Postgres is available</AlertTitle_Shadcn_>
+      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+        <>
+          <p className="mb-1">
+            The following extensions are not supported in newer versions of Postgres and must be
+            removed before upgrading.{' '}
+            <InlineLink
+              className="text-foreground-lighter hover:text-foreground transition-colors"
+              href={`${DOCS_URL}/guides/platform/upgrading#upgrading-to-postgres-17`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Learn more
+            </InlineLink>
+          </p>
+
+          <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
             {unsupportedExtensions.map((obj: string) => (
-              <li className="list-disc" key={obj}>
-                {obj}
+              <li className="py-3 last:pb-0 flex flex-row justify-between gap-2" key={obj}>
+                <div className="flex flex-row gap-2 items-center flex-1 min-w-0">
+                  <p className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{obj}</p>
+                  <Badge variant="warning" size="small" className="flex-shrink-0">
+                    Deprecated
+                  </Badge>
+                </div>
+                <Button size="tiny" type="default" asChild>
+                  <Link href={`/project/${ref}/database/extensions?filter=${obj}`}>Manage</Link>
+                </Button>
               </li>
             ))}
           </ul>
-        </div>
-        <p>
-          These extensions are not supported in newer versions of Supabase Postgres. If you are not
-          using them, it is safe to remove them.
-        </p>
-        <div>
-          <Button size="tiny" type="default" asChild>
-            <a
-              href="https://supabase.com/docs/guides/platform/upgrading#extensions"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View docs
-            </a>
-          </Button>
-        </div>
+        </>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )
@@ -99,15 +108,13 @@ export const UnsupportedExtensionsWarning = ({
 
 export const UserDefinedObjectsInInternalSchemasWarning = ({ objects }: { objects: string[] }) => {
   return (
-    <Alert_Shadcn_
-      variant="warning"
-      title="A new version of Postgres is available for your project"
-    >
-      <AlertTitle_Shadcn_>A new version of Postgres is available</AlertTitle_Shadcn_>
+    <Alert_Shadcn_ title="A newer version of Postgres is available for your project">
+      <AlertTitle_Shadcn_>A newer version of Postgres is available</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
         <div>
           <p className="mb-1">
-            You'll need to move these objects out of auth/realtime/storage schemas before upgrading:
+            The following objects must be removed from the auth/realtime/storage schemas before
+            upgrading:
           </p>
 
           <ul className="pl-4">

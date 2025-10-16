@@ -10,7 +10,18 @@ export type PermissionsResponse = Permission[]
 
 export async function getPermissions(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/permissions', { signal })
-  if (error) handleError(error)
+  if (error) {
+    handleError(error, {
+      sentryContext: {
+        tags: {
+          permissionsQuery: true,
+        },
+        contexts: {
+          rawError: error,
+        },
+      },
+    })
+  }
 
   // [Joshen] TODO: Type this properly from the API
   return data as unknown as PermissionsResponse
@@ -31,7 +42,7 @@ export const usePermissionsQuery = <TData = PermissionsData>({
     {
       ...options,
       enabled: IS_PLATFORM && enabled && isLoggedIn,
-      staleTime: 30 * 60 * 1000,
+      staleTime: 5 * 60 * 1000,
     }
   )
 }

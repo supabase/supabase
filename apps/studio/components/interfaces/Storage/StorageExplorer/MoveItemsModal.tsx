@@ -12,7 +12,7 @@ interface MoveItemsModalProps {
   onSelectMove: (path: string) => void
 }
 
-const MoveItemsModal = ({
+export const MoveItemsModal = ({
   bucketName = '',
   visible = false,
   selectedItemsToMove = [],
@@ -87,5 +87,3 @@ const MoveItemsModal = ({
     </Modal>
   )
 }
-
-export default MoveItemsModal

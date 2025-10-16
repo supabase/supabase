@@ -29,6 +29,12 @@
     "title": "Analytics",
     "items": [
       {
+        "id": "v1-get-project-function-combined-stats",
+        "title": "Get project function combined stats",
+        "slug": "v1-get-project-function-combined-stats",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-logs",
         "title": "Get project logs",
         "slug": "v1-get-project-logs",
@@ -197,9 +203,27 @@
         "type": "operation"
       },
       {
-        "id": "v1-create-restore-point",
-        "title": "Create restore point",
-        "slug": "v1-create-restore-point",
+        "id": "v1-authorize-jit-access",
+        "title": "Authorize jit access",
+        "slug": "v1-authorize-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-login-role",
+        "title": "Create login role",
+        "slug": "v1-create-login-role",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-jit-access",
+        "title": "Delete jit access",
+        "slug": "v1-delete-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-login-roles",
+        "title": "Delete login roles",
+        "slug": "v1-delete-login-roles",
         "type": "operation"
       },
       {
@@ -233,6 +257,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-jit-access",
+        "title": "Get jit access",
+        "slug": "v1-get-jit-access",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-pooler-config",
         "title": "Get pooler config",
         "slug": "v1-get-pooler-config",
@@ -257,12 +287,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-restore-point",
-        "title": "Get restore point",
-        "slug": "v1-get-restore-point",
-        "type": "operation"
-      },
-      {
         "id": "v1-get-ssl-enforcement-config",
         "title": "Get ssl enforcement config",
         "slug": "v1-get-ssl-enforcement-config",
@@ -278,6 +302,12 @@
         "id": "v1-list-all-snippets",
         "title": "List all snippets",
         "slug": "v1-list-all-snippets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-jit-access",
+        "title": "List jit access",
+        "slug": "v1-list-jit-access",
         "type": "operation"
       },
       {
@@ -311,9 +341,9 @@
         "type": "operation"
       },
       {
-        "id": "v1-undo",
-        "title": "Undo",
-        "slug": "v1-undo",
+        "id": "v1-update-jit-access",
+        "title": "Update jit access",
+        "slug": "v1-update-jit-access",
         "type": "operation"
       },
       {
@@ -455,6 +485,12 @@
     "title": "Environments",
     "items": [
       {
+        "id": "v1-count-action-runs",
+        "title": "Count action runs",
+        "slug": "v1-count-action-runs",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-branch",
         "title": "Create a branch",
         "slug": "v1-create-a-branch",
@@ -491,6 +527,24 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-action-run",
+        "title": "Get action run",
+        "slug": "v1-get-action-run",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-action-run-logs",
+        "title": "Get action run logs",
+        "slug": "v1-get-action-run-logs",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-action-runs",
+        "title": "List action runs",
+        "slug": "v1-list-action-runs",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-branches",
         "title": "List all branches",
         "slug": "v1-list-all-branches",
@@ -519,6 +573,12 @@
         "title": "Update a branch config",
         "slug": "v1-update-a-branch-config",
         "type": "operation"
+      },
+      {
+        "id": "v1-update-action-run-status",
+        "title": "Update action run status",
+        "slug": "v1-update-action-run-status",
+        "type": "operation"
       }
     ]
   },
@@ -539,12 +599,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-oauth-authorize-project-claim",
-        "title": "Oauth authorize project claim",
-        "slug": "v1-oauth-authorize-project-claim",
-        "type": "operation"
-      },
-      {
         "id": "v1-revoke-token",
         "title": "Revoke token",
         "slug": "v1-revoke-token",
@@ -557,12 +611,6 @@
     "title": "Organizations",
     "items": [
       {
-        "id": "v1-claim-project-for-organization",
-        "title": "Claim project for organization",
-        "slug": "v1-claim-project-for-organization",
-        "type": "operation"
-      },
-      {
         "id": "v1-create-an-organization",
         "title": "Create an organization",
         "slug": "v1-create-an-organization",
@@ -572,12 +620,6 @@
         "id": "v1-get-an-organization",
         "title": "Get an organization",
         "slug": "v1-get-an-organization",
-        "type": "operation"
-      },
-      {
-        "id": "v1-get-organization-project-claim",
-        "title": "Get organization project claim",
-        "slug": "v1-get-organization-project-claim",
         "type": "operation"
       },
       {
@@ -611,12 +653,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-create-project-claim-token",
-        "title": "Create project claim token",
-        "slug": "v1-create-project-claim-token",
-        "type": "operation"
-      },
-      {
         "id": "v1-delete-a-project",
         "title": "Delete a project",
         "slug": "v1-delete-a-project",
@@ -626,12 +662,6 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
-        "type": "operation"
-      },
-      {
-        "id": "v1-delete-project-claim-token",
-        "title": "Delete project claim token",
-        "slug": "v1-delete-project-claim-token",
         "type": "operation"
       },
       {
@@ -656,12 +686,6 @@
         "id": "v1-get-project",
         "title": "Get project",
         "slug": "v1-get-project",
-        "type": "operation"
-      },
-      {
-        "id": "v1-get-project-claim-token",
-        "title": "Get project claim token",
-        "slug": "v1-get-project-claim-token",
         "type": "operation"
       },
       {
@@ -692,6 +716,12 @@
         "id": "v1-list-available-restore-versions",
         "title": "List available restore versions",
         "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-patch-network-restrictions",
+        "title": "Patch network restrictions",
+        "slug": "v1-patch-network-restrictions",
         "type": "operation"
       },
       {

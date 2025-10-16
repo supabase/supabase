@@ -1,28 +1,34 @@
 import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
-import { Badge, Toggle } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { toast } from 'sonner'
+
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { Badge, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface PublicationsTableItemProps {
   table: PostgresTable
   selectedPublication: PostgresPublication
 }
 
-const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTableItemProps) => {
-  const { project } = useProjectContext()
+export const PublicationsTableItem = ({
+  table,
+  selectedPublication,
+}: PublicationsTableItemProps) => {
+  const { data: project } = useSelectedProjectQuery()
+  const { data: protectedSchemas } = useProtectedSchemas()
   const enabledForAllTables = selectedPublication.tables == null
+
+  const isProtected = protectedSchemas.map((x) => x.name).includes(table.schema)
 
   const [checked, setChecked] = useState(
     selectedPublication.tables?.find((x: any) => x.id == table.id) != undefined
   )
 
-  const canUpdatePublications = useCheckPermissions(
+  const { can: canUpdatePublications } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )
@@ -70,13 +76,13 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
   }
 
   return (
-    <Table.tr key={table.id}>
-      <Table.td className="whitespace-nowrap">{table.name}</Table.td>
-      <Table.td className="whitespace-nowrap">{table.schema}</Table.td>
-      <Table.td className="hidden max-w-sm truncate whitespace-nowrap lg:table-cell">
+    <TableRow key={table.id}>
+      <TableCell className="py-3 whitespace-nowrap">{table.name}</TableCell>
+      <TableCell className="py-3 whitespace-nowrap">{table.schema}</TableCell>
+      <TableCell className="py-3 hidden max-w-sm truncate whitespace-nowrap lg:table-cell">
         {table.comment}
-      </Table.td>
-      <Table.td className="px-4 py-3 pr-2">
+      </TableCell>
+      <TableCell className="py-3">
         <div className="flex justify-end gap-2">
           {enabledForAllTables ? (
             <Badge>
@@ -84,19 +90,24 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
               <span className="hidden lg:inline-block">&nbsp;for all tables</span>
             </Badge>
           ) : (
-            <Toggle
-              size="tiny"
-              align="right"
-              disabled={!canUpdatePublications || isLoading}
-              className="m-0 ml-2 mt-1 -mb-1 p-0"
-              checked={checked}
-              onChange={() => toggleReplicationForTable(table, selectedPublication)}
-            />
+            <Tooltip>
+              <TooltipTrigger>
+                <Switch
+                  size="small"
+                  disabled={!canUpdatePublications || isLoading || isProtected}
+                  checked={checked}
+                  onClick={() => toggleReplicationForTable(table, selectedPublication)}
+                />
+              </TooltipTrigger>
+              {isProtected && (
+                <TooltipContent side="bottom" className="w-64 text-center">
+                  This table belongs to a protected schema, and its publication cannot be toggled
+                </TooltipContent>
+              )}
+            </Tooltip>
           )}
         </div>
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }
-
-export default PublicationsTableItem
