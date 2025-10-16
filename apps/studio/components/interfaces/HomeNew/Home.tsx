@@ -23,7 +23,7 @@ import { ProjectUsageSection } from './ProjectUsageSection'
 export const HomeV2 = () => {
   const { enableBranching } = useParams()
   const snap = useAppStateSnapshot()
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -109,7 +109,7 @@ export const HomeV2 = () => {
                   if (
                     id === 'getting-started' &&
                     !isMatureProject &&
-                    !isLoadingProject &&
+                    project &&
                     gettingStartedState !== 'hidden'
                   ) {
                     return (
