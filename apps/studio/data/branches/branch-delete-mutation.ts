@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { type UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { ResponseError } from 'types'
 import type { BranchesData } from './branches-query'
 import { branchKeys } from './keys'
 
@@ -11,9 +11,12 @@ export type BranchDeleteVariables = {
   projectRef: string
 }
 
-export async function deleteBranch({ branchRef }: Pick<BranchDeleteVariables, 'branchRef'>) {
+export async function deleteBranch({
+  branchRef,
+  force,
+}: Pick<BranchDeleteVariables, 'branchRef'> & { force?: boolean }) {
   const { data, error } = await del('/v1/branches/{branch_id_or_ref}', {
-    params: { path: { branch_id_or_ref: branchRef }, query: { force: 'true' } },
+    params: { path: { branch_id_or_ref: branchRef }, query: { force: force ? 'true' : undefined } },
   })
 
   if (error) handleError(error)
@@ -27,11 +30,11 @@ export const useBranchDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BranchDeleteData, ResponseError, BranchDeleteVariables>,
+  UseMutationOptions<BranchDeleteData, ResponseError, BranchDeleteVariables & { force?: boolean }>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchDeleteData, ResponseError, BranchDeleteVariables>({
+  return useMutation<BranchDeleteData, ResponseError, BranchDeleteVariables & { force?: boolean }>({
     mutationFn: (vars) => deleteBranch(vars),
     async onSuccess(data, variables, context) {
       const { branchRef, projectRef } = variables
