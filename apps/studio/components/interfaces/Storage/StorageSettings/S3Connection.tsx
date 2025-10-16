@@ -172,11 +172,19 @@ export const S3Connection = () => {
                 <CardContent className="py-6">
                   <div className="flex flex-col gap-y-4">
                     <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
-                      <Input readOnly copy disabled value={s3connectionUrl} />
+                      <Input readOnly copy value={s3connectionUrl} />
                     </FormItemLayout>
                     {!projectIsLoading && (
                       <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-                        <Input className="input-mono" copy disabled value={project?.region} />
+                        <Input
+                          readOnly
+                          copy
+                          value={project?.region}
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                        />
                       </FormItemLayout>
                     )}
                   </div>
