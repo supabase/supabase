@@ -105,7 +105,7 @@ export function useAttachmentUpload() {
     if (uploadedFiles.length === 0) return
 
     const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
-    const urls = await generateAttachmentURLs({ filenames })
+    const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
     return urls
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, uploadedFiles])
