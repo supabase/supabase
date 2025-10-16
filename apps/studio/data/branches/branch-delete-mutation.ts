@@ -11,9 +11,12 @@ export type BranchDeleteVariables = {
   projectRef: string
 }
 
-export async function deleteBranch({ branchRef }: Pick<BranchDeleteVariables, 'branchRef'>) {
+export async function deleteBranch({
+  branchRef,
+  force,
+}: Pick<BranchDeleteVariables, 'branchRef'> & { force?: boolean }) {
   const { data, error } = await del('/v1/branches/{branch_id_or_ref}', {
-    params: { path: { branch_id_or_ref: branchRef }, query: { force: 'true' } },
+    params: { path: { branch_id_or_ref: branchRef }, query: { force: force ? 'true' : undefined } },
   })
 
   if (error) handleError(error)
@@ -27,11 +30,11 @@ export const useBranchDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchDeleteData, ResponseError, BranchDeleteVariables>,
+  UseMutationOptions<BranchDeleteData, ResponseError, BranchDeleteVariables & { force?: boolean }>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchDeleteData, ResponseError, BranchDeleteVariables>(
+  return useMutation<BranchDeleteData, ResponseError, BranchDeleteVariables & { force?: boolean }>(
     (vars) => deleteBranch(vars),
     {
       async onSuccess(data, variables, context) {

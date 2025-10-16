@@ -45,7 +45,7 @@ interface OverviewProps {
   mainBranch: Branch
   previewBranches: Branch[]
   onSelectCreateBranch: () => void
-  onSelectDeleteBranch: (branch: Branch) => void
+  onSelectDeleteBranch: (branch: Branch, force?: boolean) => void
   generateCreatePullRequestURL: (branchName?: string) => string
 }
 
@@ -174,7 +174,8 @@ export const Overview = ({
                   <PreviewBranchActions
                     branch={branch}
                     repo={repo}
-                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                    // If a scheduled for deletion branch is deleted, we force the deletion
+                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch, true)}
                     generateCreatePullRequestURL={generateCreatePullRequestURL}
                   />
                 }
