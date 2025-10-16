@@ -5,10 +5,8 @@ import { useState } from 'react'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 import { FeedbackWidget } from './FeedbackWidget'
 
-const FeedbackDropdown = ({ className }: { className?: string }) => {
+export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [feedback, setFeedback] = useState('')
-  const [screenshot, setScreenshot] = useState<string>()
   const [stage, setStage] = useState<'select' | 'widget'>('select')
 
   return (
@@ -17,7 +15,6 @@ const FeedbackDropdown = ({ className }: { className?: string }) => {
       open={isOpen}
       onOpenChange={(e) => {
         setIsOpen(e)
-        if (!e) setScreenshot(undefined)
         if (!e) setStage('select')
       }}
     >
@@ -63,15 +60,7 @@ const FeedbackDropdown = ({ className }: { className?: string }) => {
             </div>
           </div>
         )}
-        {stage === 'widget' && (
-          <FeedbackWidget
-            onClose={() => setIsOpen(false)}
-            feedback={feedback}
-            setFeedback={setFeedback}
-            screenshot={screenshot}
-            setScreenshot={setScreenshot}
-          />
-        )}
+        {stage === 'widget' && <FeedbackWidget onClose={() => setIsOpen(false)} />}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
