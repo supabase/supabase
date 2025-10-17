@@ -17,11 +17,7 @@ import { isFeatureEnabled } from 'common/enabled-features'
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
-const {
-  brandingLargeLogo: largeLogo,
-} = isFeatureEnabled([
-  'branding:large_logo',
-])
+const { brandingLargeLogo: largeLogo } = isFeatureEnabled(['branding:large_logo'])
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
@@ -29,8 +25,6 @@ const TopNavBar: FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const user = useUser()
   const menu = useDropdownMenu(user)
-
-
 
   return (
     <>
@@ -139,7 +133,7 @@ const HeaderLogo = memo(() => {
         alt="Supabase wordmark"
       />
       <Image
-        className={`block dark:hidden !m-0 ${largeLogo ? 'h-[36px]' : null }`}
+        className={`block dark:hidden !m-0 ${largeLogo ? 'h-[36px]' : null}`}
         src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"
