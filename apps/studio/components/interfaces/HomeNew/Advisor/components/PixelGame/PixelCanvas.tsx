@@ -29,8 +29,8 @@ export const PixelCanvas = ({
   onMouseMove,
   canvasRef: externalCanvasRef,
 }: PixelCanvasProps) => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const internalCanvasRef = useRef<HTMLCanvasElement>(null)
   const [viewState, setViewState] = useState<ViewState>({
     offsetX: 0,
