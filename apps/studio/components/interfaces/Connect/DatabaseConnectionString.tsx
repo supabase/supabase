@@ -347,9 +347,9 @@ export const DatabaseConnectionString = () => {
                 <StepLabel number={++stepNumber} className="items-start">
                   Install the following
                 </StepLabel>
-                {exampleInstallCommands?.map((cmd, i) => (
+                {exampleInstallCommands?.map((cmd) => (
                   <CodeBlock
-                    key={i}
+                    key={`example-install-command-${cmd}`}
                     className="[&_code]:text-[12px] [&_code]:text-foreground"
                     wrapperClassName="lg:col-span-2"
                     value={cmd}
@@ -365,8 +365,8 @@ export const DatabaseConnectionString = () => {
                   <StepLabel number={++stepNumber} className="items-start">
                     Add file to project
                   </StepLabel>
-                  {exampleFiles?.map((file, i) => (
-                    <div key={i} className="lg:col-span-2">
+                  {exampleFiles?.map((file) => (
+                    <div key={`example-files-${file.name}`} className="lg:col-span-2">
                       <CodeBlockFileHeader title={file.name} />
                       <CodeBlock
                         wrapperClassName="[&_pre]:max-h-40 [&_pre]:px-4 [&_pre]:py-3 [&_pre]:rounded-t-none"
@@ -515,9 +515,9 @@ export const DatabaseConnectionString = () => {
               <StepLabel number={++stepNumber} className="items-start">
                 Add the configuration package to read the settings
               </StepLabel>
-              {examplePostInstallCommands?.map((cmd, i) => (
+              {examplePostInstallCommands?.map((cmd) => (
                 <CodeBlock
-                  key={i}
+                  key={`example-post-install-commands-${cmd}`}
                   className="text-sm"
                   wrapperClassName="lg:col-span-2"
                   value={cmd}
