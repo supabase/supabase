@@ -87,9 +87,6 @@ export const Connect = () => {
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
   const [queryWith, setQueryWith] = useQueryState('with', parseAsString)
-  const [_, setQueryType] = useQueryState('type', parseAsString)
-  const [__, setQuerySource] = useQueryState('source', parseAsString)
-  const [___, setQueryMethod] = useQueryState('method', parseAsString)
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -245,20 +242,13 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
-  const resetQueryStates = () => {
-    setQueryFramework(null)
-    setQueryUsing(null)
-    setQueryWith(null)
-    setQueryType(null)
-    setQuerySource(null)
-    setQueryMethod(null)
-  }
-
   const handleDialogChange = (open: boolean) => {
     if (!open) {
       setShowConnect(null)
       setTab(null)
-      resetQueryStates()
+      setQueryFramework(null)
+      setQueryUsing(null)
+      setQueryWith(null)
     } else {
       setShowConnect(open)
     }
@@ -321,8 +311,8 @@ export const Connect = () => {
           <span>Connect</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className={cn('sm:max-w-5xl p-0 rounded-lg')} centered={false}>
-        <DialogHeader className={cn('text-left', DIALOG_PADDING_X)}>
+      <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
+        <DialogHeader className={DIALOG_PADDING_X}>
           <DialogTitle>
             Connect to your project
             {connectionTypes.length === 1 ? ` via ${connectionTypes[0].label.toLowerCase()}` : null}
@@ -332,13 +322,7 @@ export const Connect = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_
-          defaultValue={tab}
-          onValueChange={(value) => {
-            resetQueryStates()
-            handleConnectionType(value)
-          }}
-        >
+        <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
           {connectionTypes.length > 1 ? (
             <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
               {connectionTypes.map((type) => (
