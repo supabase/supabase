@@ -36,10 +36,10 @@ import { ErrorBoundary } from 'react-error-boundary'
 import {
   FeatureFlagProvider,
   getFlags,
+  LOCAL_STORAGE_KEYS,
   TelemetryTagManager,
   ThemeProvider,
   useThemeSandbox,
-  LOCAL_STORAGE_KEYS,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { RouteValidationWrapper } from 'components/interfaces/App'
@@ -86,11 +86,7 @@ const CommandProviderWithPreferences = ({ children }: PropsWithChildren) => {
     true
   )
 
-  return (
-    <CommandProvider openKey={commandMenuHotkeyEnabled ? 'k' : ''}>
-      {children}
-    </CommandProvider>
-  )
+  return <CommandProvider openKey={commandMenuHotkeyEnabled ? 'k' : ''}>{children}</CommandProvider>
 }
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
