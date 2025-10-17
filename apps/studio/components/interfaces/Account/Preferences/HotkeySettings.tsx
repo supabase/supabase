@@ -28,39 +28,36 @@ export const HotkeySettings = () => {
         </div>
       }
     >
-      <Panel.Content className="space-y-3">
+      <Panel.Content className="space-y-2">
         <Toggle
           checked={commandMenuEnabled}
           onChange={() => setCommandMenuEnabled(!commandMenuEnabled)}
           label={
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-3">
               <KeyboardShortcut keys={['Meta', 'k']} />
               <span>Command menu</span>
             </div>
           }
-          descriptionText="Toggles the global command menu."
         />
         <Toggle
           checked={aiAssistantEnabled}
           onChange={() => setAiAssistantEnabled(!aiAssistantEnabled)}
           label={
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-3">
               <KeyboardShortcut keys={['Meta', 'i']} />
-              <span>AI Assistant</span>
+              <span>AI Assistant Panel</span>
             </div>
           }
-          descriptionText="Toggles the AI Assistant panel."
         />
         <Toggle
           checked={inlineEditorEnabled}
           onChange={() => setInlineEditorEnabled(!inlineEditorEnabled)}
           label={
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-3">
               <KeyboardShortcut keys={['Meta', 'e']} />
-              <span>Inline SQL Editor</span>
+              <span>Inline SQL Editor Panel</span>
             </div>
           }
-          descriptionText="Toggles the inline SQL editor in a side panel"
         />
       </Panel.Content>
     </Panel>
