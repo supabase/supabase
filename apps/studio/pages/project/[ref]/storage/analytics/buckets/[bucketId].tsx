@@ -5,6 +5,7 @@ import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsErr
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
@@ -28,7 +29,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
             <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
           </div>
         ) : bucket.type === 'ANALYTICS' ? (
-          <AnalyticBucketDetails bucket={bucket} />
+          <AnalyticBucketDetails bucket={bucket as AnalyticsBucket} />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <p className="text-sm text-foreground-light">This bucket is not an analytics bucket</p>
