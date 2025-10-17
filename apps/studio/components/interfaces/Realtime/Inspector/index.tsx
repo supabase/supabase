@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { MousePointer2 } from 'lucide-react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
@@ -17,6 +17,19 @@ import { EmptyRealtime } from './EmptyRealtime'
 export const RealtimeInspector = () => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
+
+  // Check if realtime publications are available
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+  const isRealtimeAvailable =
+    !!realtimePublication &&
+    ((realtimePublication?.tables ?? []).length > 0 || realtimePublication?.tables === null)
 
   const [sendMessageShown, setSendMessageShown] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
@@ -31,12 +44,17 @@ export const RealtimeInspector = () => {
     filter: undefined,
     bearer: null,
     enablePresence: true,
-    enableDbChanges: true,
+    enableDbChanges: isRealtimeAvailable, // Initialize based on publications availability
     enableBroadcast: true,
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
+
+  // Update enableDbChanges when publications change
+  useEffect(() => {
+    setRealtimeConfig((prev) => ({ ...prev, enableDbChanges: isRealtimeAvailable }))
+  }, [isRealtimeAvailable])
 
   return (
     <div className="flex flex-col grow h-full">
