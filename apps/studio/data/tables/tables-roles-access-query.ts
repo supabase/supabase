@@ -1,4 +1,4 @@
-import { getTablesAnonAuthenticatedRolesAccessSQL } from '@supabase/pg-meta/src/sql/studio/check-tables-anon-authenticated-access'
+import { getTablesWithAnonAuthenticatedAccessSQL } from '@supabase/pg-meta/src/sql/studio/check-tables-anon-authenticated-access'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
@@ -13,39 +13,23 @@ export type TablesRolesAccessVariables = TablesRolesAccessArgs & {
   connectionString?: string | null
 }
 
-export async function getTablesRolesAccess(
+export async function getTablesWithAnonAuthenticatedAccess(
   { schema, projectRef, connectionString }: TablesRolesAccessVariables,
   signal?: AbortSignal
 ) {
   if (!schema) throw new Error('schema is required')
 
-  const sql = getTablesAnonAuthenticatedRolesAccessSQL({ schema })
+  const sql = getTablesWithAnonAuthenticatedAccessSQL({ schema })
 
   const { result } = (await executeSql(
     { projectRef, connectionString, sql, queryKey: ['TablesRolesAccess', schema] },
     signal
-  )) as { result: { table_name: string; grantee: string; privilege_type: string }[] }
+  )) as { result: { table_name: string }[] }
 
-  const tablesWithRoles = result.reduce<Record<string, string[]>>((acc, row) => {
-    const roles = acc[row.table_name] ?? []
-    if (!roles.includes(row.grantee)) {
-      roles.push(row.grantee)
-    }
-    acc[row.table_name] = roles
-    return acc
-  }, {})
-
-  const roleOrder = ['anon', 'authenticated']
-  Object.keys(tablesWithRoles).forEach((tableName) => {
-    tablesWithRoles[tableName] = tablesWithRoles[tableName].sort(
-      (a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b)
-    )
-  })
-
-  return tablesWithRoles
+  return new Set(result.map((r) => r.table_name))
 }
 
-export type TablesRolesAccessData = Awaited<ReturnType<typeof getTablesRolesAccess>>
+export type TablesRolesAccessData = Awaited<ReturnType<typeof getTablesWithAnonAuthenticatedAccess>>
 export type TablesRolesAccessError = ExecuteSqlError
 
 export const useTablesRolesAccessQuery = <TData = TablesRolesAccessData>(
@@ -55,11 +39,14 @@ export const useTablesRolesAccessQuery = <TData = TablesRolesAccessData>(
     ...options
   }: UseQueryOptions<TablesRolesAccessData, TablesRolesAccessError, TData> = {}
 ) =>
-  useQuery<TablesRolesAccessData, TablesRolesAccessError, TData>(
-    tableKeys.rolesAccess(projectRef, schema),
-    ({ signal }) => getTablesRolesAccess({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<TablesRolesAccessData, TablesRolesAccessError, TData>({
+    queryKey: tableKeys.rolesAccess(projectRef, schema),
+    queryFn: ({ signal }) =>
+      getTablesWithAnonAuthenticatedAccess({ projectRef, connectionString, schema }, signal),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof schema !== 'undefined' &&
+      !!connectionString,
+    ...options,
+  })
