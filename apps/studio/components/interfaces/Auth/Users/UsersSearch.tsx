@@ -11,6 +11,9 @@ import {
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -62,9 +65,17 @@ export const UsersSearch = ({
               Phone number
             </SelectItem_Shadcn_>
             <SelectSeparator_Shadcn_ />
-            <SelectItem_Shadcn_ value="freeform" className="text-xs">
-              All columns
-            </SelectItem_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
+                <SelectItem_Shadcn_ value="freeform" className="text-xs">
+                  Unified search
+                </SelectItem_Shadcn_>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="w-64 text-center">
+                Search by all columns at once, including mid-string search. May impact database
+                performance if you have many users.
+              </TooltipContent>
+            </Tooltip>
           </SelectGroup_Shadcn_>
         </SelectContent_Shadcn_>
       </Select_Shadcn_>
