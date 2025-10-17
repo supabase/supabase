@@ -4,7 +4,7 @@ import { noop } from 'lodash'
 import AlertError from 'components/ui/AlertError'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useTableRolesAccessQuery } from 'data/tables/table-roles-access-query'
+import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
@@ -65,12 +65,12 @@ export const PolicyTableRow = ({
   const isRLSEnabled = table.rls_enabled
   const isTableExposedThroughAPI = exposedSchemas.includes(table.schema)
 
-  const { data: tableRolesAccess = {} } = useTableRolesAccessQuery({
+  const { data: tablesRolesAccess = {} } = useTablesRolesAccessQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: table.schema,
   })
-  const roles = tableRolesAccess?.[table.name] ?? []
+  const roles = tablesRolesAccess?.[table.name] ?? []
   const hasAnonAuthenticatedRolesAccess = roles.length !== 0
   const isPubliclyReadableWritable =
     !isRLSEnabled && isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
