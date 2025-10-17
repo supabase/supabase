@@ -2,18 +2,22 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { makeRandomString } from './helpers'
 
 const GITHUB_INTEGRATION_APP_NAME =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? `supabase`
-    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? `supabase-staging`
-      : `supabase-local-testing`
+  process.env.NIMBUS_PROD_PROJECTS_URL !== undefined
+    ? 'supabase-snap'
+    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+      ? `supabase`
+      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? `supabase-staging`
+        : `supabase-local-testing`
 
 const GITHUB_INTEGRATION_CLIENT_ID =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? `Iv1.b91a6d8eaa272168`
-    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? `Iv1.2681ab9a0360d8ad`
-      : `Iv1.5022a3b44d150fbf`
+  process.env.NIMBUS_PROD_PROJECTS_URL !== undefined
+    ? 'Iv23li2pAiqDGgaSrP8q'
+    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+      ? `Iv1.b91a6d8eaa272168`
+      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? `Iv1.2681ab9a0360d8ad`
+        : `Iv1.5022a3b44d150fbf`
 
 const GITHUB_INTEGRATION_AUTHORIZATION_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_INTEGRATION_CLIENT_ID}`
 export const GITHUB_INTEGRATION_INSTALLATION_URL = `https://github.com/apps/${GITHUB_INTEGRATION_APP_NAME}/installations/new`
