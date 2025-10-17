@@ -1,9 +1,10 @@
-import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
+import { ControllerRenderProps } from 'react-hook-form'
 
 import { useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
+import type { DesiredInstanceSize } from 'data/projects/new-project.constants'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -27,7 +28,7 @@ import { getAvailableRegions } from './ProjectCreation.utils'
 interface RegionSelectorProps {
   cloudProvider: CloudProvider
   field: ControllerRenderProps<any, 'dbRegion'>
-  form: UseFormReturn<any>
+  instanceSize?: DesiredInstanceSize
   layout?: 'vertical' | 'horizontal'
 }
 
@@ -38,6 +39,7 @@ interface RegionSelectorProps {
 export const RegionSelector = ({
   cloudProvider,
   field,
+  instanceSize,
   layout = 'horizontal',
 }: RegionSelectorProps) => {
   const { slug } = useParams()
@@ -54,7 +56,10 @@ export const RegionSelector = ({
     isLoading: isLoadingAvailableRegions,
     isError: isErrorAvailableRegions,
     error: errorAvailableRegions,
-  } = useOrganizationAvailableRegionsQuery({ slug, cloudProvider }, { enabled: smartRegionEnabled })
+  } = useOrganizationAvailableRegionsQuery(
+    { slug, cloudProvider, desiredInstanceSize: instanceSize },
+    { enabled: smartRegionEnabled, staleTime: 1000 * 60 * 5 } // 5 minutes
+  )
 
   const smartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []
