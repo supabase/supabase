@@ -595,29 +595,6 @@ const ConnectionStringMethodSelectItem = ({
       <div className="text-foreground-lighter text-xs">
         {connectionStringMethodOptions[method].description}
       </div>
-      <div className="flex items-center gap-1 mt-2">
-        {method === 'session' ? (
-          <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
-            <InfoIcon className="w-3 h-3" />
-            {connectionStringMethodOptions[method].badge}
-          </Badge>
-        ) : (
-          <Badge variant="outline" size="small" className="flex gap-1 text-foreground-lighter">
-            <GlobeIcon className="w-3 h-3" />
-            {connectionStringMethodOptions[method].badge}
-          </Badge>
-        )}
-        {method === 'transaction' && (
-          <Badge variant="outline" size="small" className="text-foreground-lighter">
-            {poolerBadge}
-          </Badge>
-        )}
-        {method === 'session' && (
-          <Badge variant="outline" size="small" className="text-foreground-lighter">
-            Shared Pooler
-          </Badge>
-        )}
-      </div>
     </div>
   </SelectItem_Shadcn_>
 )
