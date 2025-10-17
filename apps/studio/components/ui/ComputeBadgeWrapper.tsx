@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -21,19 +21,11 @@ const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string })
   )
 }
 
-interface ComputeBadgeWrapperProps {
-  project: {
-    ref?: string
-    organization_slug?: string
-    cloud_provider?: string
-    infra_compute_size?: InfraInstanceSize
-  }
-}
-
-export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
+export const ComputeBadgeWrapper = ({ slug, project }: { slug?: string; project: OrgProject }) => {
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
+  const computeSize = getComputeSize(project)
 
   // returns hardcoded values for infra
   const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
@@ -51,7 +43,7 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   const computeInstanceMeta = computeInstance?.variant?.meta
 
   const meta = (
-    computeInstanceMeta === undefined && project.infra_compute_size === 'micro'
+    computeInstanceMeta === undefined && computeSize === 'micro'
       ? INSTANCE_MICRO_SPECS
       : computeInstanceMeta
   ) as ProjectAddonVariantMeta
@@ -62,26 +54,24 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
 
   const highestComputeAvailable = availableCompute?.[availableCompute.length - 1].identifier
 
-  const isHighestCompute =
-    project?.infra_compute_size === highestComputeAvailable?.replace('ci_', '')
+  const isHighestCompute = computeSize === highestComputeAvailable?.replace('ci_', '')
 
   const { data, isLoading: isLoadingSubscriptions } = useOrgSubscriptionQuery(
-    { orgSlug: project?.organization_slug },
+    { orgSlug: slug },
     { enabled: open }
   )
 
-  const isEligibleForFreeUpgrade =
-    data?.plan.id !== 'free' && project?.infra_compute_size === 'nano'
+  const isEligibleForFreeUpgrade = data?.plan.id !== 'free' && computeSize === 'nano'
 
   const isLoading = isLoadingAddons || isLoadingSubscriptions
 
-  if (!project?.infra_compute_size) return null
+  if (!computeSize) return null
 
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
       <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
         <div>
-          <ComputeBadge infraComputeSize={project.infra_compute_size} />
+          <ComputeBadge infraComputeSize={computeSize} />
         </div>
       </HoverCardTrigger>
       <HoverCardContent
@@ -94,7 +84,7 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
         <Separator />
         <div className="p-3 px-5 flex flex-row gap-4">
           <div>
-            <ComputeBadge infraComputeSize={project?.infra_compute_size} />
+            <ComputeBadge infraComputeSize={computeSize} />
           </div>
           <div className="flex flex-col gap-4">
             {isLoading ? (

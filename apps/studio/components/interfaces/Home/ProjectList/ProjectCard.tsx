@@ -14,6 +14,7 @@ import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
+  slug?: string
   project: OrgProject
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
@@ -22,6 +23,7 @@ export interface ProjectCardProps {
 }
 
 export const ProjectCard = ({
+  slug,
   project,
   rewriteHref,
   githubIntegration,
@@ -56,7 +58,7 @@ export const ProjectCard = ({
             <span className="text-sm text-foreground-light">{desc}</span>
             <div className="flex items-center gap-x-1.5">
               {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
-                <ComputeBadgeWrapper project={project} />
+                <ComputeBadgeWrapper slug={slug} project={project} />
               )}
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">

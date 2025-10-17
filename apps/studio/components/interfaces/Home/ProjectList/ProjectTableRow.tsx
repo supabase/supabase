@@ -95,14 +95,7 @@ export const ProjectTableRow = ({
       <TableCell>
         <div className="w-fit">
           {project.status !== 'INACTIVE' ? (
-            <ComputeBadgeWrapper
-              project={{
-                ref: project.ref,
-                organization_slug: organization?.slug,
-                cloud_provider: infraInformation?.cloud_provider,
-                infra_compute_size: infraInformation?.infra_compute_size,
-              }}
-            />
+            <ComputeBadgeWrapper slug={organization?.slug} project={project} />
           ) : (
             <span className="text-xs text-foreground-light">-</span>
           )}
