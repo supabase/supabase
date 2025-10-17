@@ -43,7 +43,7 @@ export enum TableSource {
 
 export enum QuickstartVariant {
   CONTROL = 'control',
-  AI = 'ai',
+  ASSISTANT = 'assistant',
   TEMPLATES = 'templates',
 }
 
