@@ -5,7 +5,7 @@ import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { OrgProject } from 'data/projects/org-projects-infinite-query'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -14,6 +14,7 @@ import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
+  slug?: string
   project: OrgProject
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
@@ -22,6 +23,7 @@ export interface ProjectCardProps {
 }
 
 export const ProjectCard = ({
+  slug,
   project,
   rewriteHref,
   githubIntegration,
@@ -56,7 +58,12 @@ export const ProjectCard = ({
             <span className="text-sm text-foreground-light">{desc}</span>
             <div className="flex items-center gap-x-1.5">
               {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
-                <ComputeBadgeWrapper project={project} />
+                <ComputeBadgeWrapper
+                  slug={slug}
+                  projectRef={project.ref}
+                  cloudProvider={project.cloud_provider}
+                  computeSize={getComputeSize(project)}
+                />
               )}
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">

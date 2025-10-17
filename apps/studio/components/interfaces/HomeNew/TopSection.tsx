@@ -7,12 +7,12 @@ import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
@@ -85,12 +85,10 @@ export const TopSection = () => {
                 </Tooltip>
               )}
               <ComputeBadgeWrapper
-                project={{
-                  ref: project?.ref,
-                  organization_slug: organization?.slug,
-                  cloud_provider: project?.cloud_provider,
-                  infra_compute_size: project?.infra_compute_size,
-                }}
+                projectRef={project?.ref}
+                slug={organization?.slug}
+                cloudProvider={project?.cloud_provider}
+                computeSize={project?.infra_compute_size}
               />
             </div>
           </div>
