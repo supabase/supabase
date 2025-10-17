@@ -9272,7 +9272,6 @@ export interface components {
       created_at: string
       format: string
       id: string
-      name: string
       /** @enum {string} */
       type: 'ANALYTICS'
       updated_at: string
