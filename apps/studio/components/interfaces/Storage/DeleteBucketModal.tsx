@@ -29,6 +29,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
@@ -43,6 +44,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const isStorageV2 = useIsNewStorageUIEnabled()
 
   const schema = z.object({
     confirm: z.literal(bucket.id, {
@@ -92,7 +94,11 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
         )
 
         toast.success(`Successfully deleted bucket ${bucket.id}`)
-        router.push(`/project/${projectRef}/storage/buckets`)
+        if (isStorageV2) {
+          router.push(`/project/${projectRef}/storage/files`)
+        } else {
+          router.push(`/project/${projectRef}/storage/buckets`)
+        }
         onClose()
       } catch (error) {
         toast.success(
@@ -103,7 +109,17 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   })
 
   const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
-    useAnalyticsBucketDeleteMutation()
+    useAnalyticsBucketDeleteMutation({
+      onSuccess: () => {
+        toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
+        if (isStorageV2) {
+          router.push(`/project/${projectRef}/storage/analytics`)
+        } else {
+          router.push(`/project/${projectRef}/storage/buckets`)
+        }
+        onClose()
+      },
+    })
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
