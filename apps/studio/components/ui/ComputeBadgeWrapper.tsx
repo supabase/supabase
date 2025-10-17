@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
+import { ProjectDetail } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -21,20 +21,29 @@ const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string })
   )
 }
 
-export const ComputeBadgeWrapper = ({ slug, project }: { slug?: string; project: OrgProject }) => {
+interface ComputeBadgeWrapperProps {
+  slug?: string
+  projectRef?: string
+  cloudProvider?: string
+  computeSize?: ProjectDetail['infra_compute_size']
+}
+
+export const ComputeBadgeWrapper = ({
+  slug,
+  projectRef,
+  cloudProvider,
+  computeSize,
+}: ComputeBadgeWrapperProps) => {
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
-  const computeSize = getComputeSize(project)
 
   // returns hardcoded values for infra
-  const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
+  const cpuArchitecture = getCloudProviderArchitecture(cloudProvider)
 
   // fetches addons
   const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery(
-    {
-      projectRef: project.ref,
-    },
+    { projectRef },
     { enabled: open }
   )
   const selectedAddons = addons?.selected_addons ?? []
@@ -135,7 +144,7 @@ export const ComputeBadgeWrapper = ({ slug, project }: { slug?: string; project:
               </div>
               <div>
                 <Button asChild type="default" htmlType="button" role="button">
-                  <Link href={`/project/${project?.ref}/settings/compute-and-disk`}>
+                  <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
                     Upgrade compute
                   </Link>
                 </Button>
