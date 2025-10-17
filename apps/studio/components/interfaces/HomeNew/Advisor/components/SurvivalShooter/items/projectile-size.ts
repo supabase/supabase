@@ -1,7 +1,8 @@
-import type { GameItem } from './base'
 import { WeaponType } from '../types'
+import type { GameItem } from './base'
+import { defineItem } from './registry'
 
-export const projectileSize: GameItem = {
+export const projectileSize = defineItem({
   id: 'projectile_size',
   name: 'Big Shot',
   description: '+50% Projectile Size',
@@ -10,4 +11,4 @@ export const projectileSize: GameItem = {
   },
   requiresWeaponSelection: true,
   applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
-}
+} satisfies GameItem)

@@ -76,6 +76,8 @@ export interface Projectile {
   weaponType: WeaponType
   isPulse: boolean // deprecated, use weaponType === PULSE
   createdAt?: number // for pulse expansion
+  initialRadius?: number // starting radius for pulse expansion
+  maxAge?: number // max age in seconds before removal (for pulses)
 }
 
 export interface SelectedCard {

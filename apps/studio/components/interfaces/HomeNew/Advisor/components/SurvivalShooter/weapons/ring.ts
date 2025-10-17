@@ -3,8 +3,9 @@ import { applyModifiers, aggregateModifiers, aggregateEventHandlers } from './ba
 import type { GameItem } from '../items/base'
 import type { Projectile } from '../types'
 import { WeaponType } from '../types'
+import { defineWeapon } from './registry'
 
-export const ringWeapon: GameWeapon = {
+export const ringWeapon = defineWeapon({
   type: WeaponType.RING,
   name: 'Ring Weapon',
   baseStats: {
@@ -51,6 +52,7 @@ export const ringWeapon: GameWeapon = {
       weaponType: WeaponType.RING,
       isPulse: true,
       createdAt: currentTime,
+      initialRadius: config.playerRadius,
     })
 
     return {
@@ -62,4 +64,4 @@ export const ringWeapon: GameWeapon = {
   getEventHandlers: (appliedItems: GameItem[]) => {
     return aggregateEventHandlers(appliedItems)
   },
-}
+} satisfies GameWeapon)

@@ -1,20 +1,36 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import type { GameWeapon } from './base'
-import { normalWeapon } from './normal'
-import { ringWeapon } from './ring'
 import { WeaponType } from '../types'
+import { weaponRegistry } from './registry'
 
-// Export all weapons
+// Export base types
 export * from './base'
-export * from './normal'
-export * from './ring'
 
-// Weapon registry - all available weapons
-export const WEAPON_REGISTRY: Record<WeaponType, GameWeapon> = {
-  [WeaponType.NORMAL]: normalWeapon,
-  [WeaponType.RING]: ringWeapon,
+declare const require: {
+  context: (path: string, includeSubdirectories: boolean, regExp: RegExp) => {
+    keys: () => string[]
+    <T>(id: string): T
+  }
 }
 
-// Helper to get weapon by type
+// Auto-register every weapon definition in this directory
+const weaponContext =
+  typeof require === 'function'
+    ? require.context('./', false, /^(?!.*(?:index|base|registry)).*\.ts$/)
+    : null
+
+weaponContext?.keys().forEach((key) => {
+  weaponContext(key)
+})
+
 export function getWeaponByType(type: WeaponType): GameWeapon {
-  return WEAPON_REGISTRY[type]
+  const weapon = weaponRegistry.getByType(type)
+  if (!weapon) {
+    throw new Error(`Weapon "${type}" is not registered`)
+  }
+  return weapon
+}
+
+export function getAllWeapons(): GameWeapon[] {
+  return weaponRegistry.getAll()
 }

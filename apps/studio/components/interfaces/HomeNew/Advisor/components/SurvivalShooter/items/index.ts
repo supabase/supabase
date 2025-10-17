@@ -1,37 +1,30 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import type { GameItem } from './base'
-import { hpIncrease } from './hp-increase'
-import { attackSpeed } from './attack-speed'
-import { attackDamage } from './attack-damage'
-import { lifeSteal } from './life-steal'
-import { projectileCount } from './projectile-count'
-import { projectileSize } from './projectile-size'
-import { unlockRing } from './unlock-ring'
-import { piercingDamage } from './piercing-damage'
+import { itemRegistry } from './registry'
 
 // Export all items
 export * from './base'
-export * from './hp-increase'
-export * from './attack-speed'
-export * from './attack-damage'
-export * from './life-steal'
-export * from './projectile-count'
-export * from './projectile-size'
-export * from './unlock-ring'
-export * from './piercing-damage'
 
-// Item registry - all available items
-export const ALL_ITEMS: GameItem[] = [
-  hpIncrease,
-  attackSpeed,
-  attackDamage,
-  lifeSteal,
-  projectileCount,
-  projectileSize,
-  unlockRing,
-  piercingDamage,
-]
+declare const require: {
+  context: (path: string, includeSubdirectories: boolean, regExp: RegExp) => {
+    keys: () => string[]
+    <T>(id: string): T
+  }
+}
 
-// Helper to get item by id
+// Automatically register every item file in this directory (excluding helpers)
+const itemContext =
+  typeof require === 'function'
+    ? require.context('./', false, /^(?!.*(?:index|base|registry)).*\.ts$/)
+    : null
+
+itemContext?.keys().forEach((key) => {
+    itemContext(key)
+})
+
+// Item registry helpers
+export const ALL_ITEMS: GameItem[] = itemRegistry.getAll()
+
 export function getItemById(id: string): GameItem | undefined {
-  return ALL_ITEMS.find((item) => item.id === id)
+  return itemRegistry.getById(id)
 }

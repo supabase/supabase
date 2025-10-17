@@ -1,7 +1,8 @@
-import type { GameItem } from './base'
 import { WeaponType } from '../types'
+import type { GameItem } from './base'
+import { defineItem } from './registry'
 
-export const attackDamage: GameItem = {
+export const attackDamage = defineItem({
   id: 'attack_damage',
   name: 'Damage Boost',
   description: '+25% Damage',
@@ -10,4 +11,4 @@ export const attackDamage: GameItem = {
   },
   requiresWeaponSelection: true,
   applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
-}
+} satisfies GameItem)

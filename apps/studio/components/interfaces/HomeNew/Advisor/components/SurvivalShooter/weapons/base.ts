@@ -122,8 +122,11 @@ export function aggregateEventHandlers(items: GameItem[]): EventHandlers {
         const existingHandler = handlers.onEnemyDeath
         const newHandler = item.eventHandlers.onEnemyDeath
         handlers.onEnemyDeath = (context) => {
+          // Call existing handler first
           const result1 = existingHandler ? existingHandler(context) : {}
+          // Then call new handler (allows items to affect enemies directly via context)
           const result2 = newHandler(context)
+          // Aggregate only the return values (items handle their own side effects)
           return {
             healAmount: (result1?.healAmount || 0) + (result2?.healAmount || 0),
             spawnProjectiles: (result1?.spawnProjectiles || 0) + (result2?.spawnProjectiles || 0),

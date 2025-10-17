@@ -1,7 +1,8 @@
-import type { GameItem } from './base'
 import { WeaponType } from '../types'
+import type { GameItem } from './base'
+import { defineItem } from './registry'
 
-export const attackSpeed: GameItem = {
+export const attackSpeed = defineItem({
   id: 'attack_speed',
   name: 'Attack Speed',
   description: '+25% Attack Speed',
@@ -10,4 +11,4 @@ export const attackSpeed: GameItem = {
   },
   requiresWeaponSelection: true,
   applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
-}
+} satisfies GameItem)

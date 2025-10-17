@@ -1,8 +1,9 @@
-import type { GameItem } from './base'
 import { WeaponType } from '../types'
+import type { GameItem } from './base'
 import type { OnDamageContext, OnDamageResult } from '../events'
+import { defineItem } from './registry'
 
-export const piercingDamage: GameItem = {
+export const piercingDamage = defineItem({
   id: 'piercing_damage',
   name: 'Piercing Damage',
   description: 'Projectiles pierce through enemies',
@@ -14,4 +15,4 @@ export const piercingDamage: GameItem = {
       return { shouldRemoveProjectile: false }
     },
   },
-}
+} satisfies GameItem)

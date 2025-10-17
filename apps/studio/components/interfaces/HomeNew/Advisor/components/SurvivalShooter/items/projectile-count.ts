@@ -1,7 +1,8 @@
-import type { GameItem } from './base'
 import { WeaponType } from '../types'
+import type { GameItem } from './base'
+import { defineItem } from './registry'
 
-export const projectileCount: GameItem = {
+export const projectileCount = defineItem({
   id: 'projectile_count',
   name: 'Multishot',
   description: '+1 Projectile',
@@ -10,4 +11,4 @@ export const projectileCount: GameItem = {
   },
   requiresWeaponSelection: true,
   applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
-}
+} satisfies GameItem)

@@ -1,8 +1,9 @@
-import type { GameWeapon, ShootContext, ShootResult, BaseWeaponStats } from './base'
+import type { GameWeapon, ShootContext, ShootResult } from './base'
 import { applyModifiers, aggregateModifiers, aggregateEventHandlers } from './base'
-import type { GameItem } from '../items/base'
 import type { Vector2, Projectile } from '../types'
+import type { GameItem } from '../items/base'
 import { WeaponType } from '../types'
+import { defineWeapon } from './registry'
 
 // Helper: Find the biggest gap between angles and return the angle in the middle
 function findBiggestGap(angles: number[]): number {
@@ -32,7 +33,7 @@ function findBiggestGap(angles: number[]): number {
   }
 }
 
-export const normalWeapon: GameWeapon = {
+export const normalWeapon = defineWeapon({
   type: WeaponType.NORMAL,
   name: 'Blaster',
   baseStats: {
@@ -105,4 +106,4 @@ export const normalWeapon: GameWeapon = {
   getEventHandlers: (appliedItems: GameItem[]) => {
     return aggregateEventHandlers(appliedItems)
   },
-}
+} satisfies GameWeapon)
