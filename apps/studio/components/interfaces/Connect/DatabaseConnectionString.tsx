@@ -385,7 +385,7 @@ export const DatabaseConnectionString = () => {
           <div>
             {hasCodeExamples && (
               <div className="px-4 md:px-7 pt-8">
-                <StepLabel number={++stepNumber}>Choose type of connection</StepLabel>
+                <StepLabel number={++stepNumber}>Connect to your database</StepLabel>
               </div>
             )}
             <div className="px-4 md:px-7 py-8">
