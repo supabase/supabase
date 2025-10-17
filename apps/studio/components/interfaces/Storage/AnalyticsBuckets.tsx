@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
+import { AnalyticsBucket, useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import {
   Button,
   Card,
@@ -32,10 +32,12 @@ export const AnalyticsBuckets = () => {
   const { ref } = useParams()
 
   const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
-  const [selectedBucket, setSelectedBucket] = useState<Bucket>()
+  const [selectedBucket, setSelectedBucket] = useState<AnalyticsBucket>()
   const [filterString, setFilterString] = useState('')
 
-  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
+  const { data: buckets = [], isLoading: isLoadingBuckets } = useAnalyticsBucketsQuery({
+    projectRef: ref,
+  })
 
   const analyticsBuckets = buckets
     .filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS')
@@ -165,7 +167,7 @@ export const AnalyticsBuckets = () => {
 
       {selectedBucket && (
         <DeleteBucketModal
-          visible={modal === `delete`}
+          visible={modal === 'delete'}
           bucket={selectedBucket}
           onClose={() => setModal(null)}
         />

@@ -8,6 +8,8 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
+import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -31,7 +33,7 @@ import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
   visible: boolean
-  bucket: Bucket
+  bucket: Bucket | AnalyticsBucket
   onClose: () => void
 }
 
@@ -53,6 +55,8 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   })
 
   const { data } = useBucketsQuery({ projectRef })
+  const buckets = data ?? []
+
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -60,7 +64,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   })
   const { mutateAsync: deletePolicy } = useDatabasePolicyDeleteMutation()
 
-  const { mutate: deleteBucket, isLoading } = useBucketDeleteMutation({
+  const { mutate: deleteBucket, isLoading: isDeletingBucket } = useBucketDeleteMutation({
     onSuccess: async () => {
       if (!project) return console.error('Project is required')
 
@@ -98,13 +102,21 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     },
   })
 
-  const buckets = data ?? []
+  const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
+    useAnalyticsBucketDeleteMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
-    deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
+
+    if (bucket.type === 'STANDARD') {
+      deleteBucket({ projectRef, id: bucket.id })
+    } else if (bucket.type === 'ANALYTICS') {
+      deleteAnalyticsBucket({ projectRef, id: bucket.id })
+    }
   }
+
+  const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket
 
   return (
     <Dialog
@@ -166,10 +178,10 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={onClose}>
+          <Button type="default" disabled={isDeleting} onClick={onClose}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" type="danger" loading={isLoading}>
+          <Button form={formId} htmlType="submit" type="danger" loading={isDeleting}>
             Delete bucket
           </Button>
         </DialogFooter>
