@@ -109,9 +109,10 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
 
-    if (bucket.type === 'STANDARD') {
+    // [Joshen] We'll need a third case to figure out for vector buckets
+    if ('type' in bucket && bucket.type === 'STANDARD') {
       deleteBucket({ projectRef, id: bucket.id })
-    } else if (bucket.type === 'ANALYTICS') {
+    } else {
       deleteAnalyticsBucket({ projectRef, id: bucket.id })
     }
   }
