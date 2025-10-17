@@ -78,39 +78,17 @@ export interface Projectile {
   createdAt?: number // for pulse expansion
 }
 
-export enum ItemType {
-  HP_INCREASE = 'hp_increase',
-  ATTACK_SPEED = 'attack_speed',
-  ATTACK_DAMAGE = 'attack_damage',
-  PROJECTILE_COUNT = 'projectile_count',
-  PROJECTILE_SIZE = 'projectile_size',
-  UNLOCK_RING = 'unlock_ring',
-  LIFE_STEAL = 'life_steal',
-}
-
-// For backwards compatibility
-export const PerkType = ItemType
-
-export interface Perk {
-  type: PerkType
-  name: string
-  description: string
-  value: number // percentage or flat value depending on type
-}
-
-export interface Card {
-  id: string
-  name: string
-  description: string
-  cardType: 'weapon' | 'stat'
-  weapon?: Weapon
-  perks: Perk[]
-  requiresWeaponSelection?: boolean
-  applicableWeaponTypes?: WeaponType[]
-}
-
 export interface SelectedCard {
-  card: Card
+  // Store minimal item info (full GameItem retrieved from registry when needed)
+  item: {
+    id: string
+    name: string
+    description: string
+    requiresWeaponSelection?: boolean
+    applicableWeaponTypes?: WeaponType[]
+    unlocksWeapon?: WeaponType
+    stackable?: boolean
+  }
   assignedWeaponType?: WeaponType
 }
 
