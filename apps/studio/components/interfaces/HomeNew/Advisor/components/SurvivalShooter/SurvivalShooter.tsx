@@ -1,99 +1,131 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Button } from 'ui'
 import { X, Heart, Zap } from 'lucide-react'
 import { SurvivalCanvas } from './SurvivalCanvas'
 import { useGameLoop } from './useGameLoop'
-import type { Card, GameStatus } from './types'
-import { PerkType } from './types'
+import type { Card, GameStatus, SelectedCard } from './types'
+import { PerkType, WeaponType } from './types'
 
 interface SurvivalShooterProps {
   availableResources: number
   onExit: () => void
 }
 
-// Generate random cards based on available resources
-const generateCards = (count: number): Card[] => {
-  const allItemTypes = [
-    {
-      type: PerkType.HP_INCREASE,
-      name: 'Health Potion',
-      desc: '+30 HP',
-      value: 30
-    },
-    {
-      type: PerkType.ATTACK_SPEED,
-      name: 'Attack Speed',
-      desc: '+25% Speed (All Weapons)',
-      value: 25
-    },
-    {
-      type: PerkType.ATTACK_DAMAGE,
-      name: 'Damage Boost',
-      desc: '+25% Damage (All Weapons)',
-      value: 25
-    },
-    {
-      type: PerkType.PROJECTILE_COUNT,
-      name: 'Multishot',
-      desc: '+1 Projectile (All Weapons)',
-      value: 1
-    },
-    {
-      type: PerkType.PROJECTILE_SIZE,
-      name: 'Big Shot',
-      desc: '+50% Size (All Weapons)',
-      value: 0.5
-    },
-    {
-      type: PerkType.UNLOCK_RING,
-      name: 'Ring Weapon',
-      desc: 'Unlock Expanding Ring',
-      value: 1
-    },
-  ]
+const allItemTypes = [
+  {
+    type: PerkType.HP_INCREASE,
+    name: 'Health Potion',
+    desc: '+30 HP',
+    value: 30,
+    requiresWeaponSelection: false,
+  },
+  {
+    type: PerkType.ATTACK_SPEED,
+    name: 'Attack Speed',
+    desc: '+25% Attack Speed',
+    value: 25,
+    requiresWeaponSelection: true,
+    applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
+  },
+  {
+    type: PerkType.ATTACK_DAMAGE,
+    name: 'Damage Boost',
+    desc: '+25% Damage',
+    value: 25,
+    requiresWeaponSelection: true,
+    applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
+  },
+  {
+    type: PerkType.PROJECTILE_COUNT,
+    name: 'Multishot',
+    desc: '+1 Projectile',
+    value: 1,
+    requiresWeaponSelection: true,
+    applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
+  },
+  {
+    type: PerkType.PROJECTILE_SIZE,
+    name: 'Big Shot',
+    desc: '+50% Projectile Size',
+    value: 0.5,
+    requiresWeaponSelection: true,
+    applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
+  },
+  {
+    type: PerkType.UNLOCK_RING,
+    name: 'Ring Weapon',
+    desc: 'Unlock Expanding Ring',
+    value: 1,
+    requiresWeaponSelection: false,
+  },
+] as const
 
-  return Array.from({ length: count }, (_, i) => {
-    const itemData = allItemTypes[Math.floor(Math.random() * allItemTypes.length)]
-    const isStatBoost = itemData.type === PerkType.HP_INCREASE
-    return {
-      id: `card_${i}`,
-      name: itemData.name,
-      description: itemData.desc,
-      cardType: isStatBoost ? ('stat' as const) : ('weapon' as const),
-      perks: [
-        {
-          type: itemData.type,
-          name: itemData.name,
-          description: itemData.desc,
-          value: itemData.value,
-        },
-      ],
-    }
-  })
+const createRandomCard = (): Card => {
+  const itemData = allItemTypes[Math.floor(Math.random() * allItemTypes.length)]
+  const isStatBoost = itemData.type === PerkType.HP_INCREASE
+  return {
+    id: `card_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
+    name: itemData.name,
+    description: itemData.desc,
+    cardType: isStatBoost ? ('stat' as const) : ('weapon' as const),
+    perks: [
+      {
+        type: itemData.type,
+        name: itemData.name,
+        description: itemData.desc,
+        value: itemData.value,
+      },
+    ],
+    requiresWeaponSelection: itemData.requiresWeaponSelection,
+    applicableWeaponTypes: itemData.applicableWeaponTypes,
+  }
 }
 
-export const SurvivalShooter = ({ availableResources, onExit }: SurvivalShooterProps) => {
-  const maxCards = Math.min(Math.floor(availableResources / 5), 5)
-  const [selectedCards, setSelectedCards] = useState<Card[]>([])
-  const [availableCards, setAvailableCards] = useState<Card[]>([])
+const weaponTypeLabels: Record<WeaponType, string> = {
+  [WeaponType.NORMAL]: 'Blaster',
+  [WeaponType.RING]: 'Ring Weapon',
+}
+
+export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShooterProps) => {
+  const maxCards = Math.max(0, availableResources)
+  const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([])
+  const [currentOptions, setCurrentOptions] = useState<Card[]>([])
   const [hasStarted, setHasStarted] = useState(false)
   const [currentScore, setCurrentScore] = useState(0)
   const [gameStatus, setGameStatus] = useState<GameStatus>('card_selection' as GameStatus)
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
+  const [weaponSelectionPrompt, setWeaponSelectionPrompt] = useState<{
+    card: Card
+    options: WeaponType[]
+  } | null>(null)
+  const [isSelectionActive, setIsSelectionActive] = useState(false)
+  const wasPlayingBeforeSelectionRef = useRef(false)
 
   const { gameStateRef, config, startGame, pauseGame, resumeGame, updateMousePosition } =
-    useGameLoop(selectedCards, canvasSize)
+    useGameLoop(selectedCards, canvasSize, maxCards)
 
-  // Generate cards on mount
-  useEffect(() => {
-    if (maxCards > 0) {
-      setAvailableCards(generateCards(maxCards))
-    } else {
-      // If no resources for cards, start immediately
-      setHasStarted(true)
-      startGame()
-    }
-  }, [maxCards])
+  const remainingSelections = Math.max(0, maxCards - selectedCards.length)
+
+  const unlockedWeapons = useMemo(() => {
+    const weapons = new Set<WeaponType>([WeaponType.NORMAL])
+    selectedCards.forEach((choice) => {
+      if (choice.card.perks.some((perk) => perk.type === PerkType.UNLOCK_RING)) {
+        weapons.add(WeaponType.RING)
+      }
+    })
+    return weapons
+  }, [selectedCards])
+
+  const getWeaponOptions = (card: Card): WeaponType[] => {
+    if (!card.requiresWeaponSelection) return []
+    const allowedTypes = card.applicableWeaponTypes ?? []
+    return allowedTypes.filter((type) => unlockedWeapons.has(type))
+  }
+
+  const addCardSelection = (card: Card, assignedWeaponType?: WeaponType) => {
+    setSelectedCards((prev) => [...prev, { card, assignedWeaponType }])
+    setCurrentOptions([])
+  }
 
   // Monitor game state
   useEffect(() => {
@@ -109,24 +141,115 @@ export const SurvivalShooter = ({ availableResources, onExit }: SurvivalShooterP
     return () => clearInterval(interval)
   }, [hasStarted, gameStateRef])
 
-  const handleCardSelect = (card: Card) => {
-    if (selectedCards.find((c) => c.id === card.id)) {
-      setSelectedCards(selectedCards.filter((c) => c.id !== card.id))
+  useEffect(() => {
+    if (remainingSelections > 0) {
+      if (!isSelectionActive) {
+        setIsSelectionActive(true)
+        setCurrentOptions([])
+        const status = gameStateRef.current?.status
+        if (status === 'playing') {
+          pauseGame()
+          wasPlayingBeforeSelectionRef.current = true
+        } else {
+          wasPlayingBeforeSelectionRef.current = false
+        }
+      }
     } else {
-      setSelectedCards([...selectedCards, card])
+      if (isSelectionActive) {
+        setIsSelectionActive(false)
+        setCurrentOptions([])
+        if (!hasStarted) {
+          setHasStarted(true)
+          startGame()
+        } else if (wasPlayingBeforeSelectionRef.current) {
+          resumeGame()
+        }
+        wasPlayingBeforeSelectionRef.current = false
+      } else if (!hasStarted && maxCards === 0) {
+        setHasStarted(true)
+        startGame()
+      }
     }
+  }, [
+    remainingSelections,
+    isSelectionActive,
+    pauseGame,
+    resumeGame,
+    startGame,
+    hasStarted,
+    maxCards,
+    gameStateRef,
+  ])
+
+  useEffect(() => {
+    if (!isSelectionActive) {
+      setWeaponSelectionPrompt(null)
+    }
+  }, [isSelectionActive])
+
+  useEffect(() => {
+    const hasRingUnlocked = selectedCards.some((choice) =>
+      choice.card.perks.some((perk) => perk.type === PerkType.UNLOCK_RING)
+    )
+    if (hasRingUnlocked) return
+
+    const filtered = selectedCards.filter((choice) => choice.assignedWeaponType !== WeaponType.RING)
+    if (filtered.length !== selectedCards.length) {
+      setSelectedCards(filtered)
+    }
+  }, [selectedCards])
+
+  useEffect(() => {
+    if (!isSelectionActive) {
+      setCurrentOptions([])
+      return
+    }
+
+    if (weaponSelectionPrompt) return
+
+    if (remainingSelections <= 0) {
+      setCurrentOptions([])
+      return
+    }
+
+    if (currentOptions.length === 0) {
+      const optionCount = Math.min(3, remainingSelections)
+      setCurrentOptions(Array.from({ length: optionCount }, () => createRandomCard()))
+    }
+  }, [isSelectionActive, weaponSelectionPrompt, remainingSelections, currentOptions.length])
+
+  const handleCardSelect = (card: Card) => {
+    if (!isSelectionActive || weaponSelectionPrompt) return
+    if (selectedCards.some((choice) => choice.card.id === card.id)) return
+    if (remainingSelections <= 0) return
+
+    if (card.requiresWeaponSelection) {
+      const options = getWeaponOptions(card)
+      if (options.length === 0) return
+      if (options.length === 1) {
+        addCardSelection(card, options[0])
+      } else {
+        setWeaponSelectionPrompt({ card, options })
+      }
+      return
+    }
+
+    addCardSelection(card)
   }
 
-  const handleStartGame = () => {
-    setHasStarted(true)
-    startGame()
+  const handleWeaponSelection = (weapon: WeaponType) => {
+    if (!weaponSelectionPrompt) return
+    addCardSelection(weaponSelectionPrompt.card, weapon)
+    setWeaponSelectionPrompt(null)
   }
 
   const handleRestart = () => {
     setHasStarted(false)
     setSelectedCards([])
-    setAvailableCards(generateCards(maxCards))
+    setCurrentOptions([])
     setGameStatus('card_selection' as GameStatus)
+    setWeaponSelectionPrompt(null)
+    wasPlayingBeforeSelectionRef.current = false
   }
 
   const formatTime = (seconds: number) => {
@@ -135,56 +258,86 @@ export const SurvivalShooter = ({ availableResources, onExit }: SurvivalShooterP
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  // Card selection screen
-  if (!hasStarted && maxCards > 0) {
-    return (
-      <div className="w-full h-full relative overflow-hidden bg-alternative">
-        <Button
-          onClick={onExit}
-          type="default"
-          size="tiny"
-          className="absolute top-4 right-4 z-10"
-          icon={<X strokeWidth={1} size={16} />}
-        />
+  const renderSelectionOverlay = isSelectionActive ? (
+    <div className="absolute inset-0 bg-surface-100/95 backdrop-blur-md z-20 flex items-center justify-center p-6">
+      <Button
+        onClick={onExit}
+        type="default"
+        size="tiny"
+        className="absolute top-4 right-4"
+        icon={<X strokeWidth={1} size={16} />}
+      />
+      <div className="bg-surface-100 border border-overlay rounded-lg shadow-xl w-full max-w-lg p-6 flex flex-col gap-4">
+        {!weaponSelectionPrompt ? (
+          <>
+            <div className="text-center space-y-1">
+              <h2 className="text-lg font-medium">Select an item</h2>
+              <p className="text-sm text-foreground-light">
+                {remainingSelections} selection{remainingSelections !== 1 ? 's' : ''} remaining
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {currentOptions.map((card) => {
+                const weaponOptions = getWeaponOptions(card)
+                const isDisabled = card.requiresWeaponSelection && weaponOptions.length === 0
 
-        <div className="w-full h-full flex flex-col items-center justify-center gap-6 p-6">
-          <div className="text-center">
-            <h2 className="text-lg font-medium mb-2">Select Your Items</h2>
-            <p className="text-sm text-foreground-light">
-              Choose up to {maxCards} item{maxCards !== 1 ? 's' : ''} to enhance your abilities
-            </p>
-          </div>
-
-          <div className="flex gap-3 flex-wrap justify-center max-w-md">
-            {availableCards.map((card) => {
-              const isSelected = selectedCards.find((c) => c.id === card.id)
-              return (
-                <button
-                  key={card.id}
-                  onClick={() => handleCardSelect(card)}
-                  className={`
-                    px-4 py-3 rounded-lg border-2 transition-all
-                    ${
-                      isSelected
-                        ? 'border-brand bg-brand/10 scale-105'
-                        : 'border-overlay hover:border-foreground-muted hover:scale-105'
-                    }
-                  `}
-                >
-                  <div className="text-sm font-medium">{card.name}</div>
-                  <div className="text-xs text-foreground-light mt-1">{card.description}</div>
-                </button>
-              )
-            })}
-          </div>
-
-          <Button onClick={handleStartGame} size="small" type="primary">
-            Start Game
-          </Button>
-        </div>
+                return (
+                  <button
+                    key={card.id}
+                    type="button"
+                    onClick={() => handleCardSelect(card)}
+                    disabled={isDisabled}
+                    className={`w-44 px-4 py-3 rounded-lg border-2 transition-all text-left ${
+                      isDisabled
+                        ? 'border-overlay opacity-40 cursor-not-allowed'
+                        : 'border-overlay hover:border-brand hover:bg-brand/10'
+                    }`}
+                  >
+                    <div className="text-sm font-medium">{card.name}</div>
+                    <div className="text-xs text-foreground-light mt-1">{card.description}</div>
+                    {card.requiresWeaponSelection && weaponOptions.length === 0 && (
+                      <div className="text-xs text-foreground-muted mt-2">
+                        Unlock a compatible weapon to use this item
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+            {currentOptions.length === 0 && (
+              <div className="text-center text-sm text-foreground-muted">
+                Generating more items...
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="text-center space-y-1">
+              <h3 className="text-lg font-medium">Choose a weapon</h3>
+              <p className="text-sm text-foreground-light">
+                {weaponSelectionPrompt.card.name} can be applied to multiple weapons
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {weaponSelectionPrompt.options.map((option) => (
+                <Button key={option} onClick={() => handleWeaponSelection(option)} size="tiny">
+                  {weaponTypeLabels[option]}
+                </Button>
+              ))}
+            </div>
+            <Button
+              onClick={() => setWeaponSelectionPrompt(null)}
+              type="text"
+              size="tiny"
+              className="self-center"
+            >
+              Back to items
+            </Button>
+          </>
+        )}
       </div>
-    )
-  }
+    </div>
+  ) : null
 
   // Game over screen
   if (gameStatus === 'game_over') {
@@ -255,6 +408,7 @@ export const SurvivalShooter = ({ availableResources, onExit }: SurvivalShooterP
         onMouseMove={updateMousePosition}
         onResize={setCanvasSize}
       />
+      {renderSelectionOverlay}
     </div>
   )
 }

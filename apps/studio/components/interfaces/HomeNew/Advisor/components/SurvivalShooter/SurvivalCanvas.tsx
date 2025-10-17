@@ -19,106 +19,117 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
-    if (!canvas || !ctx || !gameStateRef.current) return
+
+    if (!canvas || !ctx) {
+      animationFrameId.current = requestAnimationFrame(draw)
+      return
+    }
+
+    const width = canvas.width || config.canvasWidth
+    const height = canvas.height || config.canvasHeight
+
+    // Always clear the visible canvas so we can redraw with fresh state
+    ctx.fillStyle = isDark ? '#0a0a0a' : '#fafafa'
+    ctx.fillRect(0, 0, width, height)
 
     const gameState = gameStateRef.current
-    const { player, enemies, projectiles } = gameState
+    if (gameState) {
+      const { player, enemies, projectiles } = gameState
 
-    // Clear canvas
-    ctx.fillStyle = isDark ? '#0a0a0a' : '#fafafa'
-    ctx.fillRect(0, 0, config.canvasWidth, config.canvasHeight)
+      // Draw player (circle) - scale size with HP
+      const baseRadius = 8
+      const hpMultiplier = player.stats.maxHp / 100 // starts at 1.0 for 100hp
+      const playerRadius = baseRadius * Math.sqrt(hpMultiplier) // use sqrt for more reasonable scaling
 
-    // Draw player (circle) - scale size with HP
-    const baseRadius = 8
-    const hpMultiplier = player.stats.maxHp / 100 // starts at 1.0 for 100hp
-    const playerRadius = baseRadius * Math.sqrt(hpMultiplier) // use sqrt for more reasonable scaling
+      ctx.fillStyle = isDark ? '#3b82f6' : '#2563eb'
+      ctx.beginPath()
+      ctx.arc(player.position.x, player.position.y, playerRadius, 0, Math.PI * 2)
+      ctx.fill()
 
-    ctx.fillStyle = isDark ? '#3b82f6' : '#2563eb'
-    ctx.beginPath()
-    ctx.arc(player.position.x, player.position.y, playerRadius, 0, Math.PI * 2)
-    ctx.fill()
+      // Draw rotation indicator
+      ctx.strokeStyle = isDark ? '#60a5fa' : '#3b82f6'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(player.position.x, player.position.y)
+      const indicatorLength = playerRadius + 6
+      ctx.lineTo(
+        player.position.x + Math.cos(player.rotation) * indicatorLength,
+        player.position.y + Math.sin(player.rotation) * indicatorLength
+      )
+      ctx.stroke()
 
-    // Draw rotation indicator
-    ctx.strokeStyle = isDark ? '#60a5fa' : '#3b82f6'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.moveTo(player.position.x, player.position.y)
-    const indicatorLength = playerRadius + 6
-    ctx.lineTo(
-      player.position.x + Math.cos(player.rotation) * indicatorLength,
-      player.position.y + Math.sin(player.rotation) * indicatorLength
-    )
-    ctx.stroke()
+      // Draw player HP bar
+      const hpBarWidth = playerRadius * 2
+      const hpBarHeight = 3
+      const hpBarX = player.position.x - playerRadius
+      const hpBarY = player.position.y - playerRadius - 6
 
-    // Draw player HP bar
-    const hpBarWidth = playerRadius * 2
-    const hpBarHeight = 3
-    const hpBarX = player.position.x - playerRadius
-    const hpBarY = player.position.y - playerRadius - 6
-
-    // Background
-    ctx.fillStyle = isDark ? '#333' : '#ddd'
-    ctx.fillRect(hpBarX, hpBarY, hpBarWidth, hpBarHeight)
-
-    // HP
-    const hpPercentage = player.stats.currentHp / player.stats.maxHp
-    ctx.fillStyle = hpPercentage > 0.5 ? '#22c55e' : hpPercentage > 0.25 ? '#eab308' : '#ef4444'
-    ctx.fillRect(hpBarX, hpBarY, hpBarWidth * hpPercentage, hpBarHeight)
-
-    // Draw enemies (squares)
-    enemies.forEach((enemy) => {
-      const size = config.enemySize
-      const x = enemy.position.x - size / 2
-      const y = enemy.position.y - size / 2
-
-      // Enemy body
-      ctx.fillStyle = isDark ? '#ef4444' : '#dc2626'
-      ctx.fillRect(x, y, size, size)
-
-      // Enemy HP bar
-      const enemyHpBarWidth = size
-      const enemyHpBarHeight = 2
-      const enemyHpBarX = x
-      const enemyHpBarY = y - 4
-
+      // Background
       ctx.fillStyle = isDark ? '#333' : '#ddd'
-      ctx.fillRect(enemyHpBarX, enemyHpBarY, enemyHpBarWidth, enemyHpBarHeight)
+      ctx.fillRect(hpBarX, hpBarY, hpBarWidth, hpBarHeight)
 
-      const enemyHpPercentage = enemy.hp / enemy.maxHp
-      ctx.fillStyle = '#22c55e'
-      ctx.fillRect(enemyHpBarX, enemyHpBarY, enemyHpBarWidth * enemyHpPercentage, enemyHpBarHeight)
-    })
+      // HP
+      const hpPercentage = player.stats.currentHp / player.stats.maxHp
+      ctx.fillStyle = hpPercentage > 0.5 ? '#22c55e' : hpPercentage > 0.25 ? '#eab308' : '#ef4444'
+      ctx.fillRect(hpBarX, hpBarY, hpBarWidth * hpPercentage, hpBarHeight)
 
-    // Draw projectiles with weapon-specific colors
-    projectiles.forEach((projectile) => {
-      if (projectile.weaponType === WeaponType.RING) {
-        // Draw ring as expanding ring
-        ctx.strokeStyle = '#a78bfa' // purple
-        ctx.lineWidth = 3
-        ctx.globalAlpha = 0.6
-        ctx.beginPath()
-        ctx.arc(player.position.x, player.position.y, projectile.radius, 0, Math.PI * 2)
-        ctx.stroke()
-        ctx.globalAlpha = 1
-      } else {
-        // Draw normal projectiles (yellow)
-        ctx.fillStyle = '#fbbf24' // yellow
-        ctx.beginPath()
-        ctx.arc(
-          projectile.position.x,
-          projectile.position.y,
-          projectile.radius,
-          0,
-          Math.PI * 2
+      // Draw enemies (squares)
+      enemies.forEach((enemy) => {
+        const size = config.enemySize
+        const x = enemy.position.x - size / 2
+        const y = enemy.position.y - size / 2
+
+        // Enemy body
+        ctx.fillStyle = isDark ? '#ef4444' : '#dc2626'
+        ctx.fillRect(x, y, size, size)
+
+        // Enemy HP bar
+        const enemyHpBarWidth = size
+        const enemyHpBarHeight = 2
+        const enemyHpBarX = x
+        const enemyHpBarY = y - 4
+
+        ctx.fillStyle = isDark ? '#333' : '#ddd'
+        ctx.fillRect(enemyHpBarX, enemyHpBarY, enemyHpBarWidth, enemyHpBarHeight)
+
+        const enemyHpPercentage = enemy.hp / enemy.maxHp
+        ctx.fillStyle = '#22c55e'
+        ctx.fillRect(
+          enemyHpBarX,
+          enemyHpBarY,
+          enemyHpBarWidth * enemyHpPercentage,
+          enemyHpBarHeight
         )
-        ctx.fill()
-      }
-    })
+      })
 
-    // Continue animation loop if game is playing
-    if (gameState.status === 'playing') {
-      animationFrameId.current = requestAnimationFrame(draw)
+      // Draw projectiles with weapon-specific colors
+      projectiles.forEach((projectile) => {
+        if (projectile.weaponType === WeaponType.RING) {
+          // Draw ring as expanding ring
+          ctx.strokeStyle = '#a78bfa' // purple
+          ctx.lineWidth = 3
+          ctx.globalAlpha = 0.6
+          ctx.beginPath()
+          ctx.arc(player.position.x, player.position.y, projectile.radius, 0, Math.PI * 2)
+          ctx.stroke()
+          ctx.globalAlpha = 1
+        } else {
+          // Draw normal projectiles (yellow)
+          ctx.fillStyle = '#fbbf24' // yellow
+          ctx.beginPath()
+          ctx.arc(
+            projectile.position.x,
+            projectile.position.y,
+            projectile.radius,
+            0,
+            Math.PI * 2
+          )
+          ctx.fill()
+        }
+      })
     }
+
+    animationFrameId.current = requestAnimationFrame(draw)
   }, [gameStateRef, config, isDark])
 
   useEffect(() => {
@@ -155,16 +166,10 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
       window.removeEventListener('resize', resizeCanvas)
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current)
+        animationFrameId.current = null
       }
     }
   }, [draw, onResize])
-
-  // Redraw when game state changes
-  useEffect(() => {
-    if (!animationFrameId.current) {
-      animationFrameId.current = requestAnimationFrame(draw)
-    }
-  }, [gameStateRef.current?.status, draw])
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current

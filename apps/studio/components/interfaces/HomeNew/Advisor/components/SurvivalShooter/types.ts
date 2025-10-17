@@ -24,6 +24,7 @@ export interface Weapon {
   visuals: WeaponVisuals
   lastFireTime: number
   projectileAngles: number[] // for multi-projectile weapons
+  appliedItems?: SelectedCard[]
 }
 
 export interface PlayerStats {
@@ -103,6 +104,13 @@ export interface Card {
   cardType: 'weapon' | 'stat'
   weapon?: Weapon
   perks: Perk[]
+  requiresWeaponSelection?: boolean
+  applicableWeaponTypes?: WeaponType[]
+}
+
+export interface SelectedCard {
+  card: Card
+  assignedWeaponType?: WeaponType
 }
 
 export enum GameStatus {
@@ -126,9 +134,9 @@ export interface GameState {
   projectiles: Projectile[]
   wave: Wave
   score: number // survival time in seconds
-  selectedCards: Card[]
-  availableCards: Card[]
+  selectedCards: SelectedCard[]
   mousePosition: Vector2 | null
+  maxSelectableItems: number
 }
 
 export interface GameConfig {

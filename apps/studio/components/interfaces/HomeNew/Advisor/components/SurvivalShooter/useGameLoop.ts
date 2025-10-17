@@ -5,10 +5,11 @@ import type {
   Enemy,
   Projectile,
   Vector2,
-  Card,
   PlayerStats,
   GameConfig,
   Weapon,
+  SelectedCard,
+  WeaponModifiers,
 } from './types'
 import { PerkType, WeaponType } from './types'
 
@@ -21,29 +22,50 @@ const BASE_STATS: PlayerStats = {
   currentHp: 100,
   moveSpeed: 150, // pixels per second
   attackSpeed: 2, // attacks per second
-  attackDamage: 3,
+  attackDamage: 5,
   projectileCount: 1,
   projectileSize: 1,
   pulseEnabled: false,
 }
 
-export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; height: number }) => {
+export const useGameLoop = (
+  selectedCards: SelectedCard[],
+  canvasSize: { width: number; height: number },
+  maxSelectableItems: number
+) => {
   const gameStateRef = useRef<GameState | null>(null)
-  const keysPressed = useRef<Set<string>>(new Set())
   const animationFrameId = useRef<number | null>(null)
   const lastFrameTime = useRef<number>(0)
   const enemyIdCounter = useRef(0)
   const projectileIdCounter = useRef(0)
-
-  // Recalculate config whenever canvas size changes
-  const config: GameConfig = useMemo(() => ({
-    canvasWidth: canvasSize.width || CANVAS_WIDTH,
-    canvasHeight: canvasSize.height || CANVAS_HEIGHT,
+  const configRef = useRef<GameConfig>({
+    canvasWidth: CANVAS_WIDTH,
+    canvasHeight: CANVAS_HEIGHT,
     playerRadius: 8,
     enemySize: 12,
     projectileRadius: 3,
     basePlayerStats: BASE_STATS,
-  }), [canvasSize.width, canvasSize.height])
+  })
+
+  // Recalculate config whenever canvas size changes
+  const config: GameConfig = useMemo(
+    () => ({
+      canvasWidth: canvasSize.width || CANVAS_WIDTH,
+      canvasHeight: canvasSize.height || CANVAS_HEIGHT,
+      playerRadius: 8,
+      enemySize: 12,
+      projectileRadius: 3,
+      basePlayerStats: BASE_STATS,
+    }),
+    [canvasSize.width, canvasSize.height]
+  )
+
+  const itemLimit = Math.max(0, Math.floor(maxSelectableItems || 0))
+  const cardsForGame = useMemo(() => selectedCards.slice(0, itemLimit), [selectedCards, itemLimit])
+
+  useEffect(() => {
+    configRef.current = config
+  }, [config])
 
   // Calculate dynamic player radius based on HP
   const getPlayerRadius = useCallback((maxHp: number): number => {
@@ -56,7 +78,7 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
   const BASE_WEAPONS = {
     NORMAL: {
       type: WeaponType.NORMAL,
-      baseDamage: 3,
+      baseDamage: 8,
       baseFireRate: 2,
       baseProjectileCount: 1,
       baseProjectileSpeed: 300,
@@ -64,7 +86,7 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
     },
     RING: {
       type: WeaponType.RING,
-      baseDamage: 1.5,
+      baseDamage: 1,
       baseFireRate: 0.5,
       baseProjectileCount: 1,
       baseProjectileSpeed: 0,
@@ -72,80 +94,123 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
     },
   }
 
-  // Calculate weapon stats with modifiers applied
-  const calculateWeaponStats = useCallback((baseWeapon: typeof BASE_WEAPONS.NORMAL, modifiers: any): Weapon => {
-    return {
-      id: `${baseWeapon.type}_weapon`,
-      type: baseWeapon.type,
-      damage: baseWeapon.baseDamage * modifiers.damageMultiplier,
-      fireRate: baseWeapon.baseFireRate * modifiers.fireRateMultiplier,
-      projectileCount: baseWeapon.baseProjectileCount + modifiers.projectileCountBonus,
-      projectileSpeed: baseWeapon.baseProjectileSpeed,
-      visuals: {
-        ...baseWeapon.visuals,
-        size: baseWeapon.visuals.size * modifiers.projectileSizeMultiplier,
-      },
-      lastFireTime: 0,
-      projectileAngles: [],
-    }
-  }, [])
+  interface WeaponModifierState {
+    damageMultiplier: number
+    fireRateMultiplier: number
+    projectileCountBonus: number
+    projectileSizeMultiplier: number
+    appliedItems: SelectedCard[]
+  }
 
-  // Calculate modifiers from selected items
-  const calculateModifiers = useCallback((cards: Card[]) => {
-    const modifiers = {
-      damageMultiplier: 1.0,
-      fireRateMultiplier: 1.0,
-      projectileCountBonus: 0,
-      projectileSizeMultiplier: 1.0,
+  const createBaseModifierState = (): WeaponModifierState => ({
+    damageMultiplier: 1.0,
+    fireRateMultiplier: 1.0,
+    projectileCountBonus: 0,
+    projectileSizeMultiplier: 1.0,
+    appliedItems: [],
+  })
+
+  const calculateWeaponStats = useCallback(
+    (baseWeapon: typeof BASE_WEAPONS.NORMAL, modifierState: WeaponModifierState): Weapon => {
+      return {
+        id: `${baseWeapon.type}_weapon`,
+        type: baseWeapon.type,
+        damage: baseWeapon.baseDamage * modifierState.damageMultiplier,
+        fireRate: baseWeapon.baseFireRate * modifierState.fireRateMultiplier,
+        projectileCount: Math.max(
+          1,
+          baseWeapon.baseProjectileCount + modifierState.projectileCountBonus
+        ),
+        projectileSpeed: baseWeapon.baseProjectileSpeed,
+        visuals: {
+          ...baseWeapon.visuals,
+          size: baseWeapon.visuals.size * modifierState.projectileSizeMultiplier,
+        },
+        lastFireTime: 0,
+        projectileAngles: [],
+        appliedItems: modifierState.appliedItems,
+      }
+    },
+    []
+  )
+
+  const buildWeaponStates = useCallback((choices: SelectedCard[]) => {
+    const weaponStates: Record<WeaponType, WeaponModifierState> = {
+      [WeaponType.NORMAL]: createBaseModifierState(),
+      [WeaponType.RING]: createBaseModifierState(),
     }
 
-    cards.forEach((card) => {
-      card.perks.forEach((perk) => {
+    const unlockedWeapons = new Set<WeaponType>([WeaponType.NORMAL])
+
+    choices.forEach((choice) => {
+      if (choice.card.perks.some((perk) => perk.type === PerkType.UNLOCK_RING)) {
+        unlockedWeapons.add(WeaponType.RING)
+      }
+
+      if (choice.card.requiresWeaponSelection && choice.assignedWeaponType) {
+        const state = weaponStates[choice.assignedWeaponType]
+        if (state && !state.appliedItems.some((applied) => applied.card.id === choice.card.id)) {
+          state.appliedItems.push(choice)
+        }
+      }
+
+      choice.card.perks.forEach((perk) => {
+        const targetWeapon =
+          choice.card.requiresWeaponSelection && choice.assignedWeaponType
+            ? weaponStates[choice.assignedWeaponType]
+            : null
+
         switch (perk.type) {
           case PerkType.ATTACK_SPEED:
-            modifiers.fireRateMultiplier *= 1 + perk.value / 100
+            if (targetWeapon) {
+              targetWeapon.fireRateMultiplier *= 1 + perk.value / 100
+            }
             break
           case PerkType.ATTACK_DAMAGE:
-            modifiers.damageMultiplier *= 1 + perk.value / 100
+            if (targetWeapon) {
+              targetWeapon.damageMultiplier *= 1 + perk.value / 100
+            }
             break
           case PerkType.PROJECTILE_COUNT:
-            modifiers.projectileCountBonus += perk.value
+            if (targetWeapon) {
+              targetWeapon.projectileCountBonus += perk.value
+            }
             break
           case PerkType.PROJECTILE_SIZE:
-            modifiers.projectileSizeMultiplier += perk.value
+            if (targetWeapon) {
+              targetWeapon.projectileSizeMultiplier += perk.value
+            }
             break
         }
       })
     })
 
-    return modifiers
+    return { weaponStates, unlockedWeapons }
   }, [])
 
-  // Create weapons based on selected items
-  const createWeapons = useCallback((cards: Card[], modifiers: any): Weapon[] => {
-    const weapons: Weapon[] = []
+  const createWeapons = useCallback(
+    (
+      weaponStates: Record<WeaponType, WeaponModifierState>,
+      unlockedWeapons: Set<WeaponType>
+    ): Weapon[] => {
+      const weapons: Weapon[] = []
+      weapons.push(calculateWeaponStats(BASE_WEAPONS.NORMAL, weaponStates[WeaponType.NORMAL]))
 
-    // Always include NORMAL weapon
-    weapons.push(calculateWeaponStats(BASE_WEAPONS.NORMAL, modifiers))
+      if (unlockedWeapons.has(WeaponType.RING)) {
+        weapons.push(calculateWeaponStats(BASE_WEAPONS.RING, weaponStates[WeaponType.RING]))
+      }
 
-    // Check if RING weapon should be unlocked
-    const hasRing = cards.some((card) =>
-      card.perks.some((perk) => perk.type === PerkType.UNLOCK_RING)
-    )
-
-    if (hasRing) {
-      weapons.push(calculateWeaponStats(BASE_WEAPONS.RING, modifiers))
-    }
-
-    return weapons
-  }, [calculateWeaponStats])
+      return weapons
+    },
+    [calculateWeaponStats]
+  )
 
   // Apply card perks to player stats (only HP now, other stats use modifiers)
-  const getInitialPlayerStats = useCallback((): PlayerStats => {
+  const getInitialPlayerStats = useCallback((choices: SelectedCard[]): PlayerStats => {
     let stats = { ...BASE_STATS }
 
-    selectedCards.forEach((card) => {
-      card.perks.forEach((perk) => {
+    choices.forEach((choice) => {
+      choice.card.perks.forEach((perk) => {
         switch (perk.type) {
           case PerkType.HP_INCREASE:
             stats.maxHp += perk.value
@@ -156,20 +221,31 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
     })
 
     return stats
-  }, [selectedCards])
+  }, [])
+
+  const toWeaponModifiers = useCallback(
+    (state: WeaponModifierState): WeaponModifiers => ({
+      damageMultiplier: state.damageMultiplier,
+      fireRateMultiplier: state.fireRateMultiplier,
+      projectileCountBonus: state.projectileCountBonus,
+      projectileSizeMultiplier: state.projectileSizeMultiplier,
+    }),
+    []
+  )
 
   const initializeGame = useCallback(() => {
-    const stats = getInitialPlayerStats()
-    const modifiers = calculateModifiers(selectedCards)
-    const weapons = createWeapons(selectedCards, modifiers)
+    const stats = getInitialPlayerStats(cardsForGame)
+    const { weaponStates, unlockedWeapons } = buildWeaponStates(cardsForGame)
+    const weapons = createWeapons(weaponStates, unlockedWeapons)
+    const currentConfig = configRef.current
 
     gameStateRef.current = {
       status: 'playing' as GameStatus,
       player: {
-        position: { x: config.canvasWidth / 2, y: config.canvasHeight / 2 },
+        position: { x: currentConfig.canvasWidth / 2, y: currentConfig.canvasHeight / 2 },
         rotation: 0,
         stats,
-        modifiers,
+        modifiers: toWeaponModifiers(weaponStates[WeaponType.NORMAL]),
         weapons,
         lastAttackTime: 0,
         lastPulseTime: 0,
@@ -184,17 +260,55 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
         lastSpawnTime: 0,
       },
       score: 0,
-      selectedCards,
-      availableCards: [],
+      selectedCards: cardsForGame,
       mousePosition: null,
+      maxSelectableItems: itemLimit,
     }
 
     lastFrameTime.current = performance.now()
     enemyIdCounter.current = 0
     projectileIdCounter.current = 0
-  }, [getInitialPlayerStats, calculateModifiers, createWeapons, selectedCards, config])
+  }, [cardsForGame, itemLimit, getInitialPlayerStats, buildWeaponStates, createWeapons])
+
+  useEffect(() => {
+    if (!gameStateRef.current) return
+
+    const currentState = gameStateRef.current
+    const { weaponStates, unlockedWeapons } = buildWeaponStates(cardsForGame)
+    const updatedWeapons = createWeapons(weaponStates, unlockedWeapons)
+
+    updatedWeapons.forEach((weapon) => {
+      const existing = currentState.player.weapons.find((w) => w.type === weapon.type)
+      if (existing) {
+        weapon.lastFireTime = existing.lastFireTime
+        weapon.projectileAngles = existing.projectileAngles
+      }
+    })
+
+    const stats = getInitialPlayerStats(cardsForGame)
+    const previousMaxHp = currentState.player.stats.maxHp
+    const hpDiff = stats.maxHp - previousMaxHp
+
+    currentState.player.stats.maxHp = stats.maxHp
+    if (hpDiff > 0) {
+      currentState.player.stats.currentHp = Math.min(
+        stats.maxHp,
+        currentState.player.stats.currentHp + hpDiff
+      )
+    } else {
+      currentState.player.stats.currentHp = Math.min(
+        currentState.player.stats.currentHp,
+        stats.maxHp
+      )
+    }
+
+    currentState.player.modifiers = toWeaponModifiers(weaponStates[WeaponType.NORMAL])
+    currentState.player.weapons = updatedWeapons
+    currentState.selectedCards = cardsForGame
+  }, [cardsForGame, buildWeaponStates, createWeapons, getInitialPlayerStats, toWeaponModifiers])
 
   const spawnEnemy = useCallback((currentTime: number, waveNumber: number): Enemy => {
+    const currentConfig = configRef.current
     const id = `enemy_${enemyIdCounter.current++}`
     const angle = Math.random() * Math.PI * 2
     const baseHp = 20
@@ -202,9 +316,9 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
     const speed = baseSpeed + waveNumber * 2
 
     // Calculate spawn position on canvas edge
-    const centerX = config.canvasWidth / 2
-    const centerY = config.canvasHeight / 2
-    const spawnDistance = Math.max(config.canvasWidth, config.canvasHeight) * 0.7
+    const centerX = currentConfig.canvasWidth / 2
+    const centerY = currentConfig.canvasHeight / 2
+    const spawnDistance = Math.max(currentConfig.canvasWidth, currentConfig.canvasHeight) * 0.7
 
     const spawnX = centerX + Math.cos(angle) * spawnDistance
     const spawnY = centerY + Math.sin(angle) * spawnDistance
@@ -227,7 +341,7 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
       speed,
       damage: 10 + waveNumber * 2,
     }
-  }, [config])
+  }, [])
 
   // Find the biggest gap between angles and return the angle in the middle of that gap
   const findBiggestGap = useCallback((angles: number[]): number => {
@@ -243,9 +357,8 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
     // Check gaps between consecutive angles
     for (let i = 0; i < sorted.length; i++) {
       const nextIndex = (i + 1) % sorted.length
-      const gap = nextIndex === 0
-        ? (Math.PI * 2 - sorted[i] + sorted[0])
-        : (sorted[nextIndex] - sorted[i])
+      const gap =
+        nextIndex === 0 ? Math.PI * 2 - sorted[i] + sorted[0] : sorted[nextIndex] - sorted[i]
 
       if (gap > maxGap) {
         maxGap = gap
@@ -262,64 +375,68 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
     }
   }, [])
 
-  const shootWeapons = useCallback((currentTime: number) => {
-    if (!gameStateRef.current) return
+  const shootWeapons = useCallback(
+    (currentTime: number) => {
+      if (!gameStateRef.current) return
 
-    const { player, projectiles } = gameStateRef.current
+      const { player, projectiles } = gameStateRef.current
+      const currentConfig = configRef.current
 
-    // Fire each weapon independently
-    player.weapons.forEach((weapon) => {
-      const fireInterval = 1000 / weapon.fireRate
-      if (currentTime - weapon.lastFireTime < fireInterval) return
+      // Fire each weapon independently
+      player.weapons.forEach((weapon) => {
+        const fireInterval = 1000 / weapon.fireRate
+        if (currentTime - weapon.lastFireTime < fireInterval) return
 
-      weapon.lastFireTime = currentTime
+        weapon.lastFireTime = currentTime
 
-      // Handle different weapon types
-      if (weapon.type === WeaponType.RING) {
-        // Ring weapon: expanding ring
-        projectiles.push({
-          id: `projectile_${projectileIdCounter.current++}`,
-          position: { x: player.position.x, y: player.position.y },
-          velocity: { x: 0, y: 0 },
-          angle: 0,
-          damage: weapon.damage,
-          radius: config.playerRadius,
-          weaponType: weapon.type,
-          isPulse: true,
-          createdAt: currentTime,
-        })
-      } else {
-        // Normal weapon: standard projectiles
-        const count = Math.floor(weapon.projectileCount)
-
-        // Ensure we have the right number of projectile angles
-        while (weapon.projectileAngles.length < count) {
-          const newAngle = findBiggestGap(weapon.projectileAngles)
-          weapon.projectileAngles.push(newAngle)
-        }
-
-        // Shoot projectiles at each angle (relative to player rotation)
-        weapon.projectileAngles.forEach((relativeAngle) => {
-          const actualAngle = relativeAngle + player.rotation
-          const velocity: Vector2 = {
-            x: Math.cos(actualAngle) * weapon.projectileSpeed,
-            y: Math.sin(actualAngle) * weapon.projectileSpeed,
-          }
-
+        // Handle different weapon types
+        if (weapon.type === WeaponType.RING) {
+          // Ring weapon: expanding ring
           projectiles.push({
             id: `projectile_${projectileIdCounter.current++}`,
             position: { x: player.position.x, y: player.position.y },
-            velocity,
-            angle: actualAngle,
+            velocity: { x: 0, y: 0 },
+            angle: 0,
             damage: weapon.damage,
-            radius: config.projectileRadius * weapon.visuals.size,
+            radius: currentConfig.playerRadius,
             weaponType: weapon.type,
-            isPulse: false,
+            isPulse: true,
+            createdAt: currentTime,
           })
-        })
-      }
-    })
-  }, [findBiggestGap, config])
+        } else {
+          // Normal weapon: standard projectiles
+          const count = Math.floor(weapon.projectileCount)
+
+          // Ensure we have the right number of projectile angles
+          while (weapon.projectileAngles.length < count) {
+            const newAngle = findBiggestGap(weapon.projectileAngles)
+            weapon.projectileAngles.push(newAngle)
+          }
+
+          // Shoot projectiles at each angle (relative to player rotation)
+          weapon.projectileAngles.forEach((relativeAngle) => {
+            const actualAngle = relativeAngle + player.rotation
+            const velocity: Vector2 = {
+              x: Math.cos(actualAngle) * weapon.projectileSpeed,
+              y: Math.sin(actualAngle) * weapon.projectileSpeed,
+            }
+
+            projectiles.push({
+              id: `projectile_${projectileIdCounter.current++}`,
+              position: { x: player.position.x, y: player.position.y },
+              velocity,
+              angle: actualAngle,
+              damage: weapon.damage,
+              radius: currentConfig.projectileRadius * weapon.visuals.size,
+              weaponType: weapon.type,
+              isPulse: false,
+            })
+          })
+        }
+      })
+    },
+    [findBiggestGap]
+  )
 
   const updatePlayer = useCallback(() => {
     if (!gameStateRef.current) return
@@ -338,6 +455,7 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
     if (!gameStateRef.current) return
 
     const { projectiles } = gameStateRef.current
+    const currentConfig = configRef.current
 
     // Update positions and remove off-screen projectiles
     for (let i = projectiles.length - 1; i >= 0; i--) {
@@ -347,10 +465,13 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
         // Expand pulse projectile
         const age = (currentTime - (proj.createdAt || 0)) / 1000
         const expansionSpeed = 150 // pixels per second
-        proj.radius = config.playerRadius + age * expansionSpeed
+        proj.radius = currentConfig.playerRadius + age * expansionSpeed
 
         // Remove pulse after 2 seconds or if too large
-        if (age > 2 || proj.radius > Math.max(config.canvasWidth, config.canvasHeight)) {
+        if (
+          age > 2 ||
+          proj.radius > Math.max(currentConfig.canvasWidth, currentConfig.canvasHeight)
+        ) {
           projectiles.splice(i, 1)
           continue
         }
@@ -361,63 +482,68 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
 
         // Remove if off-screen
         if (
-          proj.position.x > config.canvasWidth + 20 ||
+          proj.position.x > currentConfig.canvasWidth + 20 ||
           proj.position.x < -20 ||
-          proj.position.y > config.canvasHeight + 20 ||
+          proj.position.y > currentConfig.canvasHeight + 20 ||
           proj.position.y < -20
         ) {
           projectiles.splice(i, 1)
         }
       }
     }
-  }, [config])
+  }, [])
 
-  const updateEnemies = useCallback((deltaTime: number, currentTime: number) => {
-    if (!gameStateRef.current) return
+  const updateEnemies = useCallback(
+    (deltaTime: number, currentTime: number) => {
+      if (!gameStateRef.current) return
 
-    const { enemies, wave, player } = gameStateRef.current
+      const { enemies, wave, player } = gameStateRef.current
+      const currentConfig = configRef.current
 
-    // Spawn enemies
-    const spawnInterval = 1000 / wave.spawnRate
-    if (currentTime - wave.lastSpawnTime > spawnInterval) {
-      enemies.push(spawnEnemy(currentTime, wave.waveNumber))
-      wave.lastSpawnTime = currentTime
-    }
-
-    // Update enemy positions
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const enemy = enemies[i]
-
-      // Recalculate velocity towards player's current position each frame
-      const dx = player.position.x - enemy.position.x
-      const dy = player.position.y - enemy.position.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
-
-      // Update velocity to always move towards player
-      if (distance > 0) {
-        enemy.velocity.x = (dx / distance) * enemy.speed
-        enemy.velocity.y = (dy / distance) * enemy.speed
+      // Spawn enemies
+      const spawnInterval = 1000 / wave.spawnRate
+      if (currentTime - wave.lastSpawnTime > spawnInterval) {
+        enemies.push(spawnEnemy(currentTime, wave.waveNumber))
+        wave.lastSpawnTime = currentTime
       }
 
-      // Move enemy using velocity vector
-      enemy.position.x += enemy.velocity.x * deltaTime
-      enemy.position.y += enemy.velocity.y * deltaTime
+      // Update enemy positions
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i]
 
-      // Check collision with player (using dynamic radius based on HP)
-      const playerRadius = getPlayerRadius(player.stats.maxHp)
+        // Recalculate velocity towards player's current position each frame
+        const dx = player.position.x - enemy.position.x
+        const dy = player.position.y - enemy.position.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
 
-      if (distance < playerRadius + config.enemySize / 2) {
-        player.stats.currentHp -= enemy.damage
-        enemies.splice(i, 1)
-        continue
+        // Update velocity to always move towards player
+        if (distance > 0) {
+          enemy.velocity.x = (dx / distance) * enemy.speed
+          enemy.velocity.y = (dy / distance) * enemy.speed
+        }
+
+        // Move enemy using velocity vector
+        enemy.position.x += enemy.velocity.x * deltaTime
+        enemy.position.y += enemy.velocity.y * deltaTime
+
+        // Check collision with player (using dynamic radius based on HP)
+        const playerRadius = getPlayerRadius(player.stats.maxHp)
+
+        if (distance < playerRadius + currentConfig.enemySize / 2) {
+          player.stats.currentHp -= enemy.damage
+          enemies.splice(i, 1)
+          continue
+        }
       }
-    }
-  }, [spawnEnemy, getPlayerRadius, config])
+    },
+    [spawnEnemy, getPlayerRadius]
+  )
 
   const checkCollisions = useCallback(() => {
     if (!gameStateRef.current) return
 
     const { enemies, projectiles, player } = gameStateRef.current
+    const currentConfig = configRef.current
 
     // Check projectile-enemy collisions
     for (let i = projectiles.length - 1; i >= 0; i--) {
@@ -437,13 +563,14 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
 
           // Check if enemy is touching the pulse ring (within a small threshold)
           const ringThickness = 20
-          isColliding = Math.abs(distanceFromCenter - proj.radius) < ringThickness + config.enemySize / 2
+          isColliding =
+            Math.abs(distanceFromCenter - proj.radius) < ringThickness + currentConfig.enemySize / 2
         } else {
           // Regular projectile collision
           const dx = proj.position.x - enemy.position.x
           const dy = proj.position.y - enemy.position.y
           const distance = Math.sqrt(dx * dx + dy * dy)
-          isColliding = distance < proj.radius + config.enemySize / 2
+          isColliding = distance < proj.radius + currentConfig.enemySize / 2
         }
 
         if (isColliding) {
@@ -466,7 +593,7 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
         projectiles.splice(i, 1)
       }
     }
-  }, [config])
+  }, [])
 
   const updateWave = useCallback((score: number) => {
     if (!gameStateRef.current) return
@@ -509,14 +636,7 @@ export const useGameLoop = (selectedCards: Card[], canvasSize: { width: number; 
 
       animationFrameId.current = requestAnimationFrame(gameLoop)
     },
-    [
-      updatePlayer,
-      shootWeapons,
-      updateProjectiles,
-      updateEnemies,
-      checkCollisions,
-      updateWave,
-    ]
+    [updatePlayer, shootWeapons, updateProjectiles, updateEnemies, checkCollisions, updateWave]
   )
 
   const startGame = useCallback(() => {
