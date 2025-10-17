@@ -71,7 +71,7 @@ export const UsersSearch = ({
                   Unified search
                 </SelectItem_Shadcn_>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="right" className="w-64 text-center">
                 Search by all columns at once, including mid-string search. May impact database
                 performance if you have many users.
               </TooltipContent>
