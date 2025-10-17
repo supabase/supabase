@@ -31,21 +31,17 @@ export const AnalyticsBuckets = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
-  const [selectedBucket, setSelectedBucket] = useState<AnalyticsBucket>()
   const [filterString, setFilterString] = useState('')
+  const [selectedBucket, setSelectedBucket] = useState<AnalyticsBucket>()
+  const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
 
   const { data: buckets = [], isLoading: isLoadingBuckets } = useAnalyticsBucketsQuery({
     projectRef: ref,
   })
 
-  const analyticsBuckets = buckets
-    .filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS')
-    .filter((bucket) =>
-      filterString.length === 0
-        ? true
-        : bucket.name.toLowerCase().includes(filterString.toLowerCase())
-    )
+  const analyticsBuckets = buckets.filter((bucket) =>
+    filterString.length === 0 ? true : bucket.id.toLowerCase().includes(filterString.toLowerCase())
+  )
 
   return (
     <>
@@ -109,7 +105,7 @@ export const AnalyticsBuckets = () => {
                       }}
                     >
                       <TableCell>
-                        <p className="text-foreground">{bucket.name}</p>
+                        <p className="text-foreground">{bucket.id}</p>
                       </TableCell>
 
                       <TableCell>

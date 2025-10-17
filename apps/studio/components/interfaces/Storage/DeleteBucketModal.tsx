@@ -45,8 +45,8 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const { data: project } = useSelectedProjectQuery()
 
   const schema = z.object({
-    confirm: z.literal(bucket.name, {
-      errorMap: () => ({ message: `Please enter "${bucket.name}" to confirm` }),
+    confirm: z.literal(bucket.id, {
+      errorMap: () => ({ message: `Please enter "${bucket.id}" to confirm` }),
     }),
   })
 
@@ -75,7 +75,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
         storageObjectsPolicies
       )
       const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket.name }),
+        find(formattedStorageObjectPolicies, { name: bucket.id }),
         ['policies'],
         []
       )
@@ -91,12 +91,12 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
           )
         )
 
-        toast.success(`Successfully deleted bucket ${bucket.name}`)
+        toast.success(`Successfully deleted bucket ${bucket.id}`)
         router.push(`/project/${projectRef}/storage/buckets`)
         onClose()
       } catch (error) {
         toast.success(
-          `Successfully deleted bucket ${bucket.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
+          `Successfully deleted bucket ${bucket.id}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
         )
       }
     },
@@ -127,7 +127,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm deletion of {bucket.name}</DialogTitle>
+          <DialogTitle>Confirm deletion of {bucket.id}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -141,7 +141,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
 
         <DialogSection>
           <p className="text-sm">
-            Your bucket <span className="font-bold text-foreground">{bucket.name}</span> and all its
+            Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all its
             contents will be permanently deleted.
           </p>
         </DialogSection>
@@ -158,7 +158,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
                     name="confirm"
                     label={
                       <>
-                        Type <span className="font-bold text-foreground">{bucket.name}</span> to
+                        Type <span className="font-bold text-foreground">{bucket.id}</span> to
                         confirm.
                       </>
                     }
