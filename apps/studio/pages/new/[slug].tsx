@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
@@ -121,7 +120,7 @@ const FormSchema = z.object({
   dbPass: z
     .string({ required_error: 'Please enter a database password.' })
     .min(1, 'Password is required.'),
-  instanceSize: z.string(),
+  instanceSize: z.string().optional(),
   dataApi: z.boolean(),
   useApiSchema: z.boolean(),
   postgresVersionSelection: z.string(),
@@ -135,6 +134,7 @@ const Wizard: NextPageWithLayout = () => {
   const { slug, projectName } = useParams()
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
+  const canChooseInstanceSize = !isFreePlan
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
@@ -320,15 +320,30 @@ const Wizard: NextPageWithLayout = () => {
       dbPass: '',
       dbPassStrength: 0,
       dbRegion: defaultRegion || undefined,
-      instanceSize: sizes[0],
+      instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
       useApiSchema: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
     },
   })
+  const { instanceSize: watchedInstanceSize, cloudProvider, dbRegion, organization } = form.watch()
+  // [Charis] Since the form is updated in a useEffect, there is an edge case
+  // when switching from free to paid, where canChooseInstanceSize is true for
+  // an in-between render, but watchedInstanceSize is still undefined from the
+  // form state carried over from the free plan. To avoid this, we set a
+  // default instance size in this case.
+  const instanceSize = canChooseInstanceSize ? watchedInstanceSize ?? sizes[0] : undefined
+  useEffect(() => {
+    if (watchedInstanceSize !== instanceSize) {
+      form.setValue('instanceSize', instanceSize, {
+        shouldDirty: false,
+        shouldValidate: false,
+        shouldTouch: false,
+      })
+    }
+  }, [instanceSize, watchedInstanceSize, form])
 
-  const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
   const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
@@ -747,7 +762,7 @@ const Wizard: NextPageWithLayout = () => {
                       </Panel.Content>
                     )}
 
-                    {currentOrg?.plan && currentOrg?.plan.id !== 'free' && (
+                    {canChooseInstanceSize && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
@@ -906,8 +921,8 @@ const Wizard: NextPageWithLayout = () => {
                         render={({ field }) => (
                           <RegionSelector
                             field={field}
-                            form={form}
                             cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                            instanceSize={instanceSize as DesiredInstanceSize}
                           />
                         )}
                       />
