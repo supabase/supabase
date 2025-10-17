@@ -62,6 +62,7 @@ export const FilesBuckets = () => {
       buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD').length === 0 ? (
         <EmptyBucketState bucketType="files" />
       ) : (
+        // Add !pt-8 to override the default first:pt-12
         <ScaffoldSection isFullWidth className="gap-y-4">
           <div className="flex flex-grow justify-between gap-x-2 items-center">
             <Input

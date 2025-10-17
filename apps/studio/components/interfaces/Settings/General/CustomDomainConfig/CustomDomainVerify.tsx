@@ -111,7 +111,7 @@ const CustomDomainVerify = () => {
                       <Link
                         target="_blank"
                         rel="noreferrer"
-                        href={`https://whatsmydns.net/#TXT/${customDomain?.hostname}`}
+                        href={`https://whatsmydns.net/#TXT/${customDomain?.ssl.txt_name}`}
                         className="text-brand"
                       >
                         here
