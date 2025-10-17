@@ -141,7 +141,7 @@ export function createSupportFormUrl(initialParams: SupportFormUrlKeys) {
  * - URL param (if any)
  * - Fallback
  */
-export async function selectInitalOrgAndProject({
+export async function selectInitialOrgAndProject({
   projectRef,
   orgSlug,
   orgs,
