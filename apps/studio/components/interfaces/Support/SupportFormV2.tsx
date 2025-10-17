@@ -98,7 +98,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         message: values.message,
         attachments,
         error: initialError,
-        commit: commit?.commitSha,
+        commit,
       }),
       verified: true,
       tags: ['dashboard-support-form'],
