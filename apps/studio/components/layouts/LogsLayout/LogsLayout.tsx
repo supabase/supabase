@@ -5,7 +5,7 @@ import { PropsWithChildren } from 'react'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
 
 interface LogsLayoutProps {
