@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import {
   calculateIOPSPrice,
@@ -12,6 +13,7 @@ import {
   DISK_PRICING,
   DiskType,
 } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
@@ -287,13 +289,16 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-2">
               <Button type="default">
-                <Link
-                  href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
-                  target="_blank"
-                  rel="noreferrer"
+                <SupportLink
+                  queryParams={{
+                    projectRef,
+                    category: SupportCategories.SALES_ENQUIRY,
+                    subject: 'Enquiry on read replicas',
+                    message: `Project DB version: ${project?.dbVersion}`,
+                  }}
                 >
                   Contact support
-                </Link>
+                </SupportLink>
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>

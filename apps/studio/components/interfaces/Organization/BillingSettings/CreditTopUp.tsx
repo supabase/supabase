@@ -6,7 +6,6 @@ import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/
 import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -14,6 +13,7 @@ import { z } from 'zod'
 
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
 import { subscriptionKeys } from 'data/subscriptions/keys'
@@ -242,12 +242,15 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
               </p>
               <p className="prose text-sm">
                 For larger discounted credit packages, please{' '}
-                <Link
-                  href={`/support/new?slug=${slug}&subject=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.SALES_ENQUIRY}`}
-                  target="_blank"
+                <SupportLink
+                  queryParams={{
+                    orgSlug: slug,
+                    subject: 'I would like to inquire about larger credit packages',
+                    category: SupportCategories.SALES_ENQUIRY,
+                  }}
                 >
                   reach out.
-                </Link>
+                </SupportLink>
               </p>
             </DialogDescription>
           </DialogHeader>

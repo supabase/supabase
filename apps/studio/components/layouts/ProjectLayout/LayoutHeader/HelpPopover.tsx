@@ -1,9 +1,9 @@
 import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
 import Image from 'next/legacy/image'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -29,8 +29,7 @@ export const HelpPopover = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const projectRef = project?.parent_project_ref ?? router.query.ref
-  const supportUrl = `/support/new${projectRef ? `?projectRef=${projectRef}` : ''}`
+  const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
 
   return (
     <Popover_Shadcn_>
@@ -118,7 +117,7 @@ export const HelpPopover = () => {
               </a>
             </ButtonGroupItem>
             <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-              <Link href={supportUrl}>Contact Support</Link>
+              <SupportLink queryParams={{ projectRef }}>Contact Support</SupportLink>
             </ButtonGroupItem>
           </ButtonGroup>
         </div>

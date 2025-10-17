@@ -3,6 +3,7 @@ import { CreditCardIcon } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -66,11 +67,14 @@ const CurrentPaymentMethod = () => {
 
       <Button type="outline" asChild>
         {subscription?.payment_method_type === 'invoice' ? (
-          <Link
-            href={`/support/new?slug=${slug}&projectRef=no-project&message=${encodeURIComponent('I would like to change my payment method')}&category=${SupportCategories.BILLING}`}
+          <SupportLink
+            queryParams={{
+              category: SupportCategories.BILLING,
+              message: 'I would like to change my payment method',
+            }}
           >
             Contact support
-          </Link>
+          </SupportLink>
         ) : (
           <Link href={`/org/${slug}/billing#payment-methods`}>Manage payment methods</Link>
         )}

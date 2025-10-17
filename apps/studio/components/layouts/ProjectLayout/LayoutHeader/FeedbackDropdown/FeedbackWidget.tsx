@@ -2,13 +2,13 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
 import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -19,6 +19,7 @@ import { timeout } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -185,12 +186,15 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
               >
                 <p className="text-xs text-foreground-light !leading-tight">
                   Please{' '}
-                  <InlineLink
-                    className="text-foreground-light hover:text-foreground"
-                    href={`/support/new/?projectRef=${slug}&message=${encodeURIComponent(feedback)}`}
+                  <SupportLink
+                    className={cn(
+                      InlineLinkClassName,
+                      'text-foreground-light hover:text-foreground'
+                    )}
+                    queryParams={{ projectRef: slug, message: feedback }}
                   >
                     open a support ticket
-                  </InlineLink>{' '}
+                  </SupportLink>{' '}
                   to get help with this issue, as we do not reply to all product feedback.
                 </p>
               </Admonition>
@@ -206,11 +210,11 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
           <p className="text-xs text-foreground">Have a technical issue?</p>
           <p className="text-xs text-foreground-light">
             Contact{' '}
-            <Link href="/support/new">
+            <SupportLink>
               <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
                 support
               </span>
-            </Link>{' '}
+            </SupportLink>{' '}
             or{' '}
             <a href={`${DOCS_URL}`} target="_blank" rel="noreferrer">
               <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
@@ -319,11 +323,11 @@ const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
         <PopoverSeparator_Shadcn_ />
         <div className="flex items-center justify-between px-4">
           <p className="text-xs text-foreground-light">
-            <Link href="/support/new">
+            <SupportLink>
               <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
                 Create a Support Ticket
               </span>
-            </Link>
+            </SupportLink>
           </p>
 
           <Button type="default" onClick={onClose}>

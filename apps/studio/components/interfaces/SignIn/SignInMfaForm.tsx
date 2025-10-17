@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useAuthError } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -17,6 +18,7 @@ import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SupportLink } from '../Support/SupportLink'
 
 const schema = z.object({
   code: z.string().min(1, 'MFA Code is required'),
@@ -200,14 +202,15 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
             </Link>
           </li>
           <li>
-            <Link
-              target="_blank"
-              rel="noreferrer"
-              href="/support/new?subject=Unable+to+sign+in+via+MFA&category=Login_issues"
+            <SupportLink
               className="text-sm transition text-foreground-light hover:text-foreground"
+              queryParams={{
+                subject: 'Unable to sign in via MFA',
+                category: SupportCategories.LOGIN_ISSUES,
+              }}
             >
               Reach out to us via support
-            </Link>
+            </SupportLink>
           </li>
         </ul>
       </div>

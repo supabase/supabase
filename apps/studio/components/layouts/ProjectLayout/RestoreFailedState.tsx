@@ -1,10 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { Download, MoreVertical, Trash } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -69,11 +69,15 @@ export const RestoreFailedState = () => {
 
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
               <Button asChild type="default">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                <SupportLink
+                  queryParams={{
+                    category: SupportCategories.DATABASE_UNRESPONSIVE,
+                    projectRef: project?.ref,
+                    subject: 'Restoration failed for project',
+                  }}
                 >
                   Contact support
-                </Link>
+                </SupportLink>
               </Button>
 
               <ButtonTooltip

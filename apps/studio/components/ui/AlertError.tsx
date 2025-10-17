@@ -1,4 +1,5 @@
-import Link from 'next/link'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { PropsWithChildren } from 'react'
 
 import {
@@ -29,13 +30,6 @@ export const AlertError = ({
   children,
   additionalActions,
 }: PropsWithChildren<AlertErrorProps>) => {
-  const subjectString = subject?.replace(/ /g, '%20')
-  let href = `/support/new?category=dashboard_bug`
-
-  if (projectRef) href += `&ref=${projectRef}`
-  if (subjectString) href += `&subject=${subjectString}`
-  if (error) href += `&error=${error.message}`
-
   const formattedErrorMessage = error?.message?.includes('503')
     ? '503 Service Temporarily Unavailable'
     : error?.message
@@ -56,7 +50,16 @@ export const AlertError = ({
         <div className="flex gap-2">
           {additionalActions}
           <Button asChild type="warning" className="w-min">
-            <Link href={href}>Contact support</Link>
+            <SupportLink
+              queryParams={{
+                category: SupportCategories.DASHBOARD_BUG,
+                projectRef,
+                subject,
+                error: error?.message,
+              }}
+            >
+              Contact support
+            </SupportLink>
           </Button>
         </div>
       </AlertDescription_Shadcn_>

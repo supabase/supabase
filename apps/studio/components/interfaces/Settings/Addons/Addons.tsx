@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import {
   getAddons,
@@ -12,6 +13,7 @@ import {
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -446,7 +448,7 @@ export const Addons = () => {
                     </AlertDescription_Shadcn_>
                     <div className="mt-4">
                       <Button type="default" asChild>
-                        <Link href="/support/new">Contact support</Link>
+                        <SupportLink>Contact support</SupportLink>
                       </Button>
                     </div>
                   </Alert_Shadcn_>
@@ -487,11 +489,15 @@ export const Addons = () => {
                             Reach out to us via support if you're interested
                           </p>
                           <Button asChild type="default">
-                            <Link
-                              href={`/support/new?projectRef=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                            <SupportLink
+                              queryParams={{
+                                projectRef,
+                                category: SupportCategories.SALES_ENQUIRY,
+                                subject: 'Project too old old for PITR',
+                              }}
                             >
                               <a>Contact support</a>
-                            </Link>
+                            </SupportLink>
                           </Button>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>

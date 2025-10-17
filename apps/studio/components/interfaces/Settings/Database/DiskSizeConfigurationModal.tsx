@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { number, object } from 'yup'
 
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -118,11 +119,15 @@ const DiskSizeConfigurationModal = ({
                     need more than this, contact us via support for help.
                   </p>
                   <Button asChild type="default" className="mt-3">
-                    <Link
-                      href={`/support/new?projectRef=${projectRef}&category=${SupportCategories.PERFORMANCE_ISSUES}&subject=Increase%20disk%20size%20beyond%20200GB`}
+                    <SupportLink
+                      queryParams={{
+                        projectRef,
+                        category: SupportCategories.PERFORMANCE_ISSUES,
+                        subject: 'Increase disk size beyond 200GB',
+                      }}
                     >
                       Contact support
-                    </Link>
+                    </SupportLink>
                   </Button>
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>

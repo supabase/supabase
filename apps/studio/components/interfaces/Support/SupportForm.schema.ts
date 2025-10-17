@@ -20,6 +20,7 @@ const createFormSchema = (showClientLibraries: boolean) => {
     message: z.string().min(1, "Please add a message about the issue that you're facing"),
     affectedServices: z.string(),
     allowSupportAccess: z.boolean(),
+    attachDashboardLogs: z.boolean(),
     dashboardSentryIssueId: z.string().optional(),
   })
 

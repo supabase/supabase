@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
@@ -64,11 +65,15 @@ const Migrations = () => {
             }
           >
             <Button key="contact-support" asChild type="default">
-              <Link
-                href={`/support/new?projectRef=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+              <SupportLink
+                queryParams={{
+                  projectRef: project?.ref,
+                  category: SupportCategories.DASHBOARD_BUG,
+                  subject: 'Unable to view database migrations',
+                }}
               >
                 Contact support
-              </Link>
+              </SupportLink>
             </Button>
           </Admonition>
         )}

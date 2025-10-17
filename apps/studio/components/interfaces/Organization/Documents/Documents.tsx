@@ -1,5 +1,4 @@
-import Link from 'next/link'
-
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { Fragment } from 'react'
@@ -59,10 +58,8 @@ const Documents = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <p className="sticky space-y-6 top-12 text-sm text-foreground-light m-0 whitespace-nowrap">
-            <Link href="/support/new" className="hover:underline">
-              Submit a support request
-            </Link>{' '}
-            if you require additional documents for financial or tax reasons, such as a W-9 form.
+            <SupportLink className="hover:underline">Submit a support request</SupportLink> if you
+            require additional documents for financial or tax reasons, such as a W-9 form.
           </p>
         </ScaffoldSection>
       </ScaffoldContainer>

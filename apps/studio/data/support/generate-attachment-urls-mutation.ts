@@ -12,7 +12,7 @@ export type GenerateAttachmentURLsResponse = {
 
 export type GenerateAttachmentURLsVariables = {
   filenames: string[]
-  bucket?: 'support-attachments' | 'feedback-attachments'
+  bucket?: 'support-attachments' | 'feedback-attachments' | 'dashboard-logs'
 }
 
 export async function generateAttachmentURLs({
@@ -45,7 +45,7 @@ export async function generateAttachmentURLs({
   }
 }
 
-type GenerateAttachmentURLsData = Awaited<ReturnType<typeof generateAttachmentURLs>>
+export type GenerateAttachmentURLsData = Awaited<ReturnType<typeof generateAttachmentURLs>>
 
 export const useGenerateAttachmentURLsMutation = ({
   onSuccess,
