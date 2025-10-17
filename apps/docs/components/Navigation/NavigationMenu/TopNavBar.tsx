@@ -12,9 +12,16 @@ import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
+import { isFeatureEnabled } from 'common/enabled-features'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
+
+const {
+  brandingLargeLogo: largeLogo,
+} = isFeatureEnabled([
+  'branding:large_logo',
+])
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
@@ -22,6 +29,8 @@ const TopNavBar: FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const user = useUser()
   const menu = useDropdownMenu(user)
+
+
 
   return (
     <>
@@ -121,7 +130,7 @@ const HeaderLogo = memo(() => {
       )}
     >
       <Image
-        className="hidden dark:block !m-0"
+        className={`hidden dark:block !m-0 ${largeLogo ? 'h-[36px]' : null}`}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
@@ -130,7 +139,7 @@ const HeaderLogo = memo(() => {
         alt="Supabase wordmark"
       />
       <Image
-        className="block dark:hidden !m-0"
+        className={`block dark:hidden !m-0 ${largeLogo ? 'h-[36px]' : null }`}
         src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"
