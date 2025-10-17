@@ -36,6 +36,14 @@ const allItemTypes = [
     applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
   },
   {
+    type: PerkType.LIFE_STEAL,
+    name: 'Life Steal',
+    desc: '+10% Life Steal',
+    value: 10,
+    requiresWeaponSelection: true,
+    applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
+  },
+  {
     type: PerkType.PROJECTILE_COUNT,
     name: 'Multishot',
     desc: '+1 Projectile',

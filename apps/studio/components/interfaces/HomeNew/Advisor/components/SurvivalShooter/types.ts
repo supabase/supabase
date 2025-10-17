@@ -85,6 +85,7 @@ export enum ItemType {
   PROJECTILE_COUNT = 'projectile_count',
   PROJECTILE_SIZE = 'projectile_size',
   UNLOCK_RING = 'unlock_ring',
+  LIFE_STEAL = 'life_steal',
 }
 
 // For backwards compatibility

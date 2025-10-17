@@ -28,6 +28,18 @@ const BASE_STATS: PlayerStats = {
   pulseEnabled: false,
 }
 
+const ON_DAMAGE_PERKS = new Set<PerkType>([PerkType.LIFE_STEAL])
+
+interface OnDamageEvent {
+  weaponType: WeaponType
+  damageDealt: number
+  enemyId: string
+  enemyPosition: Vector2
+  projectile: Projectile
+  wasLethal: boolean
+  defaultRemove: boolean
+}
+
 export const useGameLoop = (
   selectedCards: SelectedCard[],
   canvasSize: { width: number; height: number },
@@ -539,6 +551,55 @@ export const useGameLoop = (
     [spawnEnemy, getPlayerRadius]
   )
 
+  const triggerOnDamageEffects = useCallback((event: OnDamageEvent): boolean => {
+    const state = gameStateRef.current
+    let shouldRemoveProjectile = event.defaultRemove
+
+    if (!state || event.damageDealt <= 0) {
+      return shouldRemoveProjectile
+    }
+
+    const { player, selectedCards } = state
+
+    const relevantCards: SelectedCard[] = []
+    selectedCards.forEach((choice) => {
+      const hasOnDamagePerk = choice.card.perks.some((perk) => ON_DAMAGE_PERKS.has(perk.type))
+      if (!hasOnDamagePerk) return
+
+      if (choice.card.requiresWeaponSelection && choice.assignedWeaponType !== event.weaponType) {
+        return
+      }
+
+      relevantCards.push(choice)
+    })
+
+    if (relevantCards.length === 0) {
+      return shouldRemoveProjectile
+    }
+
+    let totalLifeStealPercent = 0
+
+    relevantCards.forEach((choice) => {
+      choice.card.perks.forEach((perk) => {
+        if (perk.type === PerkType.LIFE_STEAL) {
+          totalLifeStealPercent += perk.value
+        }
+      })
+    })
+
+    if (totalLifeStealPercent > 0) {
+      const healAmount = (event.damageDealt * totalLifeStealPercent) / 100
+      if (healAmount > 0) {
+        player.stats.currentHp = Math.min(
+          player.stats.maxHp,
+          player.stats.currentHp + healAmount
+        )
+      }
+    }
+
+    return shouldRemoveProjectile
+  }, [])
+
   const checkCollisions = useCallback(() => {
     if (!gameStateRef.current) return
 
@@ -549,6 +610,7 @@ export const useGameLoop = (
     for (let i = projectiles.length - 1; i >= 0; i--) {
       const proj = projectiles[i]
       let hit = false
+      let shouldRemoveProjectile = !proj.isPulse
 
       for (let j = enemies.length - 1; j >= 0; j--) {
         const enemy = enemies[j]
@@ -574,26 +636,41 @@ export const useGameLoop = (
         }
 
         if (isColliding) {
-          enemy.hp -= proj.damage
+          const preHp = enemy.hp
+          const damageDealt = Math.min(proj.damage, preHp)
+          const remainingHp = preHp - proj.damage
+          const wasLethal = remainingHp <= 0
+
+          shouldRemoveProjectile = triggerOnDamageEffects({
+            weaponType: proj.weaponType,
+            damageDealt,
+            enemyId: enemy.id,
+            enemyPosition: { x: enemy.position.x, y: enemy.position.y },
+            projectile: proj,
+            wasLethal,
+            defaultRemove: shouldRemoveProjectile,
+          })
+
+          enemy.hp = remainingHp
           hit = true
 
-          if (enemy.hp <= 0) {
+          if (wasLethal) {
             enemies.splice(j, 1)
           }
 
-          // Don't break for pulse - it can hit multiple enemies
-          if (!proj.isPulse) {
+          // Stop checking once the projectile should be removed
+          if (shouldRemoveProjectile) {
             break
           }
         }
       }
 
-      // Only remove non-pulse projectiles when they hit
-      if (hit && !proj.isPulse) {
+      // Remove projectile only if the damage handlers say so
+      if (hit && shouldRemoveProjectile) {
         projectiles.splice(i, 1)
       }
     }
-  }, [])
+  }, [triggerOnDamageEffects])
 
   const updateWave = useCallback((score: number) => {
     if (!gameStateRef.current) return
