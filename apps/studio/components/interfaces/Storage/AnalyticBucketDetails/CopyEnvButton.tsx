@@ -2,7 +2,7 @@ import { Copy } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Button } from 'ui'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { copyToClipboard } from 'ui'
@@ -34,29 +34,14 @@ export const CopyEnvButton = ({
     ).then((values) => values.join('\n'))
 
     copyToClipboard(envFile, () => {
-      toast.success('Copied to clipboard')
+      toast.success('Copied to clipboard as .env file')
       setIsLoading(false)
     })
   }, [serverOptions, values])
 
   return (
-    <ButtonTooltip
-      type="primary"
-      loading={isLoading}
-      icon={<Copy />}
-      onClick={onCopy}
-      tooltip={{
-        content: {
-          text: (
-            <span>
-              Copies an <span className="text-brand">.env file</span> with the configuration details
-              to your clipboard.
-            </span>
-          ),
-        },
-      }}
-    >
-      Copy env values
-    </ButtonTooltip>
+    <Button type="default" loading={isLoading} icon={<Copy />} onClick={onCopy}>
+      Copy all
+    </Button>
   )
 }
