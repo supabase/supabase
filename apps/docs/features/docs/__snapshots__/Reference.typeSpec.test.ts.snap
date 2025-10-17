@@ -455,7 +455,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "name": "args",
             "type": {
               "type": "nameOnly",
-              "name": "Fn['Args']"
+              "name": "Args"
             },
             "comment": {
               "shortText": "The arguments to pass to the function call"
@@ -31634,7 +31634,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "name": "args",
             "type": {
               "type": "nameOnly",
-              "name": "Fn['Args']"
+              "name": "Args"
             },
             "comment": {
               "shortText": "The arguments to pass to the function call"
@@ -34050,7 +34050,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "PostgrestTransformBuilder"
+            "name": "PostgrestFilterBuilder"
           }
         },
         "comment": {
@@ -35667,7 +35667,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "PostgrestTransformBuilder"
+            "name": "PostgrestFilterBuilder"
           }
         },
         "comment": {
@@ -39397,6 +39397,200 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "default"
           }
+        }
+      },
+      "@supabase/storage-js.packages/BlobDownloadBuilder.default.catch": {
+        "name": "@supabase/storage-js.packages/BlobDownloadBuilder.default.catch",
+        "params": [
+          {
+            "name": "onrejected",
+            "type": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "literal",
+                  "value": null
+                },
+                {
+                  "type": "function",
+                  "params": [
+                    {
+                      "name": "reason",
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    }
+                  ],
+                  "ret": {
+                    "type": {
+                      "type": "union",
+                      "subTypes": [
+                        {
+                          "type": "nameOnly",
+                          "name": "TResult"
+                        },
+                        {
+                          "type": "nameOnly",
+                          "name": "PromiseLike"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "isOptional": true,
+            "comment": {
+              "shortText": "The callback to execute when the Promise is rejected."
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "union",
+                  "name": "DownloadResult",
+                  "subTypes": [
+                    {
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "data",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "T"
+                          }
+                        },
+                        {
+                          "name": "error",
+                          "type": {
+                            "type": "literal",
+                            "value": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "data",
+                          "type": {
+                            "type": "literal",
+                            "value": null
+                          }
+                        },
+                        {
+                          "name": "error",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "StorageError"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "nameOnly",
+                  "name": "TResult"
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Attaches a callback for only the rejection of the Promise."
+        }
+      },
+      "@supabase/storage-js.packages/BlobDownloadBuilder.default.finally": {
+        "name": "@supabase/storage-js.packages/BlobDownloadBuilder.default.finally",
+        "params": [
+          {
+            "name": "onfinally",
+            "type": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "literal",
+                  "value": null
+                },
+                {
+                  "type": "function",
+                  "params": [],
+                  "ret": {
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "void"
+                    }
+                  }
+                }
+              ]
+            },
+            "isOptional": true,
+            "comment": {
+              "shortText": "The callback to execute when the Promise is settled (fulfilled or rejected)."
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "name": "DownloadResult",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "T"
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "StorageError"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The\\nresolved value cannot be modified from the callback."
         }
       },
       "@supabase/storage-js.packages/BlobDownloadBuilder.default.then": {
