@@ -1,6 +1,7 @@
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
 import { useFlag, useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
@@ -15,6 +16,10 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { getAvailableRegions } from './ProjectCreation.utils'
@@ -44,8 +49,12 @@ export const RegionSelector = ({
     { enabled: !smartRegionEnabled }
   )
 
-  const { data: availableRegionsData, isLoading: isLoadingAvailableRegions } =
-    useOrganizationAvailableRegionsQuery({ slug, cloudProvider }, { enabled: smartRegionEnabled })
+  const {
+    data: availableRegionsData,
+    isLoading: isLoadingAvailableRegions,
+    isError: isErrorAvailableRegions,
+    error: errorAvailableRegions,
+  } = useOrganizationAvailableRegionsQuery({ slug, cloudProvider }, { enabled: smartRegionEnabled })
 
   const smartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []
@@ -63,6 +72,7 @@ export const RegionSelector = ({
       code: value.code,
       name: value.displayName,
       provider: cloudProvider,
+      status: undefined,
     }
   })
 
@@ -72,6 +82,10 @@ export const RegionSelector = ({
   const showNonProdFields =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+  if (isErrorAvailableRegions) {
+    return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
+  }
 
   return (
     <FormItemLayout
@@ -146,7 +160,11 @@ export const RegionSelector = ({
                 <SelectItem_Shadcn_
                   key={value.code}
                   value={value.name}
-                  className="w-full [&>:nth-child(2)]:w-full"
+                  className={cn(
+                    'w-full [&>:nth-child(2)]:w-full',
+                    value.status !== undefined && '!pointer-events-auto'
+                  )}
+                  disabled={value.status !== undefined}
                 >
                   <div className="flex flex-row items-center justify-between w-full gap-x-2">
                     <div className="flex items-center gap-x-3">
@@ -164,11 +182,21 @@ export const RegionSelector = ({
                     </div>
 
                     {recommendedSpecificRegions.has(value.code) && (
-                      <div>
-                        <Badge variant="success" className="mr-1">
-                          Recommended
-                        </Badge>
-                      </div>
+                      <Badge variant="success" className="mr-1">
+                        Recommended
+                      </Badge>
+                    )}
+                    {value.status !== undefined && value.status === 'capacity' && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Badge variant="warning" className="mr-1">
+                            Unavailable
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Temporarily unavailable due to this region being at capacity.
+                        </TooltipContent>
+                      </Tooltip>
                     )}
                   </div>
                 </SelectItem_Shadcn_>
