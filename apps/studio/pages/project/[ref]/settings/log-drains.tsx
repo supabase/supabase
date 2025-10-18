@@ -118,7 +118,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             setOpen(v)
           }}
           defaultValues={{
-            type: selectedLogDrain?.type || 'webhook',
+            type: selectedLogDrain?.type ?? 'webhook',
             ...selectedLogDrain,
           }}
           isLoading={isLoading}

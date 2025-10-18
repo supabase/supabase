@@ -65,6 +65,15 @@ const formUnion = z.discriminatedUnion('type', [
     type: z.literal('bigquery'),
   }),
   z.object({
+    type: z.literal('clickhouse'),
+  }),
+  z.object({
+    type: z.literal('s3'),
+  }),
+  z.object({
+    type: z.literal('sentry'),
+  }),
+  z.object({
     type: z.literal('loki'),
     url: z.string().min(1, { message: 'Loki URL is required' }),
     headers: z.record(z.string(), z.string()),

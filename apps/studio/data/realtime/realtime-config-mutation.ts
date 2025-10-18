@@ -19,6 +19,9 @@ export async function updateRealtimeConfiguration({
   max_bytes_per_second,
   max_channels_per_client,
   max_joins_per_second,
+  max_presence_events_per_second,
+  max_payload_size_in_kb,
+  suspend,
 }: RealtimeConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
@@ -32,6 +35,9 @@ export async function updateRealtimeConfiguration({
       max_bytes_per_second,
       max_channels_per_client,
       max_joins_per_second,
+      max_presence_events_per_second,
+      max_payload_size_in_kb,
+      suspend,
     },
   })
 

@@ -1,15 +1,19 @@
 import { useParams } from 'common'
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { MousePointer2 } from 'lucide-react'
+import { useState } from 'react'
 
+import { InlineLink } from 'components/ui/InlineLink'
+import {
+  REALTIME_DEFAULT_CONFIG,
+  useRealtimeConfigurationQuery,
+} from 'data/realtime/realtime-config-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Admonition } from 'ui-patterns'
+import { EmptyRealtime } from './EmptyRealtime'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
-import { EmptyRealtime } from './EmptyRealtime'
 
 /**
  * Acts as a container component for the entire log display
@@ -17,6 +21,9 @@ import { EmptyRealtime } from './EmptyRealtime'
 export const RealtimeInspector = () => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+
+  const { data, isLoading } = useRealtimeConfigurationQuery({ projectRef: ref })
+  const isRealtimeSuspended = data?.suspend ?? REALTIME_DEFAULT_CONFIG.suspend
 
   const [sendMessageShown, setSendMessageShown] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
@@ -37,6 +44,24 @@ export const RealtimeInspector = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
+
+  if (isRealtimeSuspended) {
+    return (
+      <div className="grow flex flex-col items-center justify-center">
+        <Admonition
+          type="warning"
+          className="max-w-[430px]"
+          title="Realtime service is currently suspended"
+          description={
+            <>
+              To use the Inspector, the Realtime service needs to be re-enabled first from the{' '}
+              <InlineLink href={`/project/${ref}/realtime/settings`}>Realtime settings</InlineLink>.
+            </>
+          }
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col grow h-full">
