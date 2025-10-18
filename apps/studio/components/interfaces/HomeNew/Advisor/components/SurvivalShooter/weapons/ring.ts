@@ -1,9 +1,12 @@
-import type { GameWeapon, ShootContext, ShootResult } from './base'
+import type { GameWeapon, ShootContext, ShootResult, ProjectileBehavior } from './base'
 import { applyModifiers, aggregateModifiers, aggregateEventHandlers } from './base'
 import type { GameItem } from '../items/base'
 import type { Projectile } from '../types'
 import { WeaponType } from '../types'
 import { defineWeapon } from './registry'
+
+const RING_EXPANSION_SPEED = 150
+const DEFAULT_RING_MAX_AGE = 2
 
 export const ringWeapon = defineWeapon({
   type: WeaponType.RING,
@@ -58,6 +61,52 @@ export const ringWeapon = defineWeapon({
     return {
       projectiles,
       lastFireTime: currentTime,
+    }
+  },
+
+  createProjectileBehavior: (): ProjectileBehavior => {
+    return (projectile, { currentTime, runtime }) => {
+      const startTime = projectile.createdAt ?? currentTime
+      const ageSeconds = (currentTime - startTime) / 1000
+      const initialRadius = projectile.initialRadius ?? runtime.config.playerRadius
+
+      // Expand the ring over time
+      projectile.radius = initialRadius + ageSeconds * RING_EXPANSION_SPEED
+
+      const maxDimension = Math.max(runtime.config.canvasWidth, runtime.config.canvasHeight)
+      const maxAge = projectile.maxAge ?? DEFAULT_RING_MAX_AGE
+
+      // Remove if too old or too large
+      if (ageSeconds > maxAge || projectile.radius > maxDimension) {
+        return false
+      }
+
+      const playerPosition = runtime.state.player.position
+      const enemies = runtime.state.enemies
+      const ringThickness = 20
+
+      // Ring collision: check if enemy is within the ring's edge
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i]
+        const dx = enemy.position.x - playerPosition.x
+        const dy = enemy.position.y - playerPosition.y
+        const distanceFromCenter = Math.sqrt(dx * dx + dy * dy)
+
+        const isColliding =
+          Math.abs(distanceFromCenter - projectile.radius) <
+          ringThickness + runtime.config.enemySize / 2
+
+        if (!isColliding) continue
+
+        runtime.handleProjectileHit(
+          enemy,
+          projectile,
+          currentTime,
+          false // ring projectiles persist through hits
+        )
+      }
+
+      return true
     }
   },
 

@@ -1,6 +1,36 @@
-import type { WeaponType, Vector2, Projectile, Player } from '../types'
+import type { WeaponType, Vector2, Projectile, Player, Enemy } from '../types'
 import type { GameItem, WeaponModifiers } from '../items/base'
 import type { EventHandlers } from '../events'
+
+// Forward declare GameRuntime to avoid circular dependency
+export interface RuntimeContext {
+  config: {
+    canvasWidth: number
+    canvasHeight: number
+    playerRadius: number
+    enemySize: number
+    projectileRadius: number
+  }
+  state: {
+    player: Player
+    enemies: readonly Enemy[]
+  }
+  handleProjectileHit: (
+    enemy: Enemy,
+    projectile: Projectile,
+    currentTime: number,
+    defaultShouldRemove: boolean
+  ) => boolean
+}
+
+// Projectile behavior function
+export interface ProjectileUpdateContext {
+  deltaTime: number
+  currentTime: number
+  runtime: RuntimeContext
+}
+
+export type ProjectileBehavior = (projectile: Projectile, ctx: ProjectileUpdateContext) => boolean
 
 // Base weapon stats
 export interface BaseWeaponStats {
@@ -58,6 +88,9 @@ export interface GameWeapon {
     projectileAngles: number[]
   ) => ShootResult | null
 
+  // Create projectile behavior (movement, collision, rendering)
+  createProjectileBehavior: () => ProjectileBehavior
+
   // Get event handlers from applied items
   getEventHandlers: (appliedItems: GameItem[]) => EventHandlers
 }
@@ -108,13 +141,13 @@ export function aggregateEventHandlers(items: GameItem[]): EventHandlers {
         const existingHandler = handlers.onDamage
         const newHandler = item.eventHandlers.onDamage
         handlers.onDamage = (context) => {
-          const result1 = existingHandler ? existingHandler(context) : {}
-          const result2 = newHandler(context)
+          const result1 = existingHandler?.(context) || {}
+          const result2 = newHandler(context) || {}
           return {
             shouldRemoveProjectile:
-              result2?.shouldRemoveProjectile ?? result1?.shouldRemoveProjectile,
-            healAmount: (result1?.healAmount || 0) + (result2?.healAmount || 0),
-            additionalDamage: (result1?.additionalDamage || 0) + (result2?.additionalDamage || 0),
+              result2.shouldRemoveProjectile ?? result1.shouldRemoveProjectile,
+            healAmount: (result1.healAmount ?? 0) + (result2.healAmount ?? 0),
+            additionalDamage: (result1.additionalDamage ?? 0) + (result2.additionalDamage ?? 0),
           }
         }
       }
@@ -123,13 +156,13 @@ export function aggregateEventHandlers(items: GameItem[]): EventHandlers {
         const newHandler = item.eventHandlers.onEnemyDeath
         handlers.onEnemyDeath = (context) => {
           // Call existing handler first
-          const result1 = existingHandler ? existingHandler(context) : {}
+          const result1 = existingHandler?.(context) || {}
           // Then call new handler (allows items to affect enemies directly via context)
-          const result2 = newHandler(context)
+          const result2 = newHandler(context) || {}
           // Aggregate only the return values (items handle their own side effects)
           return {
-            healAmount: (result1?.healAmount || 0) + (result2?.healAmount || 0),
-            spawnProjectiles: (result1?.spawnProjectiles || 0) + (result2?.spawnProjectiles || 0),
+            healAmount: (result1.healAmount ?? 0) + (result2.healAmount ?? 0),
+            spawnProjectiles: (result1.spawnProjectiles ?? 0) + (result2.spawnProjectiles ?? 0),
           }
         }
       }

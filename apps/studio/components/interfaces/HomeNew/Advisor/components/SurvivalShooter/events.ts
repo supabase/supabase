@@ -34,6 +34,26 @@ export interface OnShootContext {
   projectileCount: number
 }
 
+export interface OnPlayerUpdateContext {
+  player: Player
+  deltaTime: number
+  currentTime: number
+}
+
+export interface OnPlayerMoveContext {
+  player: Player
+  oldPosition: { x: number; y: number }
+  newPosition: { x: number; y: number }
+  deltaTime: number
+}
+
+export interface OnPlayerDamagedContext {
+  player: Player
+  damageAmount: number
+  enemy: Enemy
+  currentTime: number
+}
+
 // Event handler return types
 export interface OnDamageResult {
   shouldRemoveProjectile?: boolean
@@ -47,16 +67,32 @@ export interface OnEnemyDeathResult {
   // Removed explosionRadius and explosionDamage - items handle effects directly via context
 }
 
+export interface OnPlayerUpdateResult {
+  healAmount?: number // regen or other healing effects
+}
+
+export interface OnPlayerDamagedResult {
+  damageReduction?: number // flat reduction
+  damageMultiplier?: number // 0.5 = half damage, 2.0 = double damage
+  reflectDamage?: number // damage to reflect back to enemies
+}
+
 // Event handler function types
 export type OnDamageHandler = (context: OnDamageContext) => OnDamageResult | void
 export type OnEnemyDeathHandler = (context: OnEnemyDeathContext) => OnEnemyDeathResult | void
 export type OnShootHandler = (context: OnShootContext) => void
+export type OnPlayerUpdateHandler = (context: OnPlayerUpdateContext) => OnPlayerUpdateResult | void
+export type OnPlayerMoveHandler = (context: OnPlayerMoveContext) => void
+export type OnPlayerDamagedHandler = (context: OnPlayerDamagedContext) => OnPlayerDamagedResult | void
 
 // Event handlers that items can implement
 export interface EventHandlers {
   onDamage?: OnDamageHandler
   onEnemyDeath?: OnEnemyDeathHandler
   onShoot?: OnShootHandler
+  onPlayerUpdate?: OnPlayerUpdateHandler
+  onPlayerMove?: OnPlayerMoveHandler
+  onPlayerDamaged?: OnPlayerDamagedHandler
 }
 
 interface DamageAggregation extends Required<Pick<OnDamageResult, 'healAmount' | 'additionalDamage'>> {
@@ -64,6 +100,14 @@ interface DamageAggregation extends Required<Pick<OnDamageResult, 'healAmount' |
 }
 
 interface EnemyDeathAggregation extends Required<Pick<OnEnemyDeathResult, 'healAmount'>> {}
+
+interface PlayerUpdateAggregation extends Required<Pick<OnPlayerUpdateResult, 'healAmount'>> {}
+
+interface PlayerDamagedAggregation {
+  damageReduction: number
+  damageMultiplier: number
+  reflectDamage: number
+}
 
 function createAggregation(): DamageAggregation {
   return {
@@ -77,6 +121,9 @@ export class GameEventBus {
   private readonly damageHandlers = new Map<HandlerScope, Set<OnDamageHandler>>()
   private readonly enemyDeathHandlers = new Map<HandlerScope, Set<OnEnemyDeathHandler>>()
   private readonly shootHandlers = new Map<HandlerScope, Set<OnShootHandler>>()
+  private readonly playerUpdateHandlers = new Map<HandlerScope, Set<OnPlayerUpdateHandler>>()
+  private readonly playerMoveHandlers = new Map<HandlerScope, Set<OnPlayerMoveHandler>>()
+  private readonly playerDamagedHandlers = new Map<HandlerScope, Set<OnPlayerDamagedHandler>>()
 
   onDamage(handler: OnDamageHandler, weaponType?: WeaponType): () => void {
     return this.attachHandler(this.damageHandlers, handler, weaponType)
@@ -90,13 +137,25 @@ export class GameEventBus {
     return this.attachHandler(this.shootHandlers, handler, weaponType)
   }
 
+  onPlayerUpdate(handler: OnPlayerUpdateHandler): () => void {
+    return this.attachHandler(this.playerUpdateHandlers, handler)
+  }
+
+  onPlayerMove(handler: OnPlayerMoveHandler): () => void {
+    return this.attachHandler(this.playerMoveHandlers, handler)
+  }
+
+  onPlayerDamaged(handler: OnPlayerDamagedHandler): () => void {
+    return this.attachHandler(this.playerDamagedHandlers, handler)
+  }
+
   emitDamage(weaponType: WeaponType, context: OnDamageContext): DamageAggregation {
     const aggregated = createAggregation()
     this.collectResults(this.damageHandlers, weaponType, context, (handler) => {
       const result = handler(context)
       if (!result) return
-      aggregated.healAmount += result.healAmount || 0
-      aggregated.additionalDamage += result.additionalDamage || 0
+      aggregated.healAmount += result.healAmount ?? 0
+      aggregated.additionalDamage += result.additionalDamage ?? 0
       if (result.shouldRemoveProjectile !== undefined) {
         aggregated.shouldRemoveProjectile = result.shouldRemoveProjectile
       }
@@ -111,7 +170,7 @@ export class GameEventBus {
     this.collectResults(this.enemyDeathHandlers, weaponType, context, (handler) => {
       const result = handler(context)
       if (!result) return
-      aggregated.healAmount += result.healAmount || 0
+      aggregated.healAmount += result.healAmount ?? 0
     })
     return aggregated
   }
@@ -122,10 +181,56 @@ export class GameEventBus {
     })
   }
 
+  emitPlayerUpdate(context: OnPlayerUpdateContext): PlayerUpdateAggregation {
+    const aggregated: PlayerUpdateAggregation = {
+      healAmount: 0,
+    }
+    // Player events don't use weapon-specific scoping, only global
+    const handlers = this.playerUpdateHandlers.get(GLOBAL_SCOPE)
+    if (!handlers) return aggregated
+
+    handlers.forEach((handler) => {
+      const result = handler(context)
+      if (!result) return
+      aggregated.healAmount += result.healAmount ?? 0
+    })
+    return aggregated
+  }
+
+  emitPlayerMove(context: OnPlayerMoveContext): void {
+    const handlers = this.playerMoveHandlers.get(GLOBAL_SCOPE)
+    if (!handlers) return
+    handlers.forEach((handler) => handler(context))
+  }
+
+  emitPlayerDamaged(context: OnPlayerDamagedContext): PlayerDamagedAggregation {
+    const aggregated: PlayerDamagedAggregation = {
+      damageReduction: 0,
+      damageMultiplier: 1,
+      reflectDamage: 0,
+    }
+    const handlers = this.playerDamagedHandlers.get(GLOBAL_SCOPE)
+    if (!handlers) return aggregated
+
+    handlers.forEach((handler) => {
+      const result = handler(context)
+      if (!result) return
+      aggregated.damageReduction += result.damageReduction ?? 0
+      if (result.damageMultiplier !== undefined) {
+        aggregated.damageMultiplier *= result.damageMultiplier
+      }
+      aggregated.reflectDamage += result.reflectDamage ?? 0
+    })
+    return aggregated
+  }
+
   clear() {
     this.damageHandlers.clear()
     this.enemyDeathHandlers.clear()
     this.shootHandlers.clear()
+    this.playerUpdateHandlers.clear()
+    this.playerMoveHandlers.clear()
+    this.playerDamagedHandlers.clear()
   }
 
   private attachHandler<T>(

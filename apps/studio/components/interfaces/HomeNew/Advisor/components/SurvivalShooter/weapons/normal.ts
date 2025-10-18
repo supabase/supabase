@@ -1,4 +1,4 @@
-import type { GameWeapon, ShootContext, ShootResult } from './base'
+import type { GameWeapon, ShootContext, ShootResult, ProjectileBehavior } from './base'
 import { applyModifiers, aggregateModifiers, aggregateEventHandlers } from './base'
 import type { Vector2, Projectile } from '../types'
 import type { GameItem } from '../items/base'
@@ -100,6 +100,52 @@ export const normalWeapon = defineWeapon({
     return {
       projectiles,
       lastFireTime: currentTime,
+    }
+  },
+
+  createProjectileBehavior: (): ProjectileBehavior => {
+    return (projectile, { deltaTime, runtime, currentTime }) => {
+      // Update position based on velocity
+      projectile.position.x += projectile.velocity.x * deltaTime
+      projectile.position.y += projectile.velocity.y * deltaTime
+
+      const { config } = runtime
+
+      // Remove if out of bounds
+      if (
+        projectile.position.x > config.canvasWidth + 20 ||
+        projectile.position.x < -20 ||
+        projectile.position.y > config.canvasHeight + 20 ||
+        projectile.position.y < -20
+      ) {
+        return false
+      }
+
+      // Check collision with enemies
+      const enemies = runtime.state.enemies
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i]
+        const dx = projectile.position.x - enemy.position.x
+        const dy = projectile.position.y - enemy.position.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        const isColliding = distance < projectile.radius + config.enemySize / 2
+
+        if (!isColliding) continue
+
+        const removeProjectile = runtime.handleProjectileHit(
+          enemy,
+          projectile,
+          currentTime,
+          true // normal projectiles are removed on hit by default
+        )
+
+        if (removeProjectile) {
+          return false
+        }
+      }
+
+      return true
     }
   },
 

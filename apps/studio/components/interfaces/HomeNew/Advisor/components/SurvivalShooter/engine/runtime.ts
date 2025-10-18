@@ -16,6 +16,7 @@ import { getItemById } from '../items'
 import { aggregateEventHandlers } from '../weapons/base'
 import { GameEventBus, type SpawnProjectileOptions } from '../events'
 import { getAllWeapons, getWeaponByType } from '../weapons'
+import { defaultPlayer } from '../player/default'
 
 type RuntimeProjectile = Projectile & {
   behavior: ProjectileBehavior
@@ -52,9 +53,6 @@ interface ItemBuckets {
   unlockedWeapons: Set<WeaponType>
 }
 
-const PLAYER_BASE_RADIUS = 8
-const RING_EXPANSION_SPEED = 150
-const DEFAULT_RING_MAX_AGE = 2
 
 export class GameRuntime {
   readonly events = new GameEventBus()
@@ -63,9 +61,10 @@ export class GameRuntime {
   private enemyIdCounter = 0
   private projectileIdCounter = 0
   private readonly baseStats: PlayerStats
-  private config: GameConfig
+  config: GameConfig // made public for behavior functions
   private itemSubscriptions: Array<() => void> = []
   private selectedCards: SelectedCard[] = []
+  private inputVector: Vector2 = { x: 0, y: 0 }
 
   constructor(config: GameConfig, baseStats: PlayerStats) {
     this.config = config
@@ -98,6 +97,10 @@ export class GameRuntime {
     this.state.mousePosition = position
   }
 
+  setInputVector(vector: Vector2) {
+    this.inputVector = vector
+  }
+
   updatePlayerRotation() {
     const { mousePosition, player } = this.state
     if (!mousePosition) return
@@ -114,6 +117,7 @@ export class GameRuntime {
 
     this.state.score += deltaTime
     this.updatePlayerRotation()
+    this.tickPlayer(deltaTime, currentTime)
     this.handleWeapons(currentTime)
     this.updateProjectiles(deltaTime, currentTime)
     this.updateEnemies(deltaTime, currentTime)
@@ -129,9 +133,10 @@ export class GameRuntime {
   spawnProjectile(projectile: SpawnProjectileOptions, currentTime: number) {
     const id = projectile.id ?? this.nextProjectileId()
     const createdAt = projectile.createdAt ?? currentTime
-    const behavior = projectile.isPulse
-      ? createPulseBehavior()
-      : createProjectileBehavior()
+
+    // Get behavior from weapon definition
+    const weaponDefinition = getWeaponByType(projectile.weaponType)
+    const behavior = weaponDefinition.createProjectileBehavior()
 
     const runtimeProjectile: RuntimeProjectile = {
       ...projectile,
@@ -143,17 +148,23 @@ export class GameRuntime {
     this.state.projectiles.push(runtimeProjectile)
   }
 
-  damagePlayer(amount: number) {
-    this.state.player.stats.currentHp = Math.max(
-      0,
-      this.state.player.stats.currentHp - amount
-    )
+  damagePlayer(amount: number, enemy?: RuntimeEnemy, currentTime?: number) {
+    const result = defaultPlayer.damage({
+      player: this.state.player,
+      amount,
+      enemy,
+      currentTime: currentTime ?? performance.now(),
+      events: this.events,
+    })
+
+    // Handle reflect damage if enemy was provided
+    if (enemy && result.reflectDamage > 0) {
+      enemy.hp -= result.reflectDamage
+    }
   }
 
   healPlayer(amount: number) {
-    if (amount <= 0) return
-    const { stats } = this.state.player
-    stats.currentHp = Math.min(stats.maxHp, stats.currentHp + amount)
+    defaultPlayer.heal(this.state.player, amount)
   }
 
   handleProjectileHit(
@@ -195,9 +206,7 @@ export class GameRuntime {
   }
 
   getPlayerRadius(): number {
-    const maxHp = this.state.player.stats.maxHp
-    const hpMultiplier = maxHp / 100
-    return PLAYER_BASE_RADIUS * Math.sqrt(hpMultiplier)
+    return defaultPlayer.getRadius(this.state.player)
   }
 
   private createInitialState(
@@ -226,20 +235,27 @@ export class GameRuntime {
   }
 
   private computeInitialStats(selectedCards: SelectedCard[]): PlayerStats {
-    const stats: PlayerStats = {
-      ...this.baseStats,
-      currentHp: this.baseStats.maxHp,
-    }
-
+    // Get all items for calculating stats
+    const allItems: GameItem[] = []
     selectedCards.forEach((card) => {
       const item = getItemById(card.item.id)
-      if (!item?.statModifiers) return
-      if (item.statModifiers.maxHp) {
-        stats.maxHp += item.statModifiers.maxHp
-      }
+      if (item) allItems.push(item)
     })
 
-    stats.currentHp = Math.min(stats.currentHp, stats.maxHp)
+    // Use player system to calculate base stats
+    const calculatedStats = defaultPlayer.calculateStats(allItems)
+
+    // Return PlayerStats (keeps existing deprecated fields for compatibility)
+    const stats: PlayerStats = {
+      maxHp: calculatedStats.maxHp,
+      currentHp: calculatedStats.currentHp,
+      moveSpeed: calculatedStats.moveSpeed,
+      attackSpeed: this.baseStats.attackSpeed,
+      attackDamage: this.baseStats.attackDamage,
+      projectileCount: this.baseStats.projectileCount,
+      projectileSize: this.baseStats.projectileSize,
+      pulseEnabled: this.baseStats.pulseEnabled,
+    }
 
     return stats
   }
@@ -316,6 +332,15 @@ export class GameRuntime {
       if (handlers.onShoot) {
         this.itemSubscriptions.push(this.events.onShoot(handlers.onShoot))
       }
+      if (handlers.onPlayerUpdate) {
+        this.itemSubscriptions.push(this.events.onPlayerUpdate(handlers.onPlayerUpdate))
+      }
+      if (handlers.onPlayerMove) {
+        this.itemSubscriptions.push(this.events.onPlayerMove(handlers.onPlayerMove))
+      }
+      if (handlers.onPlayerDamaged) {
+        this.itemSubscriptions.push(this.events.onPlayerDamaged(handlers.onPlayerDamaged))
+      }
     }
 
     perWeapon.forEach((items, weaponType) => {
@@ -381,6 +406,56 @@ export class GameRuntime {
     })
 
     player.weapons = updatedWeapons
+  }
+
+  private tickPlayer(deltaTime: number, currentTime: number) {
+    const player = this.state.player
+    const oldPosition = { ...player.position }
+
+    // Get all global items (items not assigned to specific weapons)
+    const globalItems: GameItem[] = []
+    this.selectedCards.forEach((card) => {
+      if (!card.assignedWeaponType) {
+        const item = getItemById(card.item.id)
+        if (item) globalItems.push(item)
+      }
+    })
+
+    // Update player position using player system
+    const result = defaultPlayer.update({
+      player,
+      deltaTime,
+      currentTime,
+      inputVector: this.inputVector,
+      config: {
+        canvasWidth: this.config.canvasWidth,
+        canvasHeight: this.config.canvasHeight,
+        playerRadius: this.getPlayerRadius(),
+      },
+    })
+
+    player.position = result.position
+
+    // Emit player move event if position changed
+    if (oldPosition.x !== player.position.x || oldPosition.y !== player.position.y) {
+      this.events.emitPlayerMove({
+        player,
+        oldPosition,
+        newPosition: player.position,
+        deltaTime,
+      })
+    }
+
+    // Emit player update event and handle regen/effects
+    const updateResult = this.events.emitPlayerUpdate({
+      player,
+      deltaTime,
+      currentTime,
+    })
+
+    if (updateResult.healAmount > 0) {
+      this.healPlayer(updateResult.healAmount * deltaTime) // scale by deltaTime for per-second effects
+    }
   }
 
   private handleWeapons(currentTime: number) {
@@ -626,7 +701,7 @@ const createPulseBehavior = (): ProjectileBehavior => {
 }
 
 const createEnemyBehavior = (): EnemyBehavior => {
-  return (enemy, { deltaTime, runtime }) => {
+  return (enemy, { deltaTime, runtime, currentTime }) => {
     const player = runtime.state.player
     const dx = player.position.x - enemy.position.x
     const dy = player.position.y - enemy.position.y
@@ -640,7 +715,7 @@ const createEnemyBehavior = (): EnemyBehavior => {
 
     const playerRadius = runtime.getPlayerRadius()
     if (distance < playerRadius + runtime.config.enemySize / 2) {
-      runtime.damagePlayer(enemy.damage)
+      runtime.damagePlayer(enemy.damage, enemy, currentTime)
       return false
     }
 

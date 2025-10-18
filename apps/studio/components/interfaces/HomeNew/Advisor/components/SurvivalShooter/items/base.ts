@@ -14,6 +14,12 @@ export interface WeaponModifiers {
   projectileSizeMultiplier?: number // 0.5 = +50%
 }
 
+// Player modifiers that items can provide
+export interface PlayerModifiers {
+  moveSpeedMultiplier?: number // 0.25 = +25%
+  hpRegenPerSecond?: number // flat regen per second
+}
+
 // Base item definition
 export interface GameItem {
   id: string
@@ -25,6 +31,9 @@ export interface GameItem {
 
   // Weapon modifiers (applied to specific weapon or all weapons)
   weaponModifiers?: WeaponModifiers
+
+  // Player modifiers (applied to player behavior/stats)
+  playerModifiers?: PlayerModifiers
 
   // Event handlers
   eventHandlers?: EventHandlers

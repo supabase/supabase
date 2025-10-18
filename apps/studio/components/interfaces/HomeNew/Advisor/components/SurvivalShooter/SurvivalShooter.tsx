@@ -7,6 +7,7 @@ import type { GameStatus, SelectedCard } from './types'
 import { WeaponType } from './types'
 import { ALL_ITEMS } from './items'
 import type { GameItem } from './items/base'
+import { KeyboardInput } from './input/keyboard'
 
 interface SurvivalShooterProps {
   availableResources: number
@@ -36,8 +37,9 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
   } | null>(null)
   const [isSelectionActive, setIsSelectionActive] = useState(false)
   const wasPlayingBeforeSelectionRef = useRef(false)
+  const keyboardInputRef = useRef<KeyboardInput | null>(null)
 
-  const { gameStateRef, config, startGame, pauseGame, resumeGame, updateMousePosition } =
+  const { gameStateRef, config, startGame, pauseGame, resumeGame, updateMousePosition, updateInputVector } =
     useGameLoop(selectedCards, canvasSize, maxCards)
 
   const remainingSelections = Math.max(0, maxCards - selectedCards.length)
@@ -62,6 +64,31 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
     setSelectedCards((prev) => [...prev, { item, assignedWeaponType }])
     setCurrentOptions([])
   }
+
+  // Initialize keyboard input
+  useEffect(() => {
+    const keyboard = new KeyboardInput()
+    keyboard.start()
+    keyboardInputRef.current = keyboard
+
+    return () => {
+      keyboard.stop()
+    }
+  }, [])
+
+  // Update input vector from keyboard
+  useEffect(() => {
+    if (!hasStarted || !keyboardInputRef.current) return
+
+    const interval = setInterval(() => {
+      if (keyboardInputRef.current && gameStateRef.current?.status === 'playing') {
+        const inputVector = keyboardInputRef.current.getMovementVector()
+        updateInputVector(inputVector)
+      }
+    }, 16) // ~60fps
+
+    return () => clearInterval(interval)
+  }, [hasStarted, updateInputVector, gameStateRef])
 
   // Monitor game state
   useEffect(() => {

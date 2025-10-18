@@ -113,6 +113,14 @@ export const useGameLoop = (
     [ensureRuntime]
   )
 
+  const updateInputVector = useCallback(
+    (vector: { x: number; y: number }) => {
+      const runtime = ensureRuntime()
+      runtime.setInputVector(vector)
+    },
+    [ensureRuntime]
+  )
+
   useEffect(() => {
     configRef.current = config
     runtimeRef.current?.updateConfig(config)
@@ -147,5 +155,6 @@ export const useGameLoop = (
     pauseGame,
     resumeGame,
     updateMousePosition,
+    updateInputVector,
   }
 }
