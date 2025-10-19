@@ -15,11 +15,13 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
 import {
   Button,
   cn,
@@ -51,7 +53,6 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
@@ -87,18 +88,28 @@ export const UsersV2 = () => {
     }
   }, [showEmailPhoneColumns])
 
-  const [specificFilterColumn, setSpecificFilterColumn] = useState<
-    'id' | 'email' | 'phone' | 'freeform'
-  >('id' as const)
+  const [specificFilterColumn, setSpecificFilterColumn] = useQueryState(
+    'filter',
+    parseAsStringEnum(['id', 'email', 'phone', 'freeform']).withDefault('id')
+  )
+  const [filterUserType, setFilterUserType] = useQueryState(
+    'userType',
+    parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
+  )
+  const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
 
-  const [columns, setColumns] = useState<Column<any>[]>([])
-  const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<Filter>('all')
-  const [filterKeywords, setFilterKeywords] = useState('')
+  // [Joshen] Opting to only store filter column into local storage for now, which will initialize
+  // the page when landing on auth users page only if no query params for filter column provided
+  const [localStorageFilter, setLocalStorageFilter] = useLocalStorageQuery<
+    'id' | 'email' | 'phone' | 'freeform'
+  >(LOCAL_STORAGE_KEYS.AUTH_USERS_FILTER(projectRef ?? ''), 'id')
+
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
   const [sortByValue, setSortByValue] = useState<string>('id:asc')
 
+  const [columns, setColumns] = useState<Column<any>[]>([])
+  const [search, setSearch] = useState('')
   const [selectedUser, setSelectedUser] = useState<string>()
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
@@ -133,7 +144,10 @@ export const UsersV2 = () => {
       projectRef,
       connectionString: project?.connectionString,
       keywords: filterKeywords,
-      filter: specificFilterColumn !== 'freeform' || filter === 'all' ? undefined : filter,
+      filter:
+        specificFilterColumn !== 'freeform' || filterUserType === 'all'
+          ? undefined
+          : filterUserType,
       providers: selectedProviders,
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
@@ -155,11 +169,18 @@ export const UsersV2 = () => {
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
 
+  const searchInvalid =
+    !search || specificFilterColumn === 'freeform' || specificFilterColumn === 'email'
+      ? false
+      : specificFilterColumn === 'id'
+        ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
+        : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
+
   const telemetryProps = {
     sort_column: sortColumn,
     sort_order: sortOrder,
     providers: selectedProviders,
-    user_type: filter === 'all' ? undefined : filter,
+    user_type: filterUserType === 'all' ? undefined : filterUserType,
     keywords: filterKeywords,
     filter_column: specificFilterColumn === 'freeform' ? undefined : specificFilterColumn,
   }
@@ -274,12 +295,16 @@ export const UsersV2 = () => {
     specificFilterColumn,
   ])
 
-  const searchInvalid =
-    !search || specificFilterColumn === 'freeform' || specificFilterColumn === 'email'
-      ? false
-      : specificFilterColumn === 'id'
-        ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
-        : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
+  // [Joshen] Load URL state for filter column only once, if no filter column found in URL params
+  useEffect(() => {
+    if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
+      setSpecificFilterColumn(localStorageFilter)
+    }
+  }, [])
+
+  useEffect(() => {
+    setLocalStorageFilter(specificFilterColumn)
+  }, [specificFilterColumn])
 
   return (
     <>
@@ -331,9 +356,9 @@ export const UsersV2 = () => {
 
                 {showUserTypeFilter && specificFilterColumn === 'freeform' && (
                   <Select_Shadcn_
-                    value={filter}
+                    value={filterUserType}
                     onValueChange={(val) => {
-                      setFilter(val as Filter)
+                      setFilterUserType(val as Filter)
                       sendEvent({
                         action: 'auth_users_search_submitted',
                         properties: {
@@ -345,16 +370,16 @@ export const UsersV2 = () => {
                       })
                     }}
                   >
+                    <SelectTrigger_Shadcn_
+                      size="tiny"
+                      className={cn(
+                        'w-[140px] !bg-transparent',
+                        filterUserType === 'all' && 'border-dashed'
+                      )}
+                    >
+                      <SelectValue_Shadcn_ />
+                    </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
-                      <SelectTrigger_Shadcn_
-                        size="tiny"
-                        className={cn(
-                          'w-[140px] !bg-transparent',
-                          filter === 'all' && 'border-dashed'
-                        )}
-                      >
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
                       <SelectGroup_Shadcn_>
                         <SelectItem_Shadcn_ value="all" className="text-xs">
                           All users
@@ -572,12 +597,12 @@ export const UsersV2 = () => {
                       <Users className="text-foreground-lighter" strokeWidth={1} />
                       <div className="text-center">
                         <p className="text-foreground">
-                          {filter !== 'all' || filterKeywords.length > 0
+                          {filterUserType !== 'all' || filterKeywords.length > 0
                             ? 'No users found'
                             : 'No users in your project'}
                         </p>
                         <p className="text-foreground-light">
-                          {filter !== 'all' || filterKeywords.length > 0
+                          {filterUserType !== 'all' || filterKeywords.length > 0
                             ? 'There are currently no users based on the filters applied'
                             : 'There are currently no users who signed up to your project'}
                         </p>
@@ -597,7 +622,7 @@ export const UsersV2 = () => {
         </ResizablePanelGroup>
 
         <UsersFooter
-          filter={filter}
+          filter={filterUserType}
           filterKeywords={filterKeywords}
           selectedProviders={selectedProviders}
           specificFilterColumn={specificFilterColumn}
