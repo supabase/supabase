@@ -21,6 +21,8 @@ const getRandomItem = (): GameItem => {
 const weaponTypeLabels: Record<WeaponType, string> = {
   [WeaponType.NORMAL]: 'Blaster',
   [WeaponType.RING]: 'Ring Weapon',
+  [WeaponType.SHOTGUN]: 'Shotgun',
+  [WeaponType.FLAMETHROWER]: 'Flamethrower',
 }
 
 export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShooterProps) => {
@@ -29,6 +31,7 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
   const [currentOptions, setCurrentOptions] = useState<GameItem[]>([])
   const [hasStarted, setHasStarted] = useState(false)
   const [currentScore, setCurrentScore] = useState(0)
+  const [enemiesKilled, setEnemiesKilled] = useState(0)
   const [gameStatus, setGameStatus] = useState<GameStatus>('card_selection' as GameStatus)
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
   const [weaponSelectionPrompt, setWeaponSelectionPrompt] = useState<{
@@ -98,6 +101,7 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
       if (gameStateRef.current) {
         setGameStatus(gameStateRef.current.status)
         setCurrentScore(gameStateRef.current.score)
+        setEnemiesKilled(gameStateRef.current.enemiesKilled)
       }
     }, 100)
 
@@ -245,6 +249,7 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
     setCurrentOptions([])
     setGameStatus('card_selection' as GameStatus)
     setWeaponSelectionPrompt(null)
+    setEnemiesKilled(0)
     wasPlayingBeforeSelectionRef.current = false
   }
 
@@ -389,21 +394,21 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
         icon={<X strokeWidth={1} size={16} />}
       />
 
-      {/* HUD - Fixed position floating */}
-      <div className="fixed top-4 left-4 z-10 flex flex-col gap-2">
+      {/* HUD - Top left corner */}
+      <div className="absolute top-4 left-4 z-10 flex items-center gap-3 font-mono text-sm text-foreground">
         {/* HP */}
-        <div className="flex items-center gap-2 font-mono text-sm bg-surface-100/90 backdrop-blur-sm rounded px-3 py-2 border border-overlay shadow-lg">
-          <Heart strokeWidth={1.5} size={14} className="text-red-500" />
+        <div className="flex items-center gap-1.5">
+          <Heart strokeWidth={1.5} size={16} className="text-red-500" />
           <span>
             {Math.max(0, Math.floor(gameStateRef.current?.player.stats.currentHp || 0))} /{' '}
             {gameStateRef.current?.player.stats.maxHp || 100}
           </span>
         </div>
 
-        {/* Score/Timer */}
-        <div className="flex items-center gap-2 font-mono text-sm bg-surface-100/90 backdrop-blur-sm rounded px-3 py-2 border border-overlay shadow-lg">
-          <Zap strokeWidth={1.5} size={14} className="text-yellow-500" />
-          <span>{formatTime(currentScore)}</span>
+        {/* Enemy Kill Count */}
+        <div className="flex items-center gap-1.5">
+          <Zap strokeWidth={1.5} size={16} className="text-yellow-500" />
+          <span>{enemiesKilled}</span>
         </div>
       </div>
 

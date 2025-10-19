@@ -228,6 +228,7 @@ export class GameRuntime {
         lastSpawnTime: 0,
       },
       score: 0,
+      enemiesKilled: 0,
       selectedCards,
       mousePosition: null,
       maxSelectableItems,
@@ -596,6 +597,7 @@ export class GameRuntime {
     const index = this.state.enemies.findIndex((candidate) => candidate.id === enemy.id)
     if (index >= 0) {
       this.state.enemies.splice(index, 1)
+      this.state.enemiesKilled++
     }
   }
 

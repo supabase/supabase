@@ -10,5 +10,5 @@ export const attackDamage = defineItem({
     damageMultiplier: 0.25, // +25%
   },
   requiresWeaponSelection: true,
-  applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
+  applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING, WeaponType.FLAMETHROWER],
 } satisfies GameItem)

@@ -6,6 +6,8 @@ export interface Vector2 {
 export enum WeaponType {
   NORMAL = 'normal',
   RING = 'ring',
+  SHOTGUN = 'shotgun',
+  FLAMETHROWER = 'flamethrower',
 }
 
 export interface WeaponVisuals {
@@ -115,6 +117,7 @@ export interface GameState {
   projectiles: Projectile[]
   wave: Wave
   score: number // survival time in seconds
+  enemiesKilled: number // total enemies killed
   selectedCards: SelectedCard[]
   mousePosition: Vector2 | null
   maxSelectableItems: number

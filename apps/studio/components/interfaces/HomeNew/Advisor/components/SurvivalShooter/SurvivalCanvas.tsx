@@ -113,6 +113,42 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
           ctx.arc(player.position.x, player.position.y, projectile.radius, 0, Math.PI * 2)
           ctx.stroke()
           ctx.globalAlpha = 1
+        } else if (projectile.weaponType === WeaponType.SHOTGUN) {
+          // Draw shotgun as an arc segment
+          ctx.strokeStyle = '#f97316' // orange
+          ctx.lineWidth = 4
+          ctx.globalAlpha = 0.7
+          ctx.beginPath()
+
+          // Arc angle is 60 degrees (PI/3), centered on projectile.angle
+          const arcAngle = Math.PI / 3
+          const startAngle = projectile.angle - arcAngle / 2
+          const endAngle = projectile.angle + arcAngle / 2
+
+          ctx.arc(
+            projectile.position.x,
+            projectile.position.y,
+            projectile.radius,
+            startAngle,
+            endAngle
+          )
+          ctx.stroke()
+          ctx.globalAlpha = 1
+        } else if (projectile.weaponType === WeaponType.FLAMETHROWER) {
+          // Draw flamethrower as a rotating line
+          ctx.strokeStyle = '#fb923c' // orange
+          ctx.lineWidth = 3
+          ctx.globalAlpha = 0.8
+          ctx.beginPath()
+
+          const lineLength = projectile.radius
+          const endX = projectile.position.x + Math.cos(projectile.angle) * lineLength
+          const endY = projectile.position.y + Math.sin(projectile.angle) * lineLength
+
+          ctx.moveTo(projectile.position.x, projectile.position.y)
+          ctx.lineTo(endX, endY)
+          ctx.stroke()
+          ctx.globalAlpha = 1
         } else {
           // Draw normal projectiles (yellow)
           ctx.fillStyle = '#fbbf24' // yellow

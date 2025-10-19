@@ -10,5 +10,5 @@ export const projectileCount = defineItem({
     projectileCountBonus: 1,
   },
   requiresWeaponSelection: true,
-  applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING],
+  applicableWeaponTypes: [WeaponType.NORMAL, WeaponType.RING, WeaponType.SHOTGUN, WeaponType.FLAMETHROWER],
 } satisfies GameItem)
