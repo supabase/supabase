@@ -6,12 +6,15 @@ import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
+import { useFlag } from 'common'
 
 const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
+
+  const authenticationShowOverview = useFlag('authOverviewPage')
 
   const {
     authenticationSignInProviders,
@@ -42,6 +45,7 @@ const AuthProductMenu = () => {
         authenticationMultiFactor,
         authenticationAttackProtection,
         authenticationAdvanced,
+        authenticationShowOverview,
       })}
     />
   )

@@ -9,7 +9,8 @@ import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { InlineLink } from 'components/ui/InlineLink'
+import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
@@ -61,6 +62,7 @@ export const RealtimeSettings = () => {
     schema: 'realtime',
   })
 
+  const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
 
   // Check if RLS policies exist for realtime.messages table
@@ -84,8 +86,8 @@ export const RealtimeSettings = () => {
       .min(1)
       .max(maxConn?.maxConnections ?? 100),
     max_concurrent_users: z.coerce.number().min(1).max(50000),
+    max_events_per_second: z.coerce.number().min(1).max(10000),
     // [Joshen] These fields are temporarily hidden from the UI
-    // max_events_per_second: z.coerce.number().min(1).max(50000),
     // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
     // max_channels_per_client: z.coerce.number().min(1).max(10000),
     // max_joins_per_second: z.coerce.number().min(1).max(5000),
@@ -115,6 +117,7 @@ export const RealtimeSettings = () => {
       private_only: !data.allow_public,
       connection_pool: data.connection_pool,
       max_concurrent_users: data.max_concurrent_users,
+      max_events_per_second: data.max_events_per_second,
     })
   }
 
@@ -246,46 +249,15 @@ export const RealtimeSettings = () => {
                     >
                       <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            disabled={!isUsageBillingEnabled || !canUpdateConfig}
-                            value={field.value || ''}
-                          />
+                          <Input_Shadcn_ {...field} type="number" value={field.value || ''} />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
-                        {isSuccessOrganization && !isUsageBillingEnabled && (
-                          <Admonition
-                            showIcon={false}
-                            type="default"
-                            title="Spend cap needs to be disabled to configure this value"
-                            description={
-                              <>
-                                You may adjust this setting in the{' '}
-                                <InlineLink
-                                  href={`/org/${organization?.slug}/billing?panel=costControl`}
-                                >
-                                  organization billing settings
-                                </InlineLink>
-                              </>
-                            }
-                          />
-                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}
                 />
               </CardContent>
-
-              {/*
-                [Joshen] The following fields are hidden from the UI temporarily while we figure out what settings to expose to the users
-                - Max events per second
-                - Max bytes per second
-                - Max channels per client
-                - Max joins per second
-              */}
-
-              {/* <CardContent>
+              <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
                   name="max_events_per_second"
@@ -296,7 +268,8 @@ export const RealtimeSettings = () => {
                         <FormSectionLabel
                           description={
                             <p className="text-foreground-lighter text-sm !mt-1">
-                              Sets maximum number of events per second rate per channel limit
+                              Sets maximum number of events per second that can be sent to your
+                              Realtime service
                             </p>
                           }
                         >
@@ -304,21 +277,52 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loaders={1} loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
                             type="number"
-                            disabled={!canUpdateConfig}
+                            disabled={!isUsageBillingEnabled || !canUpdateConfig}
                             value={field.value || ''}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
+                        {isSuccessOrganization && !isUsageBillingEnabled && (
+                          <Admonition showIcon={false} type="default">
+                            <div className="flex items-center gap-x-2">
+                              <div>
+                                <h5 className="text-foreground mb-1">
+                                  Spend cap needs to be disabled to configure this value
+                                </h5>
+                                <p className="text-foreground-light">
+                                  {isFreePlan
+                                    ? 'Upgrade to the Pro plan first to disable spend cap'
+                                    : 'You may adjust this setting in the organization billing settings'}
+                                </p>
+                              </div>
+                              <div className="flex-grow flex items-center justify-end">
+                                {isFreePlan ? (
+                                  <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                ) : (
+                                  <ToggleSpendCapButton />
+                                )}
+                              </div>
+                            </div>
+                          </Admonition>
+                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}
                 />
-              </CardContent> */}
+              </CardContent>
+
+              {/*
+                [Joshen] The following fields are hidden from the UI temporarily while we figure out what settings to expose to the users
+                - Max bytes per second
+                - Max channels per client
+                - Max joins per second
+              */}
+
               {/* <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
@@ -432,6 +436,7 @@ export const RealtimeSettings = () => {
                   )}
                 />
               </CardContent> */}
+
               <CardFooter className="justify-between">
                 <div>
                   {isPermissionsLoaded && !canUpdateConfig && (

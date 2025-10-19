@@ -1094,6 +1094,67 @@ functions:
           let session = try await supabase.auth.refreshSession(refreshToken: "custom-refresh-token")
           ```
 
+  - id: get-claims
+    title: 'getClaims()'
+    notes: |
+      - Verifies a JWT and extracts its claims.
+      - For symmetric JWTs (HS256), verification is performed server-side via the `getUser()` API.
+      - For asymmetric JWTs (RS256), verification is performed client-side using Apple Security framework.
+      - Uses a global JWKS cache shared across all clients with the same storage key for optimal performance.
+      - Automatically handles key rotation by falling back to server-side verification when a JWK is not found.
+      - The JWKS cache has a 10-minute TTL (time-to-live).
+    overwriteParams:
+      - name: jwt
+        isOptional: true
+        type: String
+        description: >
+          The JWT to verify. If not provided, uses the access token from the current session.
+      - name: options
+        isOptional: true
+        type: GetClaimsOptions
+        description: >
+          Options for JWT verification. Can specify `allowExpired` to skip expiration check and `jwks` to provide custom JSON Web Key Set.
+    examples:
+      - id: get-claims-current-session
+        name: Verify and get claims from current session
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.auth.getClaims()
+          print("User ID: \(response.claims.sub ?? "N/A")")
+          print("Email: \(response.claims.email ?? "N/A")")
+          print("Role: \(response.claims.role ?? "N/A")")
+          ```
+      - id: get-claims-custom-jwt
+        name: Verify and get claims from a specific JWT
+        isSpotlight: false
+        code: |
+          ```swift
+          let customToken = "eyJhbGci..."
+          let response = try await supabase.auth.getClaims(jwt: customToken)
+          ```
+      - id: get-claims-allow-expired
+        name: Get claims from an expired JWT
+        description: Useful for testing or extracting information from expired tokens.
+        isSpotlight: false
+        code: |
+          ```swift
+          let response = try await supabase.auth.getClaims(
+            options: GetClaimsOptions(allowExpired: true)
+          )
+          ```
+      - id: get-claims-custom-jwks
+        name: Verify JWT with custom JWKS
+        description: Provide a custom JSON Web Key Set for verification.
+        isSpotlight: false
+        code: |
+          ```swift
+          let customJWKS = JWKS(keys: [...])
+          let response = try await supabase.auth.getClaims(
+            options: GetClaimsOptions(jwks: customJWKS)
+          )
+          ```
+
   - id: start-auto-refresh
     title: 'startAutoRefresh()'
     description: |
@@ -1393,6 +1454,140 @@ functions:
             data: ["role": "admin"],
             redirectTo: URL(string: "https://example.com/welcome")
           )
+          ```
+
+  - id: admin-oauth-list-clients
+    title: 'admin.oauth.listClients()'
+    description: |
+      List all OAuth clients with optional pagination.
+    notes: |
+      - Requires `service_role` key.
+      - This method is part of the OAuth 2.1 server administration API.
+      - Only works when the OAuth 2.1 server is enabled in your Supabase Auth configuration.
+    overwriteParams:
+      - name: params
+        isOptional: true
+        type: PageParams
+        description: >
+          Pagination parameters with `page` and `perPage` options.
+    examples:
+      - id: list-oauth-clients
+        name: List all OAuth clients
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.auth.admin.oauth.listClients()
+          ```
+      - id: list-oauth-clients-paginated
+        name: List OAuth clients with pagination
+        isSpotlight: false
+        code: |
+          ```swift
+          let response = try await supabase.auth.admin.oauth.listClients(
+            params: PageParams(page: 1, perPage: 10)
+          )
+          ```
+
+  - id: admin-oauth-create-client
+    title: 'admin.oauth.createClient()'
+    description: |
+      Create a new OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - This method is part of the OAuth 2.1 server administration API.
+      - Only works when the OAuth 2.1 server is enabled in your Supabase Auth configuration.
+    overwriteParams:
+      - name: params
+        type: CreateOAuthClientParams
+        description: >
+          Parameters for creating the OAuth client including name, redirect URIs, and client type.
+    examples:
+      - id: create-oauth-client
+        name: Create a new OAuth client
+        isSpotlight: true
+        code: |
+          ```swift
+          let client = try await supabase.auth.admin.oauth.createClient(
+            params: CreateOAuthClientParams(
+              name: "My OAuth App",
+              redirectUris: ["https://example.com/callback"],
+              clientType: .confidential
+            )
+          )
+          ```
+
+  - id: admin-oauth-get-client
+    title: 'admin.oauth.getClient()'
+    description: |
+      Get details of a specific OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - This method is part of the OAuth 2.1 server administration API.
+    overwriteParams:
+      - name: clientId
+        type: String
+        description: >
+          The UUID of the OAuth client to retrieve.
+    examples:
+      - id: get-oauth-client
+        name: Get OAuth client by ID
+        isSpotlight: true
+        code: |
+          ```swift
+          let client = try await supabase.auth.admin.oauth.getClient(
+            clientId: "12345678-1234-1234-1234-123456789012"
+          )
+          ```
+
+  - id: admin-oauth-delete-client
+    title: 'admin.oauth.deleteClient()'
+    description: |
+      Delete an OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - This method is part of the OAuth 2.1 server administration API.
+      - This action cannot be undone.
+    overwriteParams:
+      - name: clientId
+        type: String
+        description: >
+          The UUID of the OAuth client to delete.
+    examples:
+      - id: delete-oauth-client
+        name: Delete an OAuth client
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.admin.oauth.deleteClient(
+            clientId: "12345678-1234-1234-1234-123456789012"
+          )
+          ```
+
+  - id: admin-oauth-regenerate-client-secret
+    title: 'admin.oauth.regenerateClientSecret()'
+    description: |
+      Regenerate the secret for an OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - This method is part of the OAuth 2.1 server administration API.
+      - The old secret will be immediately invalidated.
+      - Make sure to update your application with the new secret.
+    overwriteParams:
+      - name: clientId
+        type: String
+        description: >
+          The UUID of the OAuth client whose secret should be regenerated.
+    examples:
+      - id: regenerate-oauth-client-secret
+        name: Regenerate OAuth client secret
+        isSpotlight: true
+        code: |
+          ```swift
+          let client = try await supabase.auth.admin.oauth.regenerateClientSecret(
+            clientId: "12345678-1234-1234-1234-123456789012"
+          )
+          // The response contains the new secret
+          print("New secret: \(client.secret ?? "")")
           ```
 
   - id: select
@@ -4012,6 +4207,7 @@ functions:
     notes: |
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `String`, and `Data`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - When a region is specified, both the `x-region` header and `forceFunctionRegion` query parameter are set to ensure proper function routing.
     examples:
       - id: invocation-with-decodable
         name: Invocation with `Decodable` response
@@ -4244,6 +4440,37 @@ functions:
 
           // remove subscription some time later
           subscription.cancel()
+          ```
+
+      - id: broadcast-with-replay
+        name: Configure broadcast with replay
+        description: |
+          Replay allows you to receive messages that were broadcast since a specific timestamp. The `meta` field in the message payload will indicate if a message is being replayed.
+        isSpotlight: false
+        code: |
+          ```swift
+          let config = RealtimeJoinConfig(
+            broadcast: BroadcastJoinConfig(
+              acknowledgeBroadcasts: true,
+              receiveOwnBroadcasts: true,
+              replay: ReplayOption(
+                since: 1234567890,
+                limit: 100
+              )
+            )
+          )
+
+          let channel = supabase.channel("my-channel", config: config)
+
+          channel.onBroadcast { message in
+            if let meta = message.payload["meta"] as? [String: Any],
+               let replayed = meta["replayed"] as? Bool,
+               replayed {
+              print("Replayed message: \(meta["id"] ?? "")")
+            }
+          }
+
+          await channel.subscribe()
           ```
 
       - id: listen-to-presence-updates

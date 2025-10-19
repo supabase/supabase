@@ -6,7 +6,7 @@ import type {
   Project,
   Variable,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
-import type { ProjectApiData } from '~/lib/fetch/projectApi'
+import type { ProjectKeys, ProjectSettings } from '~/lib/fetch/projectApi'
 
 import { Check, Copy } from 'lucide-react'
 import Link from 'next/link'
@@ -34,7 +34,7 @@ import { useCopy } from '~/hooks/useCopy'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
 import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
-import { useProjectApiQuery } from '~/lib/fetch/projectApi'
+import { useProjectSettingsQuery, useProjectKeysQuery } from '~/lib/fetch/projectApi'
 import { isProjectPaused, useProjectsQuery } from '~/lib/fetch/projects'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
@@ -274,14 +274,25 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
 
-  const needsApiQuery = variable === 'publishableKey' || variable === 'url'
+  const needsApiQuery = variable === 'publishable' || variable === 'anon' || variable === 'url'
   const needsSupavisorQuery = variable === 'sessionPooler'
 
   const {
-    data: apiData,
-    isPending: isApiPending,
-    isError: isApiError,
-  } = useProjectApiQuery(
+    data: apiSettingsData,
+    isPending: isApiSettingsPending,
+    isError: isApiSettingsError,
+  } = useProjectSettingsQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: isLoggedIn && !!ref && !projectPaused && needsApiQuery }
+  )
+
+  const {
+    data: apiKeysData,
+    isPending: isApiKeysPending,
+    isError: isApiKeysError,
+  } = useProjectKeysQuery(
     {
       projectRef: ref,
     },
@@ -299,15 +310,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     { enabled: isLoggedIn && !!ref && !projectPaused && needsSupavisorQuery }
   )
 
-  function isInvalidApiData(apiData: ProjectApiData) {
-    switch (variable) {
-      case 'url':
-        return !apiData.app_config?.endpoint
-      case 'publishableKey':
-        return !apiData.service_api_keys?.some((key) => key.tags === 'anon')
-    }
-  }
-
   function isInvalidSupavisorData(supavisorData: SupavisorConfigData) {
     return supavisorData.length === 0
   }
@@ -320,24 +322,29 @@ function VariableView({ variable, className }: { variable: Variable; className?:
         ? 'loggedIn.noSelectedProject'
         : projectPaused
           ? 'loggedIn.selectedProject.projectPaused'
-          : (needsApiQuery ? isApiPending : isSupavisorPending)
+          : (needsApiQuery ? isApiSettingsPending || isApiKeysPending : isSupavisorPending)
             ? 'loggedIn.selectedProject.dataPending'
             : (
                   needsApiQuery
-                    ? isApiError || isInvalidApiData(apiData!)
+                    ? isApiSettingsError || isApiKeysError
                     : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
                 )
               ? 'loggedIn.selectedProject.dataError'
               : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = ''
+
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
-        variableValue = `https://${apiData?.app_config?.endpoint}`
+        variableValue = `https://${apiSettingsData?.app_config?.endpoint}`
         break
-      case 'publishableKey':
-        variableValue = apiData?.service_api_keys?.find((key) => key.tags === 'anon')?.api_key || ''
+      case 'anon':
+        variableValue =
+          apiKeysData?.find((key) => key.type === 'legacy' && key.id === 'anon')?.api_key || ''
+        break
+      case 'publishable':
+        variableValue = apiKeysData?.find((key) => key.type === 'publishable')?.api_key || ''
         break
       case 'sessionPooler':
         variableValue = supavisorConfig?.[0]?.connection_string || ''

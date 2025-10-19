@@ -6,6 +6,19 @@ subtitle: 'Common issues and solutions for Supabase branching'
 
 This guide covers common issues you might encounter when using Supabase branching and how to resolve them.
 
+## Monitoring deployments
+
+To check deployment status and troubleshoot failures:
+
+1. Go to your project dashboard
+2. Navigate to "Manage Branches"
+3. Click on your branch to view deployment logs
+4. Check the "View logs" section for detailed error messages
+
+For programmatic monitoring, you can use the [Management API](https://api.supabase.com/api/v1#tag/environments/post/v1/projects/{ref}/branches) to poll branch status.
+
+For detailed troubleshooting guidance, see our [Troubleshooting guide](/docs/guides/deployment/branching/troubleshooting).
+
 ## Common issues
 
 ### Rolling back migrations

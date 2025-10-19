@@ -42,7 +42,6 @@ export const useProjectDeleteMutation = ({
           await queryClient.invalidateQueries(
             projectKeys.infiniteListByOrg(variables.organizationSlug)
           )
-
           queryClient.invalidateQueries(
             organizationKeys.freeProjectLimitCheck(variables.organizationSlug)
           )

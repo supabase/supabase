@@ -70,6 +70,16 @@ export const docsConfig: DocsConfig = {
       ],
     },
     {
+      title: 'UI Patterns',
+      items: [
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
+          items: [],
+        },
+      ],
+    },
+    {
       title: 'Fragment Components',
       items: [
         {
@@ -105,6 +115,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Inner Side Menu',
           href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
+          title: 'Data Input',
+          href: '/docs/fragments/data-input',
           items: [],
         },
         {
@@ -287,6 +302,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Menubar',
           href: '/docs/components/menubar',
+          items: [],
+        },
+        {
+          title: 'NavMenu',
+          href: '/docs/components/nav-menu',
           items: [],
         },
         {
