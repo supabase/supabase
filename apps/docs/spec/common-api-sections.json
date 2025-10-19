@@ -599,6 +599,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-oauth-authorize-project-claim",
+        "title": "Oauth authorize project claim",
+        "slug": "v1-oauth-authorize-project-claim",
+        "type": "operation"
+      },
+      {
         "id": "v1-revoke-token",
         "title": "Revoke token",
         "slug": "v1-revoke-token",
@@ -662,6 +668,12 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-available-regions",
+        "title": "Get available regions",
+        "slug": "v1-get-available-regions",
         "type": "operation"
       },
       {

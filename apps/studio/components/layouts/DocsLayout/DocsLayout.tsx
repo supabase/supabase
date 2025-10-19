@@ -10,7 +10,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {

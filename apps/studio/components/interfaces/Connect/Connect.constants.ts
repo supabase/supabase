@@ -361,27 +361,24 @@ export type ConnectionStringMethod = 'direct' | 'transaction' | 'session'
 
 export const connectionStringMethodOptions: Record<
   ConnectionStringMethod,
-  { value: string; label: string; description: string; badge: string }
+  { value: string; label: string; description: string }
 > = {
   direct: {
     value: 'direct',
     label: 'Direct connection',
     description:
       'Ideal for applications with persistent and long-lived connections, such as those running on virtual machines or long-standing containers.',
-    badge: 'IPv4 Compatible',
   },
   transaction: {
     value: 'transaction',
     label: 'Transaction pooler',
     description:
       'Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated.',
-    badge: 'IPv4 Compatible',
   },
   session: {
     value: 'session',
     label: 'Session pooler',
     description:
       'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.',
-    badge: 'IPv4 Only',
   },
 }

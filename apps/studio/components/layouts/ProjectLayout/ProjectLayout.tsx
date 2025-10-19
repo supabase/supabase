@@ -3,13 +3,14 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -71,7 +72,7 @@ export interface ProjectLayoutProps {
   productMenuClassName?: string
 }
 
-const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
+export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
   (
     {
       title,
@@ -91,14 +92,19 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
-
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
+    const [isAiAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
+      LOCAL_STORAGE_KEYS.HOTKEY_AI_ASSISTANT,
+      true
+    )
 
     const { appTitle } = useCustomContent(['app:title'])
     const titleSuffix = appTitle || 'Supabase'
 
-    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap])
+    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap], {
+      enabled: isAiAssistantHotkeyEnabled,
+    })
 
     const editor = useEditorType()
     const forceShowProductMenu = editor === undefined
@@ -261,8 +267,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 ProjectLayout.displayName = 'ProjectLayout'
 
 export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
-
-export default ProjectLayout
 
 interface MenuBarWrapperProps {
   isLoading: boolean

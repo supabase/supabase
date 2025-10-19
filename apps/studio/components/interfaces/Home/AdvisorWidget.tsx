@@ -269,7 +269,7 @@ export const AdvisorWidget = () => {
                 },
               }}
             >
-              <Link href={`/project/${projectRef}/advisors/query-performance`} />
+              <Link href={`/project/${projectRef}/reports/query-performance`} />
             </ButtonTooltip>
           </CardHeader>
           <CardContent className="!p-0 flex-1 overflow-y-auto">

@@ -29,10 +29,12 @@ const CommandShortcut = ({ openKey }: { openKey: string }) => {
   const toggleOpen = useToggleCommandMenu()
 
   useEffect(() => {
-    const handleKeydown = (evt: KeyboardEvent) => {
-      if (openKey === '') return
+    if (openKey === '') return
 
-      if (evt.key === openKey && evt.metaKey) {
+    const handleKeydown = (evt: KeyboardEvent) => {
+      const usesPrimaryModifier = evt.metaKey || evt.ctrlKey
+      const otherModifiersActive = evt.altKey || evt.shiftKey
+      if (evt.key === openKey && usesPrimaryModifier && !otherModifiersActive) {
         evt.preventDefault()
         toggleOpen()
       }
@@ -41,7 +43,7 @@ const CommandShortcut = ({ openKey }: { openKey: string }) => {
     document.addEventListener('keydown', handleKeydown)
 
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [toggleOpen])
+  }, [openKey, toggleOpen])
 
   return null
 }

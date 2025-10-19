@@ -27,7 +27,7 @@ import {
   Separator,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 
 interface EdgeFunctionDetailsLayoutProps {

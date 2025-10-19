@@ -241,6 +241,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
           {sortedProjects?.map((project) => (
             <ProjectCard
               key={project.ref}
+              slug={slug}
               project={project}
               rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
               resourceWarnings={resourceWarnings?.find(

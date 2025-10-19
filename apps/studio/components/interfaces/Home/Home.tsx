@@ -133,12 +133,10 @@ export const Home = () => {
                 )}
                 {showInstanceSize && (
                   <ComputeBadgeWrapper
-                    project={{
-                      ref: project?.ref,
-                      organization_slug: organization?.slug,
-                      cloud_provider: project?.cloud_provider,
-                      infra_compute_size: project?.infra_compute_size,
-                    }}
+                    projectRef={project?.ref}
+                    slug={organization?.slug}
+                    cloudProvider={project?.cloud_provider}
+                    computeSize={project?.infra_compute_size}
                   />
                 )}
               </div>

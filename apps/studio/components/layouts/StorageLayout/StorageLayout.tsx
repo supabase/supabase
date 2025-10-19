@@ -7,7 +7,7 @@ import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer
 import { StorageMenu } from 'components/interfaces/Storage/StorageMenu'
 import { StorageMenuV2 } from 'components/interfaces/Storage/StorageMenuV2'
 import { withAuth } from 'hooks/misc/withAuth'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 
 export interface StorageLayoutProps {
   title: string

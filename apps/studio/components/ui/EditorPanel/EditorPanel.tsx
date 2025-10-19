@@ -72,11 +72,13 @@ interface EditorPanelProps {
   templates?: Template[]
   initialPrompt?: string
   onChange?: (value: string) => void
+  isInlineEditorHotkeyEnabled?: boolean
 }
 
 export const EditorPanel = ({
   open,
   onClose,
+  isInlineEditorHotkeyEnabled = true,
   initialValue = '',
   label = '',
   saveLabel = 'Save',
@@ -312,7 +314,7 @@ export const EditorPanel = ({
                   text: (
                     <div className="flex items-center gap-4">
                       <span>Close Editor</span>
-                      <KeyboardShortcut keys={['Meta', 'e']} />
+                      {isInlineEditorHotkeyEnabled && <KeyboardShortcut keys={['Meta', 'e']} />}
                     </div>
                   ),
                 },
@@ -347,6 +349,7 @@ export const EditorPanel = ({
               }}
               executeQuery={onExecuteSql}
               onClose={() => onClose()}
+              closeShortcutEnabled={isInlineEditorHotkeyEnabled}
             />
           </div>
 

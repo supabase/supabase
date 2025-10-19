@@ -4,6 +4,7 @@ import { AccountIdentities } from 'components/interfaces/Account/Preferences/Acc
 import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
+import { HotkeySettings } from 'components/interfaces/Account/Preferences/HotkeySettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -81,6 +82,10 @@ const ProfileCard = () => {
 
           <section>
             <ThemeSettings />
+          </section>
+
+          <section>
+            <HotkeySettings />
           </section>
 
           {profileShowAnalyticsAndMarketing && (

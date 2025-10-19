@@ -1251,6 +1251,46 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['OrganizationEntitlementsController_getEntitlements']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/entitlements/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['OrganizationEntitlementsController_getEntitlements']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/members': {
     parameters: {
       query?: never
@@ -5731,6 +5771,11 @@ export interface components {
       billing_name?: string
       billing_via_partner: boolean
       email: string
+      tax_id: {
+        country: string
+        type: string
+        value: string
+      } | null
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
@@ -6941,6 +6986,29 @@ export interface components {
     }
     LinkClazarBuyerBody: {
       buyer_id: string
+    }
+    ListEntitlementsResponse: {
+      entitlements: {
+        config:
+          | {
+              enabled: boolean
+            }
+          | {
+              enabled: boolean
+              unlimited: boolean
+              value: number
+            }
+          | {
+              enabled: boolean
+              set: string[]
+            }
+        feature: {
+          key: string
+          /** @enum {string} */
+          type: 'boolean' | 'numeric' | 'set'
+        }
+        hasAccess: boolean
+      }[]
     }
     ListGitHubConnectionsResponse: {
       connections: {
@@ -14153,6 +14221,92 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationEntitlementsController_getEntitlements: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListEntitlementsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationEntitlementsController_getEntitlements: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListEntitlementsResponse']
         }
       }
       /** @description Unauthorized */
