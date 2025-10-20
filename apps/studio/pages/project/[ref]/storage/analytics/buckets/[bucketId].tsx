@@ -28,12 +28,8 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
           <div className="flex h-full w-full items-center justify-center">
             <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
           </div>
-        ) : bucket.type === 'ANALYTICS' ? (
-          <AnalyticBucketDetails bucket={bucket as AnalyticsBucket} />
         ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-foreground-light">This bucket is not an analytics bucket</p>
-          </div>
+          <AnalyticBucketDetails bucket={bucket as AnalyticsBucket} />
         )
       ) : null}
     </div>
