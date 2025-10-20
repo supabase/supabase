@@ -110,18 +110,16 @@ const Subscription = () => {
                           variant="info"
                           title={`Unable to update plan from ${planName}`}
                           actions={[
-                            <div key="contact-support">
-                              <Button asChild type="default">
-                                <SupportLink
-                                  queryParams={{
-                                    category: SupportCategories.SALES_ENQUIRY,
-                                    subject: `Change plan away from ${planName}`,
-                                  }}
-                                >
-                                  Contact support
-                                </SupportLink>
-                              </Button>
-                            </div>,
+                            <Button asChild key="contact-support" type="default">
+                              <SupportLink
+                                queryParams={{
+                                  category: SupportCategories.SALES_ENQUIRY,
+                                  subject: `Change plan away from ${planName}`,
+                                }}
+                              >
+                                Contact support
+                              </SupportLink>
+                            </Button>,
                           ]}
                         >
                           Please contact us if you'd like to change your plan.

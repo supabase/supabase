@@ -13,6 +13,7 @@ import { z } from 'zod'
 
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { NO_PROJECT_MARKER } from 'components/interfaces/Support/SupportForm.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
@@ -241,16 +242,18 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 up credits do not expire.
               </p>
               <p className="prose text-sm">
-                For larger discounted credit packages, please{' '}
+                For larger discounted credit packages, please reach out to us via{' '}
                 <SupportLink
                   queryParams={{
                     orgSlug: slug,
+                    projectRef: NO_PROJECT_MARKER,
                     subject: 'I would like to inquire about larger credit packages',
                     category: SupportCategories.SALES_ENQUIRY,
                   }}
                 >
-                  reach out.
+                  support
                 </SupportLink>
+                .
               </p>
             </DialogDescription>
           </DialogHeader>

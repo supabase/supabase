@@ -11,6 +11,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
@@ -109,8 +110,8 @@ const SSLConfiguration = () => {
                       title="SSL enforcement was not updated successfully"
                     >
                       Please try updating again, or contact{' '}
-                      <SupportLink className="underline">support</SupportLink> if this error
-                      persists
+                      <SupportLink className={InlineLinkClassName}>support</SupportLink> if this
+                      error persists
                     </Alert>
                   )}
                 </div>

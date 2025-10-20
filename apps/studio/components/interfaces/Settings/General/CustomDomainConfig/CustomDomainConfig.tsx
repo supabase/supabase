@@ -4,6 +4,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import {
@@ -94,7 +95,7 @@ export const CustomDomainConfig = () => {
                 Failed to retrieve custom domain configuration. Please try again later or{' '}
                 <SupportLink
                   queryParams={{ projectRef: ref, category: SupportCategories.SALES_ENQUIRY }}
-                  className="underline"
+                  className={InlineLinkClassName}
                 >
                   contact support
                 </SupportLink>

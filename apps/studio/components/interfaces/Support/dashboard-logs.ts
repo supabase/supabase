@@ -14,7 +14,6 @@ import type { ExtendedSupportCategories } from './Support.constants'
 export type DashboardBreadcrumb = Sentry.Breadcrumb
 
 export const DASHBOARD_LOG_BUCKET = 'dashboard-logs'
-const SIGNED_URL_EXPIRY = 10 * 365 * 24 * 60 * 60
 
 export const DASHBOARD_LOG_CATEGORIES: ExtendedSupportCategories[] = [
   SupportCategories.DASHBOARD_BUG,
