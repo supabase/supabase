@@ -3,7 +3,7 @@ import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedT
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
-import { AnnotatedSpan, CodeCopyButton } from './CodeBlock.client'
+import { AnnotatedSpan, CodeBlockControls } from './CodeBlock.client'
 import { getFontStyle } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
@@ -82,17 +82,14 @@ export async function CodeBlock({
               ))}
             </div>
           )}
-          <div className={cn('p-6 overflow-x-auto', lineNumbers ? 'flex-grow' : '')}>
+          <div className={cn('code-content p-6 overflow-x-auto', lineNumbers ? 'flex-grow' : '')}>
             {tokens.map((line, idx) => (
               <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
             ))}
           </div>
         </code>
       </pre>
-      <CodeCopyButton
-        content={code.trim()}
-        className="hidden group-hover:block absolute top-2 right-2"
-      />
+      <CodeBlockControls content={code.trim()} />
     </div>
   )
 }
@@ -112,7 +109,7 @@ function CodeLine({
   })
 
   return (
-    <span className="block h-5">
+    <span className="block min-h-5 leading-5">
       {tokens.map((token) =>
         twoslash?.has(token.offset) ? (
           <AnnotatedSpan
