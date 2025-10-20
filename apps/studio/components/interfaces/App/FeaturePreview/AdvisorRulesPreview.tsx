@@ -29,11 +29,7 @@ export const AdvisorRulesPreview = () => {
           <li>
             Allow you to disable advisor rules for your project from the{' '}
             <InlineLink
-              href={
-                isAdvisorRulesEnabled
-                  ? `/project/${ref}/advisors/rules/security`
-                  : `/project/${ref}/advisors/security`
-              }
+              href={isAdvisorRulesEnabled ? `/project/${ref}/advisors/rules/security` : `/project/${ref}`}
             >
               Advisors section.
             </InlineLink>

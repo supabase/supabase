@@ -9,6 +9,8 @@ import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { advisorCenterState } from 'state/advisor-center-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Card,
@@ -108,6 +110,7 @@ export const AdvisorWidget = () => {
     warningCount: number,
     isLoading: boolean
   ) => {
+    const tabKey = title.toLowerCase() as 'security' | 'performance'
     const topIssues = lints
       .filter((lint) => lint.level === LINTER_LEVELS.ERROR || lint.level === LINTER_LEVELS.WARN)
       .sort((a, b) => (a.level === LINTER_LEVELS.ERROR ? -1 : 1))
@@ -131,15 +134,23 @@ export const AdvisorWidget = () => {
                   className="text-sm w-full border-b my-0 last:border-b-0 group px-4 "
                 >
                   <div className="flex items-center justify-between w-full group">
-                    <Link
-                      href={`/project/${projectRef}/advisors/${title.toLowerCase()}?id=${lint.cache_key}&preset=${lint.level}`}
-                      className="flex items-center gap-2 transition truncate flex-1 min-w-0 py-3"
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 transition truncate flex-1 min-w-0 py-3 text-left"
+                      onClick={() => {
+                        advisorCenterState.clearSeverityFilters()
+                        advisorCenterState.setActiveTab(tabKey)
+                        sidebarManagerState.openSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
+                        if (lint.cache_key) {
+                          advisorCenterState.selectItem(lint.cache_key)
+                        }
+                      }}
                     >
                       <EntityTypeIcon type={lint.metadata?.type} />
                       <p className="flex-1 font-mono text-xs leading-6 text-xs text-foreground-light group-hover:text-foreground truncate">
                         {lintText.replace(/\\`/g, '`')}
                       </p>
-                    </Link>
+                    </button>
                     <ButtonTooltip
                       type="text"
                       className="px-1 opacity-0 group-hover:opacity-100 w-7"
@@ -216,7 +227,6 @@ export const AdvisorWidget = () => {
                 </TabsTrigger>
               </TabsList>
               <ButtonTooltip
-                asChild
                 type="text"
                 className="!mt-0 w-7"
                 icon={<ExternalLink />}
@@ -227,9 +237,12 @@ export const AdvisorWidget = () => {
                     className: 'capitalize',
                   },
                 }}
-              >
-                <Link href={`/project/${projectRef}/advisors/${selectedTab}`} />
-              </ButtonTooltip>
+                onClick={() => {
+                  advisorCenterState.clearSeverityFilters()
+                  advisorCenterState.setActiveTab(selectedTab)
+                  sidebarManagerState.openSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
+                }}
+              />
             </CardHeader>
             <CardContent className="!p-0 mt-0 flex-1 overflow-y-auto">
               <TabsContent value="security" className="p-0 mt-0 h-full">

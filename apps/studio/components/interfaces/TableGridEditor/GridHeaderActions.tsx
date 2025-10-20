@@ -29,6 +29,8 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { advisorCenterState } from 'state/advisor-center-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
@@ -430,13 +432,18 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     >
                       Autofix
                     </Button>
-                    <Button type="default" asChild>
-                      <Link
-                        target="_blank"
-                        href={`/project/${ref}/advisors/security?preset=${matchingViewLint?.level}&id=${matchingViewLint?.cache_key}`}
-                      >
-                        Learn more
-                      </Link>
+                    <Button
+                      type="default"
+                      onClick={() => {
+                        advisorCenterState.clearSeverityFilters()
+                        advisorCenterState.setActiveTab('security')
+                        sidebarManagerState.openSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
+                        if (matchingViewLint?.cache_key) {
+                          advisorCenterState.selectItem(matchingViewLint.cache_key)
+                        }
+                      }}
+                    >
+                      Learn more
                     </Button>
                   </div>
                 </div>
@@ -473,13 +480,18 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </p>
 
                   <div className="mt-2">
-                    <Button type="default" asChild>
-                      <Link
-                        target="_blank"
-                        href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
-                      >
-                        Learn more
-                      </Link>
+                    <Button
+                      type="default"
+                      onClick={() => {
+                        advisorCenterState.clearSeverityFilters()
+                        advisorCenterState.setActiveTab('security')
+                        sidebarManagerState.openSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
+                        if (matchingMaterializedViewLint?.cache_key) {
+                          advisorCenterState.selectItem(matchingMaterializedViewLint.cache_key)
+                        }
+                      }}
+                    >
+                      Learn more
                     </Button>
                   </div>
                 </div>

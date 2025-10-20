@@ -12,6 +12,7 @@ import ResizableAIWidget from './ResizableAIWidget'
 interface AIEditorProps {
   id?: string
   language?: string
+  theme?: string
   value?: string
   defaultValue?: string
   aiEndpoint?: string
@@ -36,6 +37,7 @@ interface AIEditorProps {
 // We have a tendency to create multiple versions of the monaco editor like RLSCodeEditor
 // so hoping to prevent that from snowballing
 const AIEditor = ({
+  theme = 'supabase',
   language = 'javascript',
   value,
   defaultValue = '',
@@ -352,7 +354,7 @@ const AIEditor = ({
       {isDiffMode ? (
         <div className="w-full h-full">
           <DiffEditor
-            theme="supabase"
+            theme={theme}
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}
@@ -392,7 +394,7 @@ const AIEditor = ({
         <div className="w-full h-full relative">
           {/* [Joshen] Refactor: Use CodeEditor.tsx instead, reduce duplicate declaration of Editor */}
           <Editor
-            theme="supabase"
+            theme={theme}
             language={language}
             value={currentValue}
             options={defaultOptions}

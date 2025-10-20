@@ -149,12 +149,6 @@ export const generateOtherRoutes = (
   const reportsEnabled = showReports ?? true
 
   return [
-    {
-      key: 'advisors',
-      label: 'Advisors',
-      icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
-    },
     ...(IS_PLATFORM && reportsEnabled
       ? [
           {

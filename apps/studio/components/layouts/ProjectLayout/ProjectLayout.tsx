@@ -6,9 +6,9 @@ import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useAdvisorIssueToasts } from 'hooks/advisor/useAdvisorIssueToasts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -17,6 +17,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { useHotKey } from 'hooks/ui/useHotKey'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
@@ -34,6 +35,7 @@ import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { LayoutSidebar } from './LayoutSidebar'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -93,18 +95,27 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
-    const aiSnap = useAiAssistantStateSnapshot()
+    useAiAssistantStateSnapshot()
     const [isAiAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
       LOCAL_STORAGE_KEYS.HOTKEY_AI_ASSISTANT,
       true
     )
 
+    useAdvisorIssueToasts()
+
     const { appTitle } = useCustomContent(['app:title'])
     const titleSuffix = appTitle || 'Supabase'
 
-    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap], {
-      enabled: isAiAssistantHotkeyEnabled,
-    })
+    useHotKey(
+      () => {
+        sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      },
+      'i',
+      [],
+      {
+        enabled: isAiAssistantHotkeyEnabled,
+      }
+    )
 
     const editor = useEditorType()
     const forceShowProductMenu = editor === undefined
@@ -227,25 +238,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                     )}
                   </main>
                 </ResizablePanel>
-                {isClient && aiSnap.open && (
-                  <>
-                    <ResizableHandle withHandle />
-                    <ResizablePanel
-                      id="panel-assistant"
-                      defaultSize={30}
-                      minSize={30}
-                      maxSize={50}
-                      className={cn(
-                        'border-l bg fixed z-40 right-0 top-0 bottom-0',
-                        'w-screen h-[100dvh]',
-                        'md:absolute md:h-auto md:w-3/4',
-                        'xl:relative xl:border-l-0'
-                      )}
-                    >
-                      <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
-                    </ResizablePanel>
-                  </>
-                )}
+                <LayoutSidebar isClient={isClient} />
               </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>

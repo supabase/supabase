@@ -7,6 +7,7 @@ import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { SIDEBAR_KEYS, sidebarManagerState } from './sidebar-manager-state'
 
 type SuggestionsType = {
   title: string
@@ -204,7 +205,12 @@ function ensureActiveChatOrInitialize(state: AiAssistantState) {
     const urlParams = new URLSearchParams(window.location.search)
     const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
     if (aiAssistantPanelOpenParam !== null) {
-      state.open = aiAssistantPanelOpenParam === 'true'
+      const shouldOpen = aiAssistantPanelOpenParam === 'true'
+      if (shouldOpen) {
+        sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      } else {
+        sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      }
     }
   }
 
@@ -241,20 +247,8 @@ export const createAiAssistantState = (): AiAssistantState => {
     ...initialState, // Spread initial values directly
 
     resetAiAssistantPanel: () => {
+      sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       Object.assign(state, INITIAL_AI_ASSISTANT)
-    },
-
-    // Panel visibility
-    openAssistant: () => {
-      state.open = true
-    },
-
-    closeAssistant: () => {
-      state.open = false
-    },
-
-    toggleAssistant: () => {
-      state.open = !state.open
     },
 
     setModel: (model: AssistantModel) => {
@@ -271,6 +265,11 @@ export const createAiAssistantState = (): AiAssistantState => {
         Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
+      if (options?.open === true) {
+        sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      } else if (options?.open === false) {
+        sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      }
       const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
@@ -287,7 +286,6 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.activeChatId = chatId
 
       // Update non-chat related state based on options, falling back to current state, then initial
-      state.open = options?.open ?? state.open
       state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
       state.sqlSnippets = options?.sqlSnippets ?? INITIAL_AI_ASSISTANT.sqlSnippets
       state.suggestions = options?.suggestions ?? INITIAL_AI_ASSISTANT.suggestions
@@ -399,7 +397,6 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     // --- New function to load persisted state ---
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
-      state.open = persistedState.open
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
       state.model = persistedState.model ?? INITIAL_AI_ASSISTANT.model
@@ -409,8 +406,21 @@ export const createAiAssistantState = (): AiAssistantState => {
         const urlParams = new URLSearchParams(window.location.search)
         const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
         if (aiAssistantPanelOpenParam !== null) {
-          state.open = aiAssistantPanelOpenParam === 'true'
+          const shouldOpen = aiAssistantPanelOpenParam === 'true'
+          if (shouldOpen) {
+            sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+          } else {
+            sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+          }
+        } else if (persistedState.open) {
+          sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+        } else {
+          sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         }
+      } else if (persistedState.open) {
+        sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      } else {
+        sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       }
 
       // Ensure an active chat exists after loading
@@ -440,9 +450,6 @@ export const createAiAssistantState = (): AiAssistantState => {
 
 export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
-  openAssistant: () => void
-  closeAssistant: () => void
-  toggleAssistant: () => void
   activeChat: ChatSession | undefined
   setModel: (model: AssistantModel) => void
   newChat: (
@@ -470,6 +477,29 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
   const { data: project } = useSelectedProjectQuery()
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
+
+  useEffect(() => {
+    const shouldRestoreOpen = state.open
+
+    sidebarManagerState.registerSidebar(SIDEBAR_KEYS.AI_ASSISTANT, {
+      onOpen: () => {
+        state.open = true
+      },
+      onClose: () => {
+        state.open = false
+      },
+    })
+
+    if (shouldRestoreOpen) {
+      sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    } else {
+      sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    }
+
+    return () => {
+      sidebarManagerState.unregisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    }
+  }, [state])
 
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {

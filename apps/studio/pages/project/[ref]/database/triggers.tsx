@@ -10,11 +10,12 @@ import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/T
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
+import { editorPanelState } from 'state/editor-panel-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
@@ -24,10 +25,6 @@ const TriggersPage: NextPageWithLayout = () => {
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
-  // Local editor panel state
-  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
-  const [selectedTriggerForEditor, setSelectedTriggerForEditor] = useState<PostgresTrigger>()
-
   const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'triggers'
@@ -35,8 +32,15 @@ const TriggersPage: NextPageWithLayout = () => {
 
   const createTrigger = () => {
     if (isInlineEditorEnabled) {
-      setSelectedTriggerForEditor(undefined)
-      setEditorPanelOpen(true)
+      editorPanelState.configure({
+        sql: `create trigger trigger_name
+after insert or update or delete on table_name
+for each row
+execute function function_name();`,
+        label: 'Create new database trigger',
+        prompt: 'Create a new database trigger that...',
+      })
+      sidebarManagerState.openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedTrigger(undefined)
       setShowCreateTriggerForm(true)
@@ -45,8 +49,12 @@ const TriggersPage: NextPageWithLayout = () => {
 
   const editTrigger = (trigger: PostgresTrigger) => {
     if (isInlineEditorEnabled) {
-      setSelectedTriggerForEditor(trigger)
-      setEditorPanelOpen(true)
+      editorPanelState.configure({
+        sql: generateTriggerCreateSQL(trigger),
+        label: `Edit trigger "${trigger.name}"`,
+        prompt: `Update the database trigger "${trigger.name}" to...`,
+      })
+      sidebarManagerState.openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedTrigger(trigger)
       setShowCreateTriggerForm(true)
@@ -89,36 +97,6 @@ const TriggersPage: NextPageWithLayout = () => {
         trigger={selectedTrigger}
         visible={showDeleteTriggerForm}
         setVisible={setShowDeleteTriggerForm}
-      />
-
-      <EditorPanel
-        open={editorPanelOpen}
-        onRunSuccess={() => {
-          setEditorPanelOpen(false)
-          setSelectedTriggerForEditor(undefined)
-        }}
-        onClose={() => {
-          setEditorPanelOpen(false)
-          setSelectedTriggerForEditor(undefined)
-        }}
-        initialValue={
-          selectedTriggerForEditor
-            ? generateTriggerCreateSQL(selectedTriggerForEditor)
-            : `create trigger trigger_name
-after insert or update or delete on table_name
-for each row
-execute function function_name();`
-        }
-        label={
-          selectedTriggerForEditor
-            ? `Edit trigger "${selectedTriggerForEditor.name}"`
-            : 'Create new database trigger'
-        }
-        initialPrompt={
-          selectedTriggerForEditor
-            ? `Update the database trigger "${selectedTriggerForEditor.name}" to...`
-            : 'Create a new database trigger that...'
-        }
       />
     </>
   )
