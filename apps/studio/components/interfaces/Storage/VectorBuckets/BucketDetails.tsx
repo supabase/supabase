@@ -1,5 +1,6 @@
-import { MoreVertical, Trash2 } from 'lucide-react'
+import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
@@ -10,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
   Table,
   TableBody,
   TableCell,
@@ -17,22 +19,37 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
-import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+import { CreateVectorIndexSheet } from './CreateVectorIndexSheet'
 import { EmptyVectorBucketsState } from './EmptyVectorBucketState'
 
-export const VectorsBuckets = () => {
+export const BucketDetails = () => {
   const { ref: projectRef } = useParams()
   const { data } = useVectorBucketsQuery({ projectRef })
 
   const bucketsList = data?.vectorBuckets ?? []
+  const [filterString, setFilterString] = useState('')
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-y-6">
+      <div className="flex flex-col mt-12">
+        Search
+        <span className="text-lg">Tables</span>
+        <span className="text-sm text-foreground-light">
+          Vector indexes connected to this bucket.
+        </span>
+      </div>
       {bucketsList.length > 0 && (
-        <div className="flex flex-row justify-between mt-16 mb-6">
-          <span className="text-lg">Vectors</span>
-          <CreateVectorBucketDialog />
+        <div className="flex flex-row justify-between">
+          <Input
+            size="tiny"
+            placeholder="Search for a table"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            icon={<Search size={12} />}
+            className="w-48"
+          />
+          <CreateVectorIndexSheet />
         </div>
       )}
 
