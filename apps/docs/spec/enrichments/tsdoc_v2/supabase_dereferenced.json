@@ -31,7 +31,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 105,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L105"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L105"
             }
           ],
           "signatures": [
@@ -54,7 +54,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 105,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L105"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L105"
                 }
               ],
               "typeParameters": [
@@ -102,7 +102,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 44,
                                   "character": 8,
-                                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                                 }
                               ],
                               "type": {
@@ -122,7 +122,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 44,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                             }
                           ]
                         }
@@ -472,7 +472,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 59,
                               "character": 26,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                             }
                           ],
                           "type": {
@@ -492,7 +492,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 59,
                           "character": 24,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                         }
                       ]
                     }
@@ -573,7 +573,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 62,
                                   "character": 25,
-                                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                 }
                               ],
                               "type": {
@@ -596,7 +596,7 @@
                                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                           "line": 62,
                                           "character": 47,
-                                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                         }
                                       ],
                                       "type": {
@@ -616,7 +616,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 62,
                                       "character": 45,
-                                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                     }
                                   ]
                                 }
@@ -634,7 +634,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 62,
                               "character": 23,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                             }
                           ]
                         }
@@ -684,7 +684,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 65,
                                   "character": 10,
-                                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                                 }
                               ],
                               "type": {
@@ -704,7 +704,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 65,
                               "character": 8,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                             }
                           ]
                         }
@@ -740,7 +740,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 66,
                                   "character": 42,
-                                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                                 }
                               ],
                               "type": {
@@ -760,7 +760,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 66,
                               "character": 40,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                             }
                           ]
                         }
@@ -936,7 +936,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 88,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L88"
             }
           ],
           "type": {
@@ -952,7 +952,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 88,
                   "character": 26,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L88"
                 }
               ],
               "signatures": [
@@ -967,7 +967,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 88,
                       "character": 26,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L88"
                     }
                   ],
                   "type": {
@@ -1018,7 +1018,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 73,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L73"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L73"
             }
           ],
           "type": {
@@ -1044,7 +1044,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 81,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L81"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L81"
             }
           ],
           "type": {
@@ -1071,7 +1071,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 87,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L87"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L87"
             }
           ],
           "type": {
@@ -1093,7 +1093,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 86,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L86"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L86"
             }
           ],
           "type": {
@@ -1111,8 +1111,8 @@
                   "character": 17
                 },
                 {
-                  "fileName": "node_modules/@types/node/web-globals/fetch.d.ts",
-                  "line": 16,
+                  "fileName": "node_modules/@types/node/globals.d.ts",
+                  "line": 289,
                   "character": 13
                 }
               ],
@@ -1225,8 +1225,8 @@
                   },
                   "sources": [
                     {
-                      "fileName": "node_modules/@types/node/web-globals/fetch.d.ts",
-                      "line": 16,
+                      "fileName": "node_modules/@types/node/globals.d.ts",
+                      "line": 289,
                       "character": 13
                     }
                   ],
@@ -1322,7 +1322,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 83,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L83"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L83"
             }
           ],
           "type": {
@@ -1348,7 +1348,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 90,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L90"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L90"
             }
           ],
           "type": {
@@ -1382,7 +1382,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 74,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L74"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L74"
             }
           ],
           "type": {
@@ -1409,7 +1409,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 80,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L80"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L80"
             }
           ],
           "type": {
@@ -1435,7 +1435,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 84,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L84"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L84"
             }
           ],
           "type": {
@@ -1494,7 +1494,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 78,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L78"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L78"
             }
           ],
           "type": {
@@ -1520,7 +1520,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 85,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L85"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L85"
             }
           ],
           "type": {
@@ -1541,7 +1541,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 82,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L82"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L82"
             }
           ],
           "type": {
@@ -1575,7 +1575,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 107,
               "character": 14,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L107"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L107"
             }
           ],
           "type": {
@@ -1604,7 +1604,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 106,
               "character": 14,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L106"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L106"
             }
           ],
           "type": {
@@ -1623,7 +1623,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 180,
               "character": 6,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L180"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L180"
             }
           ],
           "getSignature": {
@@ -1645,7 +1645,7 @@
                 "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                 "line": 180,
                 "character": 6,
-                "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L180"
+                "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L180"
               }
             ],
             "type": {
@@ -1670,7 +1670,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 294,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L294"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L294"
             }
           ],
           "signatures": [
@@ -1693,7 +1693,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 294,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L294"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L294"
                 }
               ],
               "parameters": [
@@ -1786,19 +1786,19 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 188,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L188"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L188"
             },
             {
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 192,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L192"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L192"
             },
             {
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 200,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L200"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L200"
             }
           ],
           "signatures": [
@@ -1813,7 +1813,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 188,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L188"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L188"
                 }
               ],
               "typeParameters": [
@@ -1915,7 +1915,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 192,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L192"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L192"
                 }
               ],
               "typeParameters": [
@@ -2019,7 +2019,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 301,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L301"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L301"
             }
           ],
           "signatures": [
@@ -2042,7 +2042,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 301,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L301"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L301"
                 }
               ],
               "type": {
@@ -2072,7 +2072,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 318,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L318"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L318"
             }
           ],
           "signatures": [
@@ -2095,7 +2095,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 318,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L318"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L318"
                 }
               ],
               "type": {
@@ -2143,7 +2143,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 311,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L311"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L311"
             }
           ],
           "signatures": [
@@ -2166,7 +2166,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 311,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L311"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L311"
                 }
               ],
               "parameters": [
@@ -2238,7 +2238,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 247,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L247"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L247"
             }
           ],
           "signatures": [
@@ -2261,7 +2261,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 247,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L247"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L247"
                 }
               ],
               "typeParameters": [
@@ -2487,7 +2487,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 261,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L261"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L261"
                             }
                           ],
                           "type": {
@@ -2537,7 +2537,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 260,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L260"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L260"
                             }
                           ],
                           "type": {
@@ -2582,7 +2582,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 259,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L259"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L259"
                             }
                           ],
                           "type": {
@@ -2602,7 +2602,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 258,
                           "character": 13,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L258"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L258"
                         }
                       ]
                     }
@@ -2712,7 +2712,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 212,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L212"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L212"
             }
           ],
           "signatures": [
@@ -2735,7 +2735,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 212,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L212"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L212"
                 }
               ],
               "typeParameters": [
@@ -2882,7 +2882,7 @@
           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
           "line": 37,
           "character": 21,
-          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L37"
+          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L37"
         }
       ],
       "typeParameters": [
@@ -2962,7 +2962,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 44,
                           "character": 8,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                         }
                       ],
                       "type": {
@@ -2982,7 +2982,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 44,
                       "character": 6,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                     }
                   ]
                 }
@@ -3452,7 +3452,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 59,
                       "character": 26,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                     }
                   ],
                   "type": {
@@ -3472,7 +3472,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 59,
                   "character": 24,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                 }
               ]
             }
@@ -3553,7 +3553,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 62,
                           "character": 25,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                         }
                       ],
                       "type": {
@@ -3576,7 +3576,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 62,
                                   "character": 47,
-                                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                 }
                               ],
                               "type": {
@@ -3596,7 +3596,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 62,
                               "character": 45,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                             }
                           ]
                         }
@@ -3614,7 +3614,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 62,
                       "character": 23,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                     }
                   ]
                 }
@@ -3654,7 +3654,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 65,
                           "character": 10,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                         }
                       ],
                       "type": {
@@ -3674,7 +3674,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 65,
                       "character": 8,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                     }
                   ]
                 }
@@ -3710,7 +3710,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 66,
                           "character": 42,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                         }
                       ],
                       "type": {
@@ -3730,7 +3730,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 66,
                       "character": 40,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                     }
                   ]
                 }
@@ -3763,7 +3763,7 @@
           "fileName": "packages/core/supabase-js/src/lib/types.ts",
           "line": 115,
           "character": 12,
-          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L115"
+          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L115"
         }
       ],
       "typeParameters": [
@@ -3811,7 +3811,7 @@
                         "fileName": "packages/core/supabase-js/src/lib/types.ts",
                         "line": 115,
                         "character": 51,
-                        "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L115"
+                        "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L115"
                       }
                     ],
                     "type": {
@@ -3831,7 +3831,7 @@
                     "fileName": "packages/core/supabase-js/src/lib/types.ts",
                     "line": 115,
                     "character": 49,
-                    "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L115"
+                    "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L115"
                   }
                 ]
               }
@@ -3882,7 +3882,7 @@
           "fileName": "packages/core/supabase-js/src/lib/types.ts",
           "line": 116,
           "character": 12,
-          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L116"
+          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L116"
         }
       ],
       "type": {
@@ -3915,7 +3915,7 @@
           "fileName": "packages/core/supabase-js/src/lib/types.ts",
           "line": 114,
           "character": 12,
-          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L114"
+          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L114"
         }
       ],
       "typeParameters": [
@@ -3978,7 +3978,7 @@
           "fileName": "packages/core/supabase-js/src/lib/types.ts",
           "line": 30,
           "character": 12,
-          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L30"
+          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L30"
         }
       ],
       "typeParameters": [
@@ -4011,7 +4011,7 @@
                 "summary": [
                   {
                     "kind": "text",
-                    "text": "Optional function for using a third-party authentication system with\nSupabase. The function should return an access token or ID token (JWT) by\nobtaining it from the third-party auth client library. Note that this\nfunction may be called concurrently and many times. Use memoization and\nlocking techniques if this is not supported by the client libraries.\n\nWhen set, the "
+                    "text": "Optional function for using a third-party authentication system with\nSupabase. The function should return an access token or ID token (JWT) by\nobtaining it from the third-party auth SDK. Note that this\nfunction may be called concurrently and many times. Use memoization and\nlocking techniques if this is not supported by the SDKs.\n\nWhen set, the "
                   },
                   {
                     "kind": "code",
@@ -4028,7 +4028,7 @@
                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                   "line": 108,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L108"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L108"
                 }
               ],
               "type": {
@@ -4044,7 +4044,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 108,
                       "character": 16,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L108"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L108"
                     }
                   ],
                   "signatures": [
@@ -4096,7 +4096,7 @@
                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                   "line": 38,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L38"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L38"
                 }
               ],
               "type": {
@@ -4129,7 +4129,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 42,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L42"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L42"
                         }
                       ],
                       "type": {
@@ -4158,7 +4158,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 74,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L74"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L74"
                         }
                       ],
                       "type": {
@@ -4199,7 +4199,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 54,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L54"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L54"
                         }
                       ],
                       "type": {
@@ -4228,7 +4228,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 70,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L70"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L70"
                         }
                       ],
                       "type": {
@@ -4270,7 +4270,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 80,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L80"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L80"
                         }
                       ],
                       "type": {
@@ -4311,7 +4311,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 50,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L50"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L50"
                         }
                       ],
                       "type": {
@@ -4340,7 +4340,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 58,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L58"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L58"
                         }
                       ],
                       "type": {
@@ -4381,7 +4381,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 46,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L46"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L46"
                         }
                       ],
                       "type": {
@@ -4411,7 +4411,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 66,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L66"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L66"
                         }
                       ],
                       "type": {
@@ -4443,7 +4443,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 38,
                       "character": 9,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L38"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L38"
                     }
                   ]
                 }
@@ -4478,7 +4478,7 @@
                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                   "line": 34,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L34"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L34"
                 }
               ],
               "type": {
@@ -4503,7 +4503,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 35,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L35"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L35"
                         }
                       ],
                       "type": {
@@ -4526,7 +4526,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 34,
                       "character": 7,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L34"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L34"
                     }
                   ]
                 }
@@ -4545,7 +4545,7 @@
                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                   "line": 87,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L87"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L87"
                 }
               ],
               "type": {
@@ -4586,7 +4586,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 91,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L91"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L91"
                         }
                       ],
                       "type": {
@@ -4620,7 +4620,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 95,
                           "character": 4,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L95"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L95"
                         }
                       ],
                       "type": {
@@ -4655,7 +4655,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 87,
                       "character": 11,
-                      "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L87"
+                      "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L87"
                     }
                   ]
                 }
@@ -4682,7 +4682,7 @@
                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                   "line": 85,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L85"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L85"
                 }
               ],
               "type": {
@@ -4708,7 +4708,7 @@
                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                   "line": 86,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L86"
+                  "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L86"
                 }
               ],
               "type": {
@@ -4733,7 +4733,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 30,
               "character": 48,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/lib/types.ts#L30"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/lib/types.ts#L30"
             }
           ]
         }
@@ -4758,7 +4758,7 @@
           "fileName": "packages/core/supabase-js/src/index.ts",
           "line": 27,
           "character": 13,
-          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/index.ts#L27"
+          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/index.ts#L27"
         }
       ],
       "signatures": [
@@ -4773,7 +4773,7 @@
               "fileName": "packages/core/supabase-js/src/index.ts",
               "line": 27,
               "character": 28,
-              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/index.ts#L27"
+              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/index.ts#L27"
             }
           ],
           "typeParameters": [
@@ -4821,7 +4821,7 @@
                               "fileName": "packages/core/supabase-js/src/index.ts",
                               "line": 31,
                               "character": 8,
-                              "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/index.ts#L31"
+                              "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/index.ts#L31"
                             }
                           ],
                           "type": {
@@ -4841,7 +4841,7 @@
                           "fileName": "packages/core/supabase-js/src/index.ts",
                           "line": 31,
                           "character": 6,
-                          "url": "https://github.com/supabase/supabase-js/blob/0b47058203ef5d5fc35a0f2a7e693aae3390e1b9/packages/core/supabase-js/src/index.ts#L31"
+                          "url": "https://github.com/supabase/supabase-js/blob/282b191956b1b4093d89d081a900b20f4ab8d3fb/packages/core/supabase-js/src/index.ts#L31"
                         }
                       ]
                     }
@@ -5181,15 +5181,7 @@
   "readme": [
     {
       "kind": "text",
-      "text": "# "
-    },
-    {
-      "kind": "code",
-      "text": "`supabase-js`"
-    },
-    {
-      "kind": "text",
-      "text": " - Isomorphic JavaScript Client for Supabase.\n\n- **Documentation:** https://supabase.com/docs/reference/javascript/start\n- TypeDoc: https://supabase.github.io/supabase-js/supabase-js/v2/spec.json\n\n<div align=\"center\">\n\n[![pkg.pr.new](https://pkg.pr.new/badge/supabase/supabase-js)](https://pkg.pr.new/~/supabase/supabase-js)\n\n</div>\n\n## Usage\n\nFirst of all, you need to install the library:\n\n"
+      "text": "<br />\n<p align=\"center\">\n  <a href=\"https://supabase.io\">\n        <picture>\n      <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg\">\n      <source media=\"(prefers-color-scheme: light)\" srcset=\"https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg\">\n      <img alt=\"Supabase Logo\" width=\"300\" src=\"https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/logo-preview.jpg\">\n    </picture>\n  </a>\n\n  <h1 align=\"center\">Supabase JS SDK</h1>\n\n  <h3 align=\"center\">Isomorphic JavaScript SDK for Supabase - combining Auth, Database, Storage, Functions, and Realtime.</h3>\n\n  <p align=\"center\">\n    <a href=\"https://supabase.com/docs/guides/getting-started\">Guides</a>\n    ·\n    <a href=\"https://supabase.com/docs/reference/javascript/start\">Reference Docs</a>\n    ·\n    <a href=\"https://supabase.github.io/supabase-js/supabase-js/v2/spec.json\">TypeDoc</a>\n  </p>\n</p>\n\n<div align=\"center\">\n\n[![Build](https://github.com/supabase/supabase-js/workflows/CI/badge.svg)](https://github.com/supabase/supabase-js/actions?query=branch%3Amaster)\n[![Package](https://img.shields.io/npm/v/@supabase/supabase-js)](https://www.npmjs.com/package/@supabase/supabase-js)\n[![License: MIT](https://img.shields.io/npm/l/@supabase/supabase-js)](#license)\n[![pkg.pr.new](https://pkg.pr.new/badge/supabase/supabase-js)](https://pkg.pr.new/~/supabase/supabase-js)\n\n</div>\n\n## Usage\n\nFirst of all, you need to install the library:\n\n"
     },
     {
       "kind": "code",
@@ -5433,19 +5425,11 @@
     },
     {
       "kind": "code",
-      "text": "`test:deno`"
-    },
-    {
-      "kind": "text",
-      "text": "                | Deno runtime compatibility tests          | Supabase running + Deno installed       |\n| "
-    },
-    {
-      "kind": "code",
       "text": "`test:bun`"
     },
     {
       "kind": "text",
-      "text": "                 | Bun runtime compatibility tests           | Supabase running + Bun installed        |\n| Expo (see section below)   | React Native/Expo tests                   | Supabase running + dependencies updated |\n| Next.js (see below)        | Next.js SSR tests                         | Supabase running + dependencies updated |\n| "
+      "text": "                 | Bun runtime compatibility tests           | Supabase running + Bun installed        |\n| "
     },
     {
       "kind": "code",
@@ -5453,7 +5437,7 @@
     },
     {
       "kind": "text",
-      "text": "     | WebSocket browser tests                   | Supabase running + Playwright           |\n\n#### Unit Testing\n\n"
+      "text": "     | WebSocket browser tests                   | Supabase running + Playwright           |\n| Deno (see section below)   | Deno runtime compatibility tests          | Supabase running + Deno installed       |\n| Expo (see section below)   | React Native/Expo tests                   | Supabase running + dependencies updated |\n| Next.js (see below)        | Next.js SSR tests                         | Supabase running + dependencies updated |\n\n#### Unit Testing\n\n"
     },
     {
       "kind": "code",
@@ -5521,7 +5505,7 @@
     },
     {
       "kind": "code",
-      "text": "```bash\n# Prerequisites:\n# 1. Supabase must be running (see Prerequisites)\n# 2. Update test dependencies and pack current build\nnpx nx update:test-deps:expo supabase-js\n\n# Run Expo tests from the Expo test project\ncd packages/core/supabase-js/test/integration/expo\nnpm install\nnpm test\ncd ../../..\n```"
+      "text": "```bash\n# Prerequisites:\n# 1. Supabase must be running (see Prerequisites)\n# 2. Update test dependencies and pack current build\ncd packages/core/supabase-js\nnpm run update:test-deps:expo\n\n# Run Expo tests from the Expo test project\ncd test/integration/expo\nnpm install\nnpm test\ncd ../../..\n```"
     },
     {
       "kind": "text",
@@ -5835,15 +5819,15 @@
       "qualifiedName": "init"
     },
     "48": {
-      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "sourceFileName": "../../../node_modules/@types/node/globals.d.ts",
       "qualifiedName": "fetch"
     },
     "49": {
-      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "sourceFileName": "../../../node_modules/@types/node/globals.d.ts",
       "qualifiedName": "input"
     },
     "50": {
-      "sourceFileName": "../../../node_modules/@types/node/web-globals/fetch.d.ts",
+      "sourceFileName": "../../../node_modules/@types/node/globals.d.ts",
       "qualifiedName": "init"
     },
     "51": {
