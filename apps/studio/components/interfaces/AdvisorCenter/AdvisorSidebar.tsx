@@ -113,10 +113,37 @@ export const AdvisorSidebar = () => {
     { enabled: isSidebarOpen }
   )
 
-  const notifications = useMemo(
-    () => notificationsQuery.data?.pages.flatMap((page) => page) ?? [],
-    [notificationsQuery.data]
-  )
+  const notifications = useMemo(() => {
+    const queryNotifications = notificationsQuery.data?.pages.flatMap((page) => page) ?? []
+
+    // Mock changelog notification for testing
+    const mockChangelogNotification: Notification = {
+      id: 'mock-changelog-001',
+      name: 'changelog',
+      priority: 'Info',
+      status: 'new',
+      inserted_at: new Date().toISOString(),
+      data: {
+        title: 'New Feature: Enhanced Database Monitoring',
+        message:
+          "We've added new database monitoring capabilities to help you track performance metrics and identify potential issues early. The new monitoring dashboard provides real-time insights into query performance, connection pools, and resource utilization.\n\n**Key improvements:**\n- Real-time query performance tracking\n- Enhanced connection pool monitoring\n- Resource utilization alerts\n- Improved dashboard visualizations\n\n[Learn more about the new monitoring features](https://supabase.com/docs/guides/platform/monitoring)",
+        actions: [
+          {
+            label: 'View Documentation',
+            url: 'https://supabase.com/docs/guides/platform/monitoring',
+            action_type: 'external_link',
+          },
+          {
+            label: 'Open Monitoring Dashboard',
+            action_type: 'navigate_to_monitoring',
+          },
+        ],
+      } as NotificationData,
+      meta: {},
+    }
+
+    return [mockChangelogNotification, ...queryNotifications]
+  }, [notificationsQuery.data])
 
   const lintItems = useMemo<AdvisorCenterItem[]>(() => {
     if (!lintData) return []
@@ -235,7 +262,18 @@ export const AdvisorSidebar = () => {
               onClick={handleBackToList}
             />
             <div className="flex items-center gap-2 overflow-hidden flex-1">
-              <span className="text-sm font-medium truncate">{selectedItem?.title}</span>
+              <div className="flex-1">
+                <span className="heading-default">{selectedItem?.title}</span>
+                {selectedItem?.source === 'notification' &&
+                  selectedItem.original &&
+                  'inserted_at' in selectedItem.original && (
+                    <p className="text-xs text-foreground-light">
+                      {dayjs((selectedItem.original as Notification).inserted_at).format(
+                        'MMM D, YYYY HH:mm'
+                      )}
+                    </p>
+                  )}
+              </div>
               {selectedItem && (
                 <Badge variant={severityBadgeVariants[selectedItem.severity]}>
                   {severityLabels[selectedItem.severity]}
@@ -268,16 +306,16 @@ export const AdvisorSidebar = () => {
             <div className="flex items-center justify-between gap-3 px-4">
               <Tabs_Shadcn_ value={advisorSnap.activeTab} onValueChange={handleTabChange}>
                 <TabsList_Shadcn_ className="border-b-0 gap-4">
-                  <TabsTrigger_Shadcn_ value="all" className="py-3">
+                  <TabsTrigger_Shadcn_ value="all" className="py-3 text-xs">
                     All
                   </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="security" className="py-3">
+                  <TabsTrigger_Shadcn_ value="security" className="py-3 text-xs">
                     Security
                   </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="performance" className="py-3">
+                  <TabsTrigger_Shadcn_ value="performance" className="py-3 text-xs">
                     Performance
                   </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="messages" className="py-3">
+                  <TabsTrigger_Shadcn_ value="messages" className="py-3 text-xs">
                     Messages
                   </TabsTrigger_Shadcn_>
                 </TabsList_Shadcn_>
@@ -320,7 +358,7 @@ export const AdvisorSidebar = () => {
                       <Button
                         key={item.id}
                         type="text"
-                        className="justify-start w-full block rounded-none h-auto py-3 px-4"
+                        className="justify-start w-full block rounded-none h-auto py-3 px-4 text-foreground-light hover:text-foreground"
                         onClick={() => advisorCenterState.selectItem(item.id)}
                       >
                         <div className="flex items-center justify-between gap-2">
@@ -371,15 +409,11 @@ const AdvisorDetail = ({ item, projectRef }: AdvisorDetailProps) => {
 
   return (
     <div className="flex h-full flex-col gap-4 px-6 py-6">
-      <div>
-        <h3 className="text-lg font-medium text-foreground">{data?.title ?? 'Message'}</h3>
-        <p className="text-xs text-foreground-light mt-1">
-          {notification.inserted_at
-            ? dayjs(notification.inserted_at).format('MMM D, YYYY HH:mm')
-            : null}
-        </p>
-      </div>
-      {data?.message && <Markdown content={data.message} className="text-sm text-foreground" />}
+      {data?.message && (
+        <div>
+          <Markdown content={data.message} className="text-sm text-foreground" />
+        </div>
+      )}
     </div>
   )
 }

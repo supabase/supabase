@@ -15,6 +15,7 @@ const initialState = {
   saveValue: '',
   templates: [] as Template[],
   initialPrompt: '',
+  selectedSnippetId: undefined as string | undefined,
   onSave: undefined as ((value: string, saveValue: string) => void) | undefined,
   onRunSuccess: undefined as ((value: any[]) => void) | undefined,
   onRunError: undefined as ((value: any) => void) | undefined,
@@ -34,6 +35,9 @@ export const editorPanelState = proxy({
   },
   setInitialPrompt(prompt: string) {
     editorPanelState.initialPrompt = prompt
+  },
+  setSelectedSnippetId(id: string | undefined) {
+    editorPanelState.selectedSnippetId = id
   },
   setHandlers({
     onSave,
@@ -56,16 +60,19 @@ export const editorPanelState = proxy({
     label,
     prompt,
     templates,
+    selectedSnippetId,
   }: {
     sql?: string
     label?: string
     prompt?: string
     templates?: Template[]
+    selectedSnippetId?: string
   }) {
     if (sql !== undefined) editorPanelState.initialValue = sql
     if (label !== undefined) editorPanelState.label = label
     if (prompt !== undefined) editorPanelState.initialPrompt = prompt
     if (templates !== undefined) editorPanelState.templates = templates
+    if (selectedSnippetId !== undefined) editorPanelState.selectedSnippetId = selectedSnippetId
   },
   reset() {
     Object.assign(editorPanelState, initialState)

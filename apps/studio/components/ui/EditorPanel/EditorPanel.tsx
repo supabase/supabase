@@ -46,6 +46,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { SQLSnippetSelector } from './SQLSnippetSelector'
 
 type Template = {
   name: string
@@ -107,6 +108,9 @@ export const EditorPanel = ({
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { data: org } = useSelectedOrganizationQuery()
+
+  const selectedSnippetId = editorStateSnap.selectedSnippetId
+  const currentSnippet = selectedSnippetId ? snapV2.snippets[selectedSnippetId]?.snippet : undefined
 
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)
@@ -199,9 +203,11 @@ export const EditorPanel = ({
   return (
     <div className="flex h-full flex-col bg-background">
       <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 py-3">
-        <div className="flex-1">
-          <h2 className="text-sm font-medium">SQL Editor</h2>
-          {label && <p className="text-xs text-foreground-light">{label}</p>}
+        <div className="flex-1 flex items-center gap-x-2">
+          <SQLSnippetSelector
+            currentSnippetName={currentSnippet?.name || 'SQL Editor'}
+            currentSnippetId={selectedSnippetId}
+          />
         </div>
         <div className="flex items-center">
           {templates.length > 0 && (
@@ -211,6 +217,7 @@ export const EditorPanel = ({
                   size="tiny"
                   type="default"
                   role="combobox"
+                  className="mr-2"
                   aria-expanded={isTemplatesOpen}
                   icon={<Book size={14} />}
                 >
@@ -275,6 +282,15 @@ export const EditorPanel = ({
             }}
             onClick={() => {
               if (!ref) return console.error('Project ref is required')
+
+              // If a snippet is selected, navigate to it
+              if (selectedSnippetId) {
+                router.push(`/project/${ref}/sql/${selectedSnippetId}`)
+                sidebarManagerState.closeSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+                return
+              }
+
+              // Otherwise create a new snippet with current SQL
               if (!project) return console.error('Project is required')
               if (!profile) return console.error('Profile is required')
 
