@@ -37,6 +37,40 @@ If you're using the OAuth flow (web, Flutter web, Kotlin non-iOS platforms), App
 
 </Admonition>
 
+<Admonition type="caution">
+
+**Important: Apple Does Not Provide Full Name in Identity Token**
+
+Apple's identity token does not include the user's full name in its claims. This means the Supabase Auth server cannot automatically populate the user's name metadata when users sign in with Apple.
+
+**Critical Apple Behavior:**
+- Apple only provides the user's full name during the **first sign-in attempt** (when the user initially authorizes your app)
+- All subsequent sign-ins return `null` for the full name fields
+- The full name must be captured from Apple's native authentication response and manually saved using the `updateUser` method
+
+**Recommended Approach:**
+After a successful Sign in with Apple, check if the full name is available in the authentication response, and if so, use the `updateUser` method to save it to the user's metadata:
+
+```typescript
+// Example: Handling full name after successful sign in
+if (credential.fullName) {
+  // Full name is only provided on first sign-in
+  await supabase.auth.updateUser({
+    data: {
+      full_name: `${credential.fullName.givenName} ${credential.fullName.familyName}`,
+      given_name: credential.fullName.givenName,
+      family_name: credential.fullName.familyName,
+    }
+  })
+}
+```
+
+**Note**: If a user revokes your app's access and then re-authorizes it, Apple will provide the full name again as if it were a first sign-in.
+
+The platform-specific examples below demonstrate how to implement this pattern for each SDK.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="large"
@@ -67,6 +101,19 @@ If you're using the OAuth flow (web, Flutter web, Kotlin non-iOS platforms), App
     ```
 
     This call takes the user to Apple's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
+
+    <Admonition type="note">
+
+    **Full Name Not Available in OAuth Flow**
+
+    When using the OAuth flow, the user's full name is not accessible from Apple's response. Apple only provides the full name through native authentication methods (Sign in with Apple JS, or native iOS/macOS SDKs) during the first sign-in.
+
+    If you need to collect user names, consider:
+    - Using Sign in with Apple JS instead (see below)
+    - Collecting the name through a separate onboarding form
+    - Using a profiles table to store user information
+
+    </Admonition>
 
     <$Partial path="oauth_pkce_flow.mdx" />
 
@@ -122,11 +169,34 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
         const data = await AppleID.auth.signIn()
 
-        await supabase.auth.signInWithIdToken({
+        const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: data.id_token,
           nonce: nonce,
         })
+
+        if (error) {
+          throw error
+        }
+
+        // Apple only provides the user's name on the first sign-in
+        // The user object contains name information from Apple's response
+        if (data.user && data.user.name) {
+          const fullName = [
+            data.user.name.firstName,
+            data.user.name.middleName,
+            data.user.name.lastName
+          ].filter(Boolean).join(' ')
+
+          // Save the name to user metadata for future use
+          await supabase.auth.updateUser({
+            data: {
+              full_name: fullName,
+              given_name: data.user.name.firstName,
+              family_name: data.user.name.lastName,
+            }
+          })
+        }
       } catch (error) {
         console.error('Apple sign in failed:', error)
         // Handle sign-in errors appropriately
@@ -152,11 +222,33 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     // Listen for authorization success
     document.addEventListener('AppleIDSignInOnSuccess', async (event) => {
       try {
-        await supabase.auth.signInWithIdToken({
+        const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
-          token: event.data.id_token,
+          token: event.detail.authorization.id_token,
           nonce: nonce,
         })
+
+        if (error) {
+          throw error
+        }
+
+        // Apple only provides the user's name on the first sign-in
+        if (event.detail.user && event.detail.user.name) {
+          const fullName = [
+            event.detail.user.name.firstName,
+            event.detail.user.name.middleName,
+            event.detail.user.name.lastName
+          ].filter(Boolean).join(' ')
+
+          // Save the name to user metadata for future use
+          await supabase.auth.updateUser({
+            data: {
+              full_name: fullName,
+              given_name: event.detail.user.name.firstName,
+              family_name: event.detail.user.name.lastName,
+            }
+          })
+        }
       } catch (error) {
         console.error('Apple sign in failed:', error)
       }
@@ -222,6 +314,24 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
                   })
                   console.log(JSON.stringify({ error, user }, null, 2))
                   if (!error) {
+                    // Apple only provides the user's full name on the first sign-in
+                    // Save it to user metadata if available
+                    if (credential.fullName) {
+                      const nameParts = []
+                      if (credential.fullName.givenName) nameParts.push(credential.fullName.givenName)
+                      if (credential.fullName.middleName) nameParts.push(credential.fullName.middleName)
+                      if (credential.fullName.familyName) nameParts.push(credential.fullName.familyName)
+
+                      const fullName = nameParts.join(' ')
+
+                      await supabase.auth.updateUser({
+                        data: {
+                          full_name: fullName,
+                          given_name: credential.fullName.givenName,
+                          family_name: credential.fullName.familyName,
+                        }
+                      })
+                    }
                     // User is signed in.
                   }
                 } else {
@@ -339,11 +449,33 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
             'Could not find ID Token from generated credential.');
       }
 
-      return supabase.auth.signInWithIdToken(
+      final authResponse = await supabase.auth.signInWithIdToken(
         provider: OAuthProvider.apple,
         idToken: idToken,
         nonce: rawNonce,
       );
+
+      // Apple only provides the user's full name on the first sign-in
+      // Save it to user metadata if available
+      if (credential.givenName != null || credential.familyName != null) {
+        final nameParts = <String>[];
+        if (credential.givenName != null) nameParts.add(credential.givenName!);
+        if (credential.familyName != null) nameParts.add(credential.familyName!);
+
+        final fullName = nameParts.join(' ');
+
+        await supabase.auth.updateUser(
+          UserAttributes(
+            data: {
+              'full_name': fullName,
+              'given_name': credential.givenName,
+              'family_name': credential.familyName,
+            },
+          ),
+        );
+      }
+
+      return authResponse;
     }
     ```
 
@@ -429,12 +561,41 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
                 else {
                   return
                 }
-                  try await client.auth.signInWithIdToken(
+
+                try await client.auth.signInWithIdToken(
                   credentials: .init(
                     provider: .apple,
                     idToken: idToken
                   )
                 )
+
+                // Apple only provides the user's full name on the first sign-in
+                // Save it to user metadata if available
+                if let fullName = credential.fullName {
+                  var nameParts: [String] = []
+                  if let givenName = fullName.givenName {
+                    nameParts.append(givenName)
+                  }
+                  if let middleName = fullName.middleName {
+                    nameParts.append(middleName)
+                  }
+                  if let familyName = fullName.familyName {
+                    nameParts.append(familyName)
+                  }
+
+                  let fullNameString = nameParts.joined(separator: " ")
+
+                  try await client.auth.update(
+                    user: UserAttributes(
+                      data: [
+                        "full_name": .string(fullNameString),
+                        "given_name": .string(fullName.givenName ?? ""),
+                        "family_name": .string(fullName.familyName ?? "")
+                      ]
+                    )
+                  )
+                }
+
                 // User successfully signed in
                 print("Sign in with Apple successful!")
               } catch {
@@ -505,9 +666,37 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     				println("Network error during Apple sign in: ${result.error}")
     				// Show network error to user
     			}
-    			NativeSignInResult.Success -> {
+    			is NativeSignInResult.Success -> {
     				// User successfully signed in
     				println("Apple sign in successful!")
+
+    				// Apple only provides the user's full name on the first sign-in (iOS only)
+    				// Save it to user metadata if available
+    				result.data?.let { appleData ->
+    					appleData.fullName?.let { fullName ->
+    						val nameParts = mutableListOf<String>()
+    						fullName.givenName?.let { nameParts.add(it) }
+    						fullName.middleName?.let { nameParts.add(it) }
+    						fullName.familyName?.let { nameParts.add(it) }
+
+    						val fullNameString = nameParts.joinToString(" ")
+
+    						scope.launch {
+    							try {
+    								supabaseClient.auth.updateUser {
+    									data = buildJsonObject {
+    										put("full_name", fullNameString)
+    										fullName.givenName?.let { put("given_name", it) }
+    										fullName.familyName?.let { put("family_name", it) }
+    									}
+    								}
+    							} catch (e: Exception) {
+    								println("Failed to update user metadata: ${e.message}")
+    							}
+    						}
+    					}
+    				}
+
     				// Navigate to home screen or update UI
     			}
     		}
