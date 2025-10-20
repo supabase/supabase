@@ -14,7 +14,7 @@ import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { DOCS_URL } from 'lib/constants'
 import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { DestinationPanel } from './DestinationPanel'
+import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { EnableReplicationModal } from './EnableReplicationModal'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
@@ -153,13 +153,21 @@ export const Destinations = () => {
               const pipeline = pipelinesData?.pipelines.find(
                 (p) => p.destination_id === destination.id
               )
+
+              const type =
+                'big_query' in destination.config
+                  ? 'BigQuery'
+                  : 'iceberg' in destination.config
+                    ? 'Analytics Bucket'
+                    : 'Other'
+
               return (
                 <DestinationRow
                   key={destination.id}
                   sourceId={sourceId}
                   destinationId={destination.id}
                   destinationName={destination.name}
-                  type={'big_query' in destination.config ? 'BigQuery' : 'Other'}
+                  type={type}
                   pipeline={pipeline}
                   error={pipelinesError}
                   isLoading={isPipelinesLoading}

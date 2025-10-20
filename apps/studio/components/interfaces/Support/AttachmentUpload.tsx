@@ -21,8 +21,6 @@ import { createSupportStorageClient } from './support-storage-client'
 const MAX_ATTACHMENTS = 5
 
 const uploadAttachments = async ({ userId, files }: { userId: string; files: File[] }) => {
-  if (files.length === 0) return []
-
   const supportSupabaseClient = createSupportStorageClient()
 
   const filesToUpload = Array.from(files)
@@ -104,11 +102,13 @@ export function useAttachmentUpload() {
       return []
     }
 
+    if (uploadedFiles.length === 0) return
+
     const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
-    const urls = await generateAttachmentURLs({ filenames })
+    const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
     return urls
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedFiles])
+  }, [profile, uploadedFiles])
 
   return useMemo(
     () => ({

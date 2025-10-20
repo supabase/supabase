@@ -11,7 +11,7 @@ import {
   NO_PROJECT_MARKER,
   type SupportFormUrlKeys,
   loadSupportFormInitialParams,
-  selectInitalOrgAndProject,
+  selectInitialOrgAndProject,
 } from './SupportForm.utils'
 
 const supportFormDefaultValues: DefaultValues<SupportFormValues> = {
@@ -88,7 +88,7 @@ export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSuppo
         ? urlParamsRef.current.projectRef
         : null
 
-    selectInitalOrgAndProject({
+    selectInitialOrgAndProject({
       projectRef: projectRefFromUrl,
       orgSlug: orgSlugFromUrl,
       orgs: organizations ?? [],

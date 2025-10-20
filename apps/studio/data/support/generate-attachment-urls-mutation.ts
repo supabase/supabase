@@ -12,16 +12,22 @@ export type GenerateAttachmentURLsResponse = {
 
 export type GenerateAttachmentURLsVariables = {
   filenames: string[]
+  bucket?: 'support-attachments' | 'feedback-attachments'
 }
 
-export async function generateAttachmentURLs({ filenames }: GenerateAttachmentURLsVariables) {
+export async function generateAttachmentURLs({
+  bucket,
+  filenames,
+}: GenerateAttachmentURLsVariables) {
   const headers = await constructHeaders()
+
+  const body = bucket ? JSON.stringify({ filenames, bucket }) : JSON.stringify({ filenames })
 
   try {
     const response = await fetch(`${BASE_PATH}/api/generate-attachment-url`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ filenames }),
+      body,
     })
 
     if (!response.ok) {

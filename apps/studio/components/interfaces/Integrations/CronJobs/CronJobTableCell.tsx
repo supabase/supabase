@@ -149,17 +149,25 @@ export const CronJobTableCell = ({
               onClick={(e) => e.stopPropagation()}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-42">
-            <DropdownMenuItem
-              className="gap-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                onRunCronJob()
-              }}
-            >
-              <Play size={12} />
-              Run command
-            </DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-60 space-y-1">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onRunCronJob()
+                  }}
+                >
+                  <Play size={12} />
+                  Run command
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              <TooltipContent>
+                Manual runs execute the command immediately and will not appear in the cron jobs
+                table.
+              </TooltipContent>
+            </Tooltip>
             <DropdownMenuItem
               className="gap-x-2"
               onClick={(e) => {
