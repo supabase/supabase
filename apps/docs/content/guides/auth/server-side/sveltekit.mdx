@@ -383,6 +383,8 @@ Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your das
 
 Next, create a login page to let users sign up and log in.
 
+Add an OAuth option by posting to a server action that calls `supabase.auth.signInWithOAuth`. The action returns the provider redirect URL in `data.url`, so forward the browser to that URL.
+
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
@@ -390,6 +392,7 @@ Next, create a login page to let users sign up and log in.
 <$CodeTabs>
 
 ```ts name=src/routes/auth/+page.server.ts
+import type { Provider } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
 import type { Actions } from './$types'
@@ -421,6 +424,38 @@ export const actions: Actions = {
       redirect(303, '/private')
     }
   },
+  oauth: async ({ request, locals: { supabase }, url }) => {
+    const formData = await request.formData()
+    const provider = formData.get('provider')
+    const next = formData.get('next')
+
+    if (typeof provider !== 'string') {
+      redirect(303, '/auth/error')
+    }
+
+    const redirectTo = new URL('/auth/callback', url.origin)
+    if (typeof next === 'string' && next.startsWith('/')) {
+      redirectTo.searchParams.set('next', next)
+    }
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider as Provider,
+      options: {
+        redirectTo: redirectTo.toString(),
+      },
+    })
+
+    if (error) {
+      console.error(error)
+      redirect(303, '/auth/error')
+    }
+
+    if (data?.url) {
+      redirect(303, data.url)
+    }
+
+    redirect(303, '/auth/error')
+  },
 }
 ```
 
@@ -436,6 +471,12 @@ export const actions: Actions = {
   </label>
   <button>Login</button>
   <button formaction="?/signup">Sign up</button>
+</form>
+
+<form method="POST" action="?/oauth">
+  <input type="hidden" name="provider" value="github" />
+  <input type="hidden" name="next" value="/private" />
+  <button type="submit">Continue with GitHub</button>
 </form>
 ```
 
@@ -461,9 +502,54 @@ export const actions: Actions = {
 
 </StepHikeCompact.Code>
 
+<Admonition type="note">
+
+Update the hidden `provider` field to match the provider you've enabled (for example `github`, `google`, or `azure`). Adjust the `next` value to control where users land after signing in.
+
+</Admonition>
+
 </StepHikeCompact.Step>
 
 <StepHikeCompact.Step step={10}>
+
+<StepHikeCompact.Details title="Create the OAuth callback route">
+
+Handle the redirect from your OAuth provider by exchanging the authorization code for a session. Add the callback URL to your project's redirect allow list.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+<$CodeTabs>
+
+```ts name=src/routes/auth/callback/+server.ts
+import { redirect } from '@sveltejs/kit'
+
+import type { RequestHandler } from './$types'
+
+export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
+  const code = url.searchParams.get('code')
+  const next = url.searchParams.get('next') ?? '/'
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      const safeNext = next.startsWith('/') ? next : '/'
+      redirect(303, safeNext)
+    }
+  }
+
+  redirect(303, '/auth/error')
+}
+```
+
+</$CodeTabs>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={11}>
 
 <StepHikeCompact.Details title="Create the signup confirmation route">
 
@@ -515,7 +601,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 
 </StepHikeCompact.Step>
 
-<StepHikeCompact.Step step={11}>
+<StepHikeCompact.Step step={12}>
 
 <StepHikeCompact.Details title="Create private routes">
 
