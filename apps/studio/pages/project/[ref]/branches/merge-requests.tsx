@@ -258,7 +258,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                               rowLink={rowLink}
                               external={isPR}
                               rowActions={
-                                !isPR && (
+                                branch.review_requested_at && (
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button
