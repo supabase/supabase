@@ -15,6 +15,7 @@ import {
   type DocsSearchResultSection as PageSection,
 } from 'common'
 import { getProjectDetail } from 'data/projects/project-detail-query'
+import dayjs from 'dayjs'
 import { DOCS_URL } from 'lib/constants'
 import type { Organization } from 'types'
 import { CATEGORY_OPTIONS } from './Support.constants'
@@ -31,12 +32,15 @@ export const formatMessage = ({
   message: string
   attachments?: string[]
   error: string | null | undefined
-  commit: string | undefined
+  commit: { commitSha: string; commitTime: string } | undefined
 }) => {
   const errorString = error != null ? `\n\nError: ${error}` : ''
   const attachmentsString =
     attachments.length > 0 ? `\n\nAttachments:\n${attachments.join('\n')}` : ''
-  const commitString = commit != undefined ? `\n\n---\nSupabase Studio version:  SHA ${commit}` : ''
+  const commitString =
+    commit != undefined
+      ? `\n\n---\nSupabase Studio version: SHA ${commit.commitSha} deployed at ${commit.commitTime === 'unknown' ? 'unknown time' : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
+      : ''
   return `${message}${errorString}${attachmentsString}${commitString}`
 }
 
