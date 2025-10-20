@@ -115,12 +115,62 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
+async function debuggableNavigatorLock<R>(
+  name: string,
+  acquireTimeout: number,
+  fn: () => Promise<R>
+): Promise<R> {
+  let stack: any = null
+
+  if ('captureStackTrace' in Error) {
+    const result: any = {}
+    Error.captureStackTrace(result)
+    stack = result.stack
+  }
+
+  const debugTimeout = setTimeout(() => {
+    ;(async () => {
+      const bc = new BroadcastChannel('who-is-holding-the-lock')
+      try {
+        bc.postMessage({})
+      } finally {
+        bc.close()
+      }
+
+      console.error(
+        `Waited for over 2s to acquire an Auth client lock`,
+        await navigator.locks.query(),
+        stack
+      )
+    })()
+  }, 2000)
+
+  try {
+    return await navigatorLock(name, acquireTimeout, async () => {
+      clearTimeout(debugTimeout)
+
+      const bc = new BroadcastChannel('who-is-holding-the-lock')
+      bc.addEventListener('message', () => {
+        console.error('I am holding the lock', stack)
+      })
+
+      try {
+        return await fn()
+      } finally {
+        bc.close()
+      }
+    })
+  } finally {
+    clearTimeout(debugTimeout)
+  }
+}
+
 export const gotrueClient = new AuthClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: shouldDetectSessionInUrl,
   debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
-  lock: navigatorLockEnabled ? navigatorLock : undefined,
+  lock: navigatorLockEnabled ? debuggableNavigatorLock : undefined,
 
   ...('localStorage' in globalThis
     ? { storage: globalThis.localStorage, userStorage: globalThis.localStorage }
