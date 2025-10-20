@@ -258,6 +258,139 @@ function App() {
 
 </Tabs>
 
+## Integrate with RainbowKit
+
+[RainbowKit](https://www.rainbowkit.com/) offers a polished wallet selector and session UX that slots neatly into Supabase’s Sign in with Web3 flow. The steps below assume a Next.js app, but the same approach works for any React environment.
+
+### Prerequisites
+
+- Supabase project with the Web3 wallet provider enabled and redirect URLs configured
+- A Next.js (or React) project using Wagmi v2 and Viem v2+
+- Packages installed:
+
+  ```bash
+  npm install @rainbow-me/rainbowkit wagmi viem@2.x @tanstack/react-query @supabase/supabase-js
+  ```
+
+### 1. Configure RainbowKit & Wagmi
+
+Create or update `lib/wagmi/config.ts`:
+
+```typescript
+// filepath: lib/wagmi/config.ts
+import { getDefaultConfig } from '@rainbow-me/rainbowkit'
+import { http } from 'wagmi'
+import { mainnet, sepolia } from 'wagmi/chains'
+
+export const config = getDefaultConfig({
+  appName: 'My RainbowKit App',
+  projectId: 'YOUR_PROJECT_ID',
+  chains: [mainnet, sepolia],
+  transports: {
+    [mainnet.id]: http('https://eth-mainnet.g.alchemy.com/v2/...'),
+    [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/...'),
+  },
+})
+```
+
+### 2. Build a SIWE adapter
+
+RainbowKit needs an adapter that can fetch a nonce, craft the SIWE payload, and verify signatures. Supabase handles the verification:
+
+```typescript
+// filepath: lib/siwe/siweAdapter.ts
+import { createClient } from '@/lib/supabase/client'
+import { createAuthenticationAdapter } from '@rainbow-me/rainbowkit'
+import { createSiweMessage } from 'viem/siwe'
+import type { Hex } from 'viem'
+
+export function createSiweAdapter() {
+  return createAuthenticationAdapter({
+    getNonce: async () => crypto.randomUUID(),
+
+    createMessage: ({ nonce, address, chainId }) =>
+      createSiweMessage({
+        domain: window.location.host,
+        address,
+        statement: 'Sign in with your Ethereum wallet. Accept terms: https://yourapp.com/terms',
+        uri: window.location.origin,
+        version: '1',
+        chainId,
+        nonce,
+        issuedAt: new Date(),
+        expirationTime: new Date(Date.now() + 5 * 60 * 1000),
+      }),
+
+    verify: async ({ message, signature }) => {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithWeb3({
+        chain: 'ethereum',
+        message,
+        signature: signature as Hex,
+      })
+      return !error
+    },
+
+    signOut: async () => {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+    },
+  })
+}
+```
+
+### 3. Wrap the application with providers
+
+Centralize providers in `components/Providers.tsx` (or equivalent):
+
+```tsx
+// filepath: components/Providers.tsx
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  RainbowKitAuthenticationProvider,
+  RainbowKitProvider,
+  type AuthenticationStatus,
+} from '@rainbow-me/rainbowkit'
+import { WagmiProvider } from 'wagmi'
+import { config } from '@/lib/wagmi/config'
+import { createSiweAdapter } from '@/lib/siwe/siweAdapter'
+import { createClient } from '@/lib/supabase/client'
+
+import '@rainbow-me/rainbowkit/styles.css'
+
+const queryClient = new QueryClient()
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [authStatus, setAuthStatus] = useState<AuthenticationStatus>('loading')
+  const siweAdapter = useMemo(() => createSiweAdapter(), [])
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setAuthStatus(session ? 'authenticated' : 'unauthenticated')
+    }
+
+    checkAuth()
+  }, [])
+
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitAuthenticationProvider adapter={siweAdapter} status={authStatus}>
+          <RainbowKitProvider>{children}</RainbowKitProvider>
+        </RainbowKitAuthenticationProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  )
+}
+```
+
 ## Frequently asked questions
 
 ### How to associate an email address, phone number or social login to a user signing in with Web3?
