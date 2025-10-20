@@ -221,7 +221,7 @@ export const getReportAttributesV2: (
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
-          attribute: 'total_db_connections',
+          attribute: 'pg_stat_database_num_backends',
           provider: 'infra-monitoring',
           label: 'Total connections',
           tooltip: 'Total number of active database connections',
