@@ -1217,7 +1217,7 @@ data = client.from_('books').select().text_search('description', "'big' & !'litt
 
 ## Ranking search results [#ranking]
 
-Postgres provides ranking functions to sort search results by relevance, helping you present the most relevant matches first. Since ranking functions need to be computed server-side, we'll use RPC functions and generated columns.
+Postgres provides ranking functions to sort search results by relevance, helping you present the most relevant matches first. Since ranking functions need to be computed server-side, use RPC functions and generated columns.
 
 ### Creating a search function with ranking [#search-function-ranking]
 
