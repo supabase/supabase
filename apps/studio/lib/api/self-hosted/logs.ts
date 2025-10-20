@@ -100,12 +100,9 @@ export function getLogQuery(service: LogsService, limit: number = 100): string {
       `
     }
     case 'edge-function': {
-      // TODO(matt): https://supabase.slack.com/archives/C07E5GFAHTM/p1759936744013179
       return stripIndent`
-        select id, function_edge_logs.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from function_edge_logs
-        cross join unnest(metadata) as m
-        cross join unnest(m.response) as response
-        cross join unnest(m.request) as request
+        select id, function_edge_logs.timestamp, event_message
+        from function_edge_logs
         order by timestamp desc
         limit ${limit}
       `
