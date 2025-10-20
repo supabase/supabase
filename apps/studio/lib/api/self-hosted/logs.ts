@@ -57,7 +57,7 @@ export async function retrieveAnalyticsData({
 
     if (!response.ok) {
       const error = new Error(
-        result?.error?.message || `Failed to retrieve analytics data: ${response.statusText}`
+        result?.error?.message ?? `Failed to retrieve analytics data: ${response.statusText}`
       )
       return { data: undefined, error }
     }
