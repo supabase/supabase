@@ -826,7 +826,7 @@ where to_tsvector(description || ' ' || title) @@
 
 ## Creating indexes
 
-Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents preemptively so that they
+Now that you have Full Text Search working, create an `index`. This allows Postgres to "build" the documents preemptively so that they
 don't need to be created at the time we execute the query. This will make our queries much faster.
 
 ### Searchable columns
