@@ -22,6 +22,7 @@ export const enrichQuery = (query: string) => `
 ${query}
 `
 
+// Pulled from https://github.com/supabase/splinter/blob/main/splinter.sql
 const LINT_SQL = /* SQL */ `set local search_path = '';
 
 (
